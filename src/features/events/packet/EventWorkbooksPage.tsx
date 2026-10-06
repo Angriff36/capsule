@@ -43,21 +43,21 @@ export function EventWorkbooksPage() {
         title="Event Workbooks"
         lead={
           summaries
-            ? "Source evidence, open issues, and printable packets across every event — counts as of the last import or decision"
-            : "Source evidence, open issues, and printable packets across every event"
+            ? "Each event's files from the old system, what still needs fixing, and packets to print. Counts are from the last import or decision."
+            : "Each event's files from the old system, what still needs fixing, and packets to print."
         }
         facts={
           summaries
             ? [
                 { label: "Workbooks", value: totals.events },
-                { label: "Open blocking", value: totals.openBlocking },
+                { label: "Must fix first", value: totals.openBlocking },
                 { label: "Ready", value: totals.ready },
               ]
             : undefined
         }
         actions={
           <Link to={eventImportPath()} className="btn btn-primary">
-            Import event sources
+            Import event files
           </Link>
         }
       />
@@ -111,7 +111,7 @@ export function EventWorkbooksPage() {
             }
             action={
               <Link to={eventImportPath()} className="btn btn-primary">
-                Import event sources
+                Import event files
               </Link>
             }
           />

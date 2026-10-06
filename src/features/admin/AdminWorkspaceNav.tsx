@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { useActiveNavLinkInView } from "../../lib/useActiveNavLinkInView";
 
 const sections = [
   { label: "Permissions", path: "/admin" },
@@ -11,14 +12,20 @@ const sections = [
   { label: "Data exports", path: "/admin/data-export" },
   { label: "Integrations", path: "/admin/integrations" },
   { label: "Imports", path: "/admin/imports" },
-  { label: "Compare with TPP", path: "/admin/parallel-run" },
+  { label: "Compare events with TPP", path: "/admin/parallel-run" },
+  { label: "Compare payments with TPP", path: "/finance/money-check" },
   { label: "Match leftover items", path: "/admin/reconcile" },
   { label: "Switch from TPP", path: "/admin/cutover" },
 ] as const;
 
 export function AdminWorkspaceNav() {
+  const navRef = useActiveNavLinkInView<HTMLElement>();
   return (
-    <nav className="kitchen-book-nav" aria-label="Administration workspace">
+    <nav
+      className="kitchen-book-nav"
+      ref={navRef}
+      aria-label="Administration workspace"
+    >
       {sections.map((section) => (
         <NavLink
           key={section.path}

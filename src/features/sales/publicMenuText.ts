@@ -45,6 +45,61 @@ export function seasonText(
   return null;
 }
 
+// "1:12 server ratio" in the menu book; null when the menu states none.
+export function serverRatioText(guestsPerServer: number | null): string | null {
+  if (guestsPerServer == null || guestsPerServer < 1) return null;
+  return `One server for every ${guestsPerServer} guests`;
+}
+
+/** True when each guest picks one dish from this course. */
+export function isPickOneCourse(
+  course: string | null,
+  pickOneCourses: readonly string[],
+): boolean {
+  const key = course?.trim().toLowerCase();
+  return (
+    Boolean(key) && pickOneCourses.some((c) => c.trim().toLowerCase() === key)
+  );
+}
+
+// The menu book's short diet marks (V, VG, GF, DF, NF) with their key words.
+// Dish diet tags are typed by hand, so "Gluten free", "gluten-free" and "GF"
+// all read as GF. A tag outside this list stays a word on the dish.
+export const DIET_MARKS = [
+  { mark: "V", label: "Vegetarian", names: ["v", "vegetarian", "veg"] },
+  { mark: "VG", label: "Vegan", names: ["vg", "vegan"] },
+  { mark: "GF", label: "Gluten free", names: ["gf", "glutenfree"] },
+  { mark: "DF", label: "Dairy free", names: ["df", "dairyfree"] },
+  { mark: "NF", label: "Nut free", names: ["nf", "nutfree"] },
+] as const;
+
+export type DietMark = (typeof DIET_MARKS)[number];
+
+export function dietMark(tag: string): DietMark | null {
+  const key = tag.toLowerCase().replace(/[^a-z]/g, "");
+  return DIET_MARKS.find((entry) => entry.names.some((n) => n === key)) ?? null;
+}
+
+/**
+ * Dishes under their course headings, in menu order: a course starts where
+ * its first dish sits. Dishes with no course come first, with no heading.
+ */
+export function courseGroups<T extends { course: string | null }>(
+  dishes: T[],
+): { course: string | null; dishes: T[] }[] {
+  const groups: { course: string | null; dishes: T[] }[] = [];
+  for (const dish of dishes) {
+    const course = dish.course?.trim() || null;
+    const group = groups.find(
+      (g) => g.course?.toLowerCase() === course?.toLowerCase(),
+    );
+    if (group) group.dishes.push(dish);
+    else if (course === null) groups.unshift({ course, dishes: [dish] });
+    else groups.push({ course, dishes: [dish] });
+  }
+  return groups;
+}
+
 // Allergen codes are stored lowercase ("tree_nuts"); show them as words.
 export function allergenText(code: string): string {
   const words = code.replace(/_/g, " ");

@@ -105,7 +105,7 @@ export function EventImportPreviewPanel({ bundle, plan, recognized }: Props) {
         </ul>
       ) : null}
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div>
           <h3 className="mb-1 text-sm font-semibold text-ink">Menu</h3>
           {bundle.menu.length === 0 ? (

@@ -2,6 +2,7 @@ import type { Doc } from "../../lib/api";
 import { formatDate, formatMoney } from "../../lib/format";
 import { isBelowReorder, stockLineLink } from "../inventory/stockLevels";
 import { findRosterConflicts } from "../workforce/rosterConflicts";
+import { dateKeyToMs, openedDates } from "../sales/dateHolds";
 
 /**
  * Client-derived notifications. Capsule reads are live Convex queries, so
@@ -24,7 +25,9 @@ export interface AppNotification {
     | "staff_message"
     | "mention"
     | "prep_task_comment"
-    | "system_health";
+    | "system_health"
+    | "date_opened"
+    | "review_flag";
   message: string;
   /** Route to the relevant record. */
   link: string;
@@ -46,6 +49,8 @@ export const NOTIFICATION_KIND_LABELS: Record<AppNotification["kind"], string> =
     mention: "Mention",
     prep_task_comment: "Prep note",
     system_health: "System health",
+    date_opened: "Date open",
+    review_flag: "Question",
   };
 
 /** Stage changes older than this are history, not notifications. */
@@ -93,6 +98,12 @@ export interface NotificationSources {
   mentionEventTitles?: Record<string, string>;
   /** Titles of events named by incidents / double bookings but not in `events`. */
   eventTitles?: Record<string, string>;
+  dateHolds?: Doc<"dateHolds">[] | undefined;
+  dateWaitlistEntries?: Doc<"dateWaitlistEntries">[] | undefined;
+  /** Names of the clients waiting first for an opened date. */
+  clientNames?: Record<string, string>;
+  /** Open flags and crew questions on events. */
+  reviewFlags?: Doc<"reviewFlags">[] | undefined;
 }
 
 /** Staff messages are retained for 90 days; older ones drop out of the UI. */
@@ -423,6 +434,53 @@ export function deriveNotifications(
       message: conflict.message,
       link: "/staff/roster",
       at: conflict.startsAt,
+    });
+  }
+
+  // A held date opened (released or lapsed): prompt sales to call the next
+  // client on that date's waitlist.
+  for (const { dateKey, openedAt, next } of openedDates(
+    src.dateHolds,
+    src.dateWaitlistEntries,
+    now,
+  )) {
+    const who =
+      (next.clientId && src.clientNames?.[next.clientId]) ||
+      next.note ||
+      "A prospect";
+    out.push({
+      id: `date-opened:${dateKey}:${next._id}`,
+      kind: "date_opened",
+      message: `${formatDate(dateKeyToMs(dateKey))} is open again — ${who} is next on the waitlist`,
+      link: "/clients/date-holds",
+      at: openedAt,
+    });
+  }
+
+  // An open flag or question tells everyone who can act on it, except the
+  // person who raised it, until someone settles it.
+  for (const flag of src.reviewFlags ?? []) {
+    if (
+      flag.deletedAt != null ||
+      flag.status !== "open" ||
+      flag.raisedAt == null ||
+      (flag.raisedById != null && flag.raisedById === src.currentAuthSubjectId)
+    ) {
+      continue;
+    }
+    const eventId = String(flag.eventId);
+    const title =
+      src.events?.find((event) => String(event._id) === eventId)?.title ??
+      src.eventTitles?.[eventId] ??
+      "an event";
+    const what = flag.targetLabel?.trim();
+    const question = flag.question?.trim();
+    out.push({
+      id: `review-flag:${flag._id}`,
+      kind: "review_flag",
+      message: `Question on ${title}${what ? ` (${what})` : ""}${question ? `: ${question}` : ""}`,
+      link: `/events/${eventId}`,
+      at: flag.raisedAt,
     });
   }
 

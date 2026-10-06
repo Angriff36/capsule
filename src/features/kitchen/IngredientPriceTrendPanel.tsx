@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { formatDate, formatMoneyExact } from "../../lib/format";
+import { formatQuantity, formatDate, formatMoneyExact } from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
 import {
   observationTime,
@@ -157,7 +157,8 @@ export function IngredientPriceTrendPanel({
                         "Unavailable vendor"}
                     </td>
                     <td>
-                      {observation.receiptQuantity} {observation.unit}
+                      {formatQuantity(observation.receiptQuantity)}{" "}
+                      {observation.unit}
                     </td>
                     <td>
                       <strong>

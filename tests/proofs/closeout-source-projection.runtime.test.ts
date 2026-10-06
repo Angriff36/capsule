@@ -190,6 +190,88 @@ describe("closeout numbers come from Capsule's records (AC-625, AC-628, AC-386)"
     expect(entered).toEqual(["headcount", "ingredient", "labor", "revenue"]);
   });
 
+  it("takes the guest count and leftovers from the signed food waste form", async () => {
+    const proof = harness();
+    const { finance } = rolesFor(proof, T);
+    const { eventId } = await closedOutEvent(proof, T, "Food waste", {
+      sendInvoice: false,
+    });
+    const muda = (attendance: number) =>
+      JSON.stringify({
+        kind: "muda",
+        muda: {
+          attendance,
+          staffError: false,
+          staffErrorNote: "",
+          appetizersUsed: false,
+          appetizerStyles: [],
+          mainsHandling: "to_kitchen",
+          leftovers: [{ item: "Pulled Pork", kind: "main", amount: 6 }],
+        },
+      });
+    const formIds = (await finance.run(async (ctx) => {
+      const db = ctx.db as any;
+      const form = {
+        tenantId: T,
+        version: 3,
+        eventId,
+        formKey: "field.muda",
+        label: "Food waste count",
+        needsTwoPeople: false,
+        evidence: "note",
+      };
+      return {
+        done: await db.insert("fieldConfirmations", {
+          ...form,
+          status: "done",
+          completedAt: 1000,
+          answers: muda(33),
+        }),
+        // Not signed yet: never counts.
+        open: await db.insert("fieldConfirmations", {
+          ...form,
+          status: "open",
+          answers: muda(99),
+        }),
+      };
+    })) as { done: string; open: string };
+
+    const { lines } = (await readSources(finance, eventId))!.projection;
+    expect(line(lines, "headcount")).toMatchObject({
+      actual: 33,
+      complete: true,
+      note: "Counted on the food waste form",
+    });
+    expect(line(lines, "headcount").sources).toEqual([
+      expect.objectContaining({
+        table: "fieldConfirmations",
+        id: formIds.done,
+      }),
+    ]);
+    expect(line(lines, "waste").actual).toBe(0);
+    expect(line(lines, "waste").sources).toEqual([
+      expect.objectContaining({
+        table: "fieldConfirmations",
+        id: formIds.done,
+        amount: 0,
+        label: "Left over: Pulled Pork 6 lb · brought to kitchen",
+      }),
+    ]);
+
+    await proof.executeCommand(
+      finance,
+      api.closeoutSources.captureCloseoutFromSources,
+      {
+        eventId,
+        entered: { revenue: 4000, ingredient: 700, labor: 600 },
+      } as never,
+    );
+    expect(await closeoutRow(finance, eventId)).toMatchObject({
+      actualHeadcount: 33,
+      actualWasteCost: 0,
+    });
+  });
+
   it("gives the numbers only to finance and event managers of the same company", async () => {
     const proof = harness();
     const { eventId, invoiceId } = await closedOutEvent(proof, T, "Access");

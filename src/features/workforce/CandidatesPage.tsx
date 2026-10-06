@@ -25,7 +25,9 @@ import { CandidateRevokeHireControl } from "./CandidateRevokeHireControl";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { SearchSelect } from "../../ui/SearchSelect";
 
+import "./TrainingPage.css";
 // ponytail: a focused set of hireable operational roles for the create-form
 // picker. roleAppliedFor is a free CapsuleRole, so a KM-sourced value outside
 // this list still lands correctly (stored verbatim by the ingest seam).
@@ -393,6 +395,7 @@ export function CandidatesPage() {
         </div>
         <textarea
           className="input"
+          aria-label="KM export to import"
           rows={4}
           placeholder='Paste KM export JSON, e.g. { "Candidates": [{ "CandidateId": "KM-1", "FullName": "Jane Doe", "Stage": "interview", "Interviews": [] }] }'
           value={kmJson}
@@ -495,10 +498,12 @@ export function CandidatesPage() {
                   <div>
                     <p className="eyebrow">
                       {STAGE_LABEL[candidate.stage] ?? candidate.stage} ·{" "}
-                      {candidate.roleAppliedFor}
+                      {ROLE_OPTIONS.find(
+                        (role) => role.value === candidate.roleAppliedFor,
+                      )?.label ?? candidate.roleAppliedFor}
                       {candidate.sourceSystem === "km_interview"
-                        ? " · KM"
-                        : " · Native"}
+                        ? " · From KM import"
+                        : ""}
                     </p>
                     <h2>{candidate.fullName}</h2>
                     <p className="text-ink-2 mt-1">
@@ -735,14 +740,15 @@ export function CandidatesPage() {
                 >
                   <label className="field-label">
                     Interviewer
-                    <select name="interviewerPersonId" className="input">
-                      <option value="">Unassigned</option>
-                      {activePeople.map((person) => (
-                        <option key={person._id} value={person._id}>
-                          {person.givenName} {person.familyName}
-                        </option>
-                      ))}
-                    </select>
+                    <SearchSelect
+                      name="interviewerPersonId"
+                      recentsKey="staff"
+                      placeholder="Unassigned"
+                      options={activePeople.map((person) => ({
+                        id: person._id,
+                        label: `${person.givenName} ${person.familyName}`,
+                      }))}
+                    />
                   </label>
                   <label className="field-label">
                     Scheduled for (optional)

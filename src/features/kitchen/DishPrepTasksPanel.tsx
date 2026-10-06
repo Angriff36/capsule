@@ -553,7 +553,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
               className="btn btn-primary"
               disabled={busy != null}
             >
-              {busy === "add" ? "Adding…" : "Add prep template"}
+              {busy === "add" ? "Adding…" : "Add prep step"}
             </button>
           </div>
         </form>

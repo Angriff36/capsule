@@ -15,6 +15,7 @@ import {
 import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
+import { ContactDetailsSection } from "./ContactDetailsSection";
 import { EmailSenderSection } from "./EmailSenderSection";
 import { useBrandLogoManager } from "./brandLogoUpload";
 import { isValidBrandColor, useTenantBranding } from "./tenantBranding";
@@ -318,7 +319,7 @@ export function BrandingPage() {
                     pattern="#[0-9A-Fa-f]{6}"
                     defaultValue={branding.primaryColor}
                     disabled={!canEdit || busy}
-                    className="font-mono uppercase"
+                    className="input font-mono uppercase"
                     onInput={(event) => {
                       const value = event.currentTarget.value;
                       if (isValidBrandColor(value)) {
@@ -359,7 +360,7 @@ export function BrandingPage() {
                     pattern="#[0-9A-Fa-f]{6}"
                     defaultValue={branding.accentColor}
                     disabled={!canEdit || busy}
-                    className="font-mono uppercase"
+                    className="input font-mono uppercase"
                     onInput={(event) => {
                       const value = event.currentTarget.value;
                       if (isValidBrandColor(value)) {
@@ -467,6 +468,8 @@ export function BrandingPage() {
           displayName={branding.displayName}
           canEdit={canEdit}
         />
+
+        <ContactDetailsSection record={record} canEdit={canEdit} />
 
         <section aria-label="Document preview" className="min-w-0">
           <p className="eyebrow">Live preview</p>

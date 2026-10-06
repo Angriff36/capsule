@@ -7,10 +7,17 @@
  * over comes in completed, a Cancelled one, a lost quote or a quote whose
  * date passed cancelled. An
  * unknown client or two clients with one name leave the event waiting with a
- * plain note; the same file again makes nothing new.
+ * plain note; the same file again makes nothing new. The printed occasion and
+ * referral source ("Referred From") join the company's list of that name, a
+ * new one is added to the list once; the sales person is the one active
+ * person with that name, and the printed name is kept either way. A printed
+ * venue name joins the one saved venue of that name with an address; two
+ * saved venues of one name leave the printed name only. The printed venue
+ * state is kept in the event's venue address.
  */
 import { readFileSync } from "node:fs";
 import { beforeAll, describe, expect, it } from "vitest";
+import { api } from "../../convex/_generated/api";
 import { sourceRowsFromGrid } from "../../src/lib/importSourceFile";
 import { parseCsv } from "../../src/lib/tppMenuCsv";
 import {
@@ -50,6 +57,51 @@ describe("runtime proof: the TPP event list file imports as events", () => {
       { ContactID: "S2", FirstName: "Sam", LastName: "Lee", Email: "b@x.test" },
     ]);
 
+    // A list row the company already has, and the sales person on staff.
+    const wedding = (
+      (await (
+        actor as unknown as {
+          mutation: (fn: unknown, args: unknown) => Promise<unknown>;
+        }
+      ).mutation(api.mutations.Occasion_createViaRegister, {
+        name: "Wedding",
+        code: "wedding",
+      })) as { docId: string }
+    ).docId;
+    const tim = await actor.run(
+      async (ctx) =>
+        await ctx.db.insert("people", {
+          tenantId,
+          givenName: "Tim",
+          familyName: "Example",
+          employmentType: "full_time",
+          status: "active",
+          deletedAt: null,
+          version: 1,
+          email: "tim@example.test",
+          role: "sales_manager",
+        } as never),
+    );
+
+    // Saved venues: one "Example Barn" with an address, two "Twin Hall".
+    const addVenue = async (name: string) =>
+      (
+        (await (
+          actor as unknown as {
+            mutation: (fn: unknown, args: unknown) => Promise<unknown>;
+          }
+        ).mutation(api.mutations.Venue_createViaRegister, {
+          name,
+          venueType: "other",
+          capacity: 150,
+          addressLine1: "1 Main St",
+          city: "Spokane",
+        })) as { docId: string }
+      ).docId;
+    const barn = await addVenue("Example Barn");
+    await addVenue("Twin Hall");
+    await addVenue("Twin Hall");
+
     const rows = fileRows("event-list-sample.csv", "events");
     expect(rows[0]).toMatchObject({
       EventID: "9101",
@@ -72,10 +124,46 @@ describe("runtime proof: the TPP event list file imports as events", () => {
     const events = await tableRows(actor, "events", tenantId);
     const byTitle = (title: string) => events.find((e) => e.title === title);
 
+    const occasions = await tableRows(actor, "occasions", tenantId);
+    const sources = await tableRows(actor, "referralSources", tenantId);
+    const idOf = (rows: Record<string, unknown>[], name: string) =>
+      rows.find((r) => r.name === name)?._id;
+    expect(occasions.map((o) => o.name).sort()).toEqual([
+      "Anniversary",
+      "Birthday",
+      "Corporate Event",
+      "Graduation",
+      "Wedding",
+    ]);
+    expect(sources.map((r) => r.name).sort()).toEqual([
+      "Google",
+      "Repeat Customer",
+    ]);
+
     expect(byTitle("Lena Hartwell Wedding")).toMatchObject({
       clientId: lena,
       expectedHeadcount: 30,
       stage: "completed",
+      occasionId: wedding,
+      occasionName: "Wedding",
+      referralSourceId: idOf(sources, "Google"),
+    });
+    expect(byTitle("Lena Hartwell Wedding")).toMatchObject({
+      venueId: barn,
+      venueName: "Example Barn",
+      venueAddress: "ID",
+    });
+    expect(byTitle("Lena Hartwell Wedding")?.ownerName).toBeUndefined();
+    expect(byTitle("Example Hall Co Corporate Event")).toMatchObject({
+      venueName: "Twin Hall",
+      venueAddress: "WA",
+    });
+    expect(byTitle("Example Hall Co Corporate Event")?.venueId).toBeFalsy();
+    expect(byTitle("Example Hall Co Corporate Event")).toMatchObject({
+      occasionId: idOf(occasions, "Corporate Event"),
+      referralSourceId: idOf(sources, "Repeat Customer"),
+      assignedToId: tim,
+      ownerName: "Tim Example",
     });
     expect(byTitle("Example Hall Co Corporate Event")).toMatchObject({
       clientId: hall,
@@ -113,5 +201,7 @@ describe("runtime proof: the TPP event list file imports as events", () => {
     const again = await importRows(actor, "events", rows);
     expect(again.committed).toBe(0);
     expect(await tableRows(actor, "events", tenantId)).toHaveLength(5);
+    expect(await tableRows(actor, "occasions", tenantId)).toHaveLength(5);
+    expect(await tableRows(actor, "referralSources", tenantId)).toHaveLength(2);
   });
 });

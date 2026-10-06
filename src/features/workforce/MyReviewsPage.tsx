@@ -5,6 +5,7 @@ import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { ReviewFeedback } from "./ReviewFeedback";
 
+import "./TrainingPage.css";
 // Staff self-service view of their OWN recorded reviews (spec §9.4). Read-only
 // projection from the authored `staffSelfReviews.listMyReviews` seam — only the
 // ratings/date/reviewer/event the reviewed staff member is meant to see; the

@@ -86,3 +86,19 @@ describe("stable failure codes from real server messages", () => {
     expect(classifyCommandFailure(zod).code).toBe("VALIDATION_FAILED");
   });
 });
+
+describe("server messages thrown as ConvexError", () => {
+  it("shows only the plain message, never the file and line", () => {
+    const error = Object.assign(
+      new Error(
+        "[CONVEX M(closeoutSources:correctCloseoutFromSources)] [Request ID: 803879cbad19bdb5] Server Error\nUncaught ConvexError: Enter revenue - Capsule has no records for it yet.\n    at sourceValues (../convex/closeoutSources.ts:355:2)\n    at handler (../convex/closeoutSources.ts:424:6)\n Called by client",
+      ),
+      { data: "Enter revenue - Capsule has no records for it yet." },
+    );
+    const failure = classifyCommandFailure(error);
+    expect(failure.detail).toContain("Enter revenue");
+    expect(failure.detail).not.toMatch(
+      /ConvexError|closeoutSources\.ts|Called by client/,
+    );
+  });
+});

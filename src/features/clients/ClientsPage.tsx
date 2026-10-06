@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   useCreateClient,
   useCreateClientMerge,
@@ -27,6 +27,9 @@ import {
 } from "./contactDedup";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { useActionNotice } from "../../ui/action-result";
+import { listOriginState, useListOrigin } from "../list-state/listOrigin";
+import { ListStateManager } from "../list-state/ListStateManager";
+import { useListViewState } from "../list-state/useListViewState";
 
 function optional(value: string): string | undefined {
   const trimmed = value.trim();
@@ -45,9 +48,18 @@ const EMPTY_STATS: ClientEventStats = {
   lastPastAt: 0,
   lifetimeValue: 0,
 };
+const clientsState = new ListStateManager({
+  archived: {
+    key: "archived",
+    defaultValue: false,
+    parse: (value: string | null) => value === "1",
+    serialize: (value: boolean) => (value ? "1" : null),
+  },
+});
 
 export function ClientsPage() {
   const navigate = useNavigate();
+  const listOrigin = useListOrigin();
   const clients = useListClient();
   const contacts = useListClientContact();
   const events = useAllEventReportRows();
@@ -55,10 +67,12 @@ export function ClientsPage() {
   const createClient = useCreateClient();
   const createClientMerge = useCreateClientMerge();
   const [showRegister, setShowRegister] = useState(false);
-  const [showArchived, setShowArchived] = useState(false);
+  const [{ archived: showArchived }, setListState] =
+    useListViewState(clientsState);
   const [showDuplicates, setShowDuplicates] = useState(false);
   const [clientType, setClientType] = useState<"company" | "person">("company");
   const [busy, setBusy] = useState(false);
+  const [find, setFind] = useState("");
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(
@@ -67,6 +81,30 @@ export function ClientsPage() {
   const [primaryClientId, setPrimaryClientId] = useState<string | null>(null);
   const { prompt, host } = useActionPrompt(busy);
 
+  // Warn (never block) when a new client matches one already on file.
+  const [draftIdentity, setDraftIdentity] = useState({ name: "", email: "" });
+  const draftName = draftIdentity.name.trim().toLowerCase();
+  const draftEmail = draftIdentity.email.trim().toLowerCase();
+  const sameEmail = draftEmail
+    ? (clients ?? []).find(
+        (row) =>
+          row.deletedAt == null &&
+          String(row.email ?? "")
+            .trim()
+            .toLowerCase() === draftEmail,
+      )
+    : undefined;
+  const sameName =
+    !sameEmail && draftName
+      ? (clients ?? []).find(
+          (row) =>
+            row.deletedAt == null &&
+            clientDisplayName(row._id, [row]).trim().toLowerCase() ===
+              draftName,
+        )
+      : undefined;
+  const sameClient = sameEmail ?? sameName;
+  const sameClientBy = sameEmail ? "email" : "name";
   const registered = (clients ?? []).filter(
     (row) => row.deletedAt == null && row.registeredAt != null,
   );
@@ -97,9 +135,18 @@ export function ClientsPage() {
   }, [events]);
 
   const visible = useMemo(() => {
-    const list = showArchived
-      ? registered
-      : registered.filter((row) => String(row.status) !== "archived");
+    const needle = find.trim().toLowerCase();
+    const list = (
+      showArchived
+        ? registered
+        : registered.filter((row) => String(row.status) !== "archived")
+    ).filter(
+      (row) =>
+        !needle ||
+        [clientDisplayName(row._id, [row]), row.email, row.phone].some(
+          (value) => value?.toLowerCase().includes(needle),
+        ),
+    );
     return [...list].sort((a, b) => {
       const aStats = statsByClient.get(String(a._id)) ?? EMPTY_STATS;
       const bStats = statsByClient.get(String(b._id)) ?? EMPTY_STATS;
@@ -111,7 +158,7 @@ export function ClientsPage() {
         clientDisplayName(b._id, [b]),
       );
     });
-  }, [registered, showArchived, statsByClient]);
+  }, [registered, showArchived, statsByClient, find]);
 
   const reviewCandidate = (candidate: ClientDuplicateCandidate) => {
     setSelectedCandidateId(candidate.id);
@@ -249,7 +296,7 @@ export function ClientsPage() {
             key="archived"
             className="btn btn-ghost"
             type="button"
-            onClick={() => setShowArchived((value) => !value)}
+            onClick={() => setListState({ archived: !showArchived })}
           >
             {showArchived ? "Hide archived" : "Show archived"}
           </button>,
@@ -288,7 +335,24 @@ export function ClientsPage() {
       ) : null}
 
       {showRegister ? (
-        <form className="supply-form" onSubmit={submitRegister}>
+        <form
+          className="supply-form"
+          onSubmit={submitRegister}
+          onChange={(event) => {
+            const form = event.currentTarget;
+            const read = (name: string) =>
+              String(
+                (form.elements.namedItem(name) as HTMLInputElement | null)
+                  ?.value ?? "",
+              );
+            setDraftIdentity({
+              name:
+                read("companyName") ||
+                `${read("givenName")} ${read("familyName")}`,
+              email: read("email"),
+            });
+          }}
+        >
           <div className="supply-form-heading">
             <div>
               <p className="eyebrow">New</p>
@@ -352,6 +416,19 @@ export function ClientsPage() {
             Notes
             <textarea name="notes" rows={2} className="input" />
           </label>
+          {sameClient ? (
+            <p className="text-sm text-warn" role="status">
+              {clientDisplayName(sameClient._id, [sameClient])} is already a
+              client with this {sameClientBy}.{" "}
+              <Link
+                className="text-link"
+                to={CLIENTS_ROUTES.detail(sameClient._id)}
+              >
+                Open them
+              </Link>{" "}
+              instead, or save if this is someone else.
+            </p>
+          ) : null}
           <button className="btn btn-primary" type="submit" disabled={busy}>
             {busy ? "Saving…" : "Save client"}
           </button>
@@ -375,9 +452,21 @@ export function ClientsPage() {
         />
       ) : null}
 
+      {registered.length > 0 ? (
+        <input
+          type="search"
+          className="input min-h-10 w-full max-w-sm"
+          placeholder="Find by name, email or phone"
+          aria-label="Find a client"
+          value={find}
+          onChange={(event) => setFind(event.target.value)}
+        />
+      ) : null}
       <div className="card overflow-x-auto">
         {clients === undefined ? (
           <TableSkeleton rows={5} />
+        ) : visible.length === 0 && find.trim() ? (
+          <p className="p-4 text-base text-ink-2">Nothing matches.</p>
         ) : visible.length === 0 ? (
           <EmptyState
             title="No clients yet"
@@ -397,7 +486,7 @@ export function ClientsPage() {
             <thead>
               <tr>
                 <th className="th w-full">Client</th>
-                <th className="th">Contact</th>
+                <th className="th hidden sm:table-cell">Contact</th>
                 <th className="th text-right">Upcoming</th>
                 <th className="th">Last event</th>
                 <th className="th text-right">Lifetime value</th>
@@ -414,18 +503,27 @@ export function ClientsPage() {
                 return (
                   <tr
                     key={row._id}
-                    onClick={() => navigate(CLIENTS_ROUTES.detail(row._id))}
+                    onClick={() =>
+                      navigate(CLIENTS_ROUTES.detail(row._id), {
+                        state: listOriginState(listOrigin),
+                      })
+                    }
                     className="cursor-pointer transition-colors hover:bg-inset/60"
                   >
-                    <td className="td w-full max-w-0 truncate">
-                      <span className="font-medium">
+                    <td className="td w-full min-w-[10rem] max-w-0 whitespace-normal break-words sm:truncate">
+                      <Link
+                        to={CLIENTS_ROUTES.detail(row._id)}
+                        state={listOriginState(listOrigin)}
+                        onClick={(event) => event.stopPropagation()}
+                        className="font-medium text-ink hover:underline"
+                      >
                         {clientDisplayName(row._id, clients)}
-                      </span>
-                      <span className="ml-2 text-sm text-ink-3">
+                      </Link>
+                      <span className="ml-2 text-sm whitespace-nowrap text-ink-3">
                         {formatStatusLabel(String(row.clientType))}
                       </span>
                     </td>
-                    <td className="td text-sm text-ink-3">
+                    <td className="td hidden max-w-[16rem] truncate text-sm text-ink-3 sm:table-cell">
                       {contactLine || "—"}
                     </td>
                     <td className="td text-right font-mono">

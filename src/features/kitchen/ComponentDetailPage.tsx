@@ -1,6 +1,6 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { formatCountNoun } from "../../lib/format";
+import { formatQuantity, formatCountNoun } from "../../lib/format";
 import {
   useCreateComponentIngredient,
   useGetComponent,
@@ -55,11 +55,7 @@ import {
   toNutritionIngredient,
 } from "./ComponentNutrition";
 import { ComponentNutritionPanel } from "./ComponentNutritionPanel";
-import {
-  SELECTABLE_UNITS,
-  UNIT_OF_MEASURE,
-  unitOptionsFor,
-} from "./import/UnitOfMeasureMapper";
+import { UNIT_OF_MEASURE, unitOptionsFor } from "./import/UnitOfMeasureMapper";
 import { ComponentImportSourcePanel } from "./import/ComponentImportSourcePanel";
 import { ComponentRecipeStatusPanel } from "./ComponentRecipeStatusPanel";
 import { ComponentSubRecipesPanel } from "./ComponentSubRecipesPanel";
@@ -72,6 +68,15 @@ import { RecipeAllergenMarks } from "./RecipeAllergenMarks";
 import { RecipeTimesEquipmentPanel } from "./RecipeTimesEquipmentPanel";
 import { StylePackagingPanel } from "./StylePackagingPanel";
 import { ComponentIngredientWasteButton } from "./ComponentIngredientWasteButton";
+import { QuantityUnitInput } from "../../ui/QuantityUnitInput";
+import {
+  describeLineConversion,
+  fallbackUnitFor,
+  formatQuantityEntry,
+  isUnitCode,
+  parseQuantityInput,
+  type ItemUnitMappingLike,
+} from "../../../convex/lib/culinaryModel/units";
 import {
   beginPendingOperation,
   confirmPendingOperation,
@@ -79,6 +84,9 @@ import {
 import { useRestoreComponentSnapshotSafely } from "../../lib/safeCulinaryOperations";
 import { componentRestoreOutcome } from "./culinaryRecovery";
 import { ComponentPrepContext, prepRecipeYield } from "./ComponentPrepContext";
+import { StickyRecordHeader } from "../../ui/StickyRecordHeader";
+import { ReturnToListLink } from "../list-state/listOrigin";
+import { FieldHelp } from "../../ui/FieldHelp";
 
 const policy = new CulinaryLifecyclePolicy();
 const UNITS = UNIT_OF_MEASURE;
@@ -90,6 +98,8 @@ function optional(value: FormDataEntryValue | null) {
 
 export function ComponentDetailPage() {
   const { id } = useParams();
+  const headerSentinelRef = useRef<HTMLDivElement>(null);
+  const sectionScopeRef = useRef<HTMLElement>(null);
   const [searchParams] = useSearchParams();
   const prepTaskId = searchParams.get("prepTask") || undefined;
   const component = useRouteRecord(useGetComponent, id);
@@ -161,6 +171,12 @@ export function ComponentDetailPage() {
     value: string;
   } | null>(null);
   const [showLineForm, setShowLineForm] = useState(false);
+  const [lineIngredientId, setLineIngredientId] = useState("");
+  const [lineQuantity, setLineQuantity] = useState("1");
+  const [editingLine, setEditingLine] = useState<{
+    id: string;
+    value: string;
+  } | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [snapshotWarning, setSnapshotWarning] = useState<string | null>(null);
@@ -234,6 +250,16 @@ export function ComponentDetailPage() {
   const ingredientName = (ingredientId: string) =>
     ingredients?.find((ingredient) => ingredient._id === ingredientId)?.name ??
     "Unknown ingredient";
+  const selectedLineIngredient = (ingredients ?? []).find(
+    (ingredient) => ingredient._id === lineIngredientId,
+  );
+  const catalogUnit = selectedLineIngredient?.unit;
+  const addFallback = fallbackUnitFor(catalogUnit, UNITS);
+  const ingredientMappings = RecordedUnitMappings.fromRows(
+    itemUnitMappings,
+  ) as ItemUnitMappingLike[];
+  const catalogUnitForIngredient = (ingredientId: string) =>
+    ingredients?.find((ingredient) => ingredient._id === ingredientId)?.unit;
 
   const currentData = buildComponentSnapshotData(
     component,
@@ -366,18 +392,58 @@ export function ComponentDetailPage() {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
+    const parsedQuantity = parseQuantityInput(lineQuantity, addFallback, UNITS);
+    if (parsedQuantity.status !== "parsed") {
+      setFailure(
+        new Error(
+          parsedQuantity.status === "empty"
+            ? "Enter a quantity before saving the recipe line."
+            : parsedQuantity.message,
+        ),
+      );
+      return;
+    }
     void run("line", async () => {
       await captureBefore("Added ingredient line");
       await createLine({
         componentId: component._id,
-        ingredientId: String(data.get("ingredientId")),
-        quantity: Number(data.get("quantity")),
-        unit: String(data.get("unit")) as (typeof UNITS)[number],
+        ingredientId: lineIngredientId,
+        quantity: parsedQuantity.quantity,
+        unit: parsedQuantity.unit,
         sortOrder: componentLines.length,
         prepNotes: optional(data.get("prepNotes")),
       });
       await reconcileEvents(component._id);
       form.reset();
+      setLineIngredientId("");
+      setLineQuantity("1");
+    });
+  };
+
+  const saveAdjustedLine = (line: (typeof componentLines)[number]) => {
+    if (!editingLine || editingLine.id !== line._id) return;
+    const fallbackUnit = fallbackUnitFor(line.unit, UNITS);
+    const parsed = parseQuantityInput(editingLine.value, fallbackUnit, UNITS);
+    if (parsed.status !== "parsed") {
+      setFailure(
+        new Error(
+          parsed.status === "empty"
+            ? "Enter a quantity before saving the recipe line."
+            : parsed.message,
+        ),
+      );
+      return;
+    }
+    void run(`adjust:${line._id}`, async () => {
+      await captureBefore("Adjusted ingredient line");
+      await adjustLine({
+        docId: line._id,
+        quantity: parsed.quantity,
+        unit: parsed.unit,
+        version: line.version,
+      });
+      await reconcileEvents(component._id);
+      setEditingLine(null);
     });
   };
 
@@ -396,10 +462,72 @@ export function ComponentDetailPage() {
   };
 
   return (
-    <article className="culinary-document culinary-document-compact culinary-studio">
-      <Link to="/kitchen/components" className="culinary-studio-back">
+    <article
+      ref={sectionScopeRef}
+      className="culinary-document culinary-document-compact culinary-studio"
+    >
+      <StickyRecordHeader
+        title={component.name}
+        facts={[
+          {
+            label: "Yield",
+            value: `${formatQuantity(component.yieldQuantity)} ${String(component.yieldUnit)}`,
+          },
+          {
+            label: "Status",
+            value: formatStatusLabel(String(component.status)),
+          },
+          {
+            label: "Serves",
+            value: `${servesPerYield} guests`,
+          },
+        ]}
+        actions={
+          <>
+            {component.status === "draft" ? (
+              <button
+                className="btn btn-ghost"
+                onClick={() => setEditing((value) => !value)}
+              >
+                {editing ? "Close editor" : "Edit draft"}
+              </button>
+            ) : null}
+            {actions
+              .filter((action) => action.key !== "publishVersion")
+              .map((action) => (
+                <button
+                  key={action.key}
+                  className="btn btn-ghost"
+                  disabled={busy != null}
+                  onClick={() => invokeLifecycle(action.key)}
+                >
+                  {busy === action.key ? "Working." : action.label}
+                </button>
+              ))}
+          </>
+        }
+        primaryAction={actions
+          .filter((action) => action.key === "publishVersion")
+          .map((action) => (
+            <button
+              key={action.key}
+              className="btn btn-primary"
+              disabled={busy != null}
+              onClick={() => invokeLifecycle(action.key)}
+            >
+              {busy === action.key ? "Working." : action.label}
+            </button>
+          ))}
+        sentinelRef={headerSentinelRef}
+        sectionScopeRef={sectionScopeRef}
+        headingId="recipe-detail-title"
+      />
+      <ReturnToListLink
+        fallback="/kitchen/components"
+        className="culinary-studio-back"
+      >
         ← Recipes
-      </Link>
+      </ReturnToListLink>
       <KitchenBookNav />
       {host}
       {failure ? (
@@ -419,7 +547,13 @@ export function ComponentDetailPage() {
               Recipe · Edition {component.versionNumber} ·{" "}
               {formatStatusLabel(String(component.status))}
             </p>
-            <h1 className="culinary-title-compact">{component.name}</h1>
+            <h1
+              id="recipe-detail-title"
+              tabIndex={-1}
+              className="culinary-title-compact"
+            >
+              {component.name}
+            </h1>
           </div>
           <div className="flex flex-wrap gap-2">
             {component.status === "draft" ? (
@@ -459,7 +593,8 @@ export function ComponentDetailPage() {
           <div>
             <dt>Yield</dt>
             <dd>
-              {component.yieldQuantity} {String(component.yieldUnit)}
+              {formatQuantity(component.yieldQuantity)}{" "}
+              {String(component.yieldUnit)}
             </dd>
           </div>
           <div>
@@ -496,6 +631,7 @@ export function ComponentDetailPage() {
           />
         ) : null}
       </header>
+      <div ref={headerSentinelRef} aria-hidden="true" />
 
       <ComponentRecipeStatusPanel componentId={component._id} />
 
@@ -575,23 +711,70 @@ export function ComponentDetailPage() {
             <ul className="ingredient-list">
               {componentLines.map((line) => (
                 <li key={line._id}>
-                  <strong>
-                    {readableRecipeAmount(
-                      Number(line.quantity) * (scaleFactor ?? 1),
-                      String(line.unit),
-                    )}
-                    {scaleFactor != null ? (
-                      <span className="font-mono text-2xs text-ink-3">
-                        {" "}
-                        (base{" "}
-                        {readableRecipeAmount(
-                          Number(line.quantity),
-                          String(line.unit),
+                  {editingLine && editingLine.id === line._id ? (
+                    <div className="min-w-44">
+                      <QuantityUnitInput
+                        name={`ingredient-line-${line._id}`}
+                        value={editingLine.value}
+                        onChange={(value) =>
+                          setEditingLine({ id: line._id, value })
+                        }
+                        fallbackUnit={fallbackUnitFor(line.unit, UNITS)}
+                        canonicalUnit={catalogUnitForIngredient(
+                          line.ingredientId,
                         )}
-                        )
-                      </span>
-                    ) : null}
-                  </strong>
+                        allowedUnits={UNITS}
+                        mappings={ingredientMappings}
+                        scope={{
+                          itemKind: "ingredient",
+                          itemId: line.ingredientId,
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <strong>
+                      {readableRecipeAmount(
+                        Number(line.quantity) * (scaleFactor ?? 1),
+                        String(line.unit),
+                      )}
+                      {scaleFactor != null ? (
+                        <span className="font-mono text-2xs text-ink-3">
+                          {" "}
+                          (base{" "}
+                          {readableRecipeAmount(
+                            Number(line.quantity),
+                            String(line.unit),
+                          )}
+                          )
+                        </span>
+                      ) : null}
+                      {(() => {
+                        const catalog = catalogUnitForIngredient(
+                          line.ingredientId,
+                        );
+                        const conversion = isUnitCode(String(line.unit))
+                          ? describeLineConversion(
+                              Number(line.quantity),
+                              line.unit,
+                              catalog,
+                              ingredientMappings,
+                              {
+                                itemKind: "ingredient",
+                                itemId: line.ingredientId,
+                              },
+                            )
+                          : {
+                              status: "unresolved" as const,
+                              reason: `Recipe unit "${String(line.unit)}" is not recognized.`,
+                            };
+                        return conversion.status === "unresolved" ? (
+                          <span className="block text-xs font-normal text-warn">
+                            {conversion.reason}
+                          </span>
+                        ) : null;
+                      })()}
+                    </strong>
+                  )}
                   <span>
                     <IngredientCatalogLabel
                       ingredientId={line.ingredientId}
@@ -602,46 +785,40 @@ export function ComponentDetailPage() {
                   </span>
                   <span>{line.prepNotes || "No preparation note"}</span>
                   <div className="culinary-line-actions">
-                    <button
-                      className="btn btn-ghost btn-sm"
-                      disabled={busy != null}
-                      onClick={() => {
-                        void (async () => {
-                          const values = await prompt.askFields({
-                            title: "Adjust quantity",
-                            description: `New quantity for ${ingredientName(
-                              line.ingredientId,
-                            )} (${String(line.unit)}).`,
-                            fields: [
-                              {
-                                name: "quantity",
-                                label: "Quantity",
-                                inputType: "number",
-                                defaultValue: String(line.quantity),
-                                required: true,
-                              },
-                            ],
-                            confirmLabel: "Adjust quantity",
-                          });
-                          if (!values) return;
-                          const quantity = Number(values.quantity);
-                          if (!Number.isFinite(quantity) || quantity <= 0)
-                            return;
-                          await run(`adjust:${line._id}`, async () => {
-                            await captureBefore("Adjusted ingredient line");
-                            await adjustLine({
-                              docId: line._id,
-                              quantity,
-                              unit: line.unit,
-                              version: line.version,
-                            });
-                            await reconcileEvents(component._id);
-                          });
-                        })();
-                      }}
-                    >
-                      Adjust
-                    </button>
+                    {editingLine?.id === line._id ? (
+                      <>
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          disabled={busy != null}
+                          onClick={() => saveAdjustedLine(line)}
+                        >
+                          Save
+                        </button>
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          disabled={busy != null}
+                          onClick={() => setEditingLine(null)}
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        disabled={busy != null}
+                        onClick={() =>
+                          setEditingLine({
+                            id: line._id,
+                            value: formatQuantityEntry(
+                              Number(line.quantity),
+                              line.unit,
+                            ),
+                          })
+                        }
+                      >
+                        Adjust
+                      </button>
+                    )}
                     <ComponentIngredientWasteButton
                       ingredientName={ingredientName(line.ingredientId)}
                       wasteFactor={line.wasteFactor}
@@ -716,27 +893,31 @@ export function ComponentDetailPage() {
             <form className="culinary-line-form" onSubmit={submitLine}>
               <label className="field-label sm:col-span-2">
                 Ingredient
-                <IngredientOptionPicker ingredients={ingredients} required />
-              </label>
-              <label className="field-label">
-                Quantity
-                <input
-                  name="quantity"
-                  type="number"
-                  min={0.01}
-                  step="0.01"
-                  defaultValue={1}
-                  className="input"
+                <IngredientOptionPicker
+                  ingredients={ingredients}
                   required
+                  value={lineIngredientId}
+                  onChange={setLineIngredientId}
+                  allowCreate
                 />
               </label>
               <label className="field-label">
-                Unit
-                <select name="unit" className="input">
-                  {SELECTABLE_UNITS.map((unit) => (
-                    <option key={unit}>{unit}</option>
-                  ))}
-                </select>
+                Quantity
+                <QuantityUnitInput
+                  name="quantity"
+                  value={lineQuantity}
+                  onChange={setLineQuantity}
+                  fallbackUnit={addFallback}
+                  canonicalUnit={catalogUnit}
+                  allowedUnits={UNITS}
+                  mappings={ingredientMappings}
+                  scope={
+                    lineIngredientId
+                      ? { itemKind: "ingredient", itemId: lineIngredientId }
+                      : undefined
+                  }
+                  required
+                />
               </label>
               <label className="field-label">
                 Preparation note
@@ -904,7 +1085,10 @@ function ComponentEditForm({
           />
         </label>
         <label className="field-label">
-          Yield
+          <span className="field-label-row">
+            Yield
+            <FieldHelp term="yield" />
+          </span>
           <input
             name="yieldQuantity"
             type="number"
@@ -928,7 +1112,10 @@ function ComponentEditForm({
           </select>
         </label>
         <label className="field-label">
-          Batch multiplier
+          <span className="field-label-row">
+            Batch multiplier
+            <FieldHelp term="batchMultiplier" />
+          </span>
           <input
             name="batchMultiplier"
             type="number"

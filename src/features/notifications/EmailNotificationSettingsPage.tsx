@@ -17,6 +17,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { ErrorState, PageHeader, TableSkeleton } from "../../ui/primitives";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
+import { formatDateTime } from "../../lib/format";
 
 const PREVIEW_CONTENT: Record<
   EmailNotificationCategory,
@@ -177,7 +178,7 @@ export function EmailNotificationSettingsPage() {
   return (
     <div className="operations-stage space-y-6">
       <PageHeader
-        title="Email dispatches"
+        title="Email summaries"
         lead="Choose which summaries you want by email. In-app notifications stay on, and changing one category never changes the others."
       />
 
@@ -190,7 +191,7 @@ export function EmailNotificationSettingsPage() {
           ? "Email sending is not set up for your company yet, so no summaries go out. Your choices are saved; summaries start the morning after email is set up."
           : `Capsule emails each summary you turn on once a day at about 7 in the morning, only when there is something new.${
               sendingStatus?.nextRunAt
-                ? ` Next run: ${new Date(sendingStatus.nextRunAt).toLocaleString()}.`
+                ? ` Next run: ${formatDateTime(sendingStatus.nextRunAt)}.`
                 : ""
             }`}{" "}
         Invoice summaries go only to finance staff and managers; stock summaries
@@ -201,11 +202,11 @@ export function EmailNotificationSettingsPage() {
 
       <section className="grid overflow-hidden rounded-sm border border-line-2 bg-panel shadow-[0_24px_70px_-52px_rgba(25,36,31,0.7)] xl:grid-cols-[minmax(0,0.88fr)_minmax(460px,1.12fr)]">
         <div className="border-line-2 p-6 xl:border-r">
-          <div className="flex items-end justify-between gap-4 border-b border-line-2 pb-5">
-            <div>
-              <p className="eyebrow">Personal delivery board</p>
-              <h2 className="mt-2 font-display text-xl">Your inbox mix</h2>
-              <p className="mt-2 max-w-lg text-base leading-relaxed text-ink-2">
+          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-line-2 pb-5">
+            <div className="min-w-0">
+              <p className="eyebrow">Your emails</p>
+              <h2 className="mt-2 font-display text-xl">Summaries you get</h2>
+              <p className="mt-2 max-w-lg text-base leading-relaxed break-words text-ink-2">
                 Sent to{" "}
                 {user?.primaryEmailAddress?.emailAddress ??
                   "your account email"}

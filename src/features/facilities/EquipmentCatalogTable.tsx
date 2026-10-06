@@ -1,5 +1,6 @@
 import { formatMoney } from "../../lib/format";
 import { StatusChip } from "../../ui/primitives";
+import type { ShelfMark } from "./equipmentShelfMark";
 
 export type CatalogTableRow = {
   _id: string;
@@ -32,6 +33,7 @@ export function EquipmentCatalogTable<Row extends CatalogTableRow>({
   onEdit,
   onDetails,
   onAction,
+  shelfMark,
 }: {
   rows: Row[];
   busy: boolean;
@@ -39,6 +41,8 @@ export function EquipmentCatalogTable<Row extends CatalogTableRow>({
   onEdit: (row: Row) => void;
   onDetails: (row: Row) => void;
   onAction: (row: Row, action: CatalogRowAction) => void;
+  /** Ready / Needs service / Missing items, from open problems. */
+  shelfMark?: (row: Row) => ShelfMark | null;
 }) {
   return (
     <div className="supply-table-wrap">
@@ -69,9 +73,9 @@ export function EquipmentCatalogTable<Row extends CatalogTableRow>({
                 </small>
                 {item.ownership === "rented" ? (
                   <small>
-                    from{" "}
-                    {(item.vendorId && vendorNames.get(item.vendorId)) ||
-                      "vendor not set"}
+                    {item.vendorId && vendorNames.get(item.vendorId)
+                      ? `from ${vendorNames.get(item.vendorId)}`
+                      : "rental company not named"}
                   </small>
                 ) : null}
               </td>
@@ -114,6 +118,16 @@ export function EquipmentCatalogTable<Row extends CatalogTableRow>({
               </td>
               <td>
                 <StatusChip status={String(item.status)} />
+                {item.status === "active" && shelfMark?.(item) ? (
+                  <>
+                    {" "}
+                    <StatusChip
+                      status="shelf"
+                      color={shelfMark(item)!.tone}
+                      label={shelfMark(item)!.label}
+                    />
+                  </>
+                ) : null}
               </td>
               <td>
                 <div className="supply-row-actions">

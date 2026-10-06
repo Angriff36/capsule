@@ -6,6 +6,12 @@ import {
   useState,
   type KeyboardEvent,
 } from "react";
+import {
+  pinRecents,
+  rankBySearch,
+  readRecents,
+  rememberRecent,
+} from "./pickerSearch";
 
 export type SearchSelectOption = {
   id: string;
@@ -18,8 +24,15 @@ export type SearchSelectOption = {
 
 type Props = {
   options: readonly SearchSelectOption[];
-  value: string;
-  onChange: (id: string) => void;
+  /** Controlled value. Omit it (and use `defaultValue`) for plain FormData forms. */
+  value?: string;
+  defaultValue?: string;
+  onChange?: (id: string) => void;
+  /**
+   * Remembers this browser's last five picks under this key and pins them
+   * at the top of the list (e.g. "client", "dish", "vendor", "staff").
+   */
+  recentsKey?: string;
   placeholder?: string;
   /** Hidden form field so FormData / draft persistence see the choice. */
   name?: string;
@@ -27,19 +40,16 @@ type Props = {
   form?: string;
   required?: boolean;
   disabled?: boolean;
+  autoFocus?: boolean;
   emptyText?: string;
   "aria-label"?: string;
   /** Test id prefix for the combobox input. */
   testId?: string;
   maxVisible?: number;
+  /** Starts an external, portal-backed create flow for the current no-match query. */
+  onCreate?: (query: string) => void;
+  createLabel?: (query: string) => string;
 };
-
-function normalize(value: string): string {
-  return value
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
-}
 
 /**
  * Searchable single-select for long reference lists (clients, venues, people).
@@ -49,19 +59,27 @@ function normalize(value: string): string {
  */
 export function SearchSelect({
   options,
-  value,
+  value: controlledValue,
+  defaultValue = "",
   onChange,
+  recentsKey,
   placeholder = "Type to search…",
   name,
   form,
   required = false,
   disabled = false,
+  autoFocus = false,
   emptyText = "No matches.",
   "aria-label": ariaLabel,
   testId,
   maxVisible = 40,
+  onCreate,
+  createLabel = (query) => `Create “${query}”`,
 }: Props) {
   const listId = useId();
+  const [internalValue, setInternalValue] = useState(defaultValue);
+  const value = controlledValue ?? internalValue;
+  const [recentIds, setRecentIds] = useState(() => readRecents(recentsKey));
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -85,19 +103,21 @@ export function SearchSelect({
     [options, value],
   );
 
-  const filtered = useMemo(() => {
-    const needle = normalize(query.trim());
-    if (!needle) return options;
-    const words = needle.split(/\s+/).filter(Boolean);
-    return options.filter((option) => {
-      const haystack = normalize(
-        `${option.label} ${option.hint ?? ""} ${option.keywords ?? ""}`,
-      );
-      return words.every((word) => haystack.includes(word));
-    });
-  }, [options, query]);
-  const visible = filtered.slice(0, maxVisible);
-  const hiddenCount = filtered.length - visible.length;
+  const { recent, ranked } = useMemo(() => {
+    if (query.trim()) {
+      return {
+        recent: [] as SearchSelectOption[],
+        ranked: rankBySearch(options, query, (option) => ({
+          label: option.label,
+          extra: `${option.hint ?? ""} ${option.keywords ?? ""}`,
+        })),
+      };
+    }
+    const pinned = pinRecents(options, recentIds, (option) => option.id);
+    return { recent: pinned.recent, ranked: pinned.rest };
+  }, [options, query, recentIds]);
+  const visible = [...recent, ...ranked.slice(0, maxVisible)];
+  const hiddenCount = ranked.length - (visible.length - recent.length);
 
   useEffect(() => {
     if (!open) return;
@@ -115,24 +135,52 @@ export function SearchSelect({
     setActiveIndex(0);
   }, [query, open]);
 
-  const choose = (id: string) => {
+  // Uncontrolled pickers follow their form's reset like a native select.
+  useEffect(() => {
+    if (controlledValue !== undefined) return;
+    const owner = hiddenRef.current?.form;
+    if (!owner) return;
+    const onReset = () => setInternalValue(defaultValue);
+    owner.addEventListener("reset", onReset);
+    return () => owner.removeEventListener("reset", onReset);
+  }, [controlledValue, defaultValue]);
+
+  const commit = (id: string) => {
     announceChoice.current = true;
-    onChange(id);
+    if (controlledValue === undefined) setInternalValue(id);
+    onChange?.(id);
+  };
+
+  const choose = (id: string) => {
+    commit(id);
+    if (options.some((option) => option.id === id)) {
+      setRecentIds(rememberRecent(recentsKey, id));
+    }
     setOpen(false);
     setQuery("");
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    const itemCount = visible.length + (canCreate ? 1 : 0);
     if (event.key === "ArrowDown") {
       event.preventDefault();
       if (!open) setOpen(true);
-      setActiveIndex((index) => Math.min(index + 1, visible.length - 1));
+      setActiveIndex((index) =>
+        Math.min(index + 1, Math.max(itemCount - 1, 0)),
+      );
     } else if (event.key === "ArrowUp") {
       event.preventDefault();
       setActiveIndex((index) => Math.max(index - 1, 0));
     } else if (event.key === "Enter") {
       if (!open) return;
       event.preventDefault();
+      event.stopPropagation();
+      if (canCreate && activeIndex === visible.length) {
+        const typed = query.trim();
+        setOpen(false);
+        onCreate?.(typed);
+        return;
+      }
       const option = visible[activeIndex];
       if (option) choose(option.id);
     } else if (event.key === "Escape") {
@@ -142,12 +190,18 @@ export function SearchSelect({
         setQuery("");
       }
     } else if (event.key === "Backspace" && query === "" && value) {
-      announceChoice.current = true;
-      onChange("");
+      commit("");
     }
   };
 
   const inputValue = open ? query : (selected?.label ?? "");
+  // A match on other details (an email, an address) must not hide Create;
+  // only an option whose name holds the typed text does.
+  const typedName = query.trim().toLowerCase();
+  const canCreate =
+    !!onCreate &&
+    typedName.length > 0 &&
+    !visible.some((option) => option.label.toLowerCase().includes(typedName));
 
   return (
     <div ref={rootRef} className="relative">
@@ -170,14 +224,19 @@ export function SearchSelect({
         aria-autocomplete="list"
         aria-label={ariaLabel}
         aria-activedescendant={
-          open && visible[activeIndex]
-            ? `${listId}-${visible[activeIndex].id}`
+          open
+            ? canCreate && activeIndex === visible.length
+              ? `${listId}-create`
+              : visible[activeIndex]
+                ? `${listId}-${visible[activeIndex].id}`
+                : undefined
             : undefined
         }
         className="input"
         placeholder={selected ? selected.label : placeholder}
         value={inputValue}
         disabled={disabled}
+        autoFocus={autoFocus}
         required={required && !value}
         autoComplete="off"
         data-testid={testId}
@@ -203,10 +262,46 @@ export function SearchSelect({
           {visible.length === 0 ? (
             <li className="px-2 py-1.5 text-sm text-ink-3">{emptyText}</li>
           ) : null}
+          {canCreate ? (
+            <li
+              id={`${listId}-create`}
+              role="option"
+              aria-selected={activeIndex === visible.length}
+              className={`mt-1 cursor-pointer border-t border-line px-2 py-1.5 text-sm font-semibold text-brand ${
+                activeIndex === visible.length
+                  ? "bg-accent-soft"
+                  : "hover:bg-accent-soft"
+              }`}
+              onMouseEnter={() => setActiveIndex(visible.length)}
+              onMouseDown={(event) => event.preventDefault()}
+              onClick={() => {
+                const typed = query.trim();
+                setOpen(false);
+                onCreate?.(typed);
+              }}
+            >
+              + {createLabel(query.trim())}
+            </li>
+          ) : null}
           {visible.map((option, index) => {
+            const header =
+              recent.length && index === 0
+                ? "Recent"
+                : recent.length && index === recent.length
+                  ? "All"
+                  : null;
             const isSelected = option.id === value;
             const isActive = index === activeIndex;
-            return (
+            return [
+              header ? (
+                <li
+                  key={`header-${header}`}
+                  role="presentation"
+                  className="px-2 pt-1.5 pb-0.5 text-xs font-medium tracking-wide text-ink-3 uppercase"
+                >
+                  {header}
+                </li>
+              ) : null,
               <li
                 key={option.id}
                 id={`${listId}-${option.id}`}
@@ -233,8 +328,8 @@ export function SearchSelect({
                     {option.hint}
                   </span>
                 ) : null}
-              </li>
-            );
+              </li>,
+            ];
           })}
           {hiddenCount > 0 ? (
             <li className="px-2 py-1.5 text-xs text-ink-3">

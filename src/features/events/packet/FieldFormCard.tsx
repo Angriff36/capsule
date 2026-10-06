@@ -1,5 +1,19 @@
 import { useState, type ReactNode } from "react";
 import { fieldFormLateness } from "../../../lib/eventPacket/finalLock/fieldForms";
+import {
+  MUDA_FORM_KEY,
+  blankChecklist,
+  blankMuda,
+  encodeAnswers,
+  missedLines,
+  mudaSummary,
+} from "../../../lib/eventPacket/finalLock/fieldFormAnswers";
+import {
+  ChecklistInput,
+  FieldFormAnswersView,
+  MudaInput,
+  menuNames,
+} from "./FieldFormAnswerInputs";
 import { useGenerateUploadUrl } from "../../../lib/fileStorageClient";
 import type {
   CompleteFieldForm,
@@ -7,9 +21,10 @@ import type {
 } from "../../../lib/eventPacket/useFieldForms";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { FailureBanner } from "../FailureBanner";
+import { formatDateTime } from "../../../lib/format";
 
 const when = (value: number | null) =>
-  value == null ? null : new Date(value).toLocaleString();
+  value == null ? null : formatDateTime(value);
 
 /** Local "yyyy-mm-ddThh:mm" for a datetime-local box. */
 const localInput = (ms: number) => {
@@ -84,11 +99,15 @@ export function FieldFormCard({
         <p className="mt-1 text-ink">{form.instructions}</p>
       )}
       {form.expectedItems && (
-        <p className="mt-1 text-ink-2">Check: {form.expectedItems}</p>
+        <p className="mt-1 text-ink-2">
+          {form.formKey === MUDA_FORM_KEY ? "Menu" : "Check"}:{" "}
+          {form.expectedItems}
+        </p>
       )}
       {form.outcome === "problem" && (
         <p className="mt-1 text-danger">Problem reported</p>
       )}
+      <FieldFormAnswersView raw={form.answers} />
       {form.note && <p className="mt-1 text-ink-2">Note: {form.note}</p>}
       {form.secondNote && (
         <p className="mt-1 text-ink-2">Second check: {form.secondNote}</p>
@@ -138,8 +157,16 @@ function SignForm({
   const [photo, setPhoto] = useState<File | null>(null);
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const [lines, setLines] = useState(() => blankChecklist(form.formKey));
+  const isMuda = form.formKey === MUDA_FORM_KEY;
+  const [muda, setMuda] = useState(blankMuda);
   const uploadUrl = useGenerateUploadUrl();
-  const needsNote = form.evidence === "note" || outcome === "problem";
+  const missed = missedLines(lines).length;
+  // An unticked paper line is a problem to explain; the food waste form's
+  // counts are its note.
+  const effectiveOutcome = missed > 0 ? "problem" : outcome;
+  const needsNote =
+    effectiveOutcome === "problem" || (form.evidence === "note" && !isMuda);
   const upload = async (file: File) => {
     const res = await fetch(await uploadUrl(), {
       method: "POST",
@@ -165,10 +192,17 @@ function SignForm({
           setFailure(null);
           try {
             await onComplete(form, {
-              outcome,
+              outcome: effectiveOutcome,
               observedAt: at ? new Date(at).getTime() : undefined,
-              note,
+              note: isMuda
+                ? [mudaSummary(muda), note.trim()].filter(Boolean).join(" ")
+                : note,
               photoStorageId: photo ? await upload(photo) : undefined,
+              answers: isMuda
+                ? encodeAnswers({ kind: "muda", muda })
+                : lines.length
+                  ? encodeAnswers({ kind: "checklist", lines })
+                  : undefined,
             });
           } catch (error) {
             setFailure(classifyCommandFailure(error));
@@ -177,27 +211,44 @@ function SignForm({
           }
         }}
       >
-        <fieldset className="flex flex-wrap gap-4">
-          <legend className="sr-only">How did it go</legend>
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name={`outcome-${form.id}`}
-              checked={outcome === "all_good"}
-              onChange={() => setOutcome("all_good")}
-            />
-            All good
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name={`outcome-${form.id}`}
-              checked={outcome === "problem"}
-              onChange={() => setOutcome("problem")}
-            />
-            There is a problem
-          </label>
-        </fieldset>
+        {lines.length > 0 && (
+          <ChecklistInput lines={lines} onChange={setLines} />
+        )}
+        {isMuda && (
+          <MudaInput
+            muda={muda}
+            menu={menuNames(form.expectedItems)}
+            onChange={setMuda}
+          />
+        )}
+        {missed > 0 ? (
+          <p className="text-danger">
+            {missed} {missed === 1 ? "line is" : "lines are"} not ticked. Say
+            why below; the office sees it as a problem.
+          </p>
+        ) : (
+          <fieldset className="flex flex-wrap gap-4">
+            <legend className="sr-only">How did it go</legend>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name={`outcome-${form.id}`}
+                checked={outcome === "all_good"}
+                onChange={() => setOutcome("all_good")}
+              />
+              All good
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name={`outcome-${form.id}`}
+                checked={outcome === "problem"}
+                onChange={() => setOutcome("problem")}
+              />
+              There is a problem
+            </label>
+          </fieldset>
+        )}
         <label className="block">
           When you did it (leave blank for now)
           <input
@@ -209,7 +260,13 @@ function SignForm({
           />
         </label>
         <label className="block">
-          {needsNote ? "What you saw" : "Note (optional)"}
+          {missed > 0
+            ? "What was not done, and why"
+            : needsNote
+              ? "What you saw"
+              : isMuda
+                ? "Anything else (optional)"
+                : "Note (optional)"}
           <textarea
             className="input mt-1 block w-full"
             required={needsNote}

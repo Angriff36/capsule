@@ -96,6 +96,7 @@ import {
 } from "./EventMenuDietaryCard";
 import type { EventMenuNoteRow } from "./EventMenuNotesCard";
 import type { MenuTemplate } from "./EventMenuTemplateCard";
+import { dietTagsOnly } from "../../../convex/lib/dietaryTags";
 
 type Props = {
   eventId: string;
@@ -330,8 +331,10 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const dietaryTallies: MenuDietaryTally[] = useMemo(
     () =>
       eventMenuDietaryTallies(
-        selections.map(
-          (row) => dishes?.find((dish) => dish._id === row.dishId)?.dietaryTags,
+        selections.map((row) =>
+          dietTagsOnly(
+            dishes?.find((dish) => dish._id === row.dishId)?.dietaryTags,
+          ),
         ),
       ),
     [dishes, selections],
@@ -1006,9 +1009,20 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                             nextServingsRaw: String(
                               data.get("quantityServings") ?? "",
                             ),
-                            nextContainerRaw: String(
-                              data.get("containerCount") ?? "",
-                            ),
+                            // The box starts with the worked-out pan count.
+                            // Left as is, it is not a typed count, so pans
+                            // keep following the servings.
+                            nextContainerRaw:
+                              lineFields.containerCount == null &&
+                              String(data.get("containerCount") ?? "") ===
+                                String(linePanCount)
+                                ? ""
+                                : String(data.get("containerCount") ?? ""),
+                            containerCleared:
+                              lineFields.containerCount != null &&
+                              String(
+                                data.get("containerCount") ?? "",
+                              ).trim() === "",
                           });
                           if (
                             !Number.isFinite(plan.quantityServings) ||

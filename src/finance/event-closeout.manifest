@@ -78,10 +78,10 @@ entity EventCloseout mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
   constraint closeoutCapturedMoneyNonnegative: self.capturedAt == null or (self.actualRevenue >= 0 and self.budgetedRevenue >= 0 and self.actualIngredientCost >= 0 and self.actualWasteCost >= 0 and self.actualLaborCost >= 0 and self.actualVendorCost >= 0 and self.budgetedCost >= 0 and self.totalActualCost >= 0) "This closeout's money amounts can't be negative. Use zero or more."
-  constraint closeoutTotalCostConsistent: self.capturedAt == null or self.totalActualCost == self.actualIngredientCost + self.actualWasteCost + self.actualLaborCost + self.actualVendorCost "This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together."
-  constraint closeoutRevenueVarianceConsistent: self.capturedAt == null or self.revenueVariance == self.budgetedRevenue - self.actualRevenue "This closeout's revenue variance has to equal budgeted revenue minus actual revenue."
-  constraint closeoutCostVarianceConsistent: self.capturedAt == null or self.costVariance == self.budgetedCost - self.totalActualCost "This closeout's cost variance has to equal budgeted cost minus total actual cost."
-  constraint closeoutGrossProfitConsistent: self.capturedAt == null or self.grossProfit == self.actualRevenue - self.totalActualCost "This closeout's gross profit has to equal actual revenue minus total actual cost."
+  constraint closeoutTotalCostConsistent: self.capturedAt == null or round((self.totalActualCost) * 100) == round((self.actualIngredientCost + self.actualWasteCost + self.actualLaborCost + self.actualVendorCost) * 100) "This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together."
+  constraint closeoutRevenueVarianceConsistent: self.capturedAt == null or round((self.revenueVariance) * 100) == round((self.budgetedRevenue - self.actualRevenue) * 100) "This closeout's revenue variance has to equal budgeted revenue minus actual revenue."
+  constraint closeoutCostVarianceConsistent: self.capturedAt == null or round((self.costVariance) * 100) == round((self.budgetedCost - self.totalActualCost) * 100) "This closeout's cost variance has to equal budgeted cost minus total actual cost."
+  constraint closeoutGrossProfitConsistent: self.capturedAt == null or round((self.grossProfit) * 100) == round((self.actualRevenue - self.totalActualCost) * 100) "This closeout's gross profit has to equal actual revenue minus total actual cost."
   constraint closeoutHeadcountNonnegative: self.capturedAt == null or (self.expectedHeadcount >= 0 and self.actualHeadcount >= 0) "This closeout's headcount numbers can't be negative. Use zero or more."
 
   transition status from "draft" to ["finalized"]
@@ -117,10 +117,10 @@ entity EventCloseout mixin TenantScoped, SoftDeletable {
     guard self.event.stage == "closed_out"
     constraint captureEventMatch: eventId == self.eventId "This closeout is for a different event. Pick the event already on this closeout."
     constraint captureMoneyNonnegative: actualRevenue >= 0 and budgetedRevenue >= 0 and actualIngredientCost >= 0 and actualWasteCost >= 0 and actualLaborCost >= 0 and actualVendorCost >= 0 and budgetedCost >= 0 and totalActualCost >= 0 "This closeout's money amounts can't be negative. Use zero or more."
-    constraint captureTotalCost: totalActualCost == actualIngredientCost + actualWasteCost + actualLaborCost + actualVendorCost "This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together."
-    constraint captureRevenueVariance: revenueVariance == budgetedRevenue - actualRevenue "This closeout's revenue variance has to equal budgeted revenue minus actual revenue."
-    constraint captureCostVariance: costVariance == budgetedCost - totalActualCost "This closeout's cost variance has to equal budgeted cost minus total actual cost."
-    constraint captureGrossProfit: grossProfit == actualRevenue - totalActualCost "This closeout's gross profit has to equal actual revenue minus total actual cost."
+    constraint captureTotalCost: round((totalActualCost) * 100) == round((actualIngredientCost + actualWasteCost + actualLaborCost + actualVendorCost) * 100) "This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together."
+    constraint captureRevenueVariance: round((revenueVariance) * 100) == round((budgetedRevenue - actualRevenue) * 100) "This closeout's revenue variance has to equal budgeted revenue minus actual revenue."
+    constraint captureCostVariance: round((costVariance) * 100) == round((budgetedCost - totalActualCost) * 100) "This closeout's cost variance has to equal budgeted cost minus total actual cost."
+    constraint captureGrossProfit: round((grossProfit) * 100) == round((actualRevenue - totalActualCost) * 100) "This closeout's gross profit has to equal actual revenue minus total actual cost."
     constraint captureHeadcountNonnegative: expectedHeadcount >= 0 and actualHeadcount >= 0 "This closeout's headcount numbers can't be negative. Use zero or more."
     mutate eventId = eventId
     mutate actualRevenue = actualRevenue
@@ -238,10 +238,10 @@ entity EventCloseout mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "financeManageAccess")
     constraint correctReasonRequired: length(trim(reason)) > 0 "Say why this closeout is being corrected."
     constraint correctMoneyNonnegative: actualRevenue >= 0 and budgetedRevenue >= 0 and actualIngredientCost >= 0 and actualWasteCost >= 0 and actualLaborCost >= 0 and actualVendorCost >= 0 and budgetedCost >= 0 and totalActualCost >= 0 "This closeout's money amounts can't be negative. Use zero or more."
-    constraint correctTotalCost: totalActualCost == actualIngredientCost + actualWasteCost + actualLaborCost + actualVendorCost "This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together."
-    constraint correctRevenueVariance: revenueVariance == budgetedRevenue - actualRevenue "This closeout's revenue variance has to equal budgeted revenue minus actual revenue."
-    constraint correctCostVariance: costVariance == budgetedCost - totalActualCost "This closeout's cost variance has to equal budgeted cost minus total actual cost."
-    constraint correctGrossProfit: grossProfit == actualRevenue - totalActualCost "This closeout's gross profit has to equal actual revenue minus total actual cost."
+    constraint correctTotalCost: round((totalActualCost) * 100) == round((actualIngredientCost + actualWasteCost + actualLaborCost + actualVendorCost) * 100) "This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together."
+    constraint correctRevenueVariance: round((revenueVariance) * 100) == round((budgetedRevenue - actualRevenue) * 100) "This closeout's revenue variance has to equal budgeted revenue minus actual revenue."
+    constraint correctCostVariance: round((costVariance) * 100) == round((budgetedCost - totalActualCost) * 100) "This closeout's cost variance has to equal budgeted cost minus total actual cost."
+    constraint correctGrossProfit: round((grossProfit) * 100) == round((actualRevenue - totalActualCost) * 100) "This closeout's gross profit has to equal actual revenue minus total actual cost."
     constraint correctHeadcountNonnegative: expectedHeadcount >= 0 and actualHeadcount >= 0 "This closeout's headcount numbers can't be negative. Use zero or more."
     compute nextRevision = (self.revision != null ? self.revision : 1) + 1
     compute previousActualRevenue = self.actualRevenue

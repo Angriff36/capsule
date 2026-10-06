@@ -174,12 +174,18 @@ describe("ProposalCreateForm template state", () => {
     const title = container.querySelector(
       'input[name="title"]',
     )! as HTMLInputElement;
-    const client = container.querySelector(
-      'select[name="clientId"]',
-    )! as HTMLSelectElement;
+    // The client picker is a search box: type the name and press Enter.
+    const client = container
+      .querySelector('input[name="clientId"]')!
+      .parentElement!.querySelector<HTMLInputElement>('[role="combobox"]')!;
     await act(async () => {
-      change(client, "client-1");
+      change(client, "Client");
       change(title, "Detached proposal");
+    });
+    await act(async () => {
+      client.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Enter", bubbles: true }),
+      );
     });
     const form = container.querySelector("form")!;
     await act(async () =>

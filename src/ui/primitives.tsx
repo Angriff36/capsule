@@ -172,7 +172,7 @@ export function Section({
 }) {
   return (
     <section className="card">
-      <div className="flex h-9 items-center justify-between border-b border-line bg-inset px-3">
+      <div className="flex min-h-9 flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-line bg-inset px-3 py-0.5">
         <h2 className="text-sm font-semibold text-ink">
           {title}
           {count != null && (

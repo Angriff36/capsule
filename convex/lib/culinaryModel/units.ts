@@ -78,6 +78,114 @@ export const UNITS: Record<UnitCode, UnitDefinition> = {
 export const isUnitCode = (value: unknown): value is UnitCode =>
   typeof value === "string" && Object.prototype.hasOwnProperty.call(UNITS, value);
 
+export type QuantityInputResult =
+  | { status: "empty" }
+  | { status: "invalid"; message: string }
+  | { status: "parsed"; quantity: number; unit: UnitCode };
+
+export const ENTRY_UNIT_ALIASES: ReadonlyMap<string, UnitCode> = new Map([
+  ["ea", "each"], ["each", "each"], ["ct", "each"], ["count", "each"],
+  ["g", "gram"], ["gram", "gram"], ["grams", "gram"],
+  ["kg", "kilogram"], ["kilogram", "kilogram"], ["kilograms", "kilogram"],
+  ["oz", "ounce"], ["ounce", "ounce"], ["ounces", "ounce"],
+  ["lb", "pound"], ["lbs", "pound"], ["pound", "pound"], ["pounds", "pound"], ["#", "pound"],
+  ["ml", "milliliter"], ["milliliter", "milliliter"], ["milliliters", "milliliter"],
+  ["l", "liter"], ["liter", "liter"], ["liters", "liter"],
+  ["fl oz", "fluid_ounce"], ["fluid ounce", "fluid_ounce"], ["fluid ounces", "fluid_ounce"],
+  ["tsp", "teaspoon"], ["tsps", "teaspoon"], ["teaspoon", "teaspoon"], ["teaspoons", "teaspoon"],
+  ["tbsp", "tablespoon"], ["tbsps", "tablespoon"], ["tablespoon", "tablespoon"], ["tablespoons", "tablespoon"],
+  ["cup", "cup"], ["cups", "cup"], ["pt", "pint"], ["pts", "pint"], ["pint", "pint"], ["pints", "pint"],
+  ["qt", "quart"], ["qts", "quart"], ["quart", "quart"], ["quarts", "quart"],
+  ["gal", "gallon"], ["gallon", "gallon"], ["gallons", "gallon"],
+  ["portion", "portion"], ["portions", "portion"], ["serving", "serving"], ["servings", "serving"],
+  ["batch", "batch"], ["batches", "batch"], ["bottle", "bottle"], ["bottles", "bottle"],
+  ["piece", "piece"], ["pieces", "piece"], ["slice", "slice"], ["slices", "slice"],
+  ["pizza", "pizza"], ["pizzas", "pizza"], ["package", "package"], ["packages", "package"],
+  ["case", "case"], ["cases", "case"], ["can", "can"], ["cans", "can"], ["tub", "tub"], ["tubs", "tub"],
+]);
+
+const VULGAR_FRACTIONS: Record<string, string> = {
+  "¼": " 1/4",
+  "½": " 1/2",
+  "¾": " 3/4",
+  "⅓": " 1/3",
+  "⅔": " 2/3",
+  "⅛": " 1/8",
+  "⅜": " 3/8",
+  "⅝": " 5/8",
+  "⅞": " 7/8",
+};
+
+function numberFromEntry(raw: string): number | null {
+  const mixed = raw.match(/^(\d+)\s+(\d+)\/(\d+)$/);
+  if (mixed) {
+    const denominator = Number(mixed[3]);
+    return denominator === 0 ? null : Number(mixed[1]) + Number(mixed[2]) / denominator;
+  }
+  const fraction = raw.match(/^(\d+)\/(\d+)$/);
+  if (fraction) {
+    const denominator = Number(fraction[2]);
+    return denominator === 0 ? null : Number(fraction[1]) / denominator;
+  }
+  const value = Number(raw);
+  return Number.isFinite(value) ? value : null;
+}
+
+/**
+ * Parse the compact quantity notation staff use at the bench. A bare number
+ * retains the caller's current unit; known aliases normalize to UnitCode so
+ * the same value can feed the demand engine without a second conversion map.
+ */
+export function parseQuantityInput(
+  input: string,
+  fallbackUnit: UnitCode,
+  allowedUnits?: readonly UnitCode[],
+): QuantityInputResult {
+  const normalized = input
+    .trim()
+    .replace(/[¼½¾⅓⅔⅛⅜⅝⅞]/g, (fraction) => VULGAR_FRACTIONS[fraction] ?? fraction)
+    .replace(/\s+/g, " ");
+  if (!normalized) return { status: "empty" };
+  const match = normalized.match(
+    /^(\d+\s+\d+\/\d+|\d+\/\d+|\d+(?:\.\d+)?|\.\d+)\s*(.*?)$/,
+  );
+  if (!match) {
+    return { status: "invalid", message: "Enter a positive quantity, such as 2 lb or 500 g." };
+  }
+  const quantity = numberFromEntry(match[1]);
+  if (quantity == null || !Number.isFinite(quantity) || quantity <= 0) {
+    return { status: "invalid", message: "Quantity must be greater than zero." };
+  }
+  const rawUnit = match[2].trim();
+  if (!rawUnit) {
+    return allowedUnits && !allowedUnits.includes(fallbackUnit)
+      ? { status: "invalid", message: `"${fallbackUnit}" is not available for this recipe line.` }
+      : { status: "parsed", quantity, unit: fallbackUnit };
+  }
+  // Kitchen shorthand distinguishes lowercase t (teaspoon) from uppercase T
+  // (tablespoon) before the remaining aliases are normalized.
+  const lowerUnit = rawUnit.toLowerCase();
+  const unit = rawUnit === "t"
+    ? "teaspoon"
+    : rawUnit === "T"
+      ? "tablespoon"
+      : ENTRY_UNIT_ALIASES.get(lowerUnit) ??
+        (isUnitCode(lowerUnit)
+          ? lowerUnit
+          : isUnitCode(lowerUnit.replaceAll("_", " "))
+            ? lowerUnit.replaceAll("_", " ")
+            : isUnitCode(lowerUnit.replaceAll(" ", "_"))
+              ? lowerUnit.replaceAll(" ", "_")
+              : undefined);
+  if (!isUnitCode(unit)) {
+    return { status: "invalid", message: `"${rawUnit}" is not a recognized kitchen unit.` };
+  }
+  if (allowedUnits && !allowedUnits.includes(unit)) {
+    return { status: "invalid", message: `"${rawUnit}" is not available for this recipe line.` };
+  }
+  return { status: "parsed", quantity, unit };
+}
+
 export type QuantityBasis = "as_purchased" | "as_produced" | "raw" | "cooked" | "unknown";
 
 export type UnitStatus =
@@ -119,6 +227,40 @@ export interface ConversionResult {
 export interface ItemScope {
   itemKind: "ingredient" | "component";
   itemId: string;
+}
+
+export type LineConversionDescription =
+  | { status: "resolved"; quantity: number }
+  | { status: "unresolved"; reason: string }
+  | { status: "no-catalog-unit" };
+
+/**
+ * Describe the exact conversion culinary demand will use for a recipe line.
+ * Catalog imports can retain TPP labels, so resolve those before attempting a
+ * conversion instead of pretending they are already UnitCodes.
+ */
+export function describeLineConversion(
+  quantity: number,
+  unit: UnitCode,
+  catalogUnit: string | null | undefined,
+  mappings: readonly ItemUnitMappingLike[] = [],
+  scope?: ItemScope,
+): LineConversionDescription {
+  if (!catalogUnit?.trim()) return { status: "no-catalog-unit" };
+  const normalizedCatalogUnit = normalizeUnit(catalogUnit);
+  if (!normalizedCatalogUnit) {
+    return { status: "unresolved", reason: `This ingredient is stocked in "${catalogUnit}", which can't be converted. Enter it in ${catalogUnit}.` };
+  }
+  const conversion = convertQuantity(quantity, unit, normalizedCatalogUnit, mappings, scope);
+  if (conversion.status === "resolved") {
+    return { status: "resolved", quantity: conversion.quantity };
+  }
+  const reason = conversion.status === "unresolved_no_density"
+    ? `Can't turn a volume into a weight for this ingredient yet. Enter it in ${normalizedCatalogUnit}, or add how much a cup weighs on the ingredient.`
+    : conversion.status === "unresolved_no_mapping"
+      ? `Can't turn this into ${normalizedCatalogUnit} yet. Enter it in ${normalizedCatalogUnit}, or add how much one piece or pack is on the ingredient.`
+      : "That unit could mean more than one thing. Pick a clearer one, such as fl oz or oz.";
+  return { status: "unresolved", reason };
 }
 
 const mappingsFor = (mappings: readonly ItemUnitMappingLike[], scope: ItemScope | undefined) =>
@@ -302,6 +444,31 @@ export const resolveTppUnit = (label: string): UnitAliasResult => {
     ? { unit, status: "resolved", sourceLabel: trimmed }
     : { unit: null, status: "unresolved_ambiguous_source", sourceLabel: trimmed };
 };
+
+/** Resolve either a stored UnitCode or a supported imported TPP unit label. */
+export function normalizeUnit(raw: string | null | undefined): UnitCode | null {
+  if (!raw) return null;
+  return isUnitCode(raw) ? raw : resolveTppUnit(raw).unit;
+}
+
+/** Pick a valid default for an empty flexible quantity field. */
+export function fallbackUnitFor(
+  raw: string | null | undefined,
+  allowedUnits: readonly UnitCode[],
+  defaultUnit: UnitCode = "each",
+): UnitCode {
+  const normalized = normalizeUnit(raw);
+  return normalized && allowedUnits.includes(normalized) ? normalized : defaultUnit;
+}
+
+/** Format persisted line values for editing without exponent notation. */
+export function formatQuantityEntry(quantity: number, unit: string): string {
+  const formattedQuantity = quantity.toLocaleString("en-US", {
+    useGrouping: false,
+    maximumFractionDigits: 20,
+  });
+  return `${formattedQuantity} ${normalizeUnit(unit) ?? unit}`;
+}
 
 /**
  * Round for storage and display without losing tiny amounts: a pinch of

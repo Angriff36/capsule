@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import {
   formatDate,
   formatMoney,
+  formatMoneyExact,
   formatTime,
   normalizeCurrencyCode,
 } from "../../lib/format";
@@ -59,6 +61,9 @@ import { downloadInvoicePdf } from "./invoicePdf";
 import { readInvoiceLineItems, readTaxBreakdown } from "./invoiceTax";
 import { ReminderHistoryList } from "./ReminderHistoryList";
 import { useActionNotice } from "../../ui/action-result";
+import { LifecycleStepper } from "../../ui/LifecycleStepper";
+import { invoiceLifecycle } from "../../lib/lifecycle/lifecycleDefinitions";
+import { StickyRecordHeader } from "../../ui/StickyRecordHeader";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import "./taxWorkspace.css";
@@ -74,6 +79,8 @@ type ReminderScheduleView = {
 
 export function InvoiceDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const headerSentinelRef = useRef<HTMLDivElement>(null);
+  const sectionScopeRef = useRef<HTMLDivElement>(null);
   const invoice = useRouteRecord(useGetInvoice, id);
   useTrackRecent(
     "Invoice",
@@ -260,8 +267,11 @@ export function InvoiceDetailPage() {
     ? Number(invoice.amountDue ?? 0) * exchangeRate
     : null;
 
+  // A bill shows cents: $8,240.40, not $8,240.
   const usd = (value: unknown) =>
-    formatMoney(Number(value ?? 0), invoiceCurrencyCode);
+    normalizeCurrencyCode(invoiceCurrencyCode) === "USD"
+      ? formatMoneyExact(Number(value ?? 0))
+      : formatMoney(Number(value ?? 0), invoiceCurrencyCode);
   const depositAmount = Number(invoice.depositAmount ?? 0);
   const depositPaidAt =
     invoice.depositPaidAt != null ? Number(invoice.depositPaidAt) : null;
@@ -667,16 +677,62 @@ export function InvoiceDetailPage() {
   };
 
   return (
-    <div className="operations-stage supply-stage">
+    <div ref={sectionScopeRef} className="operations-stage supply-stage">
+      <StickyRecordHeader
+        title={
+          formatInvoiceNumber(invoice.invoiceNumber, invoice._id) ||
+          "Untitled invoice"
+        }
+        facts={[
+          { label: "Status", value: formatStatusLabel(String(invoice.status)) },
+          { label: "Total", value: usd(invoice.total) },
+          { label: "Due", value: formatDate(dueDate) },
+        ]}
+        actions={
+          <>
+            {invoice.status === "paid" ? (
+              <button
+                className="btn btn-ghost"
+                type="button"
+                disabled={busy != null || !canIssueCreditMemo}
+                onClick={() => setShowCreditMemo((visible) => !visible)}
+              >
+                Issue credit memo
+              </button>
+            ) : null}
+            <button className="btn btn-ghost" onClick={downloadPdf}>
+              Download PDF
+            </button>
+          </>
+        }
+        primaryAction={
+          <Link
+            className="btn btn-primary"
+            to={`${FINANCE_ROUTES.payments}?invoice=${invoice._id}`}
+          >
+            Record payment
+          </Link>
+        }
+        sentinelRef={headerSentinelRef}
+        sectionScopeRef={sectionScopeRef}
+        headingId="invoice-detail-title"
+      />
       <header className="supply-masthead invoice-doc-masthead">
         <div>
           <p className="eyebrow">
-            <Link className="text-link" to={FINANCE_ROUTES.invoices}>
+            <ReturnToListLink
+              fallback={FINANCE_ROUTES.invoices}
+              className="text-link"
+            >
               Invoices
-            </Link>{" "}
+            </ReturnToListLink>{" "}
             · Detail
           </p>
-          <h1 className="display-title mt-2">
+          <h1
+            id="invoice-detail-title"
+            tabIndex={-1}
+            className="display-title mt-2"
+          >
             {formatInvoiceNumber(invoice.invoiceNumber, invoice._id) ||
               "Untitled invoice"}
           </h1>
@@ -734,7 +790,10 @@ export function InvoiceDetailPage() {
             >
               {busy === "emailInvoice" ? "Emailing…" : "Email the invoice"}
             </button>
-            <Link className="btn btn-primary" to={FINANCE_ROUTES.payments}>
+            <Link
+              className="btn btn-primary"
+              to={`${FINANCE_ROUTES.payments}?invoice=${invoice._id}`}
+            >
               Add payment
             </Link>
           </div>
@@ -771,6 +830,7 @@ export function InvoiceDetailPage() {
           ) : null}
         </aside>
       </header>
+      <div ref={headerSentinelRef} aria-hidden="true" />
       <FinanceWorkspaceNav />
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (
@@ -820,23 +880,22 @@ export function InvoiceDetailPage() {
             <h2>Actions</h2>
           </div>
         </div>
+        <LifecycleStepper
+          definition={invoiceLifecycle}
+          status={String(invoice.status)}
+          actions={invoiceLifecycle.actions.filter((candidate) =>
+            policy
+              .invoiceActions(String(invoice.status), invoice)
+              .some((action) => action.key === candidate.key),
+          )}
+          blocked={policy.invoiceBlockedActions(
+            String(invoice.status),
+            invoice,
+          )}
+          busy={busy != null}
+          onAction={invoke}
+        />
         <div className="supply-row-actions">
-          {policy
-            .invoiceActions(String(invoice.status), invoice)
-            .map((action) => (
-              <button
-                key={action.key}
-                className="btn btn-ghost"
-                disabled={busy != null}
-                onClick={() => invoke(action.key)}
-              >
-                {busy === action.key
-                  ? "Working…"
-                  : action.key === "send"
-                    ? "Mark sent"
-                    : action.label}
-              </button>
-            ))}
           <button
             type="button"
             className="btn btn-ghost"
@@ -1418,7 +1477,7 @@ export function InvoiceDetailPage() {
                 aria-describedby="reminder-offsets-help"
                 disabled={!reminderAutomationAvailable || busy != null}
               />
-              <span id="reminder-offsets-help" className="field-help">
+              <span id="reminder-offsets-help" className="field-help-note">
                 Positive is before due; 0 is due day; negative is overdue.
               </span>
             </label>
@@ -1473,7 +1532,7 @@ export function InvoiceDetailPage() {
                 action: (
                   <Link
                     className="btn btn-ghost btn-sm"
-                    to={FINANCE_ROUTES.payments}
+                    to={`${FINANCE_ROUTES.payments}?invoice=${invoice._id}`}
                   >
                     Add payment
                   </Link>

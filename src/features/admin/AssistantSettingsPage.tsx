@@ -6,6 +6,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
+import { formatDateTime } from "../../lib/format";
 
 /**
  * Tenant configuration for the in-app AI assistant (docs/systems/assistant.md).
@@ -128,8 +129,7 @@ export function AssistantSettingsPage() {
               )}
               {existing?.configuredAt != null && (
                 <span className="text-xs text-ink-3">
-                  Last configured{" "}
-                  {new Date(existing.configuredAt).toLocaleString()}
+                  Last configured {formatDateTime(existing.configuredAt)}
                 </span>
               )}
             </div>

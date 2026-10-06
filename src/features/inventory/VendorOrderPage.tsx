@@ -1,8 +1,9 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import { useEventsById } from "../facilities/useEventsById";
-import { formatMoneyExact } from "../../lib/format";
+import { formatQuantity, formatMoneyExact } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
   useCreateStorageLocation,
@@ -13,6 +14,7 @@ import {
   useListInventoryLot,
   useListItemUnitMapping,
   useListPurchaseNeed,
+  useListInventoryItem,
   useListStorageLocation,
   useListVendor,
   useListVendorContact,
@@ -81,6 +83,7 @@ export function VendorOrderPage() {
   const inventoryLots = useListInventoryLot();
   const unitMappings = useListItemUnitMapping();
   const locations = useListStorageLocation();
+  const stockLines = useListInventoryItem();
   const createLocation = useCreateStorageLocation();
   const createLine = useCreateVendorOrderLine();
   const submitOrder = useVendorOrderSubmit();
@@ -110,9 +113,12 @@ export function VendorOrderPage() {
   if (order === undefined) {
     return (
       <div className="operations-stage supply-stage order-folio">
-        <Link className="text-link" to="/inventory/purchasing">
+        <ReturnToListLink
+          fallback="/inventory/purchasing"
+          className="text-link"
+        >
           ← Purchase queue
-        </Link>
+        </ReturnToListLink>
         <InventoryWorkspaceNav />
         <QueryLoadState
           title="Order data is not loading"
@@ -285,6 +291,45 @@ export function VendorOrderPage() {
     });
   };
 
+  // Most deliveries arrive as ordered: one slip number receives every open
+  // line in full, each into the place that ingredient is already kept.
+  // A short or damaged line is fixed on its own row afterwards.
+  const receiveAllAsOrdered = (lines: any[]) => {
+    void (async () => {
+      const slip = await prompt.askReason({
+        title: "Receive everything as ordered",
+        description:
+          "Every open line is received in full at its order price. Fix any short or damaged line on its own row afterwards.",
+        label: "Delivery slip or lot number",
+        placeholder: "e.g. FR-102614",
+        confirmLabel: "Receive all",
+      });
+      if (!slip) return;
+      void run("order:receiveAll", async () => {
+        const fallback = activeLocations(locations)[0]?._id;
+        for (const line of lines) {
+          const stocked = (stockLines ?? []).find(
+            (item) =>
+              item.deletedAt == null && item.ingredientId === line.ingredientId,
+          )?.locationId;
+          const locationId = line.locationId ?? stocked ?? fallback;
+          if (!locationId)
+            throw new Error("Add a storage location first, then receive.");
+          await recordReceipt({
+            docId: line._id,
+            version: line.version,
+            quantity:
+              Number(line.orderedQuantity) - Number(line.receivedQuantity),
+            locationId: String(locationId),
+            unitPrice: Number(line.unitCost),
+            supplierLotNumber: slip,
+            deliveryReference: slip,
+          });
+        }
+      });
+    })();
+  };
+
   const invokeOrderAction = (key: string) => {
     void (async () => {
       if (key === "cancel") {
@@ -372,16 +417,20 @@ export function VendorOrderPage() {
 
   return (
     <div className="operations-stage supply-stage order-folio">
-      <Link className="text-link" to="/inventory/purchasing">
+      <ReturnToListLink fallback="/inventory/purchasing" className="text-link">
         ← Purchase queue
-      </Link>
+      </ReturnToListLink>
       <header className="order-folio-masthead">
         <div>
           <p className="eyebrow">Vendor order</p>
           <h1 className="display-title mt-2">{vendorOrderTitle(order)}</h1>
           <p className="mt-3 text-ink-2">
             {vendor?.name ?? "Unknown vendor"} ·{" "}
-            {order.eventId ? "Event order" : "General stock"}
+            {order.eventId
+              ? "Event order"
+              : order.sourceRangeStart != null
+                ? `Weekly order · week of ${new Date(Number(order.sourceRangeStart)).toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: "UTC" })}`
+                : "General stock"}
           </p>
         </div>
         <div className="order-state">
@@ -513,7 +562,7 @@ export function VendorOrderPage() {
                 {openNeeds.map((need) => (
                   <option key={need._id} value={need._id}>
                     {ingredientName(need.ingredientId)} ·{" "}
-                    {need.requiredQuantity} {need.unit} ·{" "}
+                    {formatQuantity(need.requiredQuantity)} {need.unit} ·{" "}
                     {eventName(need.eventId)}
                   </option>
                 ))}
@@ -568,7 +617,29 @@ export function VendorOrderPage() {
             <p className="eyebrow">Receipt progress</p>
             <h2>Order lines</h2>
           </div>
-          <span>{orderLines.length} lines</span>
+          <span className="flex items-center gap-3">
+            {(() => {
+              const open = orderLines.filter(
+                (line) =>
+                  (line.status === "added" || line.status === "receiving") &&
+                  Number(line.orderedQuantity) - Number(line.receivedQuantity) >
+                    0,
+              );
+              return (String(order.status) === "confirmed" ||
+                String(order.status) === "partially_received") &&
+                open.length > 0 ? (
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  disabled={busy != null}
+                  onClick={() => receiveAllAsOrdered(open)}
+                >
+                  Receive all as ordered
+                </button>
+              ) : null;
+            })()}
+            {orderLines.length} lines
+          </span>
         </div>
         {lines === undefined ||
         demandLinks === undefined ||
@@ -624,8 +695,8 @@ export function VendorOrderPage() {
                       </span>
                       {lineNeeds.map((need) => (
                         <small key={need._id}>
-                          {eventName(need.eventId)} · {need.requiredQuantity}{" "}
-                          {need.unit}
+                          {eventName(need.eventId)} ·{" "}
+                          {formatQuantity(need.requiredQuantity)} {need.unit}
                           {events.find((event) => event._id === need.eventId)
                             ?.stage === "cancelled"
                             ? " · event cancelled"
@@ -642,25 +713,26 @@ export function VendorOrderPage() {
                     </div>
                     <div className="order-line-quantity">
                       <strong>
-                        {line.receivedQuantity} / {line.orderedQuantity}
+                        {formatQuantity(line.receivedQuantity)} /{" "}
+                        {formatQuantity(line.orderedQuantity)}
                       </strong>
                       <span>
                         {line.unit} received
                         {line.isFullyReceived
                           ? " · complete"
-                          : ` · ${line.remainingQuantity} remaining`}
+                          : ` · ${formatQuantity(line.remainingQuantity)} remaining`}
                       </span>
                       <small>
                         {formatMoneyExact(Number(line.lineTotal))} line ·{" "}
                         {formatMoneyExact(Number(line.unitCost))} / {line.unit}
                         {line.hasReceivingDiscrepancy
-                          ? ` · discrepancy ${line.discrepancyQuantity}`
+                          ? ` · discrepancy ${formatQuantity(line.discrepancyQuantity)}`
                           : ""}
                       </small>
                       {isDraft && line.plannedQuantity != null ? (
                         <small>
-                          Current calculation: {line.plannedQuantity}{" "}
-                          {line.unit}
+                          Current calculation:{" "}
+                          {formatQuantity(line.plannedQuantity)} {line.unit}
                           {line.quantityIsManual !== false
                             ? " · order quantity kept"
                             : " · updates with event requirements"}
@@ -723,7 +795,8 @@ export function VendorOrderPage() {
                                 })
                               }
                             >
-                              Use {line.plannedQuantity} {line.unit}
+                              Use {formatQuantity(line.plannedQuantity)}{" "}
+                              {line.unit}
                             </button>
                           ) : null}
                         </>
@@ -779,7 +852,7 @@ export function VendorOrderPage() {
                           <li key={lot._id}>
                             <strong>{lot.supplierLotNumber}</strong>
                             <span>
-                              {lot.receiptQuantity} {lot.unit} ·{" "}
+                              {formatQuantity(lot.receiptQuantity)} {lot.unit} ·{" "}
                               {ingredientName(line.ingredientId)}
                               {lot.deliveryReference
                                 ? ` · slip ${lot.deliveryReference}`

@@ -47,6 +47,18 @@ const contribution = (ingredientId: string, quantity: number): Contribution =>
     sourceDishIngredientId: null,
     sourceDishComponentId: null,
     servings: 40,
+    calculationSnapshot: {
+      version: 1,
+      kind: "direct_dish",
+      recipeLineQuantity: quantity / 40,
+      wasteFactor: 1,
+      batchMultiplier: 1,
+      servings: 40,
+      yieldQuantity: 1,
+      resultQuantity: quantity,
+      resultUnit: "pound",
+      componentPath: [],
+    },
     purchasable: true,
   }) as Contribution;
 

@@ -10,6 +10,7 @@ import { useMutation } from "convex/react";
 import { Link, useSearchParams } from "react-router-dom";
 import { api, type Doc, type Id } from "../../lib/api";
 import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
+import { SearchSelect } from "../../ui/SearchSelect";
 import { clientDisplayName } from "../events/clientName";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { useCatalogDishes } from "./useCatalogDishes";
@@ -23,7 +24,7 @@ import {
   BoundedDateInput,
   BoundedDateTimeLocalInput,
 } from "../../ui/BoundedDateInputs";
-import { toDatetimeLocalValue } from "../../lib/format";
+import { formatMoneyExact, toDatetimeLocalValue } from "../../lib/format";
 import { useListProposalTemplate } from "../../lib/manifest-convex-react";
 import {
   proposalTemplateDefaults,
@@ -589,21 +590,20 @@ export function ProposalCreateForm({
             ) : (
               <label className="field-label supply-span-2">
                 Client
-                <select
-                  className="input"
+                <SearchSelect
                   name="clientId"
                   required
                   defaultValue=""
-                >
-                  <option value="" disabled>
-                    Select client
-                  </option>
-                  {activeClients.map((row) => (
-                    <option key={row._id} value={row._id}>
-                      {clientDisplayName(row._id, clients)}
-                    </option>
-                  ))}
-                </select>
+                  recentsKey="client"
+                  placeholder="Search clients…"
+                  options={activeClients.map((row) => ({
+                    id: row._id,
+                    label: clientDisplayName(row._id, clients),
+                    hint:
+                      [row.email, row.phone].filter(Boolean).join(" · ") ||
+                      null,
+                  }))}
+                />
               </label>
             )}
             <label className="field-label">
@@ -703,6 +703,7 @@ export function ProposalCreateForm({
                           <td>
                             <input
                               className="input"
+                              aria-label={`Line ${index + 1} description`}
                               value={line.description}
                               onChange={(e) =>
                                 updateLine(
@@ -717,6 +718,7 @@ export function ProposalCreateForm({
                           <td>
                             <select
                               className="input"
+                              aria-label={`Line ${index + 1} price basis`}
                               value={line.pricingBasis}
                               onChange={(e) =>
                                 updateLine(
@@ -741,7 +743,7 @@ export function ProposalCreateForm({
                                 pickDish(line.key, e.target.value)
                               }
                               disabled={catalog.loading}
-                              aria-label="Link line to a catalog dish"
+                              aria-label={`Line ${index + 1} catalog dish`}
                             >
                               <option value="">— custom line —</option>
                               {catalog.lines.map((dish) => (
@@ -752,7 +754,7 @@ export function ProposalCreateForm({
                                   {dish.name}
                                   {dish.sellingPrice == null
                                     ? ""
-                                    : ` · ${dish.sellingPrice.toFixed(2)}`}
+                                    : ` · ${formatMoneyExact(dish.sellingPrice)}`}
                                 </option>
                               ))}
                             </select>
@@ -763,6 +765,7 @@ export function ProposalCreateForm({
                               type="number"
                               step="0.01"
                               min={0}
+                              aria-label={`Line ${index + 1} price or percent`}
                               value={line.unitPrice}
                               onChange={(e) =>
                                 updateLine(
@@ -779,6 +782,7 @@ export function ProposalCreateForm({
                               type="number"
                               step="0.01"
                               min={0}
+                              aria-label={`Line ${index + 1} quantity`}
                               value={line.quantity}
                               onChange={(e) =>
                                 updateLine(line.key, "quantity", e.target.value)
@@ -789,6 +793,7 @@ export function ProposalCreateForm({
                           <td>
                             <input
                               className="input w-20"
+                              aria-label={`Line ${index + 1} unit`}
                               value={line.unit}
                               onChange={(e) =>
                                 updateLine(line.key, "unit", e.target.value)
@@ -801,9 +806,9 @@ export function ProposalCreateForm({
                             {draftGuestCount == null &&
                             line.pricingBasis === "per_person"
                               ? "—"
-                              : (
-                                  draftPricing.lines[index]?.amount ?? 0
-                                ).toFixed(2)}
+                              : formatMoneyExact(
+                                  draftPricing.lines[index]?.amount ?? 0,
+                                )}
                           </td>
                           <td>
                             <button
@@ -854,7 +859,9 @@ export function ProposalCreateForm({
             <p className="mt-2 text-base text-ink-2">
               Subtotal (from lines):{" "}
               <span className="tabular-nums">
-                {pricingNeedsGuests ? "—" : draftPricing.subtotal.toFixed(2)}
+                {pricingNeedsGuests
+                  ? "—"
+                  : formatMoneyExact(draftPricing.subtotal)}
               </span>
             </p>
           </div>
@@ -894,7 +901,7 @@ export function ProposalCreateForm({
           <p className="mt-3 text-base font-semibold text-ink">
             Total:{" "}
             <span className="tabular-nums">
-              {pricingNeedsGuests ? "—" : draftPricing.total.toFixed(2)}
+              {pricingNeedsGuests ? "—" : formatMoneyExact(draftPricing.total)}
             </span>
           </p>
           <div className="supply-form-grid">

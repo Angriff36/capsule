@@ -88,7 +88,10 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.status == "planned"
     guard self.plannedAt == null or self.componentId == componentId
-    guard self.plannedAt != null or (self.component != null and self.component.status == "published")
+    // No "recipe must be published" guard: the Event.approve fanOut runs this
+    // for every dish component, so a draft recipe failed the whole approval
+    // ("Not allowed right now"). The kitchen still makes the dish.
+    guard self.plannedAt != null or self.component != null
     constraint planComponentMatch: componentId == self.componentId "This batch is for a different component. Pick the component already on this batch."
     constraint planEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "This batch is for a different event. Pick the event already on this batch, or leave it blank."
     constraint planYieldPositive: plannedYield > 0 or self.plannedYield > 0 "Enter a planned yield more than zero."

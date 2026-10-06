@@ -25,6 +25,7 @@ import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { FailureBanner } from "../FailureBanner";
 import { WORKBOOK_REVIEW_PARAM } from "../eventRoutes";
 import { FinalLockPanel } from "./FinalLockQuestions";
+import { formatDateTime } from "../../../lib/format";
 
 function valueText(value: unknown) {
   return Array.isArray(value)
@@ -483,7 +484,7 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
                   className="flex flex-wrap gap-3 py-2 text-sm"
                 >
                   <span>
-                    {new Date(revision.createdAt).toLocaleString()} ·{" "}
+                    {formatDateTime(revision.createdAt)} ·{" "}
                     {(revision.supersededBy &&
                       view.latestRevision?.id !== revision.id) ||
                     (view.latestRevision?.id === revision.id &&

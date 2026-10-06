@@ -16,10 +16,12 @@ describe("Clients CRM routes and lifecycle bindings", () => {
       "/clients",
       "/clients/proposals",
       "/clients/proposals/templates",
+      "/clients/tastings",
       "/clients/contracts",
       "/clients/retention",
       "/clients/quote-requests",
       "/clients/inbox",
+      "/clients/date-holds",
     ]);
   });
 
@@ -50,6 +52,12 @@ describe("Clients CRM routes and lifecycle bindings", () => {
     expect(ProposalAcceptLifecycle.map((t) => t.from)).toEqual(
       expect.arrayContaining(["sent", "viewed"]),
     );
-    expect(ContractSignLifecycle[0]?.from).toBe("viewed");
+    // A signed copy can come back straight after sending.
+    expect(ContractSignLifecycle.map((t) => t.from)).toEqual(
+      expect.arrayContaining(["sent", "viewed"]),
+    );
+    expect(policy.contractActions("sent").map((a) => a.key)).toEqual(
+      expect.arrayContaining(["sign"]),
+    );
   });
 });

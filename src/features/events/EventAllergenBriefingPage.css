@@ -26,7 +26,9 @@
 
 /* Browser print → "Save as PDF": only the sheet is visible on paper. */
 @media print {
-  body * {
+  /* Scoped: this stylesheet stays loaded after the page, and an unscoped
+     rule blanked printing on every other page. */
+  body:where(:has(.briefing-document)) * {
     visibility: hidden;
   }
 

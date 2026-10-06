@@ -174,7 +174,7 @@ export function planSupplySteps(input: SupplyPlanInput): SupplyPlanResult {
       steps.push({
         capabilityId: "Vendor.onboard",
         ref: vendorRef,
-        label: `Onboard vendor ${group.name}`,
+        label: `Add vendor ${group.name}`,
         idempotencySuffix: `vendor:${key}`,
         args: { name: group.name, notes: "Imported from a TPP order list." },
       });

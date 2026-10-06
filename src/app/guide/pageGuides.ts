@@ -56,7 +56,7 @@ export const PAGE_GUIDES: PageGuide[] = [
     purpose: "Book a new event — only the Basics section is needed to start.",
     steps: [
       "Fill in the title, client, date, and headcount.",
-      "Pick the client and venue in the side panel — create them right there if they're new.",
+      "Pick the client and venue — create them right there if they're new.",
       "Open the other sections later; you can always come back.",
     ],
   },
@@ -83,12 +83,32 @@ export const PAGE_GUIDES: PageGuide[] = [
   },
   {
     prefix: "/events/capacity",
-    title: "Capacity planner",
+    title: "Room sizes",
     purpose:
-      "See how full each day is so you know when you can safely take another booking.",
+      "Guests who said yes, set against how many the venue holds, and rooms booked for two events at once.",
     steps: [
-      "Look for crowded days before confirming a new event.",
+      "Look for full rooms and double bookings before you confirm a new event.",
       "Click a day to see what's already booked.",
+    ],
+  },
+  {
+    prefix: "/events/checklists",
+    title: "Event checklists",
+    purpose: "Lists of to-dos you use again and again.",
+    steps: [
+      "Make a checklist once for work you repeat.",
+      "Put it on an event from the event's To-dos page.",
+    ],
+  },
+  {
+    prefix: "/events/planning",
+    title: "Planning setup",
+    purpose:
+      "How the planning board checks a plan, which stages events move into by themselves, and what the board suggests.",
+    steps: [
+      "Set how loud each check is: Fix first, Worth a look, or Off.",
+      "Add planning rules for what the board should suggest.",
+      "Fill in the truck and equipment facts the checks need.",
     ],
   },
   {
@@ -424,8 +444,7 @@ export const PAGE_GUIDES: PageGuide[] = [
   {
     prefix: "/staff/roster",
     title: "Roster",
-    purpose:
-      "Assign people to events and build the weekly shift schedule, then publish it.",
+    purpose: "Assign people to events and build the weekly shift schedule.",
     steps: [
       "Add assignments for upcoming events.",
       "Build the week's shifts, then publish so staff see them.",
@@ -478,9 +497,12 @@ export const PAGE_GUIDES: PageGuide[] = [
   {
     prefix: "/staff/training",
     title: "Training",
-    purpose: "Completed trainings that unlock certain shift types.",
+    purpose:
+      "Completed trainings that unlock certain shift types, and each person's skill level per area.",
     steps: [
       "Note who's finished training so they can be scheduled for those roles.",
+      "In the skills matrix, rate each person 0 to 4 per area; level 4 people are the trainers.",
+      "Start training to keep the trainer, the dates and each step the trainer initials; finish it when the quiz is done.",
     ],
   },
   {
@@ -590,6 +612,16 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: ["Reply, and convert real inquiries into pipeline leads."],
   },
   {
+    prefix: "/clients/date-holds",
+    title: "Date holds",
+    purpose:
+      "Soft holds on dates for prospects, and who is waiting if a date opens.",
+    steps: [
+      "Hold a date for a prospect; it lapses on its own at the expiry.",
+      "When a held date opens, call the next client on its waitlist.",
+    ],
+  },
+  {
     prefix: "/finance",
     title: "Finance",
     purpose: "Money owed, money collected, and where to act next.",
@@ -624,7 +656,20 @@ export const PAGE_GUIDES: PageGuide[] = [
     title: "Closeout",
     purpose:
       "The financial wrap-up after each event — what it earned, what it cost.",
-    steps: ["Close out each event within a few days while it's fresh."],
+    steps: [
+      "Close out each event within a few days while it's fresh.",
+      "Open Leftovers on the closeout to record food donated, returned to stock, or thrown out.",
+    ],
+  },
+  {
+    prefix: "/finance/donations",
+    title: "Food donations",
+    purpose:
+      "A year of donated leftovers by recipient, for the tax file and Good Samaritan records.",
+    steps: [
+      "Pick the year and print the summary.",
+      "Chase any donation that still has no receipt number.",
+    ],
   },
   {
     prefix: "/finance/payroll",

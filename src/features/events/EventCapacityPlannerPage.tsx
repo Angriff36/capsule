@@ -148,11 +148,11 @@ export function EventCapacityPlannerPage() {
 
       <header className="capacity-masthead">
         <div>
-          <p className="eyebrow">Event ops · Capacity calendar</p>
+          <p className="eyebrow">Events · Room sizes</p>
           <h1>See the room before it fills.</h1>
           <p>
-            Confirmed RSVPs meet the venue limit here—along with every shared
-            room booking that needs a second look.
+            Guests who said yes, set against how many the venue holds, and rooms
+            booked for two events at once.
           </p>
         </div>
         <div
@@ -198,15 +198,15 @@ export function EventCapacityPlannerPage() {
         <article>
           <span>Confirmed</span>
           <strong>{formatCount(plan.confirmedHeadcount)}</strong>
-          <small>guest RSVPs</small>
+          <small>guests who said yes</small>
         </article>
         <article>
-          <span>Capacity on file</span>
+          <span>Venues hold</span>
           <strong>{formatCount(plan.recordedCapacity)}</strong>
-          <small>seats across events</small>
+          <small>guests across these events</small>
         </article>
         <article className={plan.conflicts.length ? "is-alert" : undefined}>
-          <span>Venue conflicts</span>
+          <span>Rooms booked twice</span>
           <strong data-testid="capacity-conflict-count">
             {formatCount(plan.conflicts.length)}
           </strong>
@@ -219,7 +219,7 @@ export function EventCapacityPlannerPage() {
       </section>
 
       <section className="capacity-legend" aria-label="Occupancy heat legend">
-        <span className="eyebrow">Confirmed ÷ capacity</span>
+        <span className="eyebrow">Guests who said yes, out of room size</span>
         {(
           Object.entries(HEAT_LABEL) as [keyof typeof HEAT_LABEL, string][]
         ).map(([heat, label]) => (

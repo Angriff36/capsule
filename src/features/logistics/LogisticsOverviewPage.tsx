@@ -53,8 +53,16 @@ export function LogisticsOverviewPage() {
   const liveDeliveries = (deliveries ?? []).filter(
     (row) => row.deletedAt == null && String(row.status) !== "cancelled",
   );
+  // Pack lists of events that are already over are history, not work.
+  const eventOver = (id: string) => {
+    const event = events?.find((row) => row._id === id);
+    return Number(event?.endsAt ?? event?.startsAt ?? Infinity) < now;
+  };
   const livePackLists = (packLists ?? []).filter(
-    (row) => row.deletedAt == null && String(row.status) !== "cancelled",
+    (row) =>
+      row.deletedAt == null &&
+      String(row.status) !== "cancelled" &&
+      !eventOver(row.eventId),
   );
   const eventName = (id: string) =>
     events?.find((event) => event._id === id)?.title ?? "Unknown event";
@@ -78,7 +86,13 @@ export function LogisticsOverviewPage() {
 
   const attention: AttentionRow[] = [];
   for (const row of liveDeliveries) {
-    if (String(row.status) === "scheduled" && row.driverId == null) {
+    // A delivery whose window is over no longer needs a driver.
+    const windowOver = (row.windowEndsAt ?? row.windowStartsAt ?? now) < now;
+    if (
+      String(row.status) === "scheduled" &&
+      row.driverId == null &&
+      !windowOver
+    ) {
       attention.push({
         key: `driver-${row._id}`,
         title: row.destination,
@@ -171,7 +185,7 @@ export function LogisticsOverviewPage() {
         ) : attentionRows.length === 0 ? (
           <EmptyState
             title="Nothing is stuck."
-            hint="Every scheduled delivery has a driver and every packed list has a run."
+            hint="Every upcoming delivery has a driver and every packed list has a run."
             action={
               <Link className="btn btn-ghost btn-sm" to="/logistics/deliveries">
                 Open deliveries

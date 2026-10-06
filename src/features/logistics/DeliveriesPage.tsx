@@ -1,7 +1,9 @@
 import { Fragment, useMemo, useState, type FormEvent } from "react";
+import { useEventTimingPlan } from "../../lib/operational-transactions";
+import { localDateTime } from "../events/eventDetailFormHelpers";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
-import { formatCountNoun } from "../../lib/format";
+import { formatCountNoun, formatDateTimeRange } from "../../lib/format";
 import {
   useCreateDelivery,
   useDeliveryCancel,
@@ -10,9 +12,11 @@ import {
   useDeliverySchedule,
   useDeliveryStartTransit,
   useListDelivery,
+  useListEventAssignment,
   useListPackList,
   useListPerson,
   useListVehicle,
+  useListVenue,
 } from "../../lib/manifest-convex-react";
 import { useEventsById } from "../facilities/useEventsById";
 import {
@@ -104,6 +108,50 @@ export function DeliveriesPage() {
     (vehicle) =>
       vehicle.deletedAt == null && vehicle.operationalStatus !== "retired",
   );
+  // Picking the pack list fills in what the event already knows: the venue
+  // address, the trip from the timing plan, and whoever is staffed as driver.
+  const venues = useListVenue();
+  const assignments = useListEventAssignment();
+  const [pickedPackId, setPickedPackId] = useState("");
+  const [destination, setDestination] = useState("");
+  const [windowStart, setWindowStart] = useState("");
+  const [windowEnd, setWindowEnd] = useState("");
+  const [driverId, setDriverId] = useState("");
+  const pickedEventId =
+    packLists?.find((pack) => pack._id === pickedPackId)?.eventId ?? null;
+  const pickedPlan = useEventTimingPlan(
+    pickedEventId ? (pickedEventId as Id<"events">) : null,
+  );
+  const [filledFor, setFilledFor] = useState("");
+  if (pickedEventId && pickedPlan && filledFor !== pickedPackId) {
+    setFilledFor(pickedPackId);
+    const event = pickedPlan.event as unknown as Record<string, unknown>;
+    const venue = (venues ?? []).find((row) => row._id === event.venueId);
+    setDestination(
+      [
+        venue?.name ?? event.venueName,
+        [venue?.addressLine1, venue?.city].filter(Boolean).join(", ") ||
+          event.venueAddress,
+      ]
+        .filter(Boolean)
+        .join(" · "),
+    );
+    const startsAt = Number(event.startsAt ?? NaN);
+    const leave = Number(event.timingDepartShopAt ?? NaN);
+    const arrive = Number(event.timingOnsiteAt ?? NaN);
+    setWindowStart(
+      localDateTime(Number.isFinite(leave) ? leave : startsAt - 90 * 60_000),
+    );
+    setWindowEnd(localDateTime(Number.isFinite(arrive) ? arrive : startsAt));
+    const driver = (assignments ?? []).find(
+      (row) =>
+        row.eventId === pickedEventId &&
+        row.deletedAt == null &&
+        row.status !== "unassigned" &&
+        /driver/i.test(String(row.role)),
+    );
+    if (driver) setDriverId(String(driver.personId));
+  }
   const eventName = (id: string) =>
     events?.find((event) => event._id === id)?.title ?? "Unknown event";
   const packName = (id: string) =>
@@ -332,7 +380,13 @@ export function DeliveriesPage() {
           <div className="supply-form-grid">
             <label className="field-label">
               Pack list
-              <select name="packListId" className="input" required>
+              <select
+                name="packListId"
+                className="input"
+                required
+                value={pickedPackId}
+                onChange={(event) => setPickedPackId(event.target.value)}
+              >
                 <option value="">Select pack list</option>
                 {schedulablePacks.map((pack) => (
                   <option key={pack._id} value={pack._id}>
@@ -349,6 +403,8 @@ export function DeliveriesPage() {
                 className="input"
                 placeholder="Venue loading dock"
                 required
+                value={destination}
+                onChange={(event) => setDestination(event.target.value)}
               />
             </label>
             <label className="field-label">
@@ -357,6 +413,8 @@ export function DeliveriesPage() {
                 name="windowStartsAt"
                 className="input"
                 required
+                value={windowStart}
+                onChange={(event) => setWindowStart(event.target.value)}
               />
             </label>
             <label className="field-label">
@@ -365,11 +423,18 @@ export function DeliveriesPage() {
                 name="windowEndsAt"
                 className="input"
                 required
+                value={windowEnd}
+                onChange={(event) => setWindowEnd(event.target.value)}
               />
             </label>
             <label className="field-label">
               Driver
-              <select name="driverId" className="input">
+              <select
+                name="driverId"
+                className="input"
+                value={driverId}
+                onChange={(event) => setDriverId(event.target.value)}
+              >
                 <option value="">Assign later</option>
                 {drivers.map((person) => (
                   <option key={person._id} value={person._id}>
@@ -399,7 +464,7 @@ export function DeliveriesPage() {
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">Transit</p>
+            <p className="eyebrow">On the schedule</p>
             <h2>Deliveries</h2>
           </div>
           <span>
@@ -419,13 +484,15 @@ export function DeliveriesPage() {
               to pack an event first, then schedule the run here.
             </span>
             <div className="mt-3 flex justify-center">
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={() => setShowCreate(true)}
-              >
-                Schedule delivery
-              </button>
+              {showCreate ? null : (
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => setShowCreate(true)}
+                >
+                  Schedule delivery
+                </button>
+              )}
             </div>
           </div>
         ) : (
@@ -491,7 +558,10 @@ export function DeliveriesPage() {
                             <option value="">No vehicle</option>
                             {fleet.map((vehicle) => (
                               <option key={vehicle._id} value={vehicle._id}>
-                                {vehicle.registration}
+                                {[vehicle.make, vehicle.model]
+                                  .filter(Boolean)
+                                  .join(" ")}{" "}
+                                · {vehicle.registration}
                               </option>
                             ))}
                           </select>
@@ -502,13 +572,10 @@ export function DeliveriesPage() {
                         )}
                       </td>
                       <td data-label="Window">
-                        {row.windowStartsAt
-                          ? new Date(row.windowStartsAt).toLocaleString()
-                          : "—"}{" "}
-                        →{" "}
-                        {row.windowEndsAt
-                          ? new Date(row.windowEndsAt).toLocaleString()
-                          : "—"}
+                        {formatDateTimeRange(
+                          row.windowStartsAt,
+                          row.windowEndsAt,
+                        )}
                       </td>
                       <td data-label="State">
                         <StatusChip status={String(row.status)} />

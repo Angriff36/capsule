@@ -7,6 +7,7 @@ import {
   useListVenue,
 } from "../../lib/manifest-convex-react";
 import { venueDetailPath } from "./facilitiesRoutes";
+import { listOriginState, useListOrigin } from "../list-state/listOrigin";
 import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
@@ -20,6 +21,8 @@ import {
   venueMatchesFilter,
   type VenueFilter,
 } from "./venueOperatingFacts";
+import { ListStateManager } from "../list-state/ListStateManager";
+import { useListViewState } from "../list-state/useListViewState";
 
 const VENUE_TYPES = [
   "client_site",
@@ -50,6 +53,40 @@ const LOGISTICS_BOOLEANS = [
   { name: "hasStairs", label: "Stairs (load-in)" },
 ] as const;
 
+const venuesState = new ListStateManager<VenueFilter>({
+  minGuests: {
+    key: "guests",
+    defaultValue: null,
+    parse: (value) =>
+      value != null && /^\d+$/.test(value) ? Number(value) : null,
+    serialize: (value) => (value == null ? null : String(value)),
+  },
+  premise: {
+    key: "premise",
+    defaultValue: "any",
+    parse: (value) => (value === "on" || value === "off" ? value : "any"),
+    serialize: (value) => (value === "any" ? null : value),
+  },
+  needsOven: {
+    key: "oven",
+    defaultValue: false,
+    parse: (value) => value === "1",
+    serialize: (value) => (value ? "1" : null),
+  },
+  needsFridge: {
+    key: "fridge",
+    defaultValue: false,
+    parse: (value) => value === "1",
+    serialize: (value) => (value ? "1" : null),
+  },
+  needsParking: {
+    key: "parking",
+    defaultValue: false,
+    parse: (value) => value === "1",
+    serialize: (value) => (value ? "1" : null),
+  },
+});
+
 // Tri-state logistics booleans: "" = Unknown (unset), "true" = Yes, "false" = No.
 // A binary checkbox cannot express "unknown" vs "confirmed no", which mismarks
 // venues created before a field existed. A select gives the operator all three.
@@ -59,6 +96,7 @@ const triStateBoolean = (
   value === "true" ? true : value === "false" ? false : undefined;
 
 export function VenuesPage() {
+  const listOrigin = useListOrigin();
   const venues = useListVenue();
   const createVenue = useCreateVenue();
   const deactivate = useVenueDeactivate();
@@ -69,7 +107,7 @@ export function VenuesPage() {
   const [failure, setFailure] = useState<unknown>(null);
   const { prompt, host } = useActionPrompt();
 
-  const [filter, setFilter] = useState<VenueFilter>(NO_VENUE_FILTER);
+  const [filter, setFilter] = useListViewState(venuesState);
   const rows = (venues ?? []).filter((item) => item.deletedAt == null);
   const shownRows = rows.filter((item) => venueMatchesFilter(item, filter));
   const activeRows = rows.filter(
@@ -197,19 +235,15 @@ export function VenuesPage() {
                 type="text"
                 name="name"
                 required
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="Grand Ballroom"
+                className="input mt-1"
+                placeholder="e.g. Grand Ballroom"
               />
             </div>
             <div>
               <label className="block text-xs font-medium text-ink-2">
                 Type *
               </label>
-              <select
-                name="venueType"
-                required
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-              >
+              <select name="venueType" required className="input mt-1">
                 {VENUE_TYPES.map((type) => (
                   <option key={type} value={type}>
                     {VENUE_TYPE_LABELS[type]}
@@ -244,7 +278,7 @@ export function VenuesPage() {
                   <input
                     type="text"
                     name="kitchenAccess"
-                    className="mt-1 block w-full rounded-sm border-line-2 shadow-sm text-xs"
+                    className="input mt-1"
                     placeholder="e.g., Full kitchen, warming station only, no kitchen"
                   />
                 </div>
@@ -255,7 +289,7 @@ export function VenuesPage() {
                   <input
                     type="text"
                     name="loadInInstructions"
-                    className="mt-1 block w-full rounded-sm border-line-2 shadow-sm text-xs"
+                    className="input mt-1"
                     placeholder="e.g., Dock door 3, load-in 6:00–8:00am, freight entrance off Maple"
                   />
                 </div>
@@ -268,7 +302,7 @@ export function VenuesPage() {
                       <select
                         name={field.name}
                         defaultValue=""
-                        className="mt-1 block w-full rounded-sm border-line-2 text-xs"
+                        className="input mt-1"
                       >
                         <option value="">Unknown</option>
                         <option value="true">Yes</option>
@@ -288,8 +322,8 @@ export function VenuesPage() {
                 name="capacity"
                 required
                 min="1"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="150"
+                className="input mt-1"
+                placeholder="e.g. 150"
               />
             </div>
             <div>
@@ -299,8 +333,8 @@ export function VenuesPage() {
               <input
                 type="text"
                 name="addressLine1"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="123 Main St"
+                className="input mt-1"
+                placeholder="e.g. 123 Main St"
               />
             </div>
             <div>
@@ -310,8 +344,8 @@ export function VenuesPage() {
               <input
                 type="text"
                 name="city"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="Springfield"
+                className="input mt-1"
+                placeholder="e.g. Springfield"
               />
             </div>
             <div>
@@ -321,8 +355,8 @@ export function VenuesPage() {
               <input
                 type="text"
                 name="region"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="IL"
+                className="input mt-1"
+                placeholder="e.g. IL"
               />
             </div>
             <div>
@@ -332,8 +366,8 @@ export function VenuesPage() {
               <input
                 type="text"
                 name="postalCode"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="62701"
+                className="input mt-1"
+                placeholder="e.g. 62701"
               />
             </div>
             <VenueCoordinatesFields />
@@ -344,8 +378,8 @@ export function VenuesPage() {
               <input
                 type="text"
                 name="contactName"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="John Smith"
+                className="input mt-1"
+                placeholder="e.g. John Smith"
               />
             </div>
             <div>
@@ -355,8 +389,8 @@ export function VenuesPage() {
               <input
                 type="email"
                 name="contactEmail"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="john@example.com"
+                className="input mt-1"
+                placeholder="e.g. john@example.com"
               />
             </div>
             <div>
@@ -366,8 +400,8 @@ export function VenuesPage() {
               <input
                 type="tel"
                 name="contactPhone"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="(555) 123-4567"
+                className="input mt-1"
+                placeholder="e.g. (555) 123-4567"
               />
             </div>
           </div>
@@ -378,7 +412,7 @@ export function VenuesPage() {
             <textarea
               name="accessNotes"
               rows={2}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1"
               placeholder="Loading dock available, stairs to second floor..."
             />
           </div>
@@ -389,7 +423,7 @@ export function VenuesPage() {
             <textarea
               name="cateringNotes"
               rows={2}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1"
               placeholder="Kitchen available, equipment restrictions..."
             />
           </div>
@@ -400,7 +434,7 @@ export function VenuesPage() {
             <textarea
               name="logisticsNotes"
               rows={2}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1"
               placeholder="Any other logistics context not captured above..."
             />
           </div>
@@ -411,7 +445,7 @@ export function VenuesPage() {
             <textarea
               name="wasteRules"
               rows={2}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1"
               placeholder="e.g., Dumpster behind dock, no grease disposal on-site, recycling required"
             />
           </div>
@@ -422,7 +456,7 @@ export function VenuesPage() {
             <textarea
               name="permitsInsuranceNotes"
               rows={2}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1"
               placeholder="e.g., COI required naming venue, sound permit needed, open-flame permit"
             />
           </div>
@@ -433,7 +467,7 @@ export function VenuesPage() {
             <textarea
               name="restrictions"
               rows={2}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1"
               placeholder="e.g., No open flame, sound curfew 10pm, no tape on walls"
             />
           </div>
@@ -462,7 +496,7 @@ export function VenuesPage() {
             total={rows.length}
           />
           <div className="overflow-hidden rounded-sm border border-line">
-            <table className="min-w-full divide-y divide-line">
+            <table className="phone-cards min-w-full divide-y divide-line">
               <thead className="bg-inset">
                 <tr>
                   <th className="px-4 py-3 text-left text-2xs font-medium uppercase text-ink-3">
@@ -502,6 +536,7 @@ export function VenuesPage() {
                     <td className="px-4 py-3">
                       <Link
                         to={venueDetailPath(venue._id)}
+                        state={listOriginState(listOrigin)}
                         className="font-medium text-brand hover:underline"
                       >
                         {venue.name}
@@ -513,18 +548,27 @@ export function VenuesPage() {
                         </div>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-xs text-ink-2">
+                    <td
+                      className="px-4 py-3 text-xs text-ink-2"
+                      data-label="Type"
+                    >
                       {VENUE_TYPE_LABELS[venue.venueType as VenueType] ||
                         venue.venueType}
                     </td>
-                    <td className="px-4 py-3 text-xs text-ink-2">
+                    <td
+                      className="px-4 py-3 text-xs text-ink-2"
+                      data-label="Capacity"
+                    >
                       {largestKnownCapacity(venue) || "Not known"}
                     </td>
-                    <td className="px-4 py-3 text-xs text-ink-2">
+                    <td
+                      className="px-4 py-3 text-xs text-ink-2"
+                      data-label="Location"
+                    >
                       {[venue.city, venue.region].filter(Boolean).join(", ") ||
                         "—"}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3" data-label="Status">
                       <StatusChip
                         status={
                           venue.status === "active" ? "active" : "inactive"

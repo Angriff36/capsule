@@ -5,9 +5,9 @@ import {
   useListComponent,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
+import { FieldHelp } from "../../ui/FieldHelp";
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
 import { componentPath } from "../kitchen/kitchenRoutes";
-import { ProductionWorkspaceNav } from "./ProductionWorkspaceNav";
 import {
   buildProductionYieldReport,
   type ProductionYieldBatch,
@@ -111,7 +111,12 @@ export function ProductionYieldDashboard({
       <header className="supply-masthead production-yield-masthead">
         <div>
           <p className="eyebrow">Production · Yield intelligence</p>
-          <h1 className="display-title mt-2">Production yield variance</h1>
+          <h1 className="display-title mt-2">
+            <span className="field-label-row">
+              Production yield variance
+              <FieldHelp term="yieldVariance" />
+            </span>
+          </h1>
           <p className="mt-3 max-w-180 text-ink-2">
             Compare the kitchen&apos;s planned output with what each component
             actually produced, then start coaching where the shortfall repeats.
@@ -128,7 +133,6 @@ export function ProductionYieldDashboard({
       </header>
 
       <KitchenBookNav />
-      <ProductionWorkspaceNav />
 
       <section
         className="production-yield-controls"

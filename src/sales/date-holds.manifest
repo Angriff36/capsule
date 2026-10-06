@@ -1,0 +1,198 @@
+// Capsule sales - a lightweight, warn-only claim on a prospective event day.
+// Date-only keys deliberately avoid a UTC conversion moving a local Saturday.
+
+use "../operations/event.manifest"
+use "./lead.manifest"
+
+enum DateHoldStatus {
+  held
+  released
+  expired
+  converted
+}
+
+enum DateWaitlistStatus {
+  waiting
+  offered
+  promoted
+  withdrawn
+}
+
+entity DateHold mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required holdDate: string
+  property clientId: uuid?
+  property leadId: uuid?
+  property eventId: uuid?
+  property venueId: uuid?
+  property ownerPersonId: uuid?
+  property required status: DateHoldStatus = "held"
+  property required expiresAt: int
+  property note: string?
+  property placedAt: int?
+  property releasedAt: int?
+  property convertedAt: int?
+
+  belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+  belongsTo lead: Lead fields [tenantId, leadId] references [tenantId, id]
+  belongsTo venue: Venue fields [tenantId, venueId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  transition status from "held" to ["released", "expired", "converted"]
+  transition status from "released" to []
+  transition status from "expired" to []
+  transition status from "converted" to []
+
+  default policy dateHoldRead read: roleAllows(user.role, "salesAccess") or roleAllows(user.role, "eventAccess") "Sales and event staff may see date availability"
+  default policy dateHoldWrite write: roleAllows(user.role, "salesAccess") "Sales staff may manage prospective date holds"
+  default policy dateHoldExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may manage prospective date holds"
+
+  // Holds warn, never block: a date can carry several holds and a booking.
+  command place(
+    holdDate: string,
+    expiresAt: int,
+    optional clientId: uuid,
+    optional leadId: uuid,
+    optional venueId: uuid,
+    optional note: string
+  ) {
+    guard self.placedAt == null
+    guard self.deletedAt == null
+    constraint dateHoldExpiresFuture: expiresAt > now() "Pick a hold expiry in the future."
+    mutate holdDate = holdDate
+    mutate expiresAt = expiresAt
+    mutate clientId = clientId
+    mutate leadId = leadId
+    mutate venueId = venueId
+    mutate note = note
+    mutate ownerPersonId = user.personId
+    mutate status = "held"
+    mutate placedAt = now()
+    emit DateHoldPlaced { dateHoldId: self.id tenantId: self.tenantId holdDate: self.holdDate }
+  }
+
+  command extend(expiresAt: int) {
+    guard self.status == "held"
+    guard self.deletedAt == null
+    constraint dateHoldExtendFuture: expiresAt > now() "Pick a hold expiry in the future."
+    mutate expiresAt = expiresAt
+    emit DateHoldExtended { dateHoldId: self.id tenantId: self.tenantId holdDate: self.holdDate }
+  }
+
+  command release() {
+    guard self.status == "held"
+    guard self.deletedAt == null
+    mutate status = "released"
+    mutate releasedAt = now()
+    emit DateHoldReleased { dateHoldId: self.id tenantId: self.tenantId holdDate: self.holdDate }
+  }
+
+  // Records a hold whose expiry already passed; the UI treats it as expired
+  // from expiresAt alone, so nothing waits on this command.
+  command expire() {
+    guard self.status == "held"
+    guard self.deletedAt == null
+    guard self.expiresAt <= now()
+    mutate status = "expired"
+    emit DateHoldExpired { dateHoldId: self.id tenantId: self.tenantId holdDate: self.holdDate }
+  }
+
+  command convert(eventId: uuid) {
+    guard self.status == "held"
+    guard self.deletedAt == null
+    mutate eventId = eventId
+    mutate status = "converted"
+    mutate convertedAt = now()
+    emit DateHoldConverted { dateHoldId: self.id tenantId: self.tenantId holdDate: self.holdDate }
+  }
+
+  store DateHold in durable
+}
+
+entity DateWaitlistEntry mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required holdDate: string
+  property clientId: uuid?
+  property leadId: uuid?
+  property ownerPersonId: uuid?
+  property required status: DateWaitlistStatus = "waiting"
+  property note: string?
+  property queuedAt: int?
+  property offeredAt: int?
+  property promotedAt: int?
+  property withdrawnAt: int?
+
+  belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+  belongsTo lead: Lead fields [tenantId, leadId] references [tenantId, id]
+
+  transition status from "waiting" to ["offered", "promoted", "withdrawn"]
+  transition status from "offered" to ["promoted", "withdrawn"]
+  transition status from "promoted" to []
+  transition status from "withdrawn" to []
+
+  default policy dateWaitlistRead read: roleAllows(user.role, "salesAccess") or roleAllows(user.role, "eventAccess") "Sales and event staff may see date availability"
+  default policy dateWaitlistWrite write: roleAllows(user.role, "salesAccess") "Sales staff may manage the date waitlist"
+  default policy dateWaitlistExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may manage the date waitlist"
+
+  command join(
+    holdDate: string,
+    optional clientId: uuid,
+    optional leadId: uuid,
+    optional note: string
+  ) {
+    guard self.queuedAt == null
+    guard self.deletedAt == null
+    mutate holdDate = holdDate
+    mutate clientId = clientId
+    mutate leadId = leadId
+    mutate note = note
+    mutate ownerPersonId = user.personId
+    mutate status = "waiting"
+    mutate queuedAt = now()
+    emit DateWaitlistJoined { dateWaitlistEntryId: self.id tenantId: self.tenantId holdDate: self.holdDate }
+  }
+
+  // Sales reached the client after the date opened.
+  command offer() {
+    guard self.status == "waiting"
+    guard self.deletedAt == null
+    mutate status = "offered"
+    mutate offeredAt = now()
+    emit DateWaitlistOffered { dateWaitlistEntryId: self.id tenantId: self.tenantId holdDate: self.holdDate }
+  }
+
+  // The client took the date (a hold or booking follows).
+  command promote() {
+    guard self.status == "waiting" or self.status == "offered"
+    guard self.deletedAt == null
+    mutate status = "promoted"
+    mutate promotedAt = now()
+    emit DateWaitlistPromoted { dateWaitlistEntryId: self.id tenantId: self.tenantId holdDate: self.holdDate }
+  }
+
+  command withdraw() {
+    guard self.status == "waiting" or self.status == "offered"
+    guard self.deletedAt == null
+    mutate status = "withdrawn"
+    mutate withdrawnAt = now()
+    emit DateWaitlistWithdrawn { dateWaitlistEntryId: self.id tenantId: self.tenantId holdDate: self.holdDate }
+  }
+
+  store DateWaitlistEntry in durable
+}
+
+event DateHoldPlaced: "date_hold.placed" { dateHoldId: string tenantId: string holdDate: string }
+event DateHoldExtended: "date_hold.extended" { dateHoldId: string tenantId: string holdDate: string }
+event DateHoldReleased: "date_hold.released" { dateHoldId: string tenantId: string holdDate: string }
+event DateHoldExpired: "date_hold.expired" { dateHoldId: string tenantId: string holdDate: string }
+event DateHoldConverted: "date_hold.converted" { dateHoldId: string tenantId: string holdDate: string }
+event DateWaitlistJoined: "date_waitlist.joined" { dateWaitlistEntryId: string tenantId: string holdDate: string }
+event DateWaitlistOffered: "date_waitlist.offered" { dateWaitlistEntryId: string tenantId: string holdDate: string }
+event DateWaitlistPromoted: "date_waitlist.promoted" { dateWaitlistEntryId: string tenantId: string holdDate: string }
+event DateWaitlistWithdrawn: "date_waitlist.withdrawn" { dateWaitlistEntryId: string tenantId: string holdDate: string }

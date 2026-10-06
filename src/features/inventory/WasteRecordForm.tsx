@@ -7,7 +7,12 @@ import {
 } from "../../lib/manifest-convex-react";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { useWorkingEventId } from "../events/workingEvent";
+import { AutomationCascadeFeedbackManager } from "../automation/AutomationCascadeFeedbackManager";
+import { useSuccessToast } from "../../ui/useSuccessToast";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import { UnitQuantityInput } from "../../ui/UnitQuantityInput";
+import { SearchSelect } from "../../ui/SearchSelect";
+import { formatQuantity, formatDate, formatTime } from "../../lib/format";
 
 export const WASTE_REASON_LABELS: Record<string, string> = {
   spoilage: "Spoilage",
@@ -26,6 +31,7 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
   const locations = useListStorageLocation();
   const events = usePickerAndNamedEvents([workingId]);
   const createWasteRecord = useCreateWasteRecord();
+  const { notifySuccess } = useSuccessToast();
   const [inventoryItemId, setInventoryItemId] = useState("");
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
@@ -50,17 +56,25 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
     setBusy(true);
     void (async () => {
       try {
+        const quantity = Number(data.get("quantity"));
+        const inventoryItemId = selectedItem._id;
+        const unit = selectedItem.unit;
         await createWasteRecord({
           ingredientId: selectedItem.ingredientId,
           locationId: selectedItem.locationId,
-          inventoryItemId: selectedItem._id,
-          quantity: Number(data.get("quantity")),
-          unit: selectedItem.unit,
+          inventoryItemId,
+          quantity,
+          unit,
           reason: String(data.get("reason")),
           eventId: eventId || undefined,
           unitCost: selectedItem.unitCost,
           notes: notes || undefined,
         });
+        new AutomationCascadeFeedbackManager(notifySuccess).wasteRecorded(
+          inventoryItemId,
+          quantity,
+          unit,
+        );
         element.reset();
         setInventoryItemId("");
         onClose();
@@ -103,22 +117,20 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
             {activeItems.map((item) => (
               <option key={item._id} value={item._id}>
                 {ingredientName(item.ingredientId)} ·{" "}
-                {locationName(item.locationId)} ({item.quantityOnHand}{" "}
-                {item.unit} on hand)
+                {locationName(item.locationId)} (
+                {formatQuantity(item.quantityOnHand)} {item.unit} on hand)
               </option>
             ))}
           </select>
         </label>
         <label className="field-label">
-          Quantity{selectedItem ? ` (${selectedItem.unit})` : ""}
-          <input
+          Quantity
+          {/* Any unit that converts; the record keeps the stock line's unit. */}
+          <UnitQuantityInput
+            key={selectedItem?._id ?? "none"}
             name="quantity"
-            className="input"
-            type="number"
-            min={0.0001}
+            storeUnit={selectedItem?.unit ?? "each"}
             max={selectedItem?.quantityOnHand}
-            step="any"
-            required
           />
         </label>
         <label className="field-label">
@@ -136,21 +148,30 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
         </label>
         <label className="field-label">
           Event
-          <select
+          <SearchSelect
             key={events?.length ? "events-ready" : "events-loading"}
             name="eventId"
-            className="input"
             defaultValue={workingId ?? ""}
-          >
-            <option value="">No event · kitchen operations</option>
-            {(events ?? [])
+            placeholder="No event · kitchen operations — or search…"
+            options={(events ?? [])
               .filter((item) => item.deletedAt == null)
-              .map((item) => (
-                <option key={item._id} value={item._id}>
-                  {item.title}
-                </option>
-              ))}
-          </select>
+              .map((item) => ({
+                id: item._id,
+                label: item.title,
+                // Same-name events (three "Ewing Wedding"s) differ by date.
+                hint:
+                  [
+                    item.startsAt
+                      ? `${formatDate(item.startsAt)} ${formatTime(item.startsAt)}`
+                      : null,
+                    "eventNumber" in item && item.eventNumber
+                      ? `#${item.eventNumber}`
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ") || null,
+              }))}
+          />
         </label>
         <label className="field-label">
           Notes

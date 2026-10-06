@@ -53,6 +53,7 @@ const nativeSchema = z
           food: z.boolean(),
           ownership: z.enum(["owned", "rented", "client"]).nullable(),
           leftOff: z.boolean(),
+          bin: z.number().int().nullable().optional(),
         })
         .strict(),
     ),

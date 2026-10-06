@@ -198,7 +198,9 @@ const watchIgnored = [
   "**/docs/**",
   "**/diagrams/**",
   "**/output/**",
-  "**/generated/**",
+  // Only the root proof output: src/generated holds the bindings the app
+  // imports, and ignoring it left stale rules on screen after a regen.
+  `${normalizePath(fileURLToPath(new URL("./generated", import.meta.url)))}/**`,
   "**/scripts/**",
   "**/convex/lib/**",
   "**/package.json",

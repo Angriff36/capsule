@@ -42,9 +42,13 @@ export function PaymentsPage() {
   const fail = usePaymentFail();
   const refund = usePaymentRefund();
   const reverse = usePaymentReverse();
-  const [showRecord, setShowRecord] = useState(false);
+  // "Add payment" on an invoice lands here with ?invoice=<id>: the form is
+  // open with that invoice picked.
+  const invoiceFromLink =
+    new URLSearchParams(window.location.search).get("invoice") ?? "";
+  const [showRecord, setShowRecord] = useState(invoiceFromLink !== "");
   const [showTerminal, setShowTerminal] = useState(false);
-  const [selectedInvoiceId, setSelectedInvoiceId] = useState("");
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState(invoiceFromLink);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
@@ -368,13 +372,24 @@ export function PaymentsPage() {
               <div className="supply-form-grid">
                 <label className="field-label">
                   Amount
+                  {/* Starts at what the picked invoice still owes; edit it
+                      for a partial payment. */}
                   <input
+                    key={selectedInvoiceId}
                     className="input"
                     name="amount"
                     type="number"
                     min="0.01"
                     step="0.01"
                     required
+                    defaultValue={(() => {
+                      const due = Number(
+                        payableInvoices.find(
+                          (invoice) => invoice._id === selectedInvoiceId,
+                        )?.amountDue ?? 0,
+                      );
+                      return due > 0 ? due.toFixed(2) : undefined;
+                    })()}
                   />
                 </label>
                 <label className="field-label">
@@ -457,13 +472,15 @@ export function PaymentsPage() {
                 >
                   {ledger.showSettledLabel(settledSummary)}
                 </button>
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => setShowRecord(true)}
-                >
-                  Add payment
-                </button>
+                {showRecord ? null : (
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => setShowRecord(true)}
+                  >
+                    Add payment
+                  </button>
+                )}
               </div>
             ) : (
               <>

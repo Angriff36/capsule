@@ -4,9 +4,12 @@ import {
   useGetClient,
   useGetContract,
   useGetEvent,
+  useGetVenue,
+  useListProposal,
 } from "../../lib/manifest-convex-react";
 import { formatDate, formatMoney, formatTime } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
@@ -37,8 +40,8 @@ const clientLabel = (row: {
 
 function Section({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <section className="mt-6 break-inside-avoid">
-      <h2 className="border-b border-line-2 pb-1 text-base font-semibold uppercase tracking-wide">
+    <section className="mt-6">
+      <h2 className="break-after-avoid border-b border-line-2 pb-1 text-base font-semibold uppercase tracking-wide">
         {label}
       </h2>
       <div className="mt-2 text-base leading-relaxed">{children}</div>
@@ -65,7 +68,7 @@ function SignatureBlock({
   signedAt?: number | null;
 }) {
   return (
-    <div className="mt-6">
+    <div className="mt-6 break-inside-avoid">
       <p className="text-sm uppercase tracking-wide text-ink-2">{role}</p>
       <div className="mt-8 border-b border-ink" />
       <div className="mt-1 flex justify-between text-sm">
@@ -89,6 +92,20 @@ export function ContractDocumentPage() {
   const client = useGetClient(
     contract?.clientId ? String(contract.clientId) : "skip",
   );
+  const venue = useGetVenue(event?.venueId ? String(event.venueId) : "skip");
+  // The client already agreed to these in the proposal; the contract repeats
+  // them rather than printing different money terms.
+  const proposals = useListProposal();
+  const acceptedTerms = (proposals ?? [])
+    .filter(
+      (row) =>
+        event != null &&
+        String(row.eventId ?? "") === String(event._id) &&
+        String(row.status) === "accepted" &&
+        row.deletedAt == null,
+    )
+    .sort((a, b) => Number(b.acceptedAt ?? 0) - Number(a.acceptedAt ?? 0))[0]
+    ?.terms?.trim();
 
   if (!id) {
     return (
@@ -158,7 +175,7 @@ export function ContractDocumentPage() {
       </header>
 
       <article
-        className="contract-document print-sheet mx-auto mt-6 max-w-200 bg-white p-8 text-ink"
+        className="contract-document print-sheet mx-auto mt-6 max-w-200 bg-white p-8 text-ink print:mt-0 print:max-w-none"
         style={
           {
             "--document-primary": branding.primaryColor,
@@ -238,7 +255,11 @@ export function ContractDocumentPage() {
                   <Row label="Event" value={String(event.title || "—")} />
                   <Row
                     label="Event type"
-                    value={String(event.eventType || "—")}
+                    value={
+                      event.eventType
+                        ? formatStatusLabel(String(event.eventType))
+                        : "—"
+                    }
                   />
                   <Row
                     label="Date"
@@ -254,7 +275,13 @@ export function ContractDocumentPage() {
                   <Row
                     label="Venue"
                     value={
-                      [event.venueName, event.venueAddress]
+                      [
+                        event.venueName ?? venue?.name,
+                        event.venueAddress ??
+                          [venue?.addressLine1, venue?.city]
+                            .filter(Boolean)
+                            .join(", "),
+                      ]
                         .filter(Boolean)
                         .join(", ") || "—"
                     }
@@ -285,15 +312,21 @@ export function ContractDocumentPage() {
               <Row
                 label="Quoted price"
                 value={
-                  event ? formatMoney(Number(event.quotedPrice ?? 0)) : "—"
+                  event
+                    ? Number(event.quotedPrice ?? 0) > 0
+                      ? formatMoney(Number(event.quotedPrice))
+                      : "Not priced yet"
+                    : "—"
                 }
               />
               <Row
                 label="Payment terms"
                 value={
-                  client
-                    ? `Net ${Number(client.paymentTermsDays ?? 30)} days from invoice`
-                    : "—"
+                  acceptedTerms
+                    ? "As agreed in the accepted proposal (see Terms)"
+                    : client
+                      ? `Net ${Number(client.paymentTermsDays ?? 30)} days from invoice`
+                      : "—"
                 }
               />
               {client?.taxExempt ? (
@@ -306,9 +339,12 @@ export function ContractDocumentPage() {
             </Section>
 
             <Section label="Terms">
+              {acceptedTerms ? (
+                <p className="mb-2 whitespace-pre-wrap">{acceptedTerms}</p>
+              ) : null}
               {contract.notes ? (
                 <p className="whitespace-pre-wrap">{String(contract.notes)}</p>
-              ) : (
+              ) : acceptedTerms ? null : (
                 <p className="text-ink-2">No extra terms on this contract.</p>
               )}
               {contract.expiresAt != null ? (
@@ -324,17 +360,19 @@ export function ContractDocumentPage() {
               ) : null}
             </Section>
 
-            <Section label="If you cancel">
-              <p>
-                Either party may cancel with written notice. Cancellations more
-                than 30 days before the event date incur no charge beyond
-                non-recoverable costs already committed. Cancellations within 30
-                days of the event are billed for committed costs and up to 50%
-                of the quoted price; within 7 days, up to the full quoted price.
-                Rescheduling by mutual agreement replaces cancellation charges
-                where feasible.
-              </p>
-            </Section>
+            {acceptedTerms ? null : (
+              <Section label="If you cancel">
+                <p>
+                  Either party may cancel with written notice. Cancellations
+                  more than 30 days before the event date incur no charge beyond
+                  non-recoverable costs already committed. Cancellations within
+                  30 days of the event are billed for committed costs and up to
+                  50% of the quoted price; within 7 days, up to the full quoted
+                  price. Rescheduling by mutual agreement replaces cancellation
+                  charges where feasible.
+                </p>
+              </Section>
+            )}
 
             <Section label="Signatures">
               <p className="text-ink-2">

@@ -1,3 +1,4 @@
+import { packListName } from "./packListName";
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
@@ -216,7 +217,7 @@ export function DispatchBoardPage() {
           openItems: open.map((item) => item.text).join("\n"),
         });
       else await dispatch({ docId: list._id, version: list.version });
-      setNotice(`${list.name || "Pack list"} sent out.`);
+      setNotice(`${packListName(list.name)} sent out.`);
     });
   };
 
@@ -431,7 +432,7 @@ export function DispatchBoardPage() {
                   </Link>
                   {lists.map((list) => {
                     const status = String(list.status);
-                    const label = list.name || "Pack list";
+                    const label = packListName(list.name);
                     return (
                       <span key={list._id} className="contents">
                         <Link

@@ -146,11 +146,22 @@ export function QuoteSubmissionPage() {
       const dateStr = String(data.get("eventDate") ?? "");
       const startTimeStr = String(data.get("eventStartTime") ?? "").trim();
       const endTimeStr = String(data.get("eventEndTime") ?? "").trim();
+      // No start time: assume 5:00 PM (as the event import does) and say so
+      // in the notes, so the event never shows a made-up midnight start.
+      const typedNotes = String(data.get("notes") ?? "").trim();
+      const notes = startTimeStr
+        ? typedNotes
+        : [
+            "No start time given; 5:00 PM is assumed until the client confirms.",
+            typedNotes,
+          ]
+            .filter(Boolean)
+            .join("\n");
       const result = await submitQuote({
         clientName: optional(String(data.get("clientName") ?? "")) ?? "",
         email: optional(String(data.get("email") ?? "")) ?? "",
         phone: optional(String(data.get("phone") ?? "")),
-        eventDate: Date.parse(`${dateStr}T${startTimeStr || "00:00"}`),
+        eventDate: Date.parse(`${dateStr}T${startTimeStr || "17:00"}`),
         eventEndTime: endTimeStr
           ? Date.parse(`${dateStr}T${endTimeStr}`)
           : undefined,
@@ -176,7 +187,7 @@ export function QuoteSubmissionPage() {
         dietaryRestrictions: optional(
           String(data.get("dietaryRestrictions") ?? ""),
         ),
-        notes: optional(String(data.get("notes") ?? "")),
+        notes: optional(notes),
       });
 
       setSuccess({

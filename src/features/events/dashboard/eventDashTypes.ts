@@ -47,6 +47,7 @@ export type EventDashOverviewProps = EventDetailRevisePanelsProps & {
   stage: string;
   currencyCode: string;
   lifecycleActions: readonly EventLifecycleAction[];
+  blockedLifecycleActions: readonly { key: string; reason: string }[];
   onAction: (key: EventLifecycleActionKey) => void;
   people: readonly DashOwnerPerson[] | undefined;
   dishCount: number;

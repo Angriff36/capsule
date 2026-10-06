@@ -60,6 +60,11 @@ entity PackList mixin TenantScoped, SoftDeletable {
   // "Needs assistance" on the tracker until someone resolves it.
   property assistanceRequestedAt: datetime?
   property assistanceNote: string?
+  // Bin sheet (Mangia "Memo - Perfect Packing"): JSON list of the numbered
+  // black bins on this event, [{"bin":12,"color":"green","dirty":false}].
+  // Lid colour says where the bin goes onsite; "dirty" is circled on the way
+  // back so the bin goes to the dish room. Empty = no bin sheet yet.
+  property binSheet: string?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   hasMany items: PackListItem
@@ -148,6 +153,18 @@ entity PackList mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Save the whole bin sheet. Kept open after dispatch: dirty bins are
+  // marked when the event comes back.
+  command setBinSheet(binSheet: string) {
+    guard self.deletedAt == null
+    mutate binSheet = length(trim(binSheet)) > 0 ? binSheet : null
+    emit PackListBinSheetSet {
+      packListId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
   command resolveAssistance() {
     guard self.assistanceRequestedAt != null
     guard self.deletedAt == null
@@ -182,13 +199,16 @@ entity PackList mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Also "Back to packing" from packed or loaded, so a crew can fix a line
+  // before the truck leaves (the declared transitions allow it). The first
+  // packing start time is kept.
   command startPacking() {
-    guard self.status == "draft"
+    guard self.status == "draft" or self.status == "packed" or self.status == "loaded"
     guard self.openedAt != null
     guard self.deletedAt == null
     compute previousStatus = self.status
     mutate status = "packing"
-    mutate packingStartedAt = now()
+    mutate packingStartedAt = self.packingStartedAt != null ? self.packingStartedAt : now()
     emit PackListPackingStarted {
       packListId: self.id
       tenantId: self.tenantId
@@ -339,6 +359,9 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   // What actually went out when it was not the listed item. The listed
   // description, quantity, and status stay. Empty clears it.
   property sentInstead: string?
+  // Number of the black bin this line is packed in, written to the right of
+  // the item (Mangia "Perfect Packing Process"). Empty = not in a bin.
+  property binNumber: int?
   // Set on a line that came from the service style kit; the idempotency key of
   // the kit cascade.
   property indexed serviceStyleKitItemId: uuid?
@@ -758,6 +781,18 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate note = note
     emit PackListItemAnnotated {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+    }
+  }
+
+  // Which numbered bin the line went in. Empty clears it.
+  command setBin(optional binNumber: int) {
+    guard self.deletedAt == null
+    constraint binNumberPositive: binNumber == null or binNumber > 0 "Use a bin number above zero."
+    mutate binNumber = binNumber
+    emit PackListItemBinSet {
       packListItemId: self.id
       tenantId: self.tenantId
       packListId: self.packListId
@@ -1206,6 +1241,18 @@ event PackListItemRemoved: "pack_list_item.removed" {
   description: string
 }
 
+event PackListBinSheetSet: "pack_list.bin_sheet_set" {
+  packListId: string
+  tenantId: string
+  eventId: string
+}
+
+event PackListItemBinSet: "pack_list_item.bin_set" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+}
+
 event PackListItemAnnotated: "pack_list_item.annotated" {
   packListItemId: string
   tenantId: string
@@ -1320,6 +1367,17 @@ on DishContainerReinstated fanOut PackListItem where dishContainerId = payload.d
   params { quantityServings: self.containerServings != null ? self.containerServings : 0 }
 
 on EventDishAdded fanOut PackList where activeEventId = payload.eventId
+  run requestDishContainers
+  params {
+    eventDishId: payload.eventDishId
+    dishId: payload.dishId
+    quantityServings: payload.quantityServings
+  }
+
+// A dish that arrives from an accepted proposal (a tasting pick) needs its
+// containers on the pack list too; ensureContainer matches, so a line that
+// already has them is left alone.
+on EventDishConfirmedFromProposal fanOut PackList where activeEventId = payload.eventId
   run requestDishContainers
   params {
     eventDishId: payload.eventDishId

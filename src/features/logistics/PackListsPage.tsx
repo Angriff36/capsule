@@ -1,5 +1,7 @@
+import { packListName } from "./packListName";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { listOriginState, useListOrigin } from "../list-state/listOrigin";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreatePackList,
@@ -23,10 +25,21 @@ import {
 } from "../events/WorkingEventScope";
 import { useWorkingEventId } from "../events/workingEvent";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import { ListStateManager } from "../list-state/ListStateManager";
+import { useListViewState } from "../list-state/useListViewState";
 
 const policy = new LogisticsLifecyclePolicy();
+const packListsState = new ListStateManager({
+  cancelled: {
+    key: "cancelled",
+    defaultValue: false,
+    parse: (value: string | null) => value === "1",
+    serialize: (value: boolean) => (value ? "1" : null),
+  },
+});
 
 export function PackListsPage() {
+  const listOrigin = useListOrigin();
   const eventScope = useWorkingEventScope("pack-lists");
   const workingId = useWorkingEventId();
   const packLists = useListPackList();
@@ -41,7 +54,8 @@ export function PackListsPage() {
   const dispatch = usePackListDispatch();
   const cancel = usePackListCancel();
   const [showCreate, setShowCreate] = useState(false);
-  const [showCancelled, setShowCancelled] = useState(false);
+  const [{ cancelled: showCancelled }, setListState] =
+    useListViewState(packListsState);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
@@ -173,7 +187,7 @@ export function PackListsPage() {
           <button
             className="btn btn-ghost"
             type="button"
-            onClick={() => setShowCancelled((value) => !value)}
+            onClick={() => setListState({ cancelled: !showCancelled })}
           >
             {showCancelled ? "Hide cancelled" : "Show cancelled"}
           </button>
@@ -251,7 +265,7 @@ export function PackListsPage() {
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">Dispatch trace</p>
+            <p className="eyebrow">Every list</p>
             <h2>Pack lists</h2>
           </div>
           <span>{formatCountNoun(visibleRows.length, "list")}</span>
@@ -263,13 +277,15 @@ export function PackListsPage() {
             <p>No pack lists are open.</p>
             <span>Open a pack list for an event to start packing.</span>
             <div className="mt-3 flex justify-center">
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={() => setShowCreate(true)}
-              >
-                Open pack list
-              </button>
+              {showCreate ? null : (
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => setShowCreate(true)}
+                >
+                  Open pack list
+                </button>
+              )}
             </div>
           </div>
         ) : (
@@ -290,8 +306,9 @@ export function PackListsPage() {
                       <Link
                         className="text-link"
                         to={`/logistics/packs/${row._id}`}
+                        state={listOriginState(listOrigin)}
                       >
-                        <strong>{row.name || "Untitled pack list"}</strong>
+                        <strong>{packListName(row.name)}</strong>
                       </Link>
                       {row.purpose ? <small>{row.purpose}</small> : null}
                     </td>
@@ -304,6 +321,7 @@ export function PackListsPage() {
                         <Link
                           className="btn btn-ghost btn-sm"
                           to={`/logistics/packs/${row._id}`}
+                          state={listOriginState(listOrigin)}
                         >
                           Load sheet
                         </Link>

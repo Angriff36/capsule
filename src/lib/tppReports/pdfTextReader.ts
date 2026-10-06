@@ -1,9 +1,12 @@
 import {
   fontReferences,
+  latin1,
   readIndirectObjects,
   referenceIn,
   type PdfIndirectObject,
+  type PdfInflate,
 } from "./pdfObjects";
+import { cp1252 } from "./rtfToText";
 
 /**
  * Extracts positioned text from a TPP PDF export.
@@ -93,9 +96,7 @@ function unicodeMapForFont(
   }
   const stream = toUnicode === undefined ? undefined : objects.get(toUnicode);
   const map =
-    stream?.stream === undefined
-      ? empty
-      : parseCMap(stream.stream.toString("latin1"));
+    stream?.stream === undefined ? empty : parseCMap(latin1(stream.stream));
   cache.set(fontNumber, map);
   return map;
 }
@@ -122,8 +123,10 @@ function decodeLiteralString(literal: string, unicode: UnicodeMap): string {
     return table[esc] ?? esc;
   });
   let out = "";
+  // A code the font does not map is WinAnsi text: 0x97 is a long dash.
   for (const char of unescaped) {
-    out += unicode.get(char.charCodeAt(0)) ?? char;
+    const code = char.charCodeAt(0);
+    out += unicode.get(code) ?? (code <= 0xff ? cp1252(code) : char);
   }
   return out;
 }
@@ -294,7 +297,11 @@ function joinRun(
     const current = ordered[index]!;
     const gap = current.x - previous.x;
     const width = advances.get(advanceKey(previous)) ?? gap;
-    if (cell && gap > Math.max(width * 4, 9)) {
+    // Report writers such as ActiveReports (the TPP BEO and worksheet PDFs)
+    // draw each table cell as one whole run, so the next run on the line is
+    // the next cell. Glyph-at-a-time PDFs (the battle board) never get here.
+    const wholeBox = previous.text.trim().length > 1;
+    if (cell && (wholeBox ? gap > 0 : gap > Math.max(width * 4, 9))) {
       cells.push(cell);
       cell = { x: current.x, text: current.text };
       continue;
@@ -334,8 +341,9 @@ function groupIntoLines(
 }
 
 interface PdfPage {
-  contents: Buffer[];
+  contents: Uint8Array[];
   fonts: Map<string, UnicodeMap>;
+  number: number;
 }
 
 function collectPages(objects: Map<number, PdfIndirectObject>): PdfPage[] {
@@ -356,7 +364,7 @@ function collectPages(objects: Map<number, PdfIndirectObject>): PdfPage[] {
       fonts.set(name, unicodeMapForFont(number, objects, cache));
     }
 
-    const contents: Buffer[] = [];
+    const contents: Uint8Array[] = [];
     const single = referenceIn(object.header, "Contents");
     if (single !== undefined) {
       const stream = objects.get(single)?.stream;
@@ -368,19 +376,41 @@ function collectPages(objects: Map<number, PdfIndirectObject>): PdfPage[] {
         if (stream) contents.push(stream);
       }
     }
-    if (contents.length > 0) pages.push({ contents, fonts });
+    if (contents.length > 0)
+      pages.push({ contents, fonts, number: object.number });
   }
-  return pages;
+  // Objects are stored in any order; the page tree's /Kids lists give the
+  // printed order (ActiveReports writes page 3 before page 1).
+  const printed: number[] = [];
+  for (const object of objects.values()) {
+    if (!/\/Type\s*\/Pages\b/.test(object.header)) continue;
+    const kids = object.header.match(/\/Kids\s*\[([^\]]*)\]/)?.[1] ?? "";
+    for (const [, number] of kids.matchAll(/(\d+)\s+\d+\s+R/g)) {
+      printed.push(Number(number));
+    }
+  }
+  const rank = (page: PdfPage) => {
+    const index = printed.indexOf(page.number);
+    return index < 0 ? Number.MAX_SAFE_INTEGER : index;
+  };
+  return pages
+    .map((page, index) => ({ page, index }))
+    .sort((a, b) => rank(a.page) - rank(b.page) || a.index - b.index)
+    .map(({ page }) => page);
 }
 
-/** Extract text lines from a PDF, in page then top-to-bottom order. */
-export function readPdfTextLines(buffer: Buffer): PdfTextLine[] {
-  const objects = readIndirectObjects(buffer);
+/**
+ * Extract text lines from a PDF, in page then top-to-bottom order. The
+ * inflate comes from the caller (pdfTextReaderNode / pdfTextReaderBrowser).
+ */
+export function readPdfTextLinesWith(
+  buffer: Uint8Array,
+  inflate: PdfInflate,
+): PdfTextLine[] {
+  const objects = readIndirectObjects(buffer, inflate);
   const lines: PdfTextLine[] = [];
   const pages = collectPages(objects).map((page) =>
-    page.contents.flatMap((content) =>
-      readRuns(content.toString("latin1"), page.fonts),
-    ),
+    page.contents.flatMap((content) => readRuns(latin1(content), page.fonts)),
   );
   const advances = measureAdvances(pages.flat());
   pages.forEach((runs, index) => {

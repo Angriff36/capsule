@@ -65,6 +65,8 @@ import { ProposalPricingPanel } from "./ProposalPricingPanel";
 import { ProposalEnhancementsPanel } from "./ProposalEnhancementsPanel";
 import { type PricingBasis } from "../../lib/pricing";
 import { useActionNotice } from "../../ui/action-result";
+import { LifecycleStepper } from "../../ui/LifecycleStepper";
+import { proposalLifecycle } from "../../lib/lifecycle/lifecycleDefinitions";
 import {
   projectProposalPdf,
   downloadProjectedProposalPdf,
@@ -154,6 +156,7 @@ export function ProposalsPage() {
   const emailProposal = useEmailProposal();
   const [showDraft, setShowDraft] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
+  const [find, setFind] = useState("");
   const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -181,14 +184,15 @@ export function ProposalsPage() {
           String(l.status) === "active",
       )
       .sort((a, b) => Number(b.createdAt ?? 0) - Number(a.createdAt ?? 0))[0];
-  const copyShareUrl = async (id: string) => {
+  // The link shows at once; the clipboard is a bonus. A clipboard that never
+  // answers (window in the background) must not keep the page busy.
+  const copyShareUrl = (id: string) => {
     const url = `${window.location.origin}/share/${id}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      setNotice("Share link copied to clipboard.");
-    } catch {
-      setNotice(`Share link: ${url}`);
-    }
+    setNotice(`Share link: ${url}`);
+    navigator.clipboard
+      ?.writeText(url)
+      .then(() => setNotice(`Share link copied to clipboard: ${url}`))
+      .catch(() => undefined);
   };
   const [searchParams, setSearchParams] = useSearchParams();
   // One button builds the draft from the event, or brings the draft it built
@@ -234,6 +238,7 @@ export function ProposalsPage() {
     null,
   );
   const [emailsOpenFor, setEmailsOpenFor] = useState<string | null>(null);
+  const [openRowId, setOpenRowId] = useState<string | null>(null);
   const [emailsKey, setEmailsKey] = useState(0);
 
   // Row deep link: /clients/proposals?proposal=<id> opens that proposal's
@@ -243,6 +248,7 @@ export function ProposalsPage() {
   const proposalsLoaded = proposals !== undefined;
   useEffect(() => {
     if (!focusedProposalId || !proposalsLoaded) return;
+    setOpenRowId(focusedProposalId);
     setMenuOpenFor(focusedProposalId);
     setPricingOpenFor(focusedProposalId);
     setEnhancementsOpenFor(focusedProposalId);
@@ -268,11 +274,24 @@ export function ProposalsPage() {
 
   const activeRows = (proposals ?? []).filter((row) => row.deletedAt == null);
   // Keep accepted proposals visible — operators create the Event from them.
-  const visibleRows = showTerminal
+  const openRows = showTerminal
     ? activeRows
     : activeRows.filter(
         (row) => !["declined", "expired"].includes(String(row.status)),
       );
+  // Find by title or client; a proposal opened by link always stays listed.
+  const needle = find.trim().toLowerCase();
+  const visibleRows = needle
+    ? openRows.filter(
+        (row) =>
+          row._id === focusedProposalId ||
+          [row.title, clientDisplayName(row.clientId, clients)].some((value) =>
+            String(value ?? "")
+              .toLowerCase()
+              .includes(needle),
+          ),
+      )
+    : openRows;
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -387,7 +406,7 @@ export function ProposalsPage() {
         // otherwise create one pinned to the latest published revision.
         const existing = activeShareLinkFor(row._id);
         if (existing) {
-          void copyShareUrl(existing._id);
+          copyShareUrl(existing._id);
           return;
         }
         const revision = latestRevisionFor(row._id);
@@ -405,7 +424,7 @@ export function ProposalsPage() {
           })) as { _id?: string; id?: string } | undefined;
           const id = result?._id ?? result?.id;
           if (!id) throw new Error("Failed to create share link");
-          await copyShareUrl(id);
+          copyShareUrl(id);
         });
         return;
       }
@@ -500,11 +519,20 @@ export function ProposalsPage() {
           const callbackToken = result.docId; // The entity ID is the callback token
           const acceptanceUrl = generateAcceptanceUrl(callbackToken);
 
-          // Copy to clipboard and show success
-          await navigator.clipboard.writeText(acceptanceUrl);
+          // The request exists now. The link shows at once; a clipboard
+          // that fails or never answers must not hide it or keep the page busy.
           setNotice(
-            `Signature request created. Acceptance URL copied to clipboard: ${acceptanceUrl}`,
+            `Signature request created. Copy the acceptance link: ${acceptanceUrl}`,
           );
+          void Promise.resolve()
+            .then(() => navigator.clipboard.writeText(acceptanceUrl))
+            .then(
+              () =>
+                setNotice(
+                  `Signature request created. Acceptance URL copied to clipboard: ${acceptanceUrl}`,
+                ),
+              () => undefined,
+            );
         });
         return;
       }
@@ -755,20 +783,34 @@ export function ProposalsPage() {
           </div>
           <span>{visibleRows.length}</span>
         </div>
+        {openRows.length > 0 ? (
+          <input
+            type="search"
+            className="input my-3 min-h-10 w-full max-w-sm"
+            placeholder="Find by title or client"
+            aria-label="Find a proposal"
+            value={find}
+            onChange={(event) => setFind(event.target.value)}
+          />
+        ) : null}
         {loading ? (
           <TableSkeleton rows={5} />
+        ) : visibleRows.length === 0 && needle ? (
+          <p className="p-4 text-base text-ink-2">Nothing matches.</p>
         ) : visibleRows.length === 0 ? (
           <EmptyState
             title="No open proposals."
             hint="Draft an offer to start the sales conversation."
             action={
-              <button
-                className="btn btn-primary"
-                type="button"
-                onClick={() => setShowDraft(true)}
-              >
-                New proposal
-              </button>
+              showDraft ? undefined : (
+                <button
+                  className="btn btn-primary"
+                  type="button"
+                  onClick={() => setShowDraft(true)}
+                >
+                  New proposal
+                </button>
+              )
             }
           />
         ) : (
@@ -804,7 +846,16 @@ export function ProposalsPage() {
                       </td>
                       <td>{clientDisplayName(row.clientId, clients)}</td>
                       <td className="supply-number">
-                        {formatMoneyExact(Number(row.total ?? 0))}
+                        {Number(row.total ?? 0) === 0 &&
+                        !["declined", "expired"].includes(
+                          String(row.status),
+                        ) ? (
+                          <span className="text-xs text-warn">
+                            Not priced yet
+                          </span>
+                        ) : (
+                          formatMoneyExact(Number(row.total ?? 0))
+                        )}
                       </td>
                       <td>
                         <StatusChip status={String(row.status)} />
@@ -813,190 +864,18 @@ export function ProposalsPage() {
                         <button
                           className="btn btn-ghost"
                           type="button"
+                          aria-expanded={openRowId === row._id}
+                          aria-controls={`proposal-tools-${row._id}`}
                           onClick={() =>
-                            setMenuOpenFor((current) =>
+                            setOpenRowId((current) =>
                               current === row._id ? null : row._id,
                             )
                           }
                         >
-                          {menuOpenFor === row._id ? "Hide menu" : "Menu"}
+                          {openRowId === row._id ? "Close" : "Open"}
                         </button>
-                        <button
-                          className="btn btn-ghost"
-                          type="button"
-                          onClick={() =>
-                            setPricingOpenFor((current) =>
-                              current === row._id ? null : row._id,
-                            )
-                          }
-                        >
-                          {pricingOpenFor === row._id
-                            ? "Hide pricing"
-                            : "Pricing"}
-                        </button>
-                        <button
-                          className="btn btn-ghost"
-                          type="button"
-                          onClick={() =>
-                            setEnhancementsOpenFor((current) =>
-                              current === row._id ? null : row._id,
-                            )
-                          }
-                        >
-                          {enhancementsOpenFor === row._id
-                            ? "Hide enhancements"
-                            : "Enhancements"}
-                        </button>
-                        <button
-                          className="btn btn-ghost"
-                          type="button"
-                          disabled={
-                            busy != null ||
-                            (String(row.status) !== "draft" &&
-                              proposalRevisions === undefined) ||
-                            (String(row.status) === "draft" &&
-                              (proposalDishSelections === undefined ||
-                                dishes === undefined))
-                          }
-                          onClick={() => {
-                            const projected = pdfProjectionFor(row);
-                            if (!projected) return;
-                            void withPictureUrls(projected.proposal)
-                              .then((proposal) => {
-                                const pdfProjection = {
-                                  ...projected,
-                                  proposal,
-                                };
-                                if (pdfProjection.source) {
-                                  return downloadProjectedProposalPdf({
-                                    projection: pdfProjection,
-                                    branding,
-                                    download: downloadProposalPdf,
-                                    onNotice: setNotice,
-                                  });
-                                }
-                                return downloadProposalPdf({
-                                  proposal: pdfProjection.proposal,
-                                  clientName: pdfProjection.clientName,
-                                  branding,
-                                }).then(() =>
-                                  setNotice("Proposal PDF downloaded."),
-                                );
-                              })
-                              .catch((error) => setFailure(error));
-                          }}
-                        >
-                          Download PDF
-                        </button>
-                        {["sent", "viewed", "accepted"].includes(
-                          String(row.status),
-                        ) && (
-                          <button
-                            className="btn btn-ghost"
-                            type="button"
-                            disabled={
-                              busy != null || proposalRevisions === undefined
-                            }
-                            onClick={() => onEmailProposal(row)}
-                          >
-                            {busy === `${row._id}:email`
-                              ? "Emailing…"
-                              : "Email the proposal"}
-                          </button>
-                        )}
-                        {["sent", "viewed", "accepted"].includes(
-                          String(row.status),
-                        ) && (
-                          <button
-                            className="btn btn-ghost"
-                            type="button"
-                            onClick={() =>
-                              setEmailsOpenFor((current) =>
-                                current === row._id ? null : row._id,
-                              )
-                            }
-                          >
-                            {emailsOpenFor === row._id
-                              ? "Hide emails"
-                              : "Emails"}
-                          </button>
-                        )}
-                        {(String(row.status) === "sent" ||
-                          String(row.status) === "viewed") && (
-                          <button
-                            className="btn btn-ghost"
-                            type="button"
-                            disabled={busy != null}
-                            onClick={() => invoke(row, "requestSignature")}
-                          >
-                            Request signature
-                          </button>
-                        )}
-                        <ProposalSignatureRevokeAction
-                          proposalId={row._id}
-                          prompt={prompt}
-                          busy={busy}
-                          run={run}
-                        />
-                        {(String(row.status) === "sent" ||
-                          String(row.status) === "viewed" ||
-                          String(row.status) === "accepted") && (
-                          <>
-                            <button
-                              className="btn btn-ghost"
-                              type="button"
-                              disabled={busy != null}
-                              onClick={() => invoke(row, "shareLink")}
-                            >
-                              {activeShareLinkFor(row._id)
-                                ? "Copy link"
-                                : "Share link"}
-                            </button>
-                            {activeShareLinkFor(row._id) && (
-                              <button
-                                className="btn btn-ghost"
-                                type="button"
-                                disabled={busy != null}
-                                onClick={() => invoke(row, "revokeShareLink")}
-                              >
-                                Revoke link
-                              </button>
-                            )}
-                          </>
-                        )}
-                        {policy
-                          .proposalActions(String(row.status))
-                          .map((action) => (
-                            <button
-                              key={action.key}
-                              className="btn btn-ghost"
-                              type="button"
-                              disabled={busy != null}
-                              onClick={() => invoke(row, action.key)}
-                            >
-                              {action.key === "send"
-                                ? "Publish proposal"
-                                : action.label}
-                            </button>
-                          ))}
-                        {String(row.status) === "sent" ||
-                        String(row.status) === "viewed" ? (
-                          <ProposalChangeAction
-                            proposalId={row._id}
-                            busy={busy}
-                            run={run}
-                            onNotice={setNotice}
-                            accepted={false}
-                          />
-                        ) : null}
                         {String(row.status) === "accepted" ? (
                           <>
-                            <ProposalChangeAction
-                              proposalId={row._id}
-                              busy={busy}
-                              run={run}
-                              onNotice={setNotice}
-                            />
                             {/* A linked event means the booking already exists —
                               offering Create Event again risks a duplicate. */}
                             {row.eventId ? (
@@ -1024,43 +903,246 @@ export function ProposalsPage() {
                         ) : null}
                       </td>
                     </tr>
-                    <tr>
-                      <td colSpan={5} className="pt-0">
-                        <ProposalReadinessNotice
-                          eventId={row.eventId ? String(row.eventId) : null}
-                          status={String(row.status)}
-                          total={Number(row.total ?? 0)}
-                          hasVenue={(() => {
-                            // A typed venue (quote form, import) counts too.
-                            const linked = events?.find(
-                              (e) => e._id === row.eventId,
-                            );
-                            return Boolean(
-                              linked?.venueId || linked?.venueName?.trim(),
-                            );
-                          })()}
-                          hasMenuSelections={(
-                            proposalDishSelections ?? []
-                          ).some(
-                            (selection) =>
-                              selection.proposalId === row._id &&
-                              selection.deletedAt == null,
-                          )}
-                          hasPricedLines={(proposalLineItems ?? []).some(
-                            (line) =>
-                              line.proposalId === row._id &&
-                              line.deletedAt == null,
-                          )}
-                        />
-                        {String(row.status) === "draft" ? (
-                          <ProposalDraftCheck
-                            proposalId={row._id}
-                            onFailure={setFailure}
-                            onNotice={setNotice}
+                    {/* Every tool for one proposal, shown when the row is
+                        open so the list reads as a list. */}
+                    {openRowId === row._id ? (
+                      <tr id={`proposal-tools-${row._id}`}>
+                        <td colSpan={5}>
+                          <div className="supply-row-actions flex-wrap">
+                            <button
+                              className="btn btn-ghost"
+                              type="button"
+                              onClick={() =>
+                                setMenuOpenFor((current) =>
+                                  current === row._id ? null : row._id,
+                                )
+                              }
+                            >
+                              {menuOpenFor === row._id ? "Hide menu" : "Menu"}
+                            </button>
+                            <button
+                              className="btn btn-ghost"
+                              type="button"
+                              onClick={() =>
+                                setPricingOpenFor((current) =>
+                                  current === row._id ? null : row._id,
+                                )
+                              }
+                            >
+                              {pricingOpenFor === row._id
+                                ? "Hide pricing"
+                                : "Pricing"}
+                            </button>
+                            <button
+                              className="btn btn-ghost"
+                              type="button"
+                              onClick={() =>
+                                setEnhancementsOpenFor((current) =>
+                                  current === row._id ? null : row._id,
+                                )
+                              }
+                            >
+                              {enhancementsOpenFor === row._id
+                                ? "Hide enhancements"
+                                : "Enhancements"}
+                            </button>
+                            <button
+                              className="btn btn-ghost"
+                              type="button"
+                              disabled={
+                                busy != null ||
+                                (String(row.status) !== "draft" &&
+                                  proposalRevisions === undefined) ||
+                                (String(row.status) === "draft" &&
+                                  (proposalDishSelections === undefined ||
+                                    dishes === undefined))
+                              }
+                              onClick={() => {
+                                const projected = pdfProjectionFor(row);
+                                if (!projected) return;
+                                void withPictureUrls(projected.proposal)
+                                  .then((proposal) => {
+                                    const pdfProjection = {
+                                      ...projected,
+                                      proposal,
+                                    };
+                                    if (pdfProjection.source) {
+                                      return downloadProjectedProposalPdf({
+                                        projection: pdfProjection,
+                                        branding,
+                                        download: downloadProposalPdf,
+                                        onNotice: setNotice,
+                                      });
+                                    }
+                                    return downloadProposalPdf({
+                                      proposal: pdfProjection.proposal,
+                                      clientName: pdfProjection.clientName,
+                                      branding,
+                                    }).then(() =>
+                                      setNotice("Proposal PDF downloaded."),
+                                    );
+                                  })
+                                  .catch((error) => setFailure(error));
+                              }}
+                            >
+                              Download PDF
+                            </button>
+                            {["sent", "viewed", "accepted"].includes(
+                              String(row.status),
+                            ) && (
+                              <button
+                                className="btn btn-ghost"
+                                type="button"
+                                disabled={
+                                  busy != null ||
+                                  proposalRevisions === undefined
+                                }
+                                onClick={() => onEmailProposal(row)}
+                              >
+                                {busy === `${row._id}:email`
+                                  ? "Emailing…"
+                                  : "Email the proposal"}
+                              </button>
+                            )}
+                            {["sent", "viewed", "accepted"].includes(
+                              String(row.status),
+                            ) && (
+                              <button
+                                className="btn btn-ghost"
+                                type="button"
+                                onClick={() =>
+                                  setEmailsOpenFor((current) =>
+                                    current === row._id ? null : row._id,
+                                  )
+                                }
+                              >
+                                {emailsOpenFor === row._id
+                                  ? "Hide emails"
+                                  : "Emails"}
+                              </button>
+                            )}
+                            {(String(row.status) === "sent" ||
+                              String(row.status) === "viewed") && (
+                              <button
+                                className="btn btn-ghost"
+                                type="button"
+                                disabled={busy != null}
+                                onClick={() => invoke(row, "requestSignature")}
+                              >
+                                Request signature
+                              </button>
+                            )}
+                            <ProposalSignatureRevokeAction
+                              proposalId={row._id}
+                              prompt={prompt}
+                              busy={busy}
+                              run={run}
+                            />
+                            {(String(row.status) === "sent" ||
+                              String(row.status) === "viewed" ||
+                              String(row.status) === "accepted") && (
+                              <>
+                                <button
+                                  className="btn btn-ghost"
+                                  type="button"
+                                  disabled={busy != null}
+                                  onClick={() => invoke(row, "shareLink")}
+                                >
+                                  {activeShareLinkFor(row._id)
+                                    ? "Copy link"
+                                    : "Share link"}
+                                </button>
+                                {activeShareLinkFor(row._id) && (
+                                  <button
+                                    className="btn btn-ghost"
+                                    type="button"
+                                    disabled={busy != null}
+                                    onClick={() =>
+                                      invoke(row, "revokeShareLink")
+                                    }
+                                  >
+                                    Revoke link
+                                  </button>
+                                )}
+                              </>
+                            )}
+                            <LifecycleStepper
+                              definition={proposalLifecycle}
+                              status={String(row.status)}
+                              actions={proposalLifecycle.actions.filter(
+                                (candidate) =>
+                                  policy
+                                    .proposalActions(String(row.status))
+                                    .some(
+                                      (action) => action.key === candidate.key,
+                                    ),
+                              )}
+                              busy={busy != null}
+                              onAction={(key) => invoke(row, key)}
+                            />
+                            {String(row.status) === "sent" ||
+                            String(row.status) === "viewed" ? (
+                              <ProposalChangeAction
+                                proposalId={row._id}
+                                busy={busy}
+                                run={run}
+                                onNotice={setNotice}
+                                accepted={false}
+                              />
+                            ) : null}
+                            {String(row.status) === "accepted" ? (
+                              <>
+                                <ProposalChangeAction
+                                  proposalId={row._id}
+                                  busy={busy}
+                                  run={run}
+                                  onNotice={setNotice}
+                                />
+                              </>
+                            ) : null}
+                          </div>
+                        </td>
+                      </tr>
+                    ) : null}
+                    {openRowId === row._id ? (
+                      <tr>
+                        <td colSpan={5} className="pt-0">
+                          <ProposalReadinessNotice
+                            eventId={row.eventId ? String(row.eventId) : null}
+                            status={String(row.status)}
+                            total={Number(row.total ?? 0)}
+                            hasVenue={(() => {
+                              // A typed venue (quote form, import) counts too.
+                              const linked = events?.find(
+                                (e) => e._id === row.eventId,
+                              );
+                              return Boolean(
+                                linked?.venueId || linked?.venueName?.trim(),
+                              );
+                            })()}
+                            hasMenuSelections={(
+                              proposalDishSelections ?? []
+                            ).some(
+                              (selection) =>
+                                selection.proposalId === row._id &&
+                                selection.deletedAt == null,
+                            )}
+                            hasPricedLines={(proposalLineItems ?? []).some(
+                              (line) =>
+                                line.proposalId === row._id &&
+                                line.deletedAt == null,
+                            )}
                           />
-                        ) : null}
-                      </td>
-                    </tr>
+                          {String(row.status) === "draft" ? (
+                            <ProposalDraftCheck
+                              proposalId={row._id}
+                              onFailure={setFailure}
+                              onNotice={setNotice}
+                            />
+                          ) : null}
+                        </td>
+                      </tr>
+                    ) : null}
                     {menuOpenFor === row._id ? (
                       <tr>
                         <td colSpan={5}>

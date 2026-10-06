@@ -14,13 +14,13 @@ import { EventDayTray } from "./EventDayTray";
 
 function CenteredNote({ children }: { children: React.ReactNode }) {
   return (
-    <div className="evd">
+    <div className="eday">
       <div
-        className="evd-frame"
+        className="eday-frame"
         style={{ alignItems: "center", justifyContent: "center" }}
       >
-        <p className="evd-empty">{children}</p>
-        <Link className="evd-open-link" to="/event-day">
+        <p className="eday-empty">{children}</p>
+        <Link className="eday-open-link" to="/event-day">
           Choose an event ›
         </Link>
       </div>
@@ -103,22 +103,22 @@ export function EventDayPage() {
       : null;
 
   return (
-    <div className="evd">
-      <div className="evd-frame">
-        <header className="evd-head">
+    <div className="eday">
+      <div className="eday-frame">
+        <header className="eday-head">
           <div style={{ minWidth: 0 }}>
-            <p className="evd-eyebrow">
+            <p className="eday-eyebrow">
               {typeof event.startsAt === "number"
                 ? formatDate(event.startsAt)
                 : "Unscheduled"}
             </p>
-            <Link to="/event-day" className="evd-title-btn">
-              <h1 className="evd-title">{String(event.title ?? "Event")}</h1>
-              <p className="evd-place">
+            <Link to="/event-day" className="eday-title-btn">
+              <h1 className="eday-title">{String(event.title ?? "Event")}</h1>
+              <p className="eday-place">
                 {[place, headcount].filter(Boolean).join(" · ") ||
                   "No venue yet"}
               </p>
-              <p className="evd-switch">⇄ Switch event</p>
+              <p className="eday-switch">⇄ Switch event</p>
             </Link>
           </div>
           <EventDayReadinessRing

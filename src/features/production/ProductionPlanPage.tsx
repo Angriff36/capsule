@@ -13,7 +13,6 @@ import { TableSkeleton } from "../../ui/primitives";
 import { useEventsById } from "../facilities/useEventsById";
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
 import { prepQuantityLabel } from "../kitchen/prepQuantityLabel";
-import { ProductionWorkspaceNav } from "./ProductionWorkspaceNav";
 import {
   buildProductionPlan,
   NO_DAY,
@@ -23,6 +22,7 @@ import {
   type ProductionPlanInput,
 } from "../../../convex/lib/culinaryModel/productionPlan";
 
+import "./ProductionYieldDashboardPage.css";
 const dayFormat = new Intl.DateTimeFormat(undefined, {
   weekday: "long",
   month: "short",
@@ -89,7 +89,6 @@ export function ProductionPlanView({
       </header>
 
       <KitchenBookNav />
-      <ProductionWorkspaceNav />
 
       {earlier > 0 || showEarlier ? (
         <p className="mt-4">

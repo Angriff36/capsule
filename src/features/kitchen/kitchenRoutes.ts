@@ -9,7 +9,14 @@ export const KITCHEN_SECTION_SINGULAR: Record<KitchenSection, string> = {
 };
 
 export const KITCHEN_SECTIONS: readonly {
-  key: KitchenSection | "prep" | "unresolved" | "stations" | "cleanup";
+  key:
+    | KitchenSection
+    | "prep"
+    | "plan"
+    | "yield"
+    | "unresolved"
+    | "stations"
+    | "cleanup";
   label: string;
   path: string;
 }[] = [
@@ -18,6 +25,8 @@ export const KITCHEN_SECTIONS: readonly {
   { key: "dishes", label: "Dishes", path: "/kitchen/dishes" },
   { key: "menus", label: "Menus", path: "/kitchen/menus" },
   { key: "prep", label: "Prep board", path: "/kitchen/prep" },
+  { key: "plan", label: "Production plan", path: "/kitchen/plan" },
+  { key: "yield", label: "Yield variance", path: "/kitchen/yield" },
   { key: "unresolved", label: "Unresolved", path: "/kitchen/unresolved" },
   { key: "stations", label: "Stations", path: "/kitchen/stations" },
   { key: "cleanup", label: "Cleanup", path: "/kitchen/cleanup" },

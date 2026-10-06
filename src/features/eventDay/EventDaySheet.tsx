@@ -16,11 +16,11 @@ import {
 } from "./EventDaySheetSections";
 
 const STATUS_TONE: Record<EventDaySection["status"], string> = {
-  ready: "var(--evd-ready)",
-  active: "var(--evd-active)",
-  review: "var(--evd-review)",
-  blocked: "var(--evd-blocked)",
-  dormant: "var(--evd-ink-3)",
+  ready: "var(--eday-ready)",
+  active: "var(--eday-active)",
+  review: "var(--eday-review)",
+  blocked: "var(--eday-blocked)",
+  dormant: "var(--eday-ink-3)",
 };
 
 const STATUS_WORD: Record<EventDaySection["status"], string> = {
@@ -67,27 +67,27 @@ export function EventDaySheet({ section, data, onClose }: Props) {
     <>
       <button
         type="button"
-        className="evd-scrim"
+        className="eday-scrim"
         aria-label="Close"
         onClick={onClose}
       />
       <div
-        className="evd-sheet"
+        className="eday-sheet"
         role="dialog"
         aria-modal="true"
         aria-label={section.label}
       >
-        <div className="evd-sheet-grip" />
-        <div className="evd-sheet-head">
-          <span className="evd-sheet-title">{section.label}</span>
+        <div className="eday-sheet-grip" />
+        <div className="eday-sheet-head">
+          <span className="eday-sheet-title">{section.label}</span>
           <span
-            className="evd-sheet-status"
+            className="eday-sheet-status"
             style={{ color: STATUS_TONE[section.status] }}
           >
             {STATUS_WORD[section.status]} · {section.caption}
           </span>
         </div>
-        <div className="evd-sheet-body">
+        <div className="eday-sheet-body">
           <PacketSectionCaution section={section} eventId={eventId} />
           {section.key === "venue" ? <VenueSheet data={data} /> : null}
           {section.key === "staffing" ? <StaffingSheet data={data} /> : null}
@@ -99,14 +99,14 @@ export function EventDaySheet({ section, data, onClose }: Props) {
           {section.key === "contacts" ? <ContactsSheet data={data} /> : null}
           {section.key === "packlist" ? <PackListSheet data={data} /> : null}
         </div>
-        <div className="evd-sheet-foot">
+        <div className="eday-sheet-foot">
           <Link
-            className="evd-open-link"
+            className="eday-open-link"
             to={capsuleLink(section.key, eventId)}
           >
             Open in Capsule ›
           </Link>
-          <button type="button" className="evd-close-btn" onClick={onClose}>
+          <button type="button" className="eday-close-btn" onClick={onClose}>
             Close
           </button>
         </div>

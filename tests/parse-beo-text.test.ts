@@ -115,3 +115,25 @@ describe("parseBeoText pasted BEO reading", () => {
     expect((bare.warnings ?? []).join(" ")).toMatch(/no event date/i);
   });
 });
+
+describe("parseBeoText description or cook's note (BEO 5559)", () => {
+  const menu =
+    parseBeoText(
+      [
+        "Event Items",
+        "80 Serving Assorted Crostinis",
+        "Assorted cold crostini appetizers.",
+        "30 Serving Shrimp Cocktail",
+        "Pack cold",
+      ].join("\n"),
+    ).menu ?? [];
+
+  it("keeps 'cold' before a dish word as the description", () => {
+    expect(menu[0]?.description).toBe("Assorted cold crostini appetizers.");
+    expect(menu[0]?.specialInstructions).toBeUndefined();
+  });
+
+  it("keeps 'cold' at the end of a phrase as the cook's note", () => {
+    expect(menu[1]?.specialInstructions).toBe("Pack cold");
+  });
+});

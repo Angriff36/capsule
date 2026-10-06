@@ -262,8 +262,6 @@
     margin: 0.35in;
   }
 
-  .app-sidebar,
-  .app-topbar,
   .component-status-tabs,
   .lot-trace-actions {
     display: none !important;

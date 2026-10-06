@@ -55,6 +55,14 @@ describe("breadcrumbsForPath", () => {
       "Recipe",
     ]);
     expect(labels("/events/new")).toEqual(["Events", "New event"]);
+    expect(labels("/events/checklists")).toEqual([
+      "Events",
+      "Event checklists",
+    ]);
+    expect(labels("/events/planning/setup")).toEqual([
+      "Events",
+      "Planning setup",
+    ]);
   });
 });
 

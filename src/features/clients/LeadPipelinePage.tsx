@@ -50,6 +50,7 @@ interface LeadRow {
   email?: string | null;
   phone?: string | null;
   source: string;
+  eventDate?: number | null;
   referralSourceId?: string | null;
   estimatedValue: number;
   stage: LeadStage;
@@ -116,6 +117,9 @@ export function LeadPipelinePage() {
   const [leadType, setLeadType] = useState<"company" | "person">("company");
   const [proposalLeadId, setProposalLeadId] = useState<string | null>(null);
   const [editLeadId, setEditLeadId] = useState<string | null>(null);
+  // One quick "move or price" form open at a time: a form on every card made
+  // the board thousands of pixels long on a phone.
+  const [moveLeadId, setMoveLeadId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
@@ -152,6 +156,9 @@ export function LeadPipelinePage() {
     );
     return {
       count: activeLeads.length,
+      pricedCount: activeLeads.filter(
+        (lead) => Number(lead.estimatedValue || 0) > 0,
+      ).length,
       faceValue,
       weightedValue,
       proposalCount: activeLeads.filter((lead) => lead.proposalId != null)
@@ -185,6 +192,17 @@ export function LeadPipelinePage() {
       return;
     }
     const referralSourceId = optional(data.get("referralSourceId"));
+    // "Where they came from": what was typed, else the referral picked.
+    const source =
+      String(data.get("source") ?? "").trim() ||
+      activeReferralSources.find((row) => row._id === referralSourceId)?.name ||
+      "";
+    if (!source) {
+      setFailure(
+        new Error("Say where this lead came from, or pick who referred them."),
+      );
+      return;
+    }
     void run("capture", async () => {
       await createLead({
         leadType,
@@ -193,11 +211,12 @@ export function LeadPipelinePage() {
         familyName: optional(data.get("familyName")),
         email: optional(data.get("email")),
         phone: optional(data.get("phone")),
-        source: String(data.get("source") ?? "").trim(),
+        source,
         referralSourceId,
         estimatedValue,
         probability,
         notes: optional(data.get("notes")),
+        eventDate: dateValue(data.get("eventDate")),
       });
       form.reset();
       setLeadType("company");
@@ -228,6 +247,7 @@ export function LeadPipelinePage() {
         estimatedValue,
         probability,
       });
+      setMoveLeadId(null);
       setNotice(`${leadName(lead)} pipeline updated.`);
     });
   };
@@ -342,9 +362,6 @@ export function LeadPipelinePage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Link className="text-link" to={CLIENTS_ROUTES.quoteRequests}>
-            Quote requests
-          </Link>
           <button
             className="btn btn-primary"
             type="button"
@@ -365,13 +382,25 @@ export function LeadPipelinePage() {
         </article>
         <article>
           <span>Pipeline value</span>
-          <strong>{currency.format(metrics.faceValue)}</strong>
-          <small>Unweighted opportunity</small>
+          <strong>
+            {metrics.pricedCount > 0
+              ? currency.format(metrics.faceValue)
+              : "Not priced yet"}
+          </strong>
+          <small>
+            {metrics.pricedCount < metrics.count
+              ? `${metrics.pricedCount} of ${metrics.count} inquiries have a value`
+              : "If every inquiry books"}
+          </small>
         </article>
         <article className="is-forecast">
           <span>Weighted forecast</span>
-          <strong>{currency.format(metrics.weightedValue)}</strong>
-          <small>Value × close probability</small>
+          <strong>
+            {metrics.pricedCount > 0
+              ? currency.format(metrics.weightedValue)
+              : "Not priced yet"}
+          </strong>
+          <small>Each value × its chance of booking</small>
         </article>
         <article>
           <span>Formal proposals</span>
@@ -440,11 +469,15 @@ export function LeadPipelinePage() {
               </>
             ) : null}
             <label>
-              Source
-              <input name="source" required />
+              Event date
+              <BoundedDateInput name="eventDate" />
             </label>
             <label>
-              Referral source
+              Where they came from
+              <input name="source" placeholder="e.g. Phone call, website" />
+            </label>
+            <label>
+              Referred by
               <select name="referralSourceId">
                 <option value="">None</option>
                 {activeReferralSources.map((source) => (
@@ -526,7 +559,9 @@ export function LeadPipelinePage() {
                   <h2 id={`lead-stage-${stage.key}`}>{stage.label}</h2>
                   <p>{stage.caption}</p>
                 </div>
-                <strong>{currency.format(stageValue)}</strong>
+                <strong>
+                  {stageValue > 0 ? currency.format(stageValue) : "—"}
+                </strong>
               </header>
 
               <div className="lead-pipeline-stack">
@@ -571,56 +606,19 @@ export function LeadPipelinePage() {
                       <p className="lead-card-notes">{lead.notes}</p>
                     ) : null}
 
-                    <form
-                      className="lead-card-editor"
-                      onSubmit={(event) => submitPipelineUpdate(lead, event)}
-                    >
-                      <label>
-                        <span>Stage</span>
-                        <select
-                          name="stage"
-                          defaultValue={lead.stage}
-                          aria-label={`${leadName(lead)} stage`}
-                        >
-                          {STAGES.map((option) => (
-                            <option key={option.key} value={option.key}>
-                              {option.label}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <label>
-                        <span>Value</span>
-                        <input
-                          name="estimatedValue"
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          defaultValue={lead.estimatedValue}
-                          aria-label={`${leadName(lead)} estimated value`}
-                        />
-                      </label>
-                      <label>
-                        <span>Chance</span>
-                        <input
-                          name="probability"
-                          type="number"
-                          min="0"
-                          max="100"
-                          defaultValue={lead.probability}
-                          aria-label={`${leadName(lead)} probability`}
-                        />
-                      </label>
+                    <div className="lead-card-actions">
                       <button
                         className="btn btn-ghost"
-                        type="submit"
+                        type="button"
+                        onClick={() =>
+                          setMoveLeadId((current) =>
+                            current === lead._id ? null : lead._id,
+                          )
+                        }
                         disabled={busy != null}
                       >
-                        Save
+                        {moveLeadId === lead._id ? "Close" : "Move or price"}
                       </button>
-                    </form>
-
-                    <div className="lead-card-actions">
                       <button
                         className="btn btn-ghost"
                         type="button"
@@ -679,6 +677,58 @@ export function LeadPipelinePage() {
                       )}
                     </div>
 
+                    {moveLeadId === lead._id ? (
+                      <form
+                        className="lead-card-editor"
+                        onSubmit={(event) => submitPipelineUpdate(lead, event)}
+                      >
+                        <label>
+                          <span>Stage</span>
+                          <select
+                            name="stage"
+                            defaultValue={lead.stage}
+                            aria-label={`${leadName(lead)} stage`}
+                          >
+                            {STAGES.map((option) => (
+                              <option key={option.key} value={option.key}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label>
+                          <span>Value</span>
+                          <input
+                            name="estimatedValue"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            defaultValue={lead.estimatedValue || ""}
+                            placeholder="Not priced"
+                            aria-label={`${leadName(lead)} estimated value`}
+                          />
+                        </label>
+                        <label>
+                          <span>Chance</span>
+                          <input
+                            name="probability"
+                            type="number"
+                            min="0"
+                            max="100"
+                            defaultValue={lead.probability}
+                            aria-label={`${leadName(lead)} probability`}
+                          />
+                        </label>
+                        <button
+                          className="btn btn-ghost"
+                          type="submit"
+                          disabled={busy != null}
+                        >
+                          Save
+                        </button>
+                      </form>
+                    ) : null}
+
                     {editLeadId === lead._id ? (
                       <LeadDetailsForm
                         key={`${lead._id}:${lead.version}`}
@@ -736,7 +786,17 @@ export function LeadPipelinePage() {
                           </label>
                           <label>
                             Event date
-                            <BoundedDateInput name="eventDate" />
+                            <BoundedDateInput
+                              name="eventDate"
+                              defaultValue={
+                                lead.eventDate
+                                  ? // en-CA reads as YYYY-MM-DD in local time.
+                                    new Date(lead.eventDate).toLocaleDateString(
+                                      "en-CA",
+                                    )
+                                  : undefined
+                              }
+                            />
                           </label>
                         </div>
                         <button

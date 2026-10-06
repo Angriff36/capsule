@@ -13,6 +13,7 @@ import {
   useVenueSetPartnership,
 } from "../../lib/manifest-convex-react";
 import { Section } from "../../ui/primitives";
+import { SearchSelect } from "../../ui/SearchSelect";
 import {
   classifyCommandFailure,
   type CommandFailure,
@@ -215,20 +216,21 @@ export function VenuePartnershipPanel({ venue }: { venue: Doc<"venues"> }) {
           ) : (
             <label className="field-label">
               <span>Relationship owner</span>
-              <select
-                className="input"
+              <SearchSelect
                 name="partnerOwnerPersonId"
+                recentsKey="staff"
+                placeholder="Search staff…"
                 defaultValue=""
-              >
-                <option value="">No owner yet</option>
-                {staff.map((person) => (
-                  <option key={person._id} value={person._id}>
-                    {[person.givenName, person.familyName]
+                options={[
+                  { id: "", label: "No owner yet" },
+                  ...staff.map((person) => ({
+                    id: person._id,
+                    label: [person.givenName, person.familyName]
                       .filter(Boolean)
-                      .join(" ")}
-                  </option>
-                ))}
-              </select>
+                      .join(" "),
+                  })),
+                ]}
+              />
             </label>
           )}
           <label className="field-label">

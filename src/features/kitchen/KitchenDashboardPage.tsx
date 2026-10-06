@@ -1,5 +1,11 @@
+import { useActionPrompt } from "../../ui/action-prompt";
+import {
+  prepTaskDependencyLabel,
+  prepTaskDependencySummary,
+} from "../production/PrepTaskDependencies";
+import { usePrepLabelPrint } from "../production/usePrepLabelPrint";
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import {
   useListPerson,
@@ -11,7 +17,15 @@ import {
   usePrepTaskCancel,
   usePrepTaskClaim,
   usePrepTaskComplete,
+  useCreatePrepTaskDependency,
+  useCreateQualityCheck,
+  useListPrepTaskDependency,
+  useListQualityCheck,
+  usePrepTaskMarkBlocked,
+  useQualityCheckFail,
+  useQualityCheckPass,
   usePrepTaskRelease,
+  usePrepTaskUnblock,
   usePrepTaskRevise,
   usePrepTaskStart,
 } from "../../lib/manifest-convex-react";
@@ -77,6 +91,13 @@ import { prepTimeLabel } from "./prepTiming";
 export function KitchenDashboardPage() {
   const components = useListComponent();
   const tasks = useListPrepTask();
+  // Step order ("do after") and quality checks live on the board itself.
+  const dependencies = useListPrepTaskDependency();
+  const qualityChecks = useListQualityCheck();
+  const createDependency = useCreatePrepTaskDependency();
+  const openQualityCheck = useCreateQualityCheck();
+  const passQualityCheck = useQualityCheckPass();
+  const failQualityCheck = useQualityCheckFail();
   const invoices = useListInvoice();
   const people = useListPerson();
   const venues = useListVenue();
@@ -85,19 +106,33 @@ export function KitchenDashboardPage() {
   const assign = usePrepTaskAssign();
   const claim = usePrepTaskClaim();
   const release = usePrepTaskRelease();
+  const markBlocked = usePrepTaskMarkBlocked();
+  const unblock = usePrepTaskUnblock();
   const start = usePrepTaskStart();
   const revise = usePrepTaskRevise();
   const cancel = usePrepTaskCancel();
   const complete = usePrepTaskComplete();
   const { ready: prepSyncReady, syncPrepForDish } = useEventMenuSync();
 
-  const [horizonOffset, setHorizonOffset] = useState(0);
+  // ?from=yyyy-mm-dd (an event's Open prep board) opens on that week.
+  const [searchParams] = useSearchParams();
+  const [horizonOffset, setHorizonOffset] = useState(
+    () =>
+      KitchenCommandDeckHorizon.offsetForDateValue(
+        searchParams.get("from") ?? "",
+      ) ?? 0,
+  );
   const workingEventId = useWorkingEventId();
   const [selectedEventId, setSelectedEventId] = useState(workingEventId ?? "");
   const [filter, setFilter] = useState<CommandDeckFilter>("all");
   const [assigneeFilter, setAssigneeFilter] = useState("");
   const [armedPersonId, setArmedPersonId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  // Dated container labels from a prep step (same flow as the kitchen display).
+  const { prompt: labelPrompt, host: labelPromptHost } = useActionPrompt(
+    busy != null,
+  );
+  const labels = usePrepLabelPrint(labelPrompt);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [attentionAll, setAttentionAll] = useState(false);
@@ -275,6 +310,135 @@ export function KitchenDashboardPage() {
       () => actions.releaseOne(task),
       "Returned to the pool",
     );
+  // A step the cook cannot do yet (no product, oven down) is blocked with a
+  // reason the team can read, then unblocked when it can go again.
+  const onBlockTask = async (task: PrepTaskLike) => {
+    const reason = await labelPrompt.askReason({
+      title: "Block this step",
+      description: "Say what is stopping it, so the team knows.",
+      label: "What is blocking it",
+      placeholder: "e.g. Chicken not delivered yet",
+      confirmLabel: "Block step",
+    });
+    if (!reason?.trim()) return;
+    void run(
+      `block:${task._id}`,
+      () =>
+        markBlocked({
+          docId: task._id,
+          version: task.version,
+          reason: reason.trim(),
+        }),
+      "Blocked",
+    );
+  };
+  const onUnblockTask = (task: PrepTaskLike) =>
+    void run(
+      `unblock:${task._id}`,
+      () => unblock({ docId: task._id, version: task.version }),
+      "Back on the board",
+    );
+  const liveTasks = (tasks ?? []).filter((task) => task.deletedAt == null);
+  // The summary itself skips released "do after" links.
+  const liveDependencies = dependencies ?? [];
+  const orderFor = (taskId: string) =>
+    prepTaskDependencySummary(
+      taskId,
+      liveTasks as never,
+      liveDependencies as never,
+    );
+  const openCheckFor = (taskId: string) =>
+    (qualityChecks ?? []).find(
+      (check) =>
+        check.deletedAt == null &&
+        check.prepTaskId === taskId &&
+        String(check.status) === "pending",
+    );
+  const onOrderTask = async (task: PrepTaskLike) => {
+    const others = liveTasks.filter(
+      (other) =>
+        other.eventId === task.eventId &&
+        other._id !== task._id &&
+        !["cancelled", "completed"].includes(String(other.status)),
+    );
+    if (others.length === 0) {
+      showToast("No other open steps on this event to follow.");
+      return;
+    }
+    const values = await labelPrompt.askFields({
+      title: "Do this step after another",
+      description: `${String(task.name)} cannot start until the step you pick is done.`,
+      fields: [
+        {
+          name: "predecessor",
+          label: "Do after",
+          required: true,
+          options: others.map((other) => ({
+            value: String(other._id),
+            label: String(other.name),
+          })),
+        },
+      ],
+      confirmLabel: "Set order",
+    });
+    const predecessorTaskId = values?.predecessor;
+    if (!predecessorTaskId) return;
+    void run(
+      `order:${task._id}`,
+      () =>
+        createDependency({
+          dependentTaskId: task._id,
+          predecessorTaskId,
+        }),
+      "Order set",
+    );
+  };
+  const onQualityCheck = (task: PrepTaskLike) => {
+    const open = openCheckFor(String(task._id));
+    if (!open) {
+      void run(
+        `check:${task._id}`,
+        () => openQualityCheck({ prepTaskId: task._id }),
+        "Quality check opened",
+      );
+      return;
+    }
+    void (async () => {
+      const values = await labelPrompt.askFields({
+        title: "Quality check",
+        description: `Did ${String(task.name)} pass? A fail blocks the step.`,
+        fields: [
+          {
+            name: "result",
+            label: "Result",
+            required: true,
+            options: [
+              { value: "pass", label: "Pass" },
+              { value: "fail", label: "Fail" },
+            ],
+          },
+          { name: "notes", label: "Notes", multiline: true, required: false },
+        ],
+        confirmLabel: "Save check",
+      });
+      if (!values?.result) return;
+      const args = {
+        docId: open._id,
+        version: open.version,
+        notes: values.notes?.trim() || undefined,
+      };
+      void run(
+        `check:${task._id}`,
+        () =>
+          values.result === "pass"
+            ? passQualityCheck(args)
+            : failQualityCheck(args),
+        values.result === "pass"
+          ? "Check passed"
+          : "Check failed, step blocked",
+      );
+    })();
+  };
   const onCompleteTask = (task: PrepTaskLike) =>
     void run(
       `complete:${task._id}`,
@@ -361,7 +525,11 @@ export function KitchenDashboardPage() {
    *  themselves carry no number, and inventing one would be a lie. */
   const invoiceNumberFor = (eventId: unknown) =>
     (invoices ?? []).find(
-      (i) => i.deletedAt == null && String(i.eventId) === String(eventId),
+      // A voided invoice was replaced; name the one that stands.
+      (i) =>
+        i.deletedAt == null &&
+        String(i.status) !== "voided" &&
+        String(i.eventId) === String(eventId),
     )?.invoiceNumber ?? null;
 
   /** A live step can be re-measured: the head count changes, the delivery is
@@ -427,15 +595,15 @@ export function KitchenDashboardPage() {
       return { label: "Assign", run: () => onAssignTask(row.task) };
     }
     if (status === "blocked") {
-      return {
-        label: "Open event",
-        run: () => setSelectedEventId(row.event._id),
-      };
+      return { label: "Unblock", run: () => onUnblockTask(row.task) };
     }
     if (status === "in_progress")
       return { label: "Complete", run: () => onCompleteTask(row.task) };
-    if (status === "claimed")
+    if (status === "claimed") {
+      // A step that must follow another waits until that one is done.
+      if (orderFor(String(row.task._id)).isBlocked) return null;
       return { label: "Start", run: () => onStartTask(row.task) };
+    }
     if (!row.task.assignedToId)
       return { label: "Claim", run: () => onClaimTask(row.task) };
     return { label: "Start", run: () => onStartTask(row.task) };
@@ -855,6 +1023,9 @@ export function KitchenDashboardPage() {
     }
 
     for (const event of horizonEvents) {
+      // With one event picked, other services would show "No prep built"
+      // only because the filter hides their steps; leave them out instead.
+      if (selectedEventId && event._id !== selectedEventId) continue;
       const rows = horizonTasks.filter((r) => r.event._id === event._id);
       const number = invoiceNumberFor(event._id);
       columns.push({
@@ -876,6 +1047,7 @@ export function KitchenDashboardPage() {
     eventDishes,
     model,
     invoices,
+    selectedEventId,
   ]);
 
   const tickAll = (rows: LedgerRow[], on: boolean) =>
@@ -902,6 +1074,7 @@ export function KitchenDashboardPage() {
       busy === `claim:${id}` ||
       busy === `start:${id}` ||
       busy === `complete:${id}` ||
+      busy === `unblock:${id}` ||
       busy === `assign:${id}`;
     const owner = row.task.assignedToId
       ? model.personLabel(model.findPerson(String(row.task.assignedToId)))
@@ -990,6 +1163,21 @@ export function KitchenDashboardPage() {
               {displayEventMenuNotes(row.task.specialInstructions)}
             </p>
           ) : null}
+          {(() => {
+            const order = orderFor(id);
+            const check = openCheckFor(id);
+            return order.total > 0 || check ? (
+              <p className="mt-0.5 text-sm text-ink-2">
+                {order.total > 0 ? (
+                  <span className={order.isBlocked ? "text-warn" : undefined}>
+                    {prepTaskDependencyLabel(order)}
+                  </span>
+                ) : null}
+                {order.total > 0 && check ? " · " : null}
+                {check ? "Quality check open" : null}
+              </p>
+            ) : null;
+          })()}
           {blocked ? (
             <p className="mt-0.5 text-sm text-danger">
               {String(
@@ -1025,6 +1213,59 @@ export function KitchenDashboardPage() {
                 className="cursor-pointer text-sm text-ink-2 underline underline-offset-4"
               >
                 {busy === `release:${id}` ? "Working…" : second.label}
+              </button>
+            ) : null}
+            {["pending", "claimed", "in_progress"].includes(status) ? (
+              <button
+                type="button"
+                disabled={busy === `order:${id}`}
+                onClick={() => void onOrderTask(row.task)}
+                className="cursor-pointer text-sm text-ink-2 underline underline-offset-4"
+              >
+                Do after…
+              </button>
+            ) : null}
+            {["in_progress", "completed"].includes(status) ? (
+              <button
+                type="button"
+                disabled={busy === `check:${id}`}
+                onClick={() => onQualityCheck(row.task)}
+                className="cursor-pointer text-sm text-ink-2 underline underline-offset-4"
+              >
+                {openCheckFor(id) ? "Record check" : "Check"}
+              </button>
+            ) : null}
+            {["pending", "claimed", "in_progress"].includes(status) ? (
+              <button
+                type="button"
+                disabled={busy === `block:${id}`}
+                onClick={() => void onBlockTask(row.task)}
+                className="cursor-pointer text-sm text-ink-2 underline underline-offset-4"
+              >
+                Block
+              </button>
+            ) : null}
+            {status !== "cancelled" ? (
+              <button
+                type="button"
+                disabled={!labels.ready}
+                aria-label={`Print container label for ${String(row.task.name)}`}
+                onClick={() =>
+                  void labels.print({
+                    product: stepText(row.task.name, itemName),
+                    detail: String(row.event.title),
+                    componentId: row.task.componentId,
+                    dish: row.task.dishId
+                      ? (dishes?.find((dish) => dish._id === row.task.dishId) ??
+                        null)
+                      : null,
+                    preparedAt: row.task.completedAt ?? row.task.startedAt,
+                    preparedById: row.task.assignedToId,
+                  })
+                }
+                className="cursor-pointer text-sm text-ink-2 underline underline-offset-4"
+              >
+                Label
               </button>
             ) : null}
           </div>
@@ -1120,6 +1361,7 @@ export function KitchenDashboardPage() {
 
   return (
     <div className="kitchen-command-deck pb-10">
+      {labelPromptHost}
       <div className="max-md:hidden">
         <KitchenBookNav />
       </div>
@@ -1646,13 +1888,13 @@ export function KitchenDashboardPage() {
               </select>
             </label>
             <label className="kcd-field">
-              <span>Arm cook</span>
+              <span>Tap tasks to give to</span>
               <select
                 value={armedPersonId ?? ""}
                 onChange={(e) => setArmedPersonId(e.target.value || null)}
                 aria-label="Arm a cook for assignment"
               >
-                <option value="">Nobody armed</option>
+                <option value="">Nobody (off)</option>
                 {crewRows.map((crew) => (
                   <option
                     key={String(crew.person._id)}
@@ -1699,26 +1941,6 @@ export function KitchenDashboardPage() {
                       {model.personLabel(person)}
                     </option>
                   ))}
-              </select>
-            </label>
-            {/* Arming a cook was desktop-only, so a phone could never hand
-                work out. Same control, same state. */}
-            <label className="kcd-field">
-              <span>Arm cook</span>
-              <select
-                value={armedPersonId ?? ""}
-                onChange={(e) => setArmedPersonId(e.target.value || null)}
-                aria-label="Arm a cook for assignment"
-              >
-                <option value="">Nobody armed</option>
-                {crewRows.map((crew) => (
-                  <option
-                    key={String(crew.person._id)}
-                    value={String(crew.person._id)}
-                  >
-                    {model.personLabel(crew.person)} ({crew.load} open)
-                  </option>
-                ))}
               </select>
             </label>
           </div>
@@ -1913,9 +2135,21 @@ export function KitchenDashboardPage() {
                     {column.rows.length === 0 ? (
                       <div className="border-t border-line pt-3">
                         <p className="text-base text-ink-2">
-                          No prep built for this service yet.
+                          {model.selections(column.id).length === 0
+                            ? "No dishes on this event's menu yet, so there is no prep to build."
+                            : "No prep built for this service yet."}
                         </p>
-                        {boardBy === "service" ? (
+                        {boardBy === "service" &&
+                        model.selections(column.id).length === 0 ? (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            <Link
+                              to={eventMenuRedirectPath(column.id)}
+                              className="btn btn-ghost btn-sm"
+                            >
+                              Add dishes
+                            </Link>
+                          </div>
+                        ) : boardBy === "service" ? (
                           <div className="mt-3 flex flex-wrap gap-2">
                             <button
                               type="button"

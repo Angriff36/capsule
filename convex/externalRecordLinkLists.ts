@@ -16,14 +16,24 @@ import { canRead } from "./search";
 
 type Link = Doc<"externalRecordLinks">;
 
-async function readable(ctx: QueryCtx): Promise<Link[] | null> {
+async function tenantOf(ctx: QueryCtx): Promise<string | null> {
   const auth = await getAuthContext(ctx);
   if (!auth.tenantId || !canRead(auth, ["importAccess"])) return null;
+  return auth.tenantId;
+}
+
+/** Live links of one record type, read through its index. */
+async function ofRecordType(
+  ctx: QueryCtx,
+  tenantId: string,
+  recordType: string,
+): Promise<Link[]> {
   const rows: Link[] = [];
-  // Read in pages so no single read holds the whole table in one list.
   for await (const row of ctx.db
     .query("externalRecordLinks")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", auth.tenantId!)))
+    .withIndex("by_tenantId_and_recordType", (q) =>
+      q.eq("tenantId", tenantId).eq("recordType", recordType),
+    ))
     if (row.deletedAt == null) rows.push(row);
   return rows;
 }
@@ -40,16 +50,34 @@ export const listFor = query({
     capsuleEntities: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
-    const rows = await readable(ctx);
-    if (rows == null) return [];
-    const types = new Set(args.recordTypes ?? []);
-    const entities = new Set(args.capsuleEntities ?? []);
-    return rows.filter(
-      (row) =>
-        types.has(row.recordType) ||
-        entities.has(String(row.capsuleEntity ?? "")) ||
-        (args.pending === true && row.conflictStatus === "pending_conflict"),
-    );
+    // Only the asked-for kinds are read, each through its own index. Reading
+    // every link of the company timed out /admin/reconcile (2026-10-06).
+    const tenantId = await tenantOf(ctx);
+    if (tenantId == null) return [];
+    const found = new Map<string, Link>();
+    const keep = (row: Link) => {
+      if (row.deletedAt == null) found.set(String(row._id), row);
+    };
+    for (const recordType of new Set(args.recordTypes ?? []))
+      for (const row of await ofRecordType(ctx, tenantId, recordType))
+        keep(row);
+    for (const entity of new Set(args.capsuleEntities ?? []))
+      for await (const row of ctx.db
+        .query("externalRecordLinks")
+        .withIndex("by_tenantId_and_capsuleEntity", (q) =>
+          q
+            .eq("tenantId", tenantId)
+            .eq("capsuleEntity", entity as Link["capsuleEntity"]),
+        ))
+        keep(row);
+    if (args.pending === true)
+      for await (const row of ctx.db
+        .query("externalRecordLinks")
+        .withIndex("by_tenantId_and_conflictStatus", (q) =>
+          q.eq("tenantId", tenantId).eq("conflictStatus", "pending_conflict"),
+        ))
+        keep(row);
+    return [...found.values()];
   },
 });
 
@@ -61,17 +89,15 @@ export const listFor = query({
 export const menuLinkStats = query({
   args: {},
   handler: async (ctx) => {
-    const rows = await readable(ctx);
-    if (rows == null) return null;
-    const auth = await getAuthContext(ctx);
+    const tenantId = await tenantOf(ctx);
+    if (tenantId == null) return null;
     const dishIds = new Set<string>();
     for await (const dish of ctx.db
       .query("dishes")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", auth.tenantId!)))
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId)))
       if (dish.deletedAt == null) dishIds.add(String(dish._id));
-    const menuLinks = rows.filter(
+    const menuLinks = (await ofRecordType(ctx, tenantId, "menu")).filter(
       (link) =>
-        link.recordType === "menu" &&
         link.sourceSystem === "tpp_legacy" &&
         link.conflictStatus !== "superseded",
     );

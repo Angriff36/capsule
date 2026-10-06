@@ -72,6 +72,7 @@ import { readClockEvidence } from "./clockLocation";
 import {
   breakMinutesInput,
   currentShiftFor,
+  upcomingShifts,
 } from "../workforce/timeRecordEntry";
 import { buildStaffUtilizationReport } from "../workforce/staffUtilization";
 
@@ -444,6 +445,8 @@ export function MyDayPage() {
         notice.weekEndsAt >= startOfToday.getTime(),
     )
     .sort((a, b) => a.weekStartsAt - b.weekStartsAt);
+  // A scheduled shift that ended before today is missed, not upcoming.
+  const myUpcomingShifts = upcomingShifts(myShifts, now);
   const unacknowledgedNotices = myScheduleNotices.filter(
     (notice) => !notice.acknowledgedAt,
   ).length;
@@ -618,7 +621,7 @@ export function MyDayPage() {
       signedInName={clerkDisplayName}
       linkedPersonName={linkedPersonName}
       weeklyHours={weekHours}
-      shiftCount={shifts === undefined ? undefined : myShifts.length}
+      shiftCount={shifts === undefined ? undefined : myUpcomingShifts.length}
     >
       {hasUnscopedQueuedWork() && (
         <div className="text-base text-warn">
@@ -833,15 +836,15 @@ export function MyDayPage() {
               </Section>
             </div>
             <div id="my-day-schedule" className="my-day-shifts-panel">
-              <Section title="Upcoming shifts" count={myShifts.length}>
-                {myShifts.length === 0 ? (
+              <Section title="Upcoming shifts" count={myUpcomingShifts.length}>
+                {myUpcomingShifts.length === 0 ? (
                   <EmptyState
                     title="No shifts scheduled"
                     hint="Shifts assigned to you will show up here as soon as they are published."
                   />
                 ) : (
                   <ul className="flex flex-col divide-y divide-line-2 px-4">
-                    {myShifts.map((shift) => (
+                    {myUpcomingShifts.map((shift) => (
                       <li
                         key={shift._id}
                         id={`my-day-shift-${shift._id}`}
@@ -941,7 +944,7 @@ export function MyDayPage() {
                 )}
               </Section>
             </div>
-            <MyDayCalendar shifts={myShifts} now={now} />
+            <MyDayCalendar shifts={myUpcomingShifts} now={now} />
             <div id="my-day-prep" className="my-day-prep-panel">
               <Section title="Today's prep" count={myTasks.length}>
                 {myTasks.length === 0 ? (

@@ -293,13 +293,29 @@ export function RunOfShowPage() {
   const closeBuilder = () => {
     setShowBuilder(false);
   };
+  // Times of the crew milestones already on the run; standard blocks are
+  // placed from them.
+  const milestoneAt = (name: string): number | null =>
+    (rows.find((row) => row.name === name)?.startsAt as number | null) ?? null;
   const generate = async (templates: BattleBoardTaskTemplate[]) => {
     if (!briefing || templates.length === 0) return;
     setGenerating(true);
     setFailure(null);
     try {
       await createTasks(
-        planFromTemplates(templates, String(briefing.event._id)),
+        planFromTemplates(templates, String(briefing.event._id), {
+          arriveAt:
+            milestoneAt("Arrive onsite / Setup") ??
+            (briefing.event.startsAt != null
+              ? (briefing.event.startsAt as number) - 60 * 60_000
+              : null),
+          serviceAt:
+            milestoneAt("Service starts") ??
+            (briefing.event.startsAt as number | null),
+          endsAt:
+            milestoneAt("Cleanup & reload") ??
+            (briefing.event.endsAt as number | null),
+        }),
         buildKey.current,
       );
       closeBuilder();
@@ -311,19 +327,19 @@ export function RunOfShowPage() {
 
   if (briefing === undefined)
     return (
-      <div className="evd">
-        <div className="evd-frame">
-          <p className="evd-empty">Lighting the estate…</p>
+      <div className="eday">
+        <div className="eday-frame">
+          <p className="eday-empty">Lighting the estate…</p>
         </div>
       </div>
     );
   if (briefing === null)
     return (
-      <div className="evd">
-        <div className="evd-frame">
-          <p className="evd-empty">
+      <div className="eday">
+        <div className="eday-frame">
+          <p className="eday-empty">
             This event is unavailable —{" "}
-            <Link className="evd-open-link" to="/event-day">
+            <Link className="eday-open-link" to="/event-day">
               choose an event
             </Link>
           </p>
@@ -335,31 +351,31 @@ export function RunOfShowPage() {
   const allDone = rows.length > 0 && view.doneCount === view.total;
 
   return (
-    <div className="evd">
-      <div className="evd-frame">
-        <header className="evd-run-head">
+    <div className="eday">
+      <div className="eday-frame">
+        <header className="eday-run-head">
           <Link
-            className="evd-run-back"
+            className="eday-run-back"
             to={`/event-day/${event._id}`}
             aria-label="Back to event map"
           >
             ←
           </Link>
-          <div className="evd-run-titlewrap">
-            <h1 className="evd-run-title">{String(event.title ?? "Event")}</h1>
-            <p className="evd-run-sub">Run of show</p>
+          <div className="eday-run-titlewrap">
+            <h1 className="eday-run-title">{String(event.title ?? "Event")}</h1>
+            <p className="eday-run-sub">Run of show</p>
           </div>
-          <span className="evd-run-clock">{formatTime(now)}</span>
+          <span className="eday-run-clock">{formatTime(now)}</span>
           <button
             type="button"
-            className={`evd-run-arm${armed ? " evd-run-arm-on" : ""}`}
+            className={`eday-run-arm${armed ? " eday-run-arm-on" : ""}`}
             onClick={armed ? () => setShowSettings(true) : arm}
           >
             {armed ? "On" : "Arm alerts"}
           </button>
           <button
             type="button"
-            className="evd-run-gear"
+            className="eday-run-gear"
             aria-label="Alert settings"
             onClick={() => setShowSettings(true)}
           >
@@ -368,7 +384,7 @@ export function RunOfShowPage() {
         </header>
 
         {failure ? (
-          <div className="evd-run-failure">
+          <div className="eday-run-failure">
             <FailureBanner
               failure={failure}
               onDismiss={() => setFailure(null)}
@@ -377,23 +393,23 @@ export function RunOfShowPage() {
         ) : null}
 
         {view.total > 0 ? (
-          <div className="evd-run-progress">
-            <div className="evd-run-progress-bar">
+          <div className="eday-run-progress">
+            <div className="eday-run-progress-bar">
               <div
-                className="evd-run-progress-fill"
+                className="eday-run-progress-fill"
                 style={{
                   width: `${Math.round((view.doneCount / view.total) * 100)}%`,
                 }}
               />
             </div>
-            <p className="evd-run-progress-label">
+            <p className="eday-run-progress-label">
               {view.doneCount} of {view.total} done
             </p>
           </div>
         ) : null}
 
-        <div className="evd-run-body">
-          <div className="evd-run-plan-actions">
+        <div className="eday-run-body">
+          <div className="eday-run-plan-actions">
             {rows.length === 0 ? (
               <p>
                 No run of show yet. Choose standard blocks or add custom work in
@@ -403,7 +419,7 @@ export function RunOfShowPage() {
             <button
               type="button"
               ref={buildButton}
-              className="evd-run-btn"
+              className="eday-run-btn"
               disabled={showBuilder}
               onClick={() => {
                 buildKey.current = crypto.randomUUID();
@@ -414,7 +430,7 @@ export function RunOfShowPage() {
               Add standard blocks
             </button>
             <Link
-              className="evd-open-link"
+              className="eday-open-link"
               to={`/events/${event._id}?tab=timeline`}
             >
               Plan times & custom work
@@ -430,9 +446,9 @@ export function RunOfShowPage() {
           ) : null}
 
           {allDone ? (
-            <div className="evd-run-now evd-run-now-clear">
-              <p className="evd-run-kicker">All clear</p>
-              <p className="evd-run-name">Every task is done.</p>
+            <div className="eday-run-now eday-run-now-clear">
+              <p className="eday-run-kicker">All clear</p>
+              <p className="eday-run-name">Every task is done.</p>
             </div>
           ) : view.current ? (
             <NowCard
@@ -453,8 +469,8 @@ export function RunOfShowPage() {
           ) : null}
 
           {view.overdue.length > 0 ? (
-            <section className="evd-run-card evd-run-card-late">
-              <p className="evd-run-card-kicker">
+            <section className="eday-run-card eday-run-card-late">
+              <p className="eday-run-card-kicker">
                 Late — {view.overdue.length} open
               </p>
               {view.overdue.map((row) => (
@@ -472,8 +488,8 @@ export function RunOfShowPage() {
           ) : null}
 
           {view.current && view.upcoming.length > 0 ? (
-            <section className="evd-run-card">
-              <p className="evd-run-card-kicker">Next</p>
+            <section className="eday-run-card">
+              <p className="eday-run-card-kicker">Next</p>
               {view.upcoming.map((row) => (
                 <TaskRow
                   key={row._id}
@@ -488,8 +504,8 @@ export function RunOfShowPage() {
           ) : null}
 
           {rows.length > 0 ? (
-            <section className="evd-run-card">
-              <p className="evd-run-card-kicker">Whole run of show</p>
+            <section className="eday-run-card">
+              <p className="eday-run-card-kicker">Whole run of show</p>
               {sortForRun(scoped).map((row) => (
                 <TaskRow
                   key={row._id}
@@ -519,23 +535,25 @@ export function RunOfShowPage() {
       ) : null}
 
       {alarm ? (
-        <div className="evd-alarm">
-          <div className="evd-alarm-card">
-            <p className="evd-alarm-kicker">
+        <div className="eday-alarm">
+          <div className="eday-alarm-card">
+            <p className="eday-alarm-kicker">
               {alarm.kind === "overdue"
                 ? "Still open"
                 : alarm.kind === "lead"
                   ? "Coming up"
                   : "Now"}
             </p>
-            <p className="evd-alarm-name">{String(alarm.row.name ?? "Task")}</p>
+            <p className="eday-alarm-name">
+              {String(alarm.row.name ?? "Task")}
+            </p>
             {whoLabel(alarm.row).trim().length > 0 ? (
-              <p className="evd-alarm-who">{whoLabel(alarm.row)}</p>
+              <p className="eday-alarm-who">{whoLabel(alarm.row)}</p>
             ) : null}
-            <div className="evd-alarm-actions">
+            <div className="eday-alarm-actions">
               <button
                 type="button"
-                className="evd-run-btn"
+                className="eday-run-btn"
                 onClick={() => {
                   dismissAlarm();
                   if (alarm.row._id !== "test") void markDone(alarm.row);
@@ -545,7 +563,7 @@ export function RunOfShowPage() {
               </button>
               <button
                 type="button"
-                className="evd-run-btn evd-run-btn-ghost"
+                className="eday-run-btn eday-run-btn-ghost"
                 onClick={dismissAlarm}
               >
                 Dismiss
@@ -571,6 +589,7 @@ function countdownLine(start: number | null, nowMs: number): string {
   if (minutes <= 0) return "starting now";
   if (minutes < 60) return `in ${minutes} min`;
   const hours = Math.floor(minutes / 60);
+  if (hours >= 48) return `in ${Math.round(hours / 24)} days`;
   return `in ${hours} h ${minutes % 60} min`;
 }
 
@@ -598,32 +617,32 @@ function TaskRow({
     <button
       type="button"
       className={[
-        "evd-run-row",
-        done ? "evd-run-row-done" : "",
-        late ? "evd-run-row-late" : "",
+        "eday-run-row",
+        done ? "eday-run-row-done" : "",
+        late ? "eday-run-row-late" : "",
       ]
         .filter(Boolean)
         .join(" ")}
       onClick={done ? onReopen : onDone}
       disabled={busy}
     >
-      <span className="evd-run-row-time">
+      <span className="eday-run-row-time">
         {done
           ? `✓ ${formatTime(row.completedAt)}`
           : start != null
             ? formatTime(start)
             : "Untimed"}
       </span>
-      <span className="evd-run-row-main">
-        <span className="evd-run-row-name">
+      <span className="eday-run-row-main">
+        <span className="eday-run-row-name">
           {String(row.name ?? "Task")}
           {category ? ` · ${category}` : ""}
         </span>
         {who.trim().length > 0 ? (
-          <span className="evd-run-row-sub">{who}</span>
+          <span className="eday-run-row-sub">{who}</span>
         ) : null}
       </span>
-      {!done ? <span className="evd-run-row-mark">Done</span> : null}
+      {!done ? <span className="eday-run-row-mark">Done</span> : null}
     </button>
   );
 }
@@ -644,18 +663,18 @@ function NowCard({
   const notes = notesOf(row);
   const category = categoryLabel(row.category);
   return (
-    <div className="evd-run-now">
-      <p className="evd-run-kicker">
+    <div className="eday-run-now">
+      <p className="eday-run-kicker">
         Now
-        {category ? <span className="evd-run-chip">{category}</span> : null}
+        {category ? <span className="eday-run-chip">{category}</span> : null}
       </p>
-      <p className="evd-run-name">{String(row.name ?? "Task")}</p>
-      <p className="evd-run-when">{windowLine(effectiveStart(row), end)}</p>
-      {who.trim().length > 0 ? <p className="evd-run-who">{who}</p> : null}
-      {notes.length > 0 ? <p className="evd-run-notes">{notes}</p> : null}
+      <p className="eday-run-name">{String(row.name ?? "Task")}</p>
+      <p className="eday-run-when">{windowLine(effectiveStart(row), end)}</p>
+      {who.trim().length > 0 ? <p className="eday-run-who">{who}</p> : null}
+      {notes.length > 0 ? <p className="eday-run-notes">{notes}</p> : null}
       <button
         type="button"
-        className="evd-run-btn"
+        className="eday-run-btn"
         disabled={busy}
         onClick={onDone}
       >
@@ -679,18 +698,18 @@ function NextCard({
   const notes = notesOf(row);
   const category = categoryLabel(row.category);
   return (
-    <div className="evd-run-now evd-run-now-clear">
-      <p className="evd-run-kicker evd-run-kicker-next">
+    <div className="eday-run-now eday-run-now-clear">
+      <p className="eday-run-kicker eday-run-kicker-next">
         Up next
-        {category ? <span className="evd-run-chip">{category}</span> : null}
+        {category ? <span className="eday-run-chip">{category}</span> : null}
       </p>
-      <p className="evd-run-name">{String(row.name ?? "Task")}</p>
-      <p className="evd-run-when">
+      <p className="eday-run-name">{String(row.name ?? "Task")}</p>
+      <p className="eday-run-when">
         {start != null ? formatTime(start) : "—"}
         {start != null ? ` · ${countdownLine(start, now)}` : ""}
       </p>
-      {who.trim().length > 0 ? <p className="evd-run-who">{who}</p> : null}
-      {notes.length > 0 ? <p className="evd-run-notes">{notes}</p> : null}
+      {who.trim().length > 0 ? <p className="eday-run-who">{who}</p> : null}
+      {notes.length > 0 ? <p className="eday-run-notes">{notes}</p> : null}
     </div>
   );
 }

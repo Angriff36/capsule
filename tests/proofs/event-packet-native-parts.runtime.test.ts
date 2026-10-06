@@ -106,6 +106,7 @@ async function setup() {
       packedQuantity: 0,
       unit: "each",
       status: "listed",
+      binNumber: 4,
     });
     const person = (givenName: string, phone: string) =>
       ctx.db.insert("people", {
@@ -253,6 +254,10 @@ describe("event packet parts from Capsule's own records", () => {
     expect(part("packlist-item")).toContain("Rentals");
     expect(part("packlist-category")).toContain("Serving vessel");
     expect(part("packlist-category")).toContain("[ ] Chafing dish - 6 each");
+    // A line in a numbered bin prints its bin (Perfect Packing memo).
+    expect(part("packlist-category")).toContain(
+      "Round linen - 12 each - bin 4",
+    );
     const staff = part("staffing");
     expect(staff).toContain("Lena Crew - Event lead");
     expect(staff).toContain("555-0101");

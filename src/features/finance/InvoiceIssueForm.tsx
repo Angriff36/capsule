@@ -17,8 +17,10 @@ import {
 import { formatMoney } from "../../lib/format";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { InvoiceEquipmentCharges } from "./InvoiceEquipmentCharges";
+import { InvoiceTravelFee } from "./InvoiceTravelFee";
 import "./taxWorkspace.css";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { SearchSelect } from "../../ui/SearchSelect";
 
 type ClientOption = {
   _id: string;
@@ -27,12 +29,15 @@ type ClientOption = {
   givenName?: string | null;
   familyName?: string | null;
   displayName?: string | null;
+  email?: string | null;
+  phone?: string | null;
   taxExempt?: boolean | null;
 };
 
 type EventOption = {
   _id: string;
   title?: string | null;
+  clientId?: string | null;
   deletedAt?: number | null;
 };
 
@@ -44,15 +49,28 @@ const clientLabel = (row: ClientOption) => {
   return row.companyName?.trim() || "Client";
 };
 
+/** Next INV-<year>-<nnn> after the highest one used this year. */
+function nextInvoiceNumber(
+  used: readonly (string | null | undefined)[],
+): string {
+  const year = new Date().getFullYear();
+  const pattern = new RegExp(`^INV-${year}-([0-9]+)$`);
+  const highest = used.reduce((max, number) => {
+    const match = String(number ?? "").match(pattern);
+    return match ? Math.max(max, Number(match[1])) : max;
+  }, 0);
+  return `INV-${year}-${String(highest + 1).padStart(3, "0")}`;
+}
+
 const categoryLabel = (category: InvoiceLineCategory) =>
   category.charAt(0).toUpperCase() + category.slice(1);
 
 const initialLine = (): InvoiceLineDraft => ({
   id: "line-1",
-  description: "Catering package",
+  description: "",
   category: "food",
   quantity: 1,
-  unitPrice: 1000,
+  unitPrice: 0,
 });
 
 export function InvoiceIssueForm({
@@ -64,6 +82,7 @@ export function InvoiceIssueForm({
   defaultClientId = "",
   defaultEventId = "",
   functionalCurrencyCode = "USD",
+  existingInvoiceNumbers = [],
 }: {
   clients: ClientOption[];
   events: EventOption[];
@@ -73,6 +92,8 @@ export function InvoiceIssueForm({
   defaultClientId?: string;
   defaultEventId?: string;
   functionalCurrencyCode?: string;
+  /** Numbers already used, so the form can suggest the next one. */
+  existingInvoiceNumbers?: readonly (string | null | undefined)[];
 }) {
   const clientDefault =
     defaultClientId && clients.some((row) => row._id === defaultClientId)
@@ -185,22 +206,31 @@ export function InvoiceIssueForm({
       <div className="invoice-composer-basics">
         <label className="field-label">
           Client
-          <select
-            className="input"
+          <SearchSelect
             name="clientId"
             required
             value={selectedClientId}
-            onChange={(event) => setSelectedClientId(event.target.value)}
-          >
-            <option value="" disabled>
-              Select client
-            </option>
-            {clients.map((client) => (
-              <option key={client._id} value={client._id}>
-                {clientLabel(client)}
-              </option>
-            ))}
-          </select>
+            onChange={(clientId) => {
+              setSelectedClientId(clientId);
+              // Another client's event must not stay picked. A client with
+              // one event gets it picked for them.
+              const theirs = events.filter(
+                (row) => row.deletedAt == null && row.clientId === clientId,
+              );
+              if (!theirs.some((row) => row._id === selectedEventId)) {
+                setSelectedEventId(theirs.length === 1 ? theirs[0]._id : "");
+              }
+            }}
+            recentsKey="client"
+            placeholder="Search clients…"
+            options={clients.map((client) => ({
+              id: client._id,
+              label: clientLabel(client),
+              hint:
+                [client.email, client.phone].filter(Boolean).join(" · ") ||
+                null,
+            }))}
+          />
         </label>
         <label className="field-label">
           Invoice number
@@ -208,6 +238,7 @@ export function InvoiceIssueForm({
             className="input"
             name="invoiceNumber"
             required
+            defaultValue={nextInvoiceNumber(existingInvoiceNumbers)}
             placeholder="INV-2026-001"
           />
         </label>
@@ -221,7 +252,11 @@ export function InvoiceIssueForm({
           >
             <option value="">No linked event</option>
             {events
-              .filter((row) => row.deletedAt == null)
+              .filter(
+                (row) =>
+                  row.deletedAt == null &&
+                  (!selectedClientId || row.clientId === selectedClientId),
+              )
               .map((event) => (
                 <option key={event._id} value={event._id}>
                   {event.title}
@@ -233,6 +268,16 @@ export function InvoiceIssueForm({
           eventId={selectedEventId}
           lines={lines}
           onAdd={(added) => setLines((current) => [...current, ...added])}
+        />
+        <InvoiceTravelFee
+          eventId={selectedEventId}
+          lines={lines}
+          onAdd={(added) =>
+            setLines((current) => [
+              ...current.filter((line) => !line.id.startsWith("travel-")),
+              added,
+            ])
+          }
         />
         <label className="field-label">
           Invoice currency

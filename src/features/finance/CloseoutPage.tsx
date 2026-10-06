@@ -11,7 +11,11 @@ import {
   useListInvoice,
 } from "../../lib/manifest-convex-react";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatCountNoun, formatMoneyExact } from "../../lib/format";
+import {
+  formatCountNoun,
+  formatDate,
+  formatMoneyExact,
+} from "../../lib/format";
 import {
   CLOSEOUT_EVIDENCE_CATEGORIES,
   RecordPhotoCapture,
@@ -30,10 +34,12 @@ import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { EventCostSummaryReport } from "./EventCostSummaryReport";
 import { EventFoodCostPanel } from "./EventFoodCostPanel";
+import { LeftoverDispositionPanel } from "./LeftoverDispositionPanel";
 import { EventEquipmentProblems } from "../events/EventEquipmentProblems";
 import { canReadEventFoodCost } from "../../lib/culinaryDemandClient";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useActionNotice } from "../../ui/action-result";
+import { useActionPrompt } from "../../ui/action-prompt";
 import {
   closeoutListedCost,
   isCloseoutListProfitPending,
@@ -68,12 +74,16 @@ export function CloseoutPage() {
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [draft, setDraft] = useState<CloseoutDraft | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const { prompt, host: promptHost } = useActionPrompt(busy != null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
   const [summaryCloseoutId, setSummaryCloseoutId] = useState<string | null>(
     null,
   );
   const [photoCloseoutId, setPhotoCloseoutId] = useState<string | null>(null);
+  const [leftoverCloseoutId, setLeftoverCloseoutId] = useState<string | null>(
+    null,
+  );
 
   const activeCloseouts = (closeouts ?? []).filter(
     (row) => row.deletedAt == null,
@@ -197,7 +207,24 @@ export function CloseoutPage() {
       }
     };
 
-  const invokeFinalize = (row: { _id: string; version: number }) => {
+  const invokeFinalize = async (
+    row: Parameters<typeof isCloseoutListProfitPending>[0] & {
+      _id: string;
+      version: number;
+    },
+  ) => {
+    // A draft made when the event closed out has no costs until someone
+    // reconciles it; finalizing it as-is freezes $0 cost.
+    if (
+      isCloseoutListProfitPending(row) &&
+      !(await prompt.askConfirm({
+        title: "Finalize with no costs?",
+        description:
+          "Nobody has reconciled this closeout, so it has $0 cost: clocked time, purchases and rentals are not in it yet. Reconcile first to bring them in, or finalize it as it is.",
+        confirmLabel: "Finalize at $0 cost",
+      }))
+    )
+      return;
     void run(`${row._id}:finalize`, async () => {
       await finalize({ docId: row._id, version: row.version });
       setNotice("Closeout finalized. Numbers are frozen.");
@@ -319,7 +346,8 @@ export function CloseoutPage() {
               <thead>
                 <tr>
                   <th>Event</th>
-                  <th>Billed</th>
+                  <th>Billed (with tax)</th>
+                  <th>Revenue</th>
                   <th>Cost</th>
                   <th>Gross profit</th>
                   <th>Headcount</th>
@@ -350,9 +378,21 @@ export function CloseoutPage() {
                           >
                             <strong>{eventTitle(String(row.eventId))}</strong>
                           </Link>
+                          {eventFor(String(row.eventId))?.startsAt ? (
+                            <span className="ml-2 text-sm text-ink-2">
+                              {formatDate(
+                                Number(eventFor(String(row.eventId))?.startsAt),
+                              )}
+                            </span>
+                          ) : null}
                           <CloseoutRevenueNote row={row} billing={billing} />
                         </td>
                         <td>{formatMoneyExact(billing.billedTotal)}</td>
+                        <td>
+                          {isCloseoutListProfitPending(row)
+                            ? "—"
+                            : formatMoneyExact(Number(row.actualRevenue ?? 0))}
+                        </td>
                         <td>
                           {listedCost == null
                             ? "—"
@@ -394,7 +434,7 @@ export function CloseoutPage() {
                                   key={action.key}
                                   className="btn btn-ghost btn-sm"
                                   disabled={busy != null}
-                                  onClick={() => invokeFinalize(row)}
+                                  onClick={() => void invokeFinalize(row)}
                                 >
                                   {busy === `${row._id}:${action.key}`
                                     ? "Working…"
@@ -420,6 +460,20 @@ export function CloseoutPage() {
                               }
                             >
                               Cost summary
+                            </button>
+                            <button
+                              className="btn btn-ghost btn-sm"
+                              type="button"
+                              aria-expanded={leftoverCloseoutId === row._id}
+                              onClick={() =>
+                                setLeftoverCloseoutId((current) =>
+                                  current === row._id ? null : row._id,
+                                )
+                              }
+                            >
+                              {leftoverCloseoutId === row._id
+                                ? "Hide leftovers"
+                                : "Leftovers"}
                             </button>
                             <button
                               className="btn btn-ghost btn-sm"
@@ -464,7 +518,7 @@ export function CloseoutPage() {
                       </tr>
                       {correctingId === row._id ? (
                         <tr>
-                          <td colSpan={7} className="!p-3">
+                          <td colSpan={8} className="!p-3">
                             <CloseoutCorrectionPanel
                               closeoutId={row._id}
                               eventId={String(row.eventId)}
@@ -474,9 +528,18 @@ export function CloseoutPage() {
                           </td>
                         </tr>
                       ) : null}
+                      {leftoverCloseoutId === row._id ? (
+                        <tr>
+                          <td colSpan={8} className="!p-3">
+                            <LeftoverDispositionPanel
+                              eventId={String(row.eventId)}
+                            />
+                          </td>
+                        </tr>
+                      ) : null}
                       {photoCloseoutId === row._id ? (
                         <tr>
-                          <td colSpan={7} className="!p-3">
+                          <td colSpan={8} className="!p-3">
                             <RecordPhotoCapture
                               parentType="closeout"
                               parentId={row._id}
@@ -507,6 +570,7 @@ export function CloseoutPage() {
         </Link>{" "}
         for billing collection.
       </p>
+      {promptHost}
     </div>
   );
 }

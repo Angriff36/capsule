@@ -49,12 +49,13 @@ export async function recordCommandAudit(
   event: ConvexCommandEvent,
 ): Promise<void> {
   try {
+    const eventId = String(event.eventId);
     const step = {
       stepName: `${event.entity}.${event.command}`,
       subjectEntity: event.entity,
       subjectId: String(event.entityId),
       eventType: event.type,
-      manifestEventId: String(event.eventId),
+      manifestEventId: eventId,
       versionAfter: await versionOf(ctx, String(event.entityId)),
       lastOccurredAt: event.createdAt,
       updatedAt: Date.now(),
@@ -62,7 +63,19 @@ export async function recordCommandAudit(
     const open = openAudits.get(ctx.db);
     if (open) {
       open.count += 1;
-      await ctx.db.patch(open.id, { ...step, eventCount: open.count });
+      const audit = await ctx.db.get(open.id);
+      const eventIds = Array.isArray(audit?.manifestEventIds)
+        ? audit.manifestEventIds.filter(
+            (id): id is string => typeof id === "string",
+          )
+        : [];
+      if (!eventIds.includes(eventId)) eventIds.push(eventId);
+      await ctx.db.patch(open.id, {
+        ...step,
+        eventCount: eventIds.length,
+        manifestEventIds: eventIds,
+      });
+      await stampAuditMembership(ctx, eventId, String(open.id));
       return;
     }
     const auth = ctx.auth
@@ -78,6 +91,7 @@ export async function recordCommandAudit(
       occurredAt: event.createdAt,
       ...step,
       eventCount: 1,
+      manifestEventIds: [eventId],
       actorUserId: auth.id || null,
       actorPersonId: auth.personId ?? null,
       actorRole: auth.role,
@@ -85,6 +99,7 @@ export async function recordCommandAudit(
       createdAt: step.updatedAt,
     });
     openAudits.set(ctx.db, { id, count: 1 });
+    await stampAuditMembership(ctx, eventId, String(id));
   } catch (error) {
     console.error(
       "[audit] step history not saved",
@@ -93,6 +108,21 @@ export async function recordCommandAudit(
       String(error),
     );
   }
+}
+
+/** Link the immutable event ledger to its audit row without copying command input. */
+async function stampAuditMembership(
+  ctx: AuditCtx,
+  eventId: string,
+  commandAuditId: string,
+): Promise<void> {
+  const id = ctx.db.normalizeId("manifestEvents", eventId);
+  if (!id) return;
+  const event = await ctx.db.get(id);
+  if (!event) return;
+  await ctx.db.patch(id, {
+    payload: { ...event.payload, commandAuditId },
+  });
 }
 
 /**

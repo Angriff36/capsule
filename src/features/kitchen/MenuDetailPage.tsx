@@ -25,6 +25,7 @@ import { useActionPrompt } from "../../ui/action-prompt";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { KitchenBookNav } from "./KitchenBookNav";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import { MenuDetailsEditor } from "./MenuDetailsEditor";
 import { MenuDishManager } from "./MenuDishManager";
 import { dishRecipeLinks, shareRecipeLines } from "./dishVersions";
@@ -106,6 +107,26 @@ export function MenuDetailPage() {
       ),
     [id, menuDishes],
   );
+  // Course names in menu order, as the public menu groups them.
+  const menuCourses = useMemo(() => {
+    const dishCourse = new Map(
+      (dishes ?? []).map((dish) => [String(dish._id), dish.course]),
+    );
+    const names: string[] = [];
+    for (const selection of [...selectedMenuDishes].sort(
+      (a, b) => a.sortOrder - b.sortOrder,
+    )) {
+      const course = (
+        selection.course ?? dishCourse.get(String(selection.dishId))
+      )?.trim();
+      if (
+        course &&
+        !names.some((n) => n.toLowerCase() === course.toLowerCase())
+      )
+        names.push(course);
+    }
+    return names;
+  }, [dishes, selectedMenuDishes]);
   const allergensByDish = useMemo(() => {
     const rows = deriveAllergenRows({
       dishIds: selectedMenuDishes.map((selection) => String(selection.dishId)),
@@ -304,9 +325,12 @@ export function MenuDetailPage() {
 
   return (
     <article className="culinary-document culinary-document-compact culinary-studio">
-      <Link to={kitchenCatalogPath("menus")} className="culinary-studio-back">
+      <ReturnToListLink
+        fallback={kitchenCatalogPath("menus")}
+        className="culinary-studio-back"
+      >
         ← Menu index
-      </Link>
+      </ReturnToListLink>
       <KitchenBookNav />
       {host}
       {failure ? (
@@ -529,7 +553,10 @@ export function MenuDetailPage() {
           status: String(menu.status),
           availableFrom: menu.availableFrom,
           availableUntil: menu.availableUntil,
+          guestsPerServer: menu.guestsPerServer,
+          pickOneCourses: menu.pickOneCourses,
         }}
+        courses={menuCourses}
         onFailure={setFailure}
       />
 

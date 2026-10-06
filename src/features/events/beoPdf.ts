@@ -8,6 +8,7 @@ import {
 } from "../admin/tenantBranding";
 import { displayEventMenuNotes } from "./eventMenuLineFields";
 import type { StaffingRosterEntry } from "./eventTimelineStaffRoster";
+import type { VenueLogisticsLine } from "../facilities/venueLogistics";
 
 export interface BeoEventRecord {
   _id: string;
@@ -70,6 +71,9 @@ export interface BeoPdfInput {
     notes?: string | null;
   }>;
   staff: Array<BeoStaffLine | StaffingRosterEntry>;
+  // The venue's logistics profile; left out where the venue is not shared
+  // (the client portal), so that BEO has no logistics section.
+  venueLogistics?: VenueLogisticsLine[];
   branding: TenantBranding;
 }
 
@@ -401,6 +405,17 @@ export function buildBeoPdf(input: BeoPdfInput): jsPDF {
             secondary: staffDetails(line),
           }));
 
+  if (input.venueLogistics) {
+    drawSection(
+      "Venue logistics",
+      input.venueLogistics.length === 0
+        ? [{ primary: "No logistics on file for this venue" }]
+        : input.venueLogistics.map((line) => ({
+            primary: line.label,
+            secondary: line.value,
+          })),
+    );
+  }
   drawSection("Menu and service", menuBlocks);
   drawSection("Day-of timeline", timelineBlocks);
   drawSection("Staff coverage", staffBlocks);

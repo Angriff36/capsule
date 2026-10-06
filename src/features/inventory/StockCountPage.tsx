@@ -313,8 +313,24 @@ export function StockCountPage() {
       countNote: countNote.trim() || undefined,
     };
     void run(`${activeLine._id}:count`, async () => {
-      if (String(activeLine.status) === "pending") await recordCount(payload);
-      else await reviseCount(payload);
+      const saved = (
+        String(activeLine.status) === "pending"
+          ? await recordCount(payload)
+          : await reviseCount(payload)
+      ) as { version?: number } | undefined;
+      // A shelf that matches the book needs no review: close the line now
+      // so the count moves straight on to the next one.
+      if (
+        quantity(nextQuantity) === ledgerQuantity &&
+        typeof saved?.version === "number"
+      ) {
+        await confirmLedgerMatch({
+          docId: activeLine._id,
+          version: saved.version,
+        });
+        setNotice("Count matches the stock book. On to the next line.");
+        return;
+      }
       setNotice(
         String(activeLine.status) === "pending"
           ? "Physical count saved. Review the variance, then reconcile this line."
@@ -560,7 +576,7 @@ export function StockCountPage() {
                   <span className="stock-count-session-meter">
                     <i
                       style={{
-                        width: `${session.lineCount === 0 ? 100 : Math.min(100, (done / session.lineCount) * 100)}%`,
+                        width: `${session.lineCount === 0 ? 0 : Math.min(100, (done / session.lineCount) * 100)}%`,
                       }}
                     />
                   </span>
@@ -837,7 +853,9 @@ export function StockCountPage() {
                     {selectedSession.status === "closed"
                       ? `Closed ${formatTimestamp(selectedSession.closedAt)}`
                       : canClose
-                        ? "Every line is reconciled."
+                        ? sessionLines.length === 0
+                          ? "Nothing to count on this sheet."
+                          : "Every line is counted."
                         : `${pendingLines.length} ${pendingLines.length === 1 ? "line remains" : "lines remain"}.`}
                   </strong>
                   <span>

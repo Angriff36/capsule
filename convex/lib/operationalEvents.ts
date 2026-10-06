@@ -3,6 +3,7 @@ import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { reconcileEventPrepWork } from "./prepWorkReconciliation";
+import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
 import { reconcileDishPrep, standDownEventPrep } from "./prepRecipeEvents";
 import { releaseEventInventoryHolds } from "./inventoryEvents";
 import { eventCancellationReconciliation } from "./cancellationReconciliation";
@@ -30,6 +31,7 @@ import { eventStyleReconciliation } from "./styleReconciliation";
 import { eventRentalReconciliation } from "./rentalReconciliation";
 import {
   assertInvoiceCommercialSource, ensureEventDraftInvoice, eventInvoicePricingReconciliation,
+  followAcceptedProposalPrice,
 } from "./invoicePricingReconciliation";
 import { eventCloseoutCommercialReconciliation } from "./closeoutCommercialReconciliation";
 import {
@@ -43,7 +45,7 @@ import {
 import {
   ensureTemplateStaffNeeds, placeFromWaitlist, validateDescribedDemand, validateWaitlistJoin,
   validateNewEventStaffing, validateScheduledShift, validateShiftWindow,
-  validatePayrollInputSources, validateTimeRecordClockIn,
+  validatePayrollInputSources, validateTimeRecordClockIn, clockShiftTime,
 } from "./shiftSchedulingEvents";
 import {
   adoptLegacyDraftQuantity,
@@ -51,7 +53,10 @@ import {
   retireCoveredZeroLine,
   retireUnusedAutomaticDraft,
 } from "./purchasingEvents";
-import { moveEventPurchasingWeek } from "./purchasingReschedule";
+import {
+  moveEventPurchasingWeek,
+  moveIngredientNeedsToPreferredVendor,
+} from "./purchasingReschedule";
 import { openNeedForApprovedEventDemand } from "./approvedDemandPurchasing";
 import { holdApprovedRentals } from "./acceptedRentalHolds";
 import { lineOverridePurchasingFollowThrough } from "./lineOverridePurchasing";
@@ -224,6 +229,10 @@ export async function handleManifestEvent(
     if (event.type === "ShiftRescheduled")
       await reflectManualEventShiftTiming(ctx, event.entityId as Id<"shifts">);
     else await validateAutomaticEventShift(ctx, event.entityId as Id<"shifts">, "schedule");
+    return;
+  }
+  if (event.entity === "Shift" && (event.type === "ShiftStarted" || event.type === "ShiftCompleted")) {
+    await clockShiftTime(ctx, event.entityId as Id<"shifts">, event.type === "ShiftStarted" ? "in" : "out");
     return;
   }
   if (event.entity === "Shift" && event.type === "ShiftEventTimingPlanned") {
@@ -456,6 +465,15 @@ export async function handleManifestEvent(
     await assertImportedPaymentMatchedOnce(ctx, event.entityId as Id<"externalRecordLinks">);
     return;
   }
+  if (
+    event.entity === "Ingredient" &&
+    (event.type === "IngredientPreferredVendorsSet" ||
+      event.type === "IngredientPreferredVendorSet")
+  ) {
+    // Open needs follow the new first-choice vendor, so nothing is ordered twice.
+    await moveIngredientNeedsToPreferredVendor(ctx, event.entityId as Id<"ingredients">);
+    return;
+  }
   if (event.entity === "Event" && event.type === "EventPurchasingWeekChanged") {
     if (event.payload.previousPurchasingWeekStart !== event.payload.purchasingWeekStart)
       await moveEventPurchasingWeek(ctx, event.entityId as Id<"events">);
@@ -482,6 +500,8 @@ export async function handleManifestEvent(
     // An accepted change on a booked event holds any rental it added.
     const accepted = await ctx.db.get(event.entityId as Id<"proposals">);
     if (accepted?.eventId) await holdApprovedRentals(ctx, accepted.eventId);
+    // The event's price becomes what the client accepted.
+    await followAcceptedProposalPrice(ctx, event.entityId as Id<"proposals">);
     return;
   }
   if (event.entity === "Invoice" &&
@@ -555,6 +575,17 @@ export async function handleManifestEvent(
   ) {
     if (event.payload.synchronizePrep !== false)
       await reconcileDishPrep(ctx, event.entityId as Id<"dishTasks">);
+    return;
+  }
+  // A dish that arrives from an accepted proposal gets its prep steps now,
+  // as one added on the event menu does, so the kitchen sees it to prep.
+  if (event.entity === "EventDish" && event.type === "EventDishConfirmedFromProposal") {
+    const line = await ctx.db.get(event.entityId as Id<"eventDishes">);
+    if (line && line.deletedAt == null && line.removedAt == null)
+      await reconcileEventPrepWork(
+        TenantSystemCommandRunner.forTenant(ctx, line.tenantId).context,
+        { eventDishId: line._id },
+      );
     return;
   }
   if (event.entity === "EventDish" && event.type === "EventDishRemoved") {

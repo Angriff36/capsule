@@ -5,9 +5,11 @@ import type {
   EventBundleSource,
 } from "./eventBundle";
 import { mergeEventBundle } from "./mergeEventBundle";
-import { parseBattleBoard } from "./parseBattleBoard";
+import { parseBeoText } from "./parseBeoText";
 import { bundlePartFromSheets } from "./bundlePartFromSheets";
-import { readPdfTextLines } from "./pdfTextReader";
+import { bundlePartFromPdfLines } from "./pdfReports";
+import { isRtf, rtfToText } from "./rtfToText";
+import { readPdfTextLines } from "./pdfTextReaderNode";
 import { readXlsxWorkbook } from "./xlsxReader";
 import { XlsxReportGrid } from "./xlsxReportGrid";
 import { packetEvidenceFromText } from "../eventPacket/packetContract";
@@ -38,6 +40,11 @@ export { detectWorkbookSource } from "./bundlePartFromSheets";
 
 function parseOne(file: EventBundleFile): EventBundlePart | undefined {
   const lower = file.name.toLowerCase();
+  const head = file.contents.toString("latin1", 0, 128);
+  if (isRtf(head)) {
+    // TPP saves the BEO as Rich Text too (as the import page reads it).
+    return parseBeoText(rtfToText(file.contents.toString("latin1")));
+  }
   if (file.contents.toString("utf8", 0, 128).trimStart().startsWith("{")) {
     const packetEvidence = packetEvidenceFromText(
       file.contents.toString("utf8"),
@@ -46,7 +53,7 @@ function parseOne(file: EventBundleFile): EventBundlePart | undefined {
   }
 
   if (lower.endsWith(".pdf")) {
-    return parseBattleBoard(readPdfTextLines(file.contents));
+    return bundlePartFromPdfLines(readPdfTextLines(file.contents));
   }
   if (lower.endsWith(".xlsx")) {
     // Typed read: date cells print as M/D/YYYY and format-literal units ride

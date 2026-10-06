@@ -1,15 +1,18 @@
+import { formatMoneyExact } from "../../lib/format";
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { useListProposalLineItem } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { api, type Id } from "../../lib/api";
 import {
+  byLineDisplayOrder,
   computeProposalPricing,
   PRICING_BASES,
   PRICING_BASIS_LABELS,
   type PricingBasis,
 } from "../../lib/pricing";
 import { useCatalogDishes } from "./useCatalogDishes";
+import { ProposalTravelFee } from "./ProposalTravelFee";
 
 interface ProposalPricingPanelProps {
   proposalId: string;
@@ -95,7 +98,7 @@ export function ProposalPricingPanel({
 
   const rows = (lineItems ?? [])
     .filter((row) => row.deletedAt == null && row.proposalId === proposalId)
-    .sort((a, b) => Number(a.sortOrder) - Number(b.sortOrder));
+    .sort(byLineDisplayOrder);
 
   const recomputed = computeProposalPricing({
     lines: rows.map((row) => ({
@@ -253,7 +256,9 @@ export function ProposalPricingPanel({
                   {PRICING_BASIS_LABELS[row.pricingBasis as PricingBasis]}
                 </td>
                 <td className="tabular-nums" data-label="Price / %">
-                  {Number(row.unitPrice).toFixed(2)}
+                  {row.pricingBasis === "percentage"
+                    ? `${Number(row.unitPrice)}%`
+                    : formatMoneyExact(Number(row.unitPrice))}
                 </td>
                 <td className="tabular-nums" data-label="Qty">
                   {row.pricingBasis === "per_unit"
@@ -263,7 +268,7 @@ export function ProposalPricingPanel({
                       : "—"}
                 </td>
                 <td className="tabular-nums" data-label="Amount">
-                  {(recomputed.lines[index]?.amount ?? 0).toFixed(2)}
+                  {formatMoneyExact(recomputed.lines[index]?.amount ?? 0)}
                 </td>
                 {editable ? (
                   <td>
@@ -352,14 +357,22 @@ export function ProposalPricingPanel({
               onChange={(e) => pickDishForEditor(e.target.value)}
             >
               <option value="">— custom line —</option>
-              {catalog.lines.map((dish) => (
-                <option key={dish.menuDishId} value={dish.menuDishId}>
-                  {dish.name}
-                  {dish.sellingPrice == null
-                    ? ""
-                    : ` · ${dish.sellingPrice.toFixed(2)}`}
-                </option>
-              ))}
+              {/* Only priced dishes can be linked (the save refuses the
+                  rest); price an unpriced dish as a custom line. */}
+              {catalog.lines
+                .filter(
+                  (dish) =>
+                    dish.sellingPrice != null ||
+                    dish.menuDishId === editor.menuDishId,
+                )
+                .map((dish) => (
+                  <option key={dish.menuDishId} value={dish.menuDishId}>
+                    {dish.name}
+                    {dish.sellingPrice == null
+                      ? ""
+                      : ` · ${formatMoneyExact(dish.sellingPrice)}`}
+                  </option>
+                ))}
             </select>
           </label>
           <label className="min-w-[12rem]">
@@ -469,18 +482,26 @@ export function ProposalPricingPanel({
         </button>
       ) : null}
 
+      {editable ? (
+        <ProposalTravelFee proposalId={proposalId} onFailure={onFailure} />
+      ) : null}
+
       <p className="mt-2 text-base text-ink-2">
         Subtotal{" "}
-        <span className="tabular-nums">{recomputed.subtotal.toFixed(2)}</span> ·
-        Tax{" "}
-        <span className="tabular-nums">{recomputed.taxAmount.toFixed(2)}</span>{" "}
+        <span className="tabular-nums">
+          {formatMoneyExact(recomputed.subtotal)}
+        </span>{" "}
+        · Tax{" "}
+        <span className="tabular-nums">
+          {formatMoneyExact(recomputed.taxAmount)}
+        </span>{" "}
         · Discount{" "}
         <span className="tabular-nums">
-          {recomputed.discountAmount.toFixed(2)}
+          {formatMoneyExact(recomputed.discountAmount)}
         </span>{" "}
         · <span className="font-semibold text-ink">Total </span>
         <span className="tabular-nums font-semibold text-ink">
-          {recomputed.total.toFixed(2)}
+          {formatMoneyExact(recomputed.total)}
         </span>
       </p>
     </div>

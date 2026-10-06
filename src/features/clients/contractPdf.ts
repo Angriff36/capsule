@@ -205,7 +205,12 @@ export function buildContractPdf(input: ContractPdfInput): jsPDF {
   y += 18;
 
   sectionLabel("Commercial terms");
-  detailRow("Agreement total", money(event.quotedPrice));
+  detailRow(
+    "Agreement total",
+    Number(event.quotedPrice ?? 0) > 0
+      ? money(event.quotedPrice)
+      : "Not priced yet",
+  );
   detailRow(
     "Payment terms",
     `Net ${Number(client.paymentTermsDays ?? 30)} days from invoice`,

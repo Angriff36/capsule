@@ -245,11 +245,90 @@ export function alertSpeech(
 // ---------- selected standard blocks ----------
 
 /** Templates describe work, not an event-specific timetable. */
+/**
+ * Where each standard block usually falls, in minutes from arrival on site,
+ * service start or event end, and how long it runs. A block lands on the
+ * run with a real time; a planner moves it if this event differs.
+ */
+const BLOCK_TIMING: Record<
+  string,
+  { from: "arrive" | "service" | "end"; offset: number; minutes: number }
+> = {
+  "Staff Huddle / Sign-In": { from: "arrive", offset: 0, minutes: 10 },
+  "Unload & Stage": { from: "arrive", offset: 10, minutes: 30 },
+  "Build Field Kitchen": { from: "arrive", offset: 20, minutes: 40 },
+  "Set up Scullery": { from: "arrive", offset: 30, minutes: 20 },
+  "Erect Buffet Table / Set Linen": { from: "arrive", offset: 30, minutes: 30 },
+  "Set Buffet Tables & Decor": { from: "arrive", offset: 40, minutes: 40 },
+  "Set Apps Table / Grazing Station": {
+    from: "arrive",
+    offset: 40,
+    minutes: 30,
+  },
+  "Set Dessert Station": { from: "arrive", offset: 50, minutes: 20 },
+  "Bar Arrival & Setup": { from: "service", offset: -60, minutes: 45 },
+  "Check-in with Cooks/Kitchen": { from: "service", offset: -90, minutes: 10 },
+  "Ceremony Quiet Time": { from: "service", offset: -30, minutes: 30 },
+  "Apps Huddle": { from: "service", offset: -30, minutes: 10 },
+  "Light Sternos & Fill Chafers": { from: "service", offset: -30, minutes: 15 },
+  "Team Huddle / Diet Callouts": { from: "service", offset: -20, minutes: 10 },
+  "Land Food in Chafers": { from: "service", offset: -15, minutes: 15 },
+  "Buffet Open": { from: "service", offset: 0, minutes: 0 },
+  "Buffet Service (Serve/Carve)": { from: "service", offset: 0, minutes: 90 },
+  "Passed Apps Service": { from: "service", offset: 0, minutes: 60 },
+  "Water Table Service": { from: "service", offset: 0, minutes: 120 },
+  "Flip Buffet for Dessert": { from: "service", offset: 90, minutes: 15 },
+  "Dessert Service": { from: "service", offset: 105, minutes: 45 },
+  "Buffet Close": { from: "service", offset: 120, minutes: 0 },
+  "Bar Closing": { from: "end", offset: -15, minutes: 15 },
+  "Final Bussing (Own Disposables)": { from: "end", offset: 0, minutes: 30 },
+  "Strike & Load Out": { from: "end", offset: 0, minutes: 60 },
+  "Final Pass / Walkthrough": { from: "end", offset: 30, minutes: 15 },
+  "Venue Access / Send-Off / Lock-Up": { from: "end", offset: 60, minutes: 15 },
+  "Clock Out": { from: "end", offset: 90, minutes: 0 },
+};
+
+export type RunAnchors = {
+  arriveAt: number | null;
+  serviceAt: number | null;
+  endsAt: number | null;
+};
+
 export function planFromTemplates(
   templates: BattleBoardTaskTemplate[],
   eventId: string,
+  anchors?: RunAnchors,
 ): RunTaskPlan[] {
+  const timeFor = (label: string) => {
+    const rule = BLOCK_TIMING[label];
+    const base =
+      rule && anchors
+        ? rule.from === "arrive"
+          ? anchors.arriveAt
+          : rule.from === "service"
+            ? anchors.serviceAt
+            : anchors.endsAt
+        : null;
+    if (!rule || base == null) return {};
+    let startsAt = base + rule.offset * 60_000;
+    let endsAt = startsAt + rule.minutes * 60_000;
+    // Setup work happens between arrival and service: nothing before the
+    // crew is there, nothing running past the first guest.
+    const { arriveAt, serviceAt } = anchors!;
+    const setupWork =
+      rule.from === "arrive" || (rule.from === "service" && rule.offset < 0);
+    if (setupWork && arriveAt != null && startsAt < arriveAt) {
+      endsAt += arriveAt - startsAt;
+      startsAt = arriveAt;
+    }
+    if (setupWork && serviceAt != null && endsAt > serviceAt) {
+      endsAt = Math.max(startsAt, serviceAt);
+      if (startsAt > serviceAt) startsAt = serviceAt;
+    }
+    return rule.minutes > 0 ? { startsAt, endsAt } : { startsAt };
+  };
   return templates.map((template) => ({
+    ...timeFor(template.label),
     idempotencyKey: `${eventId}:block:${encodeURIComponent(template.group)}:${encodeURIComponent(template.label)}`,
     eventId,
     name: template.label,

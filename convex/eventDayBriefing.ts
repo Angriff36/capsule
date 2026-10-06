@@ -672,6 +672,7 @@ export const getBriefing = query({
         deletedAt: row.deletedAt ?? null,
         status: row.status ?? null,
         name: row.name ?? null,
+        binSheet: row.binSheet ?? null,
       })),
       packListItems: (packListItems as any[]).map((row: any) => ({
         _id: row._id,
@@ -681,6 +682,7 @@ export const getBriefing = query({
         description: row.description ?? null,
         requiredQuantity: row.requiredQuantity ?? null,
         unit: row.unit ?? null,
+        binNumber: row.binNumber ?? null,
       })),
       people,
       me: {

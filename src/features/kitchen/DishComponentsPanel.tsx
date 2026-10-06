@@ -8,6 +8,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { componentPath } from "./kitchenRoutes";
 import { TableSkeleton } from "../../ui/primitives";
+import { FieldHelp } from "../../ui/FieldHelp";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
 
@@ -206,8 +207,11 @@ export function DishComponentsPanel({ dishId }: Props) {
             </select>
           </label>
           <label className="block text-sm">
-            <span className="meta-term">
-              Yield (0 = the subrecipe&apos;s own)
+            <span className="field-label-row">
+              <span className="meta-term">
+                Yield (0 = the subrecipe&apos;s own)
+              </span>
+              <FieldHelp term="dishYield" />
             </span>
             <input
               name="yieldQuantity"
@@ -219,7 +223,10 @@ export function DishComponentsPanel({ dishId }: Props) {
             />
           </label>
           <label className="block text-sm">
-            <span className="meta-term">Batch multiplier</span>
+            <span className="field-label-row">
+              <span className="meta-term">Batch multiplier</span>
+              <FieldHelp term="batchMultiplier" />
+            </span>
             <input
               name="batchMultiplier"
               type="number"

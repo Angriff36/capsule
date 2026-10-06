@@ -123,6 +123,8 @@ export function EventDashOverview({
   readonly onOpen: (id: DashSheetId) => void;
 }) {
   const { event, eventId } = props;
+  // Events link a venue record; the old free-text name is only a fallback.
+  const venueName = props.venue?.name || event.venueName;
   const invoices = useListInvoice();
   const comments = useEventTimelineComments(eventId);
   const canManagePacket = useEventPacketAccess(eventId);
@@ -210,7 +212,7 @@ export function EventDashOverview({
             </div>
           }
           tone={forecast.day?.adverse ? "alert" : undefined}
-          hint={`${props.startsAt != null ? `${formatTime(props.startsAt)} – ${formatTime(props.endsAt)}` : "No time set"} · ${event.venueName || "No venue"}${
+          hint={`${props.startsAt != null ? `${formatTime(props.startsAt)} – ${formatTime(props.endsAt)}` : "No time set"} · ${venueName || "No venue"}${
             forecast.day
               ? ` · ${forecast.day.highF}°/${forecast.day.lowF}°, ${forecast.day.rainProbability}% rain${forecast.day.adverse ? ", bad weather" : ""}`
               : ""
@@ -262,11 +264,19 @@ export function EventDashOverview({
           index={next()}
           onOpen={onOpen}
           big={
-            <div className="evd-big">
-              {formatMoney(props.quotedPrice, props.currencyCode)}
-            </div>
+            props.quotedPrice != null && props.quotedPrice > 0 ? (
+              <div className="evd-big">
+                {formatMoney(props.quotedPrice, props.currencyCode)}
+              </div>
+            ) : (
+              <div className="evd-big small q">Not priced yet</div>
+            )
           }
-          hint={`Quoted · ${formatMoney(props.budgetAmount, props.currencyCode)} budget · ${
+          hint={`${props.quotedPrice != null && props.quotedPrice > 0 ? "Quoted · " : ""}${
+            props.budgetAmount != null && props.budgetAmount > 0
+              ? `${formatMoney(props.budgetAmount, props.currencyCode)} budget`
+              : "no budget given"
+          } · ${
             invoice
               ? `${formatStatusLabel(String(invoice.status)).toLowerCase()} invoice`
               : "no invoice yet"
@@ -296,10 +306,8 @@ export function EventDashOverview({
           index={next()}
           onOpen={onOpen}
           big={
-            <div
-              className={`evd-big small${travel || event.venueName ? "" : " q"}`}
-            >
-              {travel ? durationLabel(travel) : event.venueName || "No venue"}
+            <div className={`evd-big small${travel || venueName ? "" : " q"}`}>
+              {travel ? durationLabel(travel) : venueName || "No venue"}
             </div>
           }
           hint={

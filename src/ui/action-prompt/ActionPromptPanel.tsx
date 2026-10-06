@@ -112,6 +112,11 @@ export function ActionPromptPanel({
   // Esc outside the dialog (fallback, non-modal environments) still cancels.
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
+      if (
+        event.target instanceof Element &&
+        event.target.closest("[data-record-preview-sheet]")
+      )
+        return;
       if (event.key !== "Escape" || event.defaultPrevented) return;
       event.preventDefault();
       if (!busy) onDismiss();
@@ -121,6 +126,9 @@ export function ActionPromptPanel({
   }, [busy, onDismiss]);
 
   const onDialogKeyDown = (event: ReactKeyboardEvent<HTMLDialogElement>) => {
+    if ((event.target as Element).closest("[data-record-preview-sheet]")) {
+      return;
+    }
     if (event.key === "Escape") {
       // Own the press: an enclosing sheet or page editor must not also close.
       event.preventDefault();

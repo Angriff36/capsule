@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../lib/api";
 import { formatDate, formatMoneyExact } from "../../lib/format";
+import { PRICING_BASIS_LABELS, type PricingBasis } from "../../lib/pricing";
 import { publicErrorMessage } from "../../lib/publicErrorMessage";
 import { ErrorState, TableSkeleton } from "../../ui/primitives";
 
@@ -144,6 +145,63 @@ export function ProposalAcceptancePage({
                 )}
               </div>
             </div>
+
+            {/* A server not yet updated sends no dishes or lines. */}
+            {(pending.dishes ?? []).length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-3">
+                  Menu
+                </h3>
+                <ul className="divide-y divide-line">
+                  {(pending.dishes ?? []).map((dish, index) => (
+                    <li key={index} className="py-2">
+                      <p className="text-ink">{dish.name}</p>
+                      {dish.description ? (
+                        <p className="text-2xs text-ink-3">
+                          {dish.description}
+                        </p>
+                      ) : null}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {(pending.lines ?? []).length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-3">
+                  Pricing Breakdown
+                </h3>
+                <ul className="divide-y divide-line">
+                  {(pending.lines ?? []).map((line, index) => (
+                    <li key={index} className="py-2 flex justify-between gap-4">
+                      <div>
+                        <p className="text-ink">{line.description}</p>
+                        <p className="text-2xs text-ink-3">
+                          {/* A server not yet updated sends no unit price: name the basis only. */}
+                          {typeof line.unitPrice !== "number"
+                            ? (PRICING_BASIS_LABELS[
+                                line.pricingBasis as PricingBasis
+                              ] ?? line.pricingBasis)
+                            : line.pricingBasis === "per_person"
+                              ? `${formatMoneyExact(line.unitPrice)} per guest × ${pending.proposal.guestCount} guests`
+                              : line.pricingBasis === "per_unit"
+                                ? `${formatMoneyExact(line.unitPrice)} × ${line.quantity}${line.unit ? ` ${line.unit}` : ""}`
+                                : line.pricingBasis === "percentage"
+                                  ? `${line.unitPrice}%`
+                                  : (PRICING_BASIS_LABELS[
+                                      line.pricingBasis as PricingBasis
+                                    ] ?? line.pricingBasis)}
+                        </p>
+                      </div>
+                      <span className="font-medium text-ink whitespace-nowrap">
+                        {formatMoneyExact(line.amount)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {pending.enhancements.length > 0 && (
               <div className="mb-6">

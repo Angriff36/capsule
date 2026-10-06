@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { ReturnToListLink } from "../../list-state/listOrigin";
 import {
   formatCount,
   formatDate,
@@ -52,7 +52,7 @@ export function EventDashHero(props: Props) {
 
   return (
     <section className="evd-hero" data-testid="event-context-header">
-      <Link to="/events" className="evd-crumb">
+      <ReturnToListLink fallback="/events" className="evd-crumb">
         <svg
           width="14"
           height="14"
@@ -66,7 +66,7 @@ export function EventDashHero(props: Props) {
           <path d="m14 6-6 6 6 6" />
         </svg>
         All events
-      </Link>
+      </ReturnToListLink>
       <div className="evd-pills">
         <span className="evd-pill status">
           {STAGE_LABEL[props.stage as EventStage] ??
@@ -79,7 +79,7 @@ export function EventDashHero(props: Props) {
           </span>
         ) : null}
       </div>
-      <h1 className="evd-title">
+      <h1 id="event-detail-title" tabIndex={-1} className="evd-title">
         {lead}
         {accent ? (
           <>

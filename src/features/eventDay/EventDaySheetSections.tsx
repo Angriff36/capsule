@@ -16,6 +16,7 @@ import { formatAssigneeLabel } from "../events/timelineAssigneeOptions";
 import { CULINARY_ALLERGENS } from "../kitchen/CulinaryAllergenVocabulary";
 import { loadWindowLabel } from "../facilities/venueOperatingFacts";
 import { vibeGuide } from "../facilities/venueSellingProfile";
+import { binColorSummary, binRows, parseBinSheet } from "../logistics/packBins";
 import {
   allergenLabel,
   deriveDishAllergens,
@@ -36,8 +37,8 @@ export function PacketSectionCaution({
   if (!section.urgentAction && !section.openIssueCount) return null;
   return (
     <>
-      <div role="status" className="evd-note">
-        <p className="evd-kicker">
+      <div role="status" className="eday-note">
+        <p className="eday-kicker">
           Workbook
           {section.openIssueCount
             ? ` · ${section.openIssueCount} unanswered ${section.openIssueCount === 1 ? "check" : "checks"}`
@@ -58,7 +59,7 @@ export function PacketSectionCaution({
       ))}
       {canManage === true && section.openIssueCount ? (
         <Link
-          className="evd-open-link"
+          className="eday-open-link"
           to={eventWorkbookReviewPath(eventId, section.key)}
         >
           Resolve these in the event workbook ›
@@ -101,7 +102,7 @@ function timeWindow(startsAt: unknown, endsAt: unknown): string {
 }
 
 export function Empty({ children }: { children: ReactNode }) {
-  return <p className="evd-empty">{children}</p>;
+  return <p className="eday-empty">{children}</p>;
 }
 
 function Row({
@@ -118,14 +119,14 @@ function Row({
   flagClass?: string;
 }) {
   return (
-    <div className="evd-row">
-      {time != null ? <span className="evd-row-time">{time}</span> : null}
-      <span className="evd-row-main">
-        <span className="evd-row-title">{title}</span>
-        {sub ? <span className="evd-row-sub block">{sub}</span> : null}
+    <div className="eday-row">
+      {time != null ? <span className="eday-row-time">{time}</span> : null}
+      <span className="eday-row-main">
+        <span className="eday-row-title">{title}</span>
+        {sub ? <span className="eday-row-sub block">{sub}</span> : null}
       </span>
       {flag ? (
-        <span className={`evd-row-flag ${flagClass ?? ""}`}>{flag}</span>
+        <span className={`eday-row-flag ${flagClass ?? ""}`}>{flag}</span>
       ) : null}
     </div>
   );
@@ -136,8 +137,8 @@ function Note({ label, text }: { label: string; text: unknown }) {
   if (!value) return null;
   return (
     <>
-      <p className="evd-kicker">{label}</p>
-      <p className="evd-note">{value}</p>
+      <p className="eday-kicker">{label}</p>
+      <p className="eday-note">{value}</p>
     </>
   );
 }
@@ -146,7 +147,7 @@ function Tel({ phone }: { phone: unknown }) {
   const value = String(phone ?? "").trim();
   if (!value) return null;
   return (
-    <a className="evd-tel" href={`tel:${value.replace(/[^+\d]/g, "")}`}>
+    <a className="eday-tel" href={`tel:${value.replace(/[^+\d]/g, "")}`}>
       {value}
     </a>
   );
@@ -198,11 +199,11 @@ export function VenueSheet({ data }: { data: EventDayDetailData }) {
         title={String(name)}
         sub={venue?.capacity ? `Capacity ${venue.capacity}` : undefined}
       />
-      {address ? <p className="evd-note">{address}</p> : null}
+      {address ? <p className="eday-note">{address}</p> : null}
       {traits.length > 0 ? (
         <>
-          <p className="evd-kicker">On site</p>
-          <p className="evd-note">{traits.join(" · ")}</p>
+          <p className="eday-kicker">On site</p>
+          <p className="eday-note">{traits.join(" · ")}</p>
         </>
       ) : null}
       {missing.length > 0 ? (
@@ -221,7 +222,7 @@ export function VenueSheet({ data }: { data: EventDayDetailData }) {
       <Note label="Photograph" text={venue?.photoFocus} />
       {venue?.contactName || venue?.contactPhone ? (
         <>
-          <p className="evd-kicker">Venue contact</p>
+          <p className="eday-kicker">Venue contact</p>
           <Row
             title={String(venue.contactName ?? "Venue")}
             sub={<Tel phone={venue.contactPhone} />}
@@ -255,14 +256,14 @@ export function StaffingSheet({ data }: { data: EventDayDetailData }) {
           flag={formatStatusLabel(String(row.status))}
           flagClass={
             ["confirmed", "checked_in"].includes(String(row.status))
-              ? "evd-tone-ok"
+              ? "eday-tone-ok"
               : undefined
           }
         />
       ))}
       {needs.length > 0 ? (
         <>
-          <p className="evd-kicker">Unfilled roles</p>
+          <p className="eday-kicker">Unfilled roles</p>
           {needs.map((row) => (
             <Row
               key={row._id}
@@ -270,7 +271,7 @@ export function StaffingSheet({ data }: { data: EventDayDetailData }) {
               title={String(row.role ?? "Role")}
               sub={String(row.description ?? "")}
               flag={formatStatusLabel(String(row.status))}
-              flagClass="evd-tone-warn"
+              flagClass="eday-tone-warn"
             />
           ))}
         </>
@@ -324,7 +325,7 @@ function AllergenLine({ report }: { report: DishAllergenReport | null }) {
       report.unresolvedCount > 0 ||
       report.unflaggedCount > 0;
     return (
-      <span className="evd-allergen-contains block">
+      <span className="eday-allergen-contains block">
         Contains {report.codes.map(allergenLabel).join(" · ")}
         {incomplete ? " · recipe not fully verified" : ""}
       </span>
@@ -332,14 +333,14 @@ function AllergenLine({ report }: { report: DishAllergenReport | null }) {
   }
   if (claim === "clear" && report != null) {
     return (
-      <span className="evd-allergen-clear block">
+      <span className="eday-allergen-clear block">
         No allergens on {report.lineCount} listed{" "}
         {report.lineCount === 1 ? "ingredient" : "ingredients"}
       </span>
     );
   }
   return (
-    <span className="evd-allergen-unknown block">
+    <span className="eday-allergen-unknown block">
       {report != null && report.unflaggedCount > 0
         ? "Allergens unverified — ingredient flags not set"
         : report != null && report.unresolvedCount > 0
@@ -381,14 +382,14 @@ export function MenuSheet({ data }: { data: EventDayDetailData }) {
   return (
     <div>
       {menuAllergens.length > 0 ? (
-        <p className="evd-allergen-banner">
+        <p className="eday-allergen-banner">
           Menu contains{" "}
           {menuAllergens.map((allergen) => allergen.label).join(" · ")}
         </p>
       ) : null}
       {[...courses.entries()].map(([course, list]) => (
         <div key={course}>
-          <p className="evd-kicker">{course}</p>
+          <p className="eday-kicker">{course}</p>
           {list.map((row) => {
             const dish = data.dishes.find((d) => d._id === row.dishId);
             const instructions = displayEventMenuNotes(row.specialInstructions);
@@ -449,9 +450,9 @@ export function VehiclesSheet({ data }: { data: EventDayDetailData }) {
             flag={formatStatusLabel(String(row.status))}
             flagClass={
               String(row.status) === "failed"
-                ? "evd-missing"
+                ? "eday-missing"
                 : String(row.status) === "delivered"
-                  ? "evd-tone-ok"
+                  ? "eday-tone-ok"
                   : undefined
             }
           />
@@ -500,7 +501,7 @@ export function EquipmentSheet({ data }: { data: EventDayDetailData }) {
               .join(" · ")}
             flag={formatStatusLabel(String(row.status))}
             flagClass={
-              String(row.status) === "checked_out" ? "evd-tone-ok" : undefined
+              String(row.status) === "checked_out" ? "eday-tone-ok" : undefined
             }
           />
         );
@@ -518,13 +519,13 @@ export function ContactsSheet({ data }: { data: EventDayDetailData }) {
   return (
     <div>
       {data.contactAccess === "withheld" ? (
-        <p className="evd-kicker">
+        <p className="eday-kicker">
           Phone numbers are shared with event staff and this event's crew.
         </p>
       ) : null}
       {named ? (
         <>
-          <p className="evd-kicker">Event contact</p>
+          <p className="eday-kicker">Event contact</p>
           <Row
             title={named}
             sub={
@@ -540,7 +541,7 @@ export function ContactsSheet({ data }: { data: EventDayDetailData }) {
       ) : null}
       {contacts.length > 0 ? (
         <>
-          <p className="evd-kicker">Client contacts</p>
+          <p className="eday-kicker">Client contacts</p>
           {contacts.map((row) => (
             <Row
               key={row._id}
@@ -552,14 +553,14 @@ export function ContactsSheet({ data }: { data: EventDayDetailData }) {
                 </>
               }
               flag={row.isPrimary ? "Primary" : undefined}
-              flagClass="evd-tone-ok"
+              flagClass="eday-tone-ok"
             />
           ))}
         </>
       ) : null}
       {venue?.contactName || venue?.contactPhone ? (
         <>
-          <p className="evd-kicker">Venue</p>
+          <p className="eday-kicker">Venue</p>
           <Row
             title={String(venue.contactName ?? "Venue")}
             sub={<Tel phone={venue.contactPhone} />}
@@ -583,10 +584,23 @@ export function PackListSheet({ data }: { data: EventDayDetailData }) {
         );
         return (
           <div key={list._id}>
-            <p className="evd-kicker">
+            <p className="eday-kicker">
               {String(list.name ?? "Pack list")} ·{" "}
               {formatStatusLabel(String(list.status))}
             </p>
+            {binColorSummary(
+              binRows(
+                items.map((row) => ({
+                  description: String(row.description ?? ""),
+                  binNumber: row.binNumber,
+                })),
+                parseBinSheet(list.binSheet),
+              ),
+            ).map((line) => (
+              <p key={line} className="eday-kicker">
+                {line}
+              </p>
+            ))}
             {items.length === 0 ? (
               <Empty>No items listed.</Empty>
             ) : (
@@ -597,11 +611,16 @@ export function PackListSheet({ data }: { data: EventDayDetailData }) {
                   <Row
                     key={row._id}
                     title={String(row.description ?? "Item")}
-                    sub={[row.requiredQuantity, row.unit]
-                      .filter((part) => part != null && part !== "")
-                      .join(" ")}
+                    sub={[
+                      [row.requiredQuantity, row.unit]
+                        .filter((part) => part != null && part !== "")
+                        .join(" "),
+                      row.binNumber ? `Bin ${row.binNumber}` : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
                     flag={missing ? "Missing" : packed ? "Packed" : undefined}
-                    flagClass={missing ? "evd-missing" : "evd-tone-ok"}
+                    flagClass={missing ? "eday-missing" : "eday-tone-ok"}
                   />
                 );
               })

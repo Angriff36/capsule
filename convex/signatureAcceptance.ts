@@ -4,6 +4,7 @@ import type { Doc } from "./_generated/dataModel";
 import { mutation, query, type QueryCtx } from "./_generated/server";
 import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 import { insertStepEvent } from "./lib/commandAudit";
+import { byLineDisplayOrder } from "../src/lib/pricing";
 
 /**
  * AUTHOR SEAM — public, token-authorized digital proposal acceptance (#115).
@@ -52,6 +53,17 @@ type PendingSignatureView = {
     name: string;
     description: string | null;
     price: number;
+  }>;
+  // The dishes and priced lines of the sent copy, so the client sees what
+  // they accept. Empty when that part is hidden on the proposal.
+  dishes: Array<{ name: string; description: string | null }>;
+  lines: Array<{
+    description: string;
+    pricingBasis: string;
+    unitPrice: number;
+    quantity: number;
+    unit: string | null;
+    amount: number;
   }>;
 };
 
@@ -111,6 +123,15 @@ export const getPendingSignatureRequest = query({
       typeof value === "number" && Number.isFinite(value) ? value : fallback;
     const str = (value: unknown): string | null =>
       typeof value === "string" && value.length > 0 ? value : null;
+    const rows = (value: unknown): Array<Record<string, unknown>> =>
+      Array.isArray(value) ? (value as Array<Record<string, unknown>>) : [];
+    const visibleSections = Array.isArray(proposal.visibleSections)
+      ? proposal.visibleSections.filter(
+          (section): section is string => typeof section === "string",
+        )
+      : [];
+    const shows = (section: string) =>
+      visibleSections.length === 0 || visibleSections.includes(section);
 
     return {
       recipientName: request.recipientName,
@@ -131,12 +152,28 @@ export const getPendingSignatureRequest = query({
           typeof proposal.eventDate === "number" ? proposal.eventDate : null,
         guestCount: num(proposal.guestCount),
         venueName: str(proposal.venueName),
-        visibleSections: Array.isArray(proposal.visibleSections)
-          ? proposal.visibleSections.filter(
-              (section): section is string => typeof section === "string",
-            )
-          : [],
+        visibleSections,
       },
+      dishes: shows("menu_sections")
+        ? rows(snapshot.dishSelections)
+            .map((dish) => ({
+              name: str(dish.dishName) ?? "",
+              description: str(dish.dishDescription),
+            }))
+            .filter((dish) => dish.name.length > 0)
+        : [],
+      lines: shows("pricing_summary")
+        ? rows(snapshot.lineItems)
+            .sort(byLineDisplayOrder)
+            .map((line) => ({
+              description: str(line.description) ?? "",
+              pricingBasis: str(line.pricingBasis) ?? "flat",
+              unitPrice: num(line.unitPrice),
+              quantity: num(line.quantity, 1),
+              unit: str(line.unit),
+              amount: num(line.amount),
+            }))
+        : [],
       enhancements: enhancements
         .map((item, index) => ({
           sortOrder: num(item.sortOrder, index),

@@ -67,22 +67,22 @@ export function EventDayNodeCard({ section, style, onOpen }: Props) {
   return (
     <button
       type="button"
-      className={`evd-node evd-st-${section.status}`}
+      className={`eday-node eday-st-${section.status}`}
       style={style}
       onClick={() => onOpen(section.key)}
       aria-label={`${section.label}: ${section.caption}`}
     >
-      <span className="evd-node-badge">
+      <span className="eday-node-badge">
         <BadgeGlyph status={section.status} />
       </span>
       <img
-        className="evd-node-img"
+        className="eday-node-img"
         src={`/assets/event-day/nodes/${section.key}.png`}
         alt=""
         draggable={false}
       />
-      <span className="evd-node-label">{section.label}</span>
-      <span className="evd-node-caption">{section.caption}</span>
+      <span className="eday-node-label">{section.label}</span>
+      <span className="eday-node-caption">{section.caption}</span>
     </button>
   );
 }

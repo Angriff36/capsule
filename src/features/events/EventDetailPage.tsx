@@ -1,8 +1,18 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AllergenBriefingButton } from "./AllergenBriefingButton";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
-import { normalizeCurrencyCode } from "../../lib/format";
+import {
+  formatCount,
+  formatDate,
+  normalizeCurrencyCode,
+} from "../../lib/format";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { useHeldQueryRows } from "../../lib/heldQueryRows";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
@@ -10,7 +20,6 @@ import {
   useEventArchive,
   useEventBeginExecution,
   useEventCancel,
-  useEventChangeHeadcount,
   useEventChangePricing,
   useEventChangePrimaryContact,
   useEventChangeRequirements,
@@ -29,6 +38,7 @@ import {
   useListPerson,
   useListVenue,
 } from "../../lib/manifest-convex-react";
+import { useApplyDemandHeadcount } from "../../lib/culinaryDemandClient";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
 import { useDishesByIds } from "../../lib/useDishesByIds";
 import { useEventTimelineActivities } from "../../lib/useEventRows";
@@ -40,11 +50,13 @@ import {
 import { useTrackRecent } from "../../lib/recents";
 import { DownloadIcon } from "../../ui/icons";
 import { eventVenueLabel } from "./eventVenueLabel";
+import { useCascadeReceiptToast } from "./useCascadeReceiptToast";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ActionMenu, ActionMenuRule, ErrorState } from "../../ui/primitives";
 import { reportActionOk } from "../../ui/action-result";
 import { useSuccessToast } from "../../ui/useSuccessToast";
+import { StickyRecordHeader } from "../../ui/StickyRecordHeader";
 import { useTenantBranding } from "../admin/tenantBranding";
 import { EventChatTab } from "../chat/EventChatTab";
 import { WalkieToggle } from "../chat/WalkieToggle";
@@ -55,6 +67,7 @@ import { EventClientPortalShare } from "../clientPortal/EventClientPortalShare";
 import { ClientPreviewCard } from "../clients/ClientPreviewCard";
 import { HoverPreview } from "../../ui/HoverPreview";
 import { downloadBeoPdf } from "./beoPdf";
+import { venueLogisticsLines } from "../facilities/venueLogistics";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { clientDisplayName } from "./clientName";
 import { EventClientTab } from "./EventClientTab";
@@ -74,6 +87,8 @@ import {
 } from "./EventLifecyclePolicy";
 import { EventMarginTab } from "./EventMarginTab";
 import { EventMenuTab } from "./EventMenuTab";
+import { DemandChangePreviewDialog } from "../inventory/DemandChangePreviewDialog";
+import { CascadePreviewDialog } from "./CascadePreviewDialog";
 import { CompleteDraftPlanningPanel } from "./CompleteDraftPlanningPanel";
 import { EventPrepTab } from "./EventPrepTab";
 import { EventPhotosTab } from "./EventPhotosTab";
@@ -93,6 +108,8 @@ import {
 } from "./eventRoutes";
 import { rememberLastViewedEvent } from "./lastViewedEvent";
 import type { Doc } from "../../lib/api";
+import { useAuthStatus } from "../../lib/useAuthStatus";
+import { AutomationCascadeFeedbackManager } from "../automation/AutomationCascadeFeedbackManager";
 
 export function EventDetailPage() {
   const { id } = useParams();
@@ -128,6 +145,10 @@ function EventDetailContent({
   event: Doc<"events">;
   id: string | undefined;
 }) {
+  const authStatus = useAuthStatus();
+  const headerSentinelRef = useRef<HTMLDivElement>(null);
+  const sectionScopeRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = parseEventDetailTab(searchParams.get("tab"));
   const mobile = useMobileViewport();
@@ -153,10 +174,22 @@ function EventDetailContent({
     "USD",
   );
   useTrackRecent("Event", event?.title);
+  useCascadeReceiptToast(event._id);
   useEffect(() => {
     if (!id || event == null || event.deletedAt != null) return;
     rememberLastViewedEvent(eventDetailPath(id, activeTab));
   }, [activeTab, event, id]);
+  // A link that names a tab (?tab=staffing from the roster) lands on that
+  // tab's content, not on the masthead above it.
+  const linkedTab = searchParams.get("tab");
+  const eventLoaded = event != null;
+  useEffect(() => {
+    if (!eventLoaded || !linkedTab || linkedTab === "overview") return;
+    document
+      .getElementById("event-sections")
+      ?.scrollIntoView({ block: "start" });
+    // Only on arrival from a link, not on every tab click.
+  }, [eventLoaded]);
   const eventId = event?._id ?? "skip";
   const eventAssignments = useEventAssignmentRows(eventId);
   const staffNeeds = useEventStaffNeedRows(eventId);
@@ -187,7 +220,7 @@ function EventDetailContent({
   const cancel = useEventCancel();
   const archive = useEventArchive();
   const returnToPlanning = useEventReturnToPlanning();
-  const changeHeadcount = useEventChangeHeadcount();
+  const applyDemandHeadcount = useApplyDemandHeadcount();
   const changePricing = useEventChangePricing();
   const changePrimaryContact = useEventChangePrimaryContact();
   const changeRequirements = useEventChangeRequirements();
@@ -200,6 +233,13 @@ function EventDetailContent({
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [pdfNotice, setPdfNotice] = useState<string | null>(null);
+  const [headcountPreview, setHeadcountPreview] = useState<{
+    newHeadcount: number;
+    version?: number;
+  } | null>(null);
+  const [cascadePreview, setCascadePreview] = useState<
+    "approve" | "closeOut" | null
+  >(null);
   const { notifySuccess, host: savedToast } = useSuccessToast();
   const version = typeof event.version === "number" ? event.version : undefined;
   const canRevise = eventLifecyclePolicy.isEditableStage(String(event.stage));
@@ -230,17 +270,20 @@ function EventDetailContent({
     const next = new URLSearchParams(searchParams);
     next.set("tab", tab);
     next.delete("full");
-    setSearchParams(next, { replace: true });
+    setSearchParams(next, { replace: true, state: location.state });
   };
 
-  const run = async (work: () => Promise<unknown>, okMessage = "Saved") => {
+  const run = async (
+    work: () => Promise<unknown>,
+    okMessage: string | null = "Saved",
+  ) => {
     setFailure(null);
     setBusy(true);
     try {
       await work();
       setReasonFor(null);
       setReason("");
-      notifySuccess(okMessage);
+      if (okMessage) notifySuccess(okMessage);
     } catch (error) {
       setFailure(classifyCommandFailure(error));
     } finally {
@@ -258,22 +301,28 @@ function EventDetailContent({
     const done = "Stage updated";
     if (key === "submitForApproval")
       void run(() => submitForApproval(args), done);
-    if (key === "approve") void run(() => approve(args), done);
+    if (key === "approve" || key === "closeOut") setCascadePreview(key);
     if (key === "lockForSales") void run(() => lockForSales(args), done);
     if (key === "confirmSalesLock")
       void run(() => confirmSalesLock(args), done);
     if (key === "finalizeEvent") void run(() => finalizeEvent(args), done);
     if (key === "beginExecution") void run(() => beginExecution(args), done);
     if (key === "complete") void run(() => complete(args), done);
-    if (key === "closeOut") void run(() => closeOut(args), done);
   };
 
   // One obvious next step: the first primary lifecycle action. Other stage
   // moves and every utility live under "More"; destructive moves sit last.
-  const lifecycle = eventLifecyclePolicy.availableActions(
-    String(event.stage),
-    event,
-  );
+  // Sales and event staff each have their own command for starting the
+  // event; offer one button, the one this person's role uses.
+  const salesRole = /^sales_/.test(String(authStatus?.role ?? ""));
+  const lifecycle = eventLifecyclePolicy
+    .availableActions(String(event.stage), event)
+    .filter((action, _index, all) =>
+      all.some((a) => a.key === "beginExecution") &&
+      all.some((a) => a.key === "confirmSalesLock")
+        ? action.key !== (salesRole ? "beginExecution" : "confirmSalesLock")
+        : true,
+    );
   const primaryAction = lifecycle.find((action) => action.kind === "primary");
   const secondaryActions = lifecycle.filter(
     (action) => action !== primaryAction && action.kind !== "danger",
@@ -331,6 +380,7 @@ function EventDetailContent({
           activity.deletedAt == null,
       ),
       staff: staffingRoster,
+      venueLogistics: venue ? venueLogisticsLines(venue) : undefined,
       branding,
     })
       .then(() => {
@@ -482,6 +532,10 @@ function EventDetailContent({
     stage: String(event.stage),
     currencyCode: currencyCode,
     lifecycleActions: lifecycle,
+    blockedLifecycleActions: eventLifecyclePolicy.blockedActions(
+      String(event.stage),
+      event,
+    ),
     onAction: runAction,
     people: people,
     dishCount: dishCount,
@@ -489,7 +543,13 @@ function EventDetailContent({
     timelineCount: timelineCount,
     run: run,
     onReschedule: reschedule,
-    onChangeHeadcount: changeHeadcount,
+    onPreviewHeadcount: ({
+      newHeadcount,
+      version: nextVersion,
+    }: {
+      newHeadcount: number;
+      version: number | undefined;
+    }) => setHeadcountPreview({ newHeadcount, version: nextVersion }),
     onChangeVenue: changeVenue,
     onChangePricing: changePricing,
     onChangePrimaryContact: changePrimaryContact,
@@ -596,6 +656,7 @@ function EventDetailContent({
             eventId={event._id}
             eventStage={String(event.stage)}
             serviceStyleId={event.serviceStyleId ?? null}
+            startsAt={event.startsAt ?? null}
           />
         </EventTabErrorBoundary>
       ) : null}
@@ -632,7 +693,7 @@ function EventDetailContent({
           <section className="space-y-4" data-testid="event-guests-tab">
             <EventTabIntro
               title="Guests"
-              description="Invite guests, track RSVPs and table assignments, and note dietary needs so they show up on the allergen briefing."
+              description="Invite guests, track RSVPs, tables, seats and entrée picks, and note dietary needs so they show up on the allergen briefing."
             />
             <EventGuestPanel
               eventId={event._id}
@@ -714,31 +775,104 @@ function EventDetailContent({
   );
 
   return (
-    <EventDashboard
-      title={String(event.title)}
-      updatedAt={typeof event.updatedAt === "number" ? event.updatedAt : null}
-      client={(() => {
-        const client = clients?.find((c) => c._id === event.clientId);
-        const name = clientDisplayName(event.clientId, clients);
-        if (!client) return name;
-        return (
-          <HoverPreview card={<ClientPreviewCard client={client} />}>
-            <Link to={`/clients/${client._id}`} className="hover:underline">
-              {name}
-            </Link>
-          </HoverPreview>
-        );
-      })()}
-      venue={
-        event.venueId ? <Link to="/facilities">{venueLabel}</Link> : venueLabel
-      }
-      actions={headerActions}
-      activeTab={activeTab}
-      onTab={setTab}
-      overview={overviewProps}
-      notices={notices}
-    >
-      {otherTabs}
-    </EventDashboard>
+    <div ref={sectionScopeRef}>
+      <StickyRecordHeader
+        title={event.title}
+        facts={[
+          { label: "Date", value: formatDate(event.startsAt) },
+          {
+            label: "Headcount",
+            value: `${formatCount(event.expectedHeadcount)} guests`,
+          },
+          { label: "Status", value: formatStatusLabel(String(event.stage)) },
+        ]}
+        actions={headerActions.filter(
+          (action) => action.key !== headerPrimary?.key,
+        )}
+        primaryAction={
+          primaryAction ? (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => runAction(primaryAction.key)}
+              className="btn btn-primary"
+            >
+              {primaryAction.label}
+            </button>
+          ) : undefined
+        }
+        sentinelRef={headerSentinelRef}
+        sectionScopeRef={sectionScopeRef}
+        sectionKey={activeTab}
+        headingId="event-detail-title"
+      />
+      <EventDashboard
+        title={String(event.title)}
+        updatedAt={typeof event.updatedAt === "number" ? event.updatedAt : null}
+        client={(() => {
+          const client = clients?.find((c) => c._id === event.clientId);
+          const name = clientDisplayName(event.clientId, clients);
+          if (!client) return name;
+          return (
+            <HoverPreview card={<ClientPreviewCard client={client} />}>
+              <Link to={`/clients/${client._id}`} className="hover:underline">
+                {name}
+              </Link>
+            </HoverPreview>
+          );
+        })()}
+        venue={
+          event.venueId ? (
+            <Link to="/facilities">{venueLabel}</Link>
+          ) : (
+            venueLabel
+          )
+        }
+        actions={headerActions}
+        activeTab={activeTab}
+        onTab={setTab}
+        overview={overviewProps}
+        notices={notices}
+        heroSentinelRef={headerSentinelRef}
+      >
+        {otherTabs}
+      </EventDashboard>
+      {headcountPreview ? (
+        <DemandChangePreviewDialog
+          request={{
+            eventId: event._id,
+            kind: "headcount",
+            newHeadcount: headcountPreview.newHeadcount,
+          }}
+          onClose={() => setHeadcountPreview(null)}
+          onApply={(expectedFingerprint) =>
+            applyDemandHeadcount({
+              eventId: event._id,
+              newHeadcount: headcountPreview.newHeadcount,
+              version: headcountPreview.version,
+              expectedFingerprint,
+            })
+          }
+        />
+      ) : null}
+      {cascadePreview ? (
+        <CascadePreviewDialog
+          eventId={event._id}
+          action={cascadePreview}
+          onClose={() => setCascadePreview(null)}
+          onConfirm={() => {
+            const args = { docId: event._id, version };
+            if (cascadePreview === "approve")
+              void run(async () => {
+                await approve(args);
+                new AutomationCascadeFeedbackManager(
+                  notifySuccess,
+                ).eventApproved(event._id);
+              }, null);
+            else void run(() => closeOut(args), "Stage updated");
+          }}
+        />
+      ) : null}
+    </div>
   );
 }

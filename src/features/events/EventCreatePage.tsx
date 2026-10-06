@@ -1,12 +1,17 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { Doc } from "../../lib/api";
 import { formatCountNoun } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
-  useCreateClient,
   useCreateEvent,
-  useCreateVenue,
+  useDateHoldConvert,
   useGetEventTemplate,
   useGetProposal,
   useListClient,
@@ -27,7 +32,6 @@ import { useCreateEventFromProposal } from "../clients/useCreateEventFromProposa
 import { CLIENTS_ROUTES } from "../clients/clientsRoutes";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { ProposalEventCarryoverPreview } from "./ProposalEventCarryoverPreview";
-import { cleanCommandArgs } from "./CleanCommandArgs";
 import { clientDisplayName } from "./clientName";
 import { eventCreateDisabledReason } from "./eventCreateGuards";
 import { useEnsureBuiltInServiceStyle } from "../../lib/eventCreateCatalogClient";
@@ -45,29 +49,20 @@ import {
 } from "./eventRoutes";
 import { proposalEventPrefill } from "./ProposalEventPrefill";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { addLocalDateTimeHours } from "../../ui/naturalDate";
 import { SearchSelect } from "../../ui/SearchSelect";
 import {
-  InlineClientForm,
-  InlineDuplicateNotice,
-  InlineVenueForm,
-  type PendingInlineDuplicate,
-  type VenueTypeCode,
-} from "./EventCreateInlineForms";
-import { findLikelyDuplicates } from "./inlineRecordDuplicates";
-import { venueAddress, venueSummary } from "./venuePickerSummary";
-import {
-  coordinatesFromFields,
-  formatCoordinates,
-  venueCoordinates,
-} from "../facilities/venueCoordinates";
+  InlineReferenceCreateSheet,
+  useCanCreateInlineReference,
+} from "../../ui/InlineReferenceCreateSheet";
+import { venueSummary } from "./venuePickerSummary";
+import { EventCreateWizard } from "./EventCreateWizard";
+import { DateHoldCollisionNotice } from "../sales/DateHoldCollisionNotice";
 
 // People who can be named as an event's salesperson/owner (Event.assignedToId).
 const SALES_PERSON_ROLES = new Set(["sales_staff", "sales_manager", "owner"]);
 
-function optional(value: string): string | undefined {
-  const trimmed = value.trim();
-  return trimmed || undefined;
-}
+const EVENT_DEFAULT_HOURS = 4;
 
 function eventFieldRules(data: FormData): Record<string, string> {
   const start = String(data.get("startsAt") ?? "");
@@ -76,6 +71,21 @@ function eventFieldRules(data: FormData): Record<string, string> {
     return { endsAt: "This event's end time has to be after its start time." };
   }
   return {};
+}
+
+/** Proposal, client and template bookings retain their established long-form carryover. */
+export function guidedEventCreateAvailable(params: {
+  clientId: string;
+  templateId: string;
+  proposalId: string;
+  holdDate?: string;
+}): boolean {
+  return (
+    !params.clientId &&
+    !params.templateId &&
+    !params.proposalId &&
+    !params.holdDate
+  );
 }
 
 // Collapsible form block (native <details>) styled like Section. Uncontrolled:
@@ -145,12 +155,34 @@ function revealInvalidSections(form: HTMLFormElement) {
 export function EventCreatePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const [creationMode, setCreationMode] = useState<"form" | "guided">(() => {
+    try {
+      return localStorage.getItem("capsule.event-create.mode") === "guided"
+        ? "guided"
+        : "form";
+    } catch {
+      return "form";
+    }
+  });
+  const [wizardBusy, setWizardBusy] = useState(false);
   const prefillClientId = searchParams.get("clientId")?.trim() || "";
   const templateId = searchParams.get("templateId")?.trim() || "";
   // Accepted proposal to book (issue #141): pre-fills the form; when the
   // proposal is still unlinked, submit goes through the proposal-booking seam
   // so the new event is linked and the accepted menu copies onto it.
   const proposalId = searchParams.get("proposalId")?.trim() || "";
+  // Booking from a date hold: start on the held day, then mark the hold booked.
+  const holdDate = /^\d{4}-\d{2}-\d{2}$/.test(searchParams.get("date") ?? "")
+    ? (searchParams.get("date") as string)
+    : "";
+  const holdId = searchParams.get("holdId")?.trim() || "";
+  const convertHold = useDateHoldConvert();
+  const guidedAvailable = guidedEventCreateAvailable({
+    clientId: prefillClientId,
+    templateId,
+    proposalId,
+    holdDate,
+  });
   const proposal = useGetProposal(proposalId || "skip");
   const proposalDishSelections = useListProposalDishSelection();
   const proposalEnhancements = useListProposalEnhancement();
@@ -166,31 +198,69 @@ export function EventCreatePage() {
   const serviceStyles = useListServiceStyle();
   const people = useListPerson();
   const referralSources = useListReferralSource();
-  const createClient = useCreateClient();
-  const createVenue = useCreateVenue();
   const createEvent = useCreateEvent();
+  const canCreateClient = useCanCreateInlineReference("client");
+  const canCreateVenue = useCanCreateInlineReference("venue");
   const ensureBuiltInServiceStyle = useEnsureBuiltInServiceStyle();
   const [clientId, setClientId] = useState(prefillClientId);
+  const contactNameRef = useRef<HTMLInputElement>(null);
+  const contactEmailRef = useRef<HTMLInputElement>(null);
+  // Start the day-of contact as the chosen client; the boxes stay editable
+  // and a value the user typed is never replaced.
+  useEffect(() => {
+    // Proposal bookings carry their own contact over (ProposalEventPrefill).
+    const client = proposalId
+      ? undefined
+      : clients?.find((row) => row._id === clientId);
+    if (!client) return;
+    if (contactNameRef.current && !contactNameRef.current.value)
+      contactNameRef.current.value = clientDisplayName(client._id, [client]);
+    if (
+      contactEmailRef.current &&
+      !contactEmailRef.current.value &&
+      client.email
+    )
+      contactEmailRef.current.value = client.email;
+  }, [clientId, clients, proposalId]);
   const [venueId, setVenueId] = useState("");
-  const [showClient, setShowClient] = useState(false);
-  const [showVenue, setShowVenue] = useState(false);
-  const [busy, setBusy] = useState<"client" | "venue" | "event" | null>(null);
+  const [inlineCreate, setInlineCreate] = useState<{
+    kind: "client" | "venue";
+    name: string;
+  } | null>(null);
+  const [temporaryClient, setTemporaryClient] = useState<{
+    id: string;
+    label: string;
+  } | null>(null);
+  const [temporaryVenue, setTemporaryVenue] = useState<{
+    id: string;
+    label: string;
+  } | null>(null);
+  const [busy, setBusy] = useState<"event" | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   const [occasionId, setOccasionId] = useState("");
   const [serviceStyleId, setServiceStyleId] = useState("");
   const [salespersonId, setSalespersonId] = useState("");
   const [referralSourceId, setReferralSourceId] = useState("");
-  // Inline create paused on a look-alike record; the operator decides.
-  const [pendingDuplicate, setPendingDuplicate] =
-    useState<PendingInlineDuplicate | null>(null);
-  const [pendingArgs, setPendingArgs] = useState<Record<
-    string,
-    unknown
-  > | null>(null);
   const { errors, touched, formProps, handleSubmit } =
     useFieldValidation(eventFieldRules);
   const draftForm = useFormDraft("event-create");
   const proposalPrefill = proposalEventPrefill.values(proposal);
+  const [startsAtValue, setStartsAtValue] = useState(
+    proposalPrefill.startsAtLocal || (holdDate ? `${holdDate}T09:00` : ""),
+  );
+  const [endsAtValue, setEndsAtValue] = useState(proposalPrefill.endsAtLocal);
+  const [endWasEdited, setEndWasEdited] = useState(
+    Boolean(proposalPrefill.endsAtLocal),
+  );
+  useEffect(() => {
+    if (!startsAtValue && proposalPrefill.startsAtLocal) {
+      setStartsAtValue(proposalPrefill.startsAtLocal);
+    }
+    if (!endsAtValue && proposalPrefill.endsAtLocal) {
+      setEndsAtValue(proposalPrefill.endsAtLocal);
+      setEndWasEdited(true);
+    }
+  }, [proposalPrefill.endsAtLocal, proposalPrefill.startsAtLocal]);
   const proposalLinkable = proposalEventPrefill.canLinkOnCreate(proposal);
   const proposalMenuCount = proposalId
     ? (proposalDishSelections ?? []).filter(
@@ -227,6 +297,28 @@ export function EventCreatePage() {
       venue.status === "active" &&
       venue.registeredAt != null,
   );
+  const clientOptions = [
+    ...activeClients.map((client) => ({
+      id: client._id,
+      label: clientDisplayName(client._id, activeClients),
+      hint: [client.email, client.phone].filter(Boolean).join(" · ") || null,
+    })),
+    ...(temporaryClient &&
+    !activeClients.some((client) => client._id === temporaryClient.id)
+      ? [{ id: temporaryClient.id, label: temporaryClient.label }]
+      : []),
+  ];
+  const venueOptions = [
+    ...activeVenues.map((venue) => ({
+      id: venue._id,
+      label: venue.name,
+      hint: venueSummary(venue),
+    })),
+    ...(temporaryVenue &&
+    !activeVenues.some((venue) => venue._id === temporaryVenue.id)
+      ? [{ id: temporaryVenue.id, label: temporaryVenue.label }]
+      : []),
+  ];
   const activeOccasions = (occasions ?? [])
     .filter((occasion) => occasion.status === "active")
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
@@ -269,10 +361,7 @@ export function EventCreatePage() {
       ? proposalEventPrefill.venueMatches(proposal, activeVenues)
       : [];
 
-  const run = async (
-    kind: "client" | "venue" | "event",
-    work: () => Promise<void>,
-  ) => {
+  const run = async (kind: "event", work: () => Promise<void>) => {
     setFailure(null);
     setBusy(kind);
     try {
@@ -286,151 +375,6 @@ export function EventCreatePage() {
     }
   };
 
-  const createClientNow = (args: Record<string, unknown>) =>
-    run("client", async () => {
-      const created = await createClient(args);
-      setClientId(created.docId);
-      setShowClient(false);
-      setPendingDuplicate(null);
-    });
-
-  const submitClient = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const clientType = String(data.get("clientType")) as "company" | "person";
-    const companyName = optional(String(data.get("companyName") ?? ""));
-    const givenName = optional(String(data.get("givenName") ?? ""));
-    const familyName = optional(String(data.get("familyName") ?? ""));
-    const email = optional(String(data.get("email") ?? ""));
-    const args = cleanCommandArgs.from({
-      clientType,
-      companyName,
-      givenName,
-      familyName,
-      email,
-      phone: optional(String(data.get("phone") ?? "")),
-      paymentTermsDays: 30,
-      taxExempt: false,
-    });
-    const typedName =
-      clientType === "company"
-        ? (companyName ?? "")
-        : [givenName, familyName].filter(Boolean).join(" ");
-    const matches = findLikelyDuplicates(
-      { name: typedName, email },
-      activeClients.map((client) => ({
-        _id: client._id,
-        name: clientDisplayName(client._id, [client]),
-        email: client.email,
-      })),
-    );
-    if (matches.length > 0) {
-      setPendingArgs(args);
-      setPendingDuplicate({
-        kind: "client",
-        typedName,
-        matches: matches.map((match) => ({
-          id: match._id,
-          label: match.name,
-          hint: match.email ?? null,
-        })),
-      });
-      return;
-    }
-    void createClientNow(args);
-  };
-
-  const createVenueNow = (args: Record<string, unknown>) =>
-    run("venue", async () => {
-      const created = await createVenue(args);
-      setVenueId(created.docId);
-      setShowVenue(false);
-      setPendingDuplicate(null);
-    });
-
-  const submitVenue = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const capacity = Number(data.get("capacity"));
-    if (!Number.isFinite(capacity) || capacity < 0) {
-      setFailure(
-        classifyCommandFailure(
-          new Error(
-            "This venue's capacity can't be negative. Use zero or more.",
-          ),
-        ),
-      );
-      return;
-    }
-    const coordinates = coordinatesFromFields(
-      String(data.get("latitude") ?? ""),
-      String(data.get("longitude") ?? ""),
-    );
-    if (!coordinates.ok) {
-      setFailure(classifyCommandFailure(new Error(coordinates.error)));
-      return;
-    }
-    const name = String(data.get("name") ?? "").trim();
-    const args = cleanCommandArgs.from({
-      name,
-      venueType: String(data.get("venueType")) as VenueTypeCode,
-      capacity,
-      addressLine1: optional(String(data.get("addressLine1") ?? "")),
-      city: optional(String(data.get("city") ?? "")),
-      region: optional(String(data.get("region") ?? "")),
-      postalCode: optional(String(data.get("postalCode") ?? "")),
-      latitude: coordinates.value?.latitude,
-      longitude: coordinates.value?.longitude,
-    });
-    const matches = findLikelyDuplicates(
-      { name },
-      activeVenues.map((venue) => ({ _id: venue._id, name: venue.name })),
-    );
-    if (matches.length > 0) {
-      setPendingArgs(args);
-      setPendingDuplicate({
-        kind: "venue",
-        typedName: name,
-        matches: matches.map((match) => {
-          const venue = activeVenues.find((row) => row._id === match._id);
-          return {
-            id: match._id,
-            label: match.name,
-            hint: venue ? venueSummary(venue) : null,
-          };
-        }),
-      });
-      return;
-    }
-    void createVenueNow(args);
-  };
-
-  const resolveDuplicate = {
-    useExisting: (id: string) => {
-      if (pendingDuplicate?.kind === "client") {
-        setClientId(id);
-        setShowClient(false);
-      } else {
-        setVenueId(id);
-        setShowVenue(false);
-      }
-      setPendingDuplicate(null);
-      setPendingArgs(null);
-    },
-    createAnyway: () => {
-      if (!pendingDuplicate || !pendingArgs) return;
-      const args = pendingArgs;
-      setPendingArgs(null);
-      void (pendingDuplicate.kind === "client"
-        ? createClientNow(args)
-        : createVenueNow(args));
-    },
-    dismiss: () => {
-      setPendingDuplicate(null);
-      setPendingArgs(null);
-    },
-  };
-
   // Restore puts text back into named fields; the relation pickers are React
   // state, so re-seed them from the same saved values (client, venue, occasion,
   // service style, salesperson, referral source were lost before — #368 item 4).
@@ -438,6 +382,11 @@ export function EventCreatePage() {
     const saved = draftForm.restore();
     if (!saved) return;
     const pick = (key: string) => saved.values[key]?.trim() ?? "";
+    if (pick("startsAt")) setStartsAtValue(pick("startsAt"));
+    if (pick("endsAt")) {
+      setEndsAtValue(pick("endsAt"));
+      setEndWasEdited(true);
+    }
     if (pick("clientId")) setClientId(pick("clientId"));
     if (pick("venueId")) setVenueId(pick("venueId"));
     if (pick("occasionId")) setOccasionId(pick("occasionId"));
@@ -550,6 +499,13 @@ export function EventCreatePage() {
     void run("event", async () => {
       const created = await createEvent(await buildArgs());
       draftForm.clear();
+      if (holdId) {
+        // The event exists either way; a hold that already lapsed or was
+        // released simply stays as it is.
+        await convertHold({ docId: holdId, eventId: created.docId }).catch(
+          () => undefined,
+        );
+      }
       navigate(eventDetailPath(created.docId));
     });
   };
@@ -558,6 +514,43 @@ export function EventCreatePage() {
     busy: busy !== null,
     clientId,
   });
+
+  const switchCreationMode = (mode: "form" | "guided") => {
+    setCreationMode(mode);
+    try {
+      localStorage.setItem("capsule.event-create.mode", mode);
+    } catch {
+      // The choice remains active for this page in private browsing.
+    }
+  };
+
+  if (creationMode === "guided" && guidedAvailable) {
+    return (
+      <div className="space-y-4">
+        <Link
+          to={eventsIndexPath()}
+          className="inline-flex items-center gap-1.5 text-sm text-ink-3 hover:text-ink"
+        >
+          <ArrowLeftIcon width={12} height={12} /> All events
+        </Link>
+        <PageHeader
+          title="New event"
+          lead="Build a booking step by step, then create it once you have reviewed the operational consequences."
+          actions={
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              disabled={wizardBusy}
+              onClick={() => switchCreationMode("form")}
+            >
+              Use long form
+            </button>
+          }
+        />
+        <EventCreateWizard onBusyChange={setWizardBusy} />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -571,9 +564,20 @@ export function EventCreatePage() {
         title="New event"
         lead="The essentials for a new booking — who it's for, where, when, and the budget."
         actions={
-          <Link to={eventImportPath()} className="btn btn-secondary btn-sm">
-            Have a BEO? Import it instead
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            {guidedAvailable ? (
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => switchCreationMode("guided")}
+              >
+                Use guided setup
+              </button>
+            ) : null}
+            <Link to={eventImportPath()} className="btn btn-secondary btn-sm">
+              Have a BEO? Import it instead
+            </Link>
+          </div>
         }
       />
 
@@ -675,7 +679,7 @@ export function EventCreatePage() {
                   />
                 ) : null}
               </div>
-              <label className="field-label">
+              <label className="field-label self-start">
                 Expected headcount *
                 <input
                   name="expectedHeadcount"
@@ -700,19 +704,38 @@ export function EventCreatePage() {
                 Starts *
                 <BoundedDateTimeLocalInput
                   name="startsAt"
-                  defaultValue={proposalPrefill.startsAtLocal}
+                  value={startsAtValue}
                   className="input"
                   required
+                  onResolvedValue={(next) => {
+                    setStartsAtValue(next);
+                    if (!endsAtValue || !endWasEdited) {
+                      setEndsAtValue(
+                        addLocalDateTimeHours(next, EVENT_DEFAULT_HOURS),
+                      );
+                    }
+                  }}
                 />
                 <FieldError name="startsAt" errors={errors} touched={touched} />
               </label>
+              <div className="sm:col-span-2">
+                <DateHoldCollisionNotice
+                  dateKey={(startsAtValue ?? "").slice(0, 10)}
+                  ignoreHoldId={holdId || undefined}
+                />
+              </div>
               <label className="field-label">
                 Ends *
                 <BoundedDateTimeLocalInput
                   name="endsAt"
-                  defaultValue={proposalPrefill.endsAtLocal}
+                  value={endsAtValue}
                   className="input"
                   required
+                  naturalDateAnchor={startsAtValue}
+                  onResolvedValue={(next) => {
+                    setEndsAtValue(next);
+                    setEndWasEdited(true);
+                  }}
                 />
                 <FieldError name="endsAt" errors={errors} touched={touched} />
               </label>
@@ -722,7 +745,12 @@ export function EventCreatePage() {
                 </p>
                 <label className="field-label">
                   Name *
-                  <input name="primaryContactName" className="input" required />
+                  <input
+                    ref={contactNameRef}
+                    name="primaryContactName"
+                    className="input"
+                    required
+                  />
                   <FieldError
                     name="primaryContactName"
                     errors={errors}
@@ -732,6 +760,7 @@ export function EventCreatePage() {
                 <label className="field-label">
                   Email
                   <input
+                    ref={contactEmailRef}
                     name="primaryContactEmail"
                     type="email"
                     className="input"
@@ -842,22 +871,20 @@ export function EventCreatePage() {
             <div className="grid gap-3 p-3 sm:grid-cols-2">
               <label className="field-label">
                 Salesperson
-                <select
+                <SearchSelect
                   name="salespersonId"
                   value={salespersonId}
-                  onChange={(event) => setSalespersonId(event.target.value)}
-                  className="input"
+                  onChange={(id) => setSalespersonId(id)}
                   form="event-create-form"
-                >
-                  <option value="">Select a salesperson</option>
-                  {salespeople.map((person) => (
-                    <option key={person._id} value={person._id}>
-                      {[person.givenName, person.familyName]
-                        .filter(Boolean)
-                        .join(" ")}
-                    </option>
-                  ))}
-                </select>
+                  recentsKey="staff"
+                  placeholder="Search salespeople…"
+                  options={salespeople.map((person) => ({
+                    id: person._id,
+                    label: [person.givenName, person.familyName]
+                      .filter(Boolean)
+                      .join(" "),
+                  }))}
+                />
                 {people !== undefined && salespeople.length === 0 ? (
                   <span
                     className="field-hint"
@@ -1046,16 +1073,20 @@ export function EventCreatePage() {
                       onChange={setClientId}
                       required
                       placeholder={`Search ${activeClients.length} clients by name or email…`}
-                      emptyText="No client matches — create one below."
+                      emptyText={
+                        canCreateClient
+                          ? "No client matches - create one below."
+                          : "No client matches."
+                      }
+                      onCreate={
+                        canCreateClient
+                          ? (name) => setInlineCreate({ kind: "client", name })
+                          : undefined
+                      }
+                      createLabel={(name) => `Create client “${name}”`}
                       testId="event-create-client"
-                      options={activeClients.map((client) => ({
-                        id: client._id,
-                        label: clientDisplayName(client._id, activeClients),
-                        hint:
-                          [client.email, client.phone]
-                            .filter(Boolean)
-                            .join(" · ") || null,
-                      }))}
+                      recentsKey="client"
+                      options={clientOptions}
                     />
                   </label>
                   {activeClients.length === 0 ? (
@@ -1070,29 +1101,7 @@ export function EventCreatePage() {
                   ) : null}
                 </>
               )}
-              <button
-                type="button"
-                className="btn btn-ghost btn-sm"
-                onClick={() => setShowClient((value) => !value)}
-              >
-                {showClient ? "Close new client form" : "Add a new client"}
-              </button>
             </div>
-            {showClient ? (
-              <InlineClientForm
-                busy={busy === "client"}
-                onSubmit={submitClient}
-              />
-            ) : null}
-            {pendingDuplicate?.kind === "client" ? (
-              <InlineDuplicateNotice
-                pending={pendingDuplicate}
-                busy={busy !== null}
-                onUseExisting={resolveDuplicate.useExisting}
-                onCreateAnyway={resolveDuplicate.createAnyway}
-                onDismiss={resolveDuplicate.dismiss}
-              />
-            ) : null}
           </Section>
 
           <Section title="Venue">
@@ -1110,13 +1119,19 @@ export function EventCreatePage() {
                       onChange={setVenueId}
                       required
                       placeholder={`Search ${activeVenues.length} venues by name or address…`}
-                      emptyText="No venue matches — create one below."
+                      emptyText={
+                        canCreateVenue
+                          ? "No venue matches - create one below."
+                          : "No venue matches."
+                      }
+                      onCreate={
+                        canCreateVenue
+                          ? (name) => setInlineCreate({ kind: "venue", name })
+                          : undefined
+                      }
+                      createLabel={(name) => `Create venue “${name}”`}
                       testId="event-create-venue"
-                      options={activeVenues.map((venue) => ({
-                        id: venue._id,
-                        label: venue.name,
-                        hint: venueSummary(venue),
-                      }))}
+                      options={venueOptions}
                     />
                   </label>
                   {selectedVenue &&
@@ -1133,27 +1148,59 @@ export function EventCreatePage() {
                   ) : null}
                 </>
               )}
-              <button
-                type="button"
-                className="btn btn-ghost btn-sm"
-                onClick={() => setShowVenue((value) => !value)}
-              >
-                {showVenue ? "Close new venue form" : "Add a new venue"}
-              </button>
             </div>
-            {showVenue ? (
-              <InlineVenueForm busy={busy === "venue"} onSubmit={submitVenue} />
-            ) : null}
-            {pendingDuplicate?.kind === "venue" ? (
-              <InlineDuplicateNotice
-                pending={pendingDuplicate}
-                busy={busy !== null}
-                onUseExisting={resolveDuplicate.useExisting}
-                onCreateAnyway={resolveDuplicate.createAnyway}
-                onDismiss={resolveDuplicate.dismiss}
-              />
-            ) : null}
           </Section>
+          {inlineCreate ? (
+            <InlineReferenceCreateSheet
+              kind={inlineCreate.kind}
+              open
+              initialName={inlineCreate.name}
+              existingOptions={
+                inlineCreate.kind === "client"
+                  ? [
+                      ...activeClients.map((client) => ({
+                        id: client._id,
+                        label: clientDisplayName(client._id, activeClients),
+                        email: client.email,
+                      })),
+                      ...(temporaryClient &&
+                      !activeClients.some(
+                        (client) => client._id === temporaryClient.id,
+                      )
+                        ? [temporaryClient]
+                        : []),
+                    ]
+                  : [
+                      ...activeVenues.map((venue) => ({
+                        id: venue._id,
+                        label: venue.name,
+                      })),
+                      ...(temporaryVenue &&
+                      !activeVenues.some(
+                        (venue) => venue._id === temporaryVenue.id,
+                      )
+                        ? [temporaryVenue]
+                        : []),
+                    ]
+              }
+              onClose={() => setInlineCreate(null)}
+              onUseExisting={(id) => {
+                if (inlineCreate.kind === "client") setClientId(id);
+                else setVenueId(id);
+                setInlineCreate(null);
+              }}
+              onCreated={(record) => {
+                if (inlineCreate.kind === "client") {
+                  setTemporaryClient(record);
+                  setClientId(record.id);
+                } else {
+                  setTemporaryVenue(record);
+                  setVenueId(record.id);
+                }
+                setInlineCreate(null);
+              }}
+            />
+          ) : null}
 
           {proposalId && proposal === undefined ? (
             <p className="text-sm text-ink-3" role="status">

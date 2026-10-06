@@ -8,8 +8,10 @@ import {
   useEquipmentTransfer,
   useEquipmentUpdateCondition,
   useListEquipment,
+  useListEquipmentIssue,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
+import { equipmentShelfMark, type ShelfIssue } from "./equipmentShelfMark";
 import { formatMoney } from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
@@ -35,6 +37,7 @@ import {
 
 export function EquipmentCatalogPage() {
   const equipment = useListEquipment();
+  const issues = useListEquipmentIssue() as ShelfIssue[] | undefined;
   const vendors = (useRentalVendorChoices() ?? []) as VendorChoice[];
   const vendorNames = new Map(vendors.map((v) => [v.vendorId, v.name]));
   const [detailId, setDetailId] = useState<string | null>(null);
@@ -51,6 +54,7 @@ export function EquipmentCatalogPage() {
   const [bulkNotice, setBulkNotice] = useState<string | null>(null);
   const [editing, setEditing] = useState<EquipmentDetailRow | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [find, setFind] = useState("");
   const [failure, setFailure] = useState<unknown>(null);
   const { prompt, host } = useActionPrompt();
 
@@ -64,6 +68,18 @@ export function EquipmentCatalogPage() {
       .map((place) => place.name),
   );
   const activeRows = rows.filter((item) => item.status === "active");
+  const needle = find.trim().toLowerCase();
+  const shownRows = needle
+    ? rows.filter((item) =>
+        [
+          item.name,
+          item.assetTag,
+          item.category,
+          item.homeLocation,
+          item.currentLocation,
+        ].some((value) => value?.toLowerCase().includes(needle)),
+      )
+    : rows;
   const ownedValue = activeRows
     .filter((item) => item.ownership === "owned")
     .reduce((sum, item) => sum + item.quantity * item.purchaseValue, 0);
@@ -238,9 +254,9 @@ export function EquipmentCatalogPage() {
           <p className="eyebrow">Facilities · Equipment</p>
           <h1 className="display-title mt-2">Equipment catalog</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Owned and rented kitchen and service equipment — chafing dishes,
-            ovens, tents, linens — with asset tag, quantity, value, and current
-            condition. The basis for maintenance and event checkout.
+            Kitchen and service equipment you own or rent — chafing dishes,
+            ovens, tents, linens — with tag number, count, value, and condition.
+            Repairs and event check-out use this list.
           </p>
         </div>
         <div className="supply-masthead-actions">
@@ -354,7 +370,7 @@ export function EquipmentCatalogPage() {
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">Asset register</p>
+            <p className="eyebrow">Everything you have</p>
             <h2>Catalog</h2>
           </div>
           <span>
@@ -371,17 +387,33 @@ export function EquipmentCatalogPage() {
             </span>
           </div>
         ) : (
-          <EquipmentCatalogTable
-            rows={rows}
-            busy={busy != null}
-            vendorNames={vendorNames}
-            onEdit={(item) => {
-              setShowForm(false);
-              setEditing(item as EquipmentDetailRow);
-            }}
-            onDetails={(item) => setDetailId(item._id)}
-            onAction={rowAction}
-          />
+          <>
+            <input
+              type="search"
+              className="input min-h-10 w-full max-w-sm"
+              placeholder="Find by name, tag, category or place"
+              aria-label="Find equipment"
+              value={find}
+              onChange={(event) => setFind(event.target.value)}
+            />
+            {shownRows.length === 0 ? (
+              <p className="text-base text-ink-2">Nothing matches.</p>
+            ) : null}
+            <EquipmentCatalogTable
+              rows={shownRows}
+              busy={busy != null}
+              vendorNames={vendorNames}
+              onEdit={(item) => {
+                setShowForm(false);
+                setEditing(item as EquipmentDetailRow);
+              }}
+              onDetails={(item) => setDetailId(item._id)}
+              onAction={rowAction}
+              shelfMark={(item) =>
+                issues ? equipmentShelfMark(item._id, issues) : null
+              }
+            />
+          </>
         )}
       </section>
     </div>

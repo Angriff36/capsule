@@ -26,6 +26,27 @@ export function formatTime(ms: number | null | undefined): string {
   return ms == null ? "—" : timeFmt.format(ms);
 }
 
+/** Date and time together, e.g. "Sep 22, 2026 2:00 PM". */
+export function formatDateTime(at: number | string | null | undefined): string {
+  if (at == null) return "—";
+  const d = new Date(at);
+  return `${dateFmt.format(d)} ${timeFmt.format(d)}`;
+}
+
+/** A start-to-end window; the date is said once when both ends share a day,
+ *  e.g. "Sep 22, 2026 2:00 PM → 5:00 PM". */
+export function formatDateTimeRange(
+  start: number | null | undefined,
+  end: number | null | undefined,
+): string {
+  if (start == null || end == null) {
+    return `${formatDateTime(start)} → ${formatDateTime(end)}`;
+  }
+  return dateFmt.format(start) === dateFmt.format(end)
+    ? `${formatDateTime(start)} → ${timeFmt.format(end)}`
+    : `${formatDateTime(start)} → ${formatDateTime(end)}`;
+}
+
 // Single-currency callers keep using the legacy signature; per-row callers
 // pass the invoice's currencyCode so financial reports stay coherent in
 // mixed-currency ledgers. Unknown / null codes fall back to USD.
@@ -59,6 +80,17 @@ export function formatMoneyExact(n: number | null | undefined): string {
   return n == null ? "—" : exactMoneyFmt.format(n);
 }
 
+/**
+ * A stored code such as "private_party" read as words ("Private party") for
+ * clients. Text a person typed with spaces or capitals stays as typed.
+ */
+export function formatCodeAsWords(value: string): string {
+  const text = value.trim();
+  if (!/^[a-z0-9]+(?:[_-][a-z0-9]+)*$/.test(text)) return text;
+  const words = text.replace(/[_-]/g, " ");
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
 export function formatCount(n: number | null | undefined): string {
   return n == null ? "—" : numFmt.format(n);
 }
@@ -88,4 +120,12 @@ export function relativeDays(ms: number, from = Date.now()): string {
   if (days === 1) return "tomorrow";
   if (days === -1) return "yesterday";
   return days > 0 ? `in ${days} days` : `${-days} days ago`;
+}
+
+/** Amounts of food and stock: up to two decimals, so recipe math never shows
+ *  float noise like 3.2000000000000006. */
+export function formatQuantity(n: number | string | null | undefined): string {
+  const value = Number(n);
+  if (n == null || n === "" || !Number.isFinite(value)) return "—";
+  return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
 }

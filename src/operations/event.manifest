@@ -431,6 +431,18 @@ entity Venue mixin TenantScoped, SoftDeletable {
   property wasteRules: string?
   property permitsInsuranceNotes: string?
   property restrictions: string?
+  // Logistics profile (site survey): what the crew must know before arriving
+  // at this venue, shown on every event there and on its BEO. The day-of
+  // contact is the person who opens doors on the day, not the sales contact.
+  // Set by setLogisticsProfile only, so the details form never clears them.
+  property loadingDock: string?
+  property elevatorNotes: string?
+  property kitchenEquipment: string?
+  property powerDetails: string?
+  property parkingDetails: string?
+  property arrivalRestrictions: string?
+  property encrypted dayOfContactName: string?
+  property encrypted dayOfContactPhone: string?
   // Venue partner program (Mangia Venue Partner Playbook): the partnership
   // tier, the one person who owns the relationship, when it started, and the
   // owner's 1-10 ratings for ease of work and relationship health. No tier =
@@ -686,6 +698,32 @@ entity Venue mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The logistics profile. Each call states all eight; a blank clears it.
+  command setLogisticsProfile(
+    optional loadingDock: string,
+    optional elevatorNotes: string,
+    optional kitchenEquipment: string,
+    optional powerDetails: string,
+    optional parkingDetails: string,
+    optional arrivalRestrictions: string,
+    optional dayOfContactName: string,
+    optional dayOfContactPhone: string
+  ) {
+    guard self.deletedAt == null
+    mutate loadingDock = loadingDock
+    mutate elevatorNotes = elevatorNotes
+    mutate kitchenEquipment = kitchenEquipment
+    mutate powerDetails = powerDetails
+    mutate parkingDetails = parkingDetails
+    mutate arrivalRestrictions = arrivalRestrictions
+    mutate dayOfContactName = dayOfContactName
+    mutate dayOfContactPhone = dayOfContactPhone
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   // Partner tier, relationship owner and ratings. Each call states all four;
   // a blank clears that one. Clearing the tier ends the partnership.
   command setPartnership(
@@ -831,6 +869,12 @@ entity Event mixin TenantScoped, SoftDeletable {
   // The kitchen the crew leaves from (PL-ROUTES). Unset: the company's only
   // active kitchen, when it has exactly one.
   property operatingLocationId: uuid?
+  // Travel & delivery fee for this event (src/lib/travelFee.ts). Distance
+  // typed by a person wins over the drive-time route distance; an override
+  // amount (zero waives the fee) wins over the company rule.
+  property travelDistanceMiles: float?
+  property travelFeeOverride: money(12, 2)?
+  property travelFeeOverrideReason: string?
   property assignedToId: uuid?
   // Printed owner/salesperson name at plan / assign time. A later catalog
   // Person.correctIdentity rename must not rewrite this Event. assignedToId
@@ -1060,9 +1104,10 @@ entity Event mixin TenantScoped, SoftDeletable {
   computed isFinalLockReady: boolean = self.hasServiceStyle and self.hasExpectedHeadcount and self.hasMenuDishes and self.hasFinalLockTiming
   // Readiness projection only — not a beginExecution/confirmSalesLock gate
   // (issue #384; backend §4.3). Staffing coverage math is not product-defined
-  // yet (assignments hasMany is navigation only). Draft pack lists do not
-  // count as in-flight work (owner anti-tedium rule, issue #12).
-  computed isReadyForExecution: boolean = count_of(self.prepTasks, (t) => t.status != "completed" and t.status != "cancelled") == 0 and count_of(self.packLists, (p) => p.status != "dispatched" and p.status != "cancelled" and p.status != "draft") == 0 and count_of(self.deliveries, (d) => d.status != "delivered" and d.status != "cancelled" and d.status != "failed") == 0
+  // yet (assignments hasMany is navigation only). A draft pack list counts as
+  // open packing: approve makes one and nobody has packed it yet. (Drafts were
+  // left out while this blocked beginExecution; it no longer blocks anything.)
+  computed isReadyForExecution: boolean = count_of(self.prepTasks, (t) => t.status != "completed" and t.status != "cancelled") == 0 and count_of(self.packLists, (p) => p.status != "dispatched" and p.status != "cancelled") == 0 and count_of(self.deliveries, (d) => d.status != "delivered" and d.status != "cancelled" and d.status != "failed") == 0
   // Live internal food-cost estimate from menu dishes. Does NOT overwrite
   // budgets, invoices, quotedPrice, or locked customer prices.
   computed estimatedFoodCost: money(12, 2) = sum(filter(self.eventDishes, (item) => item.deletedAt == null and item.addedAt != null), (item) => item.estimatedCost)
@@ -1465,6 +1510,27 @@ entity Event mixin TenantScoped, SoftDeletable {
       eventId: self.id
       tenantId: self.tenantId
       operatingLocationId: operatingLocationId
+    }
+  }
+
+  // Travel fee inputs for this event; an omitted value clears it (back to the
+  // route distance / the company rule). Allowed at any stage so a live event
+  // stays correctable.
+  command setTravelFee(
+    optional distanceMiles: number,
+    optional overrideAmount: money(12, 2),
+    optional overrideReason: string
+  ) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "salesAccess") or roleAllows(user.role, "eventAccess") or roleAllows(user.role, "manageAccess") "Sales staff, event staff and managers may set the travel fee"
+    constraint travelDistanceNonnegative: distanceMiles == null or distanceMiles >= 0 "Distance can't be negative. Use zero or more."
+    constraint travelFeeOverrideNonnegative: overrideAmount == null or overrideAmount >= 0 "The travel fee can't be negative. Use zero to waive it."
+    mutate travelDistanceMiles = distanceMiles
+    mutate travelFeeOverride = overrideAmount
+    mutate travelFeeOverrideReason = overrideReason
+    emit EventTravelFeeSet {
+      eventId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -2163,8 +2229,14 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
   property declineReason: string?
   property checkedInAt: datetime?
   property tableAssignment: string?
+  // Plated service uses the event-menu line (not a catalog Dish) so every
+  // choice stays tied to this event's actual menu and its recipe demand.
+  property entreeEventDishId: uuid?
+  property seatNumber: int?
+  property placeCardName: string?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo entree: EventDish fields [tenantId, entreeEventDishId] references [tenantId, id]
 
   computed isCheckedIn: boolean = self.checkedInAt != null
 
@@ -2260,6 +2332,25 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       eventId: self.eventId
       tableAssignment: tableAssignment
+    }
+  }
+
+  // Plated service: entrée (an event-menu line), seat, and place-card name.
+  // Every call restates all three; an omitted value clears that field.
+  command assignMeal(
+    optional entreeEventDishId: uuid,
+    optional seatNumber: int,
+    optional placeCardName: string
+  ) {
+    guard self.deletedAt == null
+    mutate entreeEventDishId = entreeEventDishId
+    mutate seatNumber = seatNumber
+    mutate placeCardName = placeCardName
+    emit EventGuestMealAssigned {
+      guestId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      entreeEventDishId: entreeEventDishId
     }
   }
 
@@ -2954,6 +3045,13 @@ event EventGuestTableAssigned: "event_guest.table_assigned" {
   tableAssignment: string
 }
 
+event EventGuestMealAssigned: "event_guest.meal_assigned" {
+  guestId: string
+  tenantId: string
+  eventId: string
+  entreeEventDishId: string?
+}
+
 event EventGuestWithdrawn: "event_guest.withdrawn" {
   guestId: string
   tenantId: string
@@ -2967,6 +3065,11 @@ event EventTimingConfigured: "event.timing_configured" {
 }
 
 event EventTimingRuleRestored: "event.timing_rule_restored" {
+  eventId: string
+  tenantId: string
+}
+
+event EventTravelFeeSet: "event.travel_fee_set" {
   eventId: string
   tenantId: string
 }

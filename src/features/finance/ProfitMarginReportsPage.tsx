@@ -6,7 +6,7 @@ import {
 import { useEventsById } from "../facilities/useEventsById";
 import { TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate, formatMoney } from "../../lib/format";
-import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
+import { ReportsWorkspaceNav } from "../reports/ReportsWorkspaceNav";
 import {
   buildProfitMarginCsv,
   buildProfitMarginReport,
@@ -245,7 +245,7 @@ export function ProfitMarginDashboard({
           Export {view} CSV
         </button>
       </header>
-      <FinanceWorkspaceNav />
+      <ReportsWorkspaceNav />
 
       <section className="profit-margin-controls" aria-label="Report filters">
         <label>

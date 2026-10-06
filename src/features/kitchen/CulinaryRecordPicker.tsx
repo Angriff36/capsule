@@ -14,6 +14,7 @@ export type PickerDish = CanonicalLike & {
   editionNumber?: number | null;
   versionOfDishId?: string | null;
   versionLabel?: string | null;
+  course?: string | null;
   /** A short line under the name, for example "Only at Kindred + Co.". */
   note?: string | null;
 };

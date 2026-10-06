@@ -5,6 +5,7 @@ import {
 } from "./beoNoteSections";
 import type {
   BundleMenuItem,
+  BundlePerson,
   BundleStaffAssignment,
   BundleTimelineEntry,
   EventBundlePart,
@@ -59,10 +60,17 @@ const NOTE_LINE =
  * change the shared catalog dish.
  */
 const INSTRUCTION_CUE =
-  /\b(?:on the side|away from|own (?:tray|platter|plate)|separate(?:ly)?|bride|groom|rare|medium|well[- ]done|less done|more done|overcook|undercook|dry|no |not |without|hold (?:the )?|omit|extra|double|half|only|instead|swap|substitut|allerg|gluten|dairy|vegan|vegetarian|kosher|halal|nut[- ]free|must|please|do not|don't|make sure|be sure|keep|serve|cook|prep|cut|slice|plate|label|warm|hot|cold|chill|reheat|tasting|last time|client (?:wants|asked|prefers)|per client)\b/i;
+  /\b(?:on the side|away from|own (?:tray|platter|plate)|separate(?:ly)?|bride|groom|rare|medium|well[- ]done|less done|more done|overcook|undercook|dry|no |not |without|hold (?:the )?|omit|extra|double|half|only|instead|swap|substitut|allerg|gluten|dairy|vegan|vegetarian|kosher|halal|nut[- ]free|must|please|do not|don't|make sure|be sure|keep|serve|cook|prep|cut|slice|plate|label|chill|reheat|tasting|last time|client (?:wants|asked|prefers)|per client)\b/i;
+/**
+ * "Hot" / "cold" / "warm" is an instruction when it leads ("Warm the rolls")
+ * or ends a phrase ("Pack cold"); before a noun it describes the dish
+ * ("Assorted cold crostini appetizers.").
+ */
+const TEMPERATURE_CUE =
+  /^(?:hot|cold|warm)\b|\b(?:hot|cold|warm)\b(?!\s+[a-z])/i;
 
 function looksLikeInstruction(text: string): boolean {
-  return INSTRUCTION_CUE.test(text);
+  return INSTRUCTION_CUE.test(text) || TEMPERATURE_CUE.test(text);
 }
 const PRINTED_FOOTER = /^printed date/i;
 const PAGE_FOOTER = /^page \d+( of \d+)?$/i;
@@ -430,6 +438,24 @@ function readContact(value: string | undefined): {
 }
 
 /**
+ * TPP prints the client's phone under the "Contact:" name as "Home: (206)
+ * 321-2642". Read it there before any other phone line, which may be the
+ * venue contact's.
+ */
+function contactBlockPhone(lines: ReadLine[]): string | undefined {
+  const at = lines.findIndex((line) => /^contact\s*:/.test(line.lower));
+  if (at < 0) return undefined;
+  for (const line of lines.slice(at + 1, at + 4)) {
+    const phone = line.text.match(
+      /^(?:home|cell|work|mobile|phone)\s*:\s*(.+)$/i,
+    );
+    if (phone) return parsePhone(phone[1]);
+    if (looksLikeLabel(line.text)) return undefined;
+  }
+  return undefined;
+}
+
+/**
  * A BEO that prints "Venue: Singh Campsite" on one line and "Address: 47.01359°
  * N, 116.52979° W" (or a street address) on the next: fold the address line
  * into the venue when the venue line did not already carry one.
@@ -519,14 +545,37 @@ interface Body {
   timeline: BundleTimelineEntry[];
   menu: BundleMenuItem[];
   staff: BundleStaffAssignment[];
+  otherContacts: BundlePerson[];
   noteLines: string[];
+}
+
+/**
+ * "Venue Manager - Trish Eason (509) 818-7553" under Staffing is the
+ * on-site person to reach, not a crew member.
+ */
+function readStaffingContact(text: string): BundlePerson | undefined {
+  const match = text.match(
+    /^(.+?)\s+[-–]\s+(.+?)\s*(\(?\d{3}\)?[\s.-]*\d{3}[\s.-]*\d{4})/,
+  );
+  if (!match) return undefined;
+  return {
+    role: match[1]!.trim(),
+    name: match[2]!.trim(),
+    phone: parsePhone(match[3]),
+  };
 }
 
 function readBody(
   lines: ReadLine[],
   eventWindow: { start?: number; end?: number } = {},
 ): Body {
-  const body: Body = { timeline: [], menu: [], staff: [], noteLines: [] };
+  const body: Body = {
+    timeline: [],
+    menu: [],
+    staff: [],
+    otherContacts: [],
+    noteLines: [],
+  };
   let section: Section = "header";
   let course: string | undefined;
 
@@ -552,6 +601,11 @@ function readBody(
       continue;
     }
     if (section === "staff") {
+      const contact = readStaffingContact(line.text);
+      if (contact) {
+        body.otherContacts.push(contact);
+        continue;
+      }
       const member = readStaffLine(line.text);
       if (member) body.staff.push(member);
       continue;
@@ -675,9 +729,13 @@ export function parseBeoText(text: string): EventBundlePart {
     locationAt >= 0 ? lines[locationAt + 1]?.text : undefined;
   const gpsLine =
     afterLocation && readCoordinates(afterLocation) ? afterLocation : undefined;
+  // The BEO PDF prints "Location: Barn and Blossom" with the street on the
+  // next line: a street under the name makes it a place, not a person.
+  const streetNext =
+    afterLocation !== undefined && /^\d+\s+\S/.test(afterLocation);
   const locationIsPlace =
     locationValue !== undefined &&
-    (/\d/.test(locationValue) || gpsLine !== undefined);
+    (/\d/.test(locationValue) || gpsLine !== undefined || streetNext);
   if (!contact.name && !locationIsPlace && locationValue) {
     contact.name = locationValue;
   }
@@ -738,7 +796,10 @@ export function parseBeoText(text: string): EventBundlePart {
               /^[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}$/.test(text) &&
               text !== salespersonEmail,
           ),
-      phone: contact.phone ?? parsePhone(labelValue(lines, "phone")),
+      phone:
+        contact.phone ??
+        contactBlockPhone(lines) ??
+        parsePhone(labelValue(lines, "phone")),
     },
     venue: (() => {
       const venue =
@@ -762,6 +823,7 @@ export function parseBeoText(text: string): EventBundlePart {
     timeline: body.timeline,
     menu: body.menu,
     staff: body.staff,
+    otherContacts: body.otherContacts,
     notes,
     warnings,
   };

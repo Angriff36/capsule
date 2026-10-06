@@ -263,7 +263,7 @@ export function ClientRetentionPage() {
             </span>
           </div>
         ) : (
-          <table className="data-table">
+          <table className="data-table phone-cards">
             <thead>
               <tr>
                 <th>Client</th>
@@ -283,8 +283,10 @@ export function ClientRetentionPage() {
                       {clientDisplayName(row.clientId, clients ?? [])}
                     </Link>
                   </td>
-                  <td>{row.priorYearEvents}</td>
-                  <td>
+                  <td data-label={`${priorYear} events`}>
+                    {row.priorYearEvents}
+                  </td>
+                  <td data-label={`Last ${priorYear} event`}>
                     {row.lastPriorYearEventAt
                       ? formatDate(row.lastPriorYearEventAt)
                       : "—"}
@@ -326,7 +328,7 @@ export function ClientRetentionPage() {
             <span>Open one from the list above.</span>
           </div>
         ) : (
-          <table className="data-table">
+          <table className="data-table phone-cards">
             <thead>
               <tr>
                 <th>Client</th>
@@ -346,8 +348,8 @@ export function ClientRetentionPage() {
                       {clientDisplayName(String(task.clientId), clients ?? [])}
                     </Link>
                   </td>
-                  <td>{String(task.reason)}</td>
-                  <td>{formatDate(task.openedAt)}</td>
+                  <td data-label="Reason">{String(task.reason)}</td>
+                  <td data-label="Opened">{formatDate(task.openedAt)}</td>
                   <td>
                     <div className="supply-row-actions">
                       <button

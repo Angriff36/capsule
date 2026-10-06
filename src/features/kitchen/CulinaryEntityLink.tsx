@@ -15,12 +15,14 @@ export function CulinaryEntityLink({
   children,
   className,
   prepTaskId,
+  state,
 }: {
   kind: EntityKind;
   id: string;
   children: ReactNode;
   className?: string;
   prepTaskId?: string;
+  state?: unknown;
 }) {
   const path =
     kind === "component"
@@ -31,7 +33,11 @@ export function CulinaryEntityLink({
           ? dishPath(id)
           : menuPath(id);
   return (
-    <Link to={path} className={className ?? "culinary-entity-link"}>
+    <Link
+      to={path}
+      state={state}
+      className={className ?? "culinary-entity-link"}
+    >
       {children}
     </Link>
   );

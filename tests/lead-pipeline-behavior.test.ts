@@ -5,6 +5,8 @@ import {
   backend,
   container,
   mount,
+  button,
+  click,
   command,
   input,
   submit,
@@ -30,6 +32,8 @@ it("persists the edited lead value, stage and probability and links its existing
   ]);
   const update = command("useLeadUpdatePipeline");
   await mount(createElement(LeadPipelinePage));
+  expect(container.querySelector(".lead-card-editor")).toBeNull();
+  await click(button("Move or price"));
   const form = container.querySelector<HTMLFormElement>(".lead-card-editor");
   expect(form).not.toBeNull();
   input("estimatedValue", "500000", form!);
@@ -44,6 +48,7 @@ it("persists the edited lead value, stage and probability and links its existing
     probability: 75,
   });
   expect(container.textContent).toContain("Harborview pipeline updated.");
+  expect(container.querySelector(".lead-card-editor")).toBeNull();
   expect(
     container.querySelector('a[href="/clients/proposals?proposal=proposal-a"]')
       ?.textContent,

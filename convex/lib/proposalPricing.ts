@@ -269,6 +269,8 @@ export const addProposalLineAndRecompute = mutation({
     menuDishId: v.optional(v.id("menuDishes")),
     overrideReason: v.optional(v.string()),
     equipmentId: v.optional(v.id("equipments")),
+    // The event's travel & delivery fee line (convex/travelFees.ts).
+    travelFee: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const auth = await getAuthContext(ctx);
@@ -304,6 +306,7 @@ export const addProposalLineAndRecompute = mutation({
       menuDishId: args.menuDishId,
       overrideReason: args.overrideReason,
       equipmentId: args.equipmentId,
+      travelFee: args.travelFee,
     });
     await ctx.runMutation(internal.lib.proposalPricing.recomputeProposalTotals, {
       proposalId: args.proposalId,

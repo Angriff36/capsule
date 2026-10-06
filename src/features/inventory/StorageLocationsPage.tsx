@@ -8,7 +8,7 @@ import {
   useStorageLocationDeactivate,
   useStorageLocationReviseDetails,
 } from "../../lib/manifest-convex-react";
-import { formatCountNoun } from "../../lib/format";
+import { formatQuantity, formatCountNoun } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
@@ -69,7 +69,7 @@ export function StorageLocationsPage() {
         const name = ingredients?.find(
           (ingredient) => ingredient._id === item.ingredientId,
         )?.name;
-        return `${name ?? "Item"} ${item.quantityOnHand} ${item.unit}`;
+        return `${name ?? "Item"} ${formatQuantity(item.quantityOnHand)} ${item.unit}`;
       })
       .join(", ");
     return `${formatCountNoun(held.length, "line")} · ${named}${held.length > 3 ? ", …" : ""}`;
@@ -197,7 +197,7 @@ export function StorageLocationsPage() {
         title="Storage locations"
         lead="Every fridge, freezer and dry store, what sits in each one, and the temperature it should keep. Capsule does not read a thermometer: the range here is the target you set."
         actions={
-          <Link to="/inventory/stock" className="btn btn-primary">
+          <Link to="/inventory/stock?new=location" className="btn btn-primary">
             Register a location
           </Link>
         }

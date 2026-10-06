@@ -6,6 +6,14 @@ Compile approved workforce time records and payroll input adjustments for a sele
 ## Current Phase
 Phase 5
 
+# Task Plan: Restore list state on record return
+
+## Goal
+Preserve list URL state, scroll offset, and safe return behavior across supported Capsule lists and record details.
+
+## Current Phase
+Phase 1 (round-3 remediation)
+
 ## Phases
 
 ### Phase 1: Requirements and discovery
@@ -76,3 +84,81 @@ Plan only; no application or test implementation. Required upstream 89262916f59e
 - Scope: one concern — a resumed quote conversion must retain one canonical Proposal-to-Event relationship. Application edits stayed inside the manifest guard change (regenerated), `convex/quoteBuilder.ts`, the new internal `convex/lib/proposalEventCreation.ts` helper, and `tests/proofs/quote-conversion.runtime.test.ts`; no UI/generated-by-hand/spec/env edits, no commit/push.
 - RED phase (past tense): the regression run showed 6 original cases green and the new canonical-link case failing (`red.log`); a soft-deleted-Event case then exposed one more gap and the repair was corrected (`207-validate-recovered-event.log`).
 - Final state: 4 new runtime cases green, focused 5 files/39 (`focused-final.log`), full suite 197 files/918 (`test.log`), full `bun run check` exit 0 with coverage 197/918 (`check-final.log`); review gpt-5.6-sol ends VERDICT: APPROVE (`review.log`). AC-412 and AC-433 → PASS; AC-006, AC-411, AC-436 and all other PENDING stay PENDING. Receipt: codex-plans/whole-spec-audit-2026-09-20/quote-retry-evidence-2026-09-21.md.
+
+- [ ] Revalidate the prior implementation against the rejection findings
+- [ ] Map each affected list's controls and detail-origin paths
+- **Status:** in progress
+
+### Phase 2: Design
+- [ ] Establish stable URL-state and visit classification contracts
+- [ ] Define scroll restore/cancellation behavior for shell and virtual list
+- **Status:** pending
+
+### Phase 3: Implementation
+- [ ] Complete shared managers and route integrations
+- [ ] Split touched list modules below the requested size limit
+- **Status:** pending
+
+### Phase 4: Verification
+- [ ] Run the temporary authenticated Playwright proof and retain artifacts
+- [ ] Run `bun run check` to completion and resolve feature-caused failures
+- **Status:** pending
+
+### Phase 5: Delivery
+- [ ] Inspect the complete diff and leave a review-ready tree
+- **Status:** pending
+
+## Decisions Made
+| Decision | Rationale |
+|---|---|
+| Preserve and correct the existing feature diff | The worktree already contains the task's incomplete implementation. |
+| Store origin by router entry key and history index | A saved URL alone cannot prove that Back returns to the originating list. |
+| Restore virtual Kitchen lists through their imperative API | The virtual window must update both DOM offset and React row state. |
+| Preserve pre-existing gate failures | They are outside this navigation feature and must not be changed merely to force green. |
+
+## Errors Encountered
+| Error | Attempt | Resolution |
+|---|---|---|
+| JSX in `listOrigin.ts` | 1 | Renamed the shared JSX component module to `.tsx`. |
+| Port 7812 already occupied | 1 | Used isolated port 7813 and recorded it in verification evidence. |
+| Playwright runner API mismatch | 1 | Used a temporary Playwright browser API script instead of the incompatible runner. |
+| Isolated browser lacks an authenticated session | 1 | Captured the blocked UI and assertion output; did not claim list-flow proof. |
+
+---
+
+# Sticky context header repair
+
+## Goal
+Repair the existing sticky context header on event, recipe, and invoice detail pages so it exposes live identity facts and one visible primary action after the route masthead scrolls away.
+
+## Phases
+- [in_progress] Inspect existing implementation, route integrations, shared components, and browser harness.
+- [pending] Refactor the sticky header into a focused reusable component and repair page integrations.
+- [pending] Add Storybook/catalog coverage and run static verification.
+- [pending] Run temporary Playwright verification, delete its artifact, and record results.
+- [pending] Prepare the worktree for independent review.
+
+## Constraints
+- Preserve existing user changes and do not edit generated or Manifest files.
+- Follow DESIGN.md: solid panel surface, fine rule, established tokens, no glass effect.
+- Do not add permanent tests; use and remove the required temporary Playwright check.
+- Do not commit, push, deploy, merge, or alter global configuration.
+
+# Flexible unit entry — round 4 plan
+
+## Goal
+
+Allow recipe ingredient and sub-recipe quantity fields to accept compact kitchen input, show an inline catalog-unit conversion or incompatibility warning, and save the entered compatible unit without downstream ambiguity.
+
+## Phases
+
+- [x] Inspect the existing round-3 diff, unit engine, recipe editors, tests, UI contract, and the #435 supply-manifest failure.
+- [x] Make the targeted test and #435 seam fixes.
+- [x] Check presentation vocabulary and record the result.
+- [ ] Run every required gate separately and record its exit status.
+- [ ] Perform the disposable Playwright verification against the worktree app, clean its records and artifacts, and record the observed result.
+- [ ] Rewrite the planning records as single, non-contradictory documents and prepare the worktree for independent review.
+
+## Scope boundaries
+
+No Manifest source or generated files, deployment, Clerk-user changes, or production services. The #435 repair is limited to extracting the existing read hook into the established `features/facilities` seam location.

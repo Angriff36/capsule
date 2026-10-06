@@ -160,7 +160,7 @@ export function VenueMenuCardPage() {
         </div>
       ) : (
         <section
-          className="card print-sheet mx-auto max-w-2xl border-t-4 p-6 sm:p-10"
+          className="card print-sheet print-sheet--handout mx-auto max-w-2xl border-t-4 p-6 sm:p-10"
           style={
             venue.brandColor ? { borderTopColor: venue.brandColor } : undefined
           }

@@ -1,11 +1,12 @@
-import { inflateSync } from "node:zlib";
-
 /**
  * Just enough PDF object structure to bind content streams to their fonts.
  *
  * TPP exports embed one subset font per style, and the subsets do NOT agree on
  * character codes. Decoding therefore needs the ToUnicode CMap of the font that
  * each `Tf` operator selects, not a merged document-wide map.
+ *
+ * No Node or browser API here: the caller passes the Flate inflate (Node's
+ * zlib on the agent path, the page's DecompressionStream on the import page).
  */
 
 export interface PdfIndirectObject {
@@ -13,15 +14,31 @@ export interface PdfIndirectObject {
   /** Dictionary and other text before the stream, if any. */
   header: string;
   /** Decoded stream payload, when the object carries a Flate stream. */
-  stream?: Buffer;
+  stream?: Uint8Array;
 }
+
+/** Inflates one Flate stream; undefined when it cannot be read. */
+export type PdfInflate = (raw: Uint8Array) => Uint8Array | undefined;
 
 const OBJECT_HEADER = /(\d+)\s+(\d+)\s+obj\b/g;
 
-function decodeStream(header: string, raw: Buffer): Buffer | undefined {
+/** Bytes as text, one character per byte (PDF syntax is byte-oriented). */
+export function latin1(bytes: Uint8Array): string {
+  let out = "";
+  for (let index = 0; index < bytes.length; index += 0x8000) {
+    out += String.fromCharCode(...bytes.subarray(index, index + 0x8000));
+  }
+  return out;
+}
+
+function decodeStream(
+  header: string,
+  raw: Uint8Array,
+  inflate: PdfInflate,
+): Uint8Array | undefined {
   if (!/\/Filter\s*\/FlateDecode/.test(header)) return raw;
   try {
-    return inflateSync(raw);
+    return inflate(raw);
   } catch {
     return undefined;
   }
@@ -29,9 +46,10 @@ function decodeStream(header: string, raw: Buffer): Buffer | undefined {
 
 /** Scan every `N G obj … endobj` span. Robust to a missing or broken xref. */
 export function readIndirectObjects(
-  buffer: Buffer,
+  buffer: Uint8Array,
+  inflate: PdfInflate,
 ): Map<number, PdfIndirectObject> {
-  const latin = buffer.toString("latin1");
+  const latin = latin1(buffer);
   const objects = new Map<number, PdfIndirectObject>();
   OBJECT_HEADER.lastIndex = 0;
 
@@ -55,6 +73,7 @@ export function readIndirectObjects(
         stream: decodeStream(
           header,
           buffer.subarray(dataStart, dataEnd < 0 ? bodyEnd : dataEnd),
+          inflate,
         ),
       });
     } else {

@@ -9,6 +9,13 @@
 //
 // Pure: convex/closeoutSources.ts loads the rows and calls this.
 
+import {
+  decodeAnswers,
+  keptLeftovers,
+  LEFTOVER_HANDLING_LABEL,
+  type MudaAnswers,
+} from "./eventPacket/finalLock/fieldFormAnswers";
+
 export type CloseoutLineKey =
   | "revenue"
   | "ingredient"
@@ -47,6 +54,8 @@ export type ProjectionInvoice = Versioned & {
   status: string;
   invoiceNumber?: string | null;
   total: number;
+  /** Sales tax on the bill: collected for the state, not earned. */
+  taxAmount?: number | null;
   amountPaid?: number | null;
   amountDue?: number | null;
   creditMemoAmount?: number | null;
@@ -73,6 +82,13 @@ export type ProjectionVendorOrder = Versioned & {
       unitCost: number;
     }
   >;
+};
+/** Stock issued out of storage to this event (a consumed hold). */
+export type ProjectionStockIssue = Versioned & {
+  ingredientName: string;
+  quantity: number;
+  /** The lot's unit cost; null when the lot was never priced. */
+  unitCost: number | null;
 };
 export type ProjectionWaste = Versioned & {
   status: string;
@@ -105,6 +121,11 @@ export type ProjectionAttribution = Versioned & {
   allocatedAmount: number;
 };
 export type ProjectionGuest = Versioned & { checkedInAt?: number | null };
+/** A signed food waste form (FieldConfirmation "field.muda", status done). */
+export type ProjectionFoodWasteForm = Versioned & {
+  completedAt?: number | null;
+  answers?: string | null;
+};
 export type ProjectionTruckRun = Versioned & {
   label: string;
   tripCost?: number | null;
@@ -120,6 +141,8 @@ export type CloseoutProjectionInput = {
   payments: ProjectionPayment[];
   creditMemos: ProjectionCreditMemo[];
   vendorOrders: ProjectionVendorOrder[];
+  /** Optional: stock issued to the event. When present it is the food cost. */
+  stockIssues?: ProjectionStockIssue[];
   waste: ProjectionWaste[];
   labor: ProjectionLabor | null;
   rentals: ProjectionRental[];
@@ -128,6 +151,8 @@ export type CloseoutProjectionInput = {
   guests: ProjectionGuest[];
   /** The event's truck runs and vendor drops still on it (not released). */
   truckRuns?: ProjectionTruckRun[];
+  /** The event's signed food waste forms (the paper "Event Food MUDA"). */
+  foodWasteForms?: ProjectionFoodWasteForm[];
 };
 
 export type CloseoutCaptureValues = {
@@ -198,19 +223,22 @@ function revenueLine(input: CloseoutProjectionInput) {
   let earned = 0;
   let billedCents = 0;
   let outstanding = 0;
-  // Revenue = billed invoice totals less the credits given back on them
+  // Revenue = billed invoice totals less their sales tax (owed to the state,
+  // not earned) and less the credits given back on them
   // (Invoice.creditMemoAmount). The credit rows are listed so the sources
   // add up to the line; payments are the collected side, listed apart.
   for (const invoice of billed) {
-    earned += cents(invoice.total) - cents(invoice.creditMemoAmount);
+    const beforeTax = cents(invoice.total) - cents(invoice.taxAmount);
+    earned += beforeTax - cents(invoice.creditMemoAmount);
     billedCents += cents(invoice.total);
     outstanding += cents(invoice.amountDue);
     sources.push(
       ref(
         "invoices",
         invoice,
-        cents(invoice.total),
-        `Invoice ${invoice.invoiceNumber || ""}`.trim(),
+        beforeTax,
+        `Invoice ${invoice.invoiceNumber || ""}`.trim() +
+          (cents(invoice.taxAmount) > 0 ? " (before sales tax)" : ""),
       ),
     );
   }
@@ -278,6 +306,43 @@ function ingredientLine(input: CloseoutProjectionInput): CloseoutLine {
       );
     }
   }
+  // Food taken from storage is what the event used, bought for it or not.
+  // Purchases feed that same stock, so when stock was issued it alone is the
+  // cost (never both); the orders stay as the plan.
+  const issues = live(input.stockIssues ?? []);
+  if (issues.length > 0) {
+    const issued: CloseoutSourceRecord[] = [];
+    let used = 0;
+    let unpriced = 0;
+    for (const row of issues) {
+      if (row.unitCost == null) {
+        unpriced += 1;
+        continue;
+      }
+      const amount = cents(row.quantity * row.unitCost);
+      used += amount;
+      issued.push(
+        ref(
+          "inventoryReservations",
+          row,
+          amount,
+          `${row.ingredientName} issued from stock`,
+        ),
+      );
+    }
+    return {
+      key: "ingredient",
+      label: "Food cost",
+      planned: planned > 0 ? money(planned) : null,
+      actual: issued.length > 0 ? money(used) : null,
+      complete: unpriced === 0,
+      note:
+        unpriced > 0
+          ? `${plural(unpriced, "issued item")} with no cost on the stock lot`
+          : null,
+      sources: issued,
+    };
+  }
   const notes: string[] = [];
   if (sources.length === 0)
     notes.push("No food deliveries received for this event");
@@ -294,6 +359,40 @@ function ingredientLine(input: CloseoutProjectionInput): CloseoutLine {
   };
 }
 
+// The newest signed food waste form with readable answers. The lead's counts
+// are servings and pounds, not money, so they are listed beside the waste
+// line and give the guest count when nobody checked guests in.
+function foodWasteForm(input: CloseoutProjectionInput) {
+  let newest: { form: ProjectionFoodWasteForm; muda: MudaAnswers } | null =
+    null;
+  for (const form of live(input.foodWasteForms ?? [])) {
+    const answers = decodeAnswers(form.answers);
+    if (answers?.kind !== "muda") continue;
+    if (newest && (newest.form.completedAt ?? 0) >= (form.completedAt ?? 0))
+      continue;
+    newest = { form, muda: answers.muda };
+  }
+  return newest;
+}
+
+function leftoverText(muda: MudaAnswers) {
+  const left = keptLeftovers(muda).map((l) =>
+    l.kind === "appetizer"
+      ? `${l.item} ${plural(l.amount, "serving")}`
+      : `${l.item} ${l.amount} lb`,
+  );
+  const parts = [
+    left.length > 0 ? `Left over: ${left.join(", ")}` : "Nothing left over",
+  ];
+  if (muda.mainsHandling)
+    parts.push(LEFTOVER_HANDLING_LABEL[muda.mainsHandling].toLowerCase());
+  if (muda.staffError)
+    parts.push(
+      `staff mistake${muda.staffErrorNote.trim() ? `: ${muda.staffErrorNote.trim()}` : ""}`,
+    );
+  return parts.join(" · ");
+}
+
 function wasteLine(input: CloseoutProjectionInput): CloseoutLine {
   const sources: CloseoutSourceRecord[] = [];
   let total = 0;
@@ -305,6 +404,11 @@ function wasteLine(input: CloseoutProjectionInput): CloseoutLine {
     total += amount;
     sources.push(ref("wasteRecords", row, amount, "Waste logged"));
   }
+  const form = foodWasteForm(input);
+  if (form)
+    sources.push(
+      ref("fieldConfirmations", form.form, 0, leftoverText(form.muda)),
+    );
   return {
     key: "waste",
     label: "Waste",
@@ -455,6 +559,23 @@ function headcountLine(input: CloseoutProjectionInput): CloseoutLine {
   const checkedIn = live(input.guests).filter(
     (guest) => guest.checkedInAt != null,
   );
+  // Guests checked in one by one beat the lead's estimate; with no check-in,
+  // the count on the signed food waste form answers the line.
+  const form = checkedIn.length === 0 ? foodWasteForm(input) : null;
+  const counted = form?.muda.attendance;
+  if (form && counted != null && Number.isFinite(counted) && counted >= 0) {
+    return {
+      key: "headcount",
+      label: "Guests who came",
+      planned: input.event.expectedHeadcount ?? null,
+      actual: Math.trunc(counted),
+      complete: true,
+      note: "Counted on the food waste form",
+      sources: [
+        ref("fieldConfirmations", form.form, 0, "Guests counted by the lead"),
+      ],
+    };
+  }
   return {
     key: "headcount",
     label: "Guests who came",

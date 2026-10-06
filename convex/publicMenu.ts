@@ -9,6 +9,7 @@ import {
   type MenuPriceLabel,
 } from "../src/lib/catalogEligibility";
 import { clockNow } from "./lib/clockNow";
+import { dietTagsOnly } from "./lib/dietaryTags";
 
 // Anonymous public menu (spec CF-4-2). It reads the SAME catalog the proposal
 // builder prices from — published menus and their active dishes — through the
@@ -41,6 +42,10 @@ export type PublicMenu = {
   maxGuests: number;
   availableFrom: number | null;
   availableUntil: number | null;
+  /** One server for this many guests; null = not stated. */
+  guestsPerServer: number | null;
+  /** Courses where each guest picks one dish. */
+  pickOneCourses: string[];
   /** Why this menu does not fit the given event; empty when it does. */
   notAvailableBecause: string[];
   dishes: PublicMenuDish[];
@@ -117,7 +122,7 @@ export const getPublicMenu = query({
                 description: dish.description ?? null,
                 course: md.course ?? dish.course ?? null,
                 serviceStyle: md.serviceStyle ?? dish.serviceStyle ?? null,
-                dietaryTags: dish.dietaryTags ?? [],
+                dietaryTags: dietTagsOnly(dish.dietaryTags),
                 allergens: allergensByDish.get(dish._id) ?? [],
                 price: effectiveSellingPrice(md, now),
               },
@@ -133,6 +138,8 @@ export const getPublicMenu = query({
           maxGuests: menu.maxGuests,
           availableFrom: menu.availableFrom ?? null,
           availableUntil: menu.availableUntil ?? null,
+          guestsPerServer: menu.guestsPerServer ?? null,
+          pickOneCourses: menu.pickOneCourses ?? [],
           notAvailableBecause: menuIneligibleReasons(menu, {
             eventDate,
             guestCount,
@@ -145,6 +152,41 @@ export const getPublicMenu = query({
           (a.category ?? "").localeCompare(b.category ?? "") ||
           a.name.localeCompare(b.name),
       );
+  },
+});
+
+export type PublicMenuCompany = {
+  name: string;
+  address: string | null;
+  phone: string | null;
+  website: string | null;
+  logoUrl: string | null;
+};
+
+/**
+ * The company head and foot of the printed menu: the Branding name, address,
+ * phone, website and logo of the same organization getPublicMenu serves.
+ * Nothing else.
+ */
+export const getPublicMenuCompany = query({
+  args: {},
+  handler: async (ctx): Promise<PublicMenuCompany | null> => {
+    const org = await ctx.db
+      .query("organizations")
+      .filter((q) => q.eq(q.field("status"), "active"))
+      .first();
+    if (!org) return null;
+    const logoId =
+      typeof org.brandLogoStorageId === "string"
+        ? ctx.db.system.normalizeId("_storage", org.brandLogoStorageId)
+        : null;
+    return {
+      name: org.brandDisplayName?.trim() || org.name,
+      address: org.brandAddress?.trim() || null,
+      phone: org.brandPhone?.trim() || null,
+      website: org.brandWebsite?.trim() || null,
+      logoUrl: logoId ? await ctx.storage.getUrl(logoId) : null,
+    };
   },
 });
 

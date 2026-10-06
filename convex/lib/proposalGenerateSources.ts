@@ -73,6 +73,8 @@ export async function readEventSources(
 
   const sources: LineSource[] = [];
   const unpriced: DraftIssue[] = [];
+  // Dishes with no single per-dish price, kept so a per-guest menu can price them.
+  const noDishPrice: { row: Doc<"eventDishes">; name: string; issue: DraftIssue }[] = [];
   for (const [index, row] of dishes.entries()) {
     const dish = await ctx.db.get(row.dishId);
     const name = row.dishName?.trim() || (dish && dish.tenantId === tenantId ? dish.name : "") || "Dish";
@@ -88,14 +90,16 @@ export async function readEventSources(
     }
     const prices = new Set(offers.map((offer) => Math.round(offer.price * 100)));
     if (prices.size !== 1) {
-      unpriced.push({
+      const issue: DraftIssue = {
         code: prices.size === 0 ? "dish_no_menu_price" : "dish_menu_price_differs",
         message:
           prices.size === 0
             ? `${name} has no price on a published menu, so it is not on the proposal. Price it on a menu, then build again.`
             : `${name} has different prices on different menus, so it is not on the proposal. Add it by hand with the price you want.`,
         recordIds: [String(row._id)],
-      });
+      };
+      if (prices.size === 0) noDishPrice.push({ row, name, issue });
+      else unpriced.push(issue);
       continue;
     }
     const offer = offers[0];
@@ -117,7 +121,98 @@ export async function readEventSources(
       ],
     });
   }
+  unpriced.push(
+    ...(await perGuestMenuLines(ctx, tenantId, noDishPrice, sources, dishes.length)),
+  );
   return { event, venue, facts, sources, unpriced };
+}
+
+/**
+ * Caterers price most menus per guest, not per dish. When the event serves
+ * every dish of a published menu that has a per-guest price, that menu becomes
+ * one per-guest line (plus its base price, if any). A dish only covered by part
+ * of such a menu stays an issue that names the menu, so nobody is charged a full
+ * menu price for half of it.
+ */
+async function perGuestMenuLines(
+  ctx: Pick<QueryCtx, "db">,
+  tenantId: string,
+  pending: { row: Doc<"eventDishes">; name: string; issue: DraftIssue }[],
+  sources: LineSource[],
+  firstSortOrder: number,
+): Promise<DraftIssue[]> {
+  const menus = new Map<string, { menu: Doc<"menus">; dishIds: Set<string> }>();
+  for (const { row } of pending) {
+    for (const menuDish of await ctx.db
+      .query("menuDishes")
+      .withIndex("by_dishId", (q) => q.eq("dishId", row.dishId))
+      .collect()) {
+      if (menuDish.tenantId !== tenantId || !live(menuDish) || menuDish.removedAt != null) continue;
+      const key = String(menuDish.menuId);
+      if (menus.has(key)) continue;
+      const menu = await ctx.db.get(menuDish.menuId);
+      if (!menu || menu.tenantId !== tenantId || !live(menu)) continue;
+      if (String(menu.status) !== "published" || !(Number(menu.pricePerPerson) > 0)) continue;
+      const dishIds = new Set(
+        (
+          await ctx.db
+            .query("menuDishes")
+            .withIndex("by_menuId", (q) => q.eq("menuId", menu._id))
+            .collect()
+        )
+          .filter((line) => line.tenantId === tenantId && live(line) && line.removedAt == null)
+          .map((line) => String(line.dishId)),
+      );
+      menus.set(key, { menu, dishIds });
+    }
+  }
+  const onEvent = new Set(pending.map(({ row }) => String(row.dishId)));
+  const covered = new Set<string>();
+  let sortOrder = firstSortOrder;
+  // Biggest menu first, so a smaller menu inside it is never charged as well.
+  const byReach = [...menus.values()].sort((a, b) => b.dishIds.size - a.dishIds.size);
+  for (const { menu, dishIds } of byReach) {
+    if (dishIds.size === 0 || [...dishIds].some((id) => !onEvent.has(id))) continue;
+    if ([...dishIds].every((id) => covered.has(id))) continue;
+    for (const id of dishIds) covered.add(id);
+    const lines: [string, string, number][] = [
+      [`menu:${menu._id}`, "per_person", Number(menu.pricePerPerson)],
+    ];
+    if (Number(menu.basePrice) > 0) {
+      lines.push([`menuBase:${menu._id}`, "flat", Number(menu.basePrice)]);
+    }
+    for (const [sourceKey, pricingBasis, unitPrice] of lines) {
+      const values = {
+        description:
+          pricingBasis === "per_person" ? `${menu.name} (per guest)` : `${menu.name} (base price)`,
+        pricingBasis,
+        unitPrice,
+        quantity: 1,
+        menuDishId: null,
+      };
+      sources.push({
+        sourceKey,
+        fingerprint: JSON.stringify([String(menu._id), values]),
+        values,
+        sortOrder: sortOrder++,
+        sources: [{ table: "menus", id: String(menu._id) }],
+      });
+    }
+  }
+  const issues: DraftIssue[] = [];
+  for (const { row, name, issue } of pending) {
+    if (covered.has(String(row.dishId))) continue;
+    const partial = [...menus.values()].find(({ dishIds }) => dishIds.has(String(row.dishId)));
+    issues.push(
+      partial
+        ? {
+            ...issue,
+            message: `${name} is on ${partial.menu.name}, which is priced per guest, but this event serves only part of that menu. Add a per-guest line with the price you want.`,
+          }
+        : issue,
+    );
+  }
+  return issues;
 }
 
 /** Every line row of a proposal (removed ones too) keyed by id. */

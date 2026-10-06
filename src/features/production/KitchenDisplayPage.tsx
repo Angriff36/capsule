@@ -20,6 +20,7 @@ import { useEventsById, usePickerEvents } from "../facilities/useEventsById";
 import { BatchAllocationsPanel } from "./BatchAllocationsPanel";
 import { BatchCompletionFields } from "./BatchCompletionFields";
 import { BatchShortfallPanel } from "./BatchShortfallPanel";
+import { usePrepLabelPrint } from "./usePrepLabelPrint";
 import {
   batchCompletionArgs,
   type BatchCompletionEntry,
@@ -33,6 +34,8 @@ import {
   type PrepTaskDependencySummary,
 } from "./PrepTaskDependencies";
 import { prepQuantityLabel } from "../kitchen/prepQuantityLabel";
+import { LifecycleStepper } from "../../ui/LifecycleStepper";
+import { productionBatchLifecycle } from "../../lib/lifecycle/lifecycleDefinitions";
 import { NO_PREP_TIME, prepMadeSoFarLabel } from "../kitchen/prepTiming";
 import {
   KitchenDisplayTaskFacts,
@@ -65,6 +68,9 @@ type BoardItem = {
   status: string;
   dueAt: number | null;
   plannedYield?: number;
+  componentId?: string;
+  startedAt?: number | null;
+  preparedById?: string | null;
   dependency?: PrepTaskDependencySummary;
   facts?: Omit<KitchenDisplayTaskFactsProps, "taskId" | "title" | "status">;
 };
@@ -123,6 +129,7 @@ export function KitchenDisplayPage() {
   >({});
   const optimistic = useOptimisticStatus();
   const { prompt, host } = useActionPrompt(busy != null);
+  const labels = usePrepLabelPrint(prompt);
   const now = Date.now();
 
   const isLoading =
@@ -204,6 +211,9 @@ export function KitchenDisplayPage() {
         status: optimistic.statusOf(batch._id, String(batch.status)),
         dueAt: null,
         plannedYield: batch.plannedYield,
+        componentId: batch.componentId,
+        startedAt: batch.startedAt ?? null,
+        preparedById: batch.startedById ?? null,
       })),
   ]
     .filter(
@@ -395,6 +405,13 @@ export function KitchenDisplayPage() {
                     }
                   />
                 ) : null}
+                {item.kind === "batch" ? (
+                  <LifecycleStepper
+                    definition={productionBatchLifecycle}
+                    status={item.status}
+                    actions={[]}
+                  />
+                ) : null}
                 {bumpAction ? (
                   <button
                     className="kds-bump"
@@ -426,6 +443,25 @@ export function KitchenDisplayPage() {
                     onClick={() => cancelBatch(item)}
                   >
                     Cancel batch
+                  </button>
+                ) : null}
+                {item.kind === "batch" ? (
+                  <button
+                    type="button"
+                    className="kds-secondary"
+                    disabled={busy != null || !labels.ready}
+                    aria-label={`Print container label for ${item.title}`}
+                    onClick={() =>
+                      void labels.print({
+                        product: item.title,
+                        detail: eventName(item.eventId),
+                        componentId: item.componentId,
+                        preparedAt: item.startedAt,
+                        preparedById: item.preparedById,
+                      })
+                    }
+                  >
+                    Print label
                   </button>
                 ) : null}
               </li>

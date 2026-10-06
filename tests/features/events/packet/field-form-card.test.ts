@@ -32,6 +32,7 @@ const form = (over: Partial<FieldFormRow>): FieldFormRow => ({
   observedAt: null,
   outcome: null,
   note: null,
+  answers: null,
   photoUrl: null,
   checkedBy: null,
   secondObservedAt: null,
@@ -64,7 +65,29 @@ describe("day-of form card", () => {
 
   it("a photo form asks for a photo; a note form asks what you saw", () => {
     expect(render(form({ evidence: "photo" }))).toContain('type="file"');
-    expect(render(form({ evidence: "note" }))).toContain("What you saw");
+    expect(
+      render(form({ formKey: "field.after-event", evidence: "note" })),
+    ).toContain("What you saw");
+  });
+
+  it("a paper form lists its lines to tick; unticked lines ask why", () => {
+    const html = render(form({}));
+    expect(html).toContain("Found the person in charge");
+    expect(html).toContain("10 lines are not ticked");
+    expect(html).toContain("What was not done, and why");
+  });
+
+  it("the food waste form counts leftovers against the menu", () => {
+    const html = render(
+      form({
+        formKey: "field.muda",
+        evidence: "note",
+        expectedItems: "Coconut Prawns; Beef Satay",
+      }),
+    );
+    expect(html).toContain("Menu: Coconut Prawns; Beef Satay");
+    expect(html).toContain("About how many guests came?");
+    expect(html).toContain("Anything else (optional)");
   });
 
   it("the first signer is not offered the second check; someone else is", () => {

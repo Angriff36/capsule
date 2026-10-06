@@ -54,7 +54,7 @@ const PACK_LIST_ACTIONS = [
     lifecycle: PackListMarkLoadedLifecycle,
   },
   { key: "dispatch", label: "Dispatch", lifecycle: PackListDispatchLifecycle },
-  { key: "cancel", label: "Cancel", lifecycle: PackListCancelLifecycle },
+  { key: "cancel", label: "Cancel list", lifecycle: PackListCancelLifecycle },
 ] as const;
 
 const PACK_ITEM_ACTIONS = [
@@ -86,12 +86,21 @@ const DELIVERY_ACTIONS = [
     label: "Mark failed",
     lifecycle: DeliveryMarkFailedLifecycle,
   },
-  { key: "cancel", label: "Cancel", lifecycle: DeliveryCancelLifecycle },
+  {
+    key: "cancel",
+    label: "Cancel delivery",
+    lifecycle: DeliveryCancelLifecycle,
+  },
 ] as const;
 
 export class LogisticsLifecyclePolicy {
   packListActions(status: string) {
-    return available(status, PACK_LIST_ACTIONS);
+    // Start packing on a packed or loaded list reopens it.
+    return available(status, PACK_LIST_ACTIONS).map((action) =>
+      action.key === "startPacking" && status !== "draft"
+        ? { ...action, label: "Back to packing" }
+        : action,
+    );
   }
 
   packItemActions(status: string) {

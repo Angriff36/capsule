@@ -55,7 +55,9 @@ import { RecipeNotes } from "./RecipeNotes";
 import "./DishRecipe.css";
 import { DishPrimaryImageUploader } from "../attachments/DishPrimaryImageUploader";
 import { KitchenBookNav } from "./KitchenBookNav";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import { dishPath, kitchenCatalogPath, componentPath } from "./kitchenRoutes";
+import { dietTagsOnly } from "../../../convex/lib/dietaryTags";
 
 const policy = new CulinaryLifecyclePolicy();
 
@@ -241,12 +243,12 @@ export function DishDetailPage() {
 
   return (
     <article className="culinary-document culinary-document-compact dish-recipe">
-      <Link
-        to={kitchenCatalogPath("dishes")}
+      <ReturnToListLink
+        fallback={kitchenCatalogPath("dishes")}
         className="culinary-studio-back relative z-[2]"
       >
         ← Dishes
-      </Link>
+      </ReturnToListLink>
       <KitchenBookNav />
       {failure ? (
         <div className="mt-4">
@@ -331,9 +333,7 @@ export function DishDetailPage() {
           <div>
             <dt>Dietary</dt>
             <dd data-testid="dish-dietary-tags">
-              {dish.dietaryTags && dish.dietaryTags.length > 0
-                ? dish.dietaryTags.join(", ")
-                : "—"}
+              {dietTagsOnly(dish.dietaryTags).join(", ") || "—"}
             </dd>
           </div>
         </dl>

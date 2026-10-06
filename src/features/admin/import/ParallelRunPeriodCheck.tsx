@@ -10,6 +10,7 @@ import type { ComparisonSummary } from "@/lib/parallelRunCompare";
 import { useActionFailure } from "../../../ui/action-result";
 import { classifyCommandFailure } from "../../events/CommandFailure";
 import { FailureBanner } from "../../events/FailureBanner";
+import { formatDateTime } from "../../../lib/format";
 
 export interface PeriodCheckResult {
   comparedAt: number;
@@ -117,7 +118,7 @@ export function ParallelRunPeriodCheck({
             {money(last.summary.tpp.revenue)} · Capsule{" "}
             {last.summary.capsule.events} events,{" "}
             {money(last.summary.capsule.revenue)} · checked{" "}
-            {new Date(last.comparedAt).toLocaleString()}
+            {formatDateTime(last.comparedAt)}
           </p>
           {last.verdict.reasons.length > 0 && (
             <ul className="mt-1 list-disc pl-5 text-xs">

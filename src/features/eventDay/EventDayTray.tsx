@@ -25,24 +25,24 @@ function Cell({
   return (
     <button
       type="button"
-      className="evd-tray-cell"
+      className="eday-tray-cell"
       disabled={item == null}
       onClick={() => item && onOpen(item.key)}
     >
-      <span className="evd-tray-head" style={{ color: dotColor }}>
-        <span className="evd-tray-dot" style={{ background: dotColor }} />
+      <span className="eday-tray-head" style={{ color: dotColor }}>
+        <span className="eday-tray-dot" style={{ background: dotColor }} />
         {head}
       </span>
       {item ? (
         <>
-          <p className="evd-tray-label">
+          <p className="eday-tray-label">
             {item.label}
             {extra != null && extra > 0 ? ` +${extra}` : ""}
           </p>
-          <p className="evd-tray-sub">{item.caption}</p>
+          <p className="eday-tray-sub">{item.caption}</p>
         </>
       ) : (
-        <p className="evd-tray-sub" style={{ marginTop: "0.35rem" }}>
+        <p className="eday-tray-sub" style={{ marginTop: "0.35rem" }}>
           {empty}
         </p>
       )}
@@ -53,24 +53,24 @@ function Cell({
 /** Now / Next / Blockers shelf under the map. */
 export function EventDayTray({ now, next, blockers, onOpen }: Props) {
   return (
-    <div className="evd-tray">
+    <div className="eday-tray">
       <Cell
         head="Now"
-        dotColor="var(--evd-ready)"
+        dotColor="var(--eday-ready)"
         item={now}
         empty="Nothing in motion"
         onOpen={onOpen}
       />
       <Cell
         head="Next"
-        dotColor="var(--evd-active)"
+        dotColor="var(--eday-active)"
         item={next}
         empty="Nothing queued"
         onOpen={onOpen}
       />
       <Cell
         head="Blockers"
-        dotColor="var(--evd-blocked)"
+        dotColor="var(--eday-blocked)"
         item={blockers[0] ?? null}
         empty="None"
         extra={blockers.length - 1}

@@ -79,15 +79,22 @@ export function ContractsPage() {
     const form = event.currentTarget;
     const data = new FormData(form);
     const eventId = String(data.get("eventId") || "").trim();
-    const clientId = String(data.get("clientId") || "").trim();
-    const title = String(data.get("title") || "").trim();
     const eventRow = events?.find((row) => row._id === eventId);
-    if (!eventId || !clientId || !title) {
-      setFailure(new Error("Event, client, and title are required."));
+    // Left blank, the title is the usual one for that event.
+    const title =
+      String(data.get("title") || "").trim() ||
+      (eventRow?.title ? `Catering agreement - ${eventRow.title}` : "");
+    // The contract is with the event's own client; asking again only let
+    // someone pick a different one and be refused.
+    const clientId = String(eventRow?.clientId ?? "");
+    if (!eventId || !title) {
+      setFailure(new Error("Pick an event and give the contract a title."));
       return;
     }
-    if (eventRow && eventRow.clientId !== clientId) {
-      setFailure(new Error("Selected client must own the selected event."));
+    if (!clientId) {
+      setFailure(
+        new Error("This event has no client yet. Add one on the event first."),
+      );
       return;
     }
     void run("draft-contract", async () => {
@@ -246,21 +253,11 @@ export function ContractsPage() {
                 </select>
               </label>
               <label>
-                Client
-                <select name="clientId" required defaultValue="">
-                  <option value="" disabled>
-                    Select client
-                  </option>
-                  {activeClients.map((row) => (
-                    <option key={row._id} value={row._id}>
-                      {clientDisplayName(row._id, clients)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
                 Title
-                <input name="title" required />
+                <input
+                  name="title"
+                  placeholder="Catering agreement - (event name)"
+                />
               </label>
               <label>
                 Document URL

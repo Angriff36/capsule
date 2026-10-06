@@ -1,4 +1,9 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import {
+  InlineReferenceCreateSheet,
+  useCanCreateInlineReference,
+} from "../../ui/InlineReferenceCreateSheet";
+import { SearchSelect } from "../../ui/SearchSelect";
 import { ADD_NEW_CHOICE } from "./inlineCatalogChoice";
 import { VENDOR_CONTACT_ROLES } from "./vendorContactRoles";
 import { suggestOrderNumber } from "./vendorOrderNumber";
@@ -8,6 +13,7 @@ type VendorOption = {
   _id: string;
   name: string;
   status: string;
+  email?: string | null;
 };
 
 type EventOption = {
@@ -41,9 +47,12 @@ export const NEW_VENDOR_FIELD = "newVendorName";
 function OrderVendorField({
   vendors,
   loading,
+  renderPicker,
 }: {
   vendors: VendorOption[];
   loading: boolean;
+  /** The vendor picker; `startAdding` switches to the new-vendor name box. */
+  renderPicker: (startAdding: () => void) => ReactNode;
 }) {
   const [adding, setAdding] = useState(false);
   if (loading) {
@@ -89,33 +98,11 @@ function OrderVendorField({
       </label>
     );
   }
-  return (
-    <label className="field-label">
-      Vendor
-      <select
-        name="vendorId"
-        className="input"
-        required
-        autoFocus
-        defaultValue={vendors.length === 1 ? vendors[0]!._id : ""}
-        onChange={(event) => {
-          if (event.target.value === ADD_NEW_CHOICE) setAdding(true);
-        }}
-      >
-        <option value="">Select vendor</option>
-        {vendors.map((vendor) => (
-          <option key={vendor._id} value={vendor._id}>
-            {vendor.name}
-          </option>
-        ))}
-        <option value={ADD_NEW_CHOICE}>New vendor…</option>
-      </select>
-    </label>
-  );
+  return renderPicker(() => setAdding(true));
 }
 
 const FORM_TITLES: Record<PurchasingFormKind, string> = {
-  vendor: "Onboard vendor",
+  vendor: "Add a vendor",
   order: "Open vendor order",
   contact: "Add vendor contact",
 };
@@ -131,141 +118,222 @@ export function PurchasingCommandForm({
   onSubmit,
 }: PurchasingCommandFormProps) {
   const workingId = useWorkingEventId();
+  const [vendorId, setVendorId] = useState(contactVendorId ?? "");
+  const [createVendorName, setCreateVendorName] = useState<string | null>(null);
+  const [temporaryVendor, setTemporaryVendor] = useState<{
+    id: string;
+    label: string;
+  } | null>(null);
+  const canCreateVendor = useCanCreateInlineReference("vendor");
+  useEffect(() => setVendorId(contactVendorId ?? ""), [contactVendorId]);
+  const vendorOptions = [
+    ...(form === "contact"
+      ? activeVendors
+      : activeVendors.filter((vendor) => vendor.status === "active")
+    ).map((vendor) => ({
+      id: vendor._id,
+      label: vendor.name,
+      email: vendor.email,
+    })),
+    ...(temporaryVendor &&
+    !activeVendors.some((vendor) => vendor._id === temporaryVendor.id)
+      ? [temporaryVendor]
+      : []),
+  ];
+  const soleVendorId =
+    form === "order" && vendorOptions.length === 1 ? vendorOptions[0]!.id : "";
   return (
-    <form className="supply-form" onSubmit={onSubmit}>
-      <div className="supply-form-heading">
-        <div>
-          <p className="eyebrow">Purchasing</p>
-          <h2>{FORM_TITLES[form]}</h2>
+    <>
+      <form className="supply-form" onSubmit={onSubmit}>
+        <div className="supply-form-heading">
+          <div>
+            <p className="eyebrow">Purchasing</p>
+            <h2>{FORM_TITLES[form]}</h2>
+          </div>
+          <div className="supply-row-actions">
+            <button type="button" className="btn btn-ghost" onClick={onCancel}>
+              Cancel
+            </button>
+            <button className="btn btn-primary" disabled={busy}>
+              {busy ? "Working…" : "Create"}
+            </button>
+          </div>
         </div>
-        <div className="supply-row-actions">
-          <button type="button" className="btn btn-ghost" onClick={onCancel}>
-            Cancel
-          </button>
-          <button className="btn btn-primary" disabled={busy}>
-            {busy ? "Working…" : "Create"}
-          </button>
-        </div>
-      </div>
-      <div className="supply-form-grid">
-        {form === "vendor" ? (
-          <>
-            <label className="field-label">
-              Vendor name
-              <input name="name" className="input" required autoFocus />
-            </label>
-            <label className="field-label">
-              Email
-              <input name="email" type="email" className="input" />
-            </label>
-            <label className="field-label">
-              Phone
-              <input name="phone" className="input" />
-            </label>
-            <label className="field-label">
-              Payment terms (days)
-              <input
-                name="paymentTermsDays"
-                type="number"
-                className="input"
-                defaultValue={30}
-                min={0}
-                required
-              />
-            </label>
-            <label className="field-label supply-span-2">
-              Notes
-              <textarea name="notes" className="input" rows={2} />
-            </label>
-          </>
-        ) : form === "contact" ? (
-          <>
-            <label className="field-label">
-              Vendor
-              <select
-                name="vendorId"
-                className="input"
-                defaultValue={contactVendorId ?? ""}
-                required
-              >
-                <option value="">Select vendor</option>
-                {activeVendors.map((vendor) => (
-                  <option key={vendor._id} value={vendor._id}>
-                    {vendor.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field-label">
-              Contact name
-              <input name="name" className="input" required autoFocus />
-            </label>
-            <label className="field-label">
-              Role
-              <select name="role" className="input" defaultValue="general">
-                {VENDOR_CONTACT_ROLES.map((role) => (
-                  <option key={role.value} value={role.value}>
-                    {role.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field-label">
-              Phone
-              <input name="phone" className="input" />
-            </label>
-            <label className="field-label">
-              Email
-              <input name="email" type="email" className="input" />
-            </label>
-            <label className="field-label supply-span-2">
-              Notes
-              <textarea name="notes" className="input" rows={2} />
-            </label>
-          </>
-        ) : (
-          <>
-            <OrderVendorField
-              loading={vendorsLoading === true}
-              vendors={activeVendors.filter(
-                (vendor) => vendor.status === "active",
-              )}
-            />
-            <label className="field-label">
-              Event (optional)
-              <select
-                key={events?.length ? "events-ready" : "events-loading"}
-                name="eventId"
-                className="input"
-                defaultValue={workingId ?? ""}
-              >
-                <option value="">General stock</option>
-                {(events ?? [])
-                  .filter((event) => event.deletedAt == null)
-                  .map((event) => (
-                    <option key={event._id} value={event._id}>
-                      {event.title}
+        <div className="supply-form-grid">
+          {form === "vendor" ? (
+            <>
+              <label className="field-label">
+                Vendor name
+                <input name="name" className="input" required autoFocus />
+              </label>
+              <label className="field-label">
+                Email
+                <input name="email" type="email" className="input" />
+              </label>
+              <label className="field-label">
+                Phone
+                <input name="phone" className="input" />
+              </label>
+              <label className="field-label">
+                Payment terms (days)
+                <input
+                  name="paymentTermsDays"
+                  type="number"
+                  className="input"
+                  defaultValue={30}
+                  min={0}
+                  required
+                />
+              </label>
+              <label className="field-label supply-span-2">
+                Notes
+                <textarea name="notes" className="input" rows={2} />
+              </label>
+            </>
+          ) : form === "contact" ? (
+            <>
+              <label className="field-label">
+                Vendor
+                <SearchSelect
+                  name="vendorId"
+                  value={vendorId}
+                  onChange={setVendorId}
+                  options={vendorOptions}
+                  required
+                  recentsKey="vendor"
+                  placeholder="Search vendors…"
+                  emptyText={
+                    canCreateVendor
+                      ? "No vendor matches - create one below."
+                      : "No vendor matches."
+                  }
+                  onCreate={canCreateVendor ? setCreateVendorName : undefined}
+                  createLabel={(name) => `Create vendor “${name}”`}
+                />
+              </label>
+              <label className="field-label">
+                Contact name
+                <input name="name" className="input" required autoFocus />
+              </label>
+              <label className="field-label">
+                Role
+                <select name="role" className="input" defaultValue="general">
+                  {VENDOR_CONTACT_ROLES.map((role) => (
+                    <option key={role.value} value={role.value}>
+                      {role.label}
                     </option>
                   ))}
-              </select>
-            </label>
-            <label className="field-label">
-              Order number
-              {/* Prefilled so manual orders never land as "Unnumbered order";
-                  still editable to match a vendor's own PO scheme. */}
-              <input
-                name="orderNumber"
-                className="input"
-                defaultValue={suggestOrderNumber()}
+                </select>
+              </label>
+              <label className="field-label">
+                Phone
+                <input name="phone" className="input" />
+              </label>
+              <label className="field-label">
+                Email
+                <input name="email" type="email" className="input" />
+              </label>
+              <label className="field-label supply-span-2">
+                Notes
+                <textarea name="notes" className="input" rows={2} />
+              </label>
+            </>
+          ) : (
+            <>
+              <OrderVendorField
+                loading={vendorsLoading === true}
+                vendors={activeVendors.filter(
+                  (vendor) => vendor.status === "active",
+                )}
+                renderPicker={(startAdding) => (
+                  <label className="field-label">
+                    Vendor
+                    <SearchSelect
+                      name="vendorId"
+                      value={vendorId || soleVendorId}
+                      onChange={(id) => {
+                        if (id === ADD_NEW_CHOICE) startAdding();
+                        else setVendorId(id);
+                      }}
+                      options={
+                        canCreateVendor
+                          ? vendorOptions
+                          : [
+                              ...vendorOptions,
+                              { id: ADD_NEW_CHOICE, label: "New vendor…" },
+                            ]
+                      }
+                      required
+                      autoFocus
+                      recentsKey="vendor"
+                      placeholder="Search vendors…"
+                      emptyText={
+                        canCreateVendor
+                          ? "No vendor matches - create one below."
+                          : "No vendor matches."
+                      }
+                      onCreate={
+                        canCreateVendor ? setCreateVendorName : undefined
+                      }
+                      createLabel={(name) => `Create vendor “${name}”`}
+                    />
+                  </label>
+                )}
               />
-            </label>
-            <label className="field-label supply-span-2">
-              Notes
-              <textarea name="notes" className="input" rows={2} />
-            </label>
-          </>
-        )}
-      </div>
-    </form>
+              <label className="field-label">
+                Event (optional)
+                <select
+                  key={events?.length ? "events-ready" : "events-loading"}
+                  name="eventId"
+                  className="input"
+                  defaultValue={workingId ?? ""}
+                >
+                  <option value="">General stock</option>
+                  {(events ?? [])
+                    .filter((event) => event.deletedAt == null)
+                    .map((event) => (
+                      <option key={event._id} value={event._id}>
+                        {event.title}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <label className="field-label">
+                Order number
+                {/* Prefilled so manual orders never land as "Unnumbered order";
+                  still editable to match a vendor's own PO scheme. */}
+                <input
+                  name="orderNumber"
+                  className="input"
+                  defaultValue={suggestOrderNumber()}
+                />
+              </label>
+              <label className="field-label supply-span-2">
+                Notes
+                <textarea name="notes" className="input" rows={2} />
+              </label>
+            </>
+          )}
+        </div>
+      </form>
+      {createVendorName ? (
+        <InlineReferenceCreateSheet
+          kind="vendor"
+          open
+          initialName={createVendorName}
+          existingOptions={vendorOptions}
+          onClose={() => setCreateVendorName(null)}
+          onUseExisting={(id) => {
+            setVendorId(id);
+            setCreateVendorName(null);
+          }}
+          onCreated={(record) => {
+            setTemporaryVendor(record);
+            setVendorId(record.id);
+            setCreateVendorName(null);
+          }}
+        />
+      ) : null}
+    </>
   );
 }

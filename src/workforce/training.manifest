@@ -26,6 +26,10 @@ entity TrainingModule mixin TenantScoped, SoftDeletable {
   property required status: TrainingModuleStatus = "active"
   property definedAt: datetime?
   property retiredAt: datetime?
+  // Mangia "Training Doc": the steps a trainer initials, one per line (a line
+  // starting "- " is detail under the step above), and the quiz questions.
+  property steps: string?
+  property quiz: string?
 
   hasMany completions: TrainingCompletion
   hasMany shiftTypes: ShiftType
@@ -44,7 +48,9 @@ entity TrainingModule mixin TenantScoped, SoftDeletable {
     name: string,
     category: TrainingModuleCategory,
     passingScore: int,
-    optional description: string
+    optional description: string,
+    optional steps: string,
+    optional quiz: string
   ) {
     guard self.definedAt == null
     guard self.deletedAt == null
@@ -55,6 +61,8 @@ entity TrainingModule mixin TenantScoped, SoftDeletable {
     mutate category = category
     mutate passingScore = passingScore
     mutate description = description
+    mutate steps = steps
+    mutate quiz = quiz
     mutate status = "active"
     mutate definedAt = now()
     emit TrainingModuleDefined {
@@ -64,6 +72,15 @@ entity TrainingModule mixin TenantScoped, SoftDeletable {
       category: category
       passingScore: passingScore
     }
+  }
+
+  command setTrainingDoc(optional steps: string, optional quiz: string) {
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    mutate steps = steps != null and length(trim(steps)) > 0 ? steps : null
+    mutate quiz = quiz != null and length(trim(quiz)) > 0 ? quiz : null
+    emit TrainingDocSet { trainingModuleId: self.id tenantId: self.tenantId }
   }
 
   command retire() {
@@ -151,6 +168,169 @@ entity TrainingCompletion mixin TenantScoped, SoftDeletable {
   }
 
   store TrainingCompletion in durable
+}
+
+// Skills matrix (Mangia "Utility Skills Matrix Criteria", 10-24-22): how far
+// one person is in one area, 0 no knowledge, 1 beginner (works under a
+// trainer), 2 independent, 3 expert, 4 trainer. The area is a training
+// module. One row per person and module; a new rating changes it in place.
+entity SkillLevel mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required personId: uuid
+  property required trainingModuleId: uuid
+  property required level: int = 0
+  property note: string?
+  property ratedAt: datetime?
+  // Who gave the rating. Empty when that account is not linked to a staff
+  // profile; rating is never blocked for that.
+  property ratedByPersonId: uuid?
+
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+  belongsTo trainingModule: TrainingModule fields [tenantId, trainingModuleId] references [tenantId, id]
+
+  constraint skillLevelRange: self.level >= 0 and self.level <= 4 "Pick a level from 0 to 4."
+
+  default policy skillLevelRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may see skill levels"
+  default policy skillLevelWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may update skill levels"
+  default policy skillLevelExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may change skill levels"
+
+  command rate(
+    personId: uuid,
+    trainingModuleId: uuid,
+    level: int,
+    optional note: string
+  ) {
+    guard self.ratedAt == null
+    guard self.deletedAt == null
+    guard self.person != null
+    guard self.trainingModule != null and self.trainingModule.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint rateSkillLevelRange: level >= 0 and level <= 4 "Pick a level from 0 to 4."
+    mutate personId = personId
+    mutate trainingModuleId = trainingModuleId
+    mutate level = level
+    mutate note = note != null and length(trim(note)) > 0 ? trim(note) : null
+    mutate ratedAt = now()
+    mutate ratedByPersonId = user.personId
+    emit SkillLevelRated {
+      skillLevelId: self.id
+      tenantId: self.tenantId
+      personId: personId
+      trainingModuleId: trainingModuleId
+      level: level
+    }
+  }
+
+  command changeLevel(level: int, optional note: string) {
+    guard self.ratedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint changeSkillLevelRange: level >= 0 and level <= 4 "Pick a level from 0 to 4."
+    mutate level = level
+    mutate note = note != null and length(trim(note)) > 0 ? trim(note) : null
+    mutate ratedAt = now()
+    mutate ratedByPersonId = user.personId
+    emit SkillLevelRated {
+      skillLevelId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      trainingModuleId: self.trainingModuleId
+      level: level
+    }
+  }
+
+  store SkillLevel in durable
+}
+
+// Training sign-off (Mangia "Training Doc" header and initial column): one
+// trainee working through one module's steps with a trainer, from a start
+// date to an end date. Each step the trainer initials is kept with the
+// initials and the day. Steps can be initialled or cleared after the end
+// date too - the record stays correctable.
+entity TrainingSignOff mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required personId: uuid
+  property required trainingModuleId: uuid
+  property trainerPersonId: uuid?
+  property startedAt: datetime?
+  property finishedAt: datetime?
+  // One line per initialled step: "<step text>|<initials>|<epoch ms>".
+  property initialledSteps: string?
+  property required quizDone: boolean = false
+  property note: string?
+
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+  belongsTo trainingModule: TrainingModule fields [tenantId, trainingModuleId] references [tenantId, id]
+  belongsTo trainer: Person fields [tenantId, trainerPersonId] references [tenantId, id]
+
+  constraint trainingSignOffDates: self.finishedAt == null or self.startedAt == null or self.finishedAt >= self.startedAt "The end date cannot be before the start date."
+
+  default policy trainingSignOffRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may see training sign-offs"
+  default policy trainingSignOffWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may update training sign-offs"
+  default policy trainingSignOffExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may change training sign-offs"
+
+  command beginTraining(
+    personId: uuid,
+    trainingModuleId: uuid,
+    startedAt: datetime,
+    optional trainerPersonId: uuid
+  ) {
+    guard self.deletedAt == null
+    guard self.person != null
+    guard self.trainingModule != null and self.trainingModule.deletedAt == null
+    guard trainerPersonId == null or self.trainer != null
+    guard roleAllows(user.role, "workforceManageAccess")
+    mutate personId = personId
+    mutate trainingModuleId = trainingModuleId
+    mutate trainerPersonId = trainerPersonId
+    mutate startedAt = startedAt
+    emit TrainingSignOffStarted {
+      trainingSignOffId: self.id
+      tenantId: self.tenantId
+      personId: personId
+      trainingModuleId: trainingModuleId
+    }
+  }
+
+  command initialTrainingSteps(initialledSteps: string) {
+    guard self.startedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    mutate initialledSteps = length(trim(initialledSteps)) > 0 ? initialledSteps : null
+    emit TrainingStepsInitialled { trainingSignOffId: self.id tenantId: self.tenantId personId: self.personId }
+  }
+
+  command finishTraining(finishedAt: datetime, quizDone: boolean, optional note: string) {
+    guard self.startedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint finishTrainingSignOffDates: finishedAt >= self.startedAt "The end date cannot be before the start date."
+    mutate finishedAt = finishedAt
+    mutate quizDone = quizDone
+    mutate note = note != null and length(trim(note)) > 0 ? trim(note) : null
+    emit TrainingSignOffFinished {
+      trainingSignOffId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      trainingModuleId: self.trainingModuleId
+    }
+  }
+
+  command reopenTraining() {
+    guard self.finishedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    mutate finishedAt = null
+    emit TrainingSignOffReopened { trainingSignOffId: self.id tenantId: self.tenantId personId: self.personId }
+  }
+
+  store TrainingSignOff in durable
 }
 
 entity ShiftType mixin TenantScoped, SoftDeletable {
@@ -259,6 +439,28 @@ event TrainingCompleted: "training.completed" {
   assessmentScore: int
 }
 
+event SkillLevelRated: "skill_level.rated" {
+  skillLevelId: string
+  tenantId: string
+  personId: string
+  trainingModuleId: string
+  level: int
+}
+
+event TrainingSignOffStarted: "training_sign_off.started" {
+  trainingSignOffId: string
+  tenantId: string
+  personId: string
+  trainingModuleId: string
+}
+
+event TrainingSignOffFinished: "training_sign_off.finished" {
+  trainingSignOffId: string
+  tenantId: string
+  personId: string
+  trainingModuleId: string
+}
+
 event ShiftTypeDefined: "shift_type.defined" {
   shiftTypeId: string
   tenantId: string
@@ -277,3 +479,7 @@ event ShiftTypeReactivated: "shift_type.reactivated" {
   tenantId: string
   name: string
 }
+
+event TrainingDocSet: "training_module.doc_set" { trainingModuleId: string tenantId: string }
+event TrainingStepsInitialled: "training_sign_off.steps_initialled" { trainingSignOffId: string tenantId: string personId: string }
+event TrainingSignOffReopened: "training_sign_off.reopened" { trainingSignOffId: string tenantId: string personId: string }

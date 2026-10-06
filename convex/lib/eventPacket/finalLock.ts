@@ -217,6 +217,7 @@ async function fieldFormRows(
       observedAt: typeof f.observedAt === "number" ? f.observedAt : null,
       outcome: (f.outcome as "all_good" | "problem" | undefined) ?? null,
       note: (f.note as string | undefined) ?? null,
+      answers: (f.answers as string | undefined) ?? null,
       // The form only stores the id it was given: show the photo only when
       // no other company or private chat owns that file.
       photoUrl:

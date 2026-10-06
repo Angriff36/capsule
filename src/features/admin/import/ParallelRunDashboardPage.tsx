@@ -13,7 +13,7 @@ import {
   useExternalRecordLinksFor,
   useMenuLinkStats,
 } from "../../../lib/useExternalRecordLinkLists";
-import { formatCountNoun } from "../../../lib/format";
+import { formatCountNoun, formatDateTime } from "../../../lib/format";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { StatusChip, TableSkeleton } from "../../../ui/primitives";
 import { Link } from "react-router-dom";
@@ -361,9 +361,9 @@ export function ParallelRunDashboardPage() {
           </p>
           <p className="mt-2 text-xs text-ink-3">
             {comparison
-              ? `Last compared ${new Date(comparison.comparedAt).toLocaleString()}${
+              ? `Last compared ${formatDateTime(comparison.comparedAt)}${
                   comparison.nextRunAt
-                    ? ` · next check ${new Date(comparison.nextRunAt).toLocaleString()}`
+                    ? ` · next check ${formatDateTime(comparison.nextRunAt)}`
                     : " · daily checks are off"
                 }`
               : "Not compared yet. Compare now starts the daily check."}
@@ -866,7 +866,7 @@ export function ParallelRunDashboardPage() {
                         </td>
                         <td>
                           {event.updatedAt
-                            ? new Date(event.updatedAt).toLocaleString()
+                            ? formatDateTime(event.updatedAt)
                             : "—"}
                         </td>
                         <td>

@@ -230,7 +230,7 @@ entity StockCountLine mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.session != null and self.session.status == "in_progress"
     guard self.inventoryItem != null and self.inventoryItem.deletedAt == null
-    guard self.countedQuantity == self.inventoryItem.quantityOnHand
+    guard round(self.countedQuantity * 10000) == round(self.inventoryItem.quantityOnHand * 10000)
     mutate ledgerQuantityAtReconcile = self.inventoryItem.quantityOnHand
     mutate adjustmentQuantity = 0
     mutate reconciledById = user.id
@@ -256,7 +256,7 @@ entity StockCountLine mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.session != null and self.session.status == "in_progress"
     guard self.inventoryItem != null and self.inventoryItem.deletedAt == null
-    guard self.countedQuantity != self.inventoryItem.quantityOnHand
+    guard round(self.countedQuantity * 10000) != round(self.inventoryItem.quantityOnHand * 10000)
     constraint stockCountVarianceReasonRequired: length(trim(reason)) > 0 "Say why this count doesn't match what's on hand."
     compute ledgerQuantity = self.inventoryItem.quantityOnHand
     compute adjustmentQuantity = self.countedQuantity - ledgerQuantity

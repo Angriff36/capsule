@@ -247,6 +247,8 @@ export type EventDayPackList = {
   deletedAt: number | null;
   status: string | null;
   name: string | null;
+  /** Bin sheet JSON (lid colours), src/features/logistics/packBins.ts. */
+  binSheet?: string | null;
 };
 
 export type EventDayPackListItem = {
@@ -257,6 +259,8 @@ export type EventDayPackListItem = {
   description: string | null;
   requiredQuantity: number | null;
   unit: string | null;
+  /** Number of the black bin the line was packed in. */
+  binNumber?: number | null;
 };
 
 export type EventDayPerson = {

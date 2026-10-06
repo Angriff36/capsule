@@ -146,7 +146,7 @@ export function LiveReportWorkspace({
           </select>
         </label>
         <label>
-          <span>Visualization</span>
+          <span>Show as</span>
           <select
             className="input"
             value={chartType}

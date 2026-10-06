@@ -205,11 +205,11 @@ export function StaffUtilizationDashboard({
     <div className="operations-stage supply-stage staff-utilization-stage">
       <header className="supply-masthead staff-utilization-masthead">
         <div>
-          <p className="eyebrow">Staff · Capacity intelligence</p>
-          <h1 className="display-title mt-2">Hours with a pulse.</h1>
+          <p className="eyebrow">Staff · Hours</p>
+          <h1 className="display-title mt-2">How staff time is used.</h1>
           <p className="mt-3 max-w-180 text-ink-2">
-            Compare committed shifts with confirmed work, see how much time was
-            event-billable, and spot thin schedules before service gets busy.
+            Compare planned shifts with confirmed work, see how much time was
+            worked on events, and spot thin schedules before service gets busy.
           </p>
         </div>
         <div className="staff-utilization-range" aria-label="Displayed period">
@@ -319,7 +319,7 @@ export function StaffUtilizationDashboard({
                   ? "—"
                   : `${percent.format(report.utilizationPercent)}%`}
               </strong>
-              <small>event-linked ÷ confirmed hours</small>
+              <small>event hours out of all confirmed hours</small>
             </div>
             <div data-testid="summary-billable-hours">
               <span>Billable hours</span>
@@ -340,9 +340,13 @@ export function StaffUtilizationDashboard({
               data-testid="summary-under-scheduled"
             >
               <span>Under scheduled</span>
-              <strong>{report.underScheduledCount}</strong>
+              <strong>
+                {weeklyTargetHours > 0 ? report.underScheduledCount : "—"}
+              </strong>
               <small>
-                below {formatHours(report.targetHoursPerPerson)} this period
+                {weeklyTargetHours > 0
+                  ? `below ${formatHours(report.targetHoursPerPerson)} this period`
+                  : "Set a weekly target to see who is short"}
               </small>
             </div>
           </section>
@@ -436,6 +440,11 @@ export function StaffUtilizationDashboard({
                             <span className="staff-utilization-status is-under">
                               {formatHours(row.scheduleGapHours)} below target
                             </span>
+                          ) : row.activeForScheduling &&
+                            weeklyTargetHours === 0 ? (
+                            <span className="staff-utilization-status">
+                              No target set
+                            </span>
                           ) : row.activeForScheduling ? (
                             <span className="staff-utilization-status is-ready">
                               Target covered
@@ -498,14 +507,14 @@ export function StaffUtilizationDashboard({
       )}
 
       <aside className="staff-utilization-method">
-        <span className="eyebrow">Method</span>
+        <span className="eyebrow">How it is counted</span>
         <p>
-          Confirmed hours use closed or corrected time entries wholly inside the
-          selected dates, less recorded breaks. Event-linked time is billable; a
-          linked shift can supply the event. Scheduled demand uses scheduled,
-          started, and completed shifts, clips them to the period, and excludes
-          cancelled or no-show shifts. The under-scheduling target is a visible
-          browser preference and never blocks scheduling.
+          Confirmed hours are closed or corrected time entries inside the chosen
+          dates, less breaks. Time tied to an event (directly or through its
+          shift) counts as billable. Scheduled hours count planned, started and
+          finished shifts inside the dates, not cancelled or no-show ones. The
+          weekly target is only a reminder kept in this browser; it never stops
+          anyone from scheduling.
         </p>
       </aside>
     </div>

@@ -25,7 +25,7 @@ const PROPOSAL_SECTIONS = [
   { id: "enhancements", label: "Enhancements / Upgrades" },
   { id: "pricing_summary", label: "Pricing Summary" },
   { id: "terms", label: "Terms & Conditions" },
-  { id: "acceptance_cta", label: "Acceptance CTA" },
+  { id: "acceptance_cta", label: "Sign and accept" },
 ] as const;
 
 const ALL_SECTION_IDS = () => new Set(PROPOSAL_SECTIONS.map((s) => s.id));
@@ -408,7 +408,7 @@ export function ProposalTemplatesPage() {
                 placeholder="14"
                 defaultValue={editingTemplate?.validityDays ?? ""}
               />
-              <span className="field-help">
+              <span className="field-help-note">
                 Days until proposal expires. Leave blank for no default.
               </span>
             </label>
@@ -479,15 +479,21 @@ export function ProposalTemplatesPage() {
                   </td>
                   <td className="text-ink-2" data-label="Defaults">
                     <div className="text-2xs">
-                      {row.defaultTaxRate != null
-                        ? `Tax: ${formatPercentage(row.defaultTaxRate)}`
-                        : null}
-                      {row.defaultServiceChargePercent != null
-                        ? ` Service: ${formatPercentage(row.defaultServiceChargePercent)}`
-                        : null}
-                      {row.validityDays != null
-                        ? ` Valid: ${row.validityDays}d`
-                        : null}
+                      {row.defaultTaxRate != null ? (
+                        <div>Tax {formatPercentage(row.defaultTaxRate)}</div>
+                      ) : null}
+                      {row.defaultServiceChargePercent != null ? (
+                        <div>
+                          Service charge{" "}
+                          {formatPercentage(row.defaultServiceChargePercent)}
+                        </div>
+                      ) : null}
+                      {row.validityDays != null ? (
+                        <div>
+                          Good for {row.validityDays}{" "}
+                          {row.validityDays === 1 ? "day" : "days"}
+                        </div>
+                      ) : null}
                     </div>
                   </td>
                   <td data-label="Status">

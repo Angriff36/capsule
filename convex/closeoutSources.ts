@@ -35,6 +35,7 @@ import {
   type CloseoutLineKey,
   type CloseoutProjection,
 } from "../src/lib/closeoutSourceProjection";
+import { MUDA_FORM_KEY } from "../src/lib/eventPacket/finalLock/fieldFormAnswers";
 
 // Mirrors financeAccess | eventManageAccess in src/foundation/base.manifest
 // (finance_staff, finance_manager, event_manager, admin, owner, system).
@@ -190,16 +191,25 @@ async function loadProjection(
   const eventId = String(event._id);
   const mine = <T extends { tenantId?: string }>(rows: T[]) =>
     rows.filter((row) => row.tenantId === tenantId);
-  const [invoices, waste, orders, rentals, issues, attributions, guests] =
-    await Promise.all([
-      byEvent(ctx, "invoices", eventId),
-      byEvent(ctx, "wasteRecords", eventId),
-      byEvent(ctx, "vendorOrders", eventId),
-      byEvent(ctx, "rentalOrderLines", eventId),
-      byEvent(ctx, "equipmentIssues", eventId),
-      byEvent(ctx, "revenueAttributions", eventId),
-      byEvent(ctx, "eventGuests", eventId),
-    ]);
+  const [
+    invoices,
+    waste,
+    orders,
+    rentals,
+    issues,
+    attributions,
+    guests,
+    forms,
+  ] = await Promise.all([
+    byEvent(ctx, "invoices", eventId),
+    byEvent(ctx, "wasteRecords", eventId),
+    byEvent(ctx, "vendorOrders", eventId),
+    byEvent(ctx, "rentalOrderLines", eventId),
+    byEvent(ctx, "equipmentIssues", eventId),
+    byEvent(ctx, "revenueAttributions", eventId),
+    byEvent(ctx, "eventGuests", eventId),
+    byEvent(ctx, "fieldConfirmations", eventId),
+  ]);
   const eventInvoices = mine(invoices as Doc<"invoices">[]);
   const payments = new Map<string, Doc<"payments">>();
   const creditMemos: Doc<"creditMemos">[] = [];
@@ -241,6 +251,32 @@ async function loadProjection(
       new Set(vendorOrders.map((order) => order._id)),
     )),
   );
+  // Stock issued to the event, priced at its lot's cost (the food it used).
+  const consumed = mine(
+    (await ctx.db
+      .query("inventoryReservations")
+      .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+      .collect()) as Doc<"inventoryReservations">[],
+  ).filter((row) => row.status === "consumed");
+  const stockIssues = [];
+  for (const row of consumed) {
+    const lot = row.inventoryLotId
+      ? await ctx.db.get(row.inventoryLotId)
+      : null;
+    const ingredient = await ctx.db.get(row.ingredientId);
+    const unitCost =
+      lot && lot.tenantId === tenantId && lot.unitCost != null
+        ? Number(lot.unitCost)
+        : null;
+    stockIssues.push({
+      _id: String(row._id),
+      version: row.version,
+      deletedAt: row.deletedAt,
+      ingredientName: String(ingredient?.name ?? "Ingredient"),
+      quantity: Number(row.quantity),
+      unitCost,
+    });
+  }
   const labor = await loadEventLabor(ctx, tenantId, eventId);
   const minutesOf = (record: Doc<"timeRecords">) =>
     Math.max(
@@ -256,6 +292,7 @@ async function loadProjection(
     payments: ids([...payments.values()]),
     creditMemos: ids(creditMemos),
     vendorOrders,
+    stockIssues,
     waste: ids(mine(waste as Doc<"wasteRecords">[])),
     labor: {
       cost: labor.cost,
@@ -273,6 +310,11 @@ async function loadProjection(
     attributions: ids(mine(attributions as Doc<"revenueAttributions">[])),
     guests: ids(mine(guests as Doc<"eventGuests">[])),
     truckRuns: await truckRuns(ctx, tenantId, eventId),
+    foodWasteForms: ids(
+      mine(forms as Doc<"fieldConfirmations">[]).filter(
+        (form) => form.formKey === MUDA_FORM_KEY && form.status === "done",
+      ),
+    ),
   });
 }
 

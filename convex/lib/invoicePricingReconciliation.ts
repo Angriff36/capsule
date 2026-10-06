@@ -13,10 +13,13 @@
  * the draft followed is a no-op (nothing differs), and replaying it against an
  * unchanged flagged invoice finds the prior receipt and writes nothing.
  */
+import { byLineDisplayOrder } from "../../src/lib/pricing";
 import { api } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
+import { calculateInvoiceTax, type InvoiceLineDraft } from "../../src/features/finance/invoiceTax";
+import { LedgerMoney } from "../../src/lib/ledgerMoney";
 import { eventReconciliationReceipt } from "./reconciliationReceipt";import type { ReconciliationReceiptOutput, TimingWindow } from "./reconciliationReceipt";
 
 /** Which ledger command triggered this reconcile — recorded on the receipt. */
@@ -174,6 +177,115 @@ export async function ensureEventDraftInvoice(
       idempotencyKey: `event-draft-invoice:${eventId}`,
     },
   );
+}
+
+/**
+ * The client accepted a proposal booked onto an event: the event's quoted
+ * price becomes the accepted total, so the money pages and the untouched
+ * draft invoice show what the client agreed to. Only while the price can
+ * still change (planning to approved); later stages keep their own process.
+ */
+export async function followAcceptedProposalPrice(
+  ctx: MutationCtx,
+  proposalId: Id<"proposals">,
+): Promise<void> {
+  const proposal = await ctx.db.get(proposalId);
+  if (!proposal?.eventId || proposal.status !== "accepted") return;
+  const event = await ctx.db.get(proposal.eventId);
+  if (!event || event.deletedAt != null || event.tenantId !== proposal.tenantId) return;
+  if (!["planning", "pending_approval", "approved"].includes(event.stage)) return;
+  const total = Number(proposal.total ?? 0);
+  if (!(total > 0)) return;
+  const system = TenantSystemCommandRunner.forTenant(ctx, event.tenantId).context;
+  if (Number(event.quotedPrice ?? 0) !== total) {
+    await system.runMutation(api.mutations.Event_changePricing, {
+      docId: event._id,
+      budgetAmount: Number(event.budgetAmount ?? 0),
+      quotedPrice: total,
+      idempotencyKey: `accepted-proposal-price:${proposalId}`,
+    });
+  }
+  // The auto-made single-amount draft nobody touched becomes an itemized,
+  // taxed invoice from what the client accepted. It was never sent or paid.
+  const invoices = (
+    await ctx.db
+      .query("invoices")
+      .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+      .collect()
+  ).filter((row) => row.tenantId === event.tenantId && row.deletedAt == null && row.status !== "voided");
+  if (invoices.length !== 1) return;
+  const draft = (await ctx.db.get(invoices[0]._id)) as InvoiceRow;
+  if (!followsEventPrice(draft)) return;
+  const itemized = await itemizedFromProposal(ctx, proposal);
+  if (!itemized) return;
+  await system.runMutation(api.mutations.Invoice_markVoided, {
+    docId: draft._id,
+    version: draft.version,
+    reason: "Replaced by the itemized invoice from the accepted proposal.",
+  });
+  // A due date from the client's payment terms, so reminders can run.
+  const client = event.clientId ? await ctx.db.get(event.clientId) : null;
+  const termsDays = Number(client?.paymentTermsDays ?? 30);
+  await system.runMutation(api.mutations.Invoice_createViaIssue, {
+    clientId: event.clientId,
+    eventId: event._id,
+    invoiceSequence: 0,
+    ...itemized,
+    paymentTermsDays: termsDays,
+    dueDate: Date.now() + termsDays * 24 * 60 * 60_000,
+    proposalId: String(proposal._id),
+    ...(proposal.acceptedRevisionId ? { proposalRevisionId: String(proposal.acceptedRevisionId) } : {}),
+    idempotencyKey: `accepted-proposal-invoice:${proposalId}`,
+  });
+}
+
+/**
+ * Invoice lines and tax from an accepted proposal's priced lines, worked out
+ * with the same calculation the issue form and the issue check use.
+ */
+async function itemizedFromProposal(ctx: MutationCtx, proposal: Doc<"proposals">) {
+  const lines = (
+    await ctx.db
+      .query("proposalLineItems")
+      .withIndex("by_proposalId", (q) => q.eq("proposalId", proposal._id))
+      .collect()
+  )
+    .filter((row) => row.tenantId === proposal.tenantId && row.deletedAt == null && row.removedAt == null)
+    .sort(byLineDisplayOrder);
+  if (lines.length === 0) return null;
+  const guests = Number(proposal.guestCount ?? 0);
+  const drafts: InvoiceLineDraft[] = lines.map((row, index) => {
+    const amount = Number(row.amount) || 0;
+    const category = row.equipmentId ? "rental" : row.pricingBasis === "per_person" || row.pricingBasis === "per_unit" ? "food" : "service";
+    const perGuest = row.pricingBasis === "per_person" && guests > 0;
+    const perUnit = row.pricingBasis === "per_unit" && Number(row.quantity) > 0;
+    return {
+      id: String(index),
+      description: row.description,
+      category,
+      quantity: perGuest ? guests : perUnit ? Number(row.quantity) : 1,
+      unitPrice: perGuest || perUnit ? Number(row.unitPrice) || 0 : amount,
+    };
+  });
+  const client = await ctx.db.get(proposal.clientId as Id<"clients">);
+  const taxExempt = client?.tenantId === proposal.tenantId && client.taxExempt === true;
+  const rates = await ctx.db
+    .query("taxRates")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", proposal.tenantId))
+    .collect();
+  const worked = calculateInvoiceTax(drafts, rates, taxExempt);
+  const discount = Number(proposal.discountAmount ?? 0);
+  return {
+    subtotal: worked.subtotal,
+    taxAmount: worked.taxAmount,
+    discountAmount: discount,
+    total: LedgerMoney.fromDollars(worked.subtotal)
+      .add(LedgerMoney.fromDollars(worked.taxAmount))
+      .subtract(LedgerMoney.fromDollars(discount))
+      .toDollars(),
+    lineItems: worked.lineItems,
+    taxBreakdown: worked.taxBreakdown,
+  };
 }
 
 /** The newest accepted proposal booked onto this event, if any. */

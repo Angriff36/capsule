@@ -65,7 +65,7 @@ export function EventCostSummaryReport({
       </div>
 
       <article
-        className="event-cost-report"
+        className="event-cost-report print-sheet"
         data-testid="event-cost-summary"
         aria-label={`Cost summary for ${event.title || "event"}`}
       >

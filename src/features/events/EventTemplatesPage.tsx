@@ -200,7 +200,7 @@ export function EventTemplatesPage() {
       </Link>
       <PageHeader
         title="Event templates"
-        lead="Named starting points for common event types — client type, headcount, menu, staff roles, and equipment pre-configured."
+        lead="Starting points for the kinds of events you do often. Each one fills in the client type, guest count, menu, staff and equipment for you."
         actions={
           <button
             type="button"
@@ -365,7 +365,7 @@ export function EventTemplatesPage() {
         ) : rows.length === 0 ? (
           <EmptyState
             title="No templates yet"
-            hint="Save a fully-configured event as a template to bootstrap the next one."
+            hint="Save a finished event as a template, and the next one like it starts already filled in."
           />
         ) : (
           <table className="phone-cards w-full">

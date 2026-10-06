@@ -356,6 +356,8 @@
   animation: lead-card-enter 320ms ease both;
   animation-delay: calc(var(--lead-index) * 45ms);
   container-type: inline-size;
+  /* A long unbroken name must not push the card past its column. */
+  min-width: 0;
 }
 
 .lead-card::before {
@@ -394,6 +396,7 @@
   font-size: 1.08rem;
   font-weight: 620;
   letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
 }
 
 .lead-card-contact,
@@ -499,6 +502,7 @@
 
 .lead-card-actions {
   display: flex;
+  flex-wrap: wrap;
   min-height: 2rem;
   align-items: center;
   justify-content: space-between;

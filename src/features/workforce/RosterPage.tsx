@@ -51,6 +51,7 @@ import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { addLocalDateTimeHours } from "../../ui/naturalDate";
 import {
   RosterAttentionSection,
   type OpenStaffNeed,
@@ -60,6 +61,7 @@ import { findRosterConflicts } from "./rosterConflicts";
 const policy = new WorkforceLifecyclePolicy();
 const OVERTIME_THRESHOLD_STORAGE_KEY =
   "capsule.workforce.overtime-threshold-hours";
+const SHIFT_DEFAULT_HOURS = 8;
 
 const hours = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 2,
@@ -128,6 +130,9 @@ export function RosterPage() {
   const [showForm, setShowForm] = useState<"assignment" | "shift" | null>(null);
   const [shiftPersonId, setShiftPersonId] = useState("");
   const [shiftTypeId, setShiftTypeId] = useState("");
+  const [shiftStartsAt, setShiftStartsAt] = useState("");
+  const [shiftEndsAt, setShiftEndsAt] = useState("");
+  const [shiftEndWasEdited, setShiftEndWasEdited] = useState(false);
   const [selectedWeekStartsAt, setSelectedWeekStartsAt] = useState(() =>
     startOfScheduleWeek(Date.now()),
   );
@@ -192,7 +197,9 @@ export function RosterPage() {
       .filter(
         (event) =>
           event.deletedAt == null &&
-          !["cancelled", "completed", "closed_out"].includes(event.stage),
+          !["cancelled", "completed", "closed_out"].includes(event.stage) &&
+          // A spot on an event that already ended can no longer be filled.
+          Number(event.endsAt ?? event.startsAt ?? Infinity) >= Date.now(),
       )
       .map((event) => event._id as string),
   );
@@ -215,13 +222,14 @@ export function RosterPage() {
         ? personName(need.claimedByPersonId)
         : null,
     }));
+  // Clashes on shifts that already ended need no action; show what is ahead.
   const rosterConflicts = findRosterConflicts({
     shifts: activeShifts,
     timeOff: timeOffRequests ?? [],
     qualifications: qualifications ?? [],
     eventTitle: eventName,
     personName,
-  });
+  }).filter((conflict) => conflict.endsAt >= Date.now());
   const selectedWeekEndsAt = addScheduleWeeks(selectedWeekStartsAt, 1);
   const selectedWeekShifts = shiftsInScheduleWeek(
     activeShifts,
@@ -396,6 +404,9 @@ export function RosterPage() {
         form.reset();
         setShiftPersonId("");
         setShiftTypeId("");
+        setShiftStartsAt("");
+        setShiftEndsAt("");
+        setShiftEndWasEdited(false);
         setShowForm(null);
       });
     })();
@@ -784,6 +795,15 @@ export function RosterPage() {
                   name="startsAt"
                   className="input"
                   required
+                  value={shiftStartsAt}
+                  onResolvedValue={(next) => {
+                    setShiftStartsAt(next);
+                    if (!shiftEndsAt || !shiftEndWasEdited) {
+                      setShiftEndsAt(
+                        addLocalDateTimeHours(next, SHIFT_DEFAULT_HOURS),
+                      );
+                    }
+                  }}
                 />
               </label>
               <label className="field-label">
@@ -792,6 +812,12 @@ export function RosterPage() {
                   name="endsAt"
                   className="input"
                   required
+                  value={shiftEndsAt}
+                  naturalDateAnchor={shiftStartsAt}
+                  onResolvedValue={(next) => {
+                    setShiftEndsAt(next);
+                    setShiftEndWasEdited(true);
+                  }}
                 />
               </label>
               <label className="field-label">

@@ -94,11 +94,13 @@ export function EventStaffingAddForm({
         onSubmit(submission, form);
       }}
     >
-      <label className="field-label sm:col-span-2">
+      {/* Two to a row until the screen is wide enough for the date and
+          time boxes; one row of six cut off Out and the button. */}
+      <label className="field-label sm:col-span-3 2xl:col-span-2">
         Role
         <StaffRoleSelect name="role" roles={roles} />
       </label>
-      <label className="field-label sm:col-span-2">
+      <label className="field-label sm:col-span-3 2xl:col-span-2">
         Who
         <select
           name="personId"
@@ -119,15 +121,15 @@ export function EventStaffingAddForm({
           ))}
         </select>
       </label>
-      <label className="field-label">
+      <label className="field-label sm:col-span-3 2xl:col-span-1">
         In
         <BoundedDateTimeLocalInput name="startsAt" className="field-input" />
       </label>
-      <label className="field-label">
+      <label className="field-label sm:col-span-3 2xl:col-span-1">
         Out
         <BoundedDateTimeLocalInput name="endsAt" className="field-input" />
       </label>
-      <label className="field-label sm:col-span-5">
+      <label className="field-label sm:col-span-4 2xl:col-span-5">
         Note
         <input
           name="notes"
@@ -137,7 +139,7 @@ export function EventStaffingAddForm({
       </label>
       <button
         type="submit"
-        className="btn btn-primary self-end whitespace-nowrap"
+        className="btn btn-primary self-end whitespace-nowrap sm:col-span-2 2xl:col-span-1"
         disabled={busy}
         data-testid="event-staffing-add"
       >

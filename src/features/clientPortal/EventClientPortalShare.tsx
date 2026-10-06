@@ -2,12 +2,13 @@ import { useAction } from "convex/react";
 import { useState } from "react";
 import type { Id } from "../../lib/api";
 import { api } from "../../lib/api";
+import { copyText } from "../../lib/copyText";
 import { useActionPrompt } from "../../ui/action-prompt";
 
 type ShareState =
   | { kind: "idle" }
   | { kind: "working" }
-  | { kind: "ready"; url: string }
+  | { kind: "ready"; url: string; copied: boolean }
   | { kind: "error"; message: string };
 
 export function EventClientPortalShare({ eventId }: { eventId: Id<"events"> }) {
@@ -25,8 +26,10 @@ export function EventClientPortalShare({ eventId }: { eventId: Id<"events"> }) {
         `/portal/events/${encodeURIComponent(token)}`,
         window.location.origin,
       ).toString();
-      await copyText(url);
-      setState({ kind: "ready", url });
+      // The new link already replaced the old one: when the browser will not
+      // copy, show it to copy by hand instead of losing it behind an error.
+      const copied = await copyText(url);
+      setState({ kind: "ready", url, copied });
     } catch (error) {
       setState({
         kind: "error",
@@ -50,7 +53,7 @@ export function EventClientPortalShare({ eventId }: { eventId: Id<"events"> }) {
     setOffState({ kind: "working" });
     try {
       await turnOffShare({ eventId });
-      setOffState({ kind: "ready", url: "" });
+      setOffState({ kind: "ready", url: "", copied: false });
       if (state.kind === "ready") setState({ kind: "idle" });
     } catch (error) {
       setOffState({
@@ -64,11 +67,7 @@ export function EventClientPortalShare({ eventId }: { eventId: Id<"events"> }) {
   };
 
   return (
-    <div
-      className="flex items-center gap-2"
-      key="client-portal-share"
-      data-keep-open
-    >
+    <div className="action-menu-group" key="client-portal-share" data-keep-open>
       {host}
       <button
         type="button"
@@ -78,7 +77,7 @@ export function EventClientPortalShare({ eventId }: { eventId: Id<"events"> }) {
       >
         {state.kind === "working"
           ? "Preparing link…"
-          : state.kind === "ready"
+          : state.kind === "ready" && state.copied
             ? "Client link copied"
             : "Copy client portal"}
       </button>
@@ -104,6 +103,14 @@ export function EventClientPortalShare({ eventId }: { eventId: Id<"events"> }) {
           Preview
         </a>
       ) : null}
+      {state.kind === "ready" && !state.copied ? (
+        <span className="max-w-64 text-xs text-ink-2">
+          This browser would not copy. Select the link and copy it:{" "}
+          <span className="select-all break-all font-medium text-ink">
+            {state.url}
+          </span>
+        </span>
+      ) : null}
       {state.kind === "ready" ? (
         <span className="max-w-64 text-xs text-ink-3">
           Works for 90 days. Copying again turns the previous link off.
@@ -120,27 +127,12 @@ export function EventClientPortalShare({ eventId }: { eventId: Id<"events"> }) {
         </span>
       ) : null}
       <span className="sr-only" role="status" aria-live="polite">
-        {state.kind === "ready" ? "Client portal link copied." : ""}
+        {state.kind === "ready"
+          ? state.copied
+            ? "Client portal link copied."
+            : "Client portal link ready to copy."
+          : ""}
       </span>
     </div>
   );
-}
-
-async function copyText(value: string): Promise<void> {
-  if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(value);
-    return;
-  }
-
-  const textarea = document.createElement("textarea");
-  textarea.value = value;
-  textarea.setAttribute("readonly", "");
-  textarea.style.position = "fixed";
-  textarea.style.opacity = "0";
-  document.body.append(textarea);
-  textarea.select();
-  const copied = document.execCommand("copy");
-  textarea.remove();
-  if (!copied)
-    throw new Error("Copy failed. Open Preview and copy the address.");
 }

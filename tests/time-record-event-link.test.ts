@@ -29,6 +29,7 @@ import {
   persistPrimaryTimeRecord,
   resolveTimeRecordEventId,
   timeRecordLedgerState,
+  upcomingShifts,
   type TimeRecordLedgerRow,
 } from "../src/features/workforce/timeRecordEntry";
 
@@ -289,6 +290,36 @@ describe("window parsing and clock-out", () => {
     expect(currentShiftFor(PERSON_ID, [eveningShift], typedIn)?._id).toBe(
       SHIFT_ID,
     );
+  });
+});
+
+describe("My Day upcoming shifts", () => {
+  it("drops a missed past scheduled shift but keeps today, later and started ones", () => {
+    const oct6Noon = Date.parse("2026-10-06T12:00:00");
+    const missed = {
+      _id: "sh_missed",
+      status: "scheduled",
+      startsAt: Date.parse("2026-09-26T16:00:00"),
+      endsAt: Date.parse("2026-09-26T22:00:00"),
+    };
+    const earlierToday = {
+      _id: "sh_today",
+      status: "scheduled",
+      startsAt: Date.parse("2026-10-06T06:00:00"),
+      endsAt: Date.parse("2026-10-06T10:00:00"),
+    };
+    const later = {
+      _id: "sh_later",
+      status: "scheduled",
+      startsAt: Date.parse("2026-10-09T16:00:00"),
+      endsAt: Date.parse("2026-10-09T22:00:00"),
+    };
+    const stillStarted = { ...missed, _id: "sh_started", status: "started" };
+    expect(
+      upcomingShifts([missed, earlierToday, later, stillStarted], oct6Noon).map(
+        (shift) => shift._id,
+      ),
+    ).toEqual(["sh_today", "sh_later", "sh_started"]);
   });
 });
 

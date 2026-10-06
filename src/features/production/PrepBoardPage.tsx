@@ -41,6 +41,7 @@ import {
   type PrepReasonAction,
 } from "./PrepActionReasonForm";
 import { PrepTaskCommentThread } from "./PrepTaskCommentThread";
+import { usePrepLabelPrint } from "./usePrepLabelPrint";
 import { ProductionFailureBanner } from "./ProductionFailureBanner";
 import { ProductionLifecyclePolicy } from "./ProductionLifecyclePolicy";
 import { ProductionWorkspaceNav } from "./ProductionWorkspaceNav";
@@ -164,6 +165,7 @@ export function PrepBoardPage() {
   const [threadTaskId, setThreadTaskId] = useState<string | null>(null);
   const optimistic = useOptimisticStatus();
   const { prompt, host: promptHost } = useActionPrompt(busy != null);
+  const labels = usePrepLabelPrint(prompt);
 
   const activeTasks = (tasks ?? []).filter((task) => task.deletedAt == null);
   const activeDependencies = dependencies ?? [];
@@ -958,6 +960,31 @@ export function PrepBoardPage() {
                                 : action.label}
                             </button>
                           ))}
+                          {String(task.status) !== "cancelled" ? (
+                            <button
+                              type="button"
+                              className="btn btn-ghost btn-sm"
+                              disabled={busy != null || !labels.ready}
+                              aria-label={`Print container label for ${taskLabel(task)}`}
+                              onClick={() =>
+                                void labels.print({
+                                  product: taskLabel(task),
+                                  detail: eventName(task.eventId),
+                                  componentId: task.componentId,
+                                  dish: task.dishId
+                                    ? dishes?.find(
+                                        (dish) => dish._id === task.dishId,
+                                      )
+                                    : null,
+                                  preparedAt:
+                                    task.completedAt ?? task.startedAt,
+                                  preparedById: task.assignedToId,
+                                })
+                              }
+                            >
+                              Print label
+                            </button>
+                          ) : null}
                         </div>
                       </td>
                     </tr>

@@ -57,6 +57,9 @@ entity FieldConfirmation mixin TenantScoped, SoftDeletable {
   property outcome: FieldConfirmationOutcome?
   property note: string?
   property photoStorageId: string?
+  // The filled-in paper form as written: ticked lines, or the food waste
+  // counts (JSON; src/lib/eventPacket/finalLock/fieldFormAnswers.ts reads it).
+  property answers: string?
 
   // Two-person forms: the second person's own check.
   property secondCompletedAt: datetime?
@@ -152,7 +155,8 @@ entity FieldConfirmation mixin TenantScoped, SoftDeletable {
     outcome: FieldConfirmationOutcome,
     optional observedAt: datetime,
     optional note: string,
-    optional photoStorageId: string
+    optional photoStorageId: string,
+    optional answers: string
   ) {
     guard self.preparedAt != null
     guard self.deletedAt == null
@@ -168,6 +172,7 @@ entity FieldConfirmation mixin TenantScoped, SoftDeletable {
     mutate formCompletedById = user.personId
     mutate note = note
     mutate photoStorageId = photoStorageId
+    mutate answers = answers
     emit FieldConfirmationCompleted {
       fieldConfirmationId: self.id
       tenantId: self.tenantId

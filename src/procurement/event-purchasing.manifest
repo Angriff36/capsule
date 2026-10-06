@@ -232,8 +232,12 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   property componentPath: list<string>?
   property productionBatchId: uuid?
   property productionBatchAllocationId: uuid?
+  // Immutable-at-write calculation inputs for a contribution. The demand row is
+  // an aggregate, so this belongs on its individual source row.
+  property calculationSnapshot: json?
   property supersededAt: datetime?
   property supersededBySourceKey: string?
+  property supersedeReason: string?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
@@ -266,7 +270,8 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     optional sourceDishComponentId: uuid,
     optional componentPath: list<string>,
     optional productionBatchId: uuid,
-    optional productionBatchAllocationId: uuid
+    optional productionBatchAllocationId: uuid,
+    optional calculationSnapshot: json
   ) {
     guard self.deletedAt == null
     constraint recordQuantityPositive: quantity >= 0 "This event's ingredient amount can't be negative. Use zero or more."
@@ -305,6 +310,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     mutate componentPath = sourceKey != null ? componentPath : (batchKeep ? self.componentPath : [])
     mutate productionBatchId = sourceKey != null ? productionBatchId : (batchKeep ? self.productionBatchId : null)
     mutate productionBatchAllocationId = sourceKey != null ? productionBatchAllocationId : (batchKeep ? self.productionBatchAllocationId : null)
+    mutate calculationSnapshot = calculationSnapshot != null ? calculationSnapshot : (batchKeep ? self.calculationSnapshot : null)
     mutate supersededAt = batchKeep ? self.supersededAt : null
     mutate supersededBySourceKey = batchKeep ? self.supersededBySourceKey : null
     emit EventIngredientContributionRecorded {
@@ -316,6 +322,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
       quantity: quantity
       unit: unit
       purchasingWeekStart: self.purchasingWeekStart
+      calculationSnapshot: self.calculationSnapshot
     }
   }
 
@@ -379,9 +386,19 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     constraint supersedeReason: length(trim(reason)) > 0 "Say why this is being replaced."
     mutate supersededAt = now()
     mutate supersededBySourceKey = supersededBySourceKey
+    mutate supersedeReason = reason
     mutate deletedAt = now()
     mutate quantity = 0
     mutate purchasingWeekStart = self.event != null and self.event.purchasingWeekStart != null ? self.event.purchasingWeekStart : self.purchasingWeekStart
+    emit EventIngredientContributionSuperseded {
+      contributionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientId: self.ingredientId
+      previousCalculationSnapshot: self.calculationSnapshot
+      supersededBySourceKey: supersededBySourceKey
+      reason: reason
+    }
     emit EventIngredientContributionRecorded {
       contributionId: self.id
       tenantId: self.tenantId
@@ -391,6 +408,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
       quantity: 0
       unit: self.unit
       purchasingWeekStart: self.purchasingWeekStart
+      calculationSnapshot: self.calculationSnapshot
     }
   }
 
@@ -439,6 +457,17 @@ event EventIngredientContributionRecorded: "event_ingredient_contribution.record
   quantity: number
   unit: UnitOfMeasure
   purchasingWeekStart: datetime?
+  calculationSnapshot: json?
+}
+
+event EventIngredientContributionSuperseded: "event_ingredient_contribution.superseded" {
+  contributionId: string
+  tenantId: string
+  eventId: string
+  ingredientId: string
+  previousCalculationSnapshot: json?
+  supersededBySourceKey: string?
+  reason: string
 }
 
 event PurchaseNeedReadyForWeeklyDraft: "purchase_need.ready_for_weekly_draft" {
@@ -503,6 +532,7 @@ on EventDishAdded fanOut DishIngredient where dishId = payload.recipeDishId
     quantityPerServing: self.quantity
     unit: self.unit
     servings: payload.quantityServings
+    calculationSnapshot: { version: 1, kind: "direct_dish", formula: "recipe line × waste factor × servings", recipeLineQuantity: self.quantity, wasteFactor: 1, servings: payload.quantityServings, resultQuantity: self.quantity * payload.quantityServings, resultUnit: self.unit }
     purchasingWeekStart: payload.purchasingWeekStart
   }
 
@@ -555,6 +585,7 @@ on EventDishComponentSeeded fanOut ComponentIngredient where componentId = paylo
     quantityPerServing: (self.quantity * payload.batchMultiplier) / payload.yieldQuantity
     unit: self.unit
     servings: payload.servings
+    calculationSnapshot: { version: 1, kind: "component_recipe", formula: "recipe line × batch multiplier × servings ÷ yield", recipeLineQuantity: self.quantity, wasteFactor: 1, batchMultiplier: payload.batchMultiplier, servings: payload.servings, yieldQuantity: payload.yieldQuantity, resultQuantity: (self.quantity * payload.batchMultiplier * payload.servings) / payload.yieldQuantity, resultUnit: self.unit }
     purchasingWeekStart: payload.purchasingWeekStart
   }
 

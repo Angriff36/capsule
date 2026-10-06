@@ -36,8 +36,19 @@ import {
   WorkingEventScopeNote,
 } from "../events/WorkingEventScope";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import { listOriginState, useListOrigin } from "../list-state/listOrigin";
+import { ListStateManager } from "../list-state/ListStateManager";
+import { useListViewState } from "../list-state/useListViewState";
 
 const policy = new CommercialLifecyclePolicy();
+const invoicesState = new ListStateManager({
+  closed: {
+    key: "closed",
+    defaultValue: false,
+    parse: (value: string | null) => value === "1",
+    serialize: (value: boolean) => (value ? "1" : null),
+  },
+});
 
 const money = (value: FormDataEntryValue | null) => {
   const amount = Number(String(value ?? "").trim());
@@ -59,6 +70,7 @@ const clientLabel = (row: {
 };
 
 export function InvoicesPage() {
+  const listOrigin = useListOrigin();
   const eventScope = useWorkingEventScope("invoices");
   const [searchParams, setSearchParams] = useSearchParams();
   const prefillClientId = searchParams.get("clientId")?.trim() || "";
@@ -86,7 +98,8 @@ export function InvoicesPage() {
     "USD",
   );
   const [showIssue, setShowIssue] = useState(openFromLink);
-  const [showClosed, setShowClosed] = useState(false);
+  const [{ closed: showClosed }, setListState] =
+    useListViewState(invoicesState);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
@@ -326,7 +339,7 @@ export function InvoicesPage() {
           <button
             className="btn btn-ghost"
             type="button"
-            onClick={() => setShowClosed((value) => !value)}
+            onClick={() => setListState({ closed: !showClosed })}
           >
             {showClosed ? "Hide closed" : "Show closed"}
           </button>
@@ -378,6 +391,9 @@ export function InvoicesPage() {
           defaultClientId={prefillClientId}
           defaultEventId={prefillEventId || eventScope.workingId || ""}
           functionalCurrencyCode={functionalCurrencyCode}
+          existingInvoiceNumbers={(invoices ?? []).map(
+            (row) => row.invoiceNumber,
+          )}
         />
       ) : null}
 
@@ -400,15 +416,17 @@ export function InvoicesPage() {
             <span>
               Issue an invoice for a registered client to begin billing.
             </span>
-            <div className="mt-3 flex justify-center">
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={() => setShowIssue(true)}
-              >
-                Issue invoice
-              </button>
-            </div>
+            {showIssue ? null : (
+              <div className="mt-3 flex justify-center">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => setShowIssue(true)}
+                >
+                  Issue invoice
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="supply-table-wrap">
@@ -458,6 +476,7 @@ export function InvoicesPage() {
                         <Link
                           className="text-link"
                           to={FINANCE_ROUTES.invoiceDetail(row._id)}
+                          state={listOriginState(listOrigin)}
                         >
                           <strong>
                             {formatInvoiceNumber(row.invoiceNumber, row._id) ||
@@ -480,6 +499,7 @@ export function InvoicesPage() {
                           <Link
                             className="btn btn-ghost btn-sm"
                             to={FINANCE_ROUTES.invoiceDetail(row._id)}
+                            state={listOriginState(listOrigin)}
                           >
                             Open
                           </Link>

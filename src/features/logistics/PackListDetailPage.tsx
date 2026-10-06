@@ -1,5 +1,7 @@
+import { packListName } from "./packListName";
 import { useState, type FormEvent } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
+import { ReturnToListLink } from "../list-state/listOrigin";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreatePackListItem,
@@ -11,6 +13,7 @@ import {
   usePackListDispatch,
   usePackListItemAdjustQuantity,
   usePackListItemAnnotate,
+  usePackListItemSetBin,
   usePackListItemAssignLoad,
   usePackListItemSetUnitVolume,
   usePackListItemSetUnitWeight,
@@ -61,6 +64,7 @@ import { useEventTransport } from "../../lib/useEventRouteLegs";
 import { PackListKitAssistBar } from "./PackListKitAssistBar";
 import { PackScanPanel } from "./PackScanPanel";
 import { PackFoodPackaging } from "./PackFoodPackaging";
+import { PackBinSheet } from "./PackBinSheet";
 import { PackListSourcePanel } from "./PackListSourcePanel";
 import { packWentOut } from "./packReturn";
 import { PACK_LIST_UNITS } from "./packListUnits";
@@ -121,6 +125,7 @@ export function PackListDetailPage() {
   const templates = useListPackListTemplate();
   const adjustQuantity = usePackListItemAdjustQuantity();
   const annotateItem = usePackListItemAnnotate();
+  const setItemBin = usePackListItemSetBin();
   const excludeItem = usePackListItemExclude();
   const assignLoad = usePackListItemAssignLoad();
   const setUnitWeight = usePackListItemSetUnitWeight();
@@ -200,9 +205,9 @@ export function PackListDetailPage() {
   if (packList === undefined) {
     return (
       <div className="operations-stage supply-stage order-folio">
-        <Link className="text-link" to="/logistics/packs">
+        <ReturnToListLink fallback="/logistics/packs" className="text-link">
           ← Pack lists
-        </Link>
+        </ReturnToListLink>
         <LogisticsWorkspaceNav />
         <QueryLoadState
           title="Pack list data is not loading"
@@ -528,6 +533,7 @@ export function PackListDetailPage() {
       status: unknown;
       note?: string | null;
       sentInstead?: string | null;
+      binNumber?: number | null;
       checkedQuantity?: number | null;
       loadedQuantity?: number | null;
       returnedQuantity?: number | null;
@@ -674,6 +680,35 @@ export function PackListDetailPage() {
             ? "Saved what went out instead."
             : "Cleared what went out instead.",
         );
+      });
+      return;
+    }
+    if (key === "bin") {
+      const values = await prompt.askFields({
+        title: "Which bin is it in?",
+        description:
+          "Write the number on the black bin this line went in, so the crew can find it onsite. Leave it empty to clear it.",
+        confirmLabel: "Save bin",
+        fields: [
+          {
+            name: "bin",
+            label: "Bin number",
+            inputType: "number",
+            required: false,
+            defaultValue: item.binNumber ? String(item.binNumber) : "",
+          },
+        ],
+      });
+      if (!values) return;
+      const raw = values.bin?.trim() ?? "";
+      const binNumber = raw === "" ? undefined : Math.round(Number(raw));
+      void run(`${item._id}:bin`, async () => {
+        await setItemBin({
+          docId: item._id,
+          version: item.version,
+          binNumber,
+        });
+        setNotice(binNumber ? `In bin ${binNumber}.` : "Bin number cleared.");
       });
       return;
     }
@@ -970,13 +1005,15 @@ export function PackListDetailPage() {
 
   return (
     <div className="operations-stage supply-stage order-folio">
-      <Link className="text-link" to="/logistics/packs">
+      <ReturnToListLink fallback="/logistics/packs" className="text-link">
         ← Pack lists
-      </Link>
+      </ReturnToListLink>
       <header className="supply-masthead">
         <div>
           <p className="eyebrow">Load sheet</p>
-          <h1 className="display-title mt-2">{packList.name || "Pack list"}</h1>
+          <h1 className="display-title mt-2">
+            {packListName(packList.name, eventTitle)}
+          </h1>
           <p className="mt-3 max-w-160 text-ink-2">
             {eventTitle}
             {packList.purpose ? ` · ${packList.purpose}` : ""}
@@ -988,7 +1025,15 @@ export function PackListDetailPage() {
             <button
               key={action.key}
               className="btn btn-ghost"
-              disabled={busy != null}
+              disabled={
+                busy != null ||
+                (action.key === "startPacking" && listItems.length === 0)
+              }
+              title={
+                action.key === "startPacking" && listItems.length === 0
+                  ? "Add items before packing."
+                  : undefined
+              }
               onClick={() => invokeList(action.key)}
             >
               {busy === `list:${action.key}` ? "Working…" : action.label}
@@ -1077,9 +1122,9 @@ export function PackListDetailPage() {
           onRequestAssistance={() =>
             void (async () => {
               const values = await prompt.askFields({
-                title: "Needs assistance",
+                title: "Ask for help",
                 description:
-                  "The Event Tracker shows this list as Needs assistance until someone resolves it.",
+                  "The Event Tracker shows this list as Needs assistance until someone marks it resolved.",
                 confirmLabel: "Ask for help",
                 fields: [
                   {
@@ -1223,7 +1268,7 @@ export function PackListDetailPage() {
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">Ruled load sheet</p>
+            <p className="eyebrow">What to pack</p>
             <h2>Pack items</h2>
           </div>
           <span>{formatCountNoun(listItems.length, "item")}</span>
@@ -1267,6 +1312,16 @@ export function PackListDetailPage() {
           reviewEventId={String(packList.eventId)}
         />
       </section>
+
+      <PackBinSheet
+        packList={{
+          _id: packList._id,
+          version: packList.version,
+          binSheet: packList.binSheet,
+          status: String(packList.status),
+        }}
+        lines={listItems}
+      />
 
       <PackFoodPackaging
         eventId={packList.eventId}

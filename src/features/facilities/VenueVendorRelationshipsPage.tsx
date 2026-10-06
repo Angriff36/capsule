@@ -24,6 +24,7 @@ import {
 } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { SearchSelect } from "../../ui/SearchSelect";
 
 // Enum values from manifest
 const CATEGORIES = [
@@ -396,7 +397,7 @@ export function VenueVendorRelationshipsPage() {
                 required
                 disabled={!!venueId}
                 defaultValue={venueId ?? ""}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1"
               >
                 <option value="">Select venue...</option>
                 {filteredVenues.map((v) => (
@@ -411,18 +412,16 @@ export function VenueVendorRelationshipsPage() {
               <label className="block text-xs font-medium text-ink-2">
                 Vendor *
               </label>
-              <select
+              <SearchSelect
                 name="vendorId"
                 required
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
-              >
-                <option value="">Select vendor...</option>
-                {filteredVendors.map((v) => (
-                  <option key={v._id} value={v._id}>
-                    {v.name}
-                  </option>
-                ))}
-              </select>
+                recentsKey="vendor"
+                placeholder="Search vendors…"
+                options={filteredVendors.map((v) => ({
+                  id: v._id,
+                  label: v.name,
+                }))}
+              />
             </div>
 
             <div>
@@ -433,7 +432,7 @@ export function VenueVendorRelationshipsPage() {
                 name="category"
                 required
                 defaultValue="other"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat.value} value={cat.value}>
@@ -451,7 +450,7 @@ export function VenueVendorRelationshipsPage() {
                 name="status"
                 required
                 defaultValue="approved"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1"
               >
                 {STATUSES.map((st) => (
                   <option key={st.value} value={st.value}>
@@ -465,20 +464,14 @@ export function VenueVendorRelationshipsPage() {
               <label className="block text-xs font-medium text-ink-2">
                 Effective From
               </label>
-              <BoundedDateInput
-                name="effectiveFrom"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
-              />
+              <BoundedDateInput name="effectiveFrom" className="input mt-1" />
             </div>
 
             <div>
               <label className="block text-xs font-medium text-ink-2">
                 Effective Until
               </label>
-              <BoundedDateInput
-                name="effectiveUntil"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
-              />
+              <BoundedDateInput name="effectiveUntil" className="input mt-1" />
             </div>
 
             <div>
@@ -492,7 +485,7 @@ export function VenueVendorRelationshipsPage() {
                 max="100"
                 step="0.01"
                 placeholder="0.00"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1"
               />
             </div>
 
@@ -506,7 +499,7 @@ export function VenueVendorRelationshipsPage() {
                 min="0"
                 step="0.01"
                 placeholder="0.00"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1"
               />
             </div>
 
@@ -518,7 +511,7 @@ export function VenueVendorRelationshipsPage() {
                 type="text"
                 name="paymentTerms"
                 placeholder="e.g., Net 30"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1"
               />
             </div>
 
@@ -530,7 +523,7 @@ export function VenueVendorRelationshipsPage() {
                 type="text"
                 name="insuranceCertificate"
                 placeholder="Certificate number or note"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1"
               />
             </div>
 
@@ -538,10 +531,7 @@ export function VenueVendorRelationshipsPage() {
               <label className="block text-xs font-medium text-ink-2">
                 Insurance Expiry
               </label>
-              <BoundedDateInput
-                name="insuranceExpiry"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
-              />
+              <BoundedDateInput name="insuranceExpiry" className="input mt-1" />
             </div>
 
             <div className="col-span-2">
@@ -552,7 +542,7 @@ export function VenueVendorRelationshipsPage() {
                 name="complianceNotes"
                 rows={2}
                 placeholder="Special requirements, certifications, etc."
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1"
               />
             </div>
 
@@ -564,7 +554,7 @@ export function VenueVendorRelationshipsPage() {
                 name="notes"
                 rows={2}
                 placeholder="Additional notes..."
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1"
               />
             </div>
           </div>

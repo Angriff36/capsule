@@ -33,10 +33,17 @@ import {
 } from "../convex/lib/culinaryModel/tppImport";
 import {
   convertQuantity,
+  describeLineConversion,
+  ENTRY_UNIT_ALIASES,
+  fallbackUnitFor,
+  formatQuantityEntry,
+  isUnitCode,
+  parseQuantityInput,
   resolveTppUnit,
   toPurchaseBasis,
   type ItemUnitMappingLike,
 } from "../convex/lib/culinaryModel/units";
+import { UNIT_OF_MEASURE } from "../src/features/kitchen/import/UnitOfMeasureMapper";
 
 const ingredient = (
   id: string,
@@ -1020,6 +1027,129 @@ describe("nested recipes keep quantities and partial costs", () => {
 });
 
 describe("units", () => {
+  it("parses compact, mixed-fraction, and kitchen shorthand entries", () => {
+    expect(parseQuantityInput("2 lb", "gram")).toMatchObject({
+      status: "parsed",
+      quantity: 2,
+      unit: "pound",
+    });
+    expect(parseQuantityInput("500g", "each")).toMatchObject({
+      status: "parsed",
+      quantity: 500,
+      unit: "gram",
+    });
+    expect(parseQuantityInput("1 ½ cup", "each")).toMatchObject({
+      status: "parsed",
+      quantity: 1.5,
+      unit: "cup",
+    });
+    expect(parseQuantityInput("2 T", "each")).toMatchObject({
+      status: "parsed",
+      quantity: 2,
+      unit: "tablespoon",
+    });
+    expect(parseQuantityInput("2 t", "each")).toMatchObject({
+      status: "parsed",
+      quantity: 2,
+      unit: "teaspoon",
+    });
+  });
+
+  it("keeps a bare number in its caller unit and rejects impossible entries", () => {
+    expect(parseQuantityInput("3", "quart")).toMatchObject({
+      status: "parsed",
+      quantity: 3,
+      unit: "quart",
+    });
+    expect(parseQuantityInput("2 bananas", "each")).toMatchObject({
+      status: "invalid",
+    });
+    expect(parseQuantityInput("0 lb", "each")).toMatchObject({
+      status: "invalid",
+    });
+    expect(parseQuantityInput(".5 kg", "each")).toMatchObject({
+      status: "parsed",
+      quantity: 0.5,
+      unit: "kilogram",
+    });
+    expect(parseQuantityInput("2 #", "each")).toMatchObject({
+      status: "parsed",
+      unit: "pound",
+    });
+    expect(parseQuantityInput("2 fl oz", "each")).toMatchObject({
+      status: "parsed",
+      unit: "fluid_ounce",
+    });
+    expect(parseQuantityInput("2 oz", "each")).toMatchObject({
+      status: "parsed",
+      unit: "ounce",
+    });
+    for (const input of [
+      "1,5 kg",
+      "-2 lb",
+      "abc",
+      "2 constructor",
+      "2 toString",
+      "2 __proto__",
+      "2 hasOwnProperty",
+      "2 valueOf",
+    ]) {
+      expect(parseQuantityInput(input, "each")).toMatchObject({
+        status: "invalid",
+      });
+    }
+  });
+
+  it("only accepts real recipe-line units", () => {
+    for (const unit of ENTRY_UNIT_ALIASES.values())
+      expect(isUnitCode(unit)).toBe(true);
+    expect(parseQuantityInput("2 lb", "each", ["each"])).toMatchObject({
+      status: "invalid",
+    });
+  });
+
+  it("round-trips every recipe-line unit through an editable entry", () => {
+    for (const unit of UNIT_OF_MEASURE) {
+      for (const quantity of [2, 0.5, 1 / 3, 1e-7]) {
+        const parsed = parseQuantityInput(
+          formatQuantityEntry(quantity, unit),
+          unit,
+          UNIT_OF_MEASURE,
+        );
+        expect(parsed).toMatchObject({ status: "parsed", unit });
+        if (parsed.status === "parsed") {
+          expect(parsed.quantity).toBeCloseTo(quantity, 14);
+        }
+      }
+    }
+    expect(formatQuantityEntry(1e-7, "gram")).toBe("0.0000001 gram");
+    const tinyQuantity = parseQuantityInput(
+      "0.0000001 gram",
+      "gram",
+      UNIT_OF_MEASURE,
+    );
+    expect(tinyQuantity).toMatchObject({ status: "parsed", unit: "gram" });
+    if (tinyQuantity.status === "parsed") {
+      expect(tinyQuantity.quantity).toBeCloseTo(1e-7, 14);
+    }
+  });
+
+  it("accepts canonical codes and resolves TPP fallback labels", () => {
+    expect(parseQuantityInput("2 fluid_ounce", "each")).toMatchObject({
+      status: "parsed",
+      unit: "fluid_ounce",
+    });
+    const allowed = ["each", "gram", "fluid_ounce"] as const;
+    expect(
+      parseQuantityInput("3", fallbackUnitFor("Oz - Fld", allowed), allowed),
+    ).toMatchObject({ status: "parsed", unit: "fluid_ounce" });
+    expect(
+      parseQuantityInput("3", fallbackUnitFor("Gram", allowed), allowed),
+    ).toMatchObject({ status: "parsed", unit: "gram" });
+    expect(fallbackUnitFor(undefined, allowed)).toBe("each");
+    expect(fallbackUnitFor("Not a TPP unit", allowed)).toBe("each");
+  });
+
   it("converts inside a dimension and refuses across without a density", () => {
     expect(convertQuantity(1.05, "cup", "quart").quantity).toBeCloseTo(
       0.2625,
@@ -1067,6 +1197,27 @@ describe("units", () => {
         itemId: "b",
       }).quantity,
     ).toBeCloseTo(96, 6);
+  });
+  it("describes the same ingredient conversion the demand engine uses", () => {
+    const mappings: ItemUnitMappingLike[] = [];
+    const scope = { itemKind: "ingredient" as const, itemId: "flour" };
+    const demandConversion = convertQuantity(
+      2,
+      "pound",
+      "gram",
+      mappings,
+      scope,
+    );
+    const description = describeLineConversion(
+      2,
+      "pound",
+      "gram",
+      mappings,
+      scope,
+    );
+    expect(description).toMatchObject({ status: "resolved" });
+    if (description.status === "resolved")
+      expect(description.quantity).toBeCloseTo(demandConversion.quantity, 8);
   });
   it("keeps TPP Cup ambiguous and maps Oz - Fld to fluid_ounce", () => {
     expect(resolveTppUnit("Oz - Fld")).toMatchObject({
@@ -1335,5 +1486,43 @@ describe("review fixes: adjust override and duplicate sub-recipe edges", () => {
     expect(new Set(demand.contributions.map((c) => c.sourceKey)).size).toBe(2);
     const plan = reconcileContributions([], demand.contributions, "ed2");
     expect(plan.create).toHaveLength(2);
+  });
+});
+
+describe("unwritten recipe reached twice in one dish", () => {
+  it("lists the recipe once", () => {
+    const sauce = component({ id: "cmp-sauce", name: "House sauce" });
+    const dish: DishLike = {
+      id: "dish-two-sauces",
+      name: "Chicken with house sauce",
+      kind: "food",
+      ingredientLines: [],
+      componentLines: [
+        {
+          id: "dc-sauce-a",
+          componentId: "cmp-sauce",
+          yieldQuantity: 1,
+          batchMultiplier: 1,
+          quantityBasis: "as_produced",
+        },
+        {
+          id: "dc-sauce-b",
+          componentId: "cmp-sauce",
+          yieldQuantity: 1,
+          batchMultiplier: 1,
+          quantityBasis: "as_produced",
+        },
+      ],
+      tasks: [],
+    };
+    const demand = expandEventDish(
+      eventDish({ id: "ed-two", dishId: dish.id, quantityServings: 10 }),
+      lookups({ dishes: [dish], components: [sauce] }),
+    );
+    expect(
+      demand.unresolved.filter(
+        (u) => u.kind === "recipe_content" && u.refId === "cmp-sauce",
+      ),
+    ).toHaveLength(1);
   });
 });

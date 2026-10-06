@@ -2892,6 +2892,246 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-05",
       "reason": "Venue selling profile: optional only-here dish idea; existing venues stay valid with none."
+    },
+    {
+      "path": "Organization.brandPhone",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Company phone for the public menu foot: optional; existing companies stay valid with none."
+    },
+    {
+      "path": "Organization.brandWebsite",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Company website for the public menu foot: optional; existing companies stay valid with none."
+    },
+    {
+      "path": "Menu.guestsPerServer",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Menu server ratio from the printed menu book: optional; existing menus stay valid with none."
+    },
+    {
+      "path": "Menu.pickOneCourses",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Courses where guests pick one dish: optional list; existing menus read as none."
+    },
+    {
+      "path": "PackList.binSheet",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Bin sheet (lid colours, dirty bins) from the Perfect Packing memo: optional; existing pack lists read as no bin sheet."
+    },
+    {
+      "path": "PackListItem.binNumber",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Bin number written on a pack line: optional; existing lines read as not in a bin."
+    },
+    {
+      "path": "FieldConfirmation.answers",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "The filled-in paper form (ticked lines or food waste counts): optional; forms signed before read as no answers."
+    },
+    {
+      "path": "TrainingModule.steps",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Training doc steps a trainer initials: optional; existing modules read as no written steps."
+    },
+    {
+      "path": "TrainingModule.quiz",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Training doc quiz questions: optional; existing modules read as no quiz."
+    },
+    {
+      "path": "EventGuest.entreeEventDishId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Plated entrée pick (event-menu line): optional; existing guests stay valid with none."
+    },
+    {
+      "path": "EventGuest.seatNumber",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Plated seat number: optional; existing guests stay valid with none."
+    },
+    {
+      "path": "EventGuest.placeCardName",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Place-card name: optional; existing guests stay valid and print their name."
+    },
+    {
+      "path": "Event.travelDistanceMiles",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Event.travelFeeOverride",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Event.travelFeeOverrideReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Organization.travelFeeFreeMiles",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Organization.travelFeeMinimum",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Organization.travelFeeMode",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Organization.travelFeeRatePerMile",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Organization.travelFeeRoundTrip",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Organization.travelFeeZonesJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "ProposalLineItem.travelFee",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Travel & delivery fee: optional; existing rows stay valid with none (no fee rule, no event override, not a travel line)."
+    },
+    {
+      "path": "Venue.loadingDock",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue logistics profile (site survey): optional; existing venues read as not known."
+    },
+    {
+      "path": "Venue.elevatorNotes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue logistics profile (site survey): optional; existing venues read as not known."
+    },
+    {
+      "path": "Venue.kitchenEquipment",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue logistics profile (site survey): optional; existing venues read as not known."
+    },
+    {
+      "path": "Venue.powerDetails",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue logistics profile (site survey): optional; existing venues read as not known."
+    },
+    {
+      "path": "Venue.parkingDetails",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue logistics profile (site survey): optional; existing venues read as not known."
+    },
+    {
+      "path": "Venue.arrivalRestrictions",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue logistics profile (site survey): optional; existing venues read as not known."
+    },
+    {
+      "path": "Venue.dayOfContactName",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue logistics profile (site survey): optional; existing venues read as not known."
+    },
+    {
+      "path": "Venue.dayOfContactPhone",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Venue logistics profile (site survey): optional; existing venues read as not known."
+    },
+    {
+      "path": "EventIngredientContribution.calculationSnapshot",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Ingredient contribution supersede/calculation record (from dev): optional; existing contributions stay valid with none."
+    },
+    {
+      "path": "EventIngredientContribution.supersedeReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Ingredient contribution supersede/calculation record (from dev): optional; existing contributions stay valid with none."
+    },
+    {
+      "path": "EventIngredientContributionRecorded.payload",
+      "category": "event-payload-changed",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Event carries the new optional supersede/calculation fields; subscribers are in-repo reactions."
+    },
+    {
+      "path": "CommandAuditRecord.manifestEventIds",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-05",
+      "reason": "Optional (json?, nullable in IR) list of event ids written by one command; old audit rows stay valid with none."
+    },
+    {
+      "path": "configureSubstitutes.parameters.substituteIngredientIds",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Ids are Convex ids (strings, not uuids): list<uuid> rejected every real id, so saving failed. Stored values are the same strings; widening keeps old rows valid."
+    },
+    {
+      "path": "configureSubstitutes.parameters.substituteIngredientIds",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Ids are Convex ids (strings, not uuids): list<uuid> rejected every real id, so saving failed. Stored values are the same strings; widening keeps old rows valid."
+    },
+    {
+      "path": "Ingredient.preferredVendorIds",
+      "category": "property-type-changed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Ids are Convex ids (strings, not uuids): list<uuid> rejected every real id, so saving failed. Stored values are the same strings; widening keeps old rows valid."
+    },
+    {
+      "path": "Ingredient.substituteIngredientIds",
+      "category": "property-type-changed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Ids are Convex ids (strings, not uuids): list<uuid> rejected every real id, so saving failed. Stored values are the same strings; widening keeps old rows valid."
+    },
+    {
+      "path": "setPreferredVendors.parameters.preferredVendorIds",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Ids are Convex ids (strings, not uuids): list<uuid> rejected every real id, so saving failed. Stored values are the same strings; widening keeps old rows valid."
+    },
+    {
+      "path": "setPreferredVendors.parameters.preferredVendorIds",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Ids are Convex ids (strings, not uuids): list<uuid> rejected every real id, so saving failed. Stored values are the same strings; widening keeps old rows valid."
     }
   ]
 }

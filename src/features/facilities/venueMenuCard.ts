@@ -1,3 +1,5 @@
+import { dietTagsOnly } from "../../../convex/lib/dietaryTags";
+
 /**
  * Venue menu card (Venue Partner Playbook section 06, "Venue-specific menu
  * cards"): the dishes made only for this venue first, then the dishes of one
@@ -67,7 +69,7 @@ export function menuCardSections(input: {
 
 /** "Vegan · Gluten free" from dietary tags like "vegan", "gluten_free". */
 export function dietaryLine(tags: readonly string[] | null | undefined) {
-  return (tags ?? [])
+  return dietTagsOnly(tags)
     .map((tag) => tag.trim().replace(/[_-]+/g, " "))
     .filter(Boolean)
     .map((tag) => tag[0].toUpperCase() + tag.slice(1).toLowerCase())

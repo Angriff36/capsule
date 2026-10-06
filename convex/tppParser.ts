@@ -7,6 +7,7 @@ import {
   type FinancialRowClass,
 } from "../src/lib/financialRowClass";
 import { derivedSourceId } from "./lib/importIdentity";
+import { dietTagsOnly } from "./lib/dietaryTags";
 
 /**
  * TPP field mapping types from ImportDataset manifest
@@ -63,6 +64,9 @@ export interface TppEventRecord {
   ClientFirstName?: string;
   ClientLastName?: string;
   Occasion?: string;
+  /** "Referred From" and "Sales Person" on the event list report, by name. */
+  ReferredFrom?: string;
+  SalesPersonName?: string;
   /**
    * PL-IMPORT-RESUME (AC-024): files that belong to the event (contract, BEO,
    * floor plan). The bytes are uploaded first; the row carries the stored id.
@@ -214,6 +218,10 @@ export interface ParsedCapsuleEvent {
   externalId: string;
   title: string;
   occasionId?: string;
+  /** Printed occasion, referral source and sales person (event list report). */
+  occasionName?: string;
+  referralSourceName?: string;
+  ownerName?: string;
   serviceStyleId?: string;
   startsAt?: number;
   endsAt?: number;
@@ -414,6 +422,7 @@ export interface ParsedCapsuleMenu {
   // visible for reconciliation") — the normalized allergenSummary / portionSize
   // alone would lose the original free text.
   rawAllergens?: string;
+  rawTags?: string;
   rawPortionDescription?: string;
   // Preserved for fidelity (Dish has no price field); EMPTY in the real feed.
   pricePerPerson?: number;
@@ -598,6 +607,9 @@ export function mapTppAllergens(value?: string): string[] {
   return out;
 }
 
+const printedText = (key: string, text: string | undefined) =>
+  text?.trim() ? { [key]: text.trim() } : {};
+
 /**
  * Parse TPP Event record to Capsule format
  */
@@ -620,6 +632,9 @@ export function parseTppEvent(record: TppEventRecord): ParsedCapsuleEvent {
     occasionId: record.EventType
       ? record.EventType.toLowerCase().replace(/\s+/g, "_")
       : undefined,
+    ...printedText("occasionName", record.Occasion),
+    ...printedText("referralSourceName", record.ReferredFrom),
+    ...printedText("ownerName", record.SalesPersonName),
     serviceStyleId: record.ServiceStyle?.toLowerCase().replace(/\s+/g, "_"),
     startsAt,
     endsAt,
@@ -934,16 +949,14 @@ export function parseTppMenu(record: TppMenuRecord): ParsedCapsuleMenu {
     serviceStyle: get("ServiceStyle", "service_style") as string | undefined,
     portionSize: parsePortionSize(portionText),
     portionUnit: "portion",
-    dietaryTags: dietaryText
-      ? dietaryText
-          .split(/[;,]/)
-          .map((s) => s.trim())
-          .filter(Boolean)
-      : [],
+    dietaryTags: dietTagsOnly(
+      dietaryText ? dietaryText.split(/[;,]/).map((s) => s.trim()) : [],
+    ),
     allergenSummary: mapTppAllergens(allergenText),
     // Preserve the raw source text on the link via JSON.stringify(menu)
     // (§6.1 reconciliation visibility).
     rawAllergens: allergenText,
+    rawTags: dietaryText,
     rawPortionDescription: portionText,
     pricePerPerson: parseTppMoney(
       get("PricePerPerson", "price_per_person") as string | number | undefined,

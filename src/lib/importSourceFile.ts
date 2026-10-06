@@ -46,6 +46,9 @@ const EVENT_ALIASES: Record<string, string> = {
   contactfirstname: "ClientFirstName",
   contactlastname: "ClientLastName",
   occasion: "Occasion",
+  referredfrom: "ReferredFrom",
+  salesperson: "SalesPersonName",
+  venuestate: "LocationState",
 };
 
 const key = (heading: string) =>

@@ -48,3 +48,30 @@ it("submits entered start and end times as distinct local timestamps", async () 
   );
   expect(container.textContent).toContain("Request received");
 });
+
+it("assumes 5:00 PM and says so when the client gives no start time", async () => {
+  backend.values.set("quoteBuilder:getQuoteFormOptions", {
+    serviceStyles: [],
+    occasions: [],
+    available: true,
+  });
+  const send = command("quoteBuilder:submitQuote", {
+    submissionId: "quote-2",
+    message: "Request received",
+  });
+  await mount(createElement(QuoteSubmissionPage));
+  input("clientName", "Pat Client");
+  input("email", "pat@example.com");
+  input("eventDate", "2099-10-12");
+  input("guestCount", "40");
+  input("notes", "Rustic theme");
+  (field("consent") as HTMLInputElement).checked = true;
+  await submit(field("clientName").closest("form")!);
+  expect(send).toHaveBeenCalledExactlyOnceWith(
+    expect.objectContaining({
+      eventDate: new Date(2099, 9, 12, 17, 0).getTime(),
+      notes:
+        "No start time given; 5:00 PM is assumed until the client confirms.\nRustic theme",
+    }),
+  );
+});

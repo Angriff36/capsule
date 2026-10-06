@@ -23,7 +23,7 @@ import {
   useListStockTransfer,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
-import { formatCountNoun, formatDate } from "../../lib/format";
+import { formatQuantity, formatCountNoun, formatDate } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
@@ -35,6 +35,7 @@ import { catalogUnitForStockLine, isBelowReorder } from "./stockLevels";
 import { IngredientCatalogLabel } from "../kitchen/IngredientCatalogLabel";
 import { IngredientCatalogImageProvider } from "../../lib/IngredientCatalogImageContext";
 import { useWorkingEventId } from "../events/workingEvent";
+import { FieldHelp } from "../../ui/FieldHelp";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import {
   reservedOn,
@@ -123,9 +124,14 @@ export function StockBookPage() {
   const returnUnused = useInventoryReservationReturnUnused();
   const createInventorySettings = useCreateInventorySettings();
   const setStockTracking = useInventorySettingsSetStockTracking();
+  // "Register a location" on the Locations page lands here with the form open.
   const [form, setForm] = useState<
     "location" | "stock" | "reserve" | "transfer" | null
-  >(null);
+  >(() =>
+    new URLSearchParams(window.location.search).get("new") === "location"
+      ? "location"
+      : null,
+  );
   const [transferSource, setTransferSource] = useState<any>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -341,7 +347,8 @@ export function StockBookPage() {
             name: "quantity",
             label:
               action === "receive" ? "Quantity received" : "Actual quantity",
-            inputType: "number",
+            unit: unitFor(item),
+            allowZero: action === "recount",
             required: true,
           },
         ],
@@ -413,6 +420,7 @@ export function StockBookPage() {
           {
             name: "parLevel",
             label: `PAR level (${unitFor(item)})`,
+            help: "parLevel",
             defaultValue: String(item.parLevel),
             inputType: "number",
             required: true,
@@ -520,7 +528,9 @@ export function StockBookPage() {
             name: "quantity",
             label: "Amount that came back",
             defaultValue: String(unusedLeft(reservation)),
-            inputType: "number",
+            ...(item
+              ? { unit: unitFor(item) }
+              : { inputType: "number" as const }),
             required: true,
           },
           {
@@ -603,11 +613,10 @@ export function StockBookPage() {
         <aside className="supply-degraded" role="note">
           <strong>Live stock facts</strong>
           <span>
-            Available stock is what's on hand minus what's reserved for events.
-            Low-stock alerts follow on-hand vs a tracked reorder point (same
-            predicate as home and the bell). Suggested purchase still uses PAR
-            minus available. Search and exact decimals can be slightly
-            imprecise.
+            Available stock is what's on hand minus what's held for events. A
+            line shows as low when on hand drops below its reorder point, the
+            same as on Home and in alerts. The suggested buy is the usual amount
+            to keep (par) minus what's available.
           </span>
         </aside>
         {failure ? <SupplyFailureBanner error={failure} /> : null}
@@ -675,7 +684,7 @@ export function StockBookPage() {
                       </td>
                       <td>{locationName(item.locationId)}</td>
                       <td className="supply-number">
-                        {item.quantityOnHand}
+                        {formatQuantity(item.quantityOnHand)}
                         {reservedFor(item._id) > 0
                           ? ` (${availableFor(item)} available)`
                           : ""}
@@ -770,7 +779,9 @@ export function StockBookPage() {
                         <small>{unitFor(item)}</small>
                       </td>
                       <td>{locationName(item.locationId)}</td>
-                      <td className="supply-number">{item.quantityOnHand}</td>
+                      <td className="supply-number">
+                        {formatQuantity(item.quantityOnHand)}
+                      </td>
                       <td>{dateLabel(item.bestBeforeAt)}</td>
                       <td>{dateLabel(item.useByAt)}</td>
                       <td>
@@ -842,7 +853,7 @@ export function StockBookPage() {
                         {locationName(item.locationId)}
                       </td>
                       <td className="supply-number" data-label="On hand">
-                        {item.quantityOnHand}
+                        {formatQuantity(item.quantityOnHand)}
                       </td>
                       <td className="supply-number" data-label="Reserved">
                         {reservedFor(item._id)}
@@ -1267,16 +1278,19 @@ function SupplyStockForm({
             {["quantityOnHand", "parLevel", "reorderThreshold", "unitCost"].map(
               (name) => (
                 <label key={name} className="field-label">
-                  {
-                    (
-                      {
-                        quantityOnHand: "Opening quantity",
-                        parLevel: "PAR level",
-                        reorderThreshold: "Reorder threshold",
-                        unitCost: "Unit cost",
-                      } as Record<string, string>
-                    )[name]
-                  }
+                  <span className="field-label-row">
+                    {
+                      (
+                        {
+                          quantityOnHand: "Opening quantity",
+                          parLevel: "PAR level",
+                          reorderThreshold: "Reorder threshold",
+                          unitCost: "Unit cost",
+                        } as Record<string, string>
+                      )[name]
+                    }
+                    {name === "parLevel" ? <FieldHelp term="parLevel" /> : null}
+                  </span>
                   <input
                     name={name}
                     className="input"
@@ -1307,7 +1321,7 @@ function SupplyStockForm({
                     (location: any) =>
                       location._id === transferSource.locationId,
                   )?.name ?? "Location"
-                } (${transferSource.quantityOnHand} ${catalogUnitForStockLine(transferSource, ingredients)} on hand)`}
+                } (${formatQuantity(transferSource.quantityOnHand)} ${catalogUnitForStockLine(transferSource, ingredients)} on hand)`}
                 readOnly
               />
             </label>
@@ -1327,7 +1341,7 @@ function SupplyStockForm({
                     {locations.find(
                       (location: any) => location._id === item.locationId,
                     )?.name ?? "Location"}{" "}
-                    ({item.quantityOnHand}{" "}
+                    ({formatQuantity(item.quantityOnHand)}{" "}
                     {catalogUnitForStockLine(item, ingredients)} on hand)
                   </option>
                 ))}

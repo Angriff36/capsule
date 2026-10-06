@@ -28,21 +28,23 @@ function EventCard({
   return (
     <Link
       to={`/event-day/${event._id}`}
-      className={`evd-pick-card ${today ? "evd-pick-today" : ""}`}
+      className={`eday-pick-card ${today ? "eday-pick-today" : ""}`}
     >
-      <span className="evd-pick-date">
-        <span className="evd-pick-month">
+      <span className="eday-pick-date">
+        <span className="eday-pick-month">
           {at ? at.toLocaleDateString(undefined, { month: "short" }) : "TBD"}
         </span>
-        <span className="evd-pick-day">{at ? at.getDate() : "—"}</span>
+        <span className="eday-pick-day">{at ? at.getDate() : "—"}</span>
       </span>
-      <span className="evd-pick-main">
-        <span className="evd-pick-title">{String(event.title ?? "Event")}</span>
-        <span className="evd-pick-sub2">
+      <span className="eday-pick-main">
+        <span className="eday-pick-title">
+          {String(event.title ?? "Event")}
+        </span>
+        <span className="eday-pick-sub2">
           {[place, guests].filter(Boolean).join(" · ") || "Details to come"}
         </span>
       </span>
-      <span className="evd-pick-stage">
+      <span className="eday-pick-stage">
         {today ? "Today" : formatStatusLabel(String(event.stage))}
       </span>
     </Link>
@@ -76,30 +78,30 @@ export function EventDayPickerPage() {
     .slice(0, 8);
 
   return (
-    <div className="evd">
-      <div className="evd-frame">
-        <header className="evd-pick-head">
-          <p className="evd-wordmark">Event Day</p>
-          <p className="evd-pick-sub">
+    <div className="eday">
+      <div className="eday-frame">
+        <header className="eday-pick-head">
+          <h1 className="eday-wordmark">Event Day</h1>
+          <p className="eday-pick-sub">
             The crew map. Pick your event — sections light up as the plan locks
             in.
           </p>
         </header>
-        <div className="evd-pick-list">
+        <div className="eday-pick-list">
           {events === undefined ? (
-            <p className="evd-empty">Lighting the estate…</p>
+            <p className="eday-empty">Lighting the estate…</p>
           ) : events === null ? (
-            <p className="evd-empty">
+            <p className="eday-empty">
               Your sign-in is not linked to a workspace yet — ask a manager to
               add you.
             </p>
           ) : !working && upcoming.length === 0 && past.length === 0 ? (
-            <p className="evd-empty">No events on the calendar yet.</p>
+            <p className="eday-empty">No events on the calendar yet.</p>
           ) : (
             <>
               {working ? (
                 <>
-                  <p className="evd-kicker">Your working event</p>
+                  <p className="eday-kicker">Your working event</p>
                   <EventCard
                     event={working}
                     today={
@@ -118,7 +120,7 @@ export function EventDayPickerPage() {
               ))}
               {past.length > 0 ? (
                 <>
-                  <p className="evd-kicker">Recently wrapped</p>
+                  <p className="eday-kicker">Recently wrapped</p>
                   {past.map((row) => (
                     <EventCard key={row._id} event={row} today={false} />
                   ))}

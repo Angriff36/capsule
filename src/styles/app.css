@@ -243,6 +243,41 @@
   .field-label {
     @apply grid gap-1 text-xs font-semibold text-ink-2;
   }
+  /* Unit-aware quantity (src/ui/UnitQuantityInput.tsx). */
+  .unit-quantity {
+    @apply grid gap-1;
+  }
+  .unit-quantity-row {
+    @apply flex gap-1;
+  }
+  .unit-quantity-unit {
+    @apply w-auto shrink-0;
+  }
+  .unit-quantity-suffix {
+    @apply inline-flex shrink-0 items-center px-1 text-xs font-normal text-ink-3;
+  }
+  .unit-quantity-hint {
+    @apply min-h-4 text-xs font-normal text-ink-3 tabular-nums;
+  }
+  /* Field help (src/ui/FieldHelp.tsx): label text plus its info icon. */
+  .field-label-row {
+    @apply inline-flex items-center gap-1;
+  }
+  .field-help {
+    @apply relative inline-flex align-middle;
+  }
+  .field-help-trigger {
+    @apply inline-flex size-4 cursor-help items-center justify-center rounded-full text-ink-3 hover:text-accent focus-visible:text-accent focus-visible:ring-2 focus-visible:ring-accent/25 focus-visible:outline-none;
+  }
+  .field-help-panel {
+    @apply absolute top-full left-0 z-40 mt-1.5 grid w-72 max-w-[80vw] gap-1.5 rounded-sm border border-line-2 bg-panel p-3 text-left font-sans text-xs font-normal text-ink-2 normal-case shadow-[0_12px_32px_-12px_rgba(34,30,22,0.35)];
+  }
+  .field-help-title {
+    @apply block text-sm font-semibold text-ink;
+  }
+  .field-help-link {
+    @apply font-semibold text-accent underline-offset-2 hover:underline;
+  }
   /* Status chip (DESIGN.md `status-chip`, owner pick 2026-09-29): a neutral
      outline with ink text; the tone lives in a leading icon, so state never
      rides on color alone. Give each chip one `chip-tone-*` class.
@@ -300,6 +335,57 @@
     @apply rounded-md border border-line bg-panel shadow-[0_1px_2px_rgb(30_40_36/0.05),0_2px_8px_-2px_rgb(30_40_36/0.08)];
   }
 
+  /* The track is as wide as all its steps; a narrow box scrolls it
+     sideways instead of pushing past its own edge. */
+  .lifecycle-stepper {
+    @apply overflow-x-auto border-y border-line bg-inset px-3 py-3;
+  }
+  .lifecycle-stepper-track {
+    @apply flex min-w-max items-start gap-0 overflow-x-auto pb-1;
+  }
+  .lifecycle-step {
+    @apply relative grid min-w-28 flex-1 grid-rows-[20px_auto_auto] gap-1 text-center text-xs font-semibold text-ink-3;
+  }
+  .lifecycle-step:not(:last-child)::after {
+    position: absolute;
+    top: 9px;
+    left: calc(50% + 12px);
+    width: calc(100% - 24px);
+    height: 1px;
+    background: var(--color-line-2);
+    content: "";
+  }
+  .lifecycle-step-dot {
+    @apply z-10 mx-auto grid h-5 w-5 place-items-center rounded-full border border-line-2 bg-panel text-xs text-ink-3;
+  }
+  .lifecycle-step-completed .lifecycle-step-dot {
+    @apply border-ok bg-ok text-on-brand;
+  }
+  .lifecycle-step-current .lifecycle-step-dot,
+  .lifecycle-step-next .lifecycle-step-dot {
+    @apply border-brand bg-brand text-on-brand;
+  }
+  .lifecycle-step-current .lifecycle-step-label {
+    @apply text-ink;
+  }
+  .lifecycle-step-next .lifecycle-step-label {
+    @apply text-brand;
+  }
+  .lifecycle-step-action {
+    @apply justify-self-center normal-case;
+  }
+  .lifecycle-action {
+    @apply inline-grid max-w-48 justify-items-center gap-1 justify-self-center;
+  }
+  .lifecycle-action-reason {
+    @apply text-xs font-normal text-ink-2;
+  }
+  .lifecycle-stepper-branches {
+    @apply mt-3 flex flex-wrap gap-2 border-t border-line pt-3;
+  }
+  .lifecycle-stepper-branch {
+    @apply mt-2 text-sm text-ink-2;
+  }
   /* barcode-label: a printable bar label and/or QR code. Both stay black on
      white in both schemes so a scanner can read them off the screen. */
   .barcode-label {
@@ -495,9 +581,20 @@
     .card,
     .working-ledger,
     .attention-ledger {
-      animation: rise-in 380ms cubic-bezier(0.22, 0.9, 0.3, 1) both;
+      /* backwards, not both: a filled transform keeps a stacking context
+         that traps dropdowns (SearchSelect) under later siblings. */
+      animation: rise-in 380ms cubic-bezier(0.22, 0.9, 0.3, 1) backwards;
       animation-delay: 60ms;
     }
+  }
+
+  /* Small help line under a form field; used by many workspaces, so it
+     lives here rather than in one page's stylesheet. */
+  .field-help-note {
+    display: block;
+    margin-top: 0.3rem;
+    color: var(--color-ink-3);
+    font-size: var(--text-xs);
   }
 }
 
@@ -1789,6 +1886,15 @@
   }
 }
 
+/* A table wider than a phone scrolls in its box; a one-cell message row
+   ("No vendor relationships found.") centred across every column started
+   off screen. On a phone it starts at the left edge. */
+@media (max-width: 767px) {
+  .overflow-x-auto td[colspan] {
+    text-align: left;
+  }
+}
+
 /* Overflow action menu: a <details> that drops a list of secondary and
    destructive actions under a "More" button. Destructive items sit last,
    separated by a rule. */
@@ -1831,8 +1937,28 @@
   color: var(--color-ink);
   font-size: 13px;
   font-weight: 500;
+  letter-spacing: normal;
   text-align: left;
+  text-transform: none;
   white-space: nowrap;
+}
+/* A group of rows in one menu item (client link: copy, turn off, preview,
+   notes). As one 32px row its notes ran over each other. */
+.action-menu-list > .action-menu-group {
+  display: grid;
+  height: auto;
+  max-width: 18rem;
+  cursor: default;
+  gap: 0;
+  padding: 0;
+  white-space: normal;
+}
+.action-menu-group > span,
+.action-menu-group > a {
+  padding: 2px 10px 4px;
+}
+.action-menu-list > .action-menu-group:hover:not(:disabled) {
+  background: transparent;
 }
 .action-menu-list > *:hover:not(:disabled) {
   background: var(--color-inset);
@@ -1855,9 +1981,22 @@
 }
 
 @media (max-width: 767px) {
+  /* Long labels kept the menu one line wide, so it ran off the left edge of
+     a phone; now it is never wider than the screen and labels wrap. */
   .action-menu-list {
     right: 0;
     left: auto;
+    width: max-content;
+    max-width: min(20rem, calc(100vw - 24px));
+  }
+  .action-menu-list > :not(.action-menu-rule),
+  .action-menu-list .btn {
+    height: auto;
+    min-height: 32px;
+    white-space: normal;
+  }
+  .action-menu-list > .action-menu-group {
+    max-width: none;
   }
 }
 
@@ -1976,7 +2115,7 @@
 .ledger-heading > span {
   color: var(--color-ink-3);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 13px;
   text-transform: uppercase;
 }
 
@@ -2070,7 +2209,7 @@
 .schedule-publish-note {
   grid-column: 1;
   color: var(--color-ink-2);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .schedule-publish-action {
@@ -2129,7 +2268,7 @@
 .schedule-notice-item-heading small {
   margin-top: 0.15rem;
   color: var(--color-ink-3);
-  font-size: 10px;
+  font-size: 13px;
   text-transform: uppercase;
 }
 
@@ -2323,7 +2462,7 @@
 .supply-muted {
   margin-top: 2px;
   color: var(--color-ink-3);
-  font-size: 10px;
+  font-size: 13px;
 }
 
 .supply-number {
@@ -2781,6 +2920,7 @@
 .report-view-switch {
   display: flex;
   gap: 0;
+  margin-bottom: 1.5rem;
   border-bottom: 1px solid var(--color-line-2);
   background: var(--color-panel);
 }
@@ -3956,7 +4096,7 @@ div.tpp-parameter-wide {
   gap: 0.4rem;
   color: var(--color-ink-3);
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 13px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -4263,6 +4403,120 @@ div.tpp-parameter-wide {
   border: 0;
 }
 
+/* Demand calculation trace: a full-width ledger detail, intentionally flat. */
+.demand-provenance-row > td {
+  padding: 0 !important;
+  background: var(--color-inset);
+}
+.demand-provenance {
+  border-block: 1px solid var(--color-line-2);
+  padding: 1.1rem 1.4rem;
+}
+.demand-provenance > header,
+.demand-provenance-line-head,
+.demand-provenance-reconcile,
+.demand-provenance-links {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.demand-provenance > header strong {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+}
+.demand-provenance > header > span,
+.demand-provenance-reconcile,
+.demand-provenance-empty,
+.demand-provenance-loading {
+  color: var(--color-ink-3);
+  font-size: 13px;
+}
+.demand-provenance-reconcile {
+  margin-top: 1rem;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+.demand-provenance-reconcile a,
+.demand-provenance-links a {
+  color: var(--color-brand);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+.demand-provenance-line {
+  border-top: 1px solid var(--color-line);
+  padding: 1rem 0;
+}
+.demand-provenance-line-head strong {
+  font-size: 11px;
+}
+.demand-provenance-line-head span,
+.demand-provenance-line code,
+.demand-provenance-line dd {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+.demand-provenance-line code {
+  display: block;
+  margin-top: 0.55rem;
+  color: var(--color-ink-2);
+  white-space: normal;
+}
+.demand-provenance-line dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 0.65rem;
+  border-block: 1px solid var(--color-line);
+}
+.demand-provenance-line dl > div {
+  padding: 0.45rem 0.65rem;
+  border-left: 1px solid var(--color-line);
+}
+.demand-provenance-line dl > div:nth-child(3n + 1) {
+  border-left: 0;
+}
+.demand-provenance-line dt {
+  color: var(--color-ink-3);
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.demand-provenance-line dd {
+  margin-top: 0.2rem;
+}
+.demand-provenance-links {
+  justify-content: flex-start;
+  margin-top: 0.65rem;
+  font-size: 13px;
+}
+.demand-provenance-history {
+  border-top: 1px solid var(--color-line);
+  padding-top: 0.8rem;
+}
+.demand-provenance-history > p:not(.eyebrow) {
+  margin-top: 0.35rem;
+  color: var(--color-ink-2);
+  font-size: 10px;
+}
+@media (max-width: 560px) {
+  .demand-provenance {
+    padding: 1rem;
+  }
+  .demand-provenance-line dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .demand-provenance-line dl > div:nth-child(3n + 1) {
+    border-left: 1px solid var(--color-line);
+  }
+  .demand-provenance-line dl > div:nth-child(2n + 1) {
+    border-left: 0;
+  }
+}
+
 @media (min-width: 960px) {
   .culinary-work-grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -4463,12 +4717,20 @@ div.tpp-parameter-wide {
 
 /* Export PDF = browser print-to-PDF of the .print-sheet region only. */
 @media print {
-  body * {
+  /* Only a page that shows a sheet hides the rest; any other page (lot
+     trace, for one) printed blank. */
+  body:where(:has(.print-sheet)) * {
     visibility: hidden;
   }
   .print-sheet,
   .print-sheet * {
     visibility: visible;
+  }
+  /* Hidden is not gone: the rest of a long page under the sheet still took
+     space and printed as blank pages after it. */
+  body:where(:has(.print-sheet))
+    *:not(:has(.print-sheet)):not(.print-sheet):not(.print-sheet *) {
+    display: none !important;
   }
   /* !important: screen rules (.card, the report drawer's slide-in shift) are
      stronger and kept the sheet in place on the paper - it printed half way
@@ -4482,9 +4744,24 @@ div.tpp-parameter-wide {
     border: none;
     box-shadow: none;
   }
+  /* A frame's slide-in animation pinned the sheet below the page title. */
   *:has(.print-sheet) {
     position: static !important;
     transform: none !important;
+    animation: none !important;
+  }
+  /* The app frame is one screen tall and clips or scrolls the rest; on paper
+     that kept every long page to its first sheet, so the frame grows to fit. */
+  *:has(.app-canvas),
+  .app-canvas {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  /* The menu rail and top bar are for the screen, not the paper. */
+  .app-shell-sidebar,
+  .app-shell-header {
+    display: none !important;
   }
   .print-sheet .supply-table-wrap {
     overflow: visible;
@@ -4552,6 +4829,20 @@ div.tpp-parameter-wide {
   @page contextual-table {
     size: letter landscape;
     margin: 10mm;
+  }
+  /* Client handouts (menus, venue packet) are portrait sheets; the app's
+     landscape default printed them sideways in the left half of the paper. */
+  body:has(.print-sheet--handout),
+  .print-sheet--handout {
+    page: handout;
+  }
+  .print-sheet--handout {
+    max-width: none !important;
+    box-shadow: none !important;
+  }
+  @page handout {
+    size: letter portrait;
+    margin: 0.5in;
   }
   @page {
     size: landscape;
@@ -4953,4 +5244,152 @@ div.tpp-parameter-wide {
     min-height: 4rem;
     padding-top: env(safe-area-inset-top);
   }
+}
+
+/* Compact record context stays above its document but below the shell rail,
+   dialogs, and high-priority overlays. It is fixed against the app's one real
+   scroll container, so showing it never changes document layout. */
+.sticky-record-header {
+  position: fixed;
+  z-index: 30;
+  top: var(--sticky-record-header-top);
+  left: var(--sticky-record-header-left);
+  display: flex;
+  width: var(--sticky-record-header-width);
+  min-height: 56px;
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid var(--color-line-2);
+  padding: 8px 24px;
+  background: var(--color-panel);
+}
+.sticky-record-header-title {
+  min-width: min(12rem, 40%);
+  max-width: 28rem;
+  overflow: hidden;
+  color: var(--color-ink);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sticky-record-header-facts {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: baseline;
+  gap: 0.85rem;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, #000 calc(100% - 1.5rem), transparent);
+}
+/* Facts keep their own width instead of squeezing into each other; the row
+   fades out where it is cut. */
+.sticky-record-header-facts > div {
+  display: flex;
+  flex: none;
+  min-width: 0;
+  align-items: baseline;
+  gap: 0.3rem;
+  white-space: nowrap;
+}
+.sticky-record-header-facts dt {
+  color: var(--color-ink-3);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.sticky-record-header-facts dd {
+  overflow: hidden;
+  color: var(--color-ink-2);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+}
+.sticky-record-header-controls,
+.sticky-record-header-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 0.45rem;
+}
+.sticky-record-header .action-menu-list button.is-active {
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+@media (max-width: 767px) {
+  .sticky-record-header {
+    gap: 0.5rem;
+    padding: 6px 10px;
+  }
+  /* A phone has room for the record's name and one action: the facts give
+     way, the name takes the rest, and the action button stays compact. */
+  .sticky-record-header-title {
+    flex: 1 1 auto;
+    max-width: none;
+    font-size: var(--text-base);
+  }
+  .sticky-record-header-facts {
+    display: none;
+  }
+  .sticky-record-header-controls {
+    margin-left: auto;
+  }
+  .sticky-record-header-controls
+    > .btn:not(.sticky-record-header-desktop-only) {
+    /* block, not flex: a flex button cannot end its text with "…" */
+    display: block;
+    min-height: 36px;
+    line-height: 36px;
+    max-width: 10rem;
+    overflow: hidden;
+    padding: 0 0.75rem;
+    font-size: var(--text-sm);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .sticky-record-header-actions,
+  .sticky-record-header-desktop-only {
+    display: none;
+  }
+}
+/* Natural-language schedule entry preserves the native picker as a visible
+   fallback. The resolved echo is compact operational metadata, not a new
+   card or status treatment. */
+.natural-date-entry {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.35rem;
+}
+.natural-date-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm, 4px);
+  background: var(--color-panel);
+  color: var(--color-ink-2);
+}
+.natural-date-button:hover:not(:disabled) {
+  color: var(--color-ink);
+}
+/* Kept in the form for its value and the browser picker; never shown. */
+.natural-date-picker {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+.natural-date-message {
+  grid-column: 1 / -1;
+  color: var(--color-ink-3);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.4;
 }

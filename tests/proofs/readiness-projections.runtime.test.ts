@@ -256,6 +256,44 @@ describe("runtime proof: nine live Event readiness projections (AC-401 first sli
     expect(codesOf(after!)).not.toContain("planning.service_style_missing");
   });
 
+  it("a pack list nobody has packed yet counts as open packing", async () => {
+    const proof = harness();
+    const tenantId = "tenant-ac168-draft-pack";
+    const { events } = rolesFor(proof, tenantId);
+    const logistics = proof.asRole({
+      subject: `logistics-${tenantId}`,
+      role: "logistics_manager",
+      tenantId,
+    });
+    const eventId = await createEvent(proof, tenantId, "Draft pack list");
+    const pack = (await proof.executeCommand(
+      logistics,
+      M.PackList_createViaOpen,
+      { eventId, name: "Main load", purpose: "Service" },
+    )) as { docId: string };
+
+    const open = await readReadiness(events, eventId);
+    const packIssues = open!.domains
+      .flatMap((domain) => domain.issues)
+      .filter((issue) => issue.affectedIds.includes(pack.docId))
+      .map((issue) => issue.code);
+    expect(packIssues).toEqual([
+      "packing.list_in_flight",
+      "execution.pack_open",
+    ]);
+
+    await proof.executeCommand(logistics, M.PackList_cancel, {
+      docId: pack.docId,
+      reason: "Nothing to load",
+    });
+    const cancelled = await readReadiness(events, eventId);
+    expect(
+      cancelled!.domains
+        .flatMap((domain) => domain.issues)
+        .some((issue) => issue.affectedIds.includes(pack.docId)),
+    ).toBe(false);
+  });
+
   it("anonymous and other-tenant identities get null, never another tenant's readiness", async () => {
     const proof = harness();
     const tenantId = "tenant-ac401-isolated";

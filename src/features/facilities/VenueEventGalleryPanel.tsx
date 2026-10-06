@@ -1,6 +1,7 @@
 import { useQuery } from "convex/react";
 import { useMemo, useState } from "react";
 import { api, type Doc } from "../../lib/api";
+import { copyText } from "../../lib/copyText";
 import { formatDate } from "../../lib/format";
 import {
   useAttachmentRemove,
@@ -40,7 +41,7 @@ export function VenueEventGalleryPanel({ venue }: { venue: Doc<"venues"> }) {
   const setGalleryToken = useVenueSetGalleryToken();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<boolean | null>(null);
 
   const inGallery = useMemo(
     () =>
@@ -111,8 +112,7 @@ export function VenueEventGalleryPanel({ venue }: { venue: Doc<"venues"> }) {
                   className="btn btn-secondary btn-sm"
                   type="button"
                   onClick={() => {
-                    void navigator.clipboard?.writeText(link);
-                    setCopied(true);
+                    void copyText(link).then(setCopied);
                   }}
                 >
                   {copied ? "Copied" : "Copy link"}
@@ -130,13 +130,19 @@ export function VenueEventGalleryPanel({ venue }: { venue: Doc<"venues"> }) {
                   type="button"
                   disabled={busy != null}
                   onClick={() => {
-                    setCopied(false);
+                    setCopied(null);
                     void setToken(undefined);
                   }}
                 >
                   Stop sharing
                 </button>
               </div>
+              {copied === false ? (
+                <p className="text-xs text-ink-2" role="status">
+                  This browser would not copy. Select the link above and copy
+                  it.
+                </p>
+              ) : null}
               <p className="text-xs text-ink-3">
                 Anyone with this link sees the photos below. Stop sharing turns
                 the link off.

@@ -7,6 +7,7 @@ import type {
 } from "../../src/features/reports/tpp/types";
 import { query } from "../_generated/server";
 import { getAuthContext } from "../lib/authContext";
+import { dietTagsOnly } from "../lib/dietaryTags";
 import { canRead } from "../search";
 import {
   REPORT_ROW_LIMIT,
@@ -515,7 +516,7 @@ export const run = query({
               course: row.course ?? "",
               portion: row.portionSize,
               unit: row.portionUnit,
-              dietary: row.dietaryTags?.join(", ") ?? "",
+              dietary: dietTagsOnly(row.dietaryTags).join(", "),
             },
           })),
       );

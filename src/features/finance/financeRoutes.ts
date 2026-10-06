@@ -46,6 +46,7 @@ export const FINANCE_ROUTES = {
   profitMargins: "/finance/profit-margins",
   reconciliation: "/finance/money-check",
   closeout: "/finance/closeout",
+  donations: "/finance/donations",
   payroll: "/finance/payroll",
   tips: "/finance/tips",
   venueCommissionTerms: "/finance/commission-terms",

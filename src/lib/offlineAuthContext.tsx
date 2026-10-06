@@ -1,5 +1,6 @@
 import { createContext, useContext, type ReactNode } from "react";
 import type { StoredAuthStatus } from "./offlineAuthSnapshot";
+import { formatDateTime } from "./format";
 
 export interface OfflineAuthValue {
   status: StoredAuthStatus;
@@ -32,7 +33,7 @@ export function OfflineReadOnlyBanner({
 }: {
   readonly capturedAt: number;
 }) {
-  const when = new Date(capturedAt).toLocaleString();
+  const when = formatDateTime(capturedAt);
   return (
     <div
       role="status"

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { formatCountNoun } from "../../lib/format";
+import { formatQuantity, formatCountNoun } from "../../lib/format";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import type { PurchasingStockContext } from "./purchasingStockContext";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
@@ -77,6 +77,7 @@ export type PurchasingQueueSplitProps = {
   ingredientName: (id: string) => string;
   ingredients?: readonly IngredientCatalogRow[];
   eventName: (id: string) => string;
+  scopedEventName?: string;
   onNeedAction: (need: PurchaseNeed, key: string) => void;
   onOnboardVendor: () => void;
   vendorContacts: VendorContact[];
@@ -99,6 +100,7 @@ export function PurchasingQueueSplit({
   ingredientName,
   ingredients,
   eventName,
+  scopedEventName,
   onNeedAction,
   onOnboardVendor,
   vendorContacts,
@@ -118,7 +120,11 @@ export function PurchasingQueueSplit({
           <TableSkeleton rows={6} />
         ) : activeNeeds.length === 0 ? (
           <div className="document-empty">
-            <p>No purchase needs are open.</p>
+            <p>
+              {scopedEventName
+                ? `No purchase needs are open for ${scopedEventName}.`
+                : "No purchase needs are open."}
+            </p>
             <span>
               Approve an event with calculated component demand to open needs
               here (weekly draft is maintained automatically).
@@ -166,8 +172,8 @@ export function PurchasingQueueSplit({
                           <strong>{ingredientName(need.ingredientId)}</strong>
                         )}
                         <span>
-                          {eventName(need.eventId)} · {need.requiredQuantity}{" "}
-                          {need.unit}
+                          {eventName(need.eventId)} ·{" "}
+                          {formatQuantity(need.requiredQuantity)} {need.unit}
                         </span>
                         {orderedChangeNote(need) ? (
                           <small>{orderedChangeNote(need)}</small>
@@ -255,7 +261,7 @@ export function PurchasingQueueSplit({
           <TableSkeleton rows={4} />
         ) : activeVendors.length === 0 ? (
           <div className="document-empty">
-            <p>No vendors onboarded.</p>
+            <p>No vendors yet.</p>
             <span>Add a supplier before opening an order folio.</span>
             <div className="mt-3 flex justify-center">
               <button
@@ -263,7 +269,7 @@ export function PurchasingQueueSplit({
                 className="btn btn-primary btn-sm"
                 onClick={onOnboardVendor}
               >
-                Onboard vendor
+                Add a vendor
               </button>
             </div>
           </div>

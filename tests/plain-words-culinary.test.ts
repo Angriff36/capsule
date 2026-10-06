@@ -114,7 +114,7 @@ describe("plain words on culinary manifests", () => {
     }
 
     for (const fresh of [
-      "Kitchen staff may see recipes",
+      "Kitchen and inventory staff may see recipes",
       "Kitchen staff may see recipe ingredient lines",
       "Kitchen staff may see recipe steps",
       "Kitchen staff may see recipe versions",
@@ -175,7 +175,7 @@ describe("plain words on culinary manifests", () => {
 
     for (const fresh of [
       "Kitchen staff may see nested recipe lines",
-      "Kitchen, sales and managers may see dishes",
+      "Kitchen, inventory, sales and managers may see dishes",
       "Kitchen staff may see dish ingredient lines",
       "Kitchen staff and managers may see dish task templates",
       "Kitchen staff and managers may see task materials",
@@ -208,7 +208,7 @@ describe("plain words on culinary manifests", () => {
     );
 
     // already-landed READ leftovers must stay put
-    expect(visible).toContain("Kitchen staff may see recipes");
+    expect(visible).toContain("Kitchen and inventory staff may see recipes");
     expect(visible).toContain("Kitchen staff may see dish recipes");
     expect(visible).toContain("Kitchen staff may see portion sizes");
 
@@ -262,7 +262,7 @@ describe("plain words on culinary manifests", () => {
 
     // already-landed leftovers must stay put
     expect(visible).toContain("Give this portion size a name.");
-    expect(visible).toContain("Kitchen staff may see recipes");
+    expect(visible).toContain("Kitchen and inventory staff may see recipes");
   });
 
   it("keeps leftover culinary yield-and-batch constraint copy free of component jargon", () => {
@@ -309,7 +309,7 @@ describe("plain words on culinary manifests", () => {
     // already-landed leftovers must stay put
     expect(visible).toContain("Give this recipe a name.");
     expect(visible).toContain("Give this portion size a name.");
-    expect(visible).toContain("Kitchen staff may see recipes");
+    expect(visible).toContain("Kitchen and inventory staff may see recipes");
   });
 
   it("keeps leftover culinary ingredient-step-and-drafted-name constraint copy free of component jargon", () => {
@@ -361,7 +361,7 @@ describe("plain words on culinary manifests", () => {
       "This recipe's batch size has to be more than zero.",
     );
     expect(visible).toContain("Give this portion size a name.");
-    expect(visible).toContain("Kitchen staff may see recipes");
+    expect(visible).toContain("Kitchen and inventory staff may see recipes");
   });
 
   it("keeps leftover culinary step-instruction-and-duration constraint copy free of component jargon", () => {
@@ -411,6 +411,6 @@ describe("plain words on culinary manifests", () => {
     expect(visible).toContain("Give this recipe step an instruction.");
     expect(visible).toContain("Give this recipe a name.");
     expect(visible).toContain("Give this portion size a name.");
-    expect(visible).toContain("Kitchen staff may see recipes");
+    expect(visible).toContain("Kitchen and inventory staff may see recipes");
   });
 });
