@@ -214,7 +214,7 @@ export function ClientRetentionPage() {
           >
             {busy
               ? "Working…"
-              : `Open outreach tasks (${uncoveredCandidates.length})`}
+              : `Start a call task for each (${uncoveredCandidates.length})`}
           </button>
         </div>
       </header>
