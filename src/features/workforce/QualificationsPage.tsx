@@ -92,7 +92,14 @@ export function QualificationsPage() {
         issuedAt: new Date(
           `${String(data.get("issuedAt"))}T00:00:00`,
         ).getTime(),
-        certificationType: String(data.get("certificationType")),
+        // "Other" files the card under its own name.
+        certificationType:
+          String(data.get("certificationType") ?? "").trim() ||
+          String(data.get("name") ?? "")
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "_")
+            .replace(/^_|_$/g, ""),
         issuingBody: String(data.get("issuingBody")),
         expiresAt: expiresRaw
           ? new Date(`${expiresRaw}T23:59:59.999`).getTime()
@@ -174,20 +181,18 @@ export function QualificationsPage() {
             </label>
             <label className="field-label">
               Type
-              <input
+              <select
                 name="certificationType"
                 className="input"
-                list="certification-type-options"
-                placeholder="food_handler"
-                required
-              />
-              <datalist id="certification-type-options">
+                defaultValue=""
+              >
+                <option value="">Other (named above)</option>
                 {certificationTypes.map(([value, label]) => (
                   <option key={value} value={value}>
                     {label}
                   </option>
                 ))}
-              </datalist>
+              </select>
             </label>
             <label className="field-label">
               Issuing body
@@ -250,7 +255,14 @@ export function QualificationsPage() {
                     </td>
                     <td data-label="Qualification">
                       {row.name}
-                      <small>{row.certificationType || "Unclassified"}</small>
+                      <small>
+                        {certificationTypes.find(
+                          ([value]) => value === row.certificationType,
+                        )?.[1] ??
+                          (row.certificationType
+                            ? row.certificationType.replace(/_/g, " ")
+                            : "Unclassified")}
+                      </small>
                     </td>
                     <td data-label="Issuing body">{row.issuingBody || "—"}</td>
                     <td data-label="Issued">
