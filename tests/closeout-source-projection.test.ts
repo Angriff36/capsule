@@ -161,6 +161,60 @@ describe("closeout source lines", () => {
     expect(values.actualIngredientCost).toBe(45);
   });
 
+  it("food issued from stock is the food cost, not also the orders that filled the stock", () => {
+    const order = {
+      _id: "o1",
+      version: 2,
+      status: "received",
+      lines: [
+        {
+          _id: "l1",
+          version: 1,
+          status: "received",
+          orderedQuantity: 10,
+          receivedQuantity: 10,
+          unitCost: 5,
+        },
+      ],
+    };
+    const food = line(
+      projectCloseoutSources(
+        input({
+          vendorOrders: [order],
+          stockIssues: [
+            {
+              _id: "r1",
+              version: 2,
+              ingredientName: "Lemons",
+              quantity: 4,
+              unitCost: 0.5,
+            },
+            {
+              _id: "r2",
+              version: 2,
+              ingredientName: "Greens",
+              quantity: 3,
+              unitCost: 4,
+            },
+            {
+              _id: "r3",
+              version: 2,
+              ingredientName: "Salt",
+              quantity: 1,
+              unitCost: null,
+            },
+          ],
+        }),
+      ),
+      "ingredient",
+    );
+    expect(food.actual).toBe(14);
+    expect(food.planned).toBe(50);
+    expect(food.complete).toBe(false);
+    expect(food.note).toMatch(/1 issued item with no cost/);
+    expect(food.sources.map((row) => row.id)).toEqual(["r1", "r2"]);
+  });
+
   it("staff time with a missing pay rate is open and names the person", () => {
     const projection = projectCloseoutSources(
       input({

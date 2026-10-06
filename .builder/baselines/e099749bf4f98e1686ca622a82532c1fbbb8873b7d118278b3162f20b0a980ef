@@ -20183,10 +20183,10 @@ async function __runEventCloseoutCapture(ctx: MutationCtx, { docId, eventId, act
     if (!((__rel_event.stage === "closed_out"))) throw new Error("Guard 3 failed");
     if (!((eventId === doc.eventId))) throw new Error("This closeout is for a different event. Pick the event already on this closeout.");
     if (!(((((((((actualRevenue >= 0) && (budgetedRevenue >= 0)) && (actualIngredientCost >= 0)) && (actualWasteCost >= 0)) && (actualLaborCost >= 0)) && (actualVendorCost >= 0)) && (budgetedCost >= 0)) && (totalActualCost >= 0)))) throw new Error("This closeout's money amounts can't be negative. Use zero or more.");
-    if (!((totalActualCost === (((actualIngredientCost + actualWasteCost) + actualLaborCost) + actualVendorCost)))) throw new Error("This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together.");
-    if (!((revenueVariance === (budgetedRevenue - actualRevenue)))) throw new Error("This closeout's revenue variance has to equal budgeted revenue minus actual revenue.");
-    if (!((costVariance === (budgetedCost - totalActualCost)))) throw new Error("This closeout's cost variance has to equal budgeted cost minus total actual cost.");
-    if (!((grossProfit === (actualRevenue - totalActualCost)))) throw new Error("This closeout's gross profit has to equal actual revenue minus total actual cost.");
+    if (!((Math.round((totalActualCost * 100)) === Math.round(((((actualIngredientCost + actualWasteCost) + actualLaborCost) + actualVendorCost) * 100))))) throw new Error("This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together.");
+    if (!((Math.round((revenueVariance * 100)) === Math.round(((budgetedRevenue - actualRevenue) * 100))))) throw new Error("This closeout's revenue variance has to equal budgeted revenue minus actual revenue.");
+    if (!((Math.round((costVariance * 100)) === Math.round(((budgetedCost - totalActualCost) * 100))))) throw new Error("This closeout's cost variance has to equal budgeted cost minus total actual cost.");
+    if (!((Math.round((grossProfit * 100)) === Math.round(((actualRevenue - totalActualCost) * 100))))) throw new Error("This closeout's gross profit has to equal actual revenue minus total actual cost.");
     if (!(((expectedHeadcount >= 0) && (actualHeadcount >= 0)))) throw new Error("This closeout's headcount numbers can't be negative. Use zero or more.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -20329,10 +20329,10 @@ export const EventCloseout_createViaCapture = mutation({
     if (!((__rel_event.stage === "closed_out"))) throw new Error("Guard 3 failed");
     if (!((eventId === __draft.eventId))) throw new Error("This closeout is for a different event. Pick the event already on this closeout.");
     if (!(((((((((actualRevenue >= 0) && (budgetedRevenue >= 0)) && (actualIngredientCost >= 0)) && (actualWasteCost >= 0)) && (actualLaborCost >= 0)) && (actualVendorCost >= 0)) && (budgetedCost >= 0)) && (totalActualCost >= 0)))) throw new Error("This closeout's money amounts can't be negative. Use zero or more.");
-    if (!((totalActualCost === (((actualIngredientCost + actualWasteCost) + actualLaborCost) + actualVendorCost)))) throw new Error("This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together.");
-    if (!((revenueVariance === (budgetedRevenue - actualRevenue)))) throw new Error("This closeout's revenue variance has to equal budgeted revenue minus actual revenue.");
-    if (!((costVariance === (budgetedCost - totalActualCost)))) throw new Error("This closeout's cost variance has to equal budgeted cost minus total actual cost.");
-    if (!((grossProfit === (actualRevenue - totalActualCost)))) throw new Error("This closeout's gross profit has to equal actual revenue minus total actual cost.");
+    if (!((Math.round((totalActualCost * 100)) === Math.round(((((actualIngredientCost + actualWasteCost) + actualLaborCost) + actualVendorCost) * 100))))) throw new Error("This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together.");
+    if (!((Math.round((revenueVariance * 100)) === Math.round(((budgetedRevenue - actualRevenue) * 100))))) throw new Error("This closeout's revenue variance has to equal budgeted revenue minus actual revenue.");
+    if (!((Math.round((costVariance * 100)) === Math.round(((budgetedCost - totalActualCost) * 100))))) throw new Error("This closeout's cost variance has to equal budgeted cost minus total actual cost.");
+    if (!((Math.round((grossProfit * 100)) === Math.round(((actualRevenue - totalActualCost) * 100))))) throw new Error("This closeout's gross profit has to equal actual revenue minus total actual cost.");
     if (!(((expectedHeadcount >= 0) && (actualHeadcount >= 0)))) throw new Error("This closeout's headcount numbers can't be negative. Use zero or more.");
     const doc: Record<string, any> = {
       ...__draft,
@@ -20384,10 +20384,10 @@ async function __runEventCloseoutCorrect(ctx: MutationCtx, { docId, reason, actu
     if (!(checkRole(user, "financeManageAccess"))) throw new Error("Guard 2 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Say why this closeout is being corrected.");
     if (!(((((((((actualRevenue >= 0) && (budgetedRevenue >= 0)) && (actualIngredientCost >= 0)) && (actualWasteCost >= 0)) && (actualLaborCost >= 0)) && (actualVendorCost >= 0)) && (budgetedCost >= 0)) && (totalActualCost >= 0)))) throw new Error("This closeout's money amounts can't be negative. Use zero or more.");
-    if (!((totalActualCost === (((actualIngredientCost + actualWasteCost) + actualLaborCost) + actualVendorCost)))) throw new Error("This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together.");
-    if (!((revenueVariance === (budgetedRevenue - actualRevenue)))) throw new Error("This closeout's revenue variance has to equal budgeted revenue minus actual revenue.");
-    if (!((costVariance === (budgetedCost - totalActualCost)))) throw new Error("This closeout's cost variance has to equal budgeted cost minus total actual cost.");
-    if (!((grossProfit === (actualRevenue - totalActualCost)))) throw new Error("This closeout's gross profit has to equal actual revenue minus total actual cost.");
+    if (!((Math.round((totalActualCost * 100)) === Math.round(((((actualIngredientCost + actualWasteCost) + actualLaborCost) + actualVendorCost) * 100))))) throw new Error("This closeout's total cost has to equal ingredient, waste, labor, and vendor cost added together.");
+    if (!((Math.round((revenueVariance * 100)) === Math.round(((budgetedRevenue - actualRevenue) * 100))))) throw new Error("This closeout's revenue variance has to equal budgeted revenue minus actual revenue.");
+    if (!((Math.round((costVariance * 100)) === Math.round(((budgetedCost - totalActualCost) * 100))))) throw new Error("This closeout's cost variance has to equal budgeted cost minus total actual cost.");
+    if (!((Math.round((grossProfit * 100)) === Math.round(((actualRevenue - totalActualCost) * 100))))) throw new Error("This closeout's gross profit has to equal actual revenue minus total actual cost.");
     if (!(((expectedHeadcount >= 0) && (actualHeadcount >= 0)))) throw new Error("This closeout's headcount numbers can't be negative. Use zero or more.");
     const nextRevision = (((doc.revision != null) ? doc.revision : 1) + 1);
     const previousActualRevenue = doc.actualRevenue;

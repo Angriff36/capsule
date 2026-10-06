@@ -83,6 +83,13 @@ export type ProjectionVendorOrder = Versioned & {
     }
   >;
 };
+/** Stock issued out of storage to this event (a consumed hold). */
+export type ProjectionStockIssue = Versioned & {
+  ingredientName: string;
+  quantity: number;
+  /** The lot's unit cost; null when the lot was never priced. */
+  unitCost: number | null;
+};
 export type ProjectionWaste = Versioned & {
   status: string;
   quantity: number;
@@ -134,6 +141,8 @@ export type CloseoutProjectionInput = {
   payments: ProjectionPayment[];
   creditMemos: ProjectionCreditMemo[];
   vendorOrders: ProjectionVendorOrder[];
+  /** Optional: stock issued to the event. When present it is the food cost. */
+  stockIssues?: ProjectionStockIssue[];
   waste: ProjectionWaste[];
   labor: ProjectionLabor | null;
   rentals: ProjectionRental[];
@@ -296,6 +305,43 @@ function ingredientLine(input: CloseoutProjectionInput): CloseoutLine {
         ),
       );
     }
+  }
+  // Food taken from storage is what the event used, bought for it or not.
+  // Purchases feed that same stock, so when stock was issued it alone is the
+  // cost (never both); the orders stay as the plan.
+  const issues = live(input.stockIssues ?? []);
+  if (issues.length > 0) {
+    const issued: CloseoutSourceRecord[] = [];
+    let used = 0;
+    let unpriced = 0;
+    for (const row of issues) {
+      if (row.unitCost == null) {
+        unpriced += 1;
+        continue;
+      }
+      const amount = cents(row.quantity * row.unitCost);
+      used += amount;
+      issued.push(
+        ref(
+          "inventoryReservations",
+          row,
+          amount,
+          `${row.ingredientName} issued from stock`,
+        ),
+      );
+    }
+    return {
+      key: "ingredient",
+      label: "Food cost",
+      planned: planned > 0 ? money(planned) : null,
+      actual: issued.length > 0 ? money(used) : null,
+      complete: unpriced === 0,
+      note:
+        unpriced > 0
+          ? `${plural(unpriced, "issued item")} with no cost on the stock lot`
+          : null,
+      sources: issued,
+    };
   }
   const notes: string[] = [];
   if (sources.length === 0)
