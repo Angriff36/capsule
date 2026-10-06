@@ -293,13 +293,29 @@ export function RunOfShowPage() {
   const closeBuilder = () => {
     setShowBuilder(false);
   };
+  // Times of the crew milestones already on the run; standard blocks are
+  // placed from them.
+  const milestoneAt = (name: string): number | null =>
+    (rows.find((row) => row.name === name)?.startsAt as number | null) ?? null;
   const generate = async (templates: BattleBoardTaskTemplate[]) => {
     if (!briefing || templates.length === 0) return;
     setGenerating(true);
     setFailure(null);
     try {
       await createTasks(
-        planFromTemplates(templates, String(briefing.event._id)),
+        planFromTemplates(templates, String(briefing.event._id), {
+          arriveAt:
+            milestoneAt("Arrive onsite / Setup") ??
+            (briefing.event.startsAt != null
+              ? (briefing.event.startsAt as number) - 60 * 60_000
+              : null),
+          serviceAt:
+            milestoneAt("Service starts") ??
+            (briefing.event.startsAt as number | null),
+          endsAt:
+            milestoneAt("Cleanup & reload") ??
+            (briefing.event.endsAt as number | null),
+        }),
         buildKey.current,
       );
       closeBuilder();
@@ -573,6 +589,7 @@ function countdownLine(start: number | null, nowMs: number): string {
   if (minutes <= 0) return "starting now";
   if (minutes < 60) return `in ${minutes} min`;
   const hours = Math.floor(minutes / 60);
+  if (hours >= 48) return `in ${Math.round(hours / 24)} days`;
   return `in ${hours} h ${minutes % 60} min`;
 }
 
