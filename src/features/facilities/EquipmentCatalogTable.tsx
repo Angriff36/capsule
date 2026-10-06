@@ -73,9 +73,9 @@ export function EquipmentCatalogTable<Row extends CatalogTableRow>({
                 </small>
                 {item.ownership === "rented" ? (
                   <small>
-                    from{" "}
-                    {(item.vendorId && vendorNames.get(item.vendorId)) ||
-                      "vendor not set"}
+                    {item.vendorId && vendorNames.get(item.vendorId)
+                      ? `from ${vendorNames.get(item.vendorId)}`
+                      : "rental company not named"}
                   </small>
                 ) : null}
               </td>

@@ -54,6 +54,7 @@ export function EquipmentCatalogPage() {
   const [bulkNotice, setBulkNotice] = useState<string | null>(null);
   const [editing, setEditing] = useState<EquipmentDetailRow | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [find, setFind] = useState("");
   const [failure, setFailure] = useState<unknown>(null);
   const { prompt, host } = useActionPrompt();
 
@@ -67,6 +68,18 @@ export function EquipmentCatalogPage() {
       .map((place) => place.name),
   );
   const activeRows = rows.filter((item) => item.status === "active");
+  const needle = find.trim().toLowerCase();
+  const shownRows = needle
+    ? rows.filter((item) =>
+        [
+          item.name,
+          item.assetTag,
+          item.category,
+          item.homeLocation,
+          item.currentLocation,
+        ].some((value) => value?.toLowerCase().includes(needle)),
+      )
+    : rows;
   const ownedValue = activeRows
     .filter((item) => item.ownership === "owned")
     .reduce((sum, item) => sum + item.quantity * item.purchaseValue, 0);
@@ -374,20 +387,33 @@ export function EquipmentCatalogPage() {
             </span>
           </div>
         ) : (
-          <EquipmentCatalogTable
-            rows={rows}
-            busy={busy != null}
-            vendorNames={vendorNames}
-            onEdit={(item) => {
-              setShowForm(false);
-              setEditing(item as EquipmentDetailRow);
-            }}
-            onDetails={(item) => setDetailId(item._id)}
-            onAction={rowAction}
-            shelfMark={(item) =>
-              issues ? equipmentShelfMark(item._id, issues) : null
-            }
-          />
+          <>
+            <input
+              type="search"
+              className="input min-h-10 w-full max-w-sm"
+              placeholder="Find by name, tag, category or place"
+              aria-label="Find equipment"
+              value={find}
+              onChange={(event) => setFind(event.target.value)}
+            />
+            {shownRows.length === 0 ? (
+              <p className="text-base text-ink-2">Nothing matches.</p>
+            ) : null}
+            <EquipmentCatalogTable
+              rows={shownRows}
+              busy={busy != null}
+              vendorNames={vendorNames}
+              onEdit={(item) => {
+                setShowForm(false);
+                setEditing(item as EquipmentDetailRow);
+              }}
+              onDetails={(item) => setDetailId(item._id)}
+              onAction={rowAction}
+              shelfMark={(item) =>
+                issues ? equipmentShelfMark(item._id, issues) : null
+              }
+            />
+          </>
         )}
       </section>
     </div>
