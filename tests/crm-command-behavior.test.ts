@@ -11,6 +11,14 @@ import {
   click,
   submit,
 } from "./support/mounted-app";
+
+/** Proposal rows open to show their tools, as a user would open them. */
+async function openProposalRows() {
+  for (const open of [...container.querySelectorAll("button")].filter(
+    (node) => node.textContent === "Open",
+  ))
+    await click(open);
+}
 import { ProposalTemplatesPage } from "../src/features/clients/ProposalTemplatesPage";
 import { ProposalsPage } from "../src/features/clients/ProposalsPage";
 import { ContractsPage } from "../src/features/clients/ContractsPage";
@@ -112,6 +120,7 @@ it("shares, copies, revokes and replaces a proposal link", async () => {
 
   // Share: a new link pinned to the published revision, copied at once.
   await mount(createElement(ProposalsPage));
+  await openProposalRows();
   await click(button("Share link"));
   expect(create).toHaveBeenCalledTimes(1);
   expect(create.mock.calls[0]?.[0]).toMatchObject({
@@ -132,6 +141,7 @@ it("shares, copies, revokes and replaces a proposal link", async () => {
   };
   backend.values.set("useListShareLink", [active]);
   await mount(createElement(ProposalsPage));
+  await openProposalRows();
   await click(button("Copy link"));
   expect(create).toHaveBeenCalledTimes(1);
   expect(writeText).toHaveBeenLastCalledWith(
@@ -155,6 +165,7 @@ it("shares, copies, revokes and replaces a proposal link", async () => {
   backend.values.set("useListShareLink", [{ ...active, status: "revoked" }]);
   create.mockResolvedValue({ _id: "link-2" });
   await mount(createElement(ProposalsPage));
+  await openProposalRows();
   await click(button("Share link"));
   expect(create).toHaveBeenCalledTimes(2);
   expect(writeText).toHaveBeenLastCalledWith(
@@ -169,6 +180,7 @@ it("reports proposal publication and contract sent-recording as internal status 
     "lib/proposalRevision:sendProposalWithRevisionCapture",
   );
   await mount(createElement(ProposalsPage));
+  await openProposalRows();
   await click(button("Publish proposal"));
   expect(publish).toHaveBeenCalledExactlyOnceWith({
     docId: "proposal-a",
