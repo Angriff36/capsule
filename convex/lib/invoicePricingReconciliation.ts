@@ -223,11 +223,16 @@ export async function followAcceptedProposalPrice(
     version: draft.version,
     reason: "Replaced by the itemized invoice from the accepted proposal.",
   });
+  // A due date from the client's payment terms, so reminders can run.
+  const client = event.clientId ? await ctx.db.get(event.clientId) : null;
+  const termsDays = Number(client?.paymentTermsDays ?? 30);
   await system.runMutation(api.mutations.Invoice_createViaIssue, {
     clientId: event.clientId,
     eventId: event._id,
     invoiceSequence: 0,
     ...itemized,
+    paymentTermsDays: termsDays,
+    dueDate: Date.now() + termsDays * 24 * 60 * 60_000,
     proposalId: String(proposal._id),
     ...(proposal.acceptedRevisionId ? { proposalRevisionId: String(proposal.acceptedRevisionId) } : {}),
     idempotencyKey: `accepted-proposal-invoice:${proposalId}`,
