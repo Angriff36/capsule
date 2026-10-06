@@ -2909,6 +2909,7 @@
 .report-view-switch {
   display: flex;
   gap: 0;
+  margin-bottom: 1.5rem;
   border-bottom: 1px solid var(--color-line-2);
   background: var(--color-panel);
 }
