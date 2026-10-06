@@ -1477,7 +1477,7 @@ export function InvoiceDetailPage() {
                 aria-describedby="reminder-offsets-help"
                 disabled={!reminderAutomationAvailable || busy != null}
               />
-              <span id="reminder-offsets-help" className="field-help">
+              <span id="reminder-offsets-help" className="field-help-note">
                 Positive is before due; 0 is due day; negative is overdue.
               </span>
             </label>

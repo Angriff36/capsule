@@ -1,6 +1,5 @@
 import { Fragment, useMemo, useState, type FormEvent } from "react";
-import { useQuery } from "convex/react";
-import { api } from "../../lib/api";
+import { useEventTimingPlan } from "../../lib/operational-transactions";
 import { localDateTime } from "../events/eventDetailFormHelpers";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
@@ -120,9 +119,8 @@ export function DeliveriesPage() {
   const [driverId, setDriverId] = useState("");
   const pickedEventId =
     packLists?.find((pack) => pack._id === pickedPackId)?.eventId ?? null;
-  const pickedPlan = useQuery(
-    api.lib.operationalTransactions.eventTimingPlan,
-    pickedEventId ? { eventId: pickedEventId as Id<"events"> } : "skip",
+  const pickedPlan = useEventTimingPlan(
+    pickedEventId ? (pickedEventId as Id<"events">) : null,
   );
   const [filledFor, setFilledFor] = useState("");
   if (pickedEventId && pickedPlan && filledFor !== pickedPackId) {

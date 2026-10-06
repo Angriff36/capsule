@@ -96,7 +96,7 @@ export function VendorOrderEmailSection({
           </button>
         </div>
       ) : (
-        <p className="field-help">
+        <p className="field-help-note">
           {status === "draft" || status === "pending_approval"
             ? "Mark the order sent first, then you can email it to the vendor."
             : "This order is finished, so it is not emailed."}
@@ -104,7 +104,7 @@ export function VendorOrderEmailSection({
       )}
       {note ? (
         <p
-          className={note.ok ? "field-help" : "text-base text-danger"}
+          className={note.ok ? "field-help-note" : "text-base text-danger"}
           role={note.ok ? "status" : "alert"}
         >
           {note.words}
@@ -130,7 +130,7 @@ export function VendorOrderEmailSection({
               <br />
               {item.words}
               {item.remedy ? (
-                <span className="field-help block">{item.remedy}</span>
+                <span className="field-help-note block">{item.remedy}</span>
               ) : null}
             </li>
           ))}

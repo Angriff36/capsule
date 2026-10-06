@@ -300,7 +300,7 @@ export function RevenueAttributionDetailPage() {
                   placeholder="0.00"
                 />
               </div>
-              <small className="field-help">
+              <small className="field-help-note">
                 Prefilled from: {eventRevenueBasis}. Confirm or replace this
                 estimate before applying.
               </small>

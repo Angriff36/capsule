@@ -33,7 +33,7 @@ export function ProposalTemplateServiceStyleField({
           </option>
         ))}
       </select>
-      <span className="field-help">
+      <span className="field-help-note">
         A proposal made from an event with this style starts from this template.
       </span>
     </label>

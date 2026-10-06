@@ -46,7 +46,7 @@ describe("plain words on workforce UI", () => {
       "Approve time entries on the time sheet or finalize payroll inputs",
       'approved time ${entry.timeRecordCount === 1 ? "entry" : "entries"}',
       "confirmed time entries",
-      "closed or corrected time entries wholly",
+      "closed or corrected time entries",
     ]) {
       expect(visible).toContain(fresh);
     }
@@ -57,14 +57,14 @@ describe("plain words on workforce UI", () => {
       "Approved time entries supply clocked hours",
       "Approve time entries on the time sheet or finalize payroll inputs",
       "confirmed time entries",
-      "closed or corrected time entries wholly",
+      "closed or corrected time entries",
     ]) {
       expectPlain(phrase);
     }
 
     // later leftovers, unchanged
     expect(visible).toContain("<th>Clocked</th>");
-    expect(visible).toContain("less recorded breaks");
+    expect(visible).toContain("less breaks");
   });
 
   it("keeps leftover TimeSheet copy free of record jargon", () => {

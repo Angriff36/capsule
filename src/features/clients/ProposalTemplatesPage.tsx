@@ -408,7 +408,7 @@ export function ProposalTemplatesPage() {
                 placeholder="14"
                 defaultValue={editingTemplate?.validityDays ?? ""}
               />
-              <span className="field-help">
+              <span className="field-help-note">
                 Days until proposal expires. Leave blank for no default.
               </span>
             </label>

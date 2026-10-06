@@ -13,8 +13,11 @@ export const useReorderEventTimeline = () =>
 export const useScheduleEventTimeline = () =>
   useMutation(api.lib.operationalTransactions.scheduleEventTimeline);
 
-export const useEventTimingPlan = (eventId: Id<"events">) =>
-  useQuery(api.lib.operationalTransactions.eventTimingPlan, { eventId });
+export const useEventTimingPlan = (eventId: Id<"events"> | null) =>
+  useQuery(
+    api.lib.operationalTransactions.eventTimingPlan,
+    eventId ? { eventId } : "skip",
+  );
 
 export const useMaterializeEventMenuTemplate = () =>
   useMutation(api.lib.operationalTransactions.materializeEventMenuTemplate);

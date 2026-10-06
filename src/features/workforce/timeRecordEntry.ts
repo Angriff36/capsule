@@ -62,6 +62,24 @@ export function toEpoch(value: unknown): number | null {
 }
 
 /**
+ * Shifts still ahead of the person: a scheduled shift that ended before today
+ * is missed, not upcoming; one already started stays until it is finished.
+ * My Day's list, count and calendar all read this.
+ */
+export function upcomingShifts<T extends ShiftLike>(
+  shifts: readonly T[],
+  now = Date.now(),
+): T[] {
+  const dayStart = new Date(now);
+  dayStart.setHours(0, 0, 0, 0);
+  return shifts.filter(
+    (shift) =>
+      String(shift.status) === "started" ||
+      (shift.endsAt ?? shift.startsAt ?? Infinity) >= dayStart.getTime(),
+  );
+}
+
+/**
  * Best shift for a clock-in at `now`: one whose window covers it (±2h slack),
  * else the person's first shift starting that same day. Time sheet and My Day
  * both use this, so a clock-in carries the shift's event either way.

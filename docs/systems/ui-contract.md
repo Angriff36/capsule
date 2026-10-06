@@ -3875,7 +3875,12 @@ Screens (30): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 - `eventLookup.reportPage` - query; live read, updates by itself
 - `eventRouteLegs.getEventRouteLegs` - query; live read, updates by itself
 - `eventRouteLegs.getEventTransport` - query; live read, updates by itself
+- `lib.operationalTransactions.applyCateringPackage` - mutation; authored step; live reads update by themselves
 - `lib.operationalTransactions.eventTimingPlan` - query; live read, updates by itself
+- `lib.operationalTransactions.issueEventStock` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.materializeEventMenuTemplate` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.reorderEventTimeline` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.scheduleEventTimeline` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.applyLayoutTemplate` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.applyPackTemplate` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.draftPurchaseOrder` - mutation; authored step; live reads update by themselves
