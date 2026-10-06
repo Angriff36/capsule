@@ -267,7 +267,7 @@ it("AC-083: with no vendors, an ad-hoc order adds the typed vendor and then open
   const createVendor = command("useCreateVendor", { docId: "vendor-new" });
   const createOrder = command("useCreateVendorOrder", { docId: "order-new" });
   await mount(createElement(PurchasingPage), "/inventory/purchasing");
-  await click(button("Open ad-hoc order"));
+  await click(button("Start an extra order"));
   input("newVendorName", "Sysco");
   input("notes", "Friday drop");
   await submit(container.querySelector<HTMLFormElement>("form.supply-form")!);

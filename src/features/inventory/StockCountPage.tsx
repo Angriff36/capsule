@@ -837,7 +837,9 @@ export function StockCountPage() {
                     {selectedSession.status === "closed"
                       ? `Closed ${formatTimestamp(selectedSession.closedAt)}`
                       : canClose
-                        ? "Every line is reconciled."
+                        ? sessionLines.length === 0
+                          ? "Nothing to count on this sheet."
+                          : "Every line is counted."
                         : `${pendingLines.length} ${pendingLines.length === 1 ? "line remains" : "lines remain"}.`}
                   </strong>
                   <span>

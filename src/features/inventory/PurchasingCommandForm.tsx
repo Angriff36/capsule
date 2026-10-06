@@ -102,7 +102,7 @@ function OrderVendorField({
 }
 
 const FORM_TITLES: Record<PurchasingFormKind, string> = {
-  vendor: "Onboard vendor",
+  vendor: "Add a vendor",
   order: "Open vendor order",
   contact: "Add vendor contact",
 };

@@ -471,8 +471,8 @@ export function PurchasingPage() {
             onClick={editApprovalThreshold}
           >
             {approvalThreshold != null
-              ? `Approval threshold: ${formatMoneyExact(Number(approvalThreshold))}`
-              : "Approval threshold: off"}
+              ? `Orders over ${formatMoneyExact(Number(approvalThreshold))} need approval`
+              : "Orders need no approval"}
           </button>
           <button
             className="btn btn-ghost"
@@ -480,14 +480,14 @@ export function PurchasingPage() {
             onClick={editDefaultVendor}
           >
             {defaultVendorId != null
-              ? `Default vendor: ${vendorName(defaultVendorId)}`
-              : "Default vendor: not set"}
+              ? `Usual vendor: ${vendorName(defaultVendorId)}`
+              : "Usual vendor: not set"}
           </button>
           <button className="btn btn-ghost" onClick={() => setForm("vendor")}>
-            Onboard vendor
+            Add a vendor
           </button>
           <button className="btn btn-ghost" onClick={() => setForm("order")}>
-            Open ad-hoc order
+            Start an extra order
           </button>
         </div>
       </header>
@@ -683,7 +683,7 @@ export function PurchasingPage() {
                 className="btn btn-ghost btn-sm"
                 onClick={() => setForm("vendor")}
               >
-                Onboard vendor
+                Add a vendor
               </button>
             </div>
           </div>

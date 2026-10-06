@@ -269,7 +269,7 @@ export function PurchasingQueueSplit({
                 className="btn btn-primary btn-sm"
                 onClick={onOnboardVendor}
               >
-                Onboard vendor
+                Add a vendor
               </button>
             </div>
           </div>
