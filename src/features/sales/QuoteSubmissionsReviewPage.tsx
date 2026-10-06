@@ -183,7 +183,14 @@ export function QuoteSubmissionsReviewPage() {
   ).length;
   const visible = [...live]
     .filter((sub) => showDismissed || sub.status !== "dismissed")
-    .sort((a, b) => (b.submittedAt ?? 0) - (a.submittedAt ?? 0));
+    // Requests still waiting on staff (new or failed) come first, newest
+    // first; finished ones follow, so a phone user does not scroll past them.
+    .sort(
+      (a, b) =>
+        Number(isActionable(b) || canRetry(b)) -
+          Number(isActionable(a) || canRetry(a)) ||
+        (b.submittedAt ?? 0) - (a.submittedAt ?? 0),
+    );
   const pendingCount = visible.filter(isActionable).length;
 
   // The public form resolves its tenant from the ACTIVE organizations row;
@@ -332,7 +339,7 @@ export function QuoteSubmissionsReviewPage() {
                       "Not specified"}
                   </p>
                 </div>
-                <div className="text-right text-xs text-ink-2 shrink-0">
+                <div className="text-left text-xs text-ink-2 shrink-0 sm:text-right">
                   <div>
                     {sub.eventDate ? formatDate(sub.eventDate) : "No date"}
                   </div>
