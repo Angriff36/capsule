@@ -73,7 +73,7 @@ export function VenueLogisticsProfilePanel({ venue }: Props) {
               <input
                 name="dayOfContactName"
                 defaultValue={venue.dayOfContactName ?? ""}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+                className="input mt-1"
               />
             </label>
             <label className="block text-xs font-medium text-ink-2">
@@ -82,7 +82,7 @@ export function VenueLogisticsProfilePanel({ venue }: Props) {
                 type="tel"
                 name="dayOfContactPhone"
                 defaultValue={venue.dayOfContactPhone ?? ""}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+                className="input mt-1"
               />
             </label>
             {VENUE_LOGISTICS_FIELDS.map((field) => (
@@ -96,7 +96,7 @@ export function VenueLogisticsProfilePanel({ venue }: Props) {
                   rows={2}
                   placeholder={field.hint}
                   defaultValue={venue[field.name] ?? ""}
-                  className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+                  className="input mt-1"
                 />
               </label>
             ))}
