@@ -26,6 +26,7 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 - `queries.getClient` - live read
 - `queries.getContract` - live read
 - `queries.getEvent` - live read
+- `queries.getVenue` - live read
 - `queries.listClient` - live read
 - `queries.listClientCommunication` - live read
 - `queries.listClientContact` - live read
@@ -3418,6 +3419,7 @@ Screens (30): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 - `queries.listVehicleMaintenanceSchedule` - live read
 - `queries.listVehicleServiceEntry` - live read
 - `queries.listVehicleTripCheck` - live read
+- `queries.listVenue` - live read
 
 ### Generated actions
 
@@ -3873,6 +3875,12 @@ Screens (30): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 - `eventLookup.reportPage` - query; live read, updates by itself
 - `eventRouteLegs.getEventRouteLegs` - query; live read, updates by itself
 - `eventRouteLegs.getEventTransport` - query; live read, updates by itself
+- `lib.operationalTransactions.applyCateringPackage` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.eventTimingPlan` - query; live read, updates by itself
+- `lib.operationalTransactions.issueEventStock` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.materializeEventMenuTemplate` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.reorderEventTimeline` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.scheduleEventTimeline` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.applyLayoutTemplate` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.applyPackTemplate` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.draftPurchaseOrder` - mutation; authored step; live reads update by themselves
