@@ -1009,9 +1009,20 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                             nextServingsRaw: String(
                               data.get("quantityServings") ?? "",
                             ),
-                            nextContainerRaw: String(
-                              data.get("containerCount") ?? "",
-                            ),
+                            // The box starts with the worked-out pan count.
+                            // Left as is, it is not a typed count, so pans
+                            // keep following the servings.
+                            nextContainerRaw:
+                              lineFields.containerCount == null &&
+                              String(data.get("containerCount") ?? "") ===
+                                String(linePanCount)
+                                ? ""
+                                : String(data.get("containerCount") ?? ""),
+                            containerCleared:
+                              lineFields.containerCount != null &&
+                              String(
+                                data.get("containerCount") ?? "",
+                              ).trim() === "",
                           });
                           if (
                             !Number.isFinite(plan.quantityServings) ||

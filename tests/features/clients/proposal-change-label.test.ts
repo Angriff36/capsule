@@ -7,7 +7,7 @@ import { act } from "react-dom/test-utils";
 import { afterEach, describe, expect, it } from "vitest";
 import { ProposalChangeLabel } from "../../../src/features/clients/ProposalChangeLabel";
 
-const LINE = "Change of the accepted proposal";
+const LINE = "Revised version of an earlier proposal";
 
 describe("proposal change label", () => {
   let root: Root | undefined;

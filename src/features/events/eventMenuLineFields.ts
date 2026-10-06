@@ -148,6 +148,8 @@ export function planEventMenuLineSave(input: {
   nextServingsRaw: string;
   nextContainerRaw: string;
   nextNotes?: string | null;
+  /** The person emptied the pans box: go back to worked-out pans. */
+  containerCleared?: boolean;
 }): EventMenuLineSavePlan {
   const current = parseEventMenuLineFields(input.currentInstructions);
   const unitSellPrice =
@@ -158,7 +160,9 @@ export function planEventMenuLineSave(input: {
     input.nextContainerRaw.trim() === ""
       ? null
       : asNonnegativeNumber(input.nextContainerRaw);
-  const containerCount = typedCount ?? current.containerCount;
+  const containerCount = input.containerCleared
+    ? null
+    : (typedCount ?? current.containerCount);
   const quantityServings = eventMenuLineServings({
     quantityServings: Number(input.nextServingsRaw),
     expectedHeadcount: input.currentServings,

@@ -59,6 +59,8 @@ type PendingSignatureView = {
   lines: Array<{
     description: string;
     pricingBasis: string;
+    unitPrice: number;
+    quantity: number;
     unit: string | null;
     amount: number;
   }>;
@@ -165,6 +167,8 @@ export const getPendingSignatureRequest = query({
             .map((line) => ({
               description: str(line.description) ?? "",
               pricingBasis: str(line.pricingBasis) ?? "flat",
+              unitPrice: num(line.unitPrice),
+              quantity: num(line.quantity, 1),
               unit: str(line.unit),
               amount: num(line.amount),
             }))

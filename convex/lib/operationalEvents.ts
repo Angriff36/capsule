@@ -30,6 +30,7 @@ import { eventStyleReconciliation } from "./styleReconciliation";
 import { eventRentalReconciliation } from "./rentalReconciliation";
 import {
   assertInvoiceCommercialSource, ensureEventDraftInvoice, eventInvoicePricingReconciliation,
+  followAcceptedProposalPrice,
 } from "./invoicePricingReconciliation";
 import { eventCloseoutCommercialReconciliation } from "./closeoutCommercialReconciliation";
 import {
@@ -482,6 +483,8 @@ export async function handleManifestEvent(
     // An accepted change on a booked event holds any rental it added.
     const accepted = await ctx.db.get(event.entityId as Id<"proposals">);
     if (accepted?.eventId) await holdApprovedRentals(ctx, accepted.eventId);
+    // The event's price becomes what the client accepted.
+    await followAcceptedProposalPrice(ctx, event.entityId as Id<"proposals">);
     return;
   }
   if (event.entity === "Invoice" &&
