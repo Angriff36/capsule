@@ -33,6 +33,20 @@ export function formatDateTime(at: number | string | null | undefined): string {
   return `${dateFmt.format(d)} ${timeFmt.format(d)}`;
 }
 
+/** A start-to-end window; the date is said once when both ends share a day,
+ *  e.g. "Sep 22, 2026 2:00 PM → 5:00 PM". */
+export function formatDateTimeRange(
+  start: number | null | undefined,
+  end: number | null | undefined,
+): string {
+  if (start == null || end == null) {
+    return `${formatDateTime(start)} → ${formatDateTime(end)}`;
+  }
+  return dateFmt.format(start) === dateFmt.format(end)
+    ? `${formatDateTime(start)} → ${timeFmt.format(end)}`
+    : `${formatDateTime(start)} → ${formatDateTime(end)}`;
+}
+
 // Single-currency callers keep using the legacy signature; per-row callers
 // pass the invoice's currencyCode so financial reports stay coherent in
 // mixed-currency ledgers. Unknown / null codes fall back to USD.
