@@ -525,7 +525,11 @@ export function KitchenDashboardPage() {
    *  themselves carry no number, and inventing one would be a lie. */
   const invoiceNumberFor = (eventId: unknown) =>
     (invoices ?? []).find(
-      (i) => i.deletedAt == null && String(i.eventId) === String(eventId),
+      // A voided invoice was replaced; name the one that stands.
+      (i) =>
+        i.deletedAt == null &&
+        String(i.status) !== "voided" &&
+        String(i.eventId) === String(eventId),
     )?.invoiceNumber ?? null;
 
   /** A live step can be re-measured: the head count changes, the delivery is
