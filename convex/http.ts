@@ -1937,7 +1937,7 @@ const COMMAND_DISPATCH = {
   "Ingredient.configureSubstitutes": {
     ref: api.mutations.Ingredient_configureSubstitutes,
     params: ["docId","substituteIngredientIds","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"substituteIngredientIds","type":"list<uuid>","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"substituteIngredientIds","type":"list<string>","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "Ingredient.discontinue": {
     ref: api.mutations.Ingredient_discontinue,
@@ -1982,7 +1982,7 @@ const COMMAND_DISPATCH = {
   "Ingredient.setPreferredVendors": {
     ref: api.mutations.Ingredient_setPreferredVendors,
     params: ["docId","preferredVendorIds","preferredVendorId","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"preferredVendorIds","type":"list<uuid>","required":true},{"name":"preferredVendorId","type":"uuid","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"preferredVendorIds","type":"list<string>","required":true},{"name":"preferredVendorId","type":"uuid","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "Ingredient.setPrimaryImage": {
     ref: api.mutations.Ingredient_setPrimaryImage,

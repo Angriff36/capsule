@@ -30393,7 +30393,7 @@ export const Ingredient_configureSubstitutes = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"},{"name":"substituteIngredientIds","table":null}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"}]);
     const __result = await __runIngredientConfigureSubstitutes(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);
@@ -31024,7 +31024,7 @@ export const Ingredient_setPreferredVendors = mutation({
       if (__hit.kind === "replay") return __hit.result;
       if (__hit.kind === "refuse") throw new Error(__hit.reason);
     }
-    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"},{"name":"preferredVendorIds","table":null},{"name":"preferredVendorId","table":null}]);
+    await __assertOwnWorkspaceLinks(ctx, args, [{"name":"canonicalIngredientId","table":"ingredients"},{"name":"mergedIntoIngredientId","table":"ingredients"},{"name":"preferredVendorId","table":null}]);
     const __result = await __runIngredientSetPreferredVendors(ctx, args);
     if (__idem !== null) {
       await __saveCommandIdempotency(ctx, __idem, __result);

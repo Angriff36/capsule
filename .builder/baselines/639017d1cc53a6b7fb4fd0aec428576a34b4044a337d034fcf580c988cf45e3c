@@ -2066,8 +2066,8 @@ export const IngredientSchema = z.object({
   isGlutenFree: z.boolean().optional().default(false),
   costPerUnit: z.number().min(0).default(0),
   category: z.string().nullable().optional(),
-  substituteIngredientIds: z.array(z.string().uuid()).optional().default([]),
-  preferredVendorIds: z.array(z.string().uuid()).optional().default([]),
+  substituteIngredientIds: z.array(z.string()).optional().default([]),
+  preferredVendorIds: z.array(z.string()).optional().default([]),
   preferredVendorId: z.string().uuid().nullable().optional(),
   status: z.enum(["active", "discontinued"]).default("active"),
   introducedAt: z.coerce.date().nullable().optional(),
@@ -8671,7 +8671,7 @@ export type IngredientClearPrimaryImageParams = z.infer<typeof IngredientClearPr
 
 // Command: configureSubstitutes on Ingredient
 export const IngredientConfigureSubstitutesParamsSchema = z.object({
-  substituteIngredientIds: z.array(z.string().uuid()),
+  substituteIngredientIds: z.array(z.string()),
 });
 
 export type IngredientConfigureSubstitutesParams = z.infer<typeof IngredientConfigureSubstitutesParamsSchema>;
@@ -8746,7 +8746,7 @@ export type IngredientSetPreferredVendorParams = z.infer<typeof IngredientSetPre
 
 // Command: setPreferredVendors on Ingredient
 export const IngredientSetPreferredVendorsParamsSchema = z.object({
-  preferredVendorIds: z.array(z.string().uuid()),
+  preferredVendorIds: z.array(z.string()),
   preferredVendorId: z.string().min(1).optional(),
 });
 
