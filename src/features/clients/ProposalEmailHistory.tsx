@@ -65,7 +65,7 @@ export function ProposalEmailHistory({
               <br />
               {item.words}
               {item.remedy ? (
-                <span className="field-help block">{item.remedy}</span>
+                <span className="field-help-note block">{item.remedy}</span>
               ) : null}
             </li>
           ))}

@@ -273,7 +273,7 @@ export function VenueCommissionTermsPage() {
                   : ""
               }
             />
-            <small className="field-help">
+            <small className="field-help-note">
               Optional; leave blank for indefinite term
             </small>
           </label>
