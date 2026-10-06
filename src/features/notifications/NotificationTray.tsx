@@ -14,6 +14,21 @@ import {
 // across devices). Move to a Notification entity + manifest commands if
 // cross-device read sync ever matters.
 const READ_STORAGE_KEY = "capsule.notifications.read";
+// Which kinds this person turned off in the tray (same per-browser store).
+const MUTED_STORAGE_KEY = "capsule.notifications.muted";
+
+function loadMutedKinds(): ReadonlySet<string> {
+  try {
+    const parsed: unknown = JSON.parse(
+      localStorage.getItem(MUTED_STORAGE_KEY) ?? "[]",
+    );
+    return new Set(
+      Array.isArray(parsed) ? parsed.filter((x) => typeof x === "string") : [],
+    );
+  } catch {
+    return new Set();
+  }
+}
 const NO_NOTIFICATIONS: AppNotification[] = [];
 
 function loadReadIds(): ReadonlySet<string> {
@@ -49,9 +64,27 @@ export function NotificationTray() {
   // problems that need someone to act, first in the list.
   const health =
     useQuery(api.systemHealthNotices.attention) ?? NO_NOTIFICATIONS;
+  const [mutedKinds, setMutedKinds] =
+    useState<ReadonlySet<string>>(loadMutedKinds);
+  const [choosing, setChoosing] = useState(false);
+  const toggleKind = (kind: string) =>
+    setMutedKinds((prev) => {
+      const next = new Set(prev);
+      if (next.has(kind)) next.delete(kind);
+      else next.add(kind);
+      try {
+        localStorage.setItem(MUTED_STORAGE_KEY, JSON.stringify([...next]));
+      } catch {
+        // Storage unavailable — the choice lasts until the page reloads.
+      }
+      return next;
+    });
   const notifications = useMemo(
-    () => (health.length === 0 ? listed : [...health, ...listed]),
-    [health, listed],
+    () =>
+      (health.length === 0 ? listed : [...health, ...listed]).filter(
+        (n) => !mutedKinds.has(n.kind),
+      ),
+    [health, listed, mutedKinds],
   );
 
   const [readIds, setReadIds] = useState<ReadonlySet<string>>(loadReadIds);
@@ -99,6 +132,13 @@ export function NotificationTray() {
       <div className="absolute top-9.5 right-0 z-30 w-80 rounded-sm border border-line-2 bg-panel p-3 shadow-[0_6px_24px_-8px_rgba(34,30,22,0.25)]">
         <div className="flex items-center justify-between">
           <p className="font-medium">Notifications</p>
+          <button
+            type="button"
+            onClick={() => setChoosing((open) => !open)}
+            className="cursor-pointer text-xs font-medium text-ink-2 hover:underline"
+          >
+            {choosing ? "Done" : "Choose"}
+          </button>
           {unreadCount > 0 && (
             <button
               type="button"
@@ -109,6 +149,23 @@ export function NotificationTray() {
             </button>
           )}
         </div>
+        {choosing ? (
+          <fieldset className="mt-2 grid grid-cols-2 gap-1 border-b border-line pb-2 text-sm">
+            <legend className="mb-1 text-xs text-ink-3">
+              Show these in this browser
+            </legend>
+            {Object.entries(NOTIFICATION_KIND_LABELS).map(([kind, label]) => (
+              <label key={kind} className="flex items-center gap-1.5">
+                <input
+                  type="checkbox"
+                  checked={!mutedKinds.has(kind)}
+                  onChange={() => toggleKind(kind)}
+                />
+                {label}
+              </label>
+            ))}
+          </fieldset>
+        ) : null}
         {notifications.length === 0 ? (
           <p className="mt-1.5 text-sm leading-relaxed text-ink-3">
             Nothing needs your attention right now.

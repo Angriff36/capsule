@@ -124,6 +124,7 @@ export const listNotifications = query({
       prepTaskComments,
       dateHolds,
       dateWaitlistEntries,
+      reviewFlags,
     ] = await Promise.all([
       // Not every event (13 s at 10,000 events, and the socket holds every
       // other read of the screen until this one answers): only the events
@@ -301,6 +302,15 @@ export const listNotifications = query({
           .withIndex("by_tenantId", byTenant)
           .collect(),
       ),
+      // Open flags and crew questions: the kitchen and the event team are
+      // told, not only whoever opens the event next.
+      when(can(auth, "eventAccess", "kitchenAccess", "manageAccess"), () =>
+        ctx.db
+          .query("reviewFlags")
+          .withIndex("by_tenantId", byTenant)
+          .collect()
+          .then((rows) => rows.filter((row) => row.status === "open")),
+      ),
     ]);
 
     // Names of waiting clients, tenant-checked, for the date-opened prompt.
@@ -388,6 +398,7 @@ export const listNotifications = query({
         },
         personName: () => "",
       });
+      for (const flag of reviewFlags ?? []) ids.add(String(flag.eventId));
       for (const event of events) ids.delete(String(event._id));
       await Promise.all(
         [...ids].map(async (id) => {
@@ -453,6 +464,7 @@ export const listNotifications = query({
       dateHolds,
       dateWaitlistEntries,
       clientNames,
+      reviewFlags,
     });
   },
 });
