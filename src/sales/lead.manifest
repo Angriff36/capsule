@@ -71,7 +71,8 @@ entity Lead mixin TenantScoped, SoftDeletable {
     optional email: string,
     optional phone: string,
     optional probability: number,
-    optional notes: string
+    optional notes: string,
+    optional eventDate: datetime
   ) {
     guard self.capturedAt == null
     guard self.deletedAt == null
@@ -91,6 +92,7 @@ entity Lead mixin TenantScoped, SoftDeletable {
     mutate stage = "new"
     mutate probability = probability != null ? probability : 10
     mutate notes = notes
+    mutate eventDate = eventDate
     mutate capturedAt = now()
     emit LeadCaptured {
       leadId: self.id

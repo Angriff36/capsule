@@ -35681,7 +35681,7 @@ export const ItemUnitMapping_retire = mutation({
   },
 });
 
-async function __runLeadCapture(ctx: MutationCtx, { docId, leadType, source, referralSourceId, estimatedValue, companyName, givenName, familyName, email, phone, probability, notes, version }: any, __creation = false) {
+async function __runLeadCapture(ctx: MutationCtx, { docId, leadType, source, referralSourceId, estimatedValue, companyName, givenName, familyName, email, phone, probability, notes, eventDate, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -35713,6 +35713,7 @@ async function __runLeadCapture(ctx: MutationCtx, { docId, leadType, source, ref
       stage: "new",
       probability: ((probability != null) ? probability : 10),
       notes: notes,
+      eventDate: eventDate,
       capturedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -35740,6 +35741,7 @@ export const Lead_capture = mutation({
     phone: v.optional(v.string()),
     probability: v.optional(v.any()),
     notes: v.optional(v.string()),
+    eventDate: v.optional(v.number()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -35772,6 +35774,7 @@ export const Lead_createViaCapture = mutation({
     phone: v.optional(v.string()),
     probability: v.optional(v.any()),
     notes: v.optional(v.string()),
+    eventDate: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -35784,7 +35787,7 @@ export const Lead_createViaCapture = mutation({
     await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"clientContactId","table":"clientContacts"},{"name":"proposalId","table":"proposals"},{"name":"referralSourceId","table":"referralSources"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { leadType, source, referralSourceId, estimatedValue, companyName, givenName, familyName, email, phone, probability, notes } = args;
+    const { leadType, source, referralSourceId, estimatedValue, companyName, givenName, familyName, email, phone, probability, notes, eventDate } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       probability: args.probability !== undefined ? args.probability : 10,
@@ -35793,6 +35796,7 @@ export const Lead_createViaCapture = mutation({
       companyName: args.companyName,
       email: args.email,
       estimatedValue: args.estimatedValue,
+      eventDate: args.eventDate,
       familyName: args.familyName,
       givenName: args.givenName,
       leadType: args.leadType,
@@ -35826,6 +35830,7 @@ export const Lead_createViaCapture = mutation({
     doc.stage = "new";
     doc.probability = ((probability != null) ? probability : 10);
     doc.notes = notes;
+    doc.eventDate = eventDate;
     doc.capturedAt = Date.now();
     const __storedDoc = await __encryptDoc(ctx, "Lead", ["email","phone"], doc);
     const docId = await ctx.db.insert("leads", __storedDoc as any);
