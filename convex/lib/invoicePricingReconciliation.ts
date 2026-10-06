@@ -214,7 +214,7 @@ export async function followAcceptedProposalPrice(
   ).filter((row) => row.tenantId === event.tenantId && row.deletedAt == null && row.status !== "voided");
   if (invoices.length !== 1) return;
   const draft = (await ctx.db.get(invoices[0]._id)) as InvoiceRow;
-  if (!followsEventPrice(draft) || draft.proposalId === proposal._id) return;
+  if (!followsEventPrice(draft)) return;
   const itemized = await itemizedFromProposal(ctx, proposal);
   if (!itemized) return;
   await system.runMutation(api.mutations.Invoice_markVoided, {
