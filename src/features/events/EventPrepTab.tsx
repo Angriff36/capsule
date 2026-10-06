@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { setWorkingEvent } from "./workingEvent";
 import {
   useListComponent,
   useListPerson,
@@ -30,9 +31,16 @@ type Props = {
   eventStage: string;
   /** The event's service style picks which packaging line each dish shows. */
   serviceStyleId?: string | null;
+  /** Event start, so the prep board opens on that event's week. */
+  startsAt?: number | null;
 };
 
-export function EventPrepTab({ eventId, eventStage, serviceStyleId }: Props) {
+export function EventPrepTab({
+  eventId,
+  eventStage,
+  serviceStyleId,
+  startsAt,
+}: Props) {
   const eventDishes = useEventMenuLines(eventId);
   const components = useListComponent();
   const packaging = useListStylePackaging() as StylePackagingRow[] | undefined;
@@ -170,7 +178,15 @@ export function EventPrepTab({ eventId, eventStage, serviceStyleId }: Props) {
         >
           {busy ? "Syncing…" : "Sync prep from menu"}
         </button>
-        <Link className="btn btn-ghost" to="/kitchen/prep">
+        <Link
+          className="btn btn-ghost"
+          to={
+            startsAt != null
+              ? `/kitchen/prep?from=${new Date(startsAt).toLocaleDateString("en-CA")}`
+              : "/kitchen/prep"
+          }
+          onClick={() => setWorkingEvent(eventId)}
+        >
           Open prep board
         </Link>
       </div>

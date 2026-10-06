@@ -656,6 +656,7 @@ function EventDetailContent({
             eventId={event._id}
             eventStage={String(event.stage)}
             serviceStyleId={event.serviceStyleId ?? null}
+            startsAt={event.startsAt ?? null}
           />
         </EventTabErrorBoundary>
       ) : null}

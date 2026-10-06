@@ -5,7 +5,7 @@ import {
 } from "../production/PrepTaskDependencies";
 import { usePrepLabelPrint } from "../production/usePrepLabelPrint";
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import {
   useListPerson,
@@ -114,7 +114,14 @@ export function KitchenDashboardPage() {
   const complete = usePrepTaskComplete();
   const { ready: prepSyncReady, syncPrepForDish } = useEventMenuSync();
 
-  const [horizonOffset, setHorizonOffset] = useState(0);
+  // ?from=yyyy-mm-dd (an event's Open prep board) opens on that week.
+  const [searchParams] = useSearchParams();
+  const [horizonOffset, setHorizonOffset] = useState(
+    () =>
+      KitchenCommandDeckHorizon.offsetForDateValue(
+        searchParams.get("from") ?? "",
+      ) ?? 0,
+  );
   const workingEventId = useWorkingEventId();
   const [selectedEventId, setSelectedEventId] = useState(workingEventId ?? "");
   const [filter, setFilter] = useState<CommandDeckFilter>("all");
