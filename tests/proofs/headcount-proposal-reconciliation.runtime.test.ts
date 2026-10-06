@@ -106,9 +106,11 @@ async function seedAndChange(
   const acceptedRevisionIdBefore = (await proposalFor(roles.sales, eventId))
     .acceptedRevisionId;
 
+  // Acceptance moves the event price to the accepted total (a version bump),
+  // so read the live version instead of assuming the first one.
   await runEvent(M.Event_changeHeadcount, {
     docId: eventId,
-    version: 1,
+    version: await readEventVersion(roles.events, eventId),
     newHeadcount: 60,
   });
   return {

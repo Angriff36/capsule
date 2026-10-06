@@ -93,14 +93,12 @@ it("calculates displayed menu cost and pans from the recipe, and saves course pl
   expect(container.textContent).toContain("2 Hotel pan");
   input("course", "Main");
   await submit(field("course").closest("form")!);
-  expect(update).toHaveBeenCalledExactlyOnceWith({
-    docId: "menu-a",
-    version: 7,
-    specialInstructions: '@capsule.menu {"containerCount":2}',
-  });
+  // The pans box shows the worked-out count; left as is, it is not saved as a
+  // typed count, so only the course changes.
+  expect(update).not.toHaveBeenCalled();
   expect(course).toHaveBeenCalledExactlyOnceWith({
     docId: "menu-a",
-    version: 8,
+    version: 7,
     course: "Main",
     serviceStyle: "plated",
   });
