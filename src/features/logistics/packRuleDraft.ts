@@ -27,6 +27,8 @@ export type PackRuleDraft = {
   baseQuantity: string;
   scaleBy: string;
   perUnits: string;
+  quantityPerUnit?: string;
+  aggregateDishQuantity?: boolean;
   sparePercent: string;
   ownership: string;
   returnRequired: boolean;
@@ -69,6 +71,8 @@ export type PackRuleRow = {
   baseQuantity: number;
   scaleBy: string;
   perUnits?: number | null;
+  quantityPerUnit?: number | null;
+  aggregateDishQuantity?: boolean | null;
   sparePercent: number;
   ownership: string;
   returnRequired: boolean;
@@ -114,6 +118,10 @@ export function packRuleArgs(draft: PackRuleDraft) {
     baseQuantity: whole(draft.baseQuantity) ?? 0,
     scaleBy: draft.scaleBy,
     perUnits: grows ? whole(draft.perUnits) : undefined,
+    quantityPerUnit: grows
+      ? (whole(draft.quantityPerUnit ?? "1") ?? 1)
+      : undefined,
+    aggregateDishQuantity: draft.aggregateDishQuantity,
     sparePercent: grows ? (whole(draft.sparePercent) ?? 0) : 0,
     ownership: draft.ownership,
     returnRequired: draft.returnRequired,
@@ -136,6 +144,8 @@ export function draftFromRule(rule: PackRuleRow): PackRuleDraft {
     baseQuantity: String(rule.baseQuantity),
     scaleBy: rule.scaleBy,
     perUnits: rule.perUnits != null ? String(rule.perUnits) : "",
+    quantityPerUnit: String(rule.quantityPerUnit ?? 1),
+    aggregateDishQuantity: rule.aggregateDishQuantity ?? false,
     sparePercent: rule.sparePercent ? String(rule.sparePercent) : "",
     ownership: rule.ownership,
     returnRequired: rule.returnRequired,
@@ -182,11 +192,12 @@ export function describeRuleAmount(rule: PackRuleRow): string {
       baseQuantity: rule.baseQuantity,
       scaleBy: rule.scaleBy as "servings" | "guests",
       perUnits: rule.perUnits,
+      quantityPerUnit: rule.quantityPerUnit,
       sparePercent: rule.sparePercent,
     },
     { servings: 100, guests: 100 },
   );
-  const parts = [`1 per ${rule.perUnits} ${noun}`];
+  const parts = [`${rule.quantityPerUnit ?? 1} per ${rule.perUnits} ${noun}`];
   if (rule.sparePercent) parts.push(`+${rule.sparePercent}% spare`);
   if (rule.baseQuantity) parts.push(`+${rule.baseQuantity} always`);
   return `${parts.join(" ")} ${rule.unit} (100 ${noun} = ${example.quantity})`;

@@ -4,6 +4,7 @@ import { api } from "../../lib/api";
 import { copyText } from "../../lib/copyText";
 import { useSendEmailReply } from "../../lib/messageReplyActions";
 import {
+  useCreateLead,
   useCreateMessage,
   useListClientContact,
   useListLead,
@@ -70,6 +71,7 @@ export function MessageInboxPage() {
   const createThread = useMessageThreadCreate();
   const createMessage = useCreateMessage();
   const linkLead = useMessageThreadLinkLead();
+  const createLead = useCreateLead();
   const setStatus = useMessageThreadSetStatus();
   const qualify = useAction(api.messageInbox.qualifyThreadAsLead);
   const sendEmailReply = useSendEmailReply();
@@ -281,6 +283,34 @@ export function MessageInboxPage() {
       setLiBody("");
       setLiSender("");
       setShowLog(false);
+    } catch (e) {
+      fail(e);
+    }
+  };
+
+  // A new inquiry becomes a lead in one press: who wrote, where from, and
+  // what they asked, then the thread is linked to it.
+  const makeLeadFromSelected = async () => {
+    if (!selected) return;
+    setFailure(null);
+    const sender = selected.senderIdentity?.trim() || threadTitle(selected);
+    const firstInbound = threadMessages.find((m) => m.direction === "inbound");
+    try {
+      const created = (await createLead({
+        leadType: "person",
+        givenName: sender,
+        email: /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(sender) ? sender : undefined,
+        phone: /^[+\d][\d\s().-]{6,}$/.test(sender) ? sender : undefined,
+        source: PROVIDER_LABEL[selected.provider] ?? selected.provider,
+        estimatedValue: 0,
+        notes: firstInbound?.bodyText?.slice(0, 2000) || undefined,
+      })) as { docId: string };
+      await linkLead({
+        docId: selected._id,
+        leadId: created.docId as Doc<"leads">["_id"],
+        version: selected.version,
+      });
+      setNotice("Lead made from this conversation. Find it in the pipeline.");
     } catch (e) {
       fail(e);
     }
@@ -524,7 +554,9 @@ export function MessageInboxPage() {
                       {selected.providerAccountId
                         ? ` · ${selected.providerAccountId}`
                         : ""}
-                      {selected.providerThreadId
+                      {selected.providerThreadId &&
+                      // A pasted message's made-up thread key means nothing to staff.
+                      !selected.providerThreadId.startsWith("paste:")
                         ? ` · ${selected.providerThreadId}`
                         : ""}
                       {contactName(selected.contactId)
@@ -532,6 +564,15 @@ export function MessageInboxPage() {
                         : ""}
                     </p>
                   </div>
+                  {selected.leadId ? null : (
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => void makeLeadFromSelected()}
+                    >
+                      Make a lead
+                    </button>
+                  )}
                   <select
                     className="input max-w-48"
                     value={selected.leadId ?? ""}

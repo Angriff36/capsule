@@ -101,6 +101,8 @@ async function readRules(ctx: MutationCtx, tenantId: string): Promise<PackRuleIn
       baseQuantity: Number(row.baseQuantity),
       scaleBy: row.scaleBy,
       perUnits: row.perUnits ?? null,
+      quantityPerUnit: row.quantityPerUnit ?? null,
+      aggregateDishQuantity: row.aggregateDishQuantity ?? false,
       sparePercent: Number(row.sparePercent ?? 0),
       ownership: row.ownership,
       returnRequired: row.returnRequired !== false,
@@ -159,6 +161,7 @@ export async function reconcileEventPackRules(
       dishId: row.dishId,
       dishName: row.dishName ?? dish?.name ?? "Dish",
       servings: Number(row.quantityServings ?? 0),
+      packingAlreadyRecorded: row.packingAlreadyRecorded ?? false,
       note: row.specialInstructions ?? null,
     });
   }

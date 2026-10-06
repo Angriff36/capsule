@@ -527,9 +527,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.PackListTemplate_createViaDefine, { "name": "PackListTemplate 2", "description": "demo-description-2", "items": "demo-items-2", "serviceStyleId": "serviceStyleId-pack-list-template-2", "occasionId": "occasionId-pack-list-template-2", "guestCountMin": 2, "guestCountMax": 2, "venueRequirement": "demo-venueRequirement-2" } as any);
   // PackRule → api.mutations.PackRule_createViaDefine
   rowsAttempted += 1;
-  await client.mutation(api.mutations.PackRule_createViaDefine, { "trigger": "demo-trigger-1", "dishId": "dishId-pack-rule-1", "serviceStyleId": "serviceStyleId-pack-rule-1", "matchFact": "demo-matchFact-1", "matchText": "demo-matchText-1", "description": "demo-description-1", "category": "demo-category-1", "unit": "demo-unit-1", "baseQuantity": 1, "scaleBy": "demo-scaleBy-1", "perUnits": 1, "sparePercent": 1, "ownership": "demo-ownership-1", "returnRequired": false, "returnNote": "demo-returnNote-1", "requiredCapability": false, "note": "demo-note-1" } as any);
+  await client.mutation(api.mutations.PackRule_createViaDefine, { "trigger": "demo-trigger-1", "dishId": "dishId-pack-rule-1", "serviceStyleId": "serviceStyleId-pack-rule-1", "matchFact": "demo-matchFact-1", "matchText": "demo-matchText-1", "description": "demo-description-1", "category": "demo-category-1", "unit": "demo-unit-1", "baseQuantity": 1, "scaleBy": "demo-scaleBy-1", "perUnits": 1, "quantityPerUnit": 1, "aggregateDishQuantity": false, "sparePercent": 1, "ownership": "demo-ownership-1", "returnRequired": false, "returnNote": "demo-returnNote-1", "requiredCapability": false, "note": "demo-note-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.PackRule_createViaDefine, { "trigger": "demo-trigger-2", "dishId": "dishId-pack-rule-2", "serviceStyleId": "serviceStyleId-pack-rule-2", "matchFact": "demo-matchFact-2", "matchText": "demo-matchText-2", "description": "demo-description-2", "category": "demo-category-2", "unit": "demo-unit-2", "baseQuantity": 2, "scaleBy": "demo-scaleBy-2", "perUnits": 2, "sparePercent": 2, "ownership": "demo-ownership-2", "returnRequired": false, "returnNote": "demo-returnNote-2", "requiredCapability": false, "note": "demo-note-2" } as any);
+  await client.mutation(api.mutations.PackRule_createViaDefine, { "trigger": "demo-trigger-2", "dishId": "dishId-pack-rule-2", "serviceStyleId": "serviceStyleId-pack-rule-2", "matchFact": "demo-matchFact-2", "matchText": "demo-matchText-2", "description": "demo-description-2", "category": "demo-category-2", "unit": "demo-unit-2", "baseQuantity": 2, "scaleBy": "demo-scaleBy-2", "perUnits": 2, "quantityPerUnit": 2, "aggregateDishQuantity": false, "sparePercent": 2, "ownership": "demo-ownership-2", "returnRequired": false, "returnNote": "demo-returnNote-2", "requiredCapability": false, "note": "demo-note-2" } as any);
   // PackScan → api.mutations.PackScan_createViaRecord
   rowsAttempted += 1;
   await client.mutation(api.mutations.PackScan_createViaRecord, { "packListId": "packListId-pack-scan-1", "packListItemId": "packListItemId-pack-scan-1", "step": "demo-step-1", "label": "demo-label-1", "outcome": "demo-outcome-1", "message": "demo-message-1", "quantity": 1 } as any);
@@ -858,6 +858,8 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   rowsAttempted += 1;
   await client.mutation(api.mutations.TimeRecord_createViaClockIn, { "personId": "personId-time-record-2", "shiftId": "shiftId-time-record-2", "eventId": "eventId-time-record-2", "timeZone": "demo-timeZone-2", "notes": "demo-notes-2" } as any);
   // skip TppReportFavorite: no creation command in IR (2 rows unused)
+  // skip TppUpload: no creation command in IR (2 rows unused)
+  // skip TppUploadPart: no creation command in IR (2 rows unused)
   // Trailer → api.mutations.Trailer_createViaRegister
   rowsAttempted += 1;
   await client.mutation(api.mutations.Trailer_createViaRegister, { "make": "demo-make-1", "model": "demo-model-1", "registration": "demo-registration-1", "payloadCapacityKg": 1, "operationalStatus": "demo-operationalStatus-1", "statusNote": "demo-statusNote-1" } as any);
@@ -1879,6 +1881,16 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "TppReportFavorite",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "TppUpload",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "TppUploadPart",
       "createMutation": null,
       "rowCount": 2
     },

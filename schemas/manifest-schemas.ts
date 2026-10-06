@@ -1385,6 +1385,7 @@ export const EventDishSchema = z.object({
   recipeDishId: z.string().uuid().nullable().optional(),
   quantityServings: z.number().int().default(1),
   followsEventHeadcount: z.boolean().nullable().optional(),
+  packingAlreadyRecorded: z.boolean().nullable().optional(),
   headcountOverride: z.number().int().nullable().optional().default(0),
   purchasingWeekStart: z.coerce.date().nullable().optional(),
   sortOrder: z.number().int().nullable().optional(),
@@ -1850,7 +1851,7 @@ export const ExternalRecordLinkSchema = z.object({
   sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync", "quickbooks_online", "google_calendar", "stripe", "other"]).default("tpp_legacy"),
   recordType: z.string().default(""),
   externalId: z.string(),
-  capsuleEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]).default("contact"),
+  capsuleEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]).default("contact"),
   capsuleId: z.string(),
   sourceAccount: z.string().nullable().optional(),
   role: z.string().nullable().optional(),
@@ -1971,7 +1972,7 @@ export const ImportDatasetSchema = z.object({
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   datasetCategory: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "invoices", "proposals"]).default("events"),
-  targetEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]).default("event_record"),
+  targetEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]).default("event_record"),
   config: z.string().default("{}"),
   active: z.boolean().default(true),
   importOrder: z.number().int().min(1).default(1),
@@ -2941,6 +2942,8 @@ export const PackRuleSchema = z.object({
   baseQuantity: z.number().int().min(0).default(0),
   scaleBy: z.enum(["fixed", "servings", "guests"]).default("fixed"),
   perUnits: z.number().int().nullable().optional(),
+  quantityPerUnit: z.number().int().nullable().optional(),
+  aggregateDishQuantity: z.boolean().nullable().optional(),
   sparePercent: z.number().int().min(0).default(0),
   ownership: z.enum(["owned", "rented", "client"]).default("owned"),
   returnRequired: z.boolean().default(true),
@@ -4595,6 +4598,54 @@ export const TppReportFavoriteSchema = z.object({
 });
 
 export type TppReportFavorite = z.infer<typeof TppReportFavoriteSchema>;
+
+// Entity: TppUpload
+export const TppUploadSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  fingerprint: z.string(),
+  sourceAccount: z.string(),
+  fileName: z.string(),
+  fileSize: z.number().int(),
+  metadata: z.string(),
+  status: z.string().default("uploading"),
+  nextPart: z.number().int().default(0),
+  bytesReceived: z.number().int().default(0),
+  counts: z.string().default("{}"),
+  actorId: z.string(),
+  timeZone: z.string(),
+  uploadedParts: z.number().int().nullable().optional(),
+  uploadedBytes: z.number().int().nullable().optional(),
+  totalParts: z.number().int().nullable().optional(),
+  processorToken: z.string().nullable().optional(),
+  processorLeaseUntil: z.coerce.date().nullable().optional(),
+  processingError: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type TppUpload = z.infer<typeof TppUploadSchema>;
+
+// Entity: TppUploadPart
+export const TppUploadPartSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  uploadId: z.string(),
+  sequence: z.number().int(),
+  collection: z.string(),
+  storageId: z.string(),
+  checksum: z.string(),
+  byteSize: z.number().int(),
+  rowCount: z.number().int(),
+  outcome: z.string(),
+  status: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type TppUploadPart = z.infer<typeof TppUploadPartSchema>;
 
 // Entity: Trailer
 export const TrailerSchema = z.object({
@@ -8297,7 +8348,7 @@ export const ExternalRecordLinkLinkParamsSchema = z.object({
   sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync", "quickbooks_online", "google_calendar", "stripe", "other"]),
   recordType: z.string(),
   externalId: z.string(),
-  capsuleEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]),
+  capsuleEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]),
   capsuleId: z.string(),
   verified: z.boolean().optional(),
   sourceImportRunId: z.string().optional(),
@@ -8502,7 +8553,7 @@ export type ImportDatasetRecordLastImportParams = z.infer<typeof ImportDatasetRe
 // Command: register on ImportDataset
 export const ImportDatasetRegisterParamsSchema = z.object({
   datasetCategory: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "invoices", "proposals"]),
-  targetEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]),
+  targetEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]),
   config: z.string(),
   name: z.string().optional(),
   description: z.string().optional(),
@@ -10299,6 +10350,8 @@ export const PackRuleDefineParamsSchema = z.object({
   baseQuantity: z.number().int().optional(),
   scaleBy: z.enum(["fixed", "servings", "guests"]).optional(),
   perUnits: z.number().int().optional(),
+  quantityPerUnit: z.number().int().optional(),
+  aggregateDishQuantity: z.boolean().optional(),
   sparePercent: z.number().int().optional(),
   ownership: z.enum(["owned", "rented", "client"]).optional(),
   returnRequired: z.boolean().optional(),
@@ -10331,6 +10384,8 @@ export const PackRuleReviseParamsSchema = z.object({
   baseQuantity: z.number().int(),
   scaleBy: z.enum(["fixed", "servings", "guests"]),
   perUnits: z.number().int().optional(),
+  quantityPerUnit: z.number().int().optional(),
+  aggregateDishQuantity: z.boolean().optional(),
   sparePercent: z.number().int(),
   ownership: z.enum(["owned", "rented", "client"]),
   returnRequired: z.boolean(),
