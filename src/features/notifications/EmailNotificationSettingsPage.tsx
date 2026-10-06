@@ -17,6 +17,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { ErrorState, PageHeader, TableSkeleton } from "../../ui/primitives";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
+import { formatDateTime } from "../../lib/format";
 
 const PREVIEW_CONTENT: Record<
   EmailNotificationCategory,
@@ -190,7 +191,7 @@ export function EmailNotificationSettingsPage() {
           ? "Email sending is not set up for your company yet, so no summaries go out. Your choices are saved; summaries start the morning after email is set up."
           : `Capsule emails each summary you turn on once a day at about 7 in the morning, only when there is something new.${
               sendingStatus?.nextRunAt
-                ? ` Next run: ${new Date(sendingStatus.nextRunAt).toLocaleString()}.`
+                ? ` Next run: ${formatDateTime(sendingStatus.nextRunAt)}.`
                 : ""
             }`}{" "}
         Invoice summaries go only to finance staff and managers; stock summaries

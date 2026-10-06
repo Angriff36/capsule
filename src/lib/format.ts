@@ -26,6 +26,13 @@ export function formatTime(ms: number | null | undefined): string {
   return ms == null ? "—" : timeFmt.format(ms);
 }
 
+/** Date and time together, e.g. "Sep 22, 2026 2:00 PM". */
+export function formatDateTime(at: number | string | null | undefined): string {
+  if (at == null) return "—";
+  const d = new Date(at);
+  return `${dateFmt.format(d)} ${timeFmt.format(d)}`;
+}
+
 // Single-currency callers keep using the legacy signature; per-row callers
 // pass the invoice's currencyCode so financial reports stay coherent in
 // mixed-currency ledgers. Unknown / null codes fall back to USD.

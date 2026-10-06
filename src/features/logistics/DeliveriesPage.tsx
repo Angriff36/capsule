@@ -1,7 +1,7 @@
 import { Fragment, useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
-import { formatCountNoun } from "../../lib/format";
+import { formatCountNoun, formatDateTime } from "../../lib/format";
 import {
   useCreateDelivery,
   useDeliveryCancel,
@@ -503,11 +503,11 @@ export function DeliveriesPage() {
                       </td>
                       <td data-label="Window">
                         {row.windowStartsAt
-                          ? new Date(row.windowStartsAt).toLocaleString()
+                          ? formatDateTime(row.windowStartsAt)
                           : "—"}{" "}
                         →{" "}
                         {row.windowEndsAt
-                          ? new Date(row.windowEndsAt).toLocaleString()
+                          ? formatDateTime(row.windowEndsAt)
                           : "—"}
                       </td>
                       <td data-label="State">

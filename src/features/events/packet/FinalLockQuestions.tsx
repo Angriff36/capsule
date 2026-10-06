@@ -21,6 +21,7 @@ import { FailureBanner } from "../FailureBanner";
 import { eventDetailPath, type EventDetailTab } from "../eventRoutes";
 import { FieldFormsPanel } from "./FieldFormsPanel";
 import { OutsideChannelForm } from "./OutsideChannelForm";
+import { formatDateTime } from "../../../lib/format";
 
 const OUTCOME: Record<FinalLockOutcome, string> = {
   clear: "ALL ANSWERED",
@@ -97,7 +98,7 @@ const sourceLabel = (source: AnswerSource) =>
           : "Equipment");
 
 const when = (value: number | string | null) =>
-  value == null ? null : new Date(value).toLocaleString();
+  value == null ? null : formatDateTime(value);
 
 /**
  * The event's Final Lock questions: each answer, why, where it came from,

@@ -7,6 +7,7 @@ import { useActionFailure, useActionNotice } from "../../ui/action-result";
 import { EmptyState, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import type { PersonalDataSubject } from "./personalDataExport";
+import { formatDateTime } from "../../lib/format";
 
 /**
  * PL-RETENTION (AC-155): erase one person's details on request. Before the
@@ -94,7 +95,7 @@ export function PersonalDataErasurePanel({
         <div className="space-y-4 p-4 text-sm">
           {preview.erasedAt ? (
             <p className="text-ink-2">
-              Details erased on {new Date(preview.erasedAt).toLocaleString()}.
+              Details erased on {formatDateTime(preview.erasedAt)}.
             </p>
           ) : (
             <>
@@ -213,7 +214,7 @@ export function PersonalDataErasureHistory() {
               {row.subjectType === "staff" ? "staff person" : "client contact"}
             </span>{" "}
             <span className="text-ink-3">
-              {new Date(row.at).toLocaleString()}
+              {formatDateTime(row.at)}
               {row.reason ? ` - ${row.reason}` : ""}
             </span>
           </li>

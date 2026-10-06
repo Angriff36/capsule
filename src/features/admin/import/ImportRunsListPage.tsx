@@ -16,6 +16,7 @@ import { QuickFileImport } from "./QuickFileImport";
 import { listOriginState, useListOrigin } from "../../list-state/listOrigin";
 import { ListStateManager } from "../../list-state/ListStateManager";
 import { useListViewState } from "../../list-state/useListViewState";
+import { formatDateTime } from "../../../lib/format";
 
 type SourceSystem = "tpp_legacy" | "csv_export" | "api_sync";
 type DatasetType =
@@ -470,16 +471,14 @@ export function ImportRunsListPage() {
                         {totalRecords > 0 ? totalRecords.toString() : "—"}
                       </td>
                       <td className="py-3 px-4 text-ink-2" data-label="Started">
-                        {run.startTime
-                          ? new Date(run.startTime).toLocaleString()
-                          : "—"}
+                        {run.startTime ? formatDateTime(run.startTime) : "—"}
                       </td>
                       <td
                         className="py-3 px-4 text-ink-2"
                         data-label="Completed"
                       >
                         {run.completionTime
-                          ? new Date(run.completionTime).toLocaleString()
+                          ? formatDateTime(run.completionTime)
                           : "—"}
                       </td>
                       <td className="py-3 px-4">

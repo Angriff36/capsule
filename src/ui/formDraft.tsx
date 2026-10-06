@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { registerUnsavedDraft } from "./unsavedDrafts";
+import { formatDateTime } from "../lib/format";
 
 // ponytail: uncontrolled-form draft persistence. A native delegated "input"
 // listener on the <form> serializes FormData to localStorage (debounced) and
@@ -174,7 +175,7 @@ export function DraftRestoreBanner({
       className="card flex flex-wrap items-center justify-between gap-2 border-line px-3 py-2"
     >
       <p className="text-sm text-ink-2">
-        Unsaved draft found from {new Date(draft.savedAt).toLocaleString()}.
+        Unsaved draft found from {formatDateTime(draft.savedAt)}.
       </p>
       <div className="flex gap-2">
         <button

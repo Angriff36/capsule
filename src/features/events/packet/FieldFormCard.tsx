@@ -21,9 +21,10 @@ import type {
 } from "../../../lib/eventPacket/useFieldForms";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { FailureBanner } from "../FailureBanner";
+import { formatDateTime } from "../../../lib/format";
 
 const when = (value: number | null) =>
-  value == null ? null : new Date(value).toLocaleString();
+  value == null ? null : formatDateTime(value);
 
 /** Local "yyyy-mm-ddThh:mm" for a datetime-local box. */
 const localInput = (ms: number) => {

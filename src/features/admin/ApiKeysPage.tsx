@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { api } from "../../lib/api";
 import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
+import { formatDateTime } from "../../lib/format";
 
 type KeyRow = {
   id: string;
@@ -13,8 +14,7 @@ type KeyRow = {
   expired: boolean;
 };
 
-const when = (ms: number | null) =>
-  ms ? new Date(ms).toLocaleString() : "never";
+const when = (ms: number | null) => (ms ? formatDateTime(ms) : "never");
 
 /**
  * Personal API keys for remote agents. A key acts as the user who created it

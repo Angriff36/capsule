@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useDemandProvenance } from "../facilities/useDemandProvenance";
+import { formatDateTime } from "../../lib/format";
 
 const number = (value: unknown) =>
   typeof value === "number"
@@ -173,7 +174,7 @@ export function IngredientDemandProvenancePanel({
                 {change.at > 0 ? (
                   <time dateTime={new Date(change.at).toISOString()}>
                     {" "}
-                    {new Date(change.at).toLocaleString()}
+                    {formatDateTime(change.at)}
                   </time>
                 ) : null}
               </p>
