@@ -205,8 +205,8 @@ export function StaffUtilizationDashboard({
     <div className="operations-stage supply-stage staff-utilization-stage">
       <header className="supply-masthead staff-utilization-masthead">
         <div>
-          <p className="eyebrow">Staff · Capacity intelligence</p>
-          <h1 className="display-title mt-2">Hours with a pulse.</h1>
+          <p className="eyebrow">Staff · Hours</p>
+          <h1 className="display-title mt-2">How staff time is used.</h1>
           <p className="mt-3 max-w-180 text-ink-2">
             Compare committed shifts with confirmed work, see how much time was
             event-billable, and spot thin schedules before service gets busy.
@@ -319,7 +319,7 @@ export function StaffUtilizationDashboard({
                   ? "—"
                   : `${percent.format(report.utilizationPercent)}%`}
               </strong>
-              <small>event-linked ÷ confirmed hours</small>
+              <small>event hours out of all confirmed hours</small>
             </div>
             <div data-testid="summary-billable-hours">
               <span>Billable hours</span>
@@ -507,14 +507,14 @@ export function StaffUtilizationDashboard({
       )}
 
       <aside className="staff-utilization-method">
-        <span className="eyebrow">Method</span>
+        <span className="eyebrow">How it is counted</span>
         <p>
-          Confirmed hours use closed or corrected time entries wholly inside the
-          selected dates, less recorded breaks. Event-linked time is billable; a
-          linked shift can supply the event. Scheduled demand uses scheduled,
-          started, and completed shifts, clips them to the period, and excludes
-          cancelled or no-show shifts. The under-scheduling target is a visible
-          browser preference and never blocks scheduling.
+          Confirmed hours are closed or corrected time entries inside the chosen
+          dates, less breaks. Time tied to an event (directly or through its
+          shift) counts as billable. Scheduled hours count planned, started and
+          finished shifts inside the dates, not cancelled or no-show ones. The
+          weekly target is only a reminder kept in this browser; it never stops
+          anyone from scheduling.
         </p>
       </aside>
     </div>
