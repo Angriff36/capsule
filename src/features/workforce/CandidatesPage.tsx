@@ -498,10 +498,12 @@ export function CandidatesPage() {
                   <div>
                     <p className="eyebrow">
                       {STAGE_LABEL[candidate.stage] ?? candidate.stage} ·{" "}
-                      {candidate.roleAppliedFor}
+                      {ROLE_OPTIONS.find(
+                        (role) => role.value === candidate.roleAppliedFor,
+                      )?.label ?? candidate.roleAppliedFor}
                       {candidate.sourceSystem === "km_interview"
-                        ? " · KM"
-                        : " · Native"}
+                        ? " · From KM import"
+                        : ""}
                     </p>
                     <h2>{candidate.fullName}</h2>
                     <p className="text-ink-2 mt-1">

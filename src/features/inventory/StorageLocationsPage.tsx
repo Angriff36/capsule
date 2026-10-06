@@ -197,7 +197,7 @@ export function StorageLocationsPage() {
         title="Storage locations"
         lead="Every fridge, freezer and dry store, what sits in each one, and the temperature it should keep. Capsule does not read a thermometer: the range here is the target you set."
         actions={
-          <Link to="/inventory/stock" className="btn btn-primary">
+          <Link to="/inventory/stock?new=location" className="btn btn-primary">
             Register a location
           </Link>
         }

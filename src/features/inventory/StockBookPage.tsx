@@ -124,9 +124,14 @@ export function StockBookPage() {
   const returnUnused = useInventoryReservationReturnUnused();
   const createInventorySettings = useCreateInventorySettings();
   const setStockTracking = useInventorySettingsSetStockTracking();
+  // "Register a location" on the Locations page lands here with the form open.
   const [form, setForm] = useState<
     "location" | "stock" | "reserve" | "transfer" | null
-  >(null);
+  >(() =>
+    new URLSearchParams(window.location.search).get("new") === "location"
+      ? "location"
+      : null,
+  );
   const [transferSource, setTransferSource] = useState<any>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
