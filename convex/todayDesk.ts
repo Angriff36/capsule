@@ -36,7 +36,7 @@ export interface DeskEvent {
 export interface TodayDesk {
   events: DeskEvent[];
   invoices: { status: string; deletedAt: null }[];
-  prepTasks: { status: string; deletedAt: null }[];
+  prepTasks: OpenRow[];
   packLists: OpenRow[];
   closeouts: { status: string; deletedAt: null }[];
   /** Lanes whose count reached LANE_CAP and is a floor. */
@@ -48,6 +48,8 @@ type StatusTable = "invoices" | "prepTasks" | "packLists" | "eventCloseouts";
 interface OpenRow {
   status: string;
   eventId: string | null;
+  /** Prep tasks only: when the step is due, so old leftovers can be left out. */
+  dueAt?: number | null;
   deletedAt: null;
 }
 
@@ -80,6 +82,7 @@ async function openRows(
     rows: all.slice(0, LANE_CAP).map((r: Doc<"packLists">) => ({
       status: String(r.status),
       eventId: r.eventId ?? null,
+      dueAt: (r as { dueAt?: number | null }).dueAt ?? null,
       deletedAt: null,
     })),
     capped: all.length > LANE_CAP,
@@ -177,7 +180,8 @@ export const desk = query({
     return {
       events,
       invoices: statusOnly(invoices.rows),
-      prepTasks: statusOnly(prepTasks.rows),
+      // With the event, so Home counts only prep for events still ahead.
+      prepTasks: prepTasks.rows,
       packLists: packLists.rows,
       closeouts: statusOnly(closeouts.rows),
       capped,
