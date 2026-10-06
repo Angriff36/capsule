@@ -232,6 +232,36 @@ export function EventInventoryPanel({
     })();
   };
 
+  const activeHolds = eventReservations.filter(
+    (reservation) => reservation.status === "active",
+  );
+
+  // One click sends every open hold out of storage, instead of one per line.
+  const issueAll = () => {
+    if (!eligible || activeHolds.length === 0) return;
+    onBusy(true);
+    onError(null);
+    void (async () => {
+      try {
+        for (const reservation of activeHolds) {
+          await issueEventStock({
+            eventId: eventId as Id<"events">,
+            reservationId: reservation._id,
+            reservationVersion: reservation.version,
+            operationKey: `event-stock-issue:${reservation._id}`,
+          });
+        }
+        setLastIssue(
+          `Issued ${activeHolds.length} hold${activeHolds.length === 1 ? "" : "s"}; stock on hand is updated.`,
+        );
+      } catch (error) {
+        onError(error);
+      } finally {
+        onBusy(false);
+      }
+    })();
+  };
+
   if (
     !eligible &&
     eventDemands.length === 0 &&
@@ -293,6 +323,16 @@ export function EventInventoryPanel({
                   Approve the event to reserve stock.
                 </p>
               )}
+              {eligible && activeHolds.length > 0 ? (
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  disabled={busy}
+                  onClick={issueAll}
+                >
+                  Issue all stock
+                </button>
+              ) : null}
             </div>
           </div>
           <p className="mt-2.5 border-t border-line pt-2.5 text-base text-ink-3">
