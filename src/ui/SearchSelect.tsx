@@ -195,8 +195,13 @@ export function SearchSelect({
   };
 
   const inputValue = open ? query : (selected?.label ?? "");
+  // A match on other details (an email, an address) must not hide Create;
+  // only an option whose name holds the typed text does.
+  const typedName = query.trim().toLowerCase();
   const canCreate =
-    !!onCreate && query.trim().length > 0 && visible.length === 0;
+    !!onCreate &&
+    typedName.length > 0 &&
+    !visible.some((option) => option.label.toLowerCase().includes(typedName));
 
   return (
     <div ref={rootRef} className="relative">

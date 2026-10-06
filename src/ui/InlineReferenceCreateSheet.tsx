@@ -322,7 +322,20 @@ export function InlineReferenceCreateSheet({
               familyName={familyName}
               email={email}
               onName={setName}
-              onClientType={setClientType}
+              onClientType={(next) => {
+                setClientType(next);
+                // "Emma Whitlock" typed as a company splits into first and
+                // last name when it turns out to be a person.
+                const words = name.trim().split(/\s+/);
+                if (
+                  next === "person" &&
+                  !familyName.trim() &&
+                  words.length > 1
+                ) {
+                  setName(words.slice(0, -1).join(" "));
+                  setFamilyName(words[words.length - 1]);
+                }
+              }}
               onFamilyName={setFamilyName}
               onEmail={setEmail}
             />
