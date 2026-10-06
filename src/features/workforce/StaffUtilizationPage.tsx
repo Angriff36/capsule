@@ -340,9 +340,13 @@ export function StaffUtilizationDashboard({
               data-testid="summary-under-scheduled"
             >
               <span>Under scheduled</span>
-              <strong>{report.underScheduledCount}</strong>
+              <strong>
+                {weeklyTargetHours > 0 ? report.underScheduledCount : "—"}
+              </strong>
               <small>
-                below {formatHours(report.targetHoursPerPerson)} this period
+                {weeklyTargetHours > 0
+                  ? `below ${formatHours(report.targetHoursPerPerson)} this period`
+                  : "Set a weekly target to see who is short"}
               </small>
             </div>
           </section>
@@ -435,6 +439,11 @@ export function StaffUtilizationDashboard({
                           {row.underScheduled ? (
                             <span className="staff-utilization-status is-under">
                               {formatHours(row.scheduleGapHours)} below target
+                            </span>
+                          ) : row.activeForScheduling &&
+                            weeklyTargetHours === 0 ? (
+                            <span className="staff-utilization-status">
+                              No target set
                             </span>
                           ) : row.activeForScheduling ? (
                             <span className="staff-utilization-status is-ready">
