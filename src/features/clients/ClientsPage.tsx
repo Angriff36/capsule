@@ -434,7 +434,7 @@ export function ClientsPage() {
                     }
                     className="cursor-pointer transition-colors hover:bg-inset/60"
                   >
-                    <td className="td w-full max-w-0 truncate">
+                    <td className="td w-full min-w-[10rem] max-w-0 truncate">
                       <span className="font-medium">
                         {clientDisplayName(row._id, clients)}
                       </span>
@@ -442,7 +442,7 @@ export function ClientsPage() {
                         {formatStatusLabel(String(row.clientType))}
                       </span>
                     </td>
-                    <td className="td text-sm text-ink-3">
+                    <td className="td max-w-[16rem] truncate text-sm text-ink-3">
                       {contactLine || "—"}
                     </td>
                     <td className="td text-right font-mono">
