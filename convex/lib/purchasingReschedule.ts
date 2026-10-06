@@ -109,3 +109,50 @@ async function moveNeedToWeek(
     purchasingWeekStart: weekStart,
   });
 }
+
+/**
+ * Runs after Ingredient.setPreferredVendors / setPreferredVendor. Every OPEN
+ * need for the ingredient that still sits on an editable draft of another
+ * vendor leaves that draft and re-opens for the new first choice in the same
+ * week. Without this, the old vendor's line kept its share while the new
+ * vendor's line summed the whole week: the ingredient was ordered twice.
+ * Ordered and fulfilled needs stay with the order they were bought on.
+ */
+export async function moveIngredientNeedsToPreferredVendor(
+  ctx: MutationCtx,
+  ingredientId: Id<"ingredients">,
+) {
+  const tenantId = requireTenant(await getAuthContext(ctx));
+  const ingredient = await ctx.db.get(ingredientId);
+  if (!ingredient || ingredient.tenantId !== tenantId || ingredient.deletedAt != null) return;
+  const next = ingredient.preferredVendorId ?? null;
+  const needs = (
+    await ctx.db
+      .query("purchaseNeeds")
+      .withIndex("by_ingredientId", (q) => q.eq("ingredientId", ingredientId))
+      .collect()
+  ).filter(
+    (need) =>
+      need.tenantId === tenantId &&
+      need.deletedAt == null &&
+      need.status === "open" &&
+      (need.preferredVendorId ?? null) !== next,
+  );
+  if (needs.length === 0) return;
+  const purchasing = TenantSystemCommandRunner.forTenant(ctx, tenantId).context;
+  for (const need of needs) {
+    if (need.vendorOrderId) {
+      const order = await ctx.db.get(need.vendorOrderId);
+      // A submitted order is history; that need was already bought.
+      if (order && order.status !== "draft") continue;
+    }
+    await releaseNeedDraftContributions(ctx, need, "Ingredient moved to its preferred vendor");
+    const current = await ctx.db.get(need._id);
+    if (!current) continue;
+    await purchasing.runMutation(api.mutations.PurchaseNeed_moveToVendor, {
+      docId: current._id,
+      version: current.version,
+      ...(next ? { preferredVendorId: String(next) } : {}),
+    });
+  }
+}

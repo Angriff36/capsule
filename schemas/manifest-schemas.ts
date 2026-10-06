@@ -11451,6 +11451,13 @@ export const PurchaseNeedMarkOrderedParamsSchema = z.object({
 
 export type PurchaseNeedMarkOrderedParams = z.infer<typeof PurchaseNeedMarkOrderedParamsSchema>;
 
+// Command: moveToVendor on PurchaseNeed
+export const PurchaseNeedMoveToVendorParamsSchema = z.object({
+  preferredVendorId: z.string().min(1).optional(),
+});
+
+export type PurchaseNeedMoveToVendorParams = z.infer<typeof PurchaseNeedMoveToVendorParamsSchema>;
+
 // Command: moveToWeek on PurchaseNeed
 export const PurchaseNeedMoveToWeekParamsSchema = z.object({
   purchasingWeekStart: z.coerce.date(),
