@@ -444,6 +444,13 @@ export function MyDayPage() {
         notice.weekEndsAt >= startOfToday.getTime(),
     )
     .sort((a, b) => a.weekStartsAt - b.weekStartsAt);
+  // A scheduled shift that ended before today is missed, not upcoming; one
+  // already started stays until it is finished.
+  const upcomingShifts = myShifts.filter(
+    (shift) =>
+      String(shift.status) === "started" ||
+      (shift.endsAt ?? shift.startsAt ?? Infinity) >= startOfToday.getTime(),
+  );
   const unacknowledgedNotices = myScheduleNotices.filter(
     (notice) => !notice.acknowledgedAt,
   ).length;
@@ -618,7 +625,7 @@ export function MyDayPage() {
       signedInName={clerkDisplayName}
       linkedPersonName={linkedPersonName}
       weeklyHours={weekHours}
-      shiftCount={shifts === undefined ? undefined : myShifts.length}
+      shiftCount={shifts === undefined ? undefined : upcomingShifts.length}
     >
       {hasUnscopedQueuedWork() && (
         <div className="text-base text-warn">
@@ -833,15 +840,15 @@ export function MyDayPage() {
               </Section>
             </div>
             <div id="my-day-schedule" className="my-day-shifts-panel">
-              <Section title="Upcoming shifts" count={myShifts.length}>
-                {myShifts.length === 0 ? (
+              <Section title="Upcoming shifts" count={upcomingShifts.length}>
+                {upcomingShifts.length === 0 ? (
                   <EmptyState
                     title="No shifts scheduled"
                     hint="Shifts assigned to you will show up here as soon as they are published."
                   />
                 ) : (
                   <ul className="flex flex-col divide-y divide-line-2 px-4">
-                    {myShifts.map((shift) => (
+                    {upcomingShifts.map((shift) => (
                       <li
                         key={shift._id}
                         id={`my-day-shift-${shift._id}`}
