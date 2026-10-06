@@ -3132,6 +3132,18 @@
       "category": "command-parameter-removed",
       "acknowledgedAt": "2026-10-06",
       "reason": "Ids are Convex ids (strings, not uuids): list<uuid> rejected every real id, so saving failed. Stored values are the same strings; widening keeps old rows valid."
+    },
+    {
+      "path": "Lead.eventType",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Optional lead fields (int? / string?, optional in convex/schema.ts): old leads simply have no value. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Lead.guestCount",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Optional lead fields (int? / string?, optional in convex/schema.ts): old leads simply have no value. The checker reads a nullable field with no default as required."
     }
   ]
 }
