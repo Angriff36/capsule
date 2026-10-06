@@ -22,6 +22,7 @@ import {
   type ProductionPlanInput,
 } from "../../../convex/lib/culinaryModel/productionPlan";
 
+import "./ProductionYieldDashboardPage.css";
 const dayFormat = new Intl.DateTimeFormat(undefined, {
   weekday: "long",
   month: "short",

@@ -17,6 +17,7 @@ import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import { ReviewFeedback } from "./ReviewFeedback";
 import { effectiveScorecard } from "./scorecardVersions";
 
+import "./TrainingPage.css";
 const DIMENSIONS = [
   { key: "reliabilityRating", label: "Reliability" },
   { key: "qualityRating", label: "Quality" },

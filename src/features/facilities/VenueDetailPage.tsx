@@ -337,7 +337,7 @@ export function VenueDetailPage() {
                 name="name"
                 required
                 defaultValue={venue.name}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+                className="input mt-1 block"
               />
             </div>
             <div>
@@ -348,7 +348,7 @@ export function VenueDetailPage() {
                 name="venueType"
                 required
                 defaultValue={venue.venueType}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+                className="input mt-1 block"
               >
                 {VENUE_TYPES.map((type) => (
                   <option key={type} value={type}>
@@ -386,7 +386,7 @@ export function VenueDetailPage() {
                     type="text"
                     name="kitchenAccess"
                     defaultValue={venue.kitchenAccess ?? ""}
-                    className="mt-1 block w-full rounded-sm border-line-2 shadow-sm text-xs"
+                    className="input mt-1 block text-xs"
                     placeholder="e.g., Full kitchen, warming station only, no kitchen"
                   />
                 </div>
@@ -398,7 +398,7 @@ export function VenueDetailPage() {
                     type="text"
                     name="loadInInstructions"
                     defaultValue={venue.loadInInstructions ?? ""}
-                    className="mt-1 block w-full rounded-sm border-line-2 shadow-sm text-xs"
+                    className="input mt-1 block text-xs"
                     placeholder="e.g., Dock door 3, load-in 6:00–8:00am, freight entrance off Maple"
                   />
                 </div>
@@ -411,7 +411,7 @@ export function VenueDetailPage() {
                       <select
                         name={field.name}
                         defaultValue={booleanSelectValue(venue[field.name])}
-                        className="mt-1 block w-full rounded-sm border-line-2 text-xs"
+                        className="input mt-1 block text-xs"
                       >
                         <option value="">Unknown</option>
                         <option value="true">Yes</option>
@@ -430,7 +430,7 @@ export function VenueDetailPage() {
                 type="text"
                 name="addressLine1"
                 defaultValue={venue.addressLine1 ?? ""}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+                className="input mt-1 block"
               />
             </div>
             <div>
@@ -441,7 +441,7 @@ export function VenueDetailPage() {
                 type="text"
                 name="addressLine2"
                 defaultValue={venue.addressLine2 ?? ""}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+                className="input mt-1 block"
               />
             </div>
             <div>
@@ -452,7 +452,7 @@ export function VenueDetailPage() {
                 type="text"
                 name="city"
                 defaultValue={venue.city ?? ""}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+                className="input mt-1 block"
               />
             </div>
             <div>
@@ -463,7 +463,7 @@ export function VenueDetailPage() {
                 type="text"
                 name="region"
                 defaultValue={venue.region ?? ""}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+                className="input mt-1 block"
               />
             </div>
             <div>
@@ -474,7 +474,7 @@ export function VenueDetailPage() {
                 type="text"
                 name="postalCode"
                 defaultValue={venue.postalCode ?? ""}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+                className="input mt-1 block"
               />
             </div>
             <div>
@@ -485,7 +485,7 @@ export function VenueDetailPage() {
                 type="text"
                 name="country"
                 defaultValue={venue.countryCode ?? ""}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+                className="input mt-1 block"
               />
             </div>
             <div>
@@ -497,7 +497,7 @@ export function VenueDetailPage() {
                 name="timeZone"
                 placeholder="Same as your kitchen"
                 defaultValue={venue.timeZone ?? ""}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+                className="input mt-1 block"
               />
             </div>
             <VenueCoordinatesFields
@@ -512,7 +512,7 @@ export function VenueDetailPage() {
                 type="text"
                 name="contactName"
                 defaultValue={venue.contactName ?? ""}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+                className="input mt-1 block"
               />
             </div>
             <div>
@@ -523,7 +523,7 @@ export function VenueDetailPage() {
                 type="email"
                 name="contactEmail"
                 defaultValue={venue.contactEmail ?? ""}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+                className="input mt-1 block"
               />
             </div>
             <div>
@@ -534,7 +534,7 @@ export function VenueDetailPage() {
                 type="tel"
                 name="contactPhone"
                 defaultValue={venue.contactPhone ?? ""}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+                className="input mt-1 block"
               />
             </div>
           </div>
@@ -546,7 +546,7 @@ export function VenueDetailPage() {
               name="accessNotes"
               rows={2}
               defaultValue={venue.accessNotes ?? ""}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1 block"
             />
           </div>
           <div>
@@ -557,7 +557,7 @@ export function VenueDetailPage() {
               name="cateringNotes"
               rows={2}
               defaultValue={venue.cateringNotes ?? ""}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1 block"
             />
           </div>
           <div>
@@ -568,7 +568,7 @@ export function VenueDetailPage() {
               name="logisticsNotes"
               rows={2}
               defaultValue={venue.logisticsNotes ?? ""}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1 block"
             />
           </div>
           <div>
@@ -579,7 +579,7 @@ export function VenueDetailPage() {
               name="wasteRules"
               rows={2}
               defaultValue={venue.wasteRules ?? ""}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1 block"
             />
           </div>
           <div>
@@ -590,7 +590,7 @@ export function VenueDetailPage() {
               name="permitsInsuranceNotes"
               rows={2}
               defaultValue={venue.permitsInsuranceNotes ?? ""}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1 block"
             />
           </div>
           <div>
@@ -601,7 +601,7 @@ export function VenueDetailPage() {
               name="restrictions"
               rows={2}
               defaultValue={venue.restrictions ?? ""}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1 block"
             />
           </div>
           <div className="flex justify-end gap-2">
@@ -642,7 +642,7 @@ export function VenueDetailPage() {
                 min="1"
                 defaultValue={venue.capacity ?? ""}
                 placeholder={String(venue.capacity ?? "Enter capacity")}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+                className="input mt-1 block"
               />
             </div>
             <button

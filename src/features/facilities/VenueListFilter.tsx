@@ -37,7 +37,7 @@ export function VenueListFilter({ filter, onChange, shown, total }: Props) {
               minGuests: value === "" ? null : Math.max(0, Number(value)),
             });
           }}
-          className="mt-1 block w-24 rounded-sm border-line-2"
+          className="input mt-1 block w-24"
           placeholder="Guests"
         />
       </label>
@@ -48,7 +48,7 @@ export function VenueListFilter({ filter, onChange, shown, total }: Props) {
           onChange={(event) =>
             set({ premise: event.target.value as VenueFilter["premise"] })
           }
-          className="mt-1 block rounded-sm border-line-2"
+          className="input mt-1 block"
         >
           <option value="any">Any</option>
           <option value="on">On-premise</option>

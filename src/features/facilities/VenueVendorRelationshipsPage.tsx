@@ -397,7 +397,7 @@ export function VenueVendorRelationshipsPage() {
                 required
                 disabled={!!venueId}
                 defaultValue={venueId ?? ""}
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1 block sm:text-xs"
               >
                 <option value="">Select venue...</option>
                 {filteredVenues.map((v) => (
@@ -432,7 +432,7 @@ export function VenueVendorRelationshipsPage() {
                 name="category"
                 required
                 defaultValue="other"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1 block sm:text-xs"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat.value} value={cat.value}>
@@ -450,7 +450,7 @@ export function VenueVendorRelationshipsPage() {
                 name="status"
                 required
                 defaultValue="approved"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1 block sm:text-xs"
               >
                 {STATUSES.map((st) => (
                   <option key={st.value} value={st.value}>
@@ -466,7 +466,7 @@ export function VenueVendorRelationshipsPage() {
               </label>
               <BoundedDateInput
                 name="effectiveFrom"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1 block sm:text-xs"
               />
             </div>
 
@@ -476,7 +476,7 @@ export function VenueVendorRelationshipsPage() {
               </label>
               <BoundedDateInput
                 name="effectiveUntil"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1 block sm:text-xs"
               />
             </div>
 
@@ -491,7 +491,7 @@ export function VenueVendorRelationshipsPage() {
                 max="100"
                 step="0.01"
                 placeholder="0.00"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1 block sm:text-xs"
               />
             </div>
 
@@ -505,7 +505,7 @@ export function VenueVendorRelationshipsPage() {
                 min="0"
                 step="0.01"
                 placeholder="0.00"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1 block sm:text-xs"
               />
             </div>
 
@@ -517,7 +517,7 @@ export function VenueVendorRelationshipsPage() {
                 type="text"
                 name="paymentTerms"
                 placeholder="e.g., Net 30"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1 block sm:text-xs"
               />
             </div>
 
@@ -529,7 +529,7 @@ export function VenueVendorRelationshipsPage() {
                 type="text"
                 name="insuranceCertificate"
                 placeholder="Certificate number or note"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1 block sm:text-xs"
               />
             </div>
 
@@ -539,7 +539,7 @@ export function VenueVendorRelationshipsPage() {
               </label>
               <BoundedDateInput
                 name="insuranceExpiry"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1 block sm:text-xs"
               />
             </div>
 
@@ -551,7 +551,7 @@ export function VenueVendorRelationshipsPage() {
                 name="complianceNotes"
                 rows={2}
                 placeholder="Special requirements, certifications, etc."
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1 block sm:text-xs"
               />
             </div>
 
@@ -563,7 +563,7 @@ export function VenueVendorRelationshipsPage() {
                 name="notes"
                 rows={2}
                 placeholder="Additional notes..."
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
+                className="input mt-1 block sm:text-xs"
               />
             </div>
           </div>

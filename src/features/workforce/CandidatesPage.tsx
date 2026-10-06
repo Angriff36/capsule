@@ -27,6 +27,7 @@ import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { SearchSelect } from "../../ui/SearchSelect";
 
+import "./TrainingPage.css";
 // ponytail: a focused set of hireable operational roles for the create-form
 // picker. roleAppliedFor is a free CapsuleRole, so a KM-sourced value outside
 // this list still lands correctly (stored verbatim by the ingest seam).

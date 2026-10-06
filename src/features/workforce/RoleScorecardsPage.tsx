@@ -13,6 +13,7 @@ import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
+import "./TrainingPage.css";
 // A measurable expectation row — serialized to a JSON string on the
 // `expectations` property (additive shape; no schema migration to extend).
 type Expectation = { metric: string; target: string };

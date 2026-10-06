@@ -31,6 +31,7 @@ import {
   allocateRevenueShare,
 } from "./revenueAttributionValues";
 
+import "./taxWorkspace.css";
 const usd = formatMoneyExact;
 
 const formatDate = (date: string | number | null | undefined) => {

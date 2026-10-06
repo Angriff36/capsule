@@ -18,6 +18,7 @@ import { SearchSelect } from "../../ui/SearchSelect";
 import { openActionsForNextMeeting } from "./oneOnOneCarryOver";
 import { effectiveScorecard } from "./scorecardVersions";
 
+import "./TrainingPage.css";
 // goals/decisions are JSON string arrays on the entity (additive shape, like
 // RoleScorecard.expectations) so the captured lists can grow without a schema
 // migration.

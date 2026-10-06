@@ -587,6 +587,15 @@
       animation-delay: 60ms;
     }
   }
+
+  /* Small help line under a form field; used by many workspaces, so it
+     lives here rather than in one page's stylesheet. */
+  .field-help {
+    display: block;
+    margin-top: 0.3rem;
+    color: var(--color-ink-3);
+    font-size: 10px;
+  }
 }
 
 @keyframes rise-in {
