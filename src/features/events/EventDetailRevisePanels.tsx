@@ -135,8 +135,10 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
           title="Schedule"
           hint="When the event starts and ends"
         >
+          {/* Each form refreshes only when its own saved values change, so
+              saving one section never wipes what is typed in another. */}
           <form
-            key={`schedule-${version}`}
+            key={`schedule-${startsAt}-${endsAt}`}
             className="space-y-3"
             onSubmit={(formEvent) => {
               formEvent.preventDefault();
@@ -198,7 +200,7 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
             run={run}
           />
           <form
-            key={`headcount-${version}`}
+            key={`headcount-${expectedHeadcount}`}
             className="flex min-w-0 flex-wrap items-end gap-2"
             onSubmit={(formEvent) => {
               formEvent.preventDefault();
@@ -234,7 +236,7 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
             </button>
           </form>
           <form
-            key={`venue-${version}`}
+            key={`venue-${venueId}`}
             className="flex min-w-0 flex-wrap items-end gap-2"
             onSubmit={(formEvent) => {
               formEvent.preventDefault();
@@ -294,7 +296,7 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
 
         <EventFormCluster title="Commercial" hint="Budget and quoted price">
           <form
-            key={`pricing-${version}`}
+            key={`pricing-${budgetAmount}-${quotedPrice}`}
             className="space-y-3"
             onSubmit={(formEvent) => {
               formEvent.preventDefault();
