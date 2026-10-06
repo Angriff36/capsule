@@ -202,7 +202,8 @@ const watchIgnored = [
   // imports, and ignoring it left stale rules on screen after a regen.
   `${normalizePath(fileURLToPath(new URL("./generated", import.meta.url)))}/**`,
   "**/scripts/**",
-  "**/convex/lib/**",
+  // convex/lib is not ignored: about 50 screens import its shared rules, and
+  // ignoring it served stale copies (a missing export blanked the app).
   "**/package.json",
   "**/.gitattributes",
   "**/.gitignore",
