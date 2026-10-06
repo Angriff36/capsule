@@ -292,7 +292,6 @@ export const CommandAuditRecordSchema = z.object({
   subjectId: z.string().nullable().optional(),
   eventType: z.string().nullable().optional(),
   manifestEventId: z.string().nullable().optional(),
-  manifestEventIds: z.unknown().nullable().optional(),
   eventCount: z.number().int().nullable().optional(),
   versionAfter: z.number().int().nullable().optional(),
   actorUserId: z.string().nullable().optional(),
@@ -638,50 +637,6 @@ export const CutoverDecisionSchema = z.object({
 });
 
 export type CutoverDecision = z.infer<typeof CutoverDecisionSchema>;
-
-// Entity: DateHold
-export const DateHoldSchema = z.object({
-  id: z.string().uuid(),
-  tenantId: z.string(),
-  deletedAt: z.coerce.date().nullable().optional(),
-  holdDate: z.string(),
-  clientId: z.string().uuid().nullable().optional(),
-  leadId: z.string().uuid().nullable().optional(),
-  eventId: z.string().uuid().nullable().optional(),
-  venueId: z.string().uuid().nullable().optional(),
-  ownerPersonId: z.string().uuid().nullable().optional(),
-  status: z.enum(["held", "released", "expired", "converted"]).default("held"),
-  expiresAt: z.number().int(),
-  note: z.string().nullable().optional(),
-  placedAt: z.number().int().nullable().optional(),
-  releasedAt: z.number().int().nullable().optional(),
-  convertedAt: z.number().int().nullable().optional(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-});
-
-export type DateHold = z.infer<typeof DateHoldSchema>;
-
-// Entity: DateWaitlistEntry
-export const DateWaitlistEntrySchema = z.object({
-  id: z.string().uuid(),
-  tenantId: z.string(),
-  deletedAt: z.coerce.date().nullable().optional(),
-  holdDate: z.string(),
-  clientId: z.string().uuid().nullable().optional(),
-  leadId: z.string().uuid().nullable().optional(),
-  ownerPersonId: z.string().uuid().nullable().optional(),
-  status: z.enum(["waiting", "offered", "promoted", "withdrawn"]).default("waiting"),
-  note: z.string().nullable().optional(),
-  queuedAt: z.number().int().nullable().optional(),
-  offeredAt: z.number().int().nullable().optional(),
-  promotedAt: z.number().int().nullable().optional(),
-  withdrawnAt: z.number().int().nullable().optional(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-});
-
-export type DateWaitlistEntry = z.infer<typeof DateWaitlistEntrySchema>;
 
 // Entity: DeckShareLink
 export const DeckShareLinkSchema = z.object({
@@ -1126,9 +1081,6 @@ export const EventSchema = z.object({
   referralSourceId: z.string().uuid().nullable().optional(),
   venueId: z.string().uuid().nullable().optional(),
   operatingLocationId: z.string().uuid().nullable().optional(),
-  travelDistanceMiles: z.number().nullable().optional(),
-  travelFeeOverride: z.number().nullable().optional(),
-  travelFeeOverrideReason: z.string().nullable().optional(),
   assignedToId: z.string().uuid().nullable().optional(),
   ownerName: z.string().nullable().optional(),
   title: z.string().default(""),
@@ -1475,9 +1427,6 @@ export const EventGuestSchema = z.object({
   declineReason: z.string().nullable().optional(),
   checkedInAt: z.coerce.date().nullable().optional(),
   tableAssignment: z.string().nullable().optional(),
-  entreeEventDishId: z.string().uuid().nullable().optional(),
-  seatNumber: z.number().int().nullable().optional(),
-  placeCardName: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1519,10 +1468,8 @@ export const EventIngredientContributionSchema = z.object({
   componentPath: z.array(z.string()).nullable().optional(),
   productionBatchId: z.string().uuid().nullable().optional(),
   productionBatchAllocationId: z.string().uuid().nullable().optional(),
-  calculationSnapshot: z.unknown().nullable().optional(),
   supersededAt: z.coerce.date().nullable().optional(),
   supersededBySourceKey: z.string().nullable().optional(),
-  supersedeReason: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1908,7 +1855,6 @@ export const FieldConfirmationSchema = z.object({
   outcome: z.enum(["all_good", "problem"]).nullable().optional(),
   note: z.string().nullable().optional(),
   photoStorageId: z.string().nullable().optional(),
-  answers: z.string().nullable().optional(),
   secondCompletedAt: z.coerce.date().nullable().optional(),
   secondObservedAt: z.coerce.date().nullable().optional(),
   formCheckedById: z.string().uuid().nullable().optional(),
@@ -2067,8 +2013,8 @@ export const IngredientSchema = z.object({
   isGlutenFree: z.boolean().optional().default(false),
   costPerUnit: z.number().min(0).default(0),
   category: z.string().nullable().optional(),
-  substituteIngredientIds: z.array(z.string()).optional().default([]),
-  preferredVendorIds: z.array(z.string()).optional().default([]),
+  substituteIngredientIds: z.array(z.string().uuid()).optional().default([]),
+  preferredVendorIds: z.array(z.string().uuid()).optional().default([]),
   preferredVendorId: z.string().uuid().nullable().optional(),
   status: z.enum(["active", "discontinued"]).default("active"),
   introducedAt: z.coerce.date().nullable().optional(),
@@ -2451,32 +2397,6 @@ export const LeadershipItemSchema = z.object({
 
 export type LeadershipItem = z.infer<typeof LeadershipItemSchema>;
 
-// Entity: LeftoverDisposition
-export const LeftoverDispositionSchema = z.object({
-  id: z.string().uuid(),
-  tenantId: z.string(),
-  deletedAt: z.coerce.date().nullable().optional(),
-  eventId: z.string().uuid(),
-  disposition: z.enum(["donated", "returned_to_stock", "discarded"]).default("donated"),
-  itemDescription: z.string().default(""),
-  dispositionDate: z.string().default(""),
-  weightLb: z.number().nullable().optional(),
-  estimatedValue: z.number().nullable().optional(),
-  recipientOrganization: z.string().nullable().optional(),
-  recipientEin: z.string().nullable().optional(),
-  recipientAddress: z.string().nullable().optional(),
-  recipientContact: z.string().nullable().optional(),
-  receiptReference: z.string().nullable().optional(),
-  handlingNote: z.string().nullable().optional(),
-  note: z.string().nullable().optional(),
-  recordedAt: z.coerce.date().nullable().optional(),
-  recordedByPersonId: z.string().uuid().nullable().optional(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-});
-
-export type LeftoverDisposition = z.infer<typeof LeftoverDispositionSchema>;
-
 // Entity: MaterializationReceipt
 export const MaterializationReceiptSchema = z.object({
   id: z.string().uuid(),
@@ -2511,8 +2431,6 @@ export const MenuSchema = z.object({
   archiveReason: z.string().nullable().optional(),
   availableFrom: z.coerce.date().nullable().optional(),
   availableUntil: z.coerce.date().nullable().optional(),
-  guestsPerServer: z.number().int().nullable().optional(),
-  pickOneCourses: z.array(z.string()).optional().default([]),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2745,12 +2663,6 @@ export const OrganizationSchema = z.object({
   routeSafetyBufferMinutes: z.number().int().nullable().optional(),
   routeTrafficPolicy: z.enum(["traffic_aware", "no_traffic"]).nullable().optional(),
   routeRefreshHours: z.number().int().nullable().optional(),
-  travelFeeMode: z.enum(["off", "per_mile", "zone"]).nullable().optional(),
-  travelFeeRatePerMile: z.number().nullable().optional(),
-  travelFeeFreeMiles: z.number().nullable().optional(),
-  travelFeeMinimum: z.number().nullable().optional(),
-  travelFeeRoundTrip: z.boolean().nullable().optional(),
-  travelFeeZonesJson: z.string().nullable().optional(),
   timingFullServiceSetupMinutes: z.number().int().nullable().optional(),
   timingLimitedServiceSetupMinutes: z.number().int().nullable().optional(),
   timingBriefingMinutes: z.number().int().nullable().optional(),
@@ -2761,8 +2673,6 @@ export const OrganizationSchema = z.object({
   equipmentFieldsJson: z.string().nullable().optional(),
   emailSenderName: z.string().nullable().optional(),
   emailReplyTo: z.string().nullable().optional(),
-  brandPhone: z.string().nullable().optional(),
-  brandWebsite: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2814,7 +2724,6 @@ export const PackListSchema = z.object({
   cancellationReason: z.string().nullable().optional(),
   assistanceRequestedAt: z.coerce.date().nullable().optional(),
   assistanceNote: z.string().nullable().optional(),
-  binSheet: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2836,7 +2745,6 @@ export const PackListItemSchema = z.object({
   productionBatchId: z.string().uuid().nullable().optional(),
   note: z.string().nullable().optional(),
   sentInstead: z.string().nullable().optional(),
-  binNumber: z.number().int().nullable().optional(),
   serviceStyleKitItemId: z.string().uuid().nullable().optional(),
   unitCorrectionSource: z.string().nullable().optional(),
   associationSource: z.string().nullable().optional(),
@@ -3573,7 +3481,6 @@ export const ProposalLineItemSchema = z.object({
   menuDishId: z.string().uuid().nullable().optional(),
   overrideReason: z.string().nullable().optional(),
   equipmentId: z.string().uuid().nullable().optional(),
-  travelFee: z.boolean().nullable().optional(),
   addedAt: z.coerce.date().nullable().optional(),
   removedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -4201,23 +4108,6 @@ export const SignatureRequestSchema = z.object({
 
 export type SignatureRequest = z.infer<typeof SignatureRequestSchema>;
 
-// Entity: SkillLevel
-export const SkillLevelSchema = z.object({
-  id: z.string().uuid(),
-  tenantId: z.string(),
-  deletedAt: z.coerce.date().nullable().optional(),
-  personId: z.string().uuid(),
-  trainingModuleId: z.string().uuid(),
-  level: z.number().int().default(0),
-  note: z.string().nullable().optional(),
-  ratedAt: z.coerce.date().nullable().optional(),
-  ratedByPersonId: z.string().uuid().nullable().optional(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-});
-
-export type SkillLevel = z.infer<typeof SkillLevelSchema>;
-
 // Entity: SoftDeletable
 export const SoftDeletableSchema = z.object({
   deletedAt: z.coerce.date().nullable().optional(),
@@ -4445,54 +4335,6 @@ export const SyncErrorSchema = z.object({
 
 export type SyncError = z.infer<typeof SyncErrorSchema>;
 
-// Entity: Tasting
-export const TastingSchema = z.object({
-  id: z.string().uuid(),
-  tenantId: z.string(),
-  deletedAt: z.coerce.date().nullable().optional(),
-  leadId: z.string().uuid().nullable().optional(),
-  proposalId: z.string().uuid().nullable().optional(),
-  eventId: z.string().uuid().nullable().optional(),
-  scheduledAt: z.coerce.date(),
-  durationMinutes: z.number().int().default(60),
-  location: z.string().nullable().optional(),
-  guestCount: z.number().int().default(1),
-  attendeeNames: z.array(z.string()).nullable().optional(),
-  notes: z.string().nullable().optional(),
-  createdByPersonId: z.string().uuid().nullable().optional(),
-  status: z.enum(["scheduled", "completed", "selectionsApplied", "cancelled"]).default("scheduled"),
-  completedAt: z.coerce.date().nullable().optional(),
-  cancelledAt: z.coerce.date().nullable().optional(),
-  selectionsAppliedAt: z.coerce.date().nullable().optional(),
-  bookedAt: z.coerce.date().nullable().optional(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-});
-
-export type Tasting = z.infer<typeof TastingSchema>;
-
-// Entity: TastingDish
-export const TastingDishSchema = z.object({
-  id: z.string().uuid(),
-  tenantId: z.string(),
-  deletedAt: z.coerce.date().nullable().optional(),
-  tastingId: z.string().uuid(),
-  menuId: z.string().uuid(),
-  dishId: z.string().uuid(),
-  portionCount: z.number().int().default(1),
-  sortOrder: z.number().int().default(0),
-  clientRating: z.number().int().nullable().optional(),
-  clientFeedback: z.string().nullable().optional(),
-  decision: z.enum(["pending", "approved", "rejected", "maybe"]).default("pending"),
-  appliedToProposalId: z.string().uuid().nullable().optional(),
-  appliedAt: z.coerce.date().nullable().optional(),
-  addedAt: z.coerce.date().nullable().optional(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-});
-
-export type TastingDish = z.infer<typeof TastingDishSchema>;
-
 // Entity: TaxRate
 export const TaxRateSchema = z.object({
   id: z.string().uuid(),
@@ -4709,32 +4551,11 @@ export const TrainingModuleSchema = z.object({
   status: z.enum(["active", "retired"]).default("active"),
   definedAt: z.coerce.date().nullable().optional(),
   retiredAt: z.coerce.date().nullable().optional(),
-  steps: z.string().nullable().optional(),
-  quiz: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
 
 export type TrainingModule = z.infer<typeof TrainingModuleSchema>;
-
-// Entity: TrainingSignOff
-export const TrainingSignOffSchema = z.object({
-  id: z.string().uuid(),
-  tenantId: z.string(),
-  deletedAt: z.coerce.date().nullable().optional(),
-  personId: z.string().uuid(),
-  trainingModuleId: z.string().uuid(),
-  trainerPersonId: z.string().uuid().nullable().optional(),
-  startedAt: z.coerce.date().nullable().optional(),
-  finishedAt: z.coerce.date().nullable().optional(),
-  initialledSteps: z.string().nullable().optional(),
-  quizDone: z.boolean().default(false),
-  note: z.string().nullable().optional(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-});
-
-export type TrainingSignOff = z.infer<typeof TrainingSignOffSchema>;
 
 // Entity: Vehicle
 export const VehicleSchema = z.object({
@@ -5155,14 +4976,6 @@ export const VenueSchema = z.object({
   wasteRules: z.string().nullable().optional(),
   permitsInsuranceNotes: z.string().nullable().optional(),
   restrictions: z.string().nullable().optional(),
-  loadingDock: z.string().nullable().optional(),
-  elevatorNotes: z.string().nullable().optional(),
-  kitchenEquipment: z.string().nullable().optional(),
-  powerDetails: z.string().nullable().optional(),
-  parkingDetails: z.string().nullable().optional(),
-  arrivalRestrictions: z.string().nullable().optional(),
-  dayOfContactName: z.string().nullable().optional(),
-  dayOfContactPhone: z.string().nullable().optional(),
   partnerTier: z.enum(["catering_only", "catering_rentals", "full_event"]).nullable().optional(),
   partnerOwnerPersonId: z.string().uuid().nullable().optional(),
   partnerSince: z.coerce.date().nullable().optional(),
@@ -6322,67 +6135,6 @@ export const CutoverDecisionSetTppReadOnlyParamsSchema = z.object({
 
 export type CutoverDecisionSetTppReadOnlyParams = z.infer<typeof CutoverDecisionSetTppReadOnlyParamsSchema>;
 
-// Command: convert on DateHold
-export const DateHoldConvertParamsSchema = z.object({
-  eventId: z.string().min(1),
-});
-
-export type DateHoldConvertParams = z.infer<typeof DateHoldConvertParamsSchema>;
-
-// Command: expire on DateHold
-export const DateHoldExpireParamsSchema = z.object({});
-
-export type DateHoldExpireParams = z.infer<typeof DateHoldExpireParamsSchema>;
-
-// Command: extend on DateHold
-export const DateHoldExtendParamsSchema = z.object({
-  expiresAt: z.number().int(),
-});
-
-export type DateHoldExtendParams = z.infer<typeof DateHoldExtendParamsSchema>;
-
-// Command: place on DateHold
-export const DateHoldPlaceParamsSchema = z.object({
-  holdDate: z.string(),
-  expiresAt: z.number().int(),
-  clientId: z.string().min(1).optional(),
-  leadId: z.string().min(1).optional(),
-  venueId: z.string().min(1).optional(),
-  note: z.string().optional(),
-});
-
-export type DateHoldPlaceParams = z.infer<typeof DateHoldPlaceParamsSchema>;
-
-// Command: release on DateHold
-export const DateHoldReleaseParamsSchema = z.object({});
-
-export type DateHoldReleaseParams = z.infer<typeof DateHoldReleaseParamsSchema>;
-
-// Command: join on DateWaitlistEntry
-export const DateWaitlistEntryJoinParamsSchema = z.object({
-  holdDate: z.string(),
-  clientId: z.string().min(1).optional(),
-  leadId: z.string().min(1).optional(),
-  note: z.string().optional(),
-});
-
-export type DateWaitlistEntryJoinParams = z.infer<typeof DateWaitlistEntryJoinParamsSchema>;
-
-// Command: offer on DateWaitlistEntry
-export const DateWaitlistEntryOfferParamsSchema = z.object({});
-
-export type DateWaitlistEntryOfferParams = z.infer<typeof DateWaitlistEntryOfferParamsSchema>;
-
-// Command: promote on DateWaitlistEntry
-export const DateWaitlistEntryPromoteParamsSchema = z.object({});
-
-export type DateWaitlistEntryPromoteParams = z.infer<typeof DateWaitlistEntryPromoteParamsSchema>;
-
-// Command: withdraw on DateWaitlistEntry
-export const DateWaitlistEntryWithdrawParamsSchema = z.object({});
-
-export type DateWaitlistEntryWithdrawParams = z.infer<typeof DateWaitlistEntryWithdrawParamsSchema>;
-
 // Command: create on DeckShareLink
 export const DeckShareLinkCreateParamsSchema = z.object({
   attachmentId: z.string().min(1),
@@ -7361,15 +7113,6 @@ export const EventSetEventNumberParamsSchema = z.object({
 
 export type EventSetEventNumberParams = z.infer<typeof EventSetEventNumberParamsSchema>;
 
-// Command: setTravelFee on Event
-export const EventSetTravelFeeParamsSchema = z.object({
-  distanceMiles: z.number().optional(),
-  overrideAmount: z.number().optional(),
-  overrideReason: z.string().optional(),
-});
-
-export type EventSetTravelFeeParams = z.infer<typeof EventSetTravelFeeParamsSchema>;
-
 // Command: stageClientMerge on Event
 export const EventStageClientMergeParamsSchema = z.object({
   clientMergeId: z.string().uuid(),
@@ -7808,15 +7551,6 @@ export const EventDishLineOverrideRevokeParamsSchema = z.object({
 
 export type EventDishLineOverrideRevokeParams = z.infer<typeof EventDishLineOverrideRevokeParamsSchema>;
 
-// Command: assignMeal on EventGuest
-export const EventGuestAssignMealParamsSchema = z.object({
-  entreeEventDishId: z.string().min(1).optional(),
-  seatNumber: z.number().int().optional(),
-  placeCardName: z.string().optional(),
-});
-
-export type EventGuestAssignMealParams = z.infer<typeof EventGuestAssignMealParamsSchema>;
-
 // Command: assignTable on EventGuest
 export const EventGuestAssignTableParamsSchema = z.object({
   tableAssignment: z.string(),
@@ -7885,7 +7619,6 @@ export const EventIngredientContributionRecordParamsSchema = z.object({
   componentPath: z.array(z.string()).optional(),
   productionBatchId: z.string().min(1).optional(),
   productionBatchAllocationId: z.string().uuid().optional(),
-  calculationSnapshot: z.unknown().optional(),
 });
 
 export type EventIngredientContributionRecordParams = z.infer<typeof EventIngredientContributionRecordParamsSchema>;
@@ -8426,7 +8159,6 @@ export const FieldConfirmationCompleteParamsSchema = z.object({
   observedAt: z.coerce.date().optional(),
   note: z.string().optional(),
   photoStorageId: z.string().optional(),
-  answers: z.string().optional(),
 });
 
 export type FieldConfirmationCompleteParams = z.infer<typeof FieldConfirmationCompleteParamsSchema>;
@@ -8722,7 +8454,7 @@ export type IngredientClearPrimaryImageParams = z.infer<typeof IngredientClearPr
 
 // Command: configureSubstitutes on Ingredient
 export const IngredientConfigureSubstitutesParamsSchema = z.object({
-  substituteIngredientIds: z.array(z.string()),
+  substituteIngredientIds: z.array(z.string().uuid()),
 });
 
 export type IngredientConfigureSubstitutesParams = z.infer<typeof IngredientConfigureSubstitutesParamsSchema>;
@@ -8797,7 +8529,7 @@ export type IngredientSetPreferredVendorParams = z.infer<typeof IngredientSetPre
 
 // Command: setPreferredVendors on Ingredient
 export const IngredientSetPreferredVendorsParamsSchema = z.object({
-  preferredVendorIds: z.array(z.string()),
+  preferredVendorIds: z.array(z.string().uuid()),
   preferredVendorId: z.string().min(1).optional(),
 });
 
@@ -9323,7 +9055,6 @@ export const LeadCaptureParamsSchema = z.object({
   phone: z.string().optional(),
   probability: z.number().optional(),
   notes: z.string().optional(),
-  eventDate: z.coerce.date().optional(),
 });
 
 export type LeadCaptureParams = z.infer<typeof LeadCaptureParamsSchema>;
@@ -9436,48 +9167,6 @@ export const LeadershipItemReviseParamsSchema = z.object({
 
 export type LeadershipItemReviseParams = z.infer<typeof LeadershipItemReviseParamsSchema>;
 
-// Command: record on LeftoverDisposition
-export const LeftoverDispositionRecordParamsSchema = z.object({
-  eventId: z.string().min(1),
-  disposition: z.enum(["donated", "returned_to_stock", "discarded"]),
-  itemDescription: z.string(),
-  dispositionDate: z.string(),
-  weightLb: z.number().optional(),
-  estimatedValue: z.number().optional(),
-  recipientOrganization: z.string().optional(),
-  recipientEin: z.string().optional(),
-  recipientAddress: z.string().optional(),
-  recipientContact: z.string().optional(),
-  receiptReference: z.string().optional(),
-  handlingNote: z.string().optional(),
-  note: z.string().optional(),
-});
-
-export type LeftoverDispositionRecordParams = z.infer<typeof LeftoverDispositionRecordParamsSchema>;
-
-// Command: remove on LeftoverDisposition
-export const LeftoverDispositionRemoveParamsSchema = z.object({});
-
-export type LeftoverDispositionRemoveParams = z.infer<typeof LeftoverDispositionRemoveParamsSchema>;
-
-// Command: revise on LeftoverDisposition
-export const LeftoverDispositionReviseParamsSchema = z.object({
-  disposition: z.enum(["donated", "returned_to_stock", "discarded"]),
-  itemDescription: z.string(),
-  dispositionDate: z.string(),
-  weightLb: z.number().optional(),
-  estimatedValue: z.number().optional(),
-  recipientOrganization: z.string().optional(),
-  recipientEin: z.string().optional(),
-  recipientAddress: z.string().optional(),
-  recipientContact: z.string().optional(),
-  receiptReference: z.string().optional(),
-  handlingNote: z.string().optional(),
-  note: z.string().optional(),
-});
-
-export type LeftoverDispositionReviseParams = z.infer<typeof LeftoverDispositionReviseParamsSchema>;
-
 // Command: archive on Menu
 export const MenuArchiveParamsSchema = z.object({
   reason: z.string(),
@@ -9526,14 +9215,6 @@ export const MenuSetSeasonParamsSchema = z.object({
 });
 
 export type MenuSetSeasonParams = z.infer<typeof MenuSetSeasonParamsSchema>;
-
-// Command: setService on Menu
-export const MenuSetServiceParamsSchema = z.object({
-  guestsPerServer: z.number().optional(),
-  pickOneCourses: z.array(z.string()),
-});
-
-export type MenuSetServiceParams = z.infer<typeof MenuSetServiceParamsSchema>;
 
 // Command: unpublish on Menu
 export const MenuUnpublishParamsSchema = z.object({
@@ -9839,14 +9520,6 @@ export const OrganizationConfigureBrandingParamsSchema = z.object({
 
 export type OrganizationConfigureBrandingParams = z.infer<typeof OrganizationConfigureBrandingParamsSchema>;
 
-// Command: configureContactDetails on Organization
-export const OrganizationConfigureContactDetailsParamsSchema = z.object({
-  phone: z.string().optional(),
-  website: z.string().optional(),
-});
-
-export type OrganizationConfigureContactDetailsParams = z.infer<typeof OrganizationConfigureContactDetailsParamsSchema>;
-
 // Command: configureEmailSender on Organization
 export const OrganizationConfigureEmailSenderParamsSchema = z.object({
   senderName: z.string().optional(),
@@ -9895,18 +9568,6 @@ export const OrganizationConfigureTimingPolicyParamsSchema = z.object({
 });
 
 export type OrganizationConfigureTimingPolicyParams = z.infer<typeof OrganizationConfigureTimingPolicyParamsSchema>;
-
-// Command: configureTravelFee on Organization
-export const OrganizationConfigureTravelFeeParamsSchema = z.object({
-  mode: z.enum(["off", "per_mile", "zone"]),
-  ratePerMile: z.number(),
-  freeMiles: z.number(),
-  minimumFee: z.number(),
-  roundTrip: z.boolean(),
-  zonesJson: z.string().optional(),
-});
-
-export type OrganizationConfigureTravelFeeParams = z.infer<typeof OrganizationConfigureTravelFeeParamsSchema>;
 
 // Command: deactivate on Organization
 export const OrganizationDeactivateParamsSchema = z.object({});
@@ -10038,13 +9699,6 @@ export type PackListRequestDishContainersParams = z.infer<typeof PackListRequest
 export const PackListResolveAssistanceParamsSchema = z.object({});
 
 export type PackListResolveAssistanceParams = z.infer<typeof PackListResolveAssistanceParamsSchema>;
-
-// Command: setBinSheet on PackList
-export const PackListSetBinSheetParamsSchema = z.object({
-  binSheet: z.string(),
-});
-
-export type PackListSetBinSheetParams = z.infer<typeof PackListSetBinSheetParamsSchema>;
 
 // Command: standDownWithEvent on PackList
 export const PackListStandDownWithEventParamsSchema = z.object({});
@@ -10245,13 +9899,6 @@ export const PackListItemRestoreImportedAssociationParamsSchema = z.object({
 });
 
 export type PackListItemRestoreImportedAssociationParams = z.infer<typeof PackListItemRestoreImportedAssociationParamsSchema>;
-
-// Command: setBin on PackListItem
-export const PackListItemSetBinParamsSchema = z.object({
-  binNumber: z.number().int().optional(),
-});
-
-export type PackListItemSetBinParams = z.infer<typeof PackListItemSetBinParamsSchema>;
 
 // Command: setResponsibility on PackListItem
 export const PackListItemSetResponsibilityParamsSchema = z.object({
@@ -11379,7 +11026,6 @@ export const ProposalLineItemAddLineParamsSchema = z.object({
   menuDishId: z.string().uuid().optional(),
   overrideReason: z.string().optional(),
   equipmentId: z.string().min(1).optional(),
-  travelFee: z.boolean().optional(),
 });
 
 export type ProposalLineItemAddLineParams = z.infer<typeof ProposalLineItemAddLineParamsSchema>;
@@ -11505,13 +11151,6 @@ export const PurchaseNeedMarkOrderedParamsSchema = z.object({
 });
 
 export type PurchaseNeedMarkOrderedParams = z.infer<typeof PurchaseNeedMarkOrderedParamsSchema>;
-
-// Command: moveToVendor on PurchaseNeed
-export const PurchaseNeedMoveToVendorParamsSchema = z.object({
-  preferredVendorId: z.string().min(1).optional(),
-});
-
-export type PurchaseNeedMoveToVendorParams = z.infer<typeof PurchaseNeedMoveToVendorParamsSchema>;
 
 // Command: moveToWeek on PurchaseNeed
 export const PurchaseNeedMoveToWeekParamsSchema = z.object({
@@ -12308,24 +11947,6 @@ export const SignatureRequestRevokeParamsSchema = z.object({
 
 export type SignatureRequestRevokeParams = z.infer<typeof SignatureRequestRevokeParamsSchema>;
 
-// Command: changeLevel on SkillLevel
-export const SkillLevelChangeLevelParamsSchema = z.object({
-  level: z.number().int(),
-  note: z.string().optional(),
-});
-
-export type SkillLevelChangeLevelParams = z.infer<typeof SkillLevelChangeLevelParamsSchema>;
-
-// Command: rate on SkillLevel
-export const SkillLevelRateParamsSchema = z.object({
-  personId: z.string().min(1),
-  trainingModuleId: z.string().min(1),
-  level: z.number().int(),
-  note: z.string().optional(),
-});
-
-export type SkillLevelRateParams = z.infer<typeof SkillLevelRateParamsSchema>;
-
 // Command: open on StaffChatReadCursor
 export const StaffChatReadCursorOpenParamsSchema = z.object({
   channelKey: z.string(),
@@ -12604,65 +12225,6 @@ export const SyncErrorReopenParamsSchema = z.object({
 
 export type SyncErrorReopenParams = z.infer<typeof SyncErrorReopenParamsSchema>;
 
-// Command: cancel on Tasting
-export const TastingCancelParamsSchema = z.object({});
-
-export type TastingCancelParams = z.infer<typeof TastingCancelParamsSchema>;
-
-// Command: markSelectionsApplied on Tasting
-export const TastingMarkSelectionsAppliedParamsSchema = z.object({
-  proposalId: z.string().min(1),
-});
-
-export type TastingMarkSelectionsAppliedParams = z.infer<typeof TastingMarkSelectionsAppliedParamsSchema>;
-
-// Command: markTasted on Tasting
-export const TastingMarkTastedParamsSchema = z.object({});
-
-export type TastingMarkTastedParams = z.infer<typeof TastingMarkTastedParamsSchema>;
-
-// Command: schedule on Tasting
-export const TastingScheduleParamsSchema = z.object({
-  scheduledAt: z.coerce.date(),
-  durationMinutes: z.number().int(),
-  guestCount: z.number().int(),
-  leadId: z.string().min(1).optional(),
-  proposalId: z.string().min(1).optional(),
-  eventId: z.string().min(1).optional(),
-  location: z.string().optional(),
-  attendeeNames: z.array(z.string()).optional(),
-  notes: z.string().optional(),
-});
-
-export type TastingScheduleParams = z.infer<typeof TastingScheduleParamsSchema>;
-
-// Command: add on TastingDish
-export const TastingDishAddParamsSchema = z.object({
-  tastingId: z.string().min(1),
-  menuId: z.string().min(1),
-  dishId: z.string().min(1),
-  portionCount: z.number().int(),
-  sortOrder: z.number().int().optional(),
-});
-
-export type TastingDishAddParams = z.infer<typeof TastingDishAddParamsSchema>;
-
-// Command: markOnProposal on TastingDish
-export const TastingDishMarkOnProposalParamsSchema = z.object({
-  proposalId: z.string().min(1),
-});
-
-export type TastingDishMarkOnProposalParams = z.infer<typeof TastingDishMarkOnProposalParamsSchema>;
-
-// Command: recordFeedback on TastingDish
-export const TastingDishRecordFeedbackParamsSchema = z.object({
-  decision: z.enum(["pending", "approved", "rejected", "maybe"]),
-  clientRating: z.number().int().optional(),
-  clientFeedback: z.string().optional(),
-});
-
-export type TastingDishRecordFeedbackParams = z.infer<typeof TastingDishRecordFeedbackParamsSchema>;
-
 // Command: define on TaxRate
 export const TaxRateDefineParamsSchema = z.object({
   name: z.string(),
@@ -12833,8 +12395,6 @@ export const TrainingModuleDefineParamsSchema = z.object({
   category: z.enum(["food_safety", "equipment_operation", "service_standards", "other"]),
   passingScore: z.number().int(),
   description: z.string().optional(),
-  steps: z.string().optional(),
-  quiz: z.string().optional(),
 });
 
 export type TrainingModuleDefineParams = z.infer<typeof TrainingModuleDefineParamsSchema>;
@@ -12848,45 +12408,6 @@ export type TrainingModuleReactivateParams = z.infer<typeof TrainingModuleReacti
 export const TrainingModuleRetireParamsSchema = z.object({});
 
 export type TrainingModuleRetireParams = z.infer<typeof TrainingModuleRetireParamsSchema>;
-
-// Command: setTrainingDoc on TrainingModule
-export const TrainingModuleSetTrainingDocParamsSchema = z.object({
-  steps: z.string().optional(),
-  quiz: z.string().optional(),
-});
-
-export type TrainingModuleSetTrainingDocParams = z.infer<typeof TrainingModuleSetTrainingDocParamsSchema>;
-
-// Command: beginTraining on TrainingSignOff
-export const TrainingSignOffBeginTrainingParamsSchema = z.object({
-  personId: z.string().min(1),
-  trainingModuleId: z.string().min(1),
-  startedAt: z.coerce.date(),
-  trainerPersonId: z.string().min(1).optional(),
-});
-
-export type TrainingSignOffBeginTrainingParams = z.infer<typeof TrainingSignOffBeginTrainingParamsSchema>;
-
-// Command: finishTraining on TrainingSignOff
-export const TrainingSignOffFinishTrainingParamsSchema = z.object({
-  finishedAt: z.coerce.date(),
-  quizDone: z.boolean(),
-  note: z.string().optional(),
-});
-
-export type TrainingSignOffFinishTrainingParams = z.infer<typeof TrainingSignOffFinishTrainingParamsSchema>;
-
-// Command: initialTrainingSteps on TrainingSignOff
-export const TrainingSignOffInitialTrainingStepsParamsSchema = z.object({
-  initialledSteps: z.string(),
-});
-
-export type TrainingSignOffInitialTrainingStepsParams = z.infer<typeof TrainingSignOffInitialTrainingStepsParamsSchema>;
-
-// Command: reopenTraining on TrainingSignOff
-export const TrainingSignOffReopenTrainingParamsSchema = z.object({});
-
-export type TrainingSignOffReopenTrainingParams = z.infer<typeof TrainingSignOffReopenTrainingParamsSchema>;
 
 // Command: register on Vehicle
 export const VehicleRegisterParamsSchema = z.object({
@@ -13563,20 +13084,6 @@ export const VenueSetGalleryTokenParamsSchema = z.object({
 });
 
 export type VenueSetGalleryTokenParams = z.infer<typeof VenueSetGalleryTokenParamsSchema>;
-
-// Command: setLogisticsProfile on Venue
-export const VenueSetLogisticsProfileParamsSchema = z.object({
-  loadingDock: z.string().optional(),
-  elevatorNotes: z.string().optional(),
-  kitchenEquipment: z.string().optional(),
-  powerDetails: z.string().optional(),
-  parkingDetails: z.string().optional(),
-  arrivalRestrictions: z.string().optional(),
-  dayOfContactName: z.string().optional(),
-  dayOfContactPhone: z.string().optional(),
-});
-
-export type VenueSetLogisticsProfileParams = z.infer<typeof VenueSetLogisticsProfileParamsSchema>;
 
 // Command: setPartnership on Venue
 export const VenueSetPartnershipParamsSchema = z.object({
