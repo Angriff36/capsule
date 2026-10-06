@@ -32,7 +32,9 @@ type Props = {
   onError: (error: unknown | null) => void;
 };
 
-const ELIGIBLE_STAGES = new Set(["approved", "executing"]);
+// Same live stages the reserve command accepts after approval; sales lock is
+// live operations, not a stock freeze.
+const ELIGIBLE_STAGES = new Set(["approved", "sales_lock", "executing"]);
 
 export function EventInventoryPanel({
   eventId,
