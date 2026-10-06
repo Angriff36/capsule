@@ -9,6 +9,7 @@ import {
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
+import { EventDayPlan } from "./EventDayPlan";
 import { EventDriveTimePanel } from "./EventDriveTimePanel";
 import { EventTravelFeePanel } from "./EventTravelFeePanel";
 import { EventRouteLegsPanel } from "./EventRouteLegsPanel";
@@ -142,10 +143,11 @@ export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
           </button>
         )}
       </div>
-      <p className="mt-2 text-base text-ink-2">
-        Work back from service to staff on, then forward from event end to staff
-        off. Unknown durations leave the affected times unset.
-      </p>
+      <EventDayPlan
+        eventId={eventId}
+        plan={plan}
+        canChange={plan.event.timingCanRecalculate}
+      />
       {!plan.event.timingCanRecalculate && (
         <p className="mt-2 text-base text-ink-2">
           This event keeps its saved timing. Individual timeline blocks remain
@@ -276,101 +278,118 @@ export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
       )}
       {plan.event.timingConfiguredAt != null && (
         <>
-          <p className="mt-4 text-base text-ink-2">
-            Manual times and performed work are kept when the plan changes.
-          </p>
-          <ul className="mt-3 divide-y divide-line">
-            {plan.milestones.map((milestone) => {
-              const row = milestone.row;
-              const kept = milestone.manual || milestone.performed;
-              const differs =
-                row != null &&
-                ((row.startsAt ?? null) !== milestone.startsAt ||
-                  (row.endsAt ?? null) !== milestone.endsAt);
-              return (
-                <li
-                  key={milestone.key}
-                  className="flex flex-col items-start justify-between gap-3 py-3 sm:flex-row"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p
-                      className="text-base font-semibold"
-                      tabIndex={-1}
-                      ref={(element) => {
-                        milestoneLabels.current[milestone.key] = element;
-                      }}
+          {/* The day plan above already shows every calculated time; this
+              list only appears for blocks someone changed or must choose. */}
+          {plan.milestones.some(
+            (m) => m.manual || m.performed || m.removed || m.matches.length > 1,
+          ) ? (
+            <>
+              <p className="mt-4 text-base text-ink-2">
+                Times changed by hand or already done are kept when the plan
+                changes.
+              </p>
+              <ul className="mt-3 divide-y divide-line">
+                {plan.milestones.map((milestone) => {
+                  const row = milestone.row;
+                  const kept = milestone.manual || milestone.performed;
+                  const differs =
+                    row != null &&
+                    ((row.startsAt ?? null) !== milestone.startsAt ||
+                      (row.endsAt ?? null) !== milestone.endsAt);
+                  return (
+                    <li
+                      key={milestone.key}
+                      className="flex flex-col items-start justify-between gap-3 py-3 sm:flex-row"
                     >
-                      {row?.name ?? milestone.name}
-                    </p>
-                    <p className="text-base">
-                      {milestone.removed
-                        ? "Removed from this event"
-                        : `${milestone.matches.length > 1 ? "Calculated: " : ""}${timeLabel(row ? row.startsAt : milestone.startsAt)}`}
-                      {!milestone.removed &&
-                        (row ? row.endsAt : milestone.endsAt) != null &&
-                        ` – ${timeLabel(row ? row.endsAt : milestone.endsAt)}`}
-                    </p>
-                    {kept && (
-                      <p className="text-sm text-ink-2">
-                        {milestone.performed
-                          ? "Performed work kept"
-                          : "Manual time kept"}
-                        {differs &&
-                          `. Calculated: ${timeLabel(milestone.startsAt)}${milestone.endsAt != null ? ` – ${timeLabel(milestone.endsAt)}` : ""}`}
-                      </p>
-                    )}
-                    {milestone.matches.length > 1 &&
-                      plan.event.timingCanRecalculate && (
-                        <label className="field-label mt-2">
-                          <span>
-                            Choose the existing block for this milestone
-                          </span>
-                          <select
-                            className="input min-h-10 w-full"
-                            value=""
-                            disabled={busy || !plan.event.timingCanRecalculate}
-                            onChange={(e) =>
-                              useBlock(milestone, e.target.value)
-                            }
+                      <div className="min-w-0 flex-1">
+                        <p
+                          className="text-base font-semibold"
+                          tabIndex={-1}
+                          ref={(element) => {
+                            milestoneLabels.current[milestone.key] = element;
+                          }}
+                        >
+                          {row?.name ?? milestone.name}
+                        </p>
+                        <p className="text-base">
+                          {milestone.removed
+                            ? "Removed from this event"
+                            : `${milestone.matches.length > 1 ? "Calculated: " : ""}${timeLabel(row ? row.startsAt : milestone.startsAt)}`}
+                          {!milestone.removed &&
+                            (row ? row.endsAt : milestone.endsAt) != null &&
+                            ` – ${timeLabel(row ? row.endsAt : milestone.endsAt)}`}
+                        </p>
+                        {kept && (
+                          <p className="text-sm text-ink-2">
+                            {milestone.performed
+                              ? "Performed work kept"
+                              : "Manual time kept"}
+                            {differs &&
+                              `. Calculated: ${timeLabel(milestone.startsAt)}${milestone.endsAt != null ? ` – ${timeLabel(milestone.endsAt)}` : ""}`}
+                          </p>
+                        )}
+                        {milestone.matches.length > 1 &&
+                          plan.event.timingCanRecalculate && (
+                            <label className="field-label mt-2">
+                              <span>
+                                Choose the existing block for this milestone
+                              </span>
+                              <select
+                                className="input min-h-10 w-full"
+                                value=""
+                                disabled={
+                                  busy || !plan.event.timingCanRecalculate
+                                }
+                                onChange={(e) =>
+                                  useBlock(milestone, e.target.value)
+                                }
+                              >
+                                <option value="" disabled>
+                                  Select a block
+                                </option>
+                                {milestone.matches.map((candidate) => (
+                                  <option
+                                    value={candidate._id}
+                                    key={candidate._id}
+                                  >
+                                    {candidate.name} ·{" "}
+                                    {timeLabel(candidate.startsAt)}
+                                  </option>
+                                ))}
+                              </select>
+                            </label>
+                          )}
+                      </div>
+                      {plan.event.timingCanRecalculate &&
+                        milestone.manual &&
+                        !milestone.performed &&
+                        row && (
+                          <button
+                            type="button"
+                            className="btn btn-ghost min-h-10"
+                            disabled={busy}
+                            onClick={async () => {
+                              setFocusMilestone(null);
+                              if (
+                                await run(() =>
+                                  resume({
+                                    docId: row._id,
+                                    version: row.version,
+                                  }),
+                                )
+                              )
+                                setFocusMilestone(milestone.key);
+                            }}
                           >
-                            <option value="" disabled>
-                              Select a block
-                            </option>
-                            {milestone.matches.map((candidate) => (
-                              <option value={candidate._id} key={candidate._id}>
-                                {candidate.name} ·{" "}
-                                {timeLabel(candidate.startsAt)}
-                              </option>
-                            ))}
-                          </select>
-                        </label>
-                      )}
-                  </div>
-                  {plan.event.timingCanRecalculate &&
-                    milestone.manual &&
-                    !milestone.performed &&
-                    row && (
-                      <button
-                        type="button"
-                        className="btn btn-ghost min-h-10"
-                        disabled={busy}
-                        onClick={async () => {
-                          setFocusMilestone(null);
-                          if (
-                            await run(() =>
-                              resume({ docId: row._id, version: row.version }),
-                            )
-                          )
-                            setFocusMilestone(milestone.key);
-                        }}
-                      >
-                        Use calculated time
-                      </button>
-                    )}
-                </li>
-              );
-            })}
-          </ul>
+                            Use calculated time
+                          </button>
+                        )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </>
+          ) : null}
           <EventRouteLegsPanel
             eventId={eventId}
             canChange={plan.event.timingCanRecalculate}
