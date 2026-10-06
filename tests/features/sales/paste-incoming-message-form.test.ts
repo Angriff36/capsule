@@ -167,7 +167,7 @@ describe("PasteIncomingMessageForm", () => {
     render(props);
 
     const toggle = Array.from(container.querySelectorAll("button")).find((b) =>
-      b.textContent?.includes("Advanced"),
+      b.textContent?.includes("Paste a message export"),
     );
     expect(toggle).toBeDefined();
     act(() => toggle!.click());

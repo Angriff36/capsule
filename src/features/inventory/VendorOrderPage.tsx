@@ -18,6 +18,8 @@ import {
   useListStorageLocation,
   useListVendor,
   useListVendorContact,
+  useListVendorContract,
+  useListVendorContractPriceTier,
   useListVendorOrderLine,
   useListVendorOrderLineDemand,
   useVendorOrderApprove,
@@ -58,6 +60,7 @@ import {
   cancelVendorOrderLine,
 } from "./VendorOrderLineCancel";
 import { orderLineUnitIssues } from "./orderLineUnitIssues";
+import { contractPrice } from "./contractPrice";
 import { VendorOrderLinePacks } from "./VendorOrderLinePacks";
 
 const policy = new SupplyLifecyclePolicy();
@@ -67,6 +70,8 @@ export function VendorOrderPage() {
   const order = useRouteRecord(useGetVendorOrder, id);
   const vendors = useListVendor();
   const vendorContacts = useListVendorContact();
+  const contracts = useListVendorContract();
+  const contractTiers = useListVendorContractPriceTier();
   const lines = useListVendorOrderLine();
   const demandLinks = useListVendorOrderLineDemand();
   const needs = useListPurchaseNeed();
@@ -100,6 +105,7 @@ export function VendorOrderPage() {
   const reconcileLine = useVendorOrderLineReconcileDraftRequirement();
   const reviseLine = useVendorOrderLineReviseQuantity();
   const [showLineForm, setShowLineForm] = useState(false);
+  const [lineNeedId, setLineNeedId] = useState("");
   const [receivingLineId, setReceivingLineId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -156,6 +162,25 @@ export function VendorOrderPage() {
   const ingredientName = (ingredientId: string) =>
     ingredients?.find((item) => item._id === ingredientId)?.name ??
     "Unknown ingredient";
+  const agreedPrice = (ingredientId: string, unit: string, quantity: number) =>
+    contractPrice(contracts ?? [], contractTiers ?? [], {
+      vendorId: order.vendorId,
+      itemName: ingredientName(ingredientId),
+      unit,
+      quantity,
+    });
+  const lineNeed = openNeeds.find((need) => need._id === lineNeedId);
+  const lineNeedPrice = lineNeed
+    ? (agreedPrice(
+        lineNeed.ingredientId,
+        lineNeed.unit,
+        Number(lineNeed.requiredQuantity),
+      ) ??
+      Number(
+        ingredients?.find((item) => item._id === lineNeed.ingredientId)
+          ?.costPerUnit ?? 0,
+      ))
+    : 0;
   const eventName = (eventId: string) =>
     events?.find((item) => item._id === eventId)?.title ?? "Unknown event";
   const locationName = (locationId?: string | null) =>
@@ -213,6 +238,7 @@ export function VendorOrderPage() {
         locationId: String(data.get("locationId")) || undefined,
       });
       element.reset();
+      setLineNeedId("");
       setShowLineForm(false);
     });
   };
@@ -557,7 +583,13 @@ export function VendorOrderPage() {
           <div className="supply-form-grid">
             <label className="field-label supply-span-2">
               Open purchase need
-              <select name="purchaseNeedId" className="input" required>
+              <select
+                name="purchaseNeedId"
+                className="input"
+                required
+                value={lineNeedId}
+                onChange={(event) => setLineNeedId(event.target.value)}
+              >
                 <option value="">Select need</option>
                 {openNeeds.map((need) => (
                   <option key={need._id} value={need._id}>
@@ -571,23 +603,28 @@ export function VendorOrderPage() {
             <label className="field-label">
               Ordered quantity
               <input
+                key={`qty-${lineNeedId}`}
                 name="orderedQuantity"
                 className="input"
                 type="number"
                 min={0.0001}
                 step="any"
+                defaultValue={
+                  lineNeed ? Number(lineNeed.requiredQuantity) : undefined
+                }
                 required
               />
             </label>
             <label className="field-label">
               Unit cost
               <input
+                key={`cost-${lineNeedId}`}
                 name="unitCost"
                 className="input"
                 type="number"
                 min={0}
                 step="any"
-                defaultValue={0}
+                defaultValue={lineNeedPrice}
                 required
               />
             </label>
@@ -729,6 +766,44 @@ export function VendorOrderPage() {
                           ? ` · discrepancy ${formatQuantity(line.discrepancyQuantity)}`
                           : ""}
                       </small>
+                      {(() => {
+                        if (!isDraft || line.status !== "added") return null;
+                        const agreed = agreedPrice(
+                          line.ingredientId,
+                          line.unit,
+                          Number(line.orderedQuantity),
+                        );
+                        if (
+                          agreed == null ||
+                          Math.abs(agreed - Number(line.unitCost)) < 0.005
+                        )
+                          return null;
+                        return (
+                          <small role="status">
+                            Contract price {formatMoneyExact(agreed)} /{" "}
+                            {line.unit}{" "}
+                            <button
+                              type="button"
+                              className="text-link"
+                              disabled={busy != null}
+                              onClick={() =>
+                                void run(`${line._id}:quantity`, async () => {
+                                  await reviseLine({
+                                    docId: line._id,
+                                    version: line.version,
+                                    orderedQuantity: Number(
+                                      line.orderedQuantity,
+                                    ),
+                                    unitCost: agreed,
+                                  });
+                                })
+                              }
+                            >
+                              Use contract price
+                            </button>
+                          </small>
+                        );
+                      })()}
                       {isDraft && line.plannedQuantity != null ? (
                         <small>
                           Current calculation:{" "}

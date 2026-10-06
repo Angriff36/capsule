@@ -31,6 +31,8 @@ type BoundedDateInputProps = Omit<
   onResolvedValue?: (value: string) => void;
   /** Lets an end field resolve phrases such as `+4h` against its start. */
   naturalDateAnchor?: string;
+  /** "any" keeps a typed day in this year even when it has passed. */
+  naturalDateDirection?: "future" | "any";
 };
 
 /** An empty-string `max` (e.g. from cleared range state) is the same as no
@@ -44,6 +46,7 @@ function NaturalDateInput({
   max,
   onResolvedValue,
   naturalDateAnchor,
+  naturalDateDirection,
   className,
   defaultValue,
   value,
@@ -92,6 +95,7 @@ function NaturalDateInput({
     const parsed = parseNaturalDate(text, {
       kind,
       anchor: naturalDateAnchor,
+      direction: naturalDateDirection,
     });
     if (!parsed.ok) {
       setMessage(

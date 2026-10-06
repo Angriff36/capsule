@@ -362,6 +362,29 @@ export async function releaseNeedDraftContributions(
   }
 }
 
+/** A finished event's bought needs stop counting toward its week's buying. */
+export async function settleEventPurchasing(
+  ctx: MutationCtx,
+  eventId: Id<"events">,
+) {
+  const tenantId = requireTenant(await getAuthContext(ctx));
+  const needs = await ctx.db
+    .query("purchaseNeeds")
+    .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+    .collect();
+  for (const need of needs) {
+    if (
+      need.tenantId !== tenantId ||
+      need.deletedAt != null ||
+      !["ordered", "fulfilled"].includes(need.status)
+    )
+      continue;
+    await ctx.runMutation(api.mutations.PurchaseNeed_settleWithEvent, {
+      docId: need._id,
+    });
+  }
+}
+
 /** Runs inside the authorized event cancellation; settled purchasing stays intact. */
 export async function standDownEventPurchasing(
   ctx: MutationCtx,
