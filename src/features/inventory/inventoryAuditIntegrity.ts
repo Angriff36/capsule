@@ -11,6 +11,9 @@ export interface InventoryAuditEntry {
   occurredAt: number;
   reason: string;
   referenceId: string | null;
+  /** Readable names for the screen; not part of the history checksum. */
+  eventTitle?: string | null;
+  actorName?: string | null;
 }
 
 export interface ChainedInventoryAuditEntry extends InventoryAuditEntry {
