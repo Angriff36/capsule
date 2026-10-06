@@ -4,6 +4,7 @@ import type { Doc } from "./_generated/dataModel";
 import { mutation, query, type QueryCtx } from "./_generated/server";
 import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 import { insertStepEvent } from "./lib/commandAudit";
+import { byLineDisplayOrder } from "../src/lib/pricing";
 
 /**
  * AUTHOR SEAM — public, token-authorized digital proposal acceptance (#115).
@@ -163,7 +164,7 @@ export const getPendingSignatureRequest = query({
         : [],
       lines: shows("pricing_summary")
         ? rows(snapshot.lineItems)
-            .sort((a, b) => num(a.sortOrder) - num(b.sortOrder))
+            .sort(byLineDisplayOrder)
             .map((line) => ({
               description: str(line.description) ?? "",
               pricingBasis: str(line.pricingBasis) ?? "flat",

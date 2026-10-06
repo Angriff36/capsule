@@ -5,6 +5,7 @@ import { useListProposalLineItem } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { api, type Id } from "../../lib/api";
 import {
+  byLineDisplayOrder,
   computeProposalPricing,
   PRICING_BASES,
   PRICING_BASIS_LABELS,
@@ -97,7 +98,7 @@ export function ProposalPricingPanel({
 
   const rows = (lineItems ?? [])
     .filter((row) => row.deletedAt == null && row.proposalId === proposalId)
-    .sort((a, b) => Number(a.sortOrder) - Number(b.sortOrder));
+    .sort(byLineDisplayOrder);
 
   const recomputed = computeProposalPricing({
     lines: rows.map((row) => ({

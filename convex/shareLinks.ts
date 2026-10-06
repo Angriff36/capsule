@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import type { Doc, Id } from "./_generated/dataModel";
 import { mutation, query, type QueryCtx } from "./_generated/server";
 import { clockNow } from "./lib/clockNow";
+import { byLineDisplayOrder } from "../src/lib/pricing";
 
 /**
  * AUTHOR SEAM — public, token-authorized proposal share links (spec §4.6).
@@ -348,7 +349,7 @@ export const getSharedProposal = query({
         typeof client.name === "string" && client.name.length > 0
           ? client.name
           : "Client",
-      lineItems: lineItems.map((line) => ({
+      lineItems: [...lineItems].sort(byLineDisplayOrder).map((line) => ({
         description:
           typeof line.description === "string" ? line.description : "",
         pricingBasis:

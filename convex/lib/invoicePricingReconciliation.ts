@@ -13,6 +13,7 @@
  * the draft followed is a no-op (nothing differs), and replaying it against an
  * unchanged flagged invoice finds the prior receipt and writes nothing.
  */
+import { byLineDisplayOrder } from "../../src/lib/pricing";
 import { api } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
@@ -245,7 +246,7 @@ async function itemizedFromProposal(ctx: MutationCtx, proposal: Doc<"proposals">
       .collect()
   )
     .filter((row) => row.tenantId === proposal.tenantId && row.deletedAt == null && row.removedAt == null)
-    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+    .sort(byLineDisplayOrder);
   if (lines.length === 0) return null;
   const guests = Number(proposal.guestCount ?? 0);
   const drafts: InvoiceLineDraft[] = lines.map((row, index) => {

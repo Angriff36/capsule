@@ -143,3 +143,17 @@ export function computeProposalPricing(
     .toDollars();
   return { lines, subtotal, discountAmount, taxAmount, total };
 }
+
+/**
+ * Display order for priced lines: a percentage line (service charge) is
+ * worked out from every other line, so it is listed after them; otherwise the
+ * saved sortOrder.
+ */
+export function byLineDisplayOrder(
+  a: { pricingBasis?: unknown; sortOrder?: unknown },
+  b: { pricingBasis?: unknown; sortOrder?: unknown },
+): number {
+  const pa = a.pricingBasis === "percentage" ? 1 : 0;
+  const pb = b.pricingBasis === "percentage" ? 1 : 0;
+  return pa - pb || Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0);
+}
