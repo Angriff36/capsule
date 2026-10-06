@@ -197,7 +197,9 @@ export function RosterPage() {
       .filter(
         (event) =>
           event.deletedAt == null &&
-          !["cancelled", "completed", "closed_out"].includes(event.stage),
+          !["cancelled", "completed", "closed_out"].includes(event.stage) &&
+          // A spot on an event that already ended can no longer be filled.
+          Number(event.endsAt ?? event.startsAt ?? Infinity) >= Date.now(),
       )
       .map((event) => event._id as string),
   );
