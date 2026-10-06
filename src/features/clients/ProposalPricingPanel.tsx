@@ -1,3 +1,4 @@
+import { formatMoneyExact } from "../../lib/format";
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { useListProposalLineItem } from "../../lib/manifest-convex-react";
@@ -254,7 +255,7 @@ export function ProposalPricingPanel({
                   {PRICING_BASIS_LABELS[row.pricingBasis as PricingBasis]}
                 </td>
                 <td className="tabular-nums" data-label="Price / %">
-                  {Number(row.unitPrice).toFixed(2)}
+                  {formatMoneyExact(Number(row.unitPrice))}
                 </td>
                 <td className="tabular-nums" data-label="Qty">
                   {row.pricingBasis === "per_unit"
@@ -264,7 +265,7 @@ export function ProposalPricingPanel({
                       : "—"}
                 </td>
                 <td className="tabular-nums" data-label="Amount">
-                  {(recomputed.lines[index]?.amount ?? 0).toFixed(2)}
+                  {formatMoneyExact(recomputed.lines[index]?.amount ?? 0)}
                 </td>
                 {editable ? (
                   <td>
@@ -358,7 +359,7 @@ export function ProposalPricingPanel({
                   {dish.name}
                   {dish.sellingPrice == null
                     ? ""
-                    : ` · ${dish.sellingPrice.toFixed(2)}`}
+                    : ` · ${formatMoneyExact(dish.sellingPrice)}`}
                 </option>
               ))}
             </select>
@@ -476,16 +477,20 @@ export function ProposalPricingPanel({
 
       <p className="mt-2 text-base text-ink-2">
         Subtotal{" "}
-        <span className="tabular-nums">{recomputed.subtotal.toFixed(2)}</span> ·
-        Tax{" "}
-        <span className="tabular-nums">{recomputed.taxAmount.toFixed(2)}</span>{" "}
+        <span className="tabular-nums">
+          {formatMoneyExact(recomputed.subtotal)}
+        </span>{" "}
+        · Tax{" "}
+        <span className="tabular-nums">
+          {formatMoneyExact(recomputed.taxAmount)}
+        </span>{" "}
         · Discount{" "}
         <span className="tabular-nums">
-          {recomputed.discountAmount.toFixed(2)}
+          {formatMoneyExact(recomputed.discountAmount)}
         </span>{" "}
         · <span className="font-semibold text-ink">Total </span>
         <span className="tabular-nums font-semibold text-ink">
-          {recomputed.total.toFixed(2)}
+          {formatMoneyExact(recomputed.total)}
         </span>
       </p>
     </div>

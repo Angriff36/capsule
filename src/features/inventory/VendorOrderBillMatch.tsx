@@ -1,3 +1,4 @@
+import { formatMoneyExact } from "../../lib/format";
 import { useState, type FormEvent } from "react";
 import {
   useListVendorBillMatch,
@@ -74,7 +75,7 @@ function BillHistory({ rows }: { rows: ListedMatch[] }) {
           <li key={row._id}>
             <strong>
               Bill {row.billNumber}: {Number(row.billedQuantity)} at{" "}
-              {Number(row.billedUnitPrice).toFixed(2)}
+              {formatMoneyExact(Number(row.billedUnitPrice))}
             </strong>
             <span>
               {row.reviewState ? REVIEW_WORDS[row.reviewState] : "Matched"}
@@ -201,7 +202,7 @@ export function VendorOrderBillMatch({ line, busy, run }: BillMatchProps) {
           <li>
             <strong>
               Bill {line.billNumber}: {Number(line.billedQuantity)} {line.unit}{" "}
-              at {Number(line.billedUnitPrice).toFixed(2)}
+              at {formatMoneyExact(Number(line.billedUnitPrice))}
             </strong>
             <span>
               {billDifferenceText(

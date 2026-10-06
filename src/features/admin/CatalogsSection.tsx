@@ -297,9 +297,13 @@ export function CatalogsSection({
                     <span className="text-base font-semibold text-ink">
                       {row.name}
                     </span>
-                    <span className="font-mono text-2xs text-ink-2">
-                      {row.code}
-                    </span>
+                    {/* Codes made for partner venues end in a record id; that
+                        means nothing to a person, so only typed codes show. */}
+                    {/-[a-z0-9]{32}$/.test(String(row.code)) ? null : (
+                      <span className="font-mono text-2xs text-ink-2">
+                        {row.code}
+                      </span>
+                    )}
                     <span className="text-2xs text-ink-3">
                       #{row.sortOrder ?? 0}
                     </span>

@@ -44,7 +44,10 @@ type EventRow = SoftDeletable & {
 };
 
 type InvoiceRow = SoftDeletable & { status?: string | null };
-type PrepRow = SoftDeletable & { status?: string | null };
+type PrepRow = SoftDeletable & {
+  status?: string | null;
+  dueAt?: number | null;
+};
 type PackRow = SoftDeletable & {
   status?: string | null;
   eventId?: string | null;
@@ -145,8 +148,12 @@ export class HomeAttentionPolicy {
     const openInvoices = invoices.filter((row) =>
       OPEN_INVOICE_STATUSES.has(String(row.status)),
     );
-    const openPrep = prepTasks.filter((row) =>
-      OPEN_PREP_STATUSES.has(String(row.status)),
+    // A step due before yesterday belongs to a past service; it needs no
+    // decision today, so it does not count.
+    const openPrep = prepTasks.filter(
+      (row) =>
+        OPEN_PREP_STATUSES.has(String(row.status)) &&
+        (row.dueAt == null || row.dueAt >= now - WEEK_MS / 7),
     );
     const openPacks = packLists.filter((row) =>
       OPEN_PACK_STATUSES.has(String(row.status)),

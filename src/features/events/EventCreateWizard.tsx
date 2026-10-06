@@ -550,6 +550,8 @@ function ClientHeadcountStep({
           options={clients.map((client) => ({
             id: client._id,
             label: clientName(client),
+            hint:
+              [client.email, client.phone].filter(Boolean).join(" · ") || null,
           }))}
         />
       </label>

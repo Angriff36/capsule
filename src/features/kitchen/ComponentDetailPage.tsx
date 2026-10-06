@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, type FormEvent } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import { formatCountNoun } from "../../lib/format";
+import { formatQuantity, formatCountNoun } from "../../lib/format";
 import {
   useCreateComponentIngredient,
   useGetComponent,
@@ -471,7 +471,7 @@ export function ComponentDetailPage() {
         facts={[
           {
             label: "Yield",
-            value: `${component.yieldQuantity} ${String(component.yieldUnit)}`,
+            value: `${formatQuantity(component.yieldQuantity)} ${String(component.yieldUnit)}`,
           },
           {
             label: "Status",
@@ -593,7 +593,8 @@ export function ComponentDetailPage() {
           <div>
             <dt>Yield</dt>
             <dd>
-              {component.yieldQuantity} {String(component.yieldUnit)}
+              {formatQuantity(component.yieldQuantity)}{" "}
+              {String(component.yieldUnit)}
             </dd>
           </div>
           <div>

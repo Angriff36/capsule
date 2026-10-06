@@ -391,6 +391,9 @@ export function InvoicesPage() {
           defaultClientId={prefillClientId}
           defaultEventId={prefillEventId || eventScope.workingId || ""}
           functionalCurrencyCode={functionalCurrencyCode}
+          existingInvoiceNumbers={(invoices ?? []).map(
+            (row) => row.invoiceNumber,
+          )}
         />
       ) : null}
 
@@ -413,15 +416,17 @@ export function InvoicesPage() {
             <span>
               Issue an invoice for a registered client to begin billing.
             </span>
-            <div className="mt-3 flex justify-center">
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={() => setShowIssue(true)}
-              >
-                Issue invoice
-              </button>
-            </div>
+            {showIssue ? null : (
+              <div className="mt-3 flex justify-center">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => setShowIssue(true)}
+                >
+                  Issue invoice
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className="supply-table-wrap">

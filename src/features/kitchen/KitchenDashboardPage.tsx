@@ -13,7 +13,9 @@ import {
   usePrepTaskCancel,
   usePrepTaskClaim,
   usePrepTaskComplete,
+  usePrepTaskMarkBlocked,
   usePrepTaskRelease,
+  usePrepTaskUnblock,
   usePrepTaskRevise,
   usePrepTaskStart,
 } from "../../lib/manifest-convex-react";
@@ -87,6 +89,8 @@ export function KitchenDashboardPage() {
   const assign = usePrepTaskAssign();
   const claim = usePrepTaskClaim();
   const release = usePrepTaskRelease();
+  const markBlocked = usePrepTaskMarkBlocked();
+  const unblock = usePrepTaskUnblock();
   const start = usePrepTaskStart();
   const revise = usePrepTaskRevise();
   const cancel = usePrepTaskCancel();
@@ -282,6 +286,34 @@ export function KitchenDashboardPage() {
       () => actions.releaseOne(task),
       "Returned to the pool",
     );
+  // A step the cook cannot do yet (no product, oven down) is blocked with a
+  // reason the team can read, then unblocked when it can go again.
+  const onBlockTask = async (task: PrepTaskLike) => {
+    const reason = await labelPrompt.askReason({
+      title: "Block this step",
+      description: "Say what is stopping it, so the team knows.",
+      label: "What is blocking it",
+      placeholder: "e.g. Chicken not delivered yet",
+      confirmLabel: "Block step",
+    });
+    if (!reason?.trim()) return;
+    void run(
+      `block:${task._id}`,
+      () =>
+        markBlocked({
+          docId: task._id,
+          version: task.version,
+          reason: reason.trim(),
+        }),
+      "Blocked",
+    );
+  };
+  const onUnblockTask = (task: PrepTaskLike) =>
+    void run(
+      `unblock:${task._id}`,
+      () => unblock({ docId: task._id, version: task.version }),
+      "Back on the board",
+    );
   const onCompleteTask = (task: PrepTaskLike) =>
     void run(
       `complete:${task._id}`,
@@ -434,10 +466,7 @@ export function KitchenDashboardPage() {
       return { label: "Assign", run: () => onAssignTask(row.task) };
     }
     if (status === "blocked") {
-      return {
-        label: "Open event",
-        run: () => setSelectedEventId(row.event._id),
-      };
+      return { label: "Unblock", run: () => onUnblockTask(row.task) };
     }
     if (status === "in_progress")
       return { label: "Complete", run: () => onCompleteTask(row.task) };
@@ -913,6 +942,7 @@ export function KitchenDashboardPage() {
       busy === `claim:${id}` ||
       busy === `start:${id}` ||
       busy === `complete:${id}` ||
+      busy === `unblock:${id}` ||
       busy === `assign:${id}`;
     const owner = row.task.assignedToId
       ? model.personLabel(model.findPerson(String(row.task.assignedToId)))
@@ -1036,6 +1066,16 @@ export function KitchenDashboardPage() {
                 className="cursor-pointer text-sm text-ink-2 underline underline-offset-4"
               >
                 {busy === `release:${id}` ? "Working…" : second.label}
+              </button>
+            ) : null}
+            {["pending", "claimed", "in_progress"].includes(status) ? (
+              <button
+                type="button"
+                disabled={busy === `block:${id}`}
+                onClick={() => void onBlockTask(row.task)}
+                className="cursor-pointer text-sm text-ink-2 underline underline-offset-4"
+              >
+                Block
               </button>
             ) : null}
             {status !== "cancelled" ? (

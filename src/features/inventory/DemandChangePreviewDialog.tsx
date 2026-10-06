@@ -1,3 +1,4 @@
+import { formatQuantity } from "../../lib/format";
 import { useState } from "react";
 import {
   type DemandChangeRequest,
@@ -131,10 +132,10 @@ export function DemandChangePreviewDialog({
                           {line.ingredientName}
                         </td>
                         <td className="py-3 pr-3 text-right font-mono text-ink-2">
-                          {line.currentQuantity} {line.unit}
+                          {formatQuantity(line.currentQuantity)} {line.unit}
                         </td>
                         <td className="py-3 pr-3 text-right font-mono font-semibold text-ink">
-                          {line.nextQuantity} {line.unit}
+                          {formatQuantity(line.nextQuantity)} {line.unit}
                         </td>
                         <td className="py-3 text-right font-semibold text-brand">
                           {line.change}

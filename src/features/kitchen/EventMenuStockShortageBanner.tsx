@@ -1,5 +1,5 @@
 import type { EventStockShortage } from "../events/EventStockReservationCoordinator";
-import { formatMoneyExact } from "../../lib/format";
+import { formatQuantity, formatMoneyExact } from "../../lib/format";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import {
   rankIngredientSubstitutions,
@@ -71,8 +71,9 @@ export function EventMenuStockShortageBanner({
                       </CulinaryEntityLink>
                     </strong>
                     <span className="font-mono text-xs text-danger">
-                      Short {row.shortageQuantity} {row.unit} · held{" "}
-                      {row.reservedQuantity} of {row.requiredQuantity}
+                      Short {formatQuantity(row.shortageQuantity)} {row.unit} ·
+                      held {row.reservedQuantity} of{" "}
+                      {formatQuantity(row.requiredQuantity)}
                     </span>
                   </div>
 
@@ -97,8 +98,9 @@ export function EventMenuStockShortageBanner({
                               {suggestion.name}
                             </CulinaryEntityLink>
                             <p className="mt-1 text-xs text-ink-3">
-                              {suggestion.availableQuantity} {suggestion.unit}{" "}
-                              available · covers {suggestion.coverageQuantity}{" "}
+                              {formatQuantity(suggestion.availableQuantity)}{" "}
+                              {suggestion.unit} available · covers{" "}
+                              {formatQuantity(suggestion.coverageQuantity)}{" "}
                               {suggestion.unit}
                             </p>
                           </div>

@@ -40,6 +40,7 @@ function dayOf(startsAt: number | null): string {
   if (startsAt == null) return "TBC";
   return new Date(startsAt).toLocaleDateString(undefined, {
     weekday: "short",
+    month: "short",
     day: "numeric",
   });
 }
@@ -279,7 +280,11 @@ export function HomePage() {
         <div className="mt-7">
           <SectionRule
             label="Coming up"
-            trailing={`${snapshot.weekAheadCount} in the next 7 days`}
+            trailing={
+              snapshot.weekAheadCount > 0
+                ? `${snapshot.weekAheadCount} in the next 7 days`
+                : "none in the next 7 days"
+            }
           />
           <div className="fact-row mt-3 gap-x-8">
             {later.slice(0, 5).map((service) => (

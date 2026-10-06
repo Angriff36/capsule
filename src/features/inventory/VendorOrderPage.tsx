@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { ReturnToListLink } from "../list-state/listOrigin";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import { useEventsById } from "../facilities/useEventsById";
-import { formatMoneyExact } from "../../lib/format";
+import { formatQuantity, formatMoneyExact } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
   useCreateStorageLocation,
@@ -517,7 +517,7 @@ export function VendorOrderPage() {
                 {openNeeds.map((need) => (
                   <option key={need._id} value={need._id}>
                     {ingredientName(need.ingredientId)} ·{" "}
-                    {need.requiredQuantity} {need.unit} ·{" "}
+                    {formatQuantity(need.requiredQuantity)} {need.unit} ·{" "}
                     {eventName(need.eventId)}
                   </option>
                 ))}
@@ -628,8 +628,8 @@ export function VendorOrderPage() {
                       </span>
                       {lineNeeds.map((need) => (
                         <small key={need._id}>
-                          {eventName(need.eventId)} · {need.requiredQuantity}{" "}
-                          {need.unit}
+                          {eventName(need.eventId)} ·{" "}
+                          {formatQuantity(need.requiredQuantity)} {need.unit}
                           {events.find((event) => event._id === need.eventId)
                             ?.stage === "cancelled"
                             ? " · event cancelled"
@@ -663,8 +663,8 @@ export function VendorOrderPage() {
                       </small>
                       {isDraft && line.plannedQuantity != null ? (
                         <small>
-                          Current calculation: {line.plannedQuantity}{" "}
-                          {line.unit}
+                          Current calculation:{" "}
+                          {formatQuantity(line.plannedQuantity)} {line.unit}
                           {line.quantityIsManual !== false
                             ? " · order quantity kept"
                             : " · updates with event requirements"}
@@ -727,7 +727,8 @@ export function VendorOrderPage() {
                                 })
                               }
                             >
-                              Use {line.plannedQuantity} {line.unit}
+                              Use {formatQuantity(line.plannedQuantity)}{" "}
+                              {line.unit}
                             </button>
                           ) : null}
                         </>
@@ -783,7 +784,7 @@ export function VendorOrderPage() {
                           <li key={lot._id}>
                             <strong>{lot.supplierLotNumber}</strong>
                             <span>
-                              {lot.receiptQuantity} {lot.unit} ·{" "}
+                              {formatQuantity(lot.receiptQuantity)} {lot.unit} ·{" "}
                               {ingredientName(line.ingredientId)}
                               {lot.deliveryReference
                                 ? ` · slip ${lot.deliveryReference}`

@@ -100,3 +100,11 @@ export function relativeDays(ms: number, from = Date.now()): string {
   if (days === -1) return "yesterday";
   return days > 0 ? `in ${days} days` : `${-days} days ago`;
 }
+
+/** Amounts of food and stock: up to two decimals, so recipe math never shows
+ *  float noise like 3.2000000000000006. */
+export function formatQuantity(n: number | string | null | undefined): string {
+  const value = Number(n);
+  if (n == null || n === "" || !Number.isFinite(value)) return "—";
+  return value.toLocaleString(undefined, { maximumFractionDigits: 2 });
+}

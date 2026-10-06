@@ -1,3 +1,4 @@
+import { formatQuantity } from "../../lib/format";
 import { type ReactNode } from "react";
 import type { EventStockShortage } from "./EventStockReservationCoordinator";
 import {
@@ -159,8 +160,9 @@ export function EventInventorySummaryAside({
                   {ingredientName(row.ingredientId)}
                 </span>
                 <p className="font-mono text-xs text-danger">
-                  short {row.shortageQuantity} {row.unit} · need{" "}
-                  {row.requiredQuantity} · held {row.reservedQuantity}
+                  short {formatQuantity(row.shortageQuantity)} {row.unit} · need{" "}
+                  {formatQuantity(row.requiredQuantity)} · held{" "}
+                  {row.reservedQuantity}
                 </p>
               </li>
             ))}

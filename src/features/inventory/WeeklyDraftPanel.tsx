@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { formatDate } from "../../lib/format";
+import { formatQuantity, formatDate } from "../../lib/format";
 import type { WeeklyDraftLineView } from "./weeklyDraftView";
 
 const plural = (count: number, unit: string) =>
@@ -148,7 +148,7 @@ function DraftLineRows({
               <span>
                 Sold by the {rounding.packUnit} ({rounding.packSize} {unit}):{" "}
                 {rounding.packs} {plural(rounding.packs, rounding.packUnit)} ={" "}
-                {rounding.roundedQuantity} {unit}
+                {formatQuantity(rounding.roundedQuantity)} {unit}
                 {rounding.extra > 0 ? `, ${rounding.extra} ${unit} extra` : ""}
                 {line.ordering === rounding.roundedQuantity
                   ? " · ordering whole packs"

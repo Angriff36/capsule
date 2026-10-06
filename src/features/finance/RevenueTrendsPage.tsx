@@ -10,7 +10,7 @@ import { normalizeCurrencyCode } from "../../lib/format";
 import { formatCurrencyLabel } from "../../lib/currency";
 import { TableSkeleton } from "../../ui/primitives";
 import { PieChart } from "../../ui/charts/PieChart";
-import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
+import { ReportsWorkspaceNav } from "../reports/ReportsWorkspaceNav";
 import {
   buildRevenueTrend,
   type RevenueBreakdown,
@@ -410,7 +410,7 @@ export function RevenueTrendsDashboard({
           </strong>
         </div>
       </header>
-      <FinanceWorkspaceNav />
+      <ReportsWorkspaceNav />
 
       <section className="revenue-controls" aria-label="Revenue chart controls">
         <div>

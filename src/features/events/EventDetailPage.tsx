@@ -177,6 +177,17 @@ function EventDetailContent({
     if (!id || event == null || event.deletedAt != null) return;
     rememberLastViewedEvent(eventDetailPath(id, activeTab));
   }, [activeTab, event, id]);
+  // A link that names a tab (?tab=staffing from the roster) lands on that
+  // tab's content, not on the masthead above it.
+  const linkedTab = searchParams.get("tab");
+  const eventLoaded = event != null;
+  useEffect(() => {
+    if (!eventLoaded || !linkedTab || linkedTab === "overview") return;
+    document
+      .getElementById("event-sections")
+      ?.scrollIntoView({ block: "start" });
+    // Only on arrival from a link, not on every tab click.
+  }, [eventLoaded]);
   const eventId = event?._id ?? "skip";
   const eventAssignments = useEventAssignmentRows(eventId);
   const staffNeeds = useEventStaffNeedRows(eventId);
