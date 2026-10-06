@@ -590,6 +590,7 @@ Screens (66): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `queries.listIngredientDemandByEventId` - live read
 - `queries.listInvoice` - live read
 - `queries.listMenu` - live read
+- `queries.listMenuDish` - live read
 - `queries.listOccasion` - live read
 - `queries.listOrganization` - live read
 - `queries.listPackList` - live read

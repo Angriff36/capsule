@@ -1886,6 +1886,15 @@
   }
 }
 
+/* A table wider than a phone scrolls in its box; a one-cell message row
+   ("No vendor relationships found.") centred across every column started
+   off screen. On a phone it starts at the left edge. */
+@media (max-width: 767px) {
+  .overflow-x-auto td[colspan] {
+    text-align: left;
+  }
+}
+
 /* Overflow action menu: a <details> that drops a list of secondary and
    destructive actions under a "More" button. Destructive items sit last,
    separated by a rule. */
