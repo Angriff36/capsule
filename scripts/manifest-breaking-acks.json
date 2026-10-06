@@ -3132,6 +3132,102 @@
       "category": "command-parameter-removed",
       "acknowledgedAt": "2026-10-06",
       "reason": "Ids are Convex ids (strings, not uuids): list<uuid> rejected every real id, so saving failed. Stored values are the same strings; widening keeps old rows valid."
+    },
+    {
+      "path": "Lead.eventType",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Optional lead fields (int? / string?, optional in convex/schema.ts): old leads simply have no value. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Lead.guestCount",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Optional lead fields (int? / string?, optional in convex/schema.ts): old leads simply have no value. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "reviseDraft.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Name clash, not a change: the checker matches commands by bare name. Component.reviseDraft (src/culinary/component.manifest) is unchanged; Proposal.reviseDraft is a new, separate command (e3fac5a6, editable wording on draft proposals)."
+    },
+    {
+      "path": "reviseDraft.parameters.batchMultiplier",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Name clash, not a change: the checker matches commands by bare name. Component.reviseDraft (src/culinary/component.manifest) is unchanged; Proposal.reviseDraft is a new, separate command (e3fac5a6, editable wording on draft proposals)."
+    },
+    {
+      "path": "reviseDraft.parameters.category",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Name clash, not a change: the checker matches commands by bare name. Component.reviseDraft (src/culinary/component.manifest) is unchanged; Proposal.reviseDraft is a new, separate command (e3fac5a6, editable wording on draft proposals)."
+    },
+    {
+      "path": "reviseDraft.parameters.cuisine",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Name clash, not a change: the checker matches commands by bare name. Component.reviseDraft (src/culinary/component.manifest) is unchanged; Proposal.reviseDraft is a new, separate command (e3fac5a6, editable wording on draft proposals)."
+    },
+    {
+      "path": "reviseDraft.parameters.description",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Name clash, not a change: the checker matches commands by bare name. Component.reviseDraft (src/culinary/component.manifest) is unchanged; Proposal.reviseDraft is a new, separate command (e3fac5a6, editable wording on draft proposals)."
+    },
+    {
+      "path": "reviseDraft.parameters.instructions",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Name clash, not a change: the checker matches commands by bare name. Component.reviseDraft (src/culinary/component.manifest) is unchanged; Proposal.reviseDraft is a new, separate command (e3fac5a6, editable wording on draft proposals)."
+    },
+    {
+      "path": "reviseDraft.parameters.name",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Name clash, not a change: the checker matches commands by bare name. Component.reviseDraft (src/culinary/component.manifest) is unchanged; Proposal.reviseDraft is a new, separate command (e3fac5a6, editable wording on draft proposals)."
+    },
+    {
+      "path": "reviseDraft.parameters.servesPerYield",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Name clash, not a change: the checker matches commands by bare name. Component.reviseDraft (src/culinary/component.manifest) is unchanged; Proposal.reviseDraft is a new, separate command (e3fac5a6, editable wording on draft proposals)."
+    },
+    {
+      "path": "reviseDraft.parameters.yieldQuantity",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Name clash, not a change: the checker matches commands by bare name. Component.reviseDraft (src/culinary/component.manifest) is unchanged; Proposal.reviseDraft is a new, separate command (e3fac5a6, editable wording on draft proposals)."
+    },
+    {
+      "path": "reviseDraft.parameters.yieldUnit",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Name clash, not a change: the checker matches commands by bare name. Component.reviseDraft (src/culinary/component.manifest) is unchanged; Proposal.reviseDraft is a new, separate command (e3fac5a6, editable wording on draft proposals)."
+    },
+    {
+      "path": "reviseDraft.parameters.expiresAt",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Name clash, not a change: the checker matches commands by bare name. Component.reviseDraft (src/culinary/component.manifest) is unchanged; Proposal.reviseDraft is a new, separate command (e3fac5a6, editable wording on draft proposals)."
+    },
+    {
+      "path": "reviseDraft.parameters.notes",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Name clash, not a change: the checker matches commands by bare name. Component.reviseDraft (src/culinary/component.manifest) is unchanged; Proposal.reviseDraft is a new, separate command (e3fac5a6, editable wording on draft proposals)."
+    },
+    {
+      "path": "reviseDraft.parameters.terms",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Name clash, not a change: the checker matches commands by bare name. Component.reviseDraft (src/culinary/component.manifest) is unchanged; Proposal.reviseDraft is a new, separate command (e3fac5a6, editable wording on draft proposals)."
+    },
+    {
+      "path": "reviseDraft.parameters.title",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-06",
+      "reason": "Name clash, not a change: the checker matches commands by bare name. Component.reviseDraft (src/culinary/component.manifest) is unchanged; Proposal.reviseDraft is a new, separate command (e3fac5a6, editable wording on draft proposals)."
     }
   ]
 }

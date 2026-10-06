@@ -162,12 +162,12 @@ describe("PasteIncomingMessageForm", () => {
     expect(args.providerAccountId).toBe("acct-1");
   });
 
-  it("keeps raw JSON available only behind the Advanced toggle", async () => {
+  it("keeps raw JSON available only behind the message-export button", async () => {
     const props = makeProps();
     render(props);
 
     const toggle = Array.from(container.querySelectorAll("button")).find((b) =>
-      b.textContent?.includes("Advanced"),
+      b.textContent?.includes("Paste a message export instead"),
     );
     expect(toggle).toBeDefined();
     act(() => toggle!.click());

@@ -102,6 +102,35 @@ type PortalStyle = CSSProperties & {
   "--portal-accent": string;
 };
 
+// Familiar course words in the order a meal is served. Any other course
+// name ("Wave 1", "Reception") means the team set its own order: keep it.
+const COURSE_RANK: Array<[RegExp, number]> = [
+  [/^(first|starter|appetizer|app|hors)/i, 0],
+  [/^(salad|soup)/i, 1],
+  [/^(entree|entrée|main)/i, 2],
+  [/^side/i, 3],
+  [/^bread/i, 4],
+  [/^dessert/i, 5],
+  [/^(beverage|drink)/i, 6],
+];
+
+function menuInServiceOrder<T extends { course: string | null }>(
+  menu: T[],
+): T[] {
+  const rank = (course: string | null) =>
+    course
+      ? COURSE_RANK.find(([pattern]) => pattern.test(course.trim()))?.[1]
+      : undefined;
+  if (menu.some((item) => rank(item.course) === undefined)) return menu;
+  return menu
+    .map((item, index) => ({ item, index }))
+    .sort(
+      (a, b) =>
+        rank(a.item.course)! - rank(b.item.course)! || a.index - b.index,
+    )
+    .map(({ item }) => item);
+}
+
 export function ClientPortalPage({ token: tokenProp }: { token?: string }) {
   const { token: routeToken } = useParams();
   const token = tokenProp ?? routeToken;
@@ -267,7 +296,7 @@ export function ClientPortalView({
             </div>
           ) : (
             <ol className="client-portal-menu-list">
-              {portal.menu.map((item, index) => (
+              {menuInServiceOrder(portal.menu).map((item, index) => (
                 <li key={item.id}>
                   <span className="client-portal-menu-number">
                     {String(index + 1).padStart(2, "0")}

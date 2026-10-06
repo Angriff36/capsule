@@ -115,6 +115,15 @@ import {
   CutoverDecisionRecordApprovalsParamsSchema,
   CutoverDecisionRollbackParamsSchema,
   CutoverDecisionSetTppReadOnlyParamsSchema,
+  DateHoldConvertParamsSchema,
+  DateHoldExpireParamsSchema,
+  DateHoldExtendParamsSchema,
+  DateHoldPlaceParamsSchema,
+  DateHoldReleaseParamsSchema,
+  DateWaitlistEntryJoinParamsSchema,
+  DateWaitlistEntryOfferParamsSchema,
+  DateWaitlistEntryPromoteParamsSchema,
+  DateWaitlistEntryWithdrawParamsSchema,
   DeckShareLinkCreateParamsSchema,
   DeckShareLinkRevokeParamsSchema,
   DeliveryCancelParamsSchema,
@@ -250,6 +259,7 @@ import {
   EventDishSyncHeadcountParamsSchema,
   EventDishUpdateInstructionsParamsSchema,
   EventFinalizeEventParamsSchema,
+  EventGuestAssignMealParamsSchema,
   EventGuestAssignTableParamsSchema,
   EventGuestCheckInParamsSchema,
   EventGuestInviteParamsSchema,
@@ -280,6 +290,7 @@ import {
   EventRescheduleParamsSchema,
   EventReturnToPlanningParamsSchema,
   EventSetEventNumberParamsSchema,
+  EventSetTravelFeeParamsSchema,
   EventStaffNeedApplyApprovedShiftSwapParamsSchema,
   EventStaffNeedCancelParamsSchema,
   EventStaffNeedChangeCoverageParamsSchema,
@@ -461,6 +472,9 @@ import {
   LeadershipItemDropParamsSchema,
   LeadershipItemReopenParamsSchema,
   LeadershipItemReviseParamsSchema,
+  LeftoverDispositionRecordParamsSchema,
+  LeftoverDispositionRemoveParamsSchema,
+  LeftoverDispositionReviseParamsSchema,
   MenuArchiveParamsSchema,
   MenuDishAddParamsSchema,
   MenuDishRemoveParamsSchema,
@@ -472,6 +486,7 @@ import {
   MenuRestoreParamsSchema,
   MenuReviseDetailsParamsSchema,
   MenuSetSeasonParamsSchema,
+  MenuSetServiceParamsSchema,
   MenuUnpublishParamsSchema,
   MenuUpdatePricingParamsSchema,
   MessagePostParamsSchema,
@@ -501,12 +516,14 @@ import {
   OrganizationCapabilitySettingRegisterParamsSchema,
   OrganizationCapabilitySettingSetEnabledParamsSchema,
   OrganizationConfigureBrandingParamsSchema,
+  OrganizationConfigureContactDetailsParamsSchema,
   OrganizationConfigureEmailSenderParamsSchema,
   OrganizationConfigureEquipmentFieldsParamsSchema,
   OrganizationConfigurePlanningChecksParamsSchema,
   OrganizationConfigureRoutePolicyParamsSchema,
   OrganizationConfigureStageMovesParamsSchema,
   OrganizationConfigureTimingPolicyParamsSchema,
+  OrganizationConfigureTravelFeeParamsSchema,
   OrganizationDeactivateParamsSchema,
   OrganizationReactivateParamsSchema,
   OrganizationRegisterParamsSchema,
@@ -539,6 +556,7 @@ import {
   PackListItemRemoveParamsSchema,
   PackListItemRestoreExcludedParamsSchema,
   PackListItemRestoreImportedAssociationParamsSchema,
+  PackListItemSetBinParamsSchema,
   PackListItemSetResponsibilityParamsSchema,
   PackListItemSetUnitVolumeParamsSchema,
   PackListItemSetUnitWeightParamsSchema,
@@ -550,6 +568,7 @@ import {
   PackListRequestAssistanceParamsSchema,
   PackListRequestDishContainersParamsSchema,
   PackListResolveAssistanceParamsSchema,
+  PackListSetBinSheetParamsSchema,
   PackListStandDownWithEventParamsSchema,
   PackListStartPackingParamsSchema,
   PackListTemplateArchiveParamsSchema,
@@ -679,6 +698,7 @@ import {
   ProposalReassignClientParamsSchema,
   ProposalRecordHistoricalAcceptanceParamsSchema,
   ProposalRefreshFromEventParamsSchema,
+  ProposalReviseDraftParamsSchema,
   ProposalRevisionCaptureParamsSchema,
   ProposalSendParamsSchema,
   ProposalStageClientMergeParamsSchema,
@@ -694,6 +714,7 @@ import {
   PurchaseNeedMarkDraftOrderedParamsSchema,
   PurchaseNeedMarkFulfilledParamsSchema,
   PurchaseNeedMarkOrderedParamsSchema,
+  PurchaseNeedMoveToVendorParamsSchema,
   PurchaseNeedMoveToWeekParamsSchema,
   PurchaseNeedReleaseCancelledDraftParamsSchema,
   PurchaseNeedReviseRequiredParamsSchema,
@@ -790,6 +811,8 @@ import {
   SignatureRequestExpireParamsSchema,
   SignatureRequestRequestSignatureParamsSchema,
   SignatureRequestRevokeParamsSchema,
+  SkillLevelChangeLevelParamsSchema,
+  SkillLevelRateParamsSchema,
   StaffChatReadCursorOpenParamsSchema,
   StaffChatReadCursorTouchParamsSchema,
   StaffMessageEditParamsSchema,
@@ -825,6 +848,13 @@ import {
   SyncErrorMarkResolvedParamsSchema,
   SyncErrorRecordParamsSchema,
   SyncErrorReopenParamsSchema,
+  TastingCancelParamsSchema,
+  TastingDishAddParamsSchema,
+  TastingDishMarkOnProposalParamsSchema,
+  TastingDishRecordFeedbackParamsSchema,
+  TastingMarkSelectionsAppliedParamsSchema,
+  TastingMarkTastedParamsSchema,
+  TastingScheduleParamsSchema,
   TaxRateDefineParamsSchema,
   TaxRateReviseParamsSchema,
   TaxRateSetActiveParamsSchema,
@@ -845,6 +875,11 @@ import {
   TrainingModuleDefineParamsSchema,
   TrainingModuleReactivateParamsSchema,
   TrainingModuleRetireParamsSchema,
+  TrainingModuleSetTrainingDocParamsSchema,
+  TrainingSignOffBeginTrainingParamsSchema,
+  TrainingSignOffFinishTrainingParamsSchema,
+  TrainingSignOffInitialTrainingStepsParamsSchema,
+  TrainingSignOffReopenTrainingParamsSchema,
   VehicleFuelLogRecordParamsSchema,
   VehicleMaintenanceScheduleApplyServiceParamsSchema,
   VehicleMaintenanceScheduleScheduleParamsSchema,
@@ -932,6 +967,7 @@ import {
   VenueRoomReviseParamsSchema,
   VenueSetBrandParamsSchema,
   VenueSetGalleryTokenParamsSchema,
+  VenueSetLogisticsProfileParamsSchema,
   VenueSetPartnershipParamsSchema,
   VenueSetSellingProfileParamsSchema,
   VenueSetSiteFactsParamsSchema,
@@ -2623,6 +2659,138 @@ export function useCutoverDecisionSetTppReadOnly() {
   };
 }
 
+/** Reactive list for DateHold. */
+export function useListDateHold() {
+  return useQuery(api.queries.listDateHold);
+}
+
+/** Reactive get-by-id for DateHold. Pass "skip" to suspend. */
+export function useGetDateHold(id: string | "skip") {
+  return useQuery(api.queries.getDateHold, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for DateHold.convert. */
+export function useDateHoldConvert() {
+  const mutate = useMutation(api.mutations.DateHold_convert);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateHoldConvertParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DateHold.expire. */
+export function useDateHoldExpire() {
+  const mutate = useMutation(api.mutations.DateHold_expire);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateHoldExpireParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DateHold.extend. */
+export function useDateHoldExtend() {
+  const mutate = useMutation(api.mutations.DateHold_extend);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateHoldExtendParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DateHold.place. */
+export function useDateHoldPlace() {
+  const mutate = useMutation(api.mutations.DateHold_place);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateHoldPlaceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DateHold.release. */
+export function useDateHoldRelease() {
+  const mutate = useMutation(api.mutations.DateHold_release);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateHoldReleaseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for DateHold.place. */
+export function useCreateDateHold() {
+  const mutate = useMutation(api.mutations.DateHold_createViaPlace);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = DateHoldPlaceParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for DateWaitlistEntry. */
+export function useListDateWaitlistEntry() {
+  return useQuery(api.queries.listDateWaitlistEntry);
+}
+
+/** Reactive get-by-id for DateWaitlistEntry. Pass "skip" to suspend. */
+export function useGetDateWaitlistEntry(id: string | "skip") {
+  return useQuery(api.queries.getDateWaitlistEntry, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for DateWaitlistEntry.join. */
+export function useDateWaitlistEntryJoin() {
+  const mutate = useMutation(api.mutations.DateWaitlistEntry_join);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateWaitlistEntryJoinParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DateWaitlistEntry.offer. */
+export function useDateWaitlistEntryOffer() {
+  const mutate = useMutation(api.mutations.DateWaitlistEntry_offer);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateWaitlistEntryOfferParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DateWaitlistEntry.promote. */
+export function useDateWaitlistEntryPromote() {
+  const mutate = useMutation(api.mutations.DateWaitlistEntry_promote);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateWaitlistEntryPromoteParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DateWaitlistEntry.withdraw. */
+export function useDateWaitlistEntryWithdraw() {
+  const mutate = useMutation(api.mutations.DateWaitlistEntry_withdraw);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DateWaitlistEntryWithdrawParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for DateWaitlistEntry.join. */
+export function useCreateDateWaitlistEntry() {
+  const mutate = useMutation(api.mutations.DateWaitlistEntry_createViaJoin);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = DateWaitlistEntryJoinParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for DeckShareLink. */
 export function useListDeckShareLink() {
   return useQuery(api.queries.listDeckShareLink);
@@ -4047,6 +4215,16 @@ export function useEventSetEventNumber() {
   };
 }
 
+/** Mutation hook for Event.setTravelFee. */
+export function useEventSetTravelFee() {
+  const mutate = useMutation(api.mutations.Event_setTravelFee);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventSetTravelFeeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Event.stageClientMerge. */
 export function useEventStageClientMerge() {
   const mutate = useMutation(api.mutations.Event_stageClientMerge);
@@ -4683,6 +4861,16 @@ export function useListEventGuest() {
 /** Reactive get-by-id for EventGuest. Pass "skip" to suspend. */
 export function useGetEventGuest(id: string | "skip") {
   return useQuery(api.queries.getEventGuest, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for EventGuest.assignMeal. */
+export function useEventGuestAssignMeal() {
+  const mutate = useMutation(api.mutations.EventGuest_assignMeal);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventGuestAssignMealParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
 }
 
 /** Mutation hook for EventGuest.assignTable. */
@@ -7232,6 +7420,57 @@ export function useCreateLeadershipItem() {
   };
 }
 
+/** Reactive list for LeftoverDisposition. */
+export function useListLeftoverDisposition() {
+  return useQuery(api.queries.listLeftoverDisposition);
+}
+
+/** Reactive get-by-id for LeftoverDisposition. Pass "skip" to suspend. */
+export function useGetLeftoverDisposition(id: string | "skip") {
+  return useQuery(api.queries.getLeftoverDisposition, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for LeftoverDisposition.record. */
+export function useLeftoverDispositionRecord() {
+  const mutate = useMutation(api.mutations.LeftoverDisposition_record);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeftoverDispositionRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for LeftoverDisposition.remove. */
+export function useLeftoverDispositionRemove() {
+  const mutate = useMutation(api.mutations.LeftoverDisposition_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeftoverDispositionRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for LeftoverDisposition.revise. */
+export function useLeftoverDispositionRevise() {
+  const mutate = useMutation(api.mutations.LeftoverDisposition_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeftoverDispositionReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for LeftoverDisposition.record. */
+export function useCreateLeftoverDisposition() {
+  const mutate = useMutation(api.mutations.LeftoverDisposition_createViaRecord);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = LeftoverDispositionRecordParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for MaterializationReceipt. */
 export function useListMaterializationReceipt() {
   return useQuery(api.queries.listMaterializationReceipt);
@@ -7308,6 +7547,16 @@ export function useMenuSetSeason() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = MenuSetSeasonParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Menu.setService. */
+export function useMenuSetService() {
+  const mutate = useMutation(api.mutations.Menu_setService);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = MenuSetServiceParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -7810,6 +8059,16 @@ export function useOrganizationConfigureBranding() {
   };
 }
 
+/** Mutation hook for Organization.configureContactDetails. */
+export function useOrganizationConfigureContactDetails() {
+  const mutate = useMutation(api.mutations.Organization_configureContactDetails);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationConfigureContactDetailsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Organization.configureEmailSender. */
 export function useOrganizationConfigureEmailSender() {
   const mutate = useMutation(api.mutations.Organization_configureEmailSender);
@@ -7866,6 +8125,16 @@ export function useOrganizationConfigureTimingPolicy() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = OrganizationConfigureTimingPolicyParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Organization.configureTravelFee. */
+export function useOrganizationConfigureTravelFee() {
+  const mutate = useMutation(api.mutations.Organization_configureTravelFee);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationConfigureTravelFeeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -8098,6 +8367,16 @@ export function usePackListResolveAssistance() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = PackListResolveAssistanceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PackList.setBinSheet. */
+export function usePackListSetBinSheet() {
+  const mutate = useMutation(api.mutations.PackList_setBinSheet);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackListSetBinSheetParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -8349,6 +8628,16 @@ export function usePackListItemRestoreImportedAssociation() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = PackListItemRestoreImportedAssociationParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PackListItem.setBin. */
+export function usePackListItemSetBin() {
+  const mutate = useMutation(api.mutations.PackListItem_setBin);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackListItemSetBinParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -10023,6 +10312,16 @@ export function useProposalRefreshFromEvent() {
   };
 }
 
+/** Mutation hook for Proposal.reviseDraft. */
+export function useProposalReviseDraft() {
+  const mutate = useMutation(api.mutations.Proposal_reviseDraft);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalReviseDraftParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Proposal.send. */
 export function useProposalSend() {
   const mutate = useMutation(api.mutations.Proposal_send);
@@ -10385,6 +10684,16 @@ export function usePurchaseNeedMarkOrdered() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = PurchaseNeedMarkOrderedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PurchaseNeed.moveToVendor. */
+export function usePurchaseNeedMoveToVendor() {
+  const mutate = useMutation(api.mutations.PurchaseNeed_moveToVendor);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PurchaseNeedMoveToVendorParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11757,6 +12066,47 @@ export function useCreateSignatureRequest() {
   };
 }
 
+/** Reactive list for SkillLevel. */
+export function useListSkillLevel() {
+  return useQuery(api.queries.listSkillLevel);
+}
+
+/** Reactive get-by-id for SkillLevel. Pass "skip" to suspend. */
+export function useGetSkillLevel(id: string | "skip") {
+  return useQuery(api.queries.getSkillLevel, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for SkillLevel.changeLevel. */
+export function useSkillLevelChangeLevel() {
+  const mutate = useMutation(api.mutations.SkillLevel_changeLevel);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SkillLevelChangeLevelParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for SkillLevel.rate. */
+export function useSkillLevelRate() {
+  const mutate = useMutation(api.mutations.SkillLevel_rate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = SkillLevelRateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for SkillLevel.rate. */
+export function useCreateSkillLevel() {
+  const mutate = useMutation(api.mutations.SkillLevel_createViaRate);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = SkillLevelRateParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for StaffChatReadCursor. */
 export function useListStaffChatReadCursor() {
   return useQuery(api.queries.listStaffChatReadCursor);
@@ -12338,6 +12688,118 @@ export function useCreateSyncError() {
   };
 }
 
+/** Reactive list for Tasting. */
+export function useListTasting() {
+  return useQuery(api.queries.listTasting);
+}
+
+/** Reactive get-by-id for Tasting. Pass "skip" to suspend. */
+export function useGetTasting(id: string | "skip") {
+  return useQuery(api.queries.getTasting, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for Tasting.cancel. */
+export function useTastingCancel() {
+  const mutate = useMutation(api.mutations.Tasting_cancel);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingCancelParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Tasting.markSelectionsApplied. */
+export function useTastingMarkSelectionsApplied() {
+  const mutate = useMutation(api.mutations.Tasting_markSelectionsApplied);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingMarkSelectionsAppliedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Tasting.markTasted. */
+export function useTastingMarkTasted() {
+  const mutate = useMutation(api.mutations.Tasting_markTasted);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingMarkTastedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Tasting.schedule. */
+export function useTastingSchedule() {
+  const mutate = useMutation(api.mutations.Tasting_schedule);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingScheduleParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for Tasting.schedule. */
+export function useCreateTasting() {
+  const mutate = useMutation(api.mutations.Tasting_createViaSchedule);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingScheduleParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for TastingDish. */
+export function useListTastingDish() {
+  return useQuery(api.queries.listTastingDish);
+}
+
+/** Reactive get-by-id for TastingDish. Pass "skip" to suspend. */
+export function useGetTastingDish(id: string | "skip") {
+  return useQuery(api.queries.getTastingDish, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for TastingDish.add. */
+export function useTastingDishAdd() {
+  const mutate = useMutation(api.mutations.TastingDish_add);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingDishAddParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for TastingDish.markOnProposal. */
+export function useTastingDishMarkOnProposal() {
+  const mutate = useMutation(api.mutations.TastingDish_markOnProposal);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingDishMarkOnProposalParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for TastingDish.recordFeedback. */
+export function useTastingDishRecordFeedback() {
+  const mutate = useMutation(api.mutations.TastingDish_recordFeedback);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingDishRecordFeedbackParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for TastingDish.add. */
+export function useCreateTastingDish() {
+  const mutate = useMutation(api.mutations.TastingDish_createViaAdd);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = TastingDishAddParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for TaxRate. */
 export function useListTaxRate() {
   return useQuery(api.queries.listTaxRate);
@@ -12683,12 +13145,83 @@ export function useTrainingModuleRetire() {
   };
 }
 
+/** Mutation hook for TrainingModule.setTrainingDoc. */
+export function useTrainingModuleSetTrainingDoc() {
+  const mutate = useMutation(api.mutations.TrainingModule_setTrainingDoc);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TrainingModuleSetTrainingDocParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Governed creation hook for TrainingModule.define. */
 export function useCreateTrainingModule() {
   const mutate = useMutation(api.mutations.TrainingModule_createViaDefine);
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = TrainingModuleDefineParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for TrainingSignOff. */
+export function useListTrainingSignOff() {
+  return useQuery(api.queries.listTrainingSignOff);
+}
+
+/** Reactive get-by-id for TrainingSignOff. Pass "skip" to suspend. */
+export function useGetTrainingSignOff(id: string | "skip") {
+  return useQuery(api.queries.getTrainingSignOff, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for TrainingSignOff.beginTraining. */
+export function useTrainingSignOffBeginTraining() {
+  const mutate = useMutation(api.mutations.TrainingSignOff_beginTraining);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TrainingSignOffBeginTrainingParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for TrainingSignOff.finishTraining. */
+export function useTrainingSignOffFinishTraining() {
+  const mutate = useMutation(api.mutations.TrainingSignOff_finishTraining);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TrainingSignOffFinishTrainingParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for TrainingSignOff.initialTrainingSteps. */
+export function useTrainingSignOffInitialTrainingSteps() {
+  const mutate = useMutation(api.mutations.TrainingSignOff_initialTrainingSteps);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TrainingSignOffInitialTrainingStepsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for TrainingSignOff.reopenTraining. */
+export function useTrainingSignOffReopenTraining() {
+  const mutate = useMutation(api.mutations.TrainingSignOff_reopenTraining);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TrainingSignOffReopenTrainingParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for TrainingSignOff.beginTraining. */
+export function useCreateTrainingSignOff() {
+  const mutate = useMutation(api.mutations.TrainingSignOff_createViaBeginTraining);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = TrainingSignOffBeginTrainingParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -13697,6 +14230,16 @@ export function useVenueSetGalleryToken() {
   };
 }
 
+/** Mutation hook for Venue.setLogisticsProfile. */
+export function useVenueSetLogisticsProfile() {
+  const mutate = useMutation(api.mutations.Venue_setLogisticsProfile);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VenueSetLogisticsProfileParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Venue.setPartnership. */
 export function useVenueSetPartnership() {
   const mutate = useMutation(api.mutations.Venue_setPartnership);
@@ -14216,4 +14759,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1504 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1561 as const;

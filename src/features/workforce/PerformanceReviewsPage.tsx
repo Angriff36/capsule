@@ -11,6 +11,7 @@ import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import { SearchSelect } from "../../ui/SearchSelect";
 import { useWorkingEventId } from "../events/workingEvent";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
@@ -39,6 +40,7 @@ export function PerformanceReviewsPage() {
   const createReview = useCreatePerformanceReview();
   const [open, setOpen] = useState(false);
   const [personId, setPersonId] = useState("");
+  const authStatus = useAuthStatus();
   const [scorecardId, setScorecardId] = useState("");
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
@@ -173,6 +175,8 @@ export function PerformanceReviewsPage() {
               <SearchSelect
                 name="reviewerId"
                 required
+                // Usually the manager filling it in.
+                defaultValue={authStatus?.personId ?? ""}
                 recentsKey="staff"
                 placeholder="Select reviewer"
                 options={activePeople.map((person) => ({
@@ -199,7 +203,12 @@ export function PerformanceReviewsPage() {
             </label>
             <label className="field-label">
               Review date
-              <BoundedDateInput name="reviewDate" className="input" required />
+              <BoundedDateInput
+                name="reviewDate"
+                className="input"
+                required
+                defaultValue={new Date().toLocaleDateString("en-CA")}
+              />
             </label>
             {DIMENSIONS.map((dimension) => (
               <label key={dimension.key} className="field-label">

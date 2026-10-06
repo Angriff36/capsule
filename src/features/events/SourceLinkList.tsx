@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useSourceLinksByCapsuleId } from "../../lib/sourceProvenance";
 import { importRunDetailPath } from "../admin/import/importRoutes";
 import { isDerivedSourceId } from "../../../convex/lib/importIdentity";
+import { oldStatusWithWord } from "../../../convex/lib/oldSystemEventStage";
 
 export type SourceLink = NonNullable<
   ReturnType<typeof useSourceLinksByCapsuleId>
@@ -158,7 +159,9 @@ export function oldSystemStatus(raw: string | null): string | null {
     const parsed: unknown = JSON.parse(raw);
     if (parsed && typeof parsed === "object" && "rawEventStatus" in parsed) {
       const status = (parsed as { rawEventStatus: unknown }).rawEventStatus;
-      return typeof status === "string" && status.trim() ? status.trim() : null;
+      return typeof status === "string" && status.trim()
+        ? oldStatusWithWord(status.trim())
+        : null;
     }
   } catch {
     return null;

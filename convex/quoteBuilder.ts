@@ -1,3 +1,4 @@
+import { templateForStyle } from "./lib/proposalGenerate";
 import { ConvexError, v } from "convex/values";
 import { api, internal } from "./_generated/api";
 import {
@@ -641,6 +642,26 @@ function quoteLeadNotes(submission: Doc<"quoteSubmissions">): string | null {
  * Each step fails gracefully — a partial conversion still leaves the earlier
  * records and updates the submission with whatever was created.
  */
+/** The company template a new proposal for this event starts from. */
+export const quoteProposalTemplate = internalQuery({
+  args: { eventId: v.id("events") },
+  handler: async (ctx, { eventId }) => {
+    const event = await ctx.db.get(eventId);
+    if (!event || event.deletedAt != null) return null;
+    const template = await templateForStyle(ctx, event);
+    return template
+      ? {
+          defaultTerms: template.defaultTerms ?? null,
+          visibleSections: template.visibleSections ?? null,
+          sectionOrder: template.sectionOrder ?? null,
+          validityDays: template.validityDays ?? null,
+          defaultServiceChargePercent:
+            template.defaultServiceChargePercent ?? null,
+        }
+      : null;
+  },
+});
+
 export const processQuoteSubmission = action({
   args: {
     submissionId: v.id("quoteSubmissions"),
@@ -847,8 +868,12 @@ export const processQuoteSubmission = action({
             api.mutations.Event_createViaPlanEngagement,
             {
               clientId,
-              title: `Quote Request: ${clientName}`,
-              eventType: "Catering Inquiry",
+              // Named for what it is ("Company holiday party - Sarah
+              // Lindqvist"), not for the form it came through.
+              title: submission.occasionText?.trim()
+                ? `${submission.occasionText.trim()} - ${clientName}`
+                : `${clientName} event`,
+              eventType: submission.occasionText?.trim() || "Catering Inquiry",
               startsAt: eventStart,
               endsAt: eventEnd,
               expectedHeadcount: submission.guestCount ?? 0,
@@ -907,12 +932,30 @@ export const processQuoteSubmission = action({
     // Draft proposal — reused from the checkpoint on retry, else created
     // fresh.
     let proposalId: Id<"proposals"> | null = submission.proposalId ?? null;
+    // A website quote starts from the same company template as a proposal
+    // built from the event: its terms, sections, validity and service charge.
+    const template =
+      !proposalId && eventId
+        ? await ctx.runQuery(internal.quoteBuilder.quoteProposalTemplate, {
+            eventId: eventId as Id<"events">,
+          })
+        : null;
+    const proposalCreatedNow = !proposalId;
     if (!proposalId) {
       try {
         if (clientId) {
           const proposalResult = await ctx.runMutation(
             api.mutations.Proposal_createViaDraft,
             {
+              ...(template
+                ? {
+                    terms: template.defaultTerms ?? undefined,
+                    visibleSections: template.visibleSections ?? undefined,
+                    sectionOrder: template.sectionOrder ?? undefined,
+                    expiresAt:
+                      Date.now() + (template.validityDays ?? 14) * 86_400_000,
+                  }
+                : {}),
               clientId,
               title: `Proposal for ${clientName}`,
               eventDate: submission.eventDate ?? Date.now(),
@@ -986,6 +1029,30 @@ export const processQuoteSubmission = action({
       } catch (error) {
         errors.push(
           `menu: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
+    }
+    // The template's service charge, picked menu or not.
+    const serviceRate = proposalCreatedNow
+      ? Number(template?.defaultServiceChargePercent ?? 0)
+      : 0;
+    if (proposalId && serviceRate > 0) {
+      try {
+        await ctx.runMutation(
+          api.lib.proposalPricing.addProposalLineAndRecompute,
+          {
+            proposalId,
+            description: "Service charge",
+            pricingBasis: "percentage",
+            unitPrice: Math.round(serviceRate * 10_000) / 100,
+            quantity: 1,
+            unit: "%",
+            sortOrder: 10_000,
+          },
+        );
+      } catch (error) {
+        errors.push(
+          `service charge: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     }

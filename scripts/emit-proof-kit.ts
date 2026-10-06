@@ -315,6 +315,14 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
     "failed",
   ];
 
+  // The whole-account TPP importer writes historical rows straight to the
+  // tables on purpose: a past event must not replay reactions (2026-10-06).
+  const tppAccountImportException = {
+    pathIncludes: "convex/lib/tppAccountNative.ts",
+    rule: "generated-writes-only",
+    reason: "Whole-account TPP history import (no reactions replayed)",
+  };
+
   const supplyGuard = emitIntegrationGuardConfig(supplyCatalog, {
     featureRoots: ["src/features/inventory"],
     convexLibRoot: "convex/lib",
@@ -338,6 +346,7 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
       "vendorOrders",
       "vendorOrderLines",
     ],
+    exceptions: [tppAccountImportException],
   });
 
   const workforceCatalog = emitCapabilityCatalog(ir, {
@@ -383,6 +392,7 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
       },
     ],
     extraOwnedTables: ["payrollInputs"],
+    exceptions: [tppAccountImportException],
   });
 
   const productionGuard = emitIntegrationGuardConfig(productionCatalog, {
@@ -439,6 +449,7 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
         ],
       },
     ],
+    exceptions: [tppAccountImportException],
   });
 
   const commercialCatalog = emitCapabilityCatalog(ir, {
@@ -490,6 +501,7 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
         ],
       },
     ],
+    exceptions: [tppAccountImportException],
   });
 
   const closeoutCatalog = emitCapabilityCatalog(ir, {
@@ -574,6 +586,7 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
           ],
         },
       ],
+      exceptions: [tppAccountImportException],
     },
   );
   write("guard.culinary.json", culinaryGuard);
@@ -631,6 +644,7 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
           rule: "generated-writes-only",
           reason: "Culinary planning seam (carried over from the Event guard)",
         },
+        tppAccountImportException,
       ],
     },
   );

@@ -36,6 +36,9 @@ entity Lead mixin TenantScoped, SoftDeletable {
   // A lead with a close date is closed (won or lost); without one it is open.
   property sourceStage: string?
   property eventDate: datetime?
+  // What the caller says first: how many and what kind of event.
+  property guestCount: int?
+  property eventType: string?
   property closedAt: datetime?
   // A client merge moves the lead to the client kept (PL-SOURCE-MERGE).
   property clientMergeAuthorizationId: uuid?
@@ -72,7 +75,9 @@ entity Lead mixin TenantScoped, SoftDeletable {
     optional phone: string,
     optional probability: number,
     optional notes: string,
-    optional eventDate: datetime
+    optional eventDate: datetime,
+    optional guestCount: number,
+    optional eventType: string
   ) {
     guard self.capturedAt == null
     guard self.deletedAt == null
@@ -93,6 +98,8 @@ entity Lead mixin TenantScoped, SoftDeletable {
     mutate probability = probability != null ? probability : 10
     mutate notes = notes
     mutate eventDate = eventDate
+    mutate guestCount = guestCount
+    mutate eventType = eventType
     mutate capturedAt = now()
     emit LeadCaptured {
       leadId: self.id
@@ -112,7 +119,10 @@ entity Lead mixin TenantScoped, SoftDeletable {
     optional familyName: string,
     optional email: string,
     optional phone: string,
-    optional notes: string
+    optional notes: string,
+    optional eventDate: datetime,
+    optional guestCount: number,
+    optional eventType: string
   ) {
     guard self.capturedAt != null
     guard self.deletedAt == null
@@ -127,6 +137,10 @@ entity Lead mixin TenantScoped, SoftDeletable {
     mutate source = source
     mutate referralSourceId = referralSourceId
     mutate notes = notes
+    // The event date moves as the conversation does; left out, it stays.
+    mutate eventDate = eventDate != null ? eventDate : self.eventDate
+    mutate guestCount = guestCount != null ? guestCount : self.guestCount
+    mutate eventType = eventType != null ? eventType : self.eventType
     emit LeadDetailsRevised {
       leadId: self.id
       tenantId: self.tenantId

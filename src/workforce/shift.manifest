@@ -458,7 +458,9 @@ entity WeeklyScheduleNotice mixin TenantScoped, SoftDeletable {
     guard self.acknowledgedAt == null
     guard self.deletedAt == null
     guard user.id != null
-    guard self.personId == user.personId or (user.personId == null and self.recipientAuthSubjectId != null and self.recipientAuthSubjectId == user.id)
+    // The login the schedule was sent to may acknowledge it, even when that
+    // login is linked through another staff record of the same person.
+    guard self.personId == user.personId or (self.recipientAuthSubjectId != null and self.recipientAuthSubjectId == user.id)
     mutate acknowledgedAt = now()
     emit WeeklyScheduleAcknowledged {
       noticeId: self.id

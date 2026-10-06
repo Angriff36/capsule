@@ -217,14 +217,14 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
   - effects: LeadProposalLinked
   - refresh: live reads update by themselves; reads affected: Lead.list, Lead.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 14 more
 - `mutations.Lead_createViaCapture` (Lead.capture)
-  - inputs from the screen: leadType, source, referralSourceId, estimatedValue, companyName, givenName, familyName, email, phone, probability, notes, eventDate; filled by the server: none
+  - inputs from the screen: leadType, source, referralSourceId, estimatedValue, companyName, givenName, familyName, email, phone, probability, notes, eventDate, guestCount, eventType; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Sales staff may see leads"; "Sales staff may update leads"; "Sales staff may change leads"; "Guard 0 failed"; "Guard 1 failed"; "Give a company name for a company lead, or a given name for a person lead"; and 3 more
   - effects: LeadCaptured
   - refresh: live reads update by themselves; reads affected: Lead.list, Lead.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 14 more
 - `mutations.Lead_reviseDetails` (Lead.reviseDetails)
-  - inputs from the screen: leadType, source, referralSourceId, companyName, givenName, familyName, email, phone, notes; filled by the server: none
+  - inputs from the screen: leadType, source, referralSourceId, companyName, givenName, familyName, email, phone, notes, eventDate, guestCount, eventType; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Sales staff may see leads"; "Sales staff may update leads"; "Sales staff may change leads"; "Guard 0 failed"; "Guard 1 failed"; "Give a company name for a company lead, or a given name for a person lead"; and 3 more
@@ -349,7 +349,7 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 
 ## 2. Proposal
 
-Screens (32): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposalSourceCard.tsx`, `clients/ProposalAcceptancePage.tsx`, `clients/ProposalBrandRow.tsx`, `clients/ProposalChangeAction.tsx`, `clients/ProposalChangeLabel.tsx`, `clients/ProposalCreateForm.tsx`, `clients/ProposalDraftCheck.tsx`, `clients/ProposalEmailHistory.tsx`, `clients/ProposalEnhancementsPanel.tsx`, `clients/ProposalHistoricalAcceptance.tsx`, `clients/ProposalMenuSelectionPanel.tsx`, `clients/proposalPdf.ts`, `clients/proposalPdfProjection.ts`, `clients/ProposalPricingPanel.tsx`, `clients/ProposalReadinessNotice.tsx`, `clients/proposalSignatureRequest.ts`, `clients/ProposalsPage.tsx`, `clients/proposalTemplateDefaults.ts`, `clients/ProposalTemplateServiceStyleField.tsx`, `clients/ProposalTemplatesPage.tsx`, `clients/ProposalTravelFee.tsx`, `clients/SharedProposalPage.tsx`, `clients/useCatalogDishes.ts`, `clients/useCreateEventFromProposal.ts`, `clients/useSendProposalWithRevisionCapture.ts`, `clients/useStartProposalChange.ts`, `sales/ProposalSignatureRevokeAction.tsx`, `sales/PublicMenuPage.tsx`, `sales/QuoteEstimatePanel.tsx`, `sales/QuoteMenuChoice.tsx`, `sales/QuoteRequestPicks.tsx`
+Screens (33): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposalSourceCard.tsx`, `clients/ProposalAcceptancePage.tsx`, `clients/ProposalBrandRow.tsx`, `clients/ProposalChangeAction.tsx`, `clients/ProposalChangeLabel.tsx`, `clients/ProposalCreateForm.tsx`, `clients/ProposalDraftCheck.tsx`, `clients/ProposalEmailHistory.tsx`, `clients/ProposalEnhancementsPanel.tsx`, `clients/ProposalHistoricalAcceptance.tsx`, `clients/ProposalMenuSelectionPanel.tsx`, `clients/proposalPdf.ts`, `clients/proposalPdfProjection.ts`, `clients/ProposalPricingPanel.tsx`, `clients/ProposalReadinessNotice.tsx`, `clients/proposalSignatureRequest.ts`, `clients/ProposalsPage.tsx`, `clients/proposalTemplateDefaults.ts`, `clients/ProposalTemplateServiceStyleField.tsx`, `clients/ProposalTemplatesPage.tsx`, `clients/ProposalTermsPanel.tsx`, `clients/ProposalTravelFee.tsx`, `clients/SharedProposalPage.tsx`, `clients/useCatalogDishes.ts`, `clients/useCreateEventFromProposal.ts`, `clients/useSendProposalWithRevisionCapture.ts`, `clients/useStartProposalChange.ts`, `sales/ProposalSignatureRevokeAction.tsx`, `sales/PublicMenuPage.tsx`, `sales/QuoteEstimatePanel.tsx`, `sales/QuoteMenuChoice.tsx`, `sales/QuoteRequestPicks.tsx`
 
 ### Generated reads
 
@@ -477,6 +477,13 @@ Screens (32): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: ProposalViewed
+  - refresh: live reads update by themselves; reads affected: Proposal.list, Proposal.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 18 more
+- `mutations.Proposal_reviseDraft` (Proposal.reviseDraft)
+  - inputs from the screen: title, terms, notes, expiresAt; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: ProposalDraftRevised
   - refresh: live reads update by themselves; reads affected: Proposal.list, Proposal.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 18 more
 - `mutations.ShareLink_create` (ShareLink.create)
   - inputs from the screen: proposalId, proposalRevisionId, expiresAt; filled by the server: none
@@ -3683,7 +3690,7 @@ Screens (30): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
   - effects: PackListPackingStarted
   - refresh: live reads update by themselves; reads affected: PackList.list, PackList.get, Delivery.list, Delivery.get, DepartureOverride.list, DepartureOverride.get, Event.list, Event.get and 6 more
 - `mutations.PackRule_createViaDefine` (PackRule.define)
-  - inputs from the screen: trigger, description, category, dishId, serviceStyleId, matchFact, matchText, unit, baseQuantity, scaleBy, perUnits, sparePercent, ownership, returnRequired, returnNote, requiredCapability, note; filled by the server: none
+  - inputs from the screen: trigger, description, category, dishId, serviceStyleId, matchFact, matchText, unit, baseQuantity, scaleBy, perUnits, quantityPerUnit, aggregateDishQuantity, sparePercent, ownership, returnRequired, returnNote, requiredCapability, note; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Staff may see pack rules"; "Event managers, logistics staff and managers may update pack rules"; "Event managers, logistics staff and managers may change pack rules"; "Guard 0 failed"; "Guard 1 failed"; "Say what goes on the pack list."
@@ -3704,7 +3711,7 @@ Screens (30): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
   - effects: PackRuleRetired
   - refresh: live reads update by themselves; reads affected: PackRule.list, PackRule.get, Dish.list, Dish.get, ServiceStyle.list, ServiceStyle.get
 - `mutations.PackRule_revise` (PackRule.revise)
-  - inputs from the screen: description, category, dishId, serviceStyleId, matchFact, matchText, unit, baseQuantity, scaleBy, perUnits, sparePercent, ownership, returnRequired, returnNote, requiredCapability, note; filled by the server: none
+  - inputs from the screen: description, category, dishId, serviceStyleId, matchFact, matchText, unit, baseQuantity, scaleBy, perUnits, quantityPerUnit, aggregateDishQuantity, sparePercent, ownership, returnRequired, returnNote, requiredCapability, note; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see pack rules"; "Event managers, logistics staff and managers may update pack rules"; "Event managers, logistics staff and managers may change pack rules"; "Guard 0 failed"; "Guard 1 failed"; "Say what goes on the pack list."; and 2 more

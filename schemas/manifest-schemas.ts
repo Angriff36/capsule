@@ -2414,6 +2414,8 @@ export const LeadSchema = z.object({
   proposalLinkedAt: z.coerce.date().nullable().optional(),
   sourceStage: z.string().nullable().optional(),
   eventDate: z.coerce.date().nullable().optional(),
+  guestCount: z.number().int().nullable().optional(),
+  eventType: z.string().nullable().optional(),
   closedAt: z.coerce.date().nullable().optional(),
   clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
   mergeTargetClientId: z.string().uuid().nullable().optional(),
@@ -9324,6 +9326,8 @@ export const LeadCaptureParamsSchema = z.object({
   probability: z.number().optional(),
   notes: z.string().optional(),
   eventDate: z.coerce.date().optional(),
+  guestCount: z.number().optional(),
+  eventType: z.string().optional(),
 });
 
 export type LeadCaptureParams = z.infer<typeof LeadCaptureParamsSchema>;
@@ -9364,6 +9368,9 @@ export const LeadReviseDetailsParamsSchema = z.object({
   email: z.string().optional(),
   phone: z.string().optional(),
   notes: z.string().optional(),
+  eventDate: z.coerce.date().optional(),
+  guestCount: z.number().optional(),
+  eventType: z.string().optional(),
 });
 
 export type LeadReviseDetailsParams = z.infer<typeof LeadReviseDetailsParamsSchema>;
@@ -11285,6 +11292,16 @@ export const ProposalRefreshFromEventParamsSchema = z.object({
 });
 
 export type ProposalRefreshFromEventParams = z.infer<typeof ProposalRefreshFromEventParamsSchema>;
+
+// Command: reviseDraft on Proposal
+export const ProposalReviseDraftParamsSchema = z.object({
+  title: z.string(),
+  terms: z.string().optional(),
+  notes: z.string().optional(),
+  expiresAt: z.coerce.date().optional(),
+});
+
+export type ProposalReviseDraftParams = z.infer<typeof ProposalReviseDraftParamsSchema>;
 
 // Command: send on Proposal
 export const ProposalSendParamsSchema = z.object({});

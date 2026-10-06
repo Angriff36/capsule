@@ -2254,6 +2254,8 @@ export default defineSchema({
     proposalLinkedAt: v.optional(v.union(v.number(), v.null())),
     sourceStage: v.optional(v.union(v.string(), v.null())),
     eventDate: v.optional(v.union(v.number(), v.null())),
+    guestCount: v.optional(v.union(v.number(), v.null())),
+    eventType: v.optional(v.union(v.string(), v.null())),
     closedAt: v.optional(v.union(v.number(), v.null())),
     clientMergeAuthorizationId: v.optional(v.union(v.id("clientMerges"), v.null())),
     mergeTargetClientId: v.optional(v.union(v.id("clients"), v.null())),

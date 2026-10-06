@@ -23,8 +23,8 @@ entity TppUpload mixin TenantScoped, SoftDeletable {
   property processorLeaseUntil: datetime?
   property processingError: string?
   default policy uploadRead read: false "Use the organization-scoped TPP import page."
-  default policy uploadWrite write: false "Use the TPP upload seam."
-  default policy uploadExecute execute: false "Use the TPP upload seam."
+  default policy uploadWrite write: false "Use the TPP import page."
+  default policy uploadExecute execute: false "Use the TPP import page."
   store TppUpload in durable
 }
 
@@ -43,7 +43,7 @@ entity TppUploadPart mixin TenantScoped, SoftDeletable {
   // Absent on old receipts = already imported.
   property status: string?
   default policy partRead read: false "Use the organization-scoped TPP import page."
-  default policy partWrite write: false "Use the TPP upload seam."
-  default policy partExecute execute: false "Use the TPP upload seam."
+  default policy partWrite write: false "Use the TPP import page."
+  default policy partExecute execute: false "Use the TPP import page."
   store TppUploadPart in durable
 }

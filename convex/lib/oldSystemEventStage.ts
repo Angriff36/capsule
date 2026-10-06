@@ -15,10 +15,30 @@ export const OLD_SYSTEM_LOST_REASON = "Quote lost in the old system";
 export const OLD_SYSTEM_UNBOOKED_REASON =
   "Quote not booked in the old system before its date";
 
-/** "3- Final" -> "final", "QUOTE (LOST)" -> "quote (lost)". */
+/**
+ * The 27-column TPP event export prints the status as a bare code in "Event
+ * Status" (its words are in "Event Status Name"). Codes word for word from the
+ * data map (work/tpp-capsule-data-map.md field 16).
+ */
+export const OLD_SYSTEM_STATUS_CODES: Record<string, string> = {
+  "0": "Quote",
+  "00": "Closed",
+  "1": "Confirmed",
+  "2": "Sales Lock",
+  "3": "Final",
+  "9": "Cancelled",
+};
+
+/** "3" -> "3 (Final)"; any other status as written. */
+export function oldStatusWithWord(rawStatus: string): string {
+  const word = OLD_SYSTEM_STATUS_CODES[rawStatus.trim()];
+  return word ? `${rawStatus.trim()} (${word})` : rawStatus;
+}
+
+/** "3- Final" -> "final", "3" -> "final", "QUOTE (LOST)" -> "quote (lost)". */
 export function plainOldStatus(rawStatus: string | null | undefined): string {
-  return (rawStatus ?? "")
-    .trim()
+  const trimmed = (rawStatus ?? "").trim();
+  return (OLD_SYSTEM_STATUS_CODES[trimmed] ?? trimmed)
     .toLowerCase()
     .replace(/^\d+\s*-\s*/, "")
     .replace(/\s+/g, " ");

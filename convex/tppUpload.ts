@@ -31,10 +31,15 @@ async function access(ctx: Pick<QueryCtx, "auth" | "db">, tenantId?: string) {
     throw new ConvexError("Only organization managers can import TPP data.");
   return auth;
 }
+// One answer for "missing" and "another organization's import", so a caller
+// cannot learn that an import exists elsewhere.
+const NOT_FOUND =
+  "Import not found in this organization. If you switched organizations, switch back to the one where this import started.";
 async function own(ctx: QueryCtx | MutationCtx, id: Id<"tppUploads">) {
+  const auth = await access(ctx);
   const job = await ctx.db.get(id);
-  if (!job || job.deletedAt != null) throw new ConvexError("Import not found.");
-  await access(ctx, job.tenantId);
+  if (!job || job.deletedAt != null || job.tenantId !== auth.tenantId)
+    throw new ConvexError(NOT_FOUND);
   return job;
 }
 export const start = mutation({
@@ -136,8 +141,10 @@ export const parts = query({
 export const sourceUrl = query({
   args: { partId: v.id("tppUploadParts") },
   handler: async (ctx, args) => {
+    const auth = await access(ctx);
     const part = await ctx.db.get(args.partId);
-    if (!part) throw new ConvexError("Source part not found.");
+    if (!part || part.tenantId !== auth.tenantId)
+      throw new ConvexError(NOT_FOUND);
     await own(ctx, part.uploadId as Id<"tppUploads">);
     return ctx.storage.getUrl(part.storageId as Id<"_storage">);
   },

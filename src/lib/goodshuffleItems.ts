@@ -105,7 +105,7 @@ export const GOODSHUFFLE_COLUMNS: ReadonlyArray<{
   },
   {
     column:
-      "Mileage Rate / Percent of Line Item Group / Percent of Order / Minimum Fee / Hourly rates",
+      "Mileage Rate / Percent of Line Item Group / Percent of Order / Minimum Fee / (Hourly) Min. Rental Period / (Hourly) Base Rate / (Hourly) Additional Hour Rate",
     goesTo: "not kept",
     note: "pricing rules of charge rows (damage waiver, delivery), not item facts",
   },

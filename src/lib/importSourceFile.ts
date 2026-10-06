@@ -51,6 +51,18 @@ const EVENT_ALIASES: Record<string, string> = {
   venuestate: "LocationState",
 };
 
+/**
+ * AC-057: printed headings of the real TPP Address / Phone List that have no
+ * field, and why each one stays with the row on the import link as written.
+ */
+export const TPP_ADDRESS_LIST_KEPT: Readonly<Record<string, string>> = {
+  Type: "The old client group (Social, Corporate); Capsule tells a person from a company by the row itself.",
+  Inactive:
+    "Every imported client starts active; the old flag stays on the import.",
+  Account:
+    "The old account number (on 680 of 3,314 rows); no other file uses it, so it never joins two people.",
+};
+
 const key = (heading: string) =>
   heading.toLowerCase().replace(/[^a-z0-9]/g, "");
 
