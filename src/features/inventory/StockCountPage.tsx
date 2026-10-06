@@ -560,7 +560,7 @@ export function StockCountPage() {
                   <span className="stock-count-session-meter">
                     <i
                       style={{
-                        width: `${session.lineCount === 0 ? 100 : Math.min(100, (done / session.lineCount) * 100)}%`,
+                        width: `${session.lineCount === 0 ? 0 : Math.min(100, (done / session.lineCount) * 100)}%`,
                       }}
                     />
                   </span>
