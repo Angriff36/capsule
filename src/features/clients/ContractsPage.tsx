@@ -79,8 +79,11 @@ export function ContractsPage() {
     const form = event.currentTarget;
     const data = new FormData(form);
     const eventId = String(data.get("eventId") || "").trim();
-    const title = String(data.get("title") || "").trim();
     const eventRow = events?.find((row) => row._id === eventId);
+    // Left blank, the title is the usual one for that event.
+    const title =
+      String(data.get("title") || "").trim() ||
+      (eventRow?.title ? `Catering agreement - ${eventRow.title}` : "");
     // The contract is with the event's own client; asking again only let
     // someone pick a different one and be refused.
     const clientId = String(eventRow?.clientId ?? "");
@@ -251,7 +254,10 @@ export function ContractsPage() {
               </label>
               <label>
                 Title
-                <input name="title" required />
+                <input
+                  name="title"
+                  placeholder="Catering agreement - (event name)"
+                />
               </label>
               <label>
                 Document URL

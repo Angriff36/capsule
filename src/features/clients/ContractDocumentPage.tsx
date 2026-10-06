@@ -4,6 +4,8 @@ import {
   useGetClient,
   useGetContract,
   useGetEvent,
+  useGetVenue,
+  useListProposal,
 } from "../../lib/manifest-convex-react";
 import { formatDate, formatMoney, formatTime } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
@@ -90,6 +92,20 @@ export function ContractDocumentPage() {
   const client = useGetClient(
     contract?.clientId ? String(contract.clientId) : "skip",
   );
+  const venue = useGetVenue(event?.venueId ? String(event.venueId) : "skip");
+  // The client already agreed to these in the proposal; the contract repeats
+  // them rather than printing different money terms.
+  const proposals = useListProposal();
+  const acceptedTerms = (proposals ?? [])
+    .filter(
+      (row) =>
+        event != null &&
+        String(row.eventId ?? "") === String(event._id) &&
+        String(row.status) === "accepted" &&
+        row.deletedAt == null,
+    )
+    .sort((a, b) => Number(b.acceptedAt ?? 0) - Number(a.acceptedAt ?? 0))[0]
+    ?.terms?.trim();
 
   if (!id) {
     return (
@@ -259,7 +275,13 @@ export function ContractDocumentPage() {
                   <Row
                     label="Venue"
                     value={
-                      [event.venueName, event.venueAddress]
+                      [
+                        event.venueName ?? venue?.name,
+                        event.venueAddress ??
+                          [venue?.addressLine1, venue?.city]
+                            .filter(Boolean)
+                            .join(", "),
+                      ]
                         .filter(Boolean)
                         .join(", ") || "—"
                     }
@@ -300,9 +322,11 @@ export function ContractDocumentPage() {
               <Row
                 label="Payment terms"
                 value={
-                  client
-                    ? `Net ${Number(client.paymentTermsDays ?? 30)} days from invoice`
-                    : "—"
+                  acceptedTerms
+                    ? "As agreed in the accepted proposal (see Terms)"
+                    : client
+                      ? `Net ${Number(client.paymentTermsDays ?? 30)} days from invoice`
+                      : "—"
                 }
               />
               {client?.taxExempt ? (
@@ -315,9 +339,12 @@ export function ContractDocumentPage() {
             </Section>
 
             <Section label="Terms">
+              {acceptedTerms ? (
+                <p className="mb-2 whitespace-pre-wrap">{acceptedTerms}</p>
+              ) : null}
               {contract.notes ? (
                 <p className="whitespace-pre-wrap">{String(contract.notes)}</p>
-              ) : (
+              ) : acceptedTerms ? null : (
                 <p className="text-ink-2">No extra terms on this contract.</p>
               )}
               {contract.expiresAt != null ? (
@@ -333,17 +360,19 @@ export function ContractDocumentPage() {
               ) : null}
             </Section>
 
-            <Section label="If you cancel">
-              <p>
-                Either party may cancel with written notice. Cancellations more
-                than 30 days before the event date incur no charge beyond
-                non-recoverable costs already committed. Cancellations within 30
-                days of the event are billed for committed costs and up to 50%
-                of the quoted price; within 7 days, up to the full quoted price.
-                Rescheduling by mutual agreement replaces cancellation charges
-                where feasible.
-              </p>
-            </Section>
+            {acceptedTerms ? null : (
+              <Section label="If you cancel">
+                <p>
+                  Either party may cancel with written notice. Cancellations
+                  more than 30 days before the event date incur no charge beyond
+                  non-recoverable costs already committed. Cancellations within
+                  30 days of the event are billed for committed costs and up to
+                  50% of the quoted price; within 7 days, up to the full quoted
+                  price. Rescheduling by mutual agreement replaces cancellation
+                  charges where feasible.
+                </p>
+              </Section>
+            )}
 
             <Section label="Signatures">
               <p className="text-ink-2">
