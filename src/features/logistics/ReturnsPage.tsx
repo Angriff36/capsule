@@ -1,7 +1,8 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import {
+  useCreateEquipmentIssue,
   useListEquipment,
   useListEquipmentIssue,
   useListEquipmentReservation,
@@ -10,6 +11,8 @@ import {
   useListPerson,
 } from "../../lib/manifest-convex-react";
 import { EmptyState, PageHeader, TableSkeleton } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
+import { useActionFailure } from "../../ui/action-result/useActionNotice";
 import { eventDetailPath } from "../events/eventRoutes";
 import { useEventsById } from "../facilities/useEventsById";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
@@ -49,6 +52,10 @@ export function ReturnsPage() {
   const reservations = useListEquipmentReservation();
   const equipment = useListEquipment();
   const issues = useListEquipmentIssue();
+  const raise = useCreateEquipmentIssue();
+  const { prompt, host } = useActionPrompt();
+  const { error, setError } = useActionFailure();
+  const [sending, setSending] = useState<string | null>(null);
   // Only events with a dispatched load, a checked-out hold or an issue show.
   const events = useEventsById(
     packLists && reservations && issues
@@ -146,6 +153,80 @@ export function ReturnsPage() {
   );
   const problemCount = lineProblems.length + openIssues.length;
 
+  // A broken or lost return goes on the repair list (and the bell) as an
+  // equipment problem. A pack line does not name the catalog item, so the
+  // closest name match is picked first.
+  const repairDescription = (line: (typeof lineProblems)[number]["line"]) =>
+    line.returnFinding?.trim() ||
+    (Number(line.damagedQuantity ?? 0) > 0
+      ? "Came back broken"
+      : "Lost at the event");
+  const alreadySent = (
+    line: (typeof lineProblems)[number]["line"],
+    eventId: string,
+  ) =>
+    (issues ?? []).some(
+      (issue) =>
+        issue.deletedAt == null &&
+        issue.eventId === eventId &&
+        issue.description === repairDescription(line),
+    );
+  const sendToRepairs = async (
+    line: (typeof lineProblems)[number]["line"],
+    eventId: string,
+  ) => {
+    const words = String(line.description)
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter((word) => word.length > 3)
+      .map((word) => word.replace(/e?s$/, ""));
+    const choices = (equipment ?? [])
+      .filter((row) => row.deletedAt == null)
+      .map((row) => ({
+        row,
+        score: words.filter((word) => row.name.toLowerCase().includes(word))
+          .length,
+      }))
+      .sort(
+        (a, b) => b.score - a.score || a.row.name.localeCompare(b.row.name),
+      );
+    const broken = Number(line.damagedQuantity ?? 0);
+    const lost = Number(line.lostQuantity ?? 0);
+    const values = await prompt.askFields({
+      title: `Send ${line.description} to repairs?`,
+      description: "It goes on the equipment problem list and tells the team.",
+      fields: [
+        {
+          name: "equipmentId",
+          label: "Which item",
+          options: choices.map(({ row }) => ({
+            value: row._id,
+            label: row.assetTag ? `${row.name} · ${row.assetTag}` : row.name,
+          })),
+          defaultValue: choices[0]?.row._id ?? "",
+        },
+      ],
+      confirmLabel: "Send to repairs",
+    });
+    if (!values) return;
+    setError(null);
+    setSending(line._id);
+    try {
+      await raise({
+        kind: broken > 0 ? "damaged" : "missing",
+        equipmentId: values.equipmentId,
+        eventId,
+        description: repairDescription(line),
+        quantity: Math.max(1, Math.ceil(broken > 0 ? broken : lost)),
+        holdsUnits: true,
+      });
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : String(failure));
+    } finally {
+      setSending(null);
+    }
+  };
+
   return (
     <div className="operations-stage supply-stage">
       <PageHeader
@@ -226,7 +307,19 @@ export function ReturnsPage() {
                         .join(" · ")}
                     </td>
                     <td>{personName(line.returnCountedByPersonId) || "—"}</td>
-                    <td>
+                    <td className="whitespace-nowrap">
+                      {alreadySent(line, event._id) ? null : (
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm mr-2"
+                          disabled={sending != null}
+                          onClick={() => void sendToRepairs(line, event._id)}
+                        >
+                          {sending === line._id
+                            ? "Sending…"
+                            : "Send to repairs"}
+                        </button>
+                      )}
                       <Link
                         className="btn btn-ghost btn-sm"
                         to={`/logistics/packs/${line.packListId}?view=returns`}
@@ -394,6 +487,12 @@ export function ReturnsPage() {
           )}
         </ul>
       )}
+      {error ? (
+        <p className="text-sm text-danger" role="alert">
+          {error}
+        </p>
+      ) : null}
+      {host}
     </div>
   );
 }
