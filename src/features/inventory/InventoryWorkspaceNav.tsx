@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 const sections = [
   { label: "Demand", path: "/inventory/demand" },
@@ -14,6 +14,8 @@ const sections = [
 ] as const;
 
 export function InventoryWorkspaceNav() {
+  // Vendor order pages live under /inventory/orders but belong to Purchasing.
+  const onOrders = useLocation().pathname.startsWith("/inventory/orders");
   return (
     <nav
       className="component-status-tabs supply-tabs"
@@ -23,7 +25,11 @@ export function InventoryWorkspaceNav() {
         <NavLink
           key={section.path}
           to={section.path}
-          className={({ isActive }) => (isActive ? "active" : undefined)}
+          className={({ isActive }) =>
+            isActive || (onOrders && section.path === "/inventory/purchasing")
+              ? "active"
+              : undefined
+          }
         >
           {section.label}
         </NavLink>
