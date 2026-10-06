@@ -518,23 +518,34 @@ export function RevenueAttributionDetailPage() {
                 disabled={!canEdit}
               >
                 <option value="">Select salesperson…</option>
-                {activePeople
-                  .filter(
-                    (p) =>
-                      p.role === "sales_staff" ||
-                      p.role === "sales_manager" ||
-                      p.role === "owner",
-                  )
-                  .sort((a, b) =>
-                    `${a.givenName} ${a.familyName}`.localeCompare(
-                      `${b.givenName} ${b.familyName}`,
-                    ),
-                  )
-                  .map((person) => (
-                    <option key={person._id} value={person._id}>
-                      {person.givenName} {person.familyName}
-                    </option>
-                  ))}
+                {/* Sales roles first; anyone may have sold it (an owner or
+                    manager often does), so everyone else follows. */}
+                {[true, false].map((sales) => {
+                  const group = activePeople
+                    .filter(
+                      (p) =>
+                        (p.role === "sales_staff" ||
+                          p.role === "sales_manager" ||
+                          p.role === "owner") === sales,
+                    )
+                    .sort((a, b) =>
+                      `${a.givenName} ${a.familyName}`.localeCompare(
+                        `${b.givenName} ${b.familyName}`,
+                      ),
+                    );
+                  return group.length === 0 ? null : (
+                    <optgroup
+                      key={String(sales)}
+                      label={sales ? "Sales" : "Other staff"}
+                    >
+                      {group.map((person) => (
+                        <option key={person._id} value={person._id}>
+                          {person.givenName} {person.familyName}
+                        </option>
+                      ))}
+                    </optgroup>
+                  );
+                })}
               </select>
             </label>
           )}
