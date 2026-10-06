@@ -287,8 +287,13 @@ export interface OpeningStockCatalog {
   mappings: ItemUnitMappingLike[];
 }
 
+// Commas, dashes and other marks do not change a name: "Olive Oil Extra
+// Virgin" on a sheet is "Olive Oil, Extra Virgin" in the catalog.
 const nameKey = (value: string) =>
-  value.trim().toLowerCase().replace(/\s+/g, " ");
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 
 const findByName = <T extends CatalogNamed>(list: T[], name: string) => {
   const key = nameKey(name);

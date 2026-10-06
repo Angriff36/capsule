@@ -22,6 +22,7 @@ function sheetRows(text: string): Record<string, string>[] {
 export function OpeningStockImport() {
   const importFile = useImportStockFile();
   const [countDate, setCountDate] = useState("");
+  const [allCounted, setAllCounted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +43,11 @@ export function OpeningStockImport() {
           read && !read.asOfText && countDate
             ? { ...row, "As of": countDate }
             : row;
-        return { ...withDate, SourceFile: file.name };
+        const withCount =
+          read && !read.countStateText && allCounted
+            ? { ...withDate, Counted: "counted" }
+            : withDate;
+        return { ...withCount, SourceFile: file.name };
       });
       for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
         const part = rows.slice(i, i + CHUNK_SIZE);
@@ -100,6 +105,15 @@ export function OpeningStockImport() {
             onChange={(event) => setCountDate(event.target.value)}
             disabled={busy}
           />
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={allCounted}
+            onChange={(event) => setAllCounted(event.target.checked)}
+            disabled={busy}
+          />
+          Every row on this sheet was counted by hand
         </label>
         <label className="field-label max-w-full min-w-0">
           Count sheet
