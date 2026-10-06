@@ -63,8 +63,9 @@ export function rentalReportRows(
     [
       "Our equipment in use",
       report.averageUse == null ? "No owned items" : percent(report.averageUse),
-      report.busiest.length > 0
+      report.busiest.some((row) => row.share > 0)
         ? `Busiest: ${report.busiest
+            .filter((row) => row.share > 0)
             .slice(0, 3)
             .map((row) => `${row.name} ${percent(row.share)}`)
             .join(", ")}`

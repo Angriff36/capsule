@@ -79,9 +79,16 @@ export function StaffOverviewPage() {
     (request) =>
       request.deletedAt == null && request.status === "awaiting_manager",
   );
+  // Only events still ahead: asking someone to confirm a past event is noise.
+  const eventEnd = (eventId: string) => {
+    const event = events?.find((row) => String(row._id) === String(eventId));
+    return Number(event?.endsAt ?? event?.startsAt ?? Infinity);
+  };
   const unconfirmedAssignments = (assignments ?? []).filter(
     (assignment) =>
-      assignment.deletedAt == null && assignment.status === "assigned",
+      assignment.deletedAt == null &&
+      assignment.status === "assigned" &&
+      eventEnd(assignment.eventId) >= now,
   );
 
   const attentionRows: AttentionRow[] = [

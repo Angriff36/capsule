@@ -78,7 +78,14 @@ export function LogisticsOverviewPage() {
 
   const attention: AttentionRow[] = [];
   for (const row of liveDeliveries) {
-    if (String(row.status) === "scheduled" && row.driverId == null) {
+    // A delivery whose window already closed cannot get a driver now.
+    const windowOpen =
+      Number(row.windowEndsAt ?? row.windowStartsAt ?? Infinity) >= now;
+    if (
+      String(row.status) === "scheduled" &&
+      row.driverId == null &&
+      windowOpen
+    ) {
       attention.push({
         key: `driver-${row._id}`,
         title: row.destination,
