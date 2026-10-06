@@ -53,6 +53,7 @@ import {
 } from "./ProposalHistoricalAcceptance";
 import { ProposalCreateForm } from "./ProposalCreateForm";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
+import { ProposalTermsPanel } from "./ProposalTermsPanel";
 import { ProposalReadinessNotice } from "./ProposalReadinessNotice";
 import {
   ProposalDraftCheck,
@@ -1167,6 +1168,12 @@ export function ProposalsPage() {
                             discountAmount={Number(row.discountAmount ?? 0)}
                             editable={String(row.status) === "draft"}
                             onFailure={setFailure}
+                          />
+                          <ProposalTermsPanel
+                            proposal={row}
+                            editable={String(row.status) === "draft"}
+                            onFailure={setFailure}
+                            onNotice={setNotice}
                           />
                         </td>
                       </tr>

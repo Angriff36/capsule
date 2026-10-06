@@ -257,6 +257,28 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Words the client reads, settled while the proposal is still a draft.
+  command reviseDraft(
+    title: string,
+    optional terms: string,
+    optional notes: string,
+    optional expiresAt: datetime
+  ) {
+    guard self.status == "draft"
+    guard self.draftedAt != null
+    guard self.deletedAt == null
+    constraint reviseDraftTitle: length(trim(title)) > 0 "Give this proposal a title"
+    mutate title = title
+    mutate terms = terms
+    mutate notes = notes
+    mutate expiresAt = expiresAt
+    emit ProposalDraftRevised {
+      proposalId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
   command send() {
     guard self.status == "draft"
     guard self.draftedAt != null
@@ -519,6 +541,12 @@ event ProposalEventHeadcountFollowed: "proposal.event_headcount_followed" {
   guestCount: number
   previousTotal: money(12, 2)
   total: money(12, 2)
+}
+
+event ProposalDraftRevised: "proposal.draft_revised" {
+  proposalId: string
+  tenantId: string
+  clientId: string
 }
 
 event ProposalRefreshedFromEvent: "proposal.refreshed_from_event" {

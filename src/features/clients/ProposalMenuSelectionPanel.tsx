@@ -87,8 +87,10 @@ export function ProposalMenuSelectionPanel({
     if (linked) coveredDishIds.add(String(linked.dishId));
     const menu = (menus ?? []).find(
       (m) =>
+        // "Fall Harvest Dinner (per guest)" from the event build,
+        // "(per person)" from a website quote.
         String(line.pricingBasis) === "per_person" &&
-        line.description === `${m.name} (per guest)`,
+        line.description.startsWith(`${m.name} (per `),
     );
     if (menu)
       for (const md of menuDishes ?? [])

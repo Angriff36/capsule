@@ -11238,6 +11238,16 @@ export const ProposalRefreshFromEventParamsSchema = z.object({
 
 export type ProposalRefreshFromEventParams = z.infer<typeof ProposalRefreshFromEventParamsSchema>;
 
+// Command: reviseDraft on Proposal
+export const ProposalReviseDraftParamsSchema = z.object({
+  title: z.string(),
+  terms: z.string().optional(),
+  notes: z.string().optional(),
+  expiresAt: z.coerce.date().optional(),
+});
+
+export type ProposalReviseDraftParams = z.infer<typeof ProposalReviseDraftParamsSchema>;
+
 // Command: send on Proposal
 export const ProposalSendParamsSchema = z.object({});
 
