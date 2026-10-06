@@ -61,7 +61,7 @@ export function PackListKitAssistBar({
             disabled={busy != null}
             onClick={onResolveAssistance}
           >
-            {busy === "list:resolveAssistance" ? "Working…" : "Resolved"}
+            {busy === "list:resolveAssistance" ? "Working…" : "Mark resolved"}
           </button>
         </>
       ) : (
@@ -70,8 +70,9 @@ export function PackListKitAssistBar({
           className="btn btn-ghost btn-sm"
           disabled={busy != null}
           onClick={onRequestAssistance}
+          title="Shows this list as Needs assistance on the Event Tracker until someone marks it resolved."
         >
-          Needs assistance
+          Ask for help
         </button>
       )}
     </div>

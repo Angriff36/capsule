@@ -1122,9 +1122,9 @@ export function PackListDetailPage() {
           onRequestAssistance={() =>
             void (async () => {
               const values = await prompt.askFields({
-                title: "Needs assistance",
+                title: "Ask for help",
                 description:
-                  "The Event Tracker shows this list as Needs assistance until someone resolves it.",
+                  "The Event Tracker shows this list as Needs assistance until someone marks it resolved.",
                 confirmLabel: "Ask for help",
                 fields: [
                   {
