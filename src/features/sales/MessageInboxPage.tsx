@@ -344,9 +344,9 @@ export function MessageInboxPage() {
           <p className="eyebrow">Clients · Inbox</p>
           <h1 className="display-title mt-2">Message inbox</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Threaded conversations across email, SMS, social DM, and internal
-            notes — separate from staff direct messages. Linked leads appear
-            alongside each thread.
+            Client conversations by email, text, social media and notes, one
+            thread each. Staff chat stays in Team chat. A lead made from a
+            thread shows next to it.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -452,9 +452,7 @@ export function MessageInboxPage() {
       ) : visibleThreads.length === 0 ? (
         <div className="empty-state">
           <strong>No message threads yet</strong>
-          <span>
-            Open a thread to start, or log an incoming provider message.
-          </span>
+          <span>Start a thread, or paste a message a client sent.</span>
         </div>
       ) : (
         <section
@@ -578,8 +576,8 @@ export function MessageInboxPage() {
                     disabled={!selected.providerThreadId}
                     title={
                       selected.providerThreadId
-                        ? "Log an incoming provider message"
-                        : "Only provider threads (with a provider thread id) can log incoming messages"
+                        ? "Add a message the client sent"
+                        : "Only threads that came in by email, text or social media take incoming messages"
                     }
                   >
                     {showLog ? "Cancel" : "Log incoming message"}
