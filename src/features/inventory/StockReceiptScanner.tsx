@@ -1,3 +1,4 @@
+import { formatQuantity } from "../../lib/format";
 import {
   useCallback,
   useEffect,
@@ -542,8 +543,9 @@ export function StockReceiptScanner({
               <span>Demand context</span>
               <strong>{eventName(selectedDemand.eventId)}</strong>
               <small>
-                {selectedDemand.requiredQuantity} {selectedDemand.unit}{" "}
-                requested · {formatStatusLabel(String(selectedDemand.status))}
+                {formatQuantity(selectedDemand.requiredQuantity)}{" "}
+                {selectedDemand.unit} requested ·{" "}
+                {formatStatusLabel(String(selectedDemand.status))}
               </small>
             </div>
           ) : null}
@@ -566,8 +568,8 @@ export function StockReceiptScanner({
                 {candidateItems.map((item) => (
                   <option key={item._id} value={item._id}>
                     {ingredientName(item.ingredientId)} ·{" "}
-                    {locationName(item.locationId)} · {item.quantityOnHand}{" "}
-                    {item.unit} on hand
+                    {locationName(item.locationId)} ·{" "}
+                    {formatQuantity(item.quantityOnHand)} {item.unit} on hand
                   </option>
                 ))}
               </select>

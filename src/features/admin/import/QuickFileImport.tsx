@@ -168,6 +168,7 @@ export function QuickFileImport() {
         <input
           ref={fileInput}
           type="file"
+          aria-label="File to import"
           accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           onChange={handleFile}
           disabled={busy}

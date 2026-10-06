@@ -23,7 +23,7 @@ import {
   useListStockTransfer,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
-import { formatCountNoun, formatDate } from "../../lib/format";
+import { formatQuantity, formatCountNoun, formatDate } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
@@ -680,7 +680,7 @@ export function StockBookPage() {
                       </td>
                       <td>{locationName(item.locationId)}</td>
                       <td className="supply-number">
-                        {item.quantityOnHand}
+                        {formatQuantity(item.quantityOnHand)}
                         {reservedFor(item._id) > 0
                           ? ` (${availableFor(item)} available)`
                           : ""}
@@ -775,7 +775,9 @@ export function StockBookPage() {
                         <small>{unitFor(item)}</small>
                       </td>
                       <td>{locationName(item.locationId)}</td>
-                      <td className="supply-number">{item.quantityOnHand}</td>
+                      <td className="supply-number">
+                        {formatQuantity(item.quantityOnHand)}
+                      </td>
                       <td>{dateLabel(item.bestBeforeAt)}</td>
                       <td>{dateLabel(item.useByAt)}</td>
                       <td>
@@ -847,7 +849,7 @@ export function StockBookPage() {
                         {locationName(item.locationId)}
                       </td>
                       <td className="supply-number" data-label="On hand">
-                        {item.quantityOnHand}
+                        {formatQuantity(item.quantityOnHand)}
                       </td>
                       <td className="supply-number" data-label="Reserved">
                         {reservedFor(item._id)}
@@ -1315,7 +1317,7 @@ function SupplyStockForm({
                     (location: any) =>
                       location._id === transferSource.locationId,
                   )?.name ?? "Location"
-                } (${transferSource.quantityOnHand} ${catalogUnitForStockLine(transferSource, ingredients)} on hand)`}
+                } (${formatQuantity(transferSource.quantityOnHand)} ${catalogUnitForStockLine(transferSource, ingredients)} on hand)`}
                 readOnly
               />
             </label>
@@ -1335,7 +1337,7 @@ function SupplyStockForm({
                     {locations.find(
                       (location: any) => location._id === item.locationId,
                     )?.name ?? "Location"}{" "}
-                    ({item.quantityOnHand}{" "}
+                    ({formatQuantity(item.quantityOnHand)}{" "}
                     {catalogUnitForStockLine(item, ingredients)} on hand)
                   </option>
                 ))}

@@ -394,6 +394,7 @@ export function CandidatesPage() {
         </div>
         <textarea
           className="input"
+          aria-label="KM export to import"
           rows={4}
           placeholder='Paste KM export JSON, e.g. { "Candidates": [{ "CandidateId": "KM-1", "FullName": "Jane Doe", "Stage": "interview", "Interviews": [] }] }'
           value={kmJson}

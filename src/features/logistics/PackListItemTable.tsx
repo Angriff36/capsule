@@ -1,3 +1,4 @@
+import { formatQuantity } from "../../lib/format";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import type { LogisticsAction } from "./LogisticsLifecyclePolicy";
 import { CulinaryEntityLink } from "../kitchen/CulinaryEntityLink";
@@ -218,7 +219,7 @@ export function PackListItemTable({
                 ) : null}
               </td>
               <td data-label="Required">
-                {item.requiredQuantity} {item.unit}
+                {formatQuantity(item.requiredQuantity)} {item.unit}
               </td>
               <td data-label="Packed">
                 {item.packedQuantity} {item.unit}
@@ -272,7 +273,7 @@ export function PackListItemTable({
                       eventId={reviewEventId}
                       targetKind="pack_list_item"
                       targetId={item._id}
-                      targetLabel={`${item.description} ×${item.requiredQuantity}`}
+                      targetLabel={`${item.description} ×${formatQuantity(item.requiredQuantity)}`}
                       disabled={busy != null}
                     />
                   ) : null}

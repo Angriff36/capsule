@@ -79,7 +79,7 @@ export function EventDayPickerPage() {
     <div className="evd">
       <div className="evd-frame">
         <header className="evd-pick-head">
-          <p className="evd-wordmark">Event Day</p>
+          <h1 className="evd-wordmark">Event Day</h1>
           <p className="evd-pick-sub">
             The crew map. Pick your event — sections light up as the plan locks
             in.

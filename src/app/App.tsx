@@ -1748,10 +1748,13 @@ export function App() {
             <Route
               path="*"
               element={
-                <ErrorState
-                  title="Page not found"
-                  detail="The address does not match any Capsule screen."
-                />
+                <>
+                  <h1 className="sr-only">Page not found</h1>
+                  <ErrorState
+                    title="Page not found"
+                    detail="The address does not match any Capsule screen."
+                  />
+                </>
               }
             />
           </Route>

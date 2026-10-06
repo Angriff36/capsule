@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { formatCountNoun } from "../../lib/format";
+import { formatQuantity, formatCountNoun } from "../../lib/format";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import type { PurchasingStockContext } from "./purchasingStockContext";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
@@ -172,8 +172,8 @@ export function PurchasingQueueSplit({
                           <strong>{ingredientName(need.ingredientId)}</strong>
                         )}
                         <span>
-                          {eventName(need.eventId)} · {need.requiredQuantity}{" "}
-                          {need.unit}
+                          {eventName(need.eventId)} ·{" "}
+                          {formatQuantity(need.requiredQuantity)} {need.unit}
                         </span>
                         {orderedChangeNote(need) ? (
                           <small>{orderedChangeNote(need)}</small>

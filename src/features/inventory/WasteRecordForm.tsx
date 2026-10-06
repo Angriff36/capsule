@@ -12,7 +12,7 @@ import { useSuccessToast } from "../../ui/useSuccessToast";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import { UnitQuantityInput } from "../../ui/UnitQuantityInput";
 import { SearchSelect } from "../../ui/SearchSelect";
-import { formatDate, formatTime } from "../../lib/format";
+import { formatQuantity, formatDate, formatTime } from "../../lib/format";
 
 export const WASTE_REASON_LABELS: Record<string, string> = {
   spoilage: "Spoilage",
@@ -117,8 +117,8 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
             {activeItems.map((item) => (
               <option key={item._id} value={item._id}>
                 {ingredientName(item.ingredientId)} ·{" "}
-                {locationName(item.locationId)} ({item.quantityOnHand}{" "}
-                {item.unit} on hand)
+                {locationName(item.locationId)} (
+                {formatQuantity(item.quantityOnHand)} {item.unit} on hand)
               </option>
             ))}
           </select>

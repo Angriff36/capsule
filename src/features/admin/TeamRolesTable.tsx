@@ -204,6 +204,7 @@ function PersonRoleCell({
   return (
     <select
       className="input"
+      aria-label={`Role for ${person.givenName} ${person.familyName}`}
       value={person.role}
       disabled={busy}
       onChange={(event) => void onAssignRole(person, event.target.value)}

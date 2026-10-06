@@ -1,3 +1,4 @@
+import { formatQuantity } from "../../lib/format";
 import { packRounding, type PackMapping } from "./packRounding";
 
 type Line = {
@@ -44,7 +45,7 @@ export function VendorOrderLinePacks({
         <small>
           Sold by the {rounding.packUnit} ({rounding.packSize} {line.unit}):{" "}
           {rounding.packs} {plural(rounding.packs, rounding.packUnit)} ={" "}
-          {rounding.roundedQuantity} {line.unit}
+          {formatQuantity(rounding.roundedQuantity)} {line.unit}
           {rounding.extra > 0
             ? `, ${rounding.extra} ${line.unit} left over`
             : ""}
@@ -60,7 +61,7 @@ export function VendorOrderLinePacks({
           onClick={() => onOrderPacks(rounding.roundedQuantity)}
         >
           Order {rounding.packs} {plural(rounding.packs, rounding.packUnit)} (
-          {rounding.roundedQuantity} {line.unit})
+          {formatQuantity(rounding.roundedQuantity)} {line.unit})
         </button>
       ) : null}
     </>
