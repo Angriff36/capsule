@@ -3,6 +3,7 @@ import { internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { reconcileEventPrepWork } from "./prepWorkReconciliation";
+import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
 import { reconcileDishPrep, standDownEventPrep } from "./prepRecipeEvents";
 import { releaseEventInventoryHolds } from "./inventoryEvents";
 import { eventCancellationReconciliation } from "./cancellationReconciliation";
@@ -574,6 +575,17 @@ export async function handleManifestEvent(
   ) {
     if (event.payload.synchronizePrep !== false)
       await reconcileDishPrep(ctx, event.entityId as Id<"dishTasks">);
+    return;
+  }
+  // A dish that arrives from an accepted proposal gets its prep steps now,
+  // as one added on the event menu does, so the kitchen sees it to prep.
+  if (event.entity === "EventDish" && event.type === "EventDishConfirmedFromProposal") {
+    const line = await ctx.db.get(event.entityId as Id<"eventDishes">);
+    if (line && line.deletedAt == null && line.removedAt == null)
+      await reconcileEventPrepWork(
+        TenantSystemCommandRunner.forTenant(ctx, line.tenantId).context,
+        { eventDishId: line._id },
+      );
     return;
   }
   if (event.entity === "EventDish" && event.type === "EventDishRemoved") {
