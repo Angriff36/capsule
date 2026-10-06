@@ -109,9 +109,16 @@ export function PurchasingPage() {
   );
   // Vendor scores use every order; operator-facing ledgers honor an explicit
   // cascade link before falling back to the working-event scope.
+  // A weekly draft serves every event in its week, so it always shows.
+  const sharedWeekly = (item: {
+    eventId?: unknown;
+    sourceRangeStart?: unknown;
+  }) => item.eventId == null && item.sourceRangeStart != null;
   const shownOrders = activeOrders.filter(
     (item) =>
-      scopedEventId == null || String(item.eventId ?? "") === scopedEventId,
+      scopedEventId == null ||
+      sharedWeekly(item) ||
+      String(item.eventId ?? "") === scopedEventId,
   );
   const vendorPerformance = useMemo(
     () =>
@@ -138,7 +145,9 @@ export function PurchasingPage() {
   );
   const shownWeeklyDrafts = weeklyDrafts.filter(
     (order) =>
-      scopedEventId == null || String(order.eventId ?? "") === scopedEventId,
+      scopedEventId == null ||
+      sharedWeekly(order) ||
+      String(order.eventId ?? "") === scopedEventId,
   );
   // Purchasing opens on the week's automatic draft (BE-10.6).
   const currentDraft = currentWeeklyDraft(weeklyDrafts, Date.now());

@@ -646,19 +646,20 @@ export function VendorOrderPage() {
                     </div>
                     <div className="order-line-quantity">
                       <strong>
-                        {line.receivedQuantity} / {line.orderedQuantity}
+                        {formatQuantity(line.receivedQuantity)} /{" "}
+                        {formatQuantity(line.orderedQuantity)}
                       </strong>
                       <span>
                         {line.unit} received
                         {line.isFullyReceived
                           ? " · complete"
-                          : ` · ${line.remainingQuantity} remaining`}
+                          : ` · ${formatQuantity(line.remainingQuantity)} remaining`}
                       </span>
                       <small>
                         {formatMoneyExact(Number(line.lineTotal))} line ·{" "}
                         {formatMoneyExact(Number(line.unitCost))} / {line.unit}
                         {line.hasReceivingDiscrepancy
-                          ? ` · discrepancy ${line.discrepancyQuantity}`
+                          ? ` · discrepancy ${formatQuantity(line.discrepancyQuantity)}`
                           : ""}
                       </small>
                       {isDraft && line.plannedQuantity != null ? (

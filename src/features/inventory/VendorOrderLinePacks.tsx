@@ -39,7 +39,8 @@ export function VendorOrderLinePacks({
   return (
     <>
       <small>
-        Needed {need} {line.unit} · ordering {ordered} {line.unit}
+        Needed {formatQuantity(need)} {line.unit} · ordering{" "}
+        {formatQuantity(ordered)} {line.unit}
       </small>
       {rounding ? (
         <small>
@@ -47,7 +48,7 @@ export function VendorOrderLinePacks({
           {rounding.packs} {plural(rounding.packs, rounding.packUnit)} ={" "}
           {formatQuantity(rounding.roundedQuantity)} {line.unit}
           {rounding.extra > 0
-            ? `, ${rounding.extra} ${line.unit} left over`
+            ? `, ${formatQuantity(rounding.extra)} ${line.unit} left over`
             : ""}
         </small>
       ) : need > 0 ? (
