@@ -34,7 +34,7 @@ export function PageGuide() {
     return (
       <button
         type="button"
-        className="fixed top-[72px] right-3 z-20 grid h-8 w-8 place-items-center rounded-full border border-line bg-panel text-sm font-bold text-ink-2 shadow-[0_2px_8px_-2px_rgb(30_40_36/0.2)]"
+        className="relative z-10 float-right mb-2 ml-3 grid h-8 w-8 place-items-center rounded-full border border-line bg-panel text-sm font-bold text-ink-2 shadow-[0_2px_8px_-2px_rgb(30_40_36/0.2)]"
         aria-label={`About ${guide.title}`}
         title={`About ${guide.title}`}
         onClick={() => setOpen(true)}
