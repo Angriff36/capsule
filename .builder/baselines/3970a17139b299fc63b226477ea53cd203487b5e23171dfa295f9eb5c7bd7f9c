@@ -36089,7 +36089,7 @@ export const Lead_recordSourceHistory = mutation({
   },
 });
 
-async function __runLeadReviseDetails(ctx: MutationCtx, { docId, leadType, source, referralSourceId, companyName, givenName, familyName, email, phone, notes, version }: any, __creation = false) {
+async function __runLeadReviseDetails(ctx: MutationCtx, { docId, leadType, source, referralSourceId, companyName, givenName, familyName, email, phone, notes, eventDate, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -36116,6 +36116,7 @@ async function __runLeadReviseDetails(ctx: MutationCtx, { docId, leadType, sourc
       source: source,
       referralSourceId: referralSourceId,
       notes: notes,
+      eventDate: ((eventDate != null) ? eventDate : doc.eventDate),
       version: ((doc as any).version ?? 0) + 1
     };
     const __storedUpdates = await __encryptDoc(ctx, "Lead", ["email","phone"], updates);
@@ -36140,6 +36141,7 @@ export const Lead_reviseDetails = mutation({
     email: v.optional(v.string()),
     phone: v.optional(v.string()),
     notes: v.optional(v.string()),
+    eventDate: v.optional(v.number()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },

@@ -112,7 +112,8 @@ entity Lead mixin TenantScoped, SoftDeletable {
     optional familyName: string,
     optional email: string,
     optional phone: string,
-    optional notes: string
+    optional notes: string,
+    optional eventDate: datetime
   ) {
     guard self.capturedAt != null
     guard self.deletedAt == null
@@ -127,6 +128,8 @@ entity Lead mixin TenantScoped, SoftDeletable {
     mutate source = source
     mutate referralSourceId = referralSourceId
     mutate notes = notes
+    // The event date moves as the conversation does; left out, it stays.
+    mutate eventDate = eventDate != null ? eventDate : self.eventDate
     emit LeadDetailsRevised {
       leadId: self.id
       tenantId: self.tenantId

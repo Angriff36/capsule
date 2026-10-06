@@ -9313,6 +9313,7 @@ export const LeadReviseDetailsParamsSchema = z.object({
   email: z.string().optional(),
   phone: z.string().optional(),
   notes: z.string().optional(),
+  eventDate: z.coerce.date().optional(),
 });
 
 export type LeadReviseDetailsParams = z.infer<typeof LeadReviseDetailsParamsSchema>;

@@ -494,7 +494,7 @@ export function LeadPipelinePage() {
                 type="number"
                 min="0"
                 step="0.01"
-                required
+                placeholder="Leave blank if not known yet"
               />
             </label>
             <label>
@@ -577,10 +577,16 @@ export function LeadPipelinePage() {
                   >
                     <div className="lead-card-topline">
                       <span>{formatStatusLabel(lead.source)}</span>
+                      {/* The event date is what a seller works to; the day
+                          the inquiry came in shows only until one is known. */}
                       <time
-                        dateTime={new Date(lead.capturedAt ?? 0).toISOString()}
+                        dateTime={new Date(
+                          lead.eventDate ?? lead.capturedAt ?? 0,
+                        ).toISOString()}
                       >
-                        {formatDate(lead.capturedAt)}
+                        {lead.eventDate
+                          ? `Event ${formatDate(lead.eventDate)}`
+                          : `In ${formatDate(lead.capturedAt)}`}
                       </time>
                     </div>
                     <h3>{leadName(lead)}</h3>
