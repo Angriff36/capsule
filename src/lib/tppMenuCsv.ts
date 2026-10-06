@@ -16,7 +16,49 @@ export interface TppMenuFeedRow {
   dietary_tags?: string;
   allergens?: string;
   price_per_person?: number;
+  /** Printed columns with no dish field, word for word (kept on the import link). */
+  kept_columns?: Record<string, string>;
 }
+
+/**
+ * Where every column of the TPP Menu Items Export goes (AC-057), word for
+ * word from the real export (work/Menu Items Export.xlsx, work/finishatkitchen.xlsx).
+ * "dish" = a dish field; "kept" = kept with the row on the import link, with
+ * the reason it is not on the dish.
+ */
+export const TPP_MENU_COLUMNS: Readonly<
+  Record<string, { goesTo: "dish" | "kept"; note: string }>
+> = {
+  Name: { goesTo: "dish", note: "name" },
+  Description: { goesTo: "dish", note: "description" },
+  Category: { goesTo: "dish", note: "category" },
+  "Portion Size": { goesTo: "dish", note: "portion size (the number)" },
+  "Portion Unit": {
+    goesTo: "kept",
+    note: "A dish counts in portions; the old unit (Serving, Pizza) stays on the import with the portion size words.",
+  },
+  "Portion Price": {
+    goesTo: "kept",
+    note: "A dish has no price; the price stays on the import as price_per_person and menu prices are set on the proposal.",
+  },
+  Tags: { goesTo: "dish", note: "dietary tags (words only)" },
+  Stations: {
+    goesTo: "kept",
+    note: "The old kitchen station name; finish timing is set on the dish page.",
+  },
+  "Item Status": {
+    goesTo: "kept",
+    note: "Every item in the export is Active or blank; a new dish starts active.",
+  },
+  "Created Date": {
+    goesTo: "kept",
+    note: "Capsule stamps its own created time; the old date stays on the import.",
+  },
+  "Last Changed Date": {
+    goesTo: "kept",
+    note: "Capsule stamps its own changed time; the old date stays on the import.",
+  },
+};
 
 // RFC4180-lite: quoted fields, escaped quotes, newlines inside quotes, BOM.
 export function parseCsv(text: string): string[][] {
@@ -84,6 +126,7 @@ const KEEP_TEXT_TAGS = /[a-z]/i;
 export function tppMenuCsvToRows(text: string): {
   rows: TppMenuFeedRow[];
   skipped: number;
+  keptAsWritten: string[];
 } {
   return tppMenuTableToRows(parseCsv(text));
 }
@@ -94,8 +137,10 @@ export function tppMenuTableToRows(
 ): {
   rows: TppMenuFeedRow[];
   skipped: number;
+  /** Printed headings with no dish field: kept with each row as written. */
+  keptAsWritten: string[];
 } {
-  if (table.length === 0) return { rows: [], skipped: 0 };
+  if (table.length === 0) return { rows: [], skipped: 0, keptAsWritten: [] };
   const headers = table[0]!.map(normalizeHeader);
   const col = (...names: string[]): number => {
     for (const n of names) {
@@ -116,6 +161,20 @@ export function tppMenuTableToRows(
   const cPrice = col("portion_price", "price_per_person");
   const cTags = col("tags", "dietary_tags");
   const cAllergens = col("allergens");
+  const read = new Set([
+    cName,
+    cDesc,
+    cCat,
+    cSize,
+    cUnit,
+    cStyle,
+    cPrice,
+    cTags,
+    cAllergens,
+  ]);
+  const keptIndexes = table[0]!.flatMap((heading, index) =>
+    heading.trim() && !read.has(index) ? [index] : [],
+  );
 
   // Pass 1: raw records + name counts.
   const raw: Array<Omit<TppMenuFeedRow, "menu_item_id">> = [];
@@ -149,6 +208,7 @@ export function tppMenuTableToRows(
       dietary_tags: tags.length ? [...new Set(tags)].join("; ") : undefined,
       allergens: cAllergens >= 0 ? (cells[cAllergens] ?? "").trim() : undefined,
       price_per_person: Number.isFinite(priceRaw) ? priceRaw : undefined,
+      kept_columns: keptColumns(table[0]!, cells, keptIndexes),
     });
   }
 
@@ -163,5 +223,22 @@ export function tppMenuTableToRows(
     seen.set(base, n + 1);
     return { menu_item_id: n > 0 ? `${base}_${n}` : base, ...rec };
   });
-  return { rows, skipped: table.length - 1 - rows.length };
+  return {
+    rows,
+    skipped: table.length - 1 - rows.length,
+    keptAsWritten: keptIndexes.map((index) => table[0]![index]!.trim()),
+  };
+}
+
+function keptColumns(
+  headings: ReadonlyArray<string>,
+  cells: ReadonlyArray<string>,
+  indexes: number[],
+): Record<string, string> | undefined {
+  const kept: Record<string, string> = {};
+  for (const index of indexes) {
+    const value = (cells[index] ?? "").trim();
+    if (value) kept[headings[index]!.trim()] = value;
+  }
+  return Object.keys(kept).length > 0 ? kept : undefined;
 }

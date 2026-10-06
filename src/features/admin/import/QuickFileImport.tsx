@@ -79,6 +79,10 @@ export function QuickFileImport() {
         const read = tppMenuTableToRows(grid);
         rows = read.rows;
         setSkippedRows(read.skipped);
+        if (read.keptAsWritten.length > 0)
+          setColumns(
+            `Kept with each row as written: ${read.keptAsWritten.join(", ")}.`,
+          );
       } else {
         const read = sourceRowsFromGrid(grid, kind);
         if (read.rows.length === 0)

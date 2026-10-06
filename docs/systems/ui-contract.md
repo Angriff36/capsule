@@ -217,14 +217,14 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
   - effects: LeadProposalLinked
   - refresh: live reads update by themselves; reads affected: Lead.list, Lead.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 14 more
 - `mutations.Lead_createViaCapture` (Lead.capture)
-  - inputs from the screen: leadType, source, referralSourceId, estimatedValue, companyName, givenName, familyName, email, phone, probability, notes, eventDate; filled by the server: none
+  - inputs from the screen: leadType, source, referralSourceId, estimatedValue, companyName, givenName, familyName, email, phone, probability, notes, eventDate, guestCount, eventType; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Sales staff may see leads"; "Sales staff may update leads"; "Sales staff may change leads"; "Guard 0 failed"; "Guard 1 failed"; "Give a company name for a company lead, or a given name for a person lead"; and 3 more
   - effects: LeadCaptured
   - refresh: live reads update by themselves; reads affected: Lead.list, Lead.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 14 more
 - `mutations.Lead_reviseDetails` (Lead.reviseDetails)
-  - inputs from the screen: leadType, source, referralSourceId, companyName, givenName, familyName, email, phone, notes; filled by the server: none
+  - inputs from the screen: leadType, source, referralSourceId, companyName, givenName, familyName, email, phone, notes, eventDate, guestCount, eventType; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Sales staff may see leads"; "Sales staff may update leads"; "Sales staff may change leads"; "Guard 0 failed"; "Guard 1 failed"; "Give a company name for a company lead, or a given name for a person lead"; and 3 more
