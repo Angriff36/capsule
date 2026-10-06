@@ -18,9 +18,12 @@ import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import "./taxWorkspace.css";
 import { useActionNotice } from "../../ui/action-result";
 
+// Term dates are saved as the picked day at midnight UTC; show that same
+// day (local formatting of UTC midnight read a day early west of UTC).
 const formatDate = (date: string | number | null | undefined) => {
   if (!date) return "—";
-  return formatDateShared(new Date(date).getTime());
+  const day = new Date(date).toISOString().slice(0, 10);
+  return formatDateShared(new Date(`${day}T12:00:00`).getTime());
 };
 
 const termStatus = (term: {

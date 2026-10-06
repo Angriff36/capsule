@@ -281,6 +281,16 @@ export function MyDayPage() {
     return () => window.clearInterval(timer);
   }, []);
   const [failure, setFailure] = useState<unknown>(null);
+  // The page is long and the message sits at the top: bring it into view so
+  // a refused tap far down the page is not silent.
+  const failureRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (failure)
+      failureRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+  }, [failure]);
 
   const activePeople = (people ?? []).filter(
     (person) => person.deletedAt == null && person.status === "active",
@@ -657,7 +667,11 @@ export function MyDayPage() {
         onRetry={retryPending}
         onDrop={(id) => offlineScope && removeAction(id, offlineScope)}
       />
-      {failure ? <WorkforceFailureBanner error={failure} /> : null}
+      {failure ? (
+        <div ref={failureRef}>
+          <WorkforceFailureBanner error={failure} />
+        </div>
+      ) : null}
       {loading ? (
         <div role="status" aria-label="Loading your day">
           <TableSkeleton rows={8} />

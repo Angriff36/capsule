@@ -396,7 +396,13 @@ export function TrainingPage() {
             </label>
             <label className="field-label">
               Completed
-              <BoundedDateInput name="completedAt" className="input" required />
+              <BoundedDateInput
+                name="completedAt"
+                className="input"
+                required
+                // Recorded the day it is passed, as a rule.
+                defaultValue={new Date().toLocaleDateString("en-CA")}
+              />
             </label>
             <label className="field-label">
               Assessment score
