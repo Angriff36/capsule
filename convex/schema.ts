@@ -1764,7 +1764,10 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_linkKey", ["linkKey"])
     .index("by_sourceImportRunId", ["sourceImportRunId"])
-    .index("by_tenantId_and_capsuleId", ["tenantId", "capsuleId"]),
+    .index("by_tenantId_and_capsuleId", ["tenantId", "capsuleId"])
+    .index("by_tenantId_and_recordType", ["tenantId", "recordType"])
+    .index("by_tenantId_and_capsuleEntity", ["tenantId", "capsuleEntity"])
+    .index("by_tenantId_and_conflictStatus", ["tenantId", "conflictStatus"]),
   fieldConfirmations: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

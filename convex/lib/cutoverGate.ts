@@ -215,9 +215,13 @@ async function openItemsCheck(
   blockers: string[],
   warnings: string[],
 ): Promise<{ check: CutoverCheck; items: CutoverOpenItem[] }> {
+  // Only waiting links can be open (isOpenTppLink); reading every link of
+  // the company timed out once the archive imports landed (2026-10-06).
   const links = await db
     .query("externalRecordLinks")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .withIndex("by_tenantId_and_conflictStatus", (q) =>
+      q.eq("tenantId", tenantId).eq("conflictStatus", "pending_conflict"),
+    )
     .collect();
   const unmatched = links.filter(isOpenTppLink);
   // A field the import and a person both changed waits for a person to say

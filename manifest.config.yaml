@@ -105,6 +105,15 @@ projections:
         ExternalRecordLink:
           - fields: [tenantId, capsuleId]
             name: by_tenantId_and_capsuleId
+          # Screens read only their kind of link (payment, menu, event, still
+          # waiting). Scanning all links timed out /admin/reconcile
+          # (2026-10-06); convex/externalRecordLinkLists.ts reads these.
+          - fields: [tenantId, recordType]
+            name: by_tenantId_and_recordType
+          - fields: [tenantId, capsuleEntity]
+            name: by_tenantId_and_capsuleEntity
+          - fields: [tenantId, conflictStatus]
+            name: by_tenantId_and_conflictStatus
         # Ingredient totals per event: every contribution reaction sums one
         # ingredient's rows in one event. Reading the whole event 13 times per
         # contribution passed Convex's 16 MB read limit on a 15-dish BEO

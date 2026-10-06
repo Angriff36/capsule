@@ -53,9 +53,13 @@ export const countUnresolvedLinks = query({
     // Same outcome as the ExternalRecordLink read policy (importAccess).
     if (!canRead(auth, ["importAccess"])) return { count: 0, sample: [] };
 
+    // Only waiting links can be open; reading every link of the company
+    // timed out once the archive imports landed (2026-10-06).
     const links = await ctx.db
       .query("externalRecordLinks")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .withIndex("by_tenantId_and_conflictStatus", (q) =>
+        q.eq("tenantId", tenantId).eq("conflictStatus", "pending_conflict"),
+      )
       .collect();
 
     // The TPP items still waiting for a person: the same set the switch
