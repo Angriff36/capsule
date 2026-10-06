@@ -814,7 +814,11 @@ export function App() {
               path="/events/:id/menu"
               element={<RedirectEventMenuAlias />}
             />
-            <Route path="/kitchen" element={<KitchenDashboardPage />} />
+            {/* One prep board, one address: /kitchen opens it. */}
+            <Route
+              path="/kitchen"
+              element={<Navigate to="/kitchen/prep" replace />}
+            />
             <Route
               path="/kitchen/components"
               element={<KitchenCatalogPage section="components" />}

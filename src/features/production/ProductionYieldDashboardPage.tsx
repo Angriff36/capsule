@@ -8,7 +8,6 @@ import { TableSkeleton } from "../../ui/primitives";
 import { FieldHelp } from "../../ui/FieldHelp";
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
 import { componentPath } from "../kitchen/kitchenRoutes";
-import { ProductionWorkspaceNav } from "./ProductionWorkspaceNav";
 import {
   buildProductionYieldReport,
   type ProductionYieldBatch,
@@ -134,7 +133,6 @@ export function ProductionYieldDashboard({
       </header>
 
       <KitchenBookNav />
-      <ProductionWorkspaceNav />
 
       <section
         className="production-yield-controls"
