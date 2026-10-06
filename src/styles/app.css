@@ -1937,7 +1937,9 @@
   color: var(--color-ink);
   font-size: 13px;
   font-weight: 500;
+  letter-spacing: normal;
   text-align: left;
+  text-transform: none;
   white-space: nowrap;
 }
 /* A group of rows in one menu item (client link: copy, turn off, preview,
