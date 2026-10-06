@@ -47,7 +47,7 @@ const PREP_ACTIONS = [
     lifecycle: PrepTaskMarkBlockedLifecycle,
   },
   { key: "unblock", label: "Unblock", lifecycle: PrepTaskUnblockLifecycle },
-  { key: "cancel", label: "Cancel", lifecycle: PrepTaskCancelLifecycle },
+  { key: "cancel", label: "Cancel step", lifecycle: PrepTaskCancelLifecycle },
 ] as const;
 
 const QUALITY_ACTIONS = [

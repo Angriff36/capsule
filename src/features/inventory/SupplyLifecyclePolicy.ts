@@ -84,7 +84,11 @@ const NEED_ACTIONS = [
     label: "Fulfill",
     lifecycle: PurchaseNeedMarkFulfilledLifecycle,
   },
-  { key: "cancel", label: "Cancel", lifecycle: PurchaseNeedCancelLifecycle },
+  {
+    key: "cancel",
+    label: "Cancel need",
+    lifecycle: PurchaseNeedCancelLifecycle,
+  },
 ] as const;
 
 const ORDER_ACTIONS = [
@@ -116,7 +120,11 @@ const ORDER_ACTIONS = [
     label: "Mark received",
     lifecycle: VendorOrderMarkReceivedLifecycle,
   },
-  { key: "cancel", label: "Cancel", lifecycle: VendorOrderCancelLifecycle },
+  {
+    key: "cancel",
+    label: "Cancel order",
+    lifecycle: VendorOrderCancelLifecycle,
+  },
 ] as const;
 
 export class SupplyLifecyclePolicy {

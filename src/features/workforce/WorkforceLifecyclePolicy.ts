@@ -44,7 +44,7 @@ function available<Key extends string>(
 const SHIFT_ACTIONS = [
   { key: "start", label: "Start", lifecycle: ShiftStartLifecycle },
   { key: "complete", label: "Complete", lifecycle: ShiftCompleteLifecycle },
-  { key: "cancel", label: "Cancel", lifecycle: ShiftCancelLifecycle },
+  { key: "cancel", label: "Cancel shift", lifecycle: ShiftCancelLifecycle },
   { key: "markNoShow", label: "No-show", lifecycle: ShiftMarkNoShowLifecycle },
 ] as const;
 
