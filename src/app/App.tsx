@@ -1,5 +1,6 @@
 import { Component, lazy, Suspense, type ReactNode } from "react";
 import { Navigate, Route, Routes, useMatch, useParams } from "react-router-dom";
+import { ReportsWorkspaceNav } from "../features/reports/ReportsWorkspaceNav";
 import { ClientPortalPage } from "../features/clientPortal/ClientPortalPage";
 import { ProposalAcceptancePage } from "../features/clients/ProposalAcceptancePage";
 import { SharedDeckPage } from "../features/clients/SharedDeckPage";
@@ -1385,6 +1386,7 @@ export function App() {
               path="/reports"
               element={
                 <SupplyRoute>
+                  <ReportsWorkspaceNav />
                   <ReportsPage />
                 </SupplyRoute>
               }
@@ -1393,6 +1395,7 @@ export function App() {
               path="/reports/sales"
               element={
                 <SupplyRoute>
+                  <ReportsWorkspaceNav />
                   <SalesDashboardPage />
                 </SupplyRoute>
               }
@@ -1401,6 +1404,7 @@ export function App() {
               path="/reports/tims-kpis"
               element={
                 <SupplyRoute>
+                  <ReportsWorkspaceNav />
                   <TimsKPIsDashboardPage />
                 </SupplyRoute>
               }
@@ -1409,6 +1413,7 @@ export function App() {
               path="/reports/scorecard"
               element={
                 <SupplyRoute>
+                  <ReportsWorkspaceNav />
                   <CompanyScorecardDashboardPage />
                 </SupplyRoute>
               }
@@ -1417,6 +1422,7 @@ export function App() {
               path="/reports/l10"
               element={
                 <SupplyRoute>
+                  <ReportsWorkspaceNav />
                   <L10DashboardPage />
                 </SupplyRoute>
               }
@@ -1425,6 +1431,7 @@ export function App() {
               path="/reports/avg-event-value"
               element={
                 <SupplyRoute>
+                  <ReportsWorkspaceNav />
                   <AvgEventValueGrowthDashboardPage />
                 </SupplyRoute>
               }
@@ -1433,6 +1440,7 @@ export function App() {
               path="/reports/comp-master"
               element={
                 <SupplyRoute>
+                  <ReportsWorkspaceNav />
                   <CompMasterDashboardPage />
                 </SupplyRoute>
               }
@@ -1441,6 +1449,7 @@ export function App() {
               path="/reports/mangia"
               element={
                 <SupplyRoute>
+                  <ReportsWorkspaceNav />
                   <MangiaDashboardPage />
                 </SupplyRoute>
               }

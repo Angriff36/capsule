@@ -15,7 +15,7 @@ import {
 import { TableSkeleton } from "../../ui/primitives";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { useActionFailure, useActionNotice } from "../../ui/action-result";
-import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
+import { AdminWorkspaceNav } from "../admin/AdminWorkspaceNav";
 import { ReconciliationTables } from "./ReconciliationTables";
 
 function dayValue(at: number): string {
@@ -104,7 +104,7 @@ export function FinanceReconciliationPage() {
           </p>
         </div>
       </header>
-      <FinanceWorkspaceNav />
+      <AdminWorkspaceNav />
       {error ? (
         <p className="mt-3 text-base text-danger" role="alert">
           {error}

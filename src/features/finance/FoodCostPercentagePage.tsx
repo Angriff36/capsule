@@ -6,7 +6,7 @@ import {
 import { TableSkeleton } from "../../ui/primitives";
 import { useEventsById } from "../facilities/useEventsById";
 import { formatCountNoun, formatDate, formatMoney } from "../../lib/format";
-import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
+import { ReportsWorkspaceNav } from "../reports/ReportsWorkspaceNav";
 import { useFinanceReportFilters } from "./useFinanceReportFilters";
 import {
   buildFoodCostReport,
@@ -240,7 +240,7 @@ export function FoodCostPercentageDashboard({
           <small>finalized closeouts only</small>
         </div>
       </header>
-      <FinanceWorkspaceNav />
+      <ReportsWorkspaceNav />
 
       <section
         className="food-cost-controls"
