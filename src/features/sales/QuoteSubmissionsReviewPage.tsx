@@ -25,6 +25,7 @@ import { QuoteRequestPicks } from "./QuoteRequestPicks";
 import { ClientsWorkspaceNav } from "../clients/ClientsWorkspaceNav";
 import { CLIENTS_ROUTES } from "../clients/clientsRoutes";
 import type { Doc } from "../../lib/api";
+import { quoteReference } from "./QuoteSubmissionPage";
 
 type QuoteSubmission = Doc<"quoteSubmissions">;
 type Failure = ReturnType<typeof classifyCommandFailure>;
@@ -346,7 +347,8 @@ export function QuoteSubmissionsReviewPage() {
                   <div>{formatCountNoun(sub.guestCount ?? 0, "guest")}</div>
                   {sub.submittedAt && (
                     <div className="text-2xs text-ink-3">
-                      submitted {formatDate(sub.submittedAt)}
+                      submitted {formatDate(sub.submittedAt)} · ref{" "}
+                      {quoteReference(String(sub._id))}
                     </div>
                   )}
                 </div>

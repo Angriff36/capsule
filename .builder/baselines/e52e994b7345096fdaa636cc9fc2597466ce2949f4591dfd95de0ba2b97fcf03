@@ -2286,8 +2286,8 @@ const COMMAND_DISPATCH = {
   },
   "Lead.capture": {
     ref: api.mutations.Lead_createViaCapture,
-    params: ["leadType","source","referralSourceId","estimatedValue","companyName","givenName","familyName","email","phone","probability","notes","eventDate","idempotencyKey"] as const,
-    paramMeta: [{"name":"leadType","type":"ClientType","required":true},{"name":"source","type":"string","required":true},{"name":"referralSourceId","type":"uuid","required":false},{"name":"estimatedValue","type":"money","required":true},{"name":"companyName","type":"string","required":false},{"name":"givenName","type":"string","required":false},{"name":"familyName","type":"string","required":false},{"name":"email","type":"string","required":false},{"name":"phone","type":"string","required":false},{"name":"probability","type":"number","required":false},{"name":"notes","type":"string","required":false},{"name":"eventDate","type":"datetime","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["leadType","source","referralSourceId","estimatedValue","companyName","givenName","familyName","email","phone","probability","notes","eventDate","guestCount","eventType","idempotencyKey"] as const,
+    paramMeta: [{"name":"leadType","type":"ClientType","required":true},{"name":"source","type":"string","required":true},{"name":"referralSourceId","type":"uuid","required":false},{"name":"estimatedValue","type":"money","required":true},{"name":"companyName","type":"string","required":false},{"name":"givenName","type":"string","required":false},{"name":"familyName","type":"string","required":false},{"name":"email","type":"string","required":false},{"name":"phone","type":"string","required":false},{"name":"probability","type":"number","required":false},{"name":"notes","type":"string","required":false},{"name":"eventDate","type":"datetime","required":false},{"name":"guestCount","type":"number","required":false},{"name":"eventType","type":"string","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "Lead.confirmConversion": {
     ref: api.mutations.Lead_confirmConversion,
@@ -2311,8 +2311,8 @@ const COMMAND_DISPATCH = {
   },
   "Lead.reviseDetails": {
     ref: api.mutations.Lead_reviseDetails,
-    params: ["docId","leadType","source","referralSourceId","companyName","givenName","familyName","email","phone","notes","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"leadType","type":"ClientType","required":true},{"name":"source","type":"string","required":true},{"name":"referralSourceId","type":"uuid","required":false},{"name":"companyName","type":"string","required":false},{"name":"givenName","type":"string","required":false},{"name":"familyName","type":"string","required":false},{"name":"email","type":"string","required":false},{"name":"phone","type":"string","required":false},{"name":"notes","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","leadType","source","referralSourceId","companyName","givenName","familyName","email","phone","notes","eventDate","guestCount","eventType","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"leadType","type":"ClientType","required":true},{"name":"source","type":"string","required":true},{"name":"referralSourceId","type":"uuid","required":false},{"name":"companyName","type":"string","required":false},{"name":"givenName","type":"string","required":false},{"name":"familyName","type":"string","required":false},{"name":"email","type":"string","required":false},{"name":"phone","type":"string","required":false},{"name":"notes","type":"string","required":false},{"name":"eventDate","type":"datetime","required":false},{"name":"guestCount","type":"number","required":false},{"name":"eventType","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "Lead.stageClientMerge": {
     ref: api.mutations.Lead_stageClientMerge,

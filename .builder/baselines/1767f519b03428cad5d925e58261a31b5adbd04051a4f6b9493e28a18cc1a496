@@ -35687,7 +35687,7 @@ export const ItemUnitMapping_retire = mutation({
   },
 });
 
-async function __runLeadCapture(ctx: MutationCtx, { docId, leadType, source, referralSourceId, estimatedValue, companyName, givenName, familyName, email, phone, probability, notes, eventDate, version }: any, __creation = false) {
+async function __runLeadCapture(ctx: MutationCtx, { docId, leadType, source, referralSourceId, estimatedValue, companyName, givenName, familyName, email, phone, probability, notes, eventDate, guestCount, eventType, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -35720,6 +35720,8 @@ async function __runLeadCapture(ctx: MutationCtx, { docId, leadType, source, ref
       probability: ((probability != null) ? probability : 10),
       notes: notes,
       eventDate: eventDate,
+      guestCount: guestCount,
+      eventType: eventType,
       capturedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -35748,6 +35750,8 @@ export const Lead_capture = mutation({
     probability: v.optional(v.any()),
     notes: v.optional(v.string()),
     eventDate: v.optional(v.number()),
+    guestCount: v.optional(v.any()),
+    eventType: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -35781,6 +35785,8 @@ export const Lead_createViaCapture = mutation({
     probability: v.optional(v.any()),
     notes: v.optional(v.string()),
     eventDate: v.optional(v.number()),
+    guestCount: v.optional(v.any()),
+    eventType: v.optional(v.string()),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -35793,7 +35799,7 @@ export const Lead_createViaCapture = mutation({
     await __assertOwnWorkspaceLinks(ctx, args, [{"name":"clientId","table":"clients"},{"name":"clientMergeAuthorizationId","table":"clientMerges"},{"name":"mergeTargetClientId","table":"clients"},{"name":"clientContactId","table":"clientContacts"},{"name":"proposalId","table":"proposals"},{"name":"referralSourceId","table":"referralSources"}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { leadType, source, referralSourceId, estimatedValue, companyName, givenName, familyName, email, phone, probability, notes, eventDate } = args;
+    const { leadType, source, referralSourceId, estimatedValue, companyName, givenName, familyName, email, phone, probability, notes, eventDate, guestCount, eventType } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       probability: args.probability !== undefined ? args.probability : 10,
@@ -35803,8 +35809,10 @@ export const Lead_createViaCapture = mutation({
       email: args.email,
       estimatedValue: args.estimatedValue,
       eventDate: args.eventDate,
+      eventType: args.eventType,
       familyName: args.familyName,
       givenName: args.givenName,
+      guestCount: args.guestCount,
       leadType: args.leadType,
       notes: args.notes,
       phone: args.phone,
@@ -35837,6 +35845,8 @@ export const Lead_createViaCapture = mutation({
     doc.probability = ((probability != null) ? probability : 10);
     doc.notes = notes;
     doc.eventDate = eventDate;
+    doc.guestCount = guestCount;
+    doc.eventType = eventType;
     doc.capturedAt = Date.now();
     const __storedDoc = await __encryptDoc(ctx, "Lead", ["email","phone"], doc);
     const docId = await ctx.db.insert("leads", __storedDoc as any);
@@ -36089,7 +36099,7 @@ export const Lead_recordSourceHistory = mutation({
   },
 });
 
-async function __runLeadReviseDetails(ctx: MutationCtx, { docId, leadType, source, referralSourceId, companyName, givenName, familyName, email, phone, notes, version }: any, __creation = false) {
+async function __runLeadReviseDetails(ctx: MutationCtx, { docId, leadType, source, referralSourceId, companyName, givenName, familyName, email, phone, notes, eventDate, guestCount, eventType, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const __storedDoc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -36116,6 +36126,9 @@ async function __runLeadReviseDetails(ctx: MutationCtx, { docId, leadType, sourc
       source: source,
       referralSourceId: referralSourceId,
       notes: notes,
+      eventDate: ((eventDate != null) ? eventDate : doc.eventDate),
+      guestCount: ((guestCount != null) ? guestCount : doc.guestCount),
+      eventType: ((eventType != null) ? eventType : doc.eventType),
       version: ((doc as any).version ?? 0) + 1
     };
     const __storedUpdates = await __encryptDoc(ctx, "Lead", ["email","phone"], updates);
@@ -36140,6 +36153,9 @@ export const Lead_reviseDetails = mutation({
     email: v.optional(v.string()),
     phone: v.optional(v.string()),
     notes: v.optional(v.string()),
+    eventDate: v.optional(v.number()),
+    guestCount: v.optional(v.any()),
+    eventType: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },

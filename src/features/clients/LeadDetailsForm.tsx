@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useLeadReviseDetails } from "../../lib/manifest-convex-react";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 export interface LeadDetailsRow {
   _id: string;
@@ -13,6 +14,9 @@ export interface LeadDetailsRow {
   source: string;
   referralSourceId?: string | null;
   notes?: string | null;
+  eventDate?: number | null;
+  guestCount?: number | null;
+  eventType?: string | null;
 }
 
 interface LeadDetailsFormProps {
@@ -22,6 +26,14 @@ interface LeadDetailsFormProps {
   run: (key: string, work: () => Promise<void>) => void;
   onSaved: (message: string) => void;
   onClose: () => void;
+}
+
+// Same reading as the capture form: noon local, so the day never slips.
+function dateValue(value: FormDataEntryValue | null): number | undefined {
+  const raw = String(value ?? "").trim();
+  if (!raw) return undefined;
+  const parsed = new Date(`${raw}T12:00:00`).getTime();
+  return Number.isNaN(parsed) ? undefined : parsed;
 }
 
 function optional(value: FormDataEntryValue | null): string | undefined {
@@ -64,6 +76,9 @@ export function LeadDetailsForm({
         email: optional(data.get("email")),
         phone: optional(data.get("phone")),
         notes: optional(data.get("notes")),
+        eventDate: dateValue(data.get("eventDate")),
+        guestCount: Number(data.get("guestCount") || 0) || undefined,
+        eventType: optional(data.get("eventType")),
       });
       onSaved("Lead details saved.");
       onClose();
@@ -135,6 +150,31 @@ export function LeadDetailsForm({
         <label>
           Phone
           <input name="phone" type="tel" defaultValue={lead.phone ?? ""} />
+        </label>
+        <label>
+          Event date
+          <BoundedDateInput
+            name="eventDate"
+            defaultValue={
+              lead.eventDate
+                ? new Date(lead.eventDate).toLocaleDateString("en-CA")
+                : undefined
+            }
+          />
+        </label>
+        <label>
+          Guests
+          <input
+            name="guestCount"
+            type="number"
+            min="0"
+            step="1"
+            defaultValue={lead.guestCount ?? ""}
+          />
+        </label>
+        <label>
+          Event type
+          <input name="eventType" defaultValue={lead.eventType ?? ""} />
         </label>
         <label className="lead-edit-form-span-2">
           Inquiry notes

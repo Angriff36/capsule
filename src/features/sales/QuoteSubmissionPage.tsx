@@ -92,6 +92,21 @@ function quoteFieldRules(data: FormData): Record<string, string> {
  * 4. Returns success with submission ID and status
  * 5. Shows thank you message with next steps
  */
+// The answers most people give, offered beside the venue and partner list.
+const COMMON_HEARD_ANSWERS = [
+  "Google",
+  "Instagram",
+  "Facebook",
+  "A friend or family member",
+  "An event we catered",
+  "We have used you before",
+];
+
+/** A short reference a customer can read out; the full id stays internal. */
+export function quoteReference(id: string): string {
+  return id.slice(-6).toUpperCase();
+}
+
 export function QuoteSubmissionPage() {
   const [busy, setBusy] = useState(false);
   const { error, setError } = useActionFailure();
@@ -123,7 +138,13 @@ export function QuoteSubmissionPage() {
 
   const activeServiceStyles = options?.serviceStyles ?? [];
   const activeOccasions = options?.occasions ?? [];
-  const referralSources = options?.referralSources ?? [];
+  // One entry per name: two referral records for the same venue read as a
+  // duplicate to the customer.
+  const referralSources = (options?.referralSources ?? []).filter(
+    (source, index, all) =>
+      all.findIndex((other) => other.name === source.name) === index,
+  );
+  const [heardChoice, setHeardChoice] = useState("");
 
   // Empty-catalog fallback (A5): once the options have loaded and a catalog
   // has no rows, ask for the answer as free text instead of a dead dropdown.
@@ -173,10 +194,18 @@ export function QuoteSubmissionPage() {
         picks: picks.menuId ? picks.picks : undefined,
         extras: picks.extras.length > 0 ? picks.extras : undefined,
         submissionKey,
-        referralSourceId: formId<Id<"referralSources">>(
-          data.get("referralSourceId"),
-        ),
-        howHeardText: optional(String(data.get("howHeardText") ?? "")),
+        // A partner pick is a referral record; a common answer ("Google")
+        // or "Other" travels as the free-text answer.
+        referralSourceId: String(data.get("referralSourceId") ?? "").startsWith(
+          "text:",
+        )
+          ? undefined
+          : formId<Id<"referralSources">>(data.get("referralSourceId")),
+        howHeardText:
+          optional(String(data.get("howHeardText") ?? "")) ??
+          (String(data.get("referralSourceId") ?? "").startsWith("text:")
+            ? String(data.get("referralSourceId")).slice(5)
+            : undefined),
         marketingConsent: data.get("marketingConsent") === "on",
         ...attribution,
         serviceStyleText: optional(String(data.get("serviceStyleText") ?? "")),
@@ -223,7 +252,7 @@ export function QuoteSubmissionPage() {
           </h1>
           <p className="text-ink-2 mb-6">{success.message}</p>
           <div className="text-xs text-ink-3 mb-8">
-            Confirmation number: {success.submissionId}
+            Your reference: {quoteReference(success.submissionId)}
           </div>
           <a href="/" className="btn btn-primary">
             Return to Home
@@ -637,19 +666,39 @@ export function QuoteSubmissionPage() {
                 How did you hear about us?
               </label>
               {referralSources.length > 0 ? (
-                <select
-                  id="referralSourceId"
-                  name="referralSourceId"
-                  className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
-                  disabled={busy}
-                >
-                  <option value="">Choose one...</option>
-                  {referralSources.map((source) => (
-                    <option key={source._id} value={source._id}>
-                      {source.name}
-                    </option>
-                  ))}
-                </select>
+                <>
+                  <select
+                    id="referralSourceId"
+                    name="referralSourceId"
+                    className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
+                    disabled={busy}
+                    value={heardChoice}
+                    onChange={(event) => setHeardChoice(event.target.value)}
+                  >
+                    <option value="">Choose one...</option>
+                    {COMMON_HEARD_ANSWERS.map((answer) => (
+                      <option key={answer} value={`text:${answer}`}>
+                        {answer}
+                      </option>
+                    ))}
+                    {referralSources.map((source) => (
+                      <option key={source._id} value={source._id}>
+                        {source.name}
+                      </option>
+                    ))}
+                    <option value="text:Other">Other</option>
+                  </select>
+                  {heardChoice === "text:Other" ? (
+                    <input
+                      type="text"
+                      name="howHeardText"
+                      aria-label="Where did you hear about us?"
+                      className="mt-2 w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
+                      placeholder="Tell us where"
+                      disabled={busy}
+                    />
+                  ) : null}
+                </>
               ) : (
                 <input
                   type="text"

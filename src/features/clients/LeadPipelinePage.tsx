@@ -51,6 +51,8 @@ interface LeadRow {
   phone?: string | null;
   source: string;
   eventDate?: number | null;
+  guestCount?: number | null;
+  eventType?: string | null;
   referralSourceId?: string | null;
   estimatedValue: number;
   stage: LeadStage;
@@ -217,6 +219,8 @@ export function LeadPipelinePage() {
         probability,
         notes: optional(data.get("notes")),
         eventDate: dateValue(data.get("eventDate")),
+        guestCount: Number(data.get("guestCount") || 0) || undefined,
+        eventType: optional(data.get("eventType")),
       });
       form.reset();
       setLeadType("company");
@@ -473,6 +477,17 @@ export function LeadPipelinePage() {
               <BoundedDateInput name="eventDate" />
             </label>
             <label>
+              Guests
+              <input name="guestCount" type="number" min="0" step="1" />
+            </label>
+            <label>
+              Event type
+              <input
+                name="eventType"
+                placeholder="e.g. Wedding, retirement party"
+              />
+            </label>
+            <label>
               Where they came from
               <input name="source" placeholder="e.g. Phone call, website" />
             </label>
@@ -494,7 +509,7 @@ export function LeadPipelinePage() {
                 type="number"
                 min="0"
                 step="0.01"
-                required
+                placeholder="Leave blank if not known yet"
               />
             </label>
             <label>
@@ -577,10 +592,16 @@ export function LeadPipelinePage() {
                   >
                     <div className="lead-card-topline">
                       <span>{formatStatusLabel(lead.source)}</span>
+                      {/* The event date is what a seller works to; the day
+                          the inquiry came in shows only until one is known. */}
                       <time
-                        dateTime={new Date(lead.capturedAt ?? 0).toISOString()}
+                        dateTime={new Date(
+                          lead.eventDate ?? lead.capturedAt ?? 0,
+                        ).toISOString()}
                       >
-                        {formatDate(lead.capturedAt)}
+                        {lead.eventDate
+                          ? `Event ${formatDate(lead.eventDate)}`
+                          : `In ${formatDate(lead.capturedAt)}`}
                       </time>
                     </div>
                     <h3>{leadName(lead)}</h3>
@@ -775,14 +796,17 @@ export function LeadPipelinePage() {
                               name="guestCount"
                               type="number"
                               min="0"
-                              defaultValue="0"
+                              defaultValue={lead.guestCount ?? 0}
                             />
                           </label>
                         </div>
                         <div>
                           <label>
                             Event type
-                            <input name="eventType" />
+                            <input
+                              name="eventType"
+                              defaultValue={lead.eventType ?? ""}
+                            />
                           </label>
                           <label>
                             Event date
