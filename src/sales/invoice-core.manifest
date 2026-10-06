@@ -243,9 +243,11 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     guard self.status == "sent" or self.status == "viewed" or self.status == "overdue" or self.status == "partial"
     guard self.deletedAt == null
     constraint applyPositive: paymentAmount > 0 "This payment's amount has to be more than zero. Enter how much was paid."
-    constraint applyWithinDue: paymentAmount <= self.amountDue "Payment amount cannot exceed amount due"
-    compute nextPaid = self.amountPaid + paymentAmount
-    compute nextDue = self.amountDue - paymentAmount
+    // Compared and kept in whole cents: 8240.40 - 2060.10 is 6180.2999...
+    // in floating point, which refused paying the last $6,180.30.
+    constraint applyWithinDue: round(paymentAmount * 100) <= round(self.amountDue * 100) "Payment amount cannot exceed amount due"
+    compute nextPaid = round((self.amountPaid + paymentAmount) * 100) / 100
+    compute nextDue = round((self.amountDue - paymentAmount) * 100) / 100
     mutate amountPaid = nextPaid
     mutate amountDue = nextDue
     mutate status = nextDue == 0 ? "paid" : "partial"
@@ -472,7 +474,7 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint writeOffReasonPresent: length(trim(reason)) > 0 "Give a reason for writing this off"
     constraint writeOffPositive: writeOffAmount > 0 "This write-off amount has to be more than zero"
-    constraint writeOffWithinDue: writeOffAmount <= self.amountDue "Write-off amount cannot exceed amount due"
+    constraint writeOffWithinDue: round(writeOffAmount * 100) <= round(self.amountDue * 100) "Write-off amount cannot exceed amount due"
     mutate status = "written_off"
     mutate amountDue = 0
     mutate writeOffReason = reason

@@ -34356,9 +34356,9 @@ async function __runInvoiceApplyPayment(ctx: MutationCtx, { docId, paymentAmount
     if (!(((((doc.status === "sent") || (doc.status === "viewed")) || (doc.status === "overdue")) || (doc.status === "partial")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((paymentAmount > 0))) throw new Error("This payment's amount has to be more than zero. Enter how much was paid.");
-    if (!((paymentAmount <= doc.amountDue))) throw new Error("Payment amount cannot exceed amount due");
-    const nextPaid = (doc.amountPaid + paymentAmount);
-    const nextDue = (doc.amountDue - paymentAmount);
+    if (!((Math.round((paymentAmount * 100)) <= Math.round((doc.amountDue * 100))))) throw new Error("Payment amount cannot exceed amount due");
+    const nextPaid = (Math.round(((doc.amountPaid + paymentAmount) * 100)) / 100);
+    const nextDue = (Math.round(((doc.amountDue - paymentAmount) * 100)) / 100);
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -35431,7 +35431,7 @@ async function __runInvoiceWriteOff(ctx: MutationCtx, { docId, reason, writeOffA
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Give a reason for writing this off");
     if (!((writeOffAmount > 0))) throw new Error("This write-off amount has to be more than zero");
-    if (!((writeOffAmount <= doc.amountDue))) throw new Error("Write-off amount cannot exceed amount due");
+    if (!((Math.round((writeOffAmount * 100)) <= Math.round((doc.amountDue * 100))))) throw new Error("Write-off amount cannot exceed amount due");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
