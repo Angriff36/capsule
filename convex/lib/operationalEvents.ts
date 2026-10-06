@@ -52,6 +52,7 @@ import {
   reconcileCancelledPurchaseDrafts,
   retireCoveredZeroLine,
   retireUnusedAutomaticDraft,
+  settleEventPurchasing,
 } from "./purchasingEvents";
 import {
   moveEventPurchasingWeek,
@@ -607,6 +608,7 @@ export async function handleManifestEvent(
   }
   if (event.entity === "Event" && event.type === "EventCompleted") {
     await releaseEventInventoryHolds(ctx, event.entityId as Id<"events">);
+    await settleEventPurchasing(ctx, event.entityId as Id<"events">);
     return;
   }
   if (

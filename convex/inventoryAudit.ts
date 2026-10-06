@@ -31,6 +31,9 @@ export interface InventoryAuditEntry {
   occurredAt: number;
   reason: string;
   referenceId: string | null;
+  /** Readable names for the screen; not part of the history checksum. */
+  eventTitle?: string | null;
+  actorName?: string | null;
 }
 
 /**
@@ -99,7 +102,8 @@ export const readForItem = internalQuery({
       );
     });
 
-    return [...directEvents, ...reservationEvents]
+    const all = [...directEvents, ...reservationEvents];
+    const entries = all
       .map(normalizeEvent)
       .filter((entry): entry is InventoryAuditEntry => entry !== null)
       .sort(
@@ -107,6 +111,46 @@ export const readForItem = internalQuery({
           left.occurredAt - right.occurredAt ||
           left.eventId.localeCompare(right.eventId),
       );
+
+    // Show the event's title and the person's name, not their raw ids.
+    const eventIdByEntry = new Map(
+      all.map((event) => [
+        String(event._id),
+        textValue(eventPayload(event).eventId),
+      ]),
+    );
+    const titles = new Map<string, string | null>();
+    const names = new Map<string, string | null>();
+    for (const entry of entries) {
+      const eventRef = eventIdByEntry.get(entry.eventId);
+      if (eventRef && !titles.has(eventRef)) {
+        const id = ctx.db.normalizeId("events", eventRef);
+        const row = id ? await ctx.db.get(id) : null;
+        titles.set(
+          eventRef,
+          row && row.tenantId === args.tenantId ? row.title : null,
+        );
+      }
+      if (entry.actorId && !names.has(entry.actorId)) {
+        const person = (
+          await ctx.db
+            .query("people")
+            .withIndex("by_authSubjectId", (q) =>
+              q.eq("authSubjectId", entry.actorId),
+            )
+            .collect()
+        ).find((row) => row.tenantId === args.tenantId);
+        names.set(
+          entry.actorId,
+          person ? `${person.givenName} ${person.familyName}`.trim() : null,
+        );
+      }
+      entry.eventTitle = eventRef ? (titles.get(eventRef) ?? null) : null;
+      entry.actorName = entry.actorId
+        ? (names.get(entry.actorId) ?? null)
+        : null;
+    }
+    return entries;
   },
 });
 

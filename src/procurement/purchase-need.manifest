@@ -13,6 +13,7 @@ enum PurchaseNeedStatus {
   open
   ordered
   fulfilled
+  used
   cancelled
 }
 
@@ -40,6 +41,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
   property openedAt: datetime?
   property orderedAt: datetime?
   property fulfilledAt: datetime?
+  property usedAt: datetime?
   property cancelledAt: datetime?
   property cancellationReason: string?
 
@@ -53,8 +55,9 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
   constraint needQuantityPositive: self.openedAt == null or self.requiredQuantity >= 0 "The amount needed can't be negative. Use zero or more."
 
   transition status from "open" to ["ordered", "cancelled"]
-  transition status from "ordered" to ["open", "fulfilled", "cancelled"]
-  transition status from "fulfilled" to ["open"]
+  transition status from "ordered" to ["open", "fulfilled", "used", "cancelled"]
+  transition status from "fulfilled" to ["open", "used"]
+  transition status from "used" to []
   transition status from "cancelled" to []
 
   // manageAccess: Event.approve (event_manager) foreach-creates PurchaseNeed;
@@ -277,6 +280,18 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
       status: "cancelled"
       reason: reason
     }
+  }
+
+  // A finished event has used its stock, so its bought need no longer counts
+  // toward the week's buying. Otherwise a later event in the same week buys
+  // the finished event's amount again. The handler runs this only for
+  // ordered and fulfilled needs.
+  command settleWithEvent() {
+    guard self.status == "ordered" or self.status == "fulfilled"
+    guard self.deletedAt == null
+    guard self.event != null and (self.event.stage == "completed" or self.event.stage == "closed_out")
+    mutate status = "used"
+    mutate usedAt = now()
   }
 
   // Rescheduled event (#328): an open need follows its event to the new

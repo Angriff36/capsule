@@ -4,7 +4,7 @@ import { CheckCircleIcon, XCircleIcon, XIcon } from "../icons";
 import { ActionResultStore, type ActionResult } from "./ActionResultStore";
 
 /**
- * Always-visible result strip. Lives above the scrolling workspace so a
+ * Always-visible result strip. Floats above the scrolling workspace so a
  * hire, email, save, or failure is still on screen after the click.
  */
 export function ActionResultHost() {
@@ -22,9 +22,11 @@ export function ActionResultHost() {
   // and text all take the danger color.
   const Icon = ok ? CheckCircleIcon : XCircleIcon;
   return (
-    <div className="shrink-0 px-4 pt-3">
+    // Floats over the top of the page instead of pushing it down, so the
+    // page does not jump under the pointer when the strip comes and goes.
+    <div className="relative z-40 h-0 shrink-0">
       <div
-        className={`flex min-h-11 items-center gap-2.5 rounded-md border px-3 py-2 ${
+        className={`absolute inset-x-4 top-3 flex min-h-11 items-center gap-2.5 rounded-md border px-3 py-2 shadow-lg ${
           ok
             ? "border-line bg-panel text-ink"
             : "border-danger bg-danger-soft text-danger"
