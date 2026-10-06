@@ -217,19 +217,19 @@ export function BattleBoardPage() {
 
   if (briefing === undefined)
     return (
-      <div className="evd">
-        <div className="evd-frame">
-          <p className="evd-empty">Lighting the estate…</p>
+      <div className="eday">
+        <div className="eday-frame">
+          <p className="eday-empty">Lighting the estate…</p>
         </div>
       </div>
     );
   if (briefing === null)
     return (
-      <div className="evd">
-        <div className="evd-frame">
-          <p className="evd-empty">
+      <div className="eday">
+        <div className="eday-frame">
+          <p className="eday-empty">
             This event is unavailable —{" "}
-            <Link className="evd-open-link" to="/event-day">
+            <Link className="eday-open-link" to="/event-day">
               choose an event
             </Link>
           </p>
@@ -246,11 +246,11 @@ export function BattleBoardPage() {
       : null;
 
   return (
-    <div className="evd">
-      <div className="evd-frame">
+    <div className="eday">
+      <div className="eday-frame">
         <div className="bbd-bar bbd-no-print">
           <Link
-            className="evd-run-back"
+            className="eday-run-back"
             to={`/event-day/${event._id}`}
             aria-label="Back to event map"
           >
@@ -259,7 +259,7 @@ export function BattleBoardPage() {
           <span className="bbd-bar-title">Battle board</span>
           <button
             type="button"
-            className="evd-run-arm"
+            className="eday-run-arm"
             onClick={() => window.print()}
           >
             Print / Save PDF

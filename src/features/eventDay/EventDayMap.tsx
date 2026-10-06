@@ -69,9 +69,9 @@ export function EventDayMap({ sections, sealed, onOpen }: Props) {
   const layouts = BOXES.layouts;
   const lockPath = `M${layouts.x + layouts.w / 2},${layouts.y + layouts.h} L${layouts.x + layouts.w / 2},${LOCK_Y}`;
   return (
-    <div className="evd-map">
+    <div className="eday-map">
       <svg
-        className="evd-routes"
+        className="eday-routes"
         viewBox={`0 0 ${W} ${H}`}
         preserveAspectRatio="none"
         aria-hidden
@@ -81,13 +81,13 @@ export function EventDayMap({ sections, sealed, onOpen }: Props) {
           return (
             <path
               key={`${from}-${to}`}
-              className={`evd-route evd-route-${status}`}
+              className={`eday-route eday-route-${status}`}
               d={routePath(BOXES[from], BOXES[to])}
             />
           );
         })}
         <path
-          className={`evd-route ${sealed ? "evd-route-ready" : "evd-route-dormant"}`}
+          className={`eday-route ${sealed ? "eday-route-ready" : "eday-route-dormant"}`}
           d={lockPath}
         />
       </svg>
@@ -100,7 +100,7 @@ export function EventDayMap({ sections, sealed, onOpen }: Props) {
         />
       ))}
       <div
-        className={`evd-lock ${sealed ? "evd-lock-open" : ""}`}
+        className={`eday-lock ${sealed ? "eday-lock-open" : ""}`}
         style={{ top: `${(LOCK_Y / H) * 100}%` }}
         title={sealed ? "Plan is final" : "Plan not final yet"}
       >

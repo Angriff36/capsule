@@ -6,9 +6,9 @@ type Props = {
 };
 
 const TONE_STROKE: Record<Props["tone"], string> = {
-  ok: "var(--evd-ready)",
-  warn: "var(--evd-review)",
-  danger: "var(--evd-blocked)",
+  ok: "var(--eday-ready)",
+  warn: "var(--eday-review)",
+  danger: "var(--eday-blocked)",
 };
 
 /** The overall-readiness dial from the north-star mock. */
@@ -28,14 +28,14 @@ export function EventDayReadinessRing({ pct, label, tone, daysOut }: Props) {
             : "Wrapped";
   return (
     <div
-      className="evd-ring"
+      className="eday-ring"
       role="img"
       aria-label={`Overall readiness ${clamped}%, ${label}`}
     >
       <svg viewBox="0 0 100 100">
-        <circle className="evd-ring-track" cx="50" cy="50" r={r} />
+        <circle className="eday-ring-track" cx="50" cy="50" r={r} />
         <circle
-          className="evd-ring-arc"
+          className="eday-ring-arc"
           cx="50"
           cy="50"
           r={r}
@@ -44,10 +44,10 @@ export function EventDayReadinessRing({ pct, label, tone, daysOut }: Props) {
           strokeDashoffset={circumference * (1 - clamped / 100)}
         />
       </svg>
-      <div className="evd-ring-core">
-        <span className="evd-ring-pct">{clamped}%</span>
-        <span className={`evd-ring-sub evd-tone-${tone}`}>{label}</span>
-        {days ? <span className="evd-ring-sub">{days}</span> : null}
+      <div className="eday-ring-core">
+        <span className="eday-ring-pct">{clamped}%</span>
+        <span className={`eday-ring-sub eday-tone-${tone}`}>{label}</span>
+        {days ? <span className="eday-ring-sub">{days}</span> : null}
       </div>
     </div>
   );

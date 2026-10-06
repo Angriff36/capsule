@@ -18,7 +18,7 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--evd-ink-2);
+  color: var(--eday-ink-2);
 }
 
 .bbd-doc {
@@ -250,8 +250,8 @@
 }
 
 /* Browser print → "Save as PDF": only the document reaches the paper.
-   The board sits inside the Event Day phone frame (.evd fixed + scrolling,
-   .evd-frame relative, max-width 430px). An absolutely positioned .bbd-doc
+   The board sits inside the Event Day phone frame (.eday fixed + scrolling,
+   .eday-frame relative, max-width 430px). An absolutely positioned .bbd-doc
    sized itself against that frame, so a Letter sheet printed a phone-width
    column and long boards could not paginate (#357). In print the frame is
    released to normal flow and the document flows across the full sheet. */
@@ -261,7 +261,7 @@
   body:where(:has(.bbd-doc)) * {
     visibility: hidden;
   }
-  .evd:has(.bbd-doc) {
+  .eday:has(.bbd-doc) {
     position: static;
     inset: auto;
     overflow: visible;
@@ -269,7 +269,7 @@
     background: none;
     color-scheme: light;
   }
-  .evd:has(.bbd-doc) .evd-frame {
+  .eday:has(.bbd-doc) .eday-frame {
     position: static;
     display: block;
     max-width: none;

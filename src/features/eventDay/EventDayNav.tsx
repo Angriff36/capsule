@@ -108,15 +108,15 @@ export function EventDayNav({
     },
   ];
   return (
-    <nav className="evd-nav">
+    <nav className="eday-nav">
       {items.map((item) =>
         item.active ? (
-          <span key={item.label} className="evd-nav-item evd-nav-on">
+          <span key={item.label} className="eday-nav-item eday-nav-on">
             <NavGlyph shape={item.glyph} />
             {item.label}
           </span>
         ) : (
-          <Link key={item.label} className="evd-nav-item" to={item.to}>
+          <Link key={item.label} className="eday-nav-item" to={item.to}>
             <NavGlyph shape={item.glyph} />
             {item.label}
           </Link>
