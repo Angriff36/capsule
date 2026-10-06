@@ -16,7 +16,13 @@
  */
 import { createHash } from "node:crypto";
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 
 const files = process.argv.slice(2);
@@ -25,7 +31,9 @@ if (files.length === 0) {
   process.exit(64);
 }
 const worktree = process.cwd();
-const head = execFileSync("git", ["-C", worktree, "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+const head = execFileSync("git", ["-C", worktree, "rev-parse", "HEAD"], {
+  encoding: "utf8",
+}).trim();
 const key = createHash("sha1")
   .update(head + "\n" + [...files].sort().join("\n"))
   .digest("hex")
@@ -47,7 +55,9 @@ function report() {
 if (existsSync(exitFile)) report();
 
 // A run with no result after 3 hours died (reboot, killed); start it again.
-const stale = existsSync(cmdFile) && Date.now() - statSync(cmdFile).mtimeMs > 3 * 60 * 60 * 1000;
+const stale =
+  existsSync(cmdFile) &&
+  Date.now() - statSync(cmdFile).mtimeMs > 3 * 60 * 60 * 1000;
 if (!existsSync(cmdFile) || stale) {
   writeFileSync(
     cmdFile,
@@ -76,5 +86,7 @@ while (Date.now() < deadline) {
 }
 const age = Math.round((Date.now() - statSync(cmdFile).mtimeMs) / 60000);
 console.log(`RUNNING for ${age} min, commit=${head.slice(0, 8)} log=${log}`);
-console.log("Run the same command again for the result (this round or the next).");
+console.log(
+  "Run the same command again for the result (this round or the next).",
+);
 process.exit(2);
