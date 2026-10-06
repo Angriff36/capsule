@@ -12,8 +12,9 @@ import { modules } from "./convex-test-modules";
 const S = {
   tenantA: "tenant-workforce-a",
   tenantB: "tenant-workforce-b",
-  startsAt: Date.UTC(2026, 6, 20, 15, 0),
-  endsAt: Date.UTC(2026, 6, 20, 23, 0),
+  // Ahead of now, so starting the shift is a live clock-in.
+  startsAt: Date.now() + 24 * 60 * 60_000,
+  endsAt: Date.now() + 32 * 60 * 60_000,
 } as const;
 
 function harness() {
@@ -144,6 +145,31 @@ describe("runtime proof: Shift schedule -> start -> complete", () => {
         clockOutAt: expect.any(Number),
       }),
     ]);
+  });
+
+  it("records no seconds-long entry when a finished shift is started after the fact", async () => {
+    const proof = harness();
+    const { manager, personId } = await hireWorkforceStaff(proof, S.tenantA);
+    const created = (await proof.executeCommand(
+      manager,
+      api.mutations.Shift_createViaSchedule,
+      {
+        personId,
+        startsAt: Date.now() - 10 * 60 * 60_000,
+        endsAt: Date.now() - 2 * 60 * 60_000,
+      },
+    )) as { docId: string };
+    await proof.executeCommand(manager, api.mutations.Shift_start, {
+      docId: created.docId,
+      version: 1,
+    });
+    await proof.executeCommand(manager, api.mutations.Shift_complete, {
+      docId: created.docId,
+      version: 2,
+    });
+    expect(
+      await manager.run(async (ctx) => ctx.db.query("timeRecords").collect()),
+    ).toEqual([]);
   });
 
   it("denies kitchen staff and leaves no partial shift", async () => {

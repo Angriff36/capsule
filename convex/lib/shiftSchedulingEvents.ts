@@ -366,7 +366,9 @@ export async function clockShiftTime(
     row.clockInAt != null && row.clockOutAt == null);
   const system = TenantSystemCommandRunner.forTenant(ctx, shift.tenantId).context;
   if (direction === "in") {
-    if (open.length > 0) return;
+    // Starting a shift that is already over is bookkeeping after the fact,
+    // not clocking in; those hours go on the time sheet as worked.
+    if (open.length > 0 || (shift.endsAt != null && Date.now() > shift.endsAt)) return;
     await system.runMutation(api.mutations.TimeRecord_createViaClockIn, {
       personId: shift.personId,
       shiftId: shift._id,
