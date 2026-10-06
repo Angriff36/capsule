@@ -83,12 +83,32 @@ export const PAGE_GUIDES: PageGuide[] = [
   },
   {
     prefix: "/events/capacity",
-    title: "Capacity planner",
+    title: "Room sizes",
     purpose:
-      "See how full each day is so you know when you can safely take another booking.",
+      "Guests who said yes, set against how many the venue holds, and rooms booked for two events at once.",
     steps: [
-      "Look for crowded days before confirming a new event.",
+      "Look for full rooms and double bookings before you confirm a new event.",
       "Click a day to see what's already booked.",
+    ],
+  },
+  {
+    prefix: "/events/checklists",
+    title: "Event checklists",
+    purpose: "Lists of to-dos you use again and again.",
+    steps: [
+      "Make a checklist once for work you repeat.",
+      "Put it on an event from the event's To-dos page.",
+    ],
+  },
+  {
+    prefix: "/events/planning",
+    title: "Planning setup",
+    purpose:
+      "How the planning board checks a plan, which stages events move into by themselves, and what the board suggests.",
+    steps: [
+      "Set how loud each check is: Fix first, Worth a look, or Off.",
+      "Add planning rules for what the board should suggest.",
+      "Fill in the truck and equipment facts the checks need.",
     ],
   },
   {
