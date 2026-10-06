@@ -83,12 +83,27 @@ async function runComparison(
   /** Differences still open for events inside the window. */
   openInWindow: number;
 }> {
-  const links = (
-    await ctx.db
+  // Only venue, event and person links take part; reading every link of
+  // the company is too much once the archive imports land.
+  const read = await Promise.all([
+    ...["venue", "event"].map((recordType) =>
+      ctx.db
+        .query("externalRecordLinks")
+        .withIndex("by_tenantId_and_recordType", (q) =>
+          q.eq("tenantId", tenantId).eq("recordType", recordType),
+        )
+        .collect(),
+    ),
+    ctx.db
       .query("externalRecordLinks")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .collect()
-  ).filter(
+      .withIndex("by_tenantId_and_capsuleEntity", (q) =>
+        q.eq("tenantId", tenantId).eq("capsuleEntity", "person"),
+      )
+      .collect(),
+  ]);
+  const links = [
+    ...new Map(read.flat().map((link) => [String(link._id), link])).values(),
+  ].filter(
     (link) =>
       link.sourceSystem === "tpp_legacy" &&
       link.deletedAt == null &&

@@ -41,12 +41,13 @@ async function findMatch(
   const matched = (
     await ctx.db
       .query("externalRecordLinks")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .withIndex("by_tenantId_and_recordType", (q) =>
+        q.eq("tenantId", tenantId).eq("recordType", SERVICE_STYLE_RECORD_TYPE),
+      )
       .collect()
   ).find(
     (link) =>
       link.deletedAt == null &&
-      link.recordType === SERVICE_STYLE_RECORD_TYPE &&
       link.sourceSystem === sourceSystem &&
       link.externalId === code &&
       link.conflictStatus === "resolved" &&
@@ -109,12 +110,13 @@ export const resolveImportedServiceStyle = mutation({
     const eventLinks = (
       await ctx.db
         .query("externalRecordLinks")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", auth.tenantId))
+        .withIndex("by_tenantId_and_recordType", (q) =>
+          q.eq("tenantId", auth.tenantId).eq("recordType", "event"),
+        )
         .collect()
     ).filter(
       (row) =>
         row.deletedAt == null &&
-        row.recordType === "event" &&
         row.sourceSystem === link.sourceSystem &&
         row.capsuleId,
     );

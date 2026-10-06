@@ -128,7 +128,9 @@ async function authorize(ctx: Ctx) {
 async function tenantLinks(ctx: Ctx, tenantId: string): Promise<Link[]> {
   return await ctx.db
     .query("externalRecordLinks")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .withIndex("by_tenantId_and_recordType", (q) =>
+      q.eq("tenantId", tenantId).eq("recordType", MENU_RECORD_TYPE),
+    )
     .filter((q) =>
       q.and(
         // Links written before the soft-delete field existed have no
@@ -137,7 +139,6 @@ async function tenantLinks(ctx: Ctx, tenantId: string): Promise<Link[]> {
           q.eq(q.field("deletedAt"), null),
           q.eq(q.field("deletedAt"), undefined),
         ),
-        q.eq(q.field("recordType"), MENU_RECORD_TYPE),
         // Only rows the TPP menus import made; other import sources are not
         // this cleanup's business.
         q.eq(q.field("sourceSystem"), SOURCE_SYSTEM),
