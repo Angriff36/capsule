@@ -220,13 +220,14 @@ export function RosterPage() {
         ? personName(need.claimedByPersonId)
         : null,
     }));
+  // Clashes on shifts that already ended need no action; show what is ahead.
   const rosterConflicts = findRosterConflicts({
     shifts: activeShifts,
     timeOff: timeOffRequests ?? [],
     qualifications: qualifications ?? [],
     eventTitle: eventName,
     personName,
-  });
+  }).filter((conflict) => conflict.endsAt >= Date.now());
   const selectedWeekEndsAt = addScheduleWeeks(selectedWeekStartsAt, 1);
   const selectedWeekShifts = shiftsInScheduleWeek(
     activeShifts,
