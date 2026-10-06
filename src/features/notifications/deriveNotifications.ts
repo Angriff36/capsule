@@ -28,7 +28,8 @@ export interface AppNotification {
     | "system_health"
     | "date_opened"
     | "review_flag"
-    | "equipment_problem";
+    | "equipment_problem"
+    | "maintenance_due";
   message: string;
   /** Route to the relevant record. */
   link: string;
@@ -53,6 +54,7 @@ export const NOTIFICATION_KIND_LABELS: Record<AppNotification["kind"], string> =
     date_opened: "Date open",
     review_flag: "Question",
     equipment_problem: "Equipment",
+    maintenance_due: "Upkeep",
   };
 
 /** Stage changes older than this are history, not notifications. */
@@ -109,6 +111,14 @@ export interface NotificationSources {
   /** Open equipment problems, and the names of the equipment they are about. */
   equipmentIssues?: Doc<"equipmentIssues">[] | undefined;
   equipmentNames?: Record<string, string>;
+  /** Truck and equipment service that is past due (worked out on the server). */
+  maintenanceDue?: Array<{
+    id: string;
+    name: string;
+    task: string;
+    link: string;
+    at: number;
+  }>;
 }
 
 /** Staff messages are retained for 90 days; older ones drop out of the UI. */
@@ -513,6 +523,16 @@ export function deriveNotifications(
         ? `/events/${issue.eventId}`
         : "/facilities/equipment",
       at: issue.raisedAt,
+    });
+  }
+
+  for (const due of src.maintenanceDue ?? []) {
+    out.push({
+      id: `maintenance-due:${due.id}`,
+      kind: "maintenance_due",
+      message: `${due.name}: ${due.task} is overdue`,
+      link: due.link,
+      at: due.at,
     });
   }
 

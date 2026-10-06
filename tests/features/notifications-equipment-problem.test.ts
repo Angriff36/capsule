@@ -68,4 +68,29 @@ describe("equipment problems reach the bell", () => {
     );
     expect(out).toEqual([]);
   });
+
+  it("overdue truck or equipment service reaches the bell as upkeep", () => {
+    const out = deriveNotifications(
+      sources({
+        maintenanceDue: [
+          {
+            id: "vehicle:s1:100",
+            name: "WA 1 Dodge Ram",
+            task: "Oil change",
+            link: "/logistics/maintenance",
+            at: 100,
+          },
+        ],
+      }),
+    );
+    expect(out).toEqual([
+      {
+        id: "maintenance-due:vehicle:s1:100",
+        kind: "maintenance_due",
+        message: "WA 1 Dodge Ram: Oil change is overdue",
+        link: "/logistics/maintenance",
+        at: 100,
+      },
+    ]);
+  });
 });

@@ -20,7 +20,10 @@
 // sync with src/foundation/base.manifest if a role grant moves.
 import type { Doc, Id } from "./_generated/dataModel";
 import { query } from "./_generated/server";
-import { deriveNotifications } from "../src/features/notifications/deriveNotifications";
+import {
+  deriveNotifications,
+  type NotificationSources,
+} from "../src/features/notifications/deriveNotifications";
 import { findRosterConflicts } from "../src/features/workforce/rosterConflicts";
 import { getAuthContext, type AppAuthContext } from "./lib/authContext";
 import { orgCapabilityDeniesAction } from "./lib/orgCapabilityGate";
@@ -341,6 +344,73 @@ export const listNotifications = query({
       ),
     ]);
 
+    // Service that is past due: trucks (by date or by miles) and equipment.
+    const maintenanceDue: NonNullable<NotificationSources["maintenanceDue"]> =
+      [];
+    const now = Date.now();
+    if (can(auth, "logisticsAccess", "manageAccess")) {
+      const [schedules, vehicles, fuel, service] = await Promise.all([
+        ctx.db
+          .query("vehicleMaintenanceSchedules")
+          .withIndex("by_tenantId", byTenant)
+          .collect(),
+        ctx.db.query("vehicles").withIndex("by_tenantId", byTenant).collect(),
+        ctx.db
+          .query("vehicleFuelLogs")
+          .withIndex("by_tenantId", byTenant)
+          .collect(),
+        ctx.db
+          .query("vehicleServiceEntries")
+          .withIndex("by_tenantId", byTenant)
+          .collect(),
+      ]);
+      const odometer = new Map<string, number>();
+      for (const row of [...fuel, ...service]) {
+        if (row.deletedAt != null) continue;
+        const id = String(row.vehicleId);
+        odometer.set(id, Math.max(odometer.get(id) ?? 0, row.odometer));
+      }
+      for (const schedule of schedules) {
+        if (schedule.deletedAt != null) continue;
+        const vehicle = vehicles.find((row) => row._id === schedule.vehicleId);
+        if (!vehicle || vehicle.deletedAt != null) continue;
+        const overdue =
+          schedule.intervalType === "mileage"
+            ? schedule.nextDueMileage != null &&
+              (odometer.get(String(schedule.vehicleId)) ?? 0) >=
+                schedule.nextDueMileage
+            : schedule.nextDueAt != null && schedule.nextDueAt < now;
+        if (!overdue) continue;
+        maintenanceDue.push({
+          id: `vehicle:${schedule._id}:${schedule.nextDueAt ?? schedule.nextDueMileage}`,
+          name: `${vehicle.registration} ${vehicle.make} ${vehicle.model}`.trim(),
+          task: schedule.taskName,
+          link: "/logistics/maintenance",
+          at: schedule.nextDueAt ?? schedule.updatedAt ?? now,
+        });
+      }
+    }
+    if (can(auth, "inventoryAccess", "logisticsAccess")) {
+      const tasks = await ctx.db
+        .query("equipmentMaintenanceTasks")
+        .withIndex("by_tenantId", byTenant)
+        .collect();
+      for (const task of tasks) {
+        if (task.deletedAt != null || task.nextDueAt == null) continue;
+        if (task.nextDueAt >= now) continue;
+        const item = await ctx.db.get(task.equipmentId);
+        if (!item || item.tenantId !== tenantId || item.deletedAt != null)
+          continue;
+        maintenanceDue.push({
+          id: `equipment:${task._id}:${task.nextDueAt}`,
+          name: item.name,
+          task: task.taskName,
+          link: "/facilities/equipment",
+          at: task.nextDueAt,
+        });
+      }
+    }
+
     // Names of the equipment those problems are about, tenant-checked.
     const equipmentNames: Record<string, string> = {};
     await Promise.all(
@@ -511,6 +581,7 @@ export const listNotifications = query({
       reviewFlags,
       equipmentIssues,
       equipmentNames,
+      maintenanceDue,
     });
   },
 });
