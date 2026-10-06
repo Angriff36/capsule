@@ -235,19 +235,15 @@ export function VenuesPage() {
                 type="text"
                 name="name"
                 required
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="Grand Ballroom"
+                className="input mt-1"
+                placeholder="e.g. Grand Ballroom"
               />
             </div>
             <div>
               <label className="block text-xs font-medium text-ink-2">
                 Type *
               </label>
-              <select
-                name="venueType"
-                required
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-              >
+              <select name="venueType" required className="input mt-1">
                 {VENUE_TYPES.map((type) => (
                   <option key={type} value={type}>
                     {VENUE_TYPE_LABELS[type]}
@@ -282,7 +278,7 @@ export function VenuesPage() {
                   <input
                     type="text"
                     name="kitchenAccess"
-                    className="mt-1 block w-full rounded-sm border-line-2 shadow-sm text-xs"
+                    className="input mt-1"
                     placeholder="e.g., Full kitchen, warming station only, no kitchen"
                   />
                 </div>
@@ -293,7 +289,7 @@ export function VenuesPage() {
                   <input
                     type="text"
                     name="loadInInstructions"
-                    className="mt-1 block w-full rounded-sm border-line-2 shadow-sm text-xs"
+                    className="input mt-1"
                     placeholder="e.g., Dock door 3, load-in 6:00–8:00am, freight entrance off Maple"
                   />
                 </div>
@@ -306,7 +302,7 @@ export function VenuesPage() {
                       <select
                         name={field.name}
                         defaultValue=""
-                        className="mt-1 block w-full rounded-sm border-line-2 text-xs"
+                        className="input mt-1"
                       >
                         <option value="">Unknown</option>
                         <option value="true">Yes</option>
@@ -326,8 +322,8 @@ export function VenuesPage() {
                 name="capacity"
                 required
                 min="1"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="150"
+                className="input mt-1"
+                placeholder="e.g. 150"
               />
             </div>
             <div>
@@ -337,8 +333,8 @@ export function VenuesPage() {
               <input
                 type="text"
                 name="addressLine1"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="123 Main St"
+                className="input mt-1"
+                placeholder="e.g. 123 Main St"
               />
             </div>
             <div>
@@ -348,8 +344,8 @@ export function VenuesPage() {
               <input
                 type="text"
                 name="city"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="Springfield"
+                className="input mt-1"
+                placeholder="e.g. Springfield"
               />
             </div>
             <div>
@@ -359,8 +355,8 @@ export function VenuesPage() {
               <input
                 type="text"
                 name="region"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="IL"
+                className="input mt-1"
+                placeholder="e.g. IL"
               />
             </div>
             <div>
@@ -370,8 +366,8 @@ export function VenuesPage() {
               <input
                 type="text"
                 name="postalCode"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="62701"
+                className="input mt-1"
+                placeholder="e.g. 62701"
               />
             </div>
             <VenueCoordinatesFields />
@@ -382,8 +378,8 @@ export function VenuesPage() {
               <input
                 type="text"
                 name="contactName"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="John Smith"
+                className="input mt-1"
+                placeholder="e.g. John Smith"
               />
             </div>
             <div>
@@ -393,8 +389,8 @@ export function VenuesPage() {
               <input
                 type="email"
                 name="contactEmail"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="john@example.com"
+                className="input mt-1"
+                placeholder="e.g. john@example.com"
               />
             </div>
             <div>
@@ -404,8 +400,8 @@ export function VenuesPage() {
               <input
                 type="tel"
                 name="contactPhone"
-                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
-                placeholder="(555) 123-4567"
+                className="input mt-1"
+                placeholder="e.g. (555) 123-4567"
               />
             </div>
           </div>
@@ -416,7 +412,7 @@ export function VenuesPage() {
             <textarea
               name="accessNotes"
               rows={2}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1"
               placeholder="Loading dock available, stairs to second floor..."
             />
           </div>
@@ -427,7 +423,7 @@ export function VenuesPage() {
             <textarea
               name="cateringNotes"
               rows={2}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1"
               placeholder="Kitchen available, equipment restrictions..."
             />
           </div>
@@ -438,7 +434,7 @@ export function VenuesPage() {
             <textarea
               name="logisticsNotes"
               rows={2}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1"
               placeholder="Any other logistics context not captured above..."
             />
           </div>
@@ -449,7 +445,7 @@ export function VenuesPage() {
             <textarea
               name="wasteRules"
               rows={2}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1"
               placeholder="e.g., Dumpster behind dock, no grease disposal on-site, recycling required"
             />
           </div>
@@ -460,7 +456,7 @@ export function VenuesPage() {
             <textarea
               name="permitsInsuranceNotes"
               rows={2}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1"
               placeholder="e.g., COI required naming venue, sound permit needed, open-flame permit"
             />
           </div>
@@ -471,7 +467,7 @@ export function VenuesPage() {
             <textarea
               name="restrictions"
               rows={2}
-              className="mt-1 block w-full rounded-sm border-line-2 shadow-sm"
+              className="input mt-1"
               placeholder="e.g., No open flame, sound curfew 10pm, no tape on walls"
             />
           </div>

@@ -20,6 +20,10 @@ export type VenueLogisticsProfile = VenueOperatingFacts & {
   readonly parkingAvailable?: boolean | null;
   readonly kitchenAccess?: string | null;
   readonly loadInInstructions?: string | null;
+  readonly contactName?: string | null;
+  readonly contactPhone?: string | null;
+  readonly hasStairs?: boolean | null;
+  readonly waterAccess?: boolean | null;
 };
 
 /** The free-text fields setLogisticsProfile writes, in form order. */
@@ -96,12 +100,15 @@ export type VenueLogisticsLine = { label: string; value: string };
 export function venueLogisticsLines(
   venue: VenueLogisticsProfile,
 ): VenueLogisticsLine[] {
-  const contact = [
-    clean(venue.dayOfContactName),
-    clean(venue.dayOfContactPhone),
-  ]
+  // The day-of contact if one is set, else the venue's own contact.
+  const dayOf = [clean(venue.dayOfContactName), clean(venue.dayOfContactPhone)]
     .filter(Boolean)
     .join(" · ");
+  const contact =
+    dayOf ||
+    [clean(venue.contactName), clean(venue.contactPhone)]
+      .filter(Boolean)
+      .join(" · ");
   const lines: Array<[string, string | null]> = [
     ["Day-of access contact", contact || null],
     [
@@ -110,7 +117,11 @@ export function venueLogisticsLines(
     ],
     [
       "Loading dock access",
-      joined(clean(venue.loadingDock), clean(venue.loadInInstructions)),
+      joined(
+        clean(venue.loadingDock),
+        clean(venue.loadInInstructions),
+        yesNo(venue.hasStairs, "Stairs at load-in", "No stairs at load-in"),
+      ),
     ],
     [
       "Elevator",
@@ -129,6 +140,7 @@ export function venueLogisticsLines(
         clean(venue.kitchenAccess),
         yesNo(venue.hasOven, "Oven on site", "No oven"),
         yesNo(venue.hasRefrigeration, "Fridge on site", "No fridge"),
+        yesNo(venue.waterAccess, "Water on site", "No water on site"),
         clean(venue.kitchenEquipment),
       ),
     ],
