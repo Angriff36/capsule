@@ -122,3 +122,20 @@ describe("Event Day contacts section when numbers are withheld", () => {
     expect(gap.status).toBe("review");
   });
 });
+
+describe("Event Day venue for a pickup order", () => {
+  it("counts the venue as ready when the order is picked up at the kitchen", () => {
+    const input = completeInput();
+    input.event = { ...input.event, venueId: null, venueName: null };
+    input.venue = undefined;
+    const open = deriveEventDay(input).sections.find(
+      (row) => row.key === "venue",
+    )!;
+    expect(open.status).not.toBe("ready");
+    const pickup = deriveEventDay({ ...input, pickup: true }).sections.find(
+      (row) => row.key === "venue",
+    )!;
+    expect(pickup.status).toBe("ready");
+    expect(pickup.caption).toBe("Pickup at the kitchen");
+  });
+});

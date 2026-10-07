@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { PICKUP_PLACE, useIsPickupEvent } from "../eventVenueLabel";
 import { Link } from "react-router-dom";
 import { formatDate, formatTime } from "../../../lib/format";
 import {
@@ -56,6 +57,7 @@ export function EventPhoneBrief({
   readonly onOpen: (id: DashSheetId) => void;
 }) {
   const { event, eventId } = props;
+  const pickup = useIsPickupEvent(event);
   const proposals = useEventProposals(eventId);
   const prepTasks = useEventPrepTasks(eventId);
   const packLists = useEventPackLists(eventId);
@@ -152,7 +154,7 @@ export function EventPhoneBrief({
             ? `${formatDate(props.startsAt)} · ${formatTime(props.startsAt)} – ${formatTime(props.endsAt)}`
             : "No date set"}
           <br />
-          {venueLine || "No venue yet"}
+          {venueLine || (pickup ? PICKUP_PLACE : "No venue yet")}
         </Row>
         <Row
           label="Contact"

@@ -49,7 +49,7 @@ import {
 } from "../../lib/eventScopedQueries";
 import { useTrackRecent } from "../../lib/recents";
 import { DownloadIcon } from "../../ui/icons";
-import { eventVenueLabel } from "./eventVenueLabel";
+import { eventVenueLabel, useIsPickupEvent } from "./eventVenueLabel";
 import { useCascadeReceiptToast } from "./useCascadeReceiptToast";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
@@ -208,6 +208,7 @@ function EventDetailContent({
   );
   const people = useHeldQueryRows("people", useListPerson());
   const venues = useHeldQueryRows("venues", useListVenue());
+  const pickup = useIsPickupEvent(event);
   const { branding } = useTenantBranding();
   const submitForApproval = useEventSubmitForApproval();
   const approve = useEventApprove();
@@ -264,6 +265,7 @@ function EventDetailContent({
     venueName: event.venueName,
     venue,
     venuesLoading: venues === undefined,
+    pickup,
   });
 
   const setTab = (tab: EventDetailTab) => {

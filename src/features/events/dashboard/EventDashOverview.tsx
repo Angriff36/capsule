@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { PICKUP_PLACE, useIsPickupEvent } from "../eventVenueLabel";
 import { Link } from "react-router-dom";
 import type { Id } from "../../../lib/api";
 import {
@@ -123,8 +124,10 @@ export function EventDashOverview({
   readonly onOpen: (id: DashSheetId) => void;
 }) {
   const { event, eventId } = props;
+  const pickup = useIsPickupEvent(event);
   // Events link a venue record; the old free-text name is only a fallback.
-  const venueName = props.venue?.name || event.venueName;
+  const venueName =
+    props.venue?.name || event.venueName || (pickup ? PICKUP_PLACE : undefined);
   const invoices = useListInvoice();
   const comments = useEventTimelineComments(eventId);
   const canManagePacket = useEventPacketAccess(eventId);
