@@ -11,6 +11,10 @@ import { useRef, useState, type ChangeEvent } from "react";
 import { api } from "../../../lib/api";
 import { sourceRowsFromGrid } from "../../../lib/importSourceFile";
 import { tppMenuTableToRows } from "../../../lib/tppMenuCsv";
+import {
+  contactTaskRowsFromGrid,
+  isContactTasksReport,
+} from "../../../lib/tppReports/parseContactTasks";
 import { importRunDetailPath } from "./importRoutes";
 import { sourceFileGrid } from "./sourceFileGrid";
 import { Link } from "react-router-dom";
@@ -100,6 +104,12 @@ export function QuickFileImport() {
           setColumns(
             `Kept with each row as written: ${read.keptAsWritten.join(", ")}.`,
           );
+      } else if (kind === "history" && isContactTasksReport(grid)) {
+        // TPP's Contact Tasks & Notes prints blocks, not one heading row.
+        rows = contactTaskRowsFromGrid(grid);
+        setColumns(
+          `Read as the old system's Contact Tasks & Notes: ${rows.length.toLocaleString()} tasks. Each joins its event by event number, or its client by name.`,
+        );
       } else {
         const read = sourceRowsFromGrid(grid, kind);
         if (read.rows.length === 0)

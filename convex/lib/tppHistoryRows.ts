@@ -11,6 +11,8 @@ export type ParsedHistoryRow = {
   contactId?: string;
   companyId?: string;
   eventId?: string;
+  /** A client named only by name (TPP's Contact Tasks & Notes report). */
+  contactName?: string;
   occurredAt: number;
   medium: HistoryMedium;
   summary: string;
@@ -100,7 +102,8 @@ export function parseTppHistory(rows: unknown[]): HistoryParseResult {
     const contactId = text(row, "ContactID");
     const companyId = text(row, "CompanyID", "ClientID");
     const eventId = text(row, "EventID", "InvoiceNumber");
-    if (!contactId && !companyId && !eventId) {
+    const contactName = text(row, "ContactName");
+    if (!contactId && !companyId && !eventId && !contactName) {
       errors.push({
         recordIndex: index,
         field: "ContactID",
@@ -118,6 +121,7 @@ export function parseTppHistory(rows: unknown[]): HistoryParseResult {
       contactId: contactId || undefined,
       companyId: companyId || undefined,
       eventId: eventId || undefined,
+      contactName: contactName || undefined,
       occurredAt,
       medium: historyMedium(text(row, "HistoryType", "ActivityType", "Type")),
       summary,

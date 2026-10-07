@@ -330,7 +330,7 @@ export const countRunLinks = internalQuery({
  * e.g. events → contact name) AND the input row exactly as received, under
  * its own `sourceRow` key, so raw source stays apart from the interpretation.
  */
-async function loadClientNames(
+export async function loadClientNames(
   ctx: ActionCtx,
   tenantId: string,
 ): Promise<ClientName[]> {
