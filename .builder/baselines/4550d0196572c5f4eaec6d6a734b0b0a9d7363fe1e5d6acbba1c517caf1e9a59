@@ -47151,6 +47151,7 @@ async function __runPayrollInputFinalize(ctx: MutationCtx, { docId, version }: a
     if (!((doc.status === "prepared"))) throw new Error("Guard 0 failed");
     if (!((doc.preparedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((doc.periodStart <= Date.now()))) throw new Error("This pay period hasn't started yet. Finalize it once the work is done.");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {

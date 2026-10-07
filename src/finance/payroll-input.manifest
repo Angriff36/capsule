@@ -116,6 +116,8 @@ entity PayrollInput mixin TenantScoped, SoftDeletable {
     guard self.status == "prepared"
     guard self.preparedAt != null
     guard self.deletedAt == null
+    // Pay is for work done: a period still ahead is prepared, not final.
+    constraint finalizeWorkedPeriod: self.periodStart <= now() "This pay period hasn't started yet. Finalize it once the work is done."
     mutate status = "finalized"
     mutate finalizedAt = now()
     emit PayrollInputFinalized {
