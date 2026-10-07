@@ -245,7 +245,9 @@ export async function ensureEventDraftInvoice(
           discountAmount: Number(source.discountAmount ?? 0),
           total: signedTotal,
           lineItems: [],
-          taxBreakdown: [],
+          // The tax report adds up the per-rate lines, so the signed tax is
+          // spread over them as well.
+          taxBreakdown: await signedTaxBreakdown(ctx, event, source),
         }
       : {
           ...(await eventPriceTotals(ctx, event, quotedPrice)),
@@ -382,6 +384,44 @@ async function itemizedFromProposal(ctx: MutationCtx, proposal: Doc<"proposals">
     lineItems: worked.lineItems,
     taxBreakdown: worked.taxBreakdown,
   };
+}
+
+/**
+ * Per-rate tax lines for a proposal's signed tax: the workspace rates worked
+ * on its subtotal, scaled so they add up to exactly the tax the client
+ * signed. With no rate, one line carries it all.
+ */
+async function signedTaxBreakdown(
+  ctx: MutationCtx,
+  event: Doc<"events">,
+  proposal: Doc<"proposals">,
+) {
+  const signed = Number(proposal.taxAmount ?? 0);
+  if (!(signed > 0)) return [];
+  const subtotal = Number(proposal.subtotal ?? 0);
+  const worked = (await eventPriceTotals(ctx, event, subtotal)).taxBreakdown as Array<{
+    amount: number;
+    name: string;
+    percentage: number;
+    taxRateId?: string;
+  }>;
+  const workedTotal = worked.reduce((sum, row) => sum + Number(row.amount), 0);
+  if (worked.length === 0 || !(workedTotal > 0)) {
+    const percentage =
+      subtotal > 0 ? Math.round((signed / subtotal) * 10000) / 100 : 0;
+    return [{ name: "Sales tax", percentage, amount: signed }];
+  }
+  // Scale in cents; the last line takes the rounding so the sum is exact.
+  const signedCents = Math.round(signed * 100);
+  let given = 0;
+  return worked.map((row, index) => {
+    const cents =
+      index === worked.length - 1
+        ? signedCents - given
+        : Math.round((Number(row.amount) / workedTotal) * signedCents);
+    given += cents;
+    return { ...row, amount: cents / 100 };
+  });
 }
 
 /** The newest accepted proposal booked onto this event, if any. */

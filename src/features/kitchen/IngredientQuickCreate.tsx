@@ -81,6 +81,9 @@ export function IngredientQuickCreate({
         data-testid="ingredient-quick-create-open"
         onClick={() => {
           setName(initialName.trim());
+          // A fresh ingredient starts from its own name's allergens, never
+          // from boxes ticked on one that was abandoned.
+          setAllergens(null);
           setError(null);
           setOpen(true);
         }}
@@ -218,7 +221,10 @@ export function IngredientQuickCreate({
           type="button"
           className="btn btn-ghost btn-sm"
           disabled={busy}
-          onClick={() => setOpen(false)}
+          onClick={() => {
+            setAllergens(null);
+            setOpen(false);
+          }}
         >
           Cancel
         </button>
