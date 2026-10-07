@@ -347,7 +347,7 @@ export function PaymentsPage() {
                   name="paymentMethodId"
                   defaultValue=""
                 >
-                  <option value="">None — use method kind below</option>
+                  <option value="">None — pick how they paid below</option>
                   {clientMethods.map((method) => (
                     <option key={method._id} value={method._id}>
                       {String(method.methodType)}
@@ -372,8 +372,8 @@ export function PaymentsPage() {
               <div className="supply-form-grid">
                 <label className="field-label">
                   Amount
-                  {/* Starts at what the picked invoice still owes; edit it
-                      for a partial payment. */}
+                  {/* Starts at the unpaid deposit, else what the picked
+                      invoice still owes; edit it for a partial payment. */}
                   <input
                     key={selectedInvoiceId}
                     className="input"
@@ -383,17 +383,22 @@ export function PaymentsPage() {
                     step="0.01"
                     required
                     defaultValue={(() => {
-                      const due = Number(
-                        payableInvoices.find(
-                          (invoice) => invoice._id === selectedInvoiceId,
-                        )?.amountDue ?? 0,
+                      const picked = payableInvoices.find(
+                        (invoice) => invoice._id === selectedInvoiceId,
                       );
+                      const owed = Number(picked?.amountDue ?? 0);
+                      const deposit =
+                        picked?.depositPaidAt == null
+                          ? Number(picked?.depositAmount ?? 0) -
+                            Number(picked?.amountPaid ?? 0)
+                          : 0;
+                      const due = deposit > 0 ? Math.min(deposit, owed) : owed;
                       return due > 0 ? due.toFixed(2) : undefined;
                     })()}
                   />
                 </label>
                 <label className="field-label">
-                  Method kind
+                  Paid by
                   <select className="input" name="method" defaultValue="card">
                     <option value="card">Card</option>
                     <option value="check">Check</option>
