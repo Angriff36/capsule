@@ -6,7 +6,7 @@
 // precise. Menu items read the TPP Menu Items Export; the other kinds read any
 // .xlsx or .csv report with a heading row (src/lib/importSourceFile.ts).
 
-import { useAction } from "convex/react";
+import { useAction, useMutation } from "convex/react";
 import { useRef, useState, type ChangeEvent } from "react";
 import { api } from "../../../lib/api";
 import { sourceRowsFromGrid } from "../../../lib/importSourceFile";
@@ -20,6 +20,13 @@ import {
   venueListingRowsFromGrid,
 } from "../../../lib/tppReports/parseVenueListing";
 import { importRunDetailPath } from "./importRoutes";
+import {
+  addPackageResults,
+  packageSummary,
+  PACKAGES_PER_SAVE,
+  readMenuPackagesFile,
+  type PackageSaveResult,
+} from "./menuPackagesImport";
 import { sourceFileGrid } from "./sourceFileGrid";
 import { Link } from "react-router-dom";
 import { classifyCommandFailure } from "../../events/CommandFailure";
@@ -28,6 +35,7 @@ const CHUNK_SIZE = 500;
 
 const KINDS = [
   { value: "menus", label: "Menu items (TPP Menu Items Export)" },
+  { value: "packages", label: "Menu packages (TPP Menu Item Packages)" },
   { value: "contacts", label: "Contacts and companies (Address / Phone List)" },
   { value: "venues", label: "Venues" },
   { value: "events", label: "Events" },
@@ -55,6 +63,7 @@ interface ChunkResult {
 
 export function QuickFileImport() {
   const importFile = useAction(api.quickImport.importFile);
+  const importPackages = useMutation(api.tppMenuPackages.importTppMenuPackages);
   const fileInput = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState("");
@@ -63,6 +72,7 @@ export function QuickFileImport() {
   const [skippedRows, setSkippedRows] = useState(0);
   const [kind, setKind] = useState<(typeof KINDS)[number]["value"]>("menus");
   const [columns, setColumns] = useState("");
+  const [packageNotes, setPackageNotes] = useState<string[]>([]);
 
   // A file refused under the wrong kind is read again when the kind changes,
   // so nobody has to pick the same file twice.
@@ -83,6 +93,7 @@ export function QuickFileImport() {
     setResults([]);
     setSkippedRows(0);
     setColumns("");
+    setPackageNotes([]);
     setBusy(true);
     // Once any rows went to the server some may be saved even if the call
     // failed, so only a file refused before that is brought in again under
@@ -90,6 +101,55 @@ export function QuickFileImport() {
     const chunks: ChunkResult[] = [];
     let sent = false;
     try {
+      if (kind === "packages") {
+        // The package report tells packages, choice groups and dishes apart
+        // only by font, so it is read from the .xlsx itself.
+        let packages;
+        try {
+          packages = await readMenuPackagesFile(file);
+        } catch {
+          throw new Error(
+            `${file.name} could not be read. Use the old system's Menu Item Packages report as .xlsx.`,
+          );
+        }
+        if (packages.length === 0)
+          throw new Error(
+            `No packages found in ${file.name}. Use the old system's Menu Item Packages report as .xlsx.`,
+          );
+        setColumns(
+          `Read as the old system's Menu Item Packages: ${packages.length} packages, ${packages
+            .reduce(
+              (n, pack) =>
+                n +
+                pack.groups.reduce((m, group) => m + group.dishes.length, 0),
+              0,
+            )
+            .toLocaleString()} dishes.`,
+        );
+        let total: PackageSaveResult = {
+          added: 0,
+          updated: 0,
+          unchanged: 0,
+          lines: 0,
+          leftAlone: [],
+          notFound: [],
+          several: [],
+        };
+        for (let i = 0; i < packages.length; i += PACKAGES_PER_SAVE) {
+          const part = packages.slice(i, i + PACKAGES_PER_SAVE);
+          setProgress(
+            `Saving packages ${i + part.length} of ${packages.length}…`,
+          );
+          sent = true;
+          total = addPackageResults(
+            total,
+            await importPackages({ packages: part }),
+          );
+          setPackageNotes(packageSummary(total));
+        }
+        setProgress("Import complete.");
+        return;
+      }
       const checksum = await fileChecksum(await file.arrayBuffer());
       let grid: string[][];
       try {
@@ -187,11 +247,13 @@ export function QuickFileImport() {
           <p className="text-xs text-ink-2">
             Pick what the file holds, then the file, as .xlsx or .csv. Menu
             items read the TPP Menu Items Export (or any sheet with a Name
-            column). The other kinds read the old system&apos;s report: its
-            headings (First Name, Zip, Venue Name…) are matched for you, and
-            columns Capsule has no place for are kept with each row. Records are
-            made right away — no extra steps. Importing the same file again is
-            safe; records already brought in are skipped.
+            column). Menu packages read the TPP Menu Item Packages report
+            (.xlsx): each package becomes a draft menu with its dishes. The
+            other kinds read the old system&apos;s report: its headings (First
+            Name, Zip, Venue Name…) are matched for you, and columns Capsule has
+            no place for are kept with each row. Records are made right away —
+            no extra steps. Importing the same file again is safe; records
+            already brought in are skipped.
           </p>
         </div>
       </div>
@@ -241,6 +303,18 @@ export function QuickFileImport() {
         <p className="px-4 pb-3 text-xs text-danger" role="alert">
           {error}
         </p>
+      ) : null}
+      {packageNotes.length > 0 ? (
+        <div className="px-4 pb-4" data-testid="quick-import-packages">
+          {packageNotes.map((note, index) => (
+            <p
+              key={note}
+              className={index === 0 ? "text-xs" : "mt-1 text-xs text-ink-3"}
+            >
+              {note}
+            </p>
+          ))}
+        </div>
       ) : null}
       {results.length > 0 ? (
         <div className="px-4 pb-4">

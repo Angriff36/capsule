@@ -327,6 +327,7 @@ import type * as teamChatPushSend from "../teamChatPushSend.js";
 import type * as teamChatSend from "../teamChatSend.js";
 import type * as todayDesk from "../todayDesk.js";
 import type * as tppEquipmentItems from "../tppEquipmentItems.js";
+import type * as tppMenuPackages from "../tppMenuPackages.js";
 import type * as tppParser from "../tppParser.js";
 import type * as tppReportFavorites from "../tppReportFavorites.js";
 import type * as tppReports_contacts from "../tppReports/contacts.js";
@@ -672,6 +673,7 @@ declare const fullApi: ApiFromModules<{
   teamChatSend: typeof teamChatSend;
   todayDesk: typeof todayDesk;
   tppEquipmentItems: typeof tppEquipmentItems;
+  tppMenuPackages: typeof tppMenuPackages;
   tppParser: typeof tppParser;
   tppReportFavorites: typeof tppReportFavorites;
   "tppReports/contacts": typeof tppReports_contacts;

@@ -24,6 +24,7 @@ import {
 } from "../../src/lib/tppMenuCsv";
 import { TPP_INVENTORY_COLUMNS } from "../../src/lib/tppInventoryList";
 import { TPP_CONTACT_TASK_COLUMNS } from "../../src/lib/tppReports/parseContactTasks";
+import { TPP_MENU_PACKAGE_PARTS } from "../../src/lib/tppReports/parseMenuPackages";
 import { TPP_VENUE_LISTING_COLUMNS } from "../../src/lib/tppReports/parseVenueListing";
 import { TPP_STAFF_LIST_COLUMNS } from "../../src/lib/tppStaffList";
 import {
@@ -229,5 +230,29 @@ describe("runtime proof: every source dataset maps, keeps or reports each presen
     for (const entry of TPP_CONTACT_TASK_COLUMNS)
       if (!keptOnLink.includes(entry.field))
         expect(historyFields, entry.column).toContain(entry.field);
+  });
+
+  it("the Menu Item Packages report: every kind of line has a home, and the prices it does not print are stated", () => {
+    // The report has no heading row: the font marks each line (package,
+    // choice group, dish, description). It was printed with "Show Prices?"
+    // off, and no old-system file prints a seasonal or dated price, so
+    // package and seasonal prices are named as not in the file.
+    const parts = TPP_MENU_PACKAGE_PARTS.map((entry) => entry.part);
+    for (const part of [
+      "Package name",
+      "Package description",
+      "Choice group",
+      "Choice group note",
+      "Dish",
+      "Dish description",
+    ])
+      expect(parts).toContain(part);
+    for (const entry of TPP_MENU_PACKAGE_PARTS)
+      expect(entry.goesTo.length, entry.part).toBeGreaterThan(2);
+    expect(
+      TPP_MENU_PACKAGE_PARTS.find(
+        (entry) => entry.part === "Package and seasonal prices",
+      )?.goesTo,
+    ).toMatch(/not in the file/);
   });
 });
