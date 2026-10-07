@@ -3234,6 +3234,24 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-06",
       "reason": "Optional datetime (datetime?, optional in convex/schema.ts) set when a finished event marks a buying need as used (ffe8782e). Old needs simply have no value. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Proposal.depositPercent",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-07",
+      "reason": "Optional int (int?, optional in convex/schema.ts): AC-654 proposal payment schedule. Old proposals simply have no schedule. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Proposal.balanceDueDaysBefore",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-07",
+      "reason": "Optional int (int?, optional in convex/schema.ts): AC-654 proposal payment schedule. Old proposals simply have no schedule. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Proposal.declineReason",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-07",
+      "reason": "Optional string (string?, optional in convex/schema.ts): why a client declined, already on dev (declined proposal reason). Old proposals simply have no reason. The checker reads a nullable field with no default as required."
     }
   ]
 }

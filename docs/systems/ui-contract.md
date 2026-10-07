@@ -294,10 +294,10 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
   - effects: OrganizationBrandLogoSet
   - refresh: live reads update by themselves; reads affected: Organization.list, Organization.get
 - `mutations.Proposal_createViaDraft` (Proposal.draft)
-  - inputs from the screen: clientId, title, subtotal, taxAmount, discountAmount, total, proposalNumber, eventDate, eventEndDate, eventType, guestCount, venueName, venueAddress, expiresAt, notes, terms, visibleSections, eventId, replacesProposalId, sectionOrder; filled by the server: none
+  - inputs from the screen: clientId, title, subtotal, taxAmount, discountAmount, total, proposalNumber, eventDate, eventEndDate, eventType, guestCount, venueName, venueAddress, expiresAt, notes, terms, visibleSections, eventId, replacesProposalId, sectionOrder, depositPercent, balanceDueDaysBefore; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
   - result: allocation `{ docId: string }`
-  - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 6 more
+  - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 8 more
   - effects: ProposalDrafted
   - refresh: live reads update by themselves; reads affected: Proposal.list, Proposal.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 18 more
 - `mutations.QuoteSubmission_dismiss` (QuoteSubmission.dismiss)
@@ -339,7 +339,6 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 - `lib.proposalRevision.sendProposalWithRevisionCapture` - mutation; authored step; live reads update by themselves
 - `messageInbox.ingestInboundMessage` - action; one-time call (not live); the live reads it changes update by themselves
 - `messageInbox.ingestProviderEnvelope` - action; one-time call (not live); the live reads it changes update by themselves
-- `messageInbox.qualifyThreadAsLead` - action; one-time call (not live); the live reads it changes update by themselves
 - `messageReply.sendEmailReply` - action; one-time call (not live); the live reads it changes update by themselves
 - `quoteBuilder.getQuoteFormOptions` - query; live read, updates by itself
 - `quoteBuilder.processQuoteSubmission` - action; one-time call (not live); the live reads it changes update by themselves
@@ -349,7 +348,7 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 
 ## 2. Proposal
 
-Screens (33): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposalSourceCard.tsx`, `clients/ProposalAcceptancePage.tsx`, `clients/ProposalBrandRow.tsx`, `clients/ProposalChangeAction.tsx`, `clients/ProposalChangeLabel.tsx`, `clients/ProposalCreateForm.tsx`, `clients/ProposalDraftCheck.tsx`, `clients/ProposalEmailHistory.tsx`, `clients/ProposalEnhancementsPanel.tsx`, `clients/ProposalHistoricalAcceptance.tsx`, `clients/ProposalMenuSelectionPanel.tsx`, `clients/proposalPdf.ts`, `clients/proposalPdfProjection.ts`, `clients/ProposalPricingPanel.tsx`, `clients/ProposalReadinessNotice.tsx`, `clients/proposalSignatureRequest.ts`, `clients/ProposalsPage.tsx`, `clients/proposalTemplateDefaults.ts`, `clients/ProposalTemplateServiceStyleField.tsx`, `clients/ProposalTemplatesPage.tsx`, `clients/ProposalTermsPanel.tsx`, `clients/ProposalTravelFee.tsx`, `clients/SharedProposalPage.tsx`, `clients/useCatalogDishes.ts`, `clients/useCreateEventFromProposal.ts`, `clients/useSendProposalWithRevisionCapture.ts`, `clients/useStartProposalChange.ts`, `sales/ProposalSignatureRevokeAction.tsx`, `sales/PublicMenuPage.tsx`, `sales/QuoteEstimatePanel.tsx`, `sales/QuoteMenuChoice.tsx`, `sales/QuoteRequestPicks.tsx`
+Screens (35): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposalSourceCard.tsx`, `clients/ProposalAcceptancePage.tsx`, `clients/ProposalBrandRow.tsx`, `clients/ProposalChangeAction.tsx`, `clients/ProposalChangeLabel.tsx`, `clients/ProposalCreateForm.tsx`, `clients/ProposalDraftCheck.tsx`, `clients/ProposalEmailHistory.tsx`, `clients/ProposalEnhancementsPanel.tsx`, `clients/ProposalHistoricalAcceptance.tsx`, `clients/ProposalMenuSelectionPanel.tsx`, `clients/ProposalPaymentScheduleList.tsx`, `clients/ProposalPaymentSchedulePanel.tsx`, `clients/proposalPdf.ts`, `clients/proposalPdfProjection.ts`, `clients/ProposalPricingPanel.tsx`, `clients/ProposalReadinessNotice.tsx`, `clients/proposalSignatureRequest.ts`, `clients/ProposalsPage.tsx`, `clients/proposalTemplateDefaults.ts`, `clients/ProposalTemplateServiceStyleField.tsx`, `clients/ProposalTemplatesPage.tsx`, `clients/ProposalTermsPanel.tsx`, `clients/ProposalTravelFee.tsx`, `clients/SharedProposalPage.tsx`, `clients/useCatalogDishes.ts`, `clients/useCreateEventFromProposal.ts`, `clients/useSendProposalWithRevisionCapture.ts`, `clients/useStartProposalChange.ts`, `sales/ProposalSignatureRevokeAction.tsx`, `sales/PublicMenuPage.tsx`, `sales/QuoteEstimatePanel.tsx`, `sales/QuoteMenuChoice.tsx`, `sales/QuoteRequestPicks.tsx`
 
 ### Generated reads
 
@@ -458,7 +457,7 @@ Screens (33): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
   - effects: ProposalAccepted
   - refresh: live reads update by themselves; reads affected: Proposal.list, Proposal.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 20 more
 - `mutations.Proposal_decline` (Proposal.decline)
-  - inputs from the screen: none; filled by the server: none
+  - inputs from the screen: reason; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
@@ -484,6 +483,13 @@ Screens (33): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
   - effects: ProposalDraftRevised
+  - refresh: live reads update by themselves; reads affected: Proposal.list, Proposal.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 18 more
+- `mutations.Proposal_setPaymentSchedule` (Proposal.setPaymentSchedule)
+  - inputs from the screen: depositPercent, balanceDueDaysBefore; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
+  - effects: ProposalPaymentScheduleSet
   - refresh: live reads update by themselves; reads affected: Proposal.list, Proposal.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 18 more
 - `mutations.ShareLink_create` (ShareLink.create)
   - inputs from the screen: proposalId, proposalRevisionId, expiresAt; filled by the server: none
@@ -1979,6 +1985,13 @@ Screens (174): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
   - refusals (role, stage and rules): "Kitchen, inventory and managers may see unit mappings"; "Kitchen, inventory and managers may update unit mappings"; "Kitchen, inventory and managers may change unit mappings"; "Guard 0 failed"; "Guard 1 failed"; "Give a reason."; and 2 more
   - effects: ItemUnitMappingRetired
   - refresh: live reads update by themselves; reads affected: ItemUnitMapping.list, ItemUnitMapping.get, Ingredient.list, Ingredient.get
+- `mutations.MenuDish_cancelPriceChange` (MenuDish.cancelPriceChange)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Kitchen and sales staff may see menu dish lines"; "Kitchen staff may update menu dish lines"; "Kitchen staff may change menu dish lines"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
+  - effects: MenuDishPriceChangeCancelled
+  - refresh: live reads update by themselves; reads affected: MenuDish.list, MenuDish.get, Dish.list, Dish.get, Menu.list, Menu.get
 - `mutations.MenuDish_createViaAdd` (MenuDish.add)
   - inputs from the screen: menuId, dishId, sortOrder, sellingPrice, course, serviceStyle, specialInstructions; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
@@ -3250,7 +3263,7 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
   - inputs from the screen: clockInAt, clockOutAt, reason, breakMinutes, notes, paidBreakMinutes, timeZone; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Workforce staff or the linked person may see time entries"; "Workforce staff or the linked person may update time entries"; "Workforce staff or the linked person may change time entries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 8 more
+  - refusals (role, stage and rules): "Workforce staff or the linked person may see time entries"; "Workforce staff or the linked person may update time entries"; "Workforce staff or the linked person may change time entries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 9 more
   - effects: TimeRecordCorrected
   - refresh: live reads update by themselves; reads affected: TimeRecord.list, TimeRecord.get, Event.list, Event.get, Person.list, Person.get, Shift.list, Shift.get
 - `mutations.TimeRecord_createViaClockIn` (TimeRecord.clockIn)
@@ -3259,6 +3272,13 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Workforce staff or the linked person may see time entries"; "Workforce staff or the linked person may update time entries"; "Workforce staff or the linked person may change time entries"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 7 more
   - effects: TimeRecordClockedIn
+  - refresh: live reads update by themselves; reads affected: TimeRecord.list, TimeRecord.get, Event.list, Event.get, Person.list, Person.get, Shift.list, Shift.get
+- `mutations.TimeRecord_remove` (TimeRecord.remove)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Workforce staff or the linked person may see time entries"; "Workforce staff or the linked person may update time entries"; "Workforce staff or the linked person may change time entries"; "Guard 0 failed"; "Guard 1 failed"; "These hours are approved for payroll. Correct them instead."; and 3 more
+  - effects: TimeRecordRemoved
   - refresh: live reads update by themselves; reads affected: TimeRecord.list, TimeRecord.get, Event.list, Event.get, Person.list, Person.get, Shift.list, Shift.get
 - `mutations.TrainingCompletion_createViaRecord` (TrainingCompletion.record)
   - inputs from the screen: personId, trainingModuleId, completedAt, assessmentScore, notes; filled by the server: none
@@ -4565,7 +4585,7 @@ Screens (70): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Finance managers may see payroll inputs"; "Finance managers may update payroll inputs"; "Finance managers may change payroll inputs"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - refusals (role, stage and rules): "Finance managers may see payroll inputs"; "Finance managers may update payroll inputs"; "Finance managers may change payroll inputs"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
   - effects: PayrollInputFinalized
   - refresh: live reads update by themselves; reads affected: PayrollInput.list, PayrollInput.get, Event.list, Event.get, Person.list, Person.get, Shift.list, Shift.get
 - `mutations.PayrollInput_markVoided` (PayrollInput.markVoided)

@@ -20,6 +20,7 @@ import type { MutationCtx } from "../_generated/server";
 import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
 import { calculateInvoiceTax, type InvoiceLineDraft } from "../../src/features/finance/invoiceTax";
 import { LedgerMoney } from "../../src/lib/ledgerMoney";
+import { applyAcceptedDeposit } from "./proposalDepositSeed";
 import { eventReconciliationReceipt } from "./reconciliationReceipt";import type { ReconciliationReceiptOutput, TimingWindow } from "./reconciliationReceipt";
 
 /** Which ledger command triggered this reconcile — recorded on the receipt. */
@@ -251,6 +252,7 @@ export async function ensureEventDraftInvoice(
       idempotencyKey: `event-draft-invoice:${eventId}`,
     },
   );
+  if (source) await applyAcceptedDeposit(ctx, event, source);
 }
 
 /**
@@ -311,6 +313,7 @@ export async function followAcceptedProposalPrice(
     ...(proposal.acceptedRevisionId ? { proposalRevisionId: String(proposal.acceptedRevisionId) } : {}),
     idempotencyKey: `accepted-proposal-invoice:${proposalId}`,
   });
+  await applyAcceptedDeposit(ctx, event, proposal);
 }
 
 /**
