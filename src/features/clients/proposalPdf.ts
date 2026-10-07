@@ -18,6 +18,10 @@ import {
 } from "../../lib/pricing";
 import { proposalSectionSequence } from "../../lib/proposalSectionOrder";
 import { loadMenuPictures } from "../../lib/proposalMenuPictures";
+import {
+  paymentScheduleLines,
+  type ProposalPaymentSchedule,
+} from "../../lib/proposalPaymentSchedule";
 
 export interface ProposalPdfRecord {
   _id: string;
@@ -56,6 +60,8 @@ export interface ProposalPdfRecord {
   // and reporting — not a second arithmetic path. Optional: proposals without
   // priced lines render the flat Estimate only (unchanged behavior).
   pricingLines?: PricingLinePdf[];
+  // AC-654: deposit and balance, due when (null or unset = no schedule).
+  paymentSchedule?: ProposalPaymentSchedule | null;
   // Acceptance URL for CTA
   acceptanceUrl?: string;
 }
@@ -685,6 +691,29 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
     }
   };
 
+  // AC-654: payment schedule, printed under the estimate.
+  const renderPaymentSchedule = () => {
+    if (sectionVisible("pricing_summary") && proposal.paymentSchedule) {
+      sectionLabel("Payment schedule");
+      for (const line of paymentScheduleLines(proposal.paymentSchedule, (at) =>
+        dateText(at),
+      )) {
+        ensureSpace(30);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.setTextColor(...INK);
+        doc.text(line.label, MARGIN, y);
+        doc.text(usd(line.amount), RIGHT, y, { align: "right" });
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(...MUTED);
+        doc.text(line.due, MARGIN, y + 12);
+        y += 28;
+      }
+      y += 4;
+    }
+  };
+
   // Terms.
   const renderTerms = () => {
     if (sectionVisible("terms")) {
@@ -772,7 +801,11 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
     menu_sections: [renderMenu],
     venue_logistics: [renderVenue],
     timeline: [renderTimeline],
-    pricing_summary: [renderPricingBreakdown, renderEstimate],
+    pricing_summary: [
+      renderPricingBreakdown,
+      renderEstimate,
+      renderPaymentSchedule,
+    ],
     enhancements: [renderEnhancements],
     terms: [renderTerms],
     acceptance_cta: [renderNextSteps],
@@ -788,6 +821,7 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
         renderPricingBreakdown,
         renderEnhancements,
         renderEstimate,
+        renderPaymentSchedule,
         renderTerms,
         renderNextSteps,
       ];

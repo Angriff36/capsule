@@ -19,6 +19,7 @@ export type ReminderFailureKind =
   | "no_recipient"
   | "payment_account"
   | "refused"
+  | "taken_earlier"
   | "service_down"
   | "unknown";
 
@@ -31,6 +32,8 @@ const REMEDY: Record<ReminderFailureKind, string> = {
     "Connect the company's Stripe account (Admin, then Integrations), then send again.",
   refused:
     "The email service would not take this email. Check the client's email address, then send again.",
+  taken_earlier:
+    "The email service already took this email on an earlier try, so it was not sent again. Ask the client to check their inbox.",
   service_down:
     "The email service did not answer. Send again in a few minutes.",
   unknown:
@@ -51,8 +54,21 @@ export class ReminderDeliveryError extends Error {
   }
 }
 
-/** Email service answer -> failure kind. 429 and 5xx are worth another try. */
-export function emailServiceFailureKind(status: number): ReminderFailureKind {
+/**
+ * Email service answer -> failure kind. 429 and 5xx are worth another try.
+ * 409 is about the send key, not the address: the service took this email on
+ * an earlier try whose answer was lost (invalid_idempotent_request), or still
+ * works on it (try again later).
+ */
+export function emailServiceFailureKind(
+  status: number,
+  errorName?: unknown,
+): ReminderFailureKind {
+  if (status === 409) {
+    return errorName === "invalid_idempotent_request"
+      ? "taken_earlier"
+      : "service_down";
+  }
   return status === 429 || status >= 500 ? "service_down" : "refused";
 }
 
@@ -223,9 +239,12 @@ export function reminderHistory(
         source,
         attempt,
         to,
-        words: to
-          ? `Taken by the email service for ${to}.`
-          : "Taken by the email service.",
+        words:
+          payload.providerState === "accepted_earlier"
+            ? "Taken by the email service on an earlier try. Not sent again."
+            : to
+              ? `Taken by the email service for ${to}.`
+              : "Taken by the email service.",
         remedy: null,
         willRetry: false,
       });

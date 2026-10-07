@@ -48,7 +48,7 @@ function UnitField({
       >
         {UNITS.map((unit) => (
           <option key={unit} value={unit}>
-            {unit}
+            {unit.replaceAll("_", " ")}
           </option>
         ))}
       </select>

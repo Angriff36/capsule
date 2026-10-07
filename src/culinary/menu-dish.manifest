@@ -136,6 +136,22 @@ entity MenuDish mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // A planned price that should not happen after all: the current price stays.
+  command cancelPriceChange() {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    constraint cancelPlannedChange: self.scheduledPriceEffectiveAt != null and self.scheduledPriceEffectiveAt > now() "There is no price change still to come on this dish."
+    mutate scheduledSellingPrice = null
+    mutate scheduledPriceEffectiveAt = null
+    emit MenuDishPriceChangeCancelled {
+      menuDishId: self.id
+      tenantId: self.tenantId
+      menuId: self.menuId
+      dishId: self.dishId
+    }
+  }
+
   command remove(reason: string) {
     guard self.addedAt != null
     guard self.deletedAt == null
@@ -182,6 +198,13 @@ event MenuDishPriceChangeScheduled: "menu_dish.price_change_scheduled" {
   dishId: string
   sellingPrice: money(12, 2)
   effectiveAt: datetime
+}
+
+event MenuDishPriceChangeCancelled: "menu_dish.price_change_cancelled" {
+  menuDishId: string
+  tenantId: string
+  menuId: string
+  dishId: string
 }
 
 event MenuDishDetailsUpdated:"menu_dish.details_updated" {

@@ -2417,6 +2417,7 @@ export const LeadSchema = z.object({
   guestCount: z.number().int().nullable().optional(),
   eventType: z.string().nullable().optional(),
   closedAt: z.coerce.date().nullable().optional(),
+  closeReason: z.string().nullable().optional(),
   clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
   mergeTargetClientId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -3500,6 +3501,8 @@ export const ProposalSchema = z.object({
   expiresAt: z.coerce.date().nullable().optional(),
   notes: z.string().nullable().optional(),
   terms: z.string().nullable().optional(),
+  depositPercent: z.number().int().nullable().optional(),
+  balanceDueDaysBefore: z.number().int().nullable().optional(),
   visibleSections: z.array(z.string()).nullable().optional(),
   sectionOrder: z.array(z.string()).nullable().optional(),
   status: z.enum(["draft", "sent", "viewed", "accepted", "declined", "expired", "superseded"]).default("draft"),
@@ -3508,6 +3511,7 @@ export const ProposalSchema = z.object({
   viewedAt: z.coerce.date().nullable().optional(),
   acceptedAt: z.coerce.date().nullable().optional(),
   declinedAt: z.coerce.date().nullable().optional(),
+  declineReason: z.string().nullable().optional(),
   expiredAt: z.coerce.date().nullable().optional(),
   supersededAt: z.coerce.date().nullable().optional(),
   supersedeReason: z.string().nullable().optional(),
@@ -9186,10 +9190,34 @@ export const InvoiceAssignNumberParamsSchema = z.object({
 
 export type InvoiceAssignNumberParams = z.infer<typeof InvoiceAssignNumberParamsSchema>;
 
+// Command: followEventClient on Invoice
+export const InvoiceFollowEventClientParamsSchema = z.object({
+  clientId: z.string().min(1),
+  subtotal: z.number(),
+  taxAmount: z.number(),
+  total: z.number(),
+  lineItems: z.unknown(),
+  taxBreakdown: z.unknown(),
+  paymentTermsDays: z.number(),
+});
+
+export type InvoiceFollowEventClientParams = z.infer<typeof InvoiceFollowEventClientParamsSchema>;
+
 // Command: followEventPrice on Invoice
 export const InvoiceFollowEventPriceParamsSchema = z.object({});
 
 export type InvoiceFollowEventPriceParams = z.infer<typeof InvoiceFollowEventPriceParamsSchema>;
+
+// Command: followEventPriceTaxed on Invoice
+export const InvoiceFollowEventPriceTaxedParamsSchema = z.object({
+  subtotal: z.number(),
+  taxAmount: z.number(),
+  total: z.number(),
+  lineItems: z.unknown(),
+  taxBreakdown: z.unknown(),
+});
+
+export type InvoiceFollowEventPriceTaxedParams = z.infer<typeof InvoiceFollowEventPriceTaxedParamsSchema>;
 
 // Command: issue on Invoice
 export const InvoiceIssueParamsSchema = z.object({
@@ -9271,6 +9299,7 @@ export type InvoiceSendBalanceReminderParams = z.infer<typeof InvoiceSendBalance
 export const InvoiceSetDepositParamsSchema = z.object({
   depositAmount: z.number(),
   balanceReminderLeadDays: z.number().optional(),
+  balanceDueAt: z.coerce.date().optional(),
 });
 
 export type InvoiceSetDepositParams = z.infer<typeof InvoiceSetDepositParamsSchema>;
@@ -9333,6 +9362,13 @@ export const LeadCaptureParamsSchema = z.object({
 
 export type LeadCaptureParams = z.infer<typeof LeadCaptureParamsSchema>;
 
+// Command: close on Lead
+export const LeadCloseParamsSchema = z.object({
+  reason: z.string().optional(),
+});
+
+export type LeadCloseParams = z.infer<typeof LeadCloseParamsSchema>;
+
 // Command: confirmConversion on Lead
 export const LeadConfirmConversionParamsSchema = z.object({});
 
@@ -9357,6 +9393,11 @@ export const LeadRecordSourceHistoryParamsSchema = z.object({
 });
 
 export type LeadRecordSourceHistoryParams = z.infer<typeof LeadRecordSourceHistoryParamsSchema>;
+
+// Command: reopen on Lead
+export const LeadReopenParamsSchema = z.object({});
+
+export type LeadReopenParams = z.infer<typeof LeadReopenParamsSchema>;
 
 // Command: reviseDetails on Lead
 export const LeadReviseDetailsParamsSchema = z.object({
@@ -9572,6 +9613,11 @@ export const MenuDishAddParamsSchema = z.object({
 });
 
 export type MenuDishAddParams = z.infer<typeof MenuDishAddParamsSchema>;
+
+// Command: cancelPriceChange on MenuDish
+export const MenuDishCancelPriceChangeParamsSchema = z.object({});
+
+export type MenuDishCancelPriceChangeParams = z.infer<typeof MenuDishCancelPriceChangeParamsSchema>;
 
 // Command: remove on MenuDish
 export const MenuDishRemoveParamsSchema = z.object({
@@ -11208,7 +11254,9 @@ export const ProposalConfirmChangeSourceParamsSchema = z.object({});
 export type ProposalConfirmChangeSourceParams = z.infer<typeof ProposalConfirmChangeSourceParamsSchema>;
 
 // Command: decline on Proposal
-export const ProposalDeclineParamsSchema = z.object({});
+export const ProposalDeclineParamsSchema = z.object({
+  reason: z.string().optional(),
+});
 
 export type ProposalDeclineParams = z.infer<typeof ProposalDeclineParamsSchema>;
 
@@ -11234,6 +11282,8 @@ export const ProposalDraftParamsSchema = z.object({
   eventId: z.string().min(1).optional(),
   replacesProposalId: z.string().min(1).optional(),
   sectionOrder: z.array(z.string()).optional(),
+  depositPercent: z.number().optional(),
+  balanceDueDaysBefore: z.number().optional(),
 });
 
 export type ProposalDraftParams = z.infer<typeof ProposalDraftParamsSchema>;
@@ -11308,6 +11358,14 @@ export type ProposalReviseDraftParams = z.infer<typeof ProposalReviseDraftParams
 export const ProposalSendParamsSchema = z.object({});
 
 export type ProposalSendParams = z.infer<typeof ProposalSendParamsSchema>;
+
+// Command: setPaymentSchedule on Proposal
+export const ProposalSetPaymentScheduleParamsSchema = z.object({
+  depositPercent: z.number().optional(),
+  balanceDueDaysBefore: z.number().optional(),
+});
+
+export type ProposalSetPaymentScheduleParams = z.infer<typeof ProposalSetPaymentScheduleParamsSchema>;
 
 // Command: stageClientMerge on Proposal
 export const ProposalStageClientMergeParamsSchema = z.object({
@@ -11492,6 +11550,11 @@ export const PurchaseNeedCancelParamsSchema = z.object({
 });
 
 export type PurchaseNeedCancelParams = z.infer<typeof PurchaseNeedCancelParamsSchema>;
+
+// Command: closeWithFinishedEvent on PurchaseNeed
+export const PurchaseNeedCloseWithFinishedEventParamsSchema = z.object({});
+
+export type PurchaseNeedCloseWithFinishedEventParams = z.infer<typeof PurchaseNeedCloseWithFinishedEventParamsSchema>;
 
 // Command: create on PurchaseNeed
 export const PurchaseNeedCreateParamsSchema = z.object({
@@ -11870,6 +11933,11 @@ export const RevenueAttributionChangeSplitParamsSchema = z.object({
 });
 
 export type RevenueAttributionChangeSplitParams = z.infer<typeof RevenueAttributionChangeSplitParamsSchema>;
+
+// Command: closeForCancelledEvent on RevenueAttribution
+export const RevenueAttributionCloseForCancelledEventParamsSchema = z.object({});
+
+export type RevenueAttributionCloseForCancelledEventParams = z.infer<typeof RevenueAttributionCloseForCancelledEventParamsSchema>;
 
 // Command: create on RevenueAttribution
 export const RevenueAttributionCreateParamsSchema = z.object({
@@ -12782,6 +12850,13 @@ export const TimeRecordCorrectParamsSchema = z.object({
 });
 
 export type TimeRecordCorrectParams = z.infer<typeof TimeRecordCorrectParamsSchema>;
+
+// Command: remove on TimeRecord
+export const TimeRecordRemoveParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type TimeRecordRemoveParams = z.infer<typeof TimeRecordRemoveParamsSchema>;
 
 // Command: register on Trailer
 export const TrailerRegisterParamsSchema = z.object({

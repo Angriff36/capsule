@@ -47,6 +47,23 @@ export type ProposalCarryoverPreview = {
  * defaults, venue matching, and whether creating the event should link back
  * to the proposal and copy its menu (via convex/lib/proposalEventCreation).
  */
+/** "Dana Whitfield catering proposal" books as "Dana Whitfield retirement
+ *  party": the event is the party, not the offer. */
+function eventTitle(
+  title: string | null | undefined,
+  eventType: string | null | undefined,
+): string | undefined {
+  const raw = title?.trim() ?? "";
+  if (!raw) return undefined;
+  const base = raw
+    .replace(/^proposal for\s+/i, "")
+    .replace(/\s+(catering\s+)?proposal$/i, "")
+    .trim();
+  if (base === raw || !base) return raw;
+  const kind = eventType?.trim().toLowerCase();
+  return kind ? `${base} ${kind}` : `${base} event`;
+}
+
 export class ProposalEventPrefill {
   values(proposal: Doc<"proposals"> | null | undefined): ProposalPrefillValues {
     if (!proposal) return {};
@@ -58,7 +75,7 @@ export class ProposalEventPrefill {
     ): string | undefined =>
       ms != null && Number.isFinite(ms) ? toDatetimeLocalValue(ms) : undefined;
     return {
-      title: proposal.title || undefined,
+      title: eventTitle(proposal.title, proposal.eventType),
       eventType: proposal.eventType ?? undefined,
       startsAtLocal: localDatetime(proposal.eventDate),
       endsAtLocal: localDatetime(proposal.eventEndDate),
@@ -119,7 +136,7 @@ export class ProposalEventPrefill {
   }): ProposalCarryoverPreview {
     const { proposal, menuCount, enhancementCount } = input;
     const notSet = "Not on the proposal — set it on the event.";
-    const title = proposal?.title?.trim() ?? "";
+    const title = eventTitle(proposal?.title, proposal?.eventType) ?? "";
     const eventType = proposal?.eventType?.trim() ?? "";
     const venueName = proposal?.venueName?.trim() ?? "";
     const venueAddress = proposal?.venueAddress?.trim() ?? "";

@@ -78,18 +78,45 @@ export const taxRateApplies = (
   return rate.appliesToRental === true;
 };
 
+/**
+ * Sales tax is due on the price after the seller's discount, so the invoice
+ * discount is spread over the lines by their share of the subtotal and each
+ * line is taxed on what is left. Line and invoice subtotals stay before the
+ * discount: total = subtotal + tax - discount.
+ */
 export function calculateInvoiceTax(
   lines: InvoiceLineDraft[],
   taxRates: TaxRateRecord[],
   taxExempt = false,
+  discountAmount = 0,
 ): InvoiceTaxCalculation {
-  const lineItems = lines.map<InvoiceLineSnapshot>((line) => {
+  const lineSubtotals = lines.map((line) =>
+    LedgerMoney.fromDollars(Math.max(0, finite(line.unitPrice)))
+      .times(Math.max(0, finite(line.quantity)))
+      .toDollars(),
+  );
+  const lineCents = lineSubtotals.map((value) =>
+    LedgerMoney.fromDollars(value).toCents(),
+  );
+  const allCents = lineCents.reduce((sum, cents) => sum + cents, 0);
+  const discountCents = Math.min(
+    allCents,
+    Math.max(0, LedgerMoney.fromDollars(finite(discountAmount)).toCents()),
+  );
+  // Running shares round to whole cents and always add up to the discount.
+  let runningCents = 0;
+  const lineDiscountCents = lineCents.map((cents) => {
+    if (allCents === 0) return 0;
+    const before = Math.round((discountCents * runningCents) / allCents);
+    runningCents += cents;
+    return Math.round((discountCents * runningCents) / allCents) - before;
+  });
+  const lineItems = lines.map<InvoiceLineSnapshot>((line, index) => {
     const quantity = Math.max(0, finite(line.quantity));
     const unitPrice = Math.max(0, finite(line.unitPrice));
-    const subtotal = LedgerMoney.fromDollars(unitPrice)
-      .times(quantity)
-      .toDollars();
-    const subtotalCents = LedgerMoney.fromDollars(subtotal).toCents();
+    const subtotal = lineSubtotals[index];
+    const subtotalCents = lineCents[index];
+    const taxableCents = subtotalCents - lineDiscountCents[index];
     const appliedTaxRates = taxExempt
       ? []
       : taxRates
@@ -100,7 +127,7 @@ export function calculateInvoiceTax(
               taxRateId: String(rate._id),
               name: String(rate.name ?? "Tax rate"),
               percentage,
-              amount: LedgerMoney.fromCents(subtotalCents)
+              amount: LedgerMoney.fromCents(taxableCents)
                 .percent(percentage)
                 .toDollars(),
             };

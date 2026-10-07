@@ -3,6 +3,10 @@ import type { Doc, Id } from "./_generated/dataModel";
 import { mutation, query, type QueryCtx } from "./_generated/server";
 import { clockNow } from "./lib/clockNow";
 import { byLineDisplayOrder } from "../src/lib/pricing";
+import {
+  frozenPaymentSchedule,
+  type ProposalPaymentSchedule,
+} from "../src/lib/proposalPaymentSchedule";
 
 /**
  * AUTHOR SEAM — public, token-authorized proposal share links (spec §4.6).
@@ -87,6 +91,8 @@ type SharedProposal = {
   }>;
   /** AC-654: the dish pictures frozen into the shared revision. */
   pictures: Array<{ dishName: string; imageUrl: string }>;
+  /** AC-654: the payment schedule frozen into the shared revision. */
+  paymentSchedule: ProposalPaymentSchedule | null;
   timeline: Array<{ name: string; startsAt: number; endsAt: number | null }>;
   revisionNumber: number;
   capturedAt: number | null;
@@ -397,6 +403,7 @@ export const getSharedProposal = query({
           ? [{ dishName: picture.dishName, imageUrl: picture.imageUrl }]
           : [],
       ),
+      paymentSchedule: frozenPaymentSchedule(snapshot.paymentSchedule),
       timeline: (Array.isArray(snapshot.timeline)
         ? (snapshot.timeline as Array<Record<string, unknown>>)
         : []

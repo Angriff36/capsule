@@ -150,7 +150,7 @@ entity TrainingCompletion mixin TenantScoped, SoftDeletable {
     constraint recordTrainingPersonMatch: personId == self.personId "This training completion is for a different person. Pick the staff member already on this training completion."
     constraint recordTrainingModuleMatch: trainingModuleId == self.trainingModuleId "This training completion is for a different module. Pick the training module already on this completion."
     constraint recordTrainingScoreRange: assessmentScore >= 0 and assessmentScore <= 100 "Give an assessment score between 0 and 100."
-    constraint recordTrainingPassingScore: assessmentScore >= self.trainingModule.passingScore "This score needs to meet the training module's passing score."
+    constraint recordTrainingPassingScore: assessmentScore >= self.trainingModule.passingScore "That score is below this module's pass mark. Only passes are saved here: use a score at or above the pass mark once they pass."
     mutate personId = personId
     mutate trainingModuleId = trainingModuleId
     mutate completedAt = completedAt

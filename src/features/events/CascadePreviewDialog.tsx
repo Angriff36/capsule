@@ -2,6 +2,8 @@ import {
   type CascadeAction,
   useEventCascadePreview,
 } from "../../lib/cascadePreviewClient";
+import { useEffect, useRef } from "react";
+import { closeModal, openModal } from "../../ui/action-prompt/dialogFocus";
 import { FieldHelp } from "../../ui/FieldHelp";
 
 type Props = {
@@ -25,21 +27,29 @@ export function CascadePreviewDialog({
 }: Props) {
   const preview = useEventCascadePreview(eventId, action);
   const copy = COPY[action];
+  // A native modal opens in the top layer, above an open event sheet.
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    openModal(dialog);
+    return () => closeModal(dialog);
+  }, []);
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/35 p-4 sm:items-center"
-      role="presentation"
+    <dialog
+      ref={dialogRef}
+      aria-labelledby="cascade-preview-title"
+      className="fixed inset-0 z-50 m-0 flex h-full max-h-none w-full max-w-none items-end justify-center border-0 bg-ink/35 p-4 sm:items-center"
+      onCancel={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
       onMouseDown={(event) => {
         if (event.currentTarget === event.target) onClose();
       }}
     >
-      <section
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="cascade-preview-title"
-        className="w-full max-w-lg rounded-ledger border border-line-2 bg-panel shadow-2xl"
-      >
+      <section className="w-full max-w-lg rounded-ledger border border-line-2 bg-panel shadow-2xl">
         <header className="border-b border-ink px-5 py-4 sm:px-7">
           <p className="eyebrow text-brand">Before you confirm</p>
           <h2
@@ -88,6 +98,6 @@ export function CascadePreviewDialog({
           </button>
         </footer>
       </section>
-    </div>
+    </dialog>
   );
 }

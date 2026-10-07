@@ -105,6 +105,15 @@ function can(auth: AppAuthContext, ...capabilities: string[]): boolean {
   );
 }
 
+/**
+ * The newest rows read per source. A whole table read every time the bell
+ * loads timed out on production after a large import and stalled every other
+ * screen; the bell is about recent and open items, so the newest rows do.
+ */
+const SOURCE_CAP = 500;
+/** People are read for names, so more of them. */
+const PEOPLE_CAP = 2000;
+
 export const listNotifications = query({
   args: {},
   handler: async (ctx) => {
@@ -116,6 +125,36 @@ export const listNotifications = query({
       q.eq("tenantId", tenantId);
     const when = <T>(allowed: boolean, read: () => Promise<T>) =>
       allowed ? read() : Promise.resolve(undefined);
+    // Rows in the given states only, through each table's (tenant, status)
+    // index, so newer closed rows never push an open one out.
+    type StatusTable =
+      | "incidents"
+      | "invoices"
+      | "timeOffRequests"
+      | "vendorOrders"
+      | "reviewFlags"
+      | "equipmentIssues"
+      | "quoteSubmissions"
+      | "shiftSwapRequests"
+      | "deliveries";
+    const inStates = async <N extends StatusTable>(
+      table: N,
+      states: string[],
+    ): Promise<Doc<N>[]> =>
+      (
+        await Promise.all(
+          states.map((status) =>
+            ctx.db
+              .query(table)
+              .withIndex("by_tenantId_and_status", (q: any) =>
+                q.eq("tenantId", tenantId).eq("status", status),
+              )
+              // Newest first, so a burst of old rows never hides new ones.
+              .order("desc")
+              .take(SOURCE_CAP),
+          ),
+        )
+      ).flat() as Doc<N>[];
 
     // One guard per source, each the same capability test as the generated
     // list<Entity> query in convex/queries.ts.
@@ -124,7 +163,7 @@ export const listNotifications = query({
       incidents,
       invoices,
       inventoryItems,
-      ingredients,
+      ,
       shifts,
       people,
       qualifications,
@@ -136,6 +175,11 @@ export const listNotifications = query({
       dateWaitlistEntries,
       reviewFlags,
       equipmentIssues,
+      quoteSubmissions,
+      swapsForMe,
+      myTimeOff,
+      swapsToApprove,
+      failedDeliveries,
     ] = await Promise.all([
       // Not every event (13 s at 10,000 events, and the socket holds every
       // other read of the screen until this one answers): only the events
@@ -149,85 +193,114 @@ export const listNotifications = query({
             .withIndex("by_tenantId_and_stage_and_startsAt", (q) =>
               q.eq("tenantId", tenantId).eq("stage", "pending_approval"),
             )
-            .collect(),
+            .take(SOURCE_CAP),
           ctx.db
             .query("events")
             .withIndex("by_tenantId_and_approvedAt", (q) =>
               q.eq("tenantId", tenantId).gte("approvedAt", since),
             )
-            .collect(),
+            .take(SOURCE_CAP),
           ctx.db
             .query("events")
             .withIndex("by_tenantId_and_executionStartedAt", (q) =>
               q.eq("tenantId", tenantId).gte("executionStartedAt", since),
             )
-            .collect(),
+            .take(SOURCE_CAP),
           ctx.db
             .query("events")
             .withIndex("by_tenantId_and_completedAt", (q) =>
               q.eq("tenantId", tenantId).gte("completedAt", since),
             )
-            .collect(),
+            .take(SOURCE_CAP),
           ctx.db
             .query("events")
             .withIndex("by_tenantId_and_cancelledAt", (q) =>
               q.eq("tenantId", tenantId).gte("cancelledAt", since),
             )
-            .collect(),
+            .take(SOURCE_CAP),
           ctx.db
             .query("events")
             .withIndex("by_tenantId_and_closedOutAt", (q) =>
               q.eq("tenantId", tenantId).gte("closedOutAt", since),
             )
-            .collect(),
+            .take(SOURCE_CAP),
         ]);
         const byId = new Map<string, Doc<"events">>();
         for (const row of lists.flat()) byId.set(String(row._id), row);
         return [...byId.values()];
       }),
       when(can(auth, "eventAccess", "kitchenAccess"), () =>
-        ctx.db.query("incidents").withIndex("by_tenantId", byTenant).collect(),
+        inStates("incidents", ["open", "investigating"]),
       ),
       when(can(auth, "financeAccess", "manageAccess"), () =>
-        ctx.db.query("invoices").withIndex("by_tenantId", byTenant).collect(),
+        inStates("invoices", ["overdue", "sent", "viewed", "partial"]),
       ),
+      // Only tracked lines (a reorder point above zero) can be low.
       when(can(auth, "inventoryAccess"), () =>
         ctx.db
           .query("inventoryItems")
-          .withIndex("by_tenantId", byTenant)
-          .collect(),
+          .withIndex("by_tenantId_and_reorderThreshold", (q) =>
+            q.eq("tenantId", tenantId).gt("reorderThreshold", 0),
+          )
+          .take(PEOPLE_CAP),
       ),
-      when(can(auth, "kitchenAccess"), () =>
-        ctx.db
-          .query("ingredients")
-          .withIndex("by_tenantId", byTenant)
-          .collect(),
-      ),
+      // Names for the stock lines, read by id below.
+      Promise.resolve(undefined),
+      // Shifts not yet over: double bookings and swaps are about these.
       when(can(auth, "workforceAccess"), () =>
-        ctx.db.query("shifts").withIndex("by_tenantId", byTenant).collect(),
+        ctx.db
+          .query("shifts")
+          .withIndex("by_tenantId_and_endsAt", (q) =>
+            q.eq("tenantId", tenantId).gte("endsAt", Date.now()),
+          )
+          .take(PEOPLE_CAP),
       ),
       when(can(auth, "staffAccess"), () =>
-        ctx.db.query("people").withIndex("by_tenantId", byTenant).collect(),
-      ),
-      when(can(auth, "workforceAccess"), () =>
         ctx.db
-          .query("qualifications")
+          .query("people")
           .withIndex("by_tenantId", byTenant)
-          .collect(),
+          .order("desc")
+          .take(PEOPLE_CAP),
       ),
+      // Active certificates that expire inside the 30-day window, and any
+      // renewals for the same person and name (a renewal ends later).
+      when(can(auth, "workforceAccess"), async () => {
+        const expiring = await ctx.db
+          .query("qualifications")
+          .withIndex("by_tenantId_and_status_and_expiresAt", (q) =>
+            q
+              .eq("tenantId", tenantId)
+              .eq("status", "active")
+              .lte("expiresAt", Date.now() + 30 * 86_400_000),
+          )
+          .take(SOURCE_CAP);
+        const renewals = await Promise.all(
+          expiring.map((row) =>
+            ctx.db
+              .query("qualifications")
+              .withIndex("by_staff_certification_expiry", (q) =>
+                q
+                  .eq("tenantId", tenantId)
+                  .eq("personId", row.personId)
+                  .eq("status", "active")
+                  .eq("name", row.name)
+                  .gt("expiresAt", row.expiresAt ?? 0),
+              )
+              .take(5),
+          ),
+        );
+        const byId = new Map<string, Doc<"qualifications">>();
+        for (const row of [...expiring, ...renewals.flat()])
+          byId.set(String(row._id), row);
+        return [...byId.values()];
+      }),
       // Row policy: workforceManageAccess, or the requester's own row. Own
       // rows never notify, so only the manage capability matters here.
       when(can(auth, "workforceManageAccess"), () =>
-        ctx.db
-          .query("timeOffRequests")
-          .withIndex("by_tenantId", byTenant)
-          .collect(),
+        inStates("timeOffRequests", ["pending"]),
       ),
       when(can(auth, "procurementAccess", "manageAccess"), () =>
-        ctx.db
-          .query("vendorOrders")
-          .withIndex("by_tenantId", byTenant)
-          .collect(),
+        inStates("vendorOrders", ["pending_approval"]),
       ),
       // Team chat made staffMessages a high-volume table, so this is no
       // longer a tenant-wide collect: the caller's direct messages — received
@@ -300,27 +373,29 @@ export const listNotifications = query({
         ctx.db
           .query("prepTaskComments")
           .withIndex("by_tenantId", byTenant)
-          .collect(),
+          .order("desc")
+          .take(SOURCE_CAP),
       ),
       // Date holds and their waitlist: low-volume sales rows (listDateHold /
       // listDateWaitlistEntry read guard; the tray prompt is for sales).
       when(can(auth, "salesAccess"), () =>
-        ctx.db.query("dateHolds").withIndex("by_tenantId", byTenant).collect(),
+        ctx.db
+          .query("dateHolds")
+          .withIndex("by_tenantId", byTenant)
+          .order("desc")
+          .take(SOURCE_CAP),
       ),
       when(can(auth, "salesAccess"), () =>
         ctx.db
           .query("dateWaitlistEntries")
           .withIndex("by_tenantId", byTenant)
-          .collect(),
+          .order("desc")
+          .take(SOURCE_CAP),
       ),
       // Open flags and crew questions: the kitchen and the event team are
       // told, not only whoever opens the event next.
       when(can(auth, "eventAccess", "kitchenAccess", "manageAccess"), () =>
-        ctx.db
-          .query("reviewFlags")
-          .withIndex("by_tenantId", byTenant)
-          .collect()
-          .then((rows) => rows.filter((row) => row.status === "open")),
+        inStates("reviewFlags", ["open"]),
       ),
       // Open equipment problems (listEquipmentIssue read guard).
       when(
@@ -332,15 +407,68 @@ export const listNotifications = query({
           "financeAccess",
         ),
         () =>
-          ctx.db
-            .query("equipmentIssues")
-            .withIndex("by_tenantId", byTenant)
+          inStates("equipmentIssues", ["open"]).then((rows) =>
+            rows.filter(
+              (row) => row.status === "open" && row.deletedAt == null,
+            ),
+          ),
+      ),
+      // Unanswered website quote requests (sales reads them).
+      when(can(auth, "salesAccess"), () =>
+        inStates("quoteSubmissions", ["pending"]),
+      ),
+      // Swaps a coworker asked this person to take.
+      auth.personId
+        ? ctx.db
+            .query("shiftSwapRequests")
+            .withIndex("by_recipientPersonId", (q) =>
+              q.eq("recipientPersonId", auth.personId as Id<"people">),
+            )
             .collect()
             .then((rows) =>
               rows.filter(
-                (row) => row.status === "open" && row.deletedAt == null,
+                (row) =>
+                  row.tenantId === tenantId &&
+                  row.status === "pending_recipient" &&
+                  row.deletedAt == null,
               ),
-            ),
+            )
+        : [],
+      // This person's own time-off requests, for the answer.
+      auth.personId
+        ? ctx.db
+            .query("timeOffRequests")
+            .withIndex("by_personId", (q) =>
+              q.eq("personId", auth.personId as Id<"people">),
+            )
+            .collect()
+            .then((rows) =>
+              rows.filter(
+                (row) =>
+                  row.tenantId === tenantId &&
+                  row.deletedAt == null &&
+                  row.status !== "pending",
+              ),
+            )
+        : [],
+      // Swaps both staff agreed to, waiting for a manager.
+      when(can(auth, "workforceManageAccess"), () =>
+        inStates("shiftSwapRequests", ["awaiting_manager"]).then((rows) =>
+          rows.filter(
+            (row) => row.status === "awaiting_manager" && row.deletedAt == null,
+          ),
+        ),
+      ),
+      // Deliveries that failed this past week.
+      when(can(auth, "logisticsAccess", "eventManageAccess"), () =>
+        inStates("deliveries", ["failed"]).then((rows) =>
+          rows.filter(
+            (row) =>
+              row.status === "failed" &&
+              row.deletedAt == null &&
+              Number(row.failedAt ?? 0) > Date.now() - 7 * 86_400_000,
+          ),
+        ),
       ),
     ]);
 
@@ -350,6 +478,8 @@ export const listNotifications = query({
     const now = Date.now();
     if (can(auth, "logisticsAccess", "manageAccess")) {
       const [schedules, vehicles, fuel, service] = await Promise.all([
+        // A fleet and its service plans are small: read whole, so no due
+        // service is cut off. Odometers come from the newest logs.
         ctx.db
           .query("vehicleMaintenanceSchedules")
           .withIndex("by_tenantId", byTenant)
@@ -358,11 +488,13 @@ export const listNotifications = query({
         ctx.db
           .query("vehicleFuelLogs")
           .withIndex("by_tenantId", byTenant)
-          .collect(),
+          .order("desc")
+          .take(SOURCE_CAP),
         ctx.db
           .query("vehicleServiceEntries")
           .withIndex("by_tenantId", byTenant)
-          .collect(),
+          .order("desc")
+          .take(SOURCE_CAP),
       ]);
       const odometer = new Map<string, number>();
       for (const row of [...fuel, ...service]) {
@@ -393,8 +525,10 @@ export const listNotifications = query({
     if (can(auth, "inventoryAccess", "logisticsAccess")) {
       const tasks = await ctx.db
         .query("equipmentMaintenanceTasks")
-        .withIndex("by_tenantId", byTenant)
-        .collect();
+        .withIndex("by_tenantId_and_nextDueAt", (q) =>
+          q.eq("tenantId", tenantId).gt("nextDueAt", 0).lt("nextDueAt", now),
+        )
+        .take(SOURCE_CAP);
       for (const task of tasks) {
         if (task.deletedAt != null || task.nextDueAt == null) continue;
         if (task.nextDueAt >= now) continue;
@@ -525,6 +659,19 @@ export const listNotifications = query({
       );
     }
 
+    // The events those failed deliveries were for.
+    const deliveryEventTitles: Record<string, string> = {};
+    await Promise.all(
+      [
+        ...new Set((failedDeliveries ?? []).map((row) => String(row.eventId))),
+      ].map(async (id) => {
+        const eventId = ctx.db.normalizeId("events", id);
+        const event = eventId ? await ctx.db.get(eventId) : null;
+        if (event && event.tenantId === tenantId)
+          deliveryEventTitles[id] = String(event.title ?? "Untitled event");
+      }),
+    );
+
     // A mention needs its channel's title: hydrate only the events of the
     // caller's own mentions inside the mention window, tenant-checked, title
     // only (same narrow projection as eventDayBriefing).
@@ -556,6 +703,24 @@ export const listNotifications = query({
       );
     }
 
+    // Names of the ingredients the stock lines hold, tenant-checked.
+    // Only lines at or below their reorder point are named in the bell.
+    const ingredients = (
+      await Promise.all(
+        [
+          ...new Set(
+            (inventoryItems ?? [])
+              .filter((row) => row.quantityOnHand <= row.reorderThreshold)
+              .map((row) => String(row.ingredientId)),
+          ),
+        ].map(async (id) => {
+          const ingredientId = ctx.db.normalizeId("ingredients", id);
+          const row = ingredientId ? await ctx.db.get(ingredientId) : null;
+          return row && row.tenantId === tenantId ? row : null;
+        }),
+      )
+    ).filter((row): row is Doc<"ingredients"> => row != null);
+
     return deriveNotifications({
       now: Date.now(),
       currentAuthSubjectId: auth.id || undefined,
@@ -582,6 +747,16 @@ export const listNotifications = query({
       equipmentIssues,
       equipmentNames,
       maintenanceDue,
+      quoteSubmissions,
+      shiftSwaps: [...(swapsForMe ?? []), ...(swapsToApprove ?? [])],
+      myTimeOff,
+      failedDeliveries: (failedDeliveries ?? []).map((row) => ({
+        id: String(row._id),
+        eventId: String(row.eventId),
+        eventTitle: deliveryEventTitles[String(row.eventId)] ?? "an event",
+        reason: row.failureReason ?? null,
+        at: Number(row.failedAt ?? row._creationTime),
+      })),
     });
   },
 });

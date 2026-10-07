@@ -124,6 +124,8 @@ export function KitchenDisplayPage() {
   const [eventFilter, setEventFilter] = useState<string>("all");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  // The card the failure came from, so the cook sees it where they tapped.
+  const [failedItem, setFailedItem] = useState<string | null>(null);
   const [batchEntries, setBatchEntries] = useState<
     Record<string, BatchCompletionEntry>
   >({});
@@ -220,6 +222,22 @@ export function KitchenDisplayPage() {
       (item) =>
         eventFilter === "all" || (item.eventId ?? "house") === eventFilter,
     )
+    // Prep for an event that is finished, cancelled or two days gone can't be
+    // cooked any more; it stays on the prep board, off the live screen
+    // (unless that event is picked above).
+    .filter((item) => {
+      if (eventFilter !== "all" || !item.eventId) return true;
+      const event =
+        namedEvents?.find((row) => row._id === item.eventId) ??
+        events?.find((row) => row._id === item.eventId);
+      if (
+        ["cancelled", "completed", "closed_out"].includes(String(event?.stage))
+      )
+        return false;
+      return !(
+        event?.startsAt != null && event.startsAt < now - 2 * 86_400_000
+      );
+    })
     .sort((left, right) => {
       const rank = urgencyRank(left, now) - urgencyRank(right, now);
       if (rank !== 0) return rank;
@@ -269,6 +287,7 @@ export function KitchenDisplayPage() {
       }
     } catch (error) {
       setFailure(error);
+      setFailedItem(item.id);
     } finally {
       setBusy(null);
       optimistic.end(item.id);
@@ -294,6 +313,7 @@ export function KitchenDisplayPage() {
         await batchCancel({ docId: item.id, version: item.version, reason });
       } catch (error) {
         setFailure(error);
+        setFailedItem(item.id);
       } finally {
         setBusy(null);
       }
@@ -327,7 +347,9 @@ export function KitchenDisplayPage() {
           </Link>
         </div>
       </header>
-      {failure != null ? <ProductionFailureBanner error={failure} /> : null}
+      {failure != null && failedItem == null ? (
+        <ProductionFailureBanner error={failure} />
+      ) : null}
       {host}
       {isLoading ? (
         <TableSkeleton rows={6} />
@@ -411,6 +433,9 @@ export function KitchenDisplayPage() {
                     status={item.status}
                     actions={[]}
                   />
+                ) : null}
+                {failure != null && failedItem === item.id ? (
+                  <ProductionFailureBanner error={failure} />
                 ) : null}
                 {bumpAction ? (
                   <button

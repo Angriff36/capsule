@@ -67,6 +67,14 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   property expiresAt: datetime?
   property notes: string?
   property terms: string?
+  // AC-654 payment schedule the client agrees to: depositPercent of the total
+  // is due when the client accepts; the rest is due balanceDueDaysBefore days
+  // before the event (null = on the event day). Both null = no schedule.
+  // src/lib/proposalPaymentSchedule.ts works out the amounts; the send
+  // freezes them into the revision, and the accepted deposit seeds the
+  // event's draft invoice (Invoice.setDeposit). No money moves here.
+  property depositPercent: int?
+  property balanceDueDaysBefore: int?
   property visibleSections: list<string>?
   // PL-PROPOSAL-DRAFT (AC-259/AC-096): section order copied from the template.
   // Null or empty = the standard order.
@@ -77,6 +85,8 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   property viewedAt: datetime?
   property acceptedAt: datetime?
   property declinedAt: datetime?
+  // Why the client said no, in sales' words (optional).
+  property declineReason: string?
   property expiredAt: datetime?
 
   // Revision tracking fields - superseded proposals when creating new revisions
@@ -134,7 +144,9 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     optional visibleSections: list<string>,
     optional eventId: uuid,
     optional replacesProposalId: uuid,
-    optional sectionOrder: list<string>
+    optional sectionOrder: list<string>,
+    optional depositPercent: number,
+    optional balanceDueDaysBefore: number
   ) {
     guard self.draftedAt == null
     guard self.status == "draft"
@@ -145,6 +157,8 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     constraint draftGuestCount: guestCount == null or guestCount >= 0 "The guest count can't be negative. Use zero or more."
     constraint draftMoneyNonnegative: subtotal >= 0 and taxAmount >= 0 and discountAmount >= 0 and total >= 0 "This proposal's money amounts can't be negative. Use zero or more."
     constraint draftTotalMatch: total == subtotal + taxAmount - discountAmount "Proposal total must equal subtotal plus tax minus discount"
+    constraint draftDepositPercent: depositPercent == null or (depositPercent >= 0 and depositPercent <= 100) "The deposit is a share of the total, from 0 to 100 percent."
+    constraint draftBalanceDays: balanceDueDaysBefore == null or balanceDueDaysBefore >= 0 "The balance can't be due after the event. Use zero or more days before it."
     mutate clientId = clientId
     mutate title = title
     mutate proposalNumber = proposalNumber
@@ -163,6 +177,8 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     mutate terms = terms
     mutate visibleSections = visibleSections
     mutate sectionOrder = sectionOrder
+    mutate depositPercent = depositPercent
+    mutate balanceDueDaysBefore = balanceDueDaysBefore
     mutate eventId = eventId
     mutate replacesProposalId = replacesProposalId
     mutate draftedAt = now()
@@ -273,6 +289,26 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     mutate notes = notes
     mutate expiresAt = expiresAt
     emit ProposalDraftRevised {
+      proposalId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
+  // AC-654: the payment schedule, set while the proposal is still a draft.
+  // Leaving both out removes the schedule.
+  command setPaymentSchedule(
+    optional depositPercent: number,
+    optional balanceDueDaysBefore: number
+  ) {
+    guard self.status == "draft"
+    guard self.draftedAt != null
+    guard self.deletedAt == null
+    constraint scheduleDepositPercent: depositPercent == null or (depositPercent >= 0 and depositPercent <= 100) "The deposit is a share of the total, from 0 to 100 percent."
+    constraint scheduleBalanceDays: balanceDueDaysBefore == null or balanceDueDaysBefore >= 0 "The balance can't be due after the event. Use zero or more days before it."
+    mutate depositPercent = depositPercent
+    mutate balanceDueDaysBefore = balanceDueDaysBefore
+    emit ProposalPaymentScheduleSet {
       proposalId: self.id
       tenantId: self.tenantId
       clientId: self.clientId
@@ -415,11 +451,12 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command decline() {
+  command decline(optional reason: string) {
     guard self.status == "sent" or self.status == "viewed"
     guard self.deletedAt == null
     mutate status = "declined"
     mutate declinedAt = now()
+    mutate declineReason = reason != null and length(trim(reason)) > 0 ? trim(reason) : null
     emit ProposalDeclined {
       proposalId: self.id
       tenantId: self.tenantId
@@ -544,6 +581,12 @@ event ProposalEventHeadcountFollowed: "proposal.event_headcount_followed" {
 }
 
 event ProposalDraftRevised: "proposal.draft_revised" {
+  proposalId: string
+  tenantId: string
+  clientId: string
+}
+
+event ProposalPaymentScheduleSet: "proposal.payment_schedule_set" {
   proposalId: string
   tenantId: string
   clientId: string

@@ -1,5 +1,6 @@
 import { formatQuantity } from "../../lib/format";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { closeModal, openModal } from "../../ui/action-prompt/dialogFocus";
 import {
   type DemandChangeRequest,
   useDemandChangePreview,
@@ -29,6 +30,14 @@ export function DemandChangePreviewDialog({
   const preview = useDemandChangePreview(request);
   const [applying, setApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // A native modal opens in the top layer, above an open edit sheet.
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    openModal(dialog);
+    return () => closeModal(dialog);
+  }, []);
   const changed =
     preview?.lines.filter((line) => line.change !== "unchanged") ?? [];
   // A guest-count change still applies when no ingredient quantity moves.
@@ -56,19 +65,19 @@ export function DemandChangePreviewDialog({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/35 p-4 sm:items-center"
-      role="presentation"
+    <dialog
+      ref={dialogRef}
+      aria-labelledby="demand-change-preview-title"
+      className="fixed inset-0 z-50 m-0 flex h-full max-h-none w-full max-w-none items-end justify-center border-0 bg-ink/35 p-4 sm:items-center"
+      onCancel={(event) => {
+        event.preventDefault();
+        if (!applying) onClose();
+      }}
       onMouseDown={(event) => {
         if (event.currentTarget === event.target && !applying) onClose();
       }}
     >
-      <section
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="demand-change-preview-title"
-        className="w-full max-w-4xl rounded-ledger border border-line-2 bg-panel shadow-2xl"
-      >
+      <section className="w-full max-w-4xl rounded-ledger border border-line-2 bg-panel shadow-2xl">
         <header className="border-b border-ink px-5 py-4 sm:px-7">
           <p className="eyebrow text-brand">Before you apply</p>
           <h2
@@ -172,6 +181,6 @@ export function DemandChangePreviewDialog({
           </button>
         </footer>
       </section>
-    </div>
+    </dialog>
   );
 }

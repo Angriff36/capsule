@@ -238,7 +238,7 @@ export function InvoicesPage() {
       setShowIssue(false);
       clearIssuePrefill();
       setNotice(
-        "Invoice issued. Deliver it outside Capsule, then mark it sent here.",
+        "Invoice issued. Open it to email it to the client, or mark it sent if you gave it to them another way.",
       );
     });
   };

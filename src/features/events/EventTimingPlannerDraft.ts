@@ -53,7 +53,11 @@ export type Draft = {
   loadOverrideReason?: string;
 } & Record<(typeof durationFields)[number][0], string>;
 
-export function startDraft(plan: Plan): Draft {
+export function startDraft(
+  plan: Plan,
+  /** The company rule minutes for this event, used where nothing is saved. */
+  rules?: { setupMinutes?: number | null; loadMinutes?: number | null },
+): Draft {
   const { event } = plan;
   const sourceService = plan.milestones.find((m) => m.key === "service")?.row
     ?.startsAt;
@@ -63,7 +67,8 @@ export function startDraft(plan: Plan): Draft {
   const defaults: Record<string, number | null | undefined> =
     event.timingConfiguredAt == null
       ? {
-          loadMinutes: 60,
+          setupMinutes: rules?.setupMinutes ?? undefined,
+          loadMinutes: rules?.loadMinutes ?? 60,
           cleanupMinutes: 60,
         }
       : {};

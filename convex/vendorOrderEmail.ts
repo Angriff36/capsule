@@ -362,11 +362,12 @@ export const send = action({
       }
       const body = (await response.json().catch(() => null)) as {
         id?: unknown;
+        name?: unknown;
         message?: unknown;
       } | null;
       if (!response.ok) {
         throw new ReminderDeliveryError(
-          emailServiceFailureKind(response.status),
+          emailServiceFailureKind(response.status, body?.name),
           typeof body?.message === "string"
             ? body.message
             : `Vendor order email failed (${response.status}).`,

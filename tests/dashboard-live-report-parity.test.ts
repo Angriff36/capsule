@@ -12,6 +12,7 @@ const seed: { events: Record<string, unknown>[] } = { events: [] };
 vi.mock("../src/lib/manifest-convex-react", () => ({
   useListEvent: () => seed.events,
   useListLead: () => [],
+  useListProposal: () => [],
   useListClient: () => [],
   useListPerson: () => [],
   useListEventCloseout: () => [],

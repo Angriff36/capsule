@@ -1,3 +1,4 @@
+import { formatStatusLabel } from "../../src/lib/statusLabels";
 import {
   packingItemDescription,
   packingAssociationMissing,
@@ -11,7 +12,12 @@ import { displayEventMenuNotes } from "../../src/features/events/eventMenuLineFi
 import { v } from "convex/values";
 import { TPP_EVENT_REPORTS } from "../../src/features/reports/tpp/catalog.event";
 import { EventTimelineStaffRoster } from "../../src/features/events/eventTimelineStaffRoster";
+import { canReadRates } from "../laborSummary";
 import { loadWindowLabel } from "../../src/features/facilities/venueOperatingFacts";
+import {
+  STAGE_LABEL,
+  type EventStage,
+} from "../../src/features/events/eventStatus";
 import {
   eventDocumentSections,
   serviceRows,
@@ -130,8 +136,45 @@ function table(
     totals: [],
   };
 }
+/** A picked venue with no load-in notes says so, not "no venue picked". */
+function venueRows(
+  venue: Doc<"venues">,
+  answers: ReadonlyArray<
+    readonly [label: string, value: string | boolean | null | undefined]
+  >,
+) {
+  const rows = serviceRows(answers);
+  return rows.length > 0
+    ? rows
+    : [
+        {
+          label: venue.name,
+          value: "No load-in notes on file yet. Add them on the venue.",
+        },
+      ];
+}
+/** A prep task's status in kitchen words. */
+function workStatus(status: string): string {
+  const words: Record<string, string> = {
+    pending: "Not started",
+    in_progress: "In progress",
+    completed: "Done",
+    blocked: "Blocked",
+    cancelled: "Cancelled",
+  };
+  return words[status] ?? status.replaceAll("_", " ");
+}
 function dateText(value: number | null | undefined): string {
-  return value == null ? "" : new Date(value).toLocaleString("en-US");
+  return value == null
+    ? ""
+    : new Date(value).toLocaleString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
 }
 function range(parameters: Parameters): [number, number] {
   return [
@@ -166,10 +209,14 @@ async function eventsInRange(
   seeVenues: boolean,
 ) {
   const [start, end] = range(parameters);
+  // Read only the chosen dates: years of imported events would otherwise
+  // fill the read limit before this month's events are reached.
   const events = (
     await ctx.db
       .query("events")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .withIndex("by_tenantId_and_startsAt", (q) =>
+        q.eq("tenantId", tenantId).gte("startsAt", start).lte("startsAt", end),
+      )
       .take(REPORT_ROW_LIMIT + 1)
       .then(keepReportRows(ctx, "events"))
   ).filter(
@@ -292,10 +339,21 @@ function staffWindowText(window: {
   startsAt?: number | null;
   endsAt?: number | null;
 }): string {
-  if (window.startsAt == null && window.endsAt == null) return "Time not set";
-  return [dateText(window.startsAt), dateText(window.endsAt)]
-    .filter(Boolean)
-    .join(" – ");
+  if (window.startsAt == null && window.endsAt == null)
+    return "No shift time yet";
+  // An end on the same day shows only its time.
+  const sameDay =
+    window.startsAt != null &&
+    window.endsAt != null &&
+    new Date(window.startsAt).toDateString() ===
+      new Date(window.endsAt).toDateString();
+  const end = sameDay
+    ? new Date(window.endsAt!).toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+      })
+    : dateText(window.endsAt);
+  return [dateText(window.startsAt), end].filter(Boolean).join(" – ");
 }
 
 function staffDetails(
@@ -307,12 +365,20 @@ function staffDetails(
     ? entry.shiftWindows
     : (entry.plannedWindows ?? []);
   const sources = [...new Set(entry.sources ?? [entry.source])]
+    // A plain assignment needs no note; the other routes say how they came.
     .map((source) =>
-      source === "filled_need" ? "filled staffing request" : source,
+      source === "filled_need"
+        ? "filled staffing request"
+        : source === "shift"
+          ? "scheduled shift"
+          : "",
     )
+    .filter(Boolean)
     .join(" + ");
   return [
-    windows.length ? windows.map(staffWindowText).join("; ") : "Time not set",
+    windows.length
+      ? windows.map(staffWindowText).join("; ")
+      : "No shift time yet",
     entry.status.replaceAll("_", " "),
     sources,
     ...(entry.notes ?? []),
@@ -524,7 +590,7 @@ async function productionWorksheet(
         if (sharedWork && task._id === firstTask._id)
           sectionRows.push({
             label: "Work status",
-            value: [task.station, human(task.status), owner]
+            value: [task.station, workStatus(task.status), owner]
               .filter(Boolean)
               .join(" / "),
           });
@@ -546,7 +612,9 @@ async function productionWorksheet(
           quantity,
           [
             sharedCategory ? "" : human(task.category),
-            ...(sharedWork ? [] : [task.station, human(task.status), owner]),
+            ...(sharedWork
+              ? []
+              : [task.station, workStatus(task.status), owner]),
           ]
             .filter(Boolean)
             .join("  /  "),
@@ -630,14 +698,54 @@ async function productionWorksheet(
   };
 }
 
-function eventRows(events: Doc<"events">[]): TppRow[] {
+// Newest invoices only: well inside the read limit even with large bills.
+const INVOICE_NUMBER_SCAN = 3000;
+
+/** Each event's invoice numbers, for people who may see invoices. */
+async function invoiceNumbers(
+  ctx: QueryCtx,
+  tenantId: string,
+  events: Doc<"events">[],
+  seeInvoices: boolean,
+): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  if (!seeInvoices) return out;
+  // One bounded read of the workspace's invoices, grouped by event, instead
+  // of one lookup per event.
+  const wanted = new Set(events.map((event) => String(event._id)));
+  const invoices = await ctx.db
+    .query("invoices")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .order("desc")
+    .take(INVOICE_NUMBER_SCAN);
+  for (const row of invoices) {
+    const eventId = row.eventId ? String(row.eventId) : "";
+    if (
+      !wanted.has(eventId) ||
+      !isLiveTenantRow(row, tenantId) ||
+      !row.invoiceNumber
+    )
+      continue;
+    const prior = out.get(eventId);
+    out.set(
+      eventId,
+      prior ? `${prior}, ${row.invoiceNumber}` : String(row.invoiceNumber),
+    );
+  }
+  return out;
+}
+
+function eventRows(
+  events: Doc<"events">[],
+  invoices: Map<string, string> = new Map(),
+): TppRow[] {
   return events.map((event) => ({
     id: event._id,
     values: {
       date: event.startsAt ?? null,
       event: event.title,
-      status: event.stage,
-      invoice: "",
+      status: formatStatusLabel(String(event.stage)),
+      invoice: invoices.get(String(event._id)) ?? "",
       contact: event.primaryContactName ?? "",
       guests: event.expectedHeadcount ?? null,
       venue: event.venueName ?? "",
@@ -793,7 +901,19 @@ export const run = query({
               { key: "changed", label: "Last changed", kind: "date" as const },
             ]
           : EVENT_COLUMNS;
-      return table(args.reportId, columns, eventRows(events));
+      return table(
+        args.reportId,
+        columns,
+        eventRows(
+          events,
+          await invoiceNumbers(
+            ctx,
+            tenantId,
+            events,
+            canRead(auth, INVOICE_READ),
+          ),
+        ),
+      );
     }
 
     if (["invoice-number-history", "staff-schedules"].includes(args.reportId)) {
@@ -1039,6 +1159,48 @@ export const run = query({
               status: row.status,
             },
           }));
+        // Items rented from a vendor on the event's Equipment tab.
+        if (canRead(auth, RENTAL_READ)) {
+          // One bounded read of the workspace's rental lines, kept for the
+          // chosen events; each vendor is read once.
+          const lines = await ctx.db
+            .query("rentalOrderLines")
+            .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+            .order("desc")
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "rental lines"));
+          const vendors = new Map<string, Doc<"vendors"> | null>();
+          for (const line of lines) {
+            const event = eventById.get(String(line.eventId));
+            if (!event) continue;
+            {
+              if (!isLiveTenantRow(line, tenantId)) continue;
+              if (line.status === "cancelled") continue;
+              const vendorKey = String(line.vendorId);
+              if (seeVendors && !vendors.has(vendorKey))
+                vendors.set(vendorKey, await ctx.db.get(line.vendorId));
+              const vendor = seeVendors
+                ? (vendors.get(vendorKey) ?? null)
+                : null;
+              rows.push({
+                id: line._id,
+                values: {
+                  vendor:
+                    vendor && isLiveTenantRow(vendor, tenantId)
+                      ? vendor.name
+                      : "Rental",
+                  item: line.description,
+                  category: "Rented from a vendor",
+                  quantity: line.quantity,
+                  unit: line.countUnit,
+                  event: event.title,
+                  due: line.deliverBy ?? event.startsAt ?? null,
+                  status: formatStatusLabel(line.status),
+                },
+              });
+            }
+          }
+        }
       }
       return table(
         args.reportId,
@@ -1058,7 +1220,19 @@ export const run = query({
 
     const event = await selectedEvent(ctx, tenantId, parameters, seeVenues);
     if (args.reportId === "event-booking")
-      return table(args.reportId, EVENT_COLUMNS, eventRows([event]));
+      return table(
+        args.reportId,
+        EVENT_COLUMNS,
+        eventRows(
+          [event],
+          await invoiceNumbers(
+            ctx,
+            tenantId,
+            [event],
+            canRead(auth, INVOICE_READ),
+          ),
+        ),
+      );
     // Menu lines show dish names, so they follow the event dish and dish
     // read policies (the menu reports require both; the BEO drops the menu).
     const menu =
@@ -1082,7 +1256,10 @@ export const run = query({
         label: "Guests",
         value: String(event.expectedHeadcount ?? "Not recorded"),
       },
-      { label: "Status", value: event.stage },
+      {
+        label: "Status",
+        value: STAGE_LABEL[event.stage as EventStage] ?? event.stage,
+      },
     ];
 
     if (
@@ -1246,7 +1423,7 @@ export const run = query({
               venue: !seeVenues
                 ? null
                 : liveVenue
-                  ? serviceRows([
+                  ? venueRows(liveVenue, [
                       ["Load-in window", loadWindowLabel(liveVenue)],
                       ["Load-in", liveVenue.loadInInstructions],
                       ["Access", liveVenue.accessNotes],
@@ -1328,7 +1505,88 @@ export const run = query({
       );
     }
 
-    if (["production-summary", "kitchen-labor"].includes(args.reportId)) {
+    if (args.reportId === "kitchen-labor") {
+      const prep = await ctx.db
+        .query("prepTasks")
+        .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "prep tasks"));
+      // One cook's cost over their hours is their pay rate, so the cost
+      // column follows the pay-rate read rule; names follow people.
+      const seesCost = canReadRates(auth.role);
+      const seesPeople = canRead(auth, PERSON_READ);
+      const live = prep.filter(
+        (row) => isLiveTenantRow(row, tenantId) && row.status !== "cancelled",
+      );
+      const people = new Map<string, Doc<"people"> | null>();
+      for (const row of live) {
+        const id = row.assignedToId ? String(row.assignedToId) : "";
+        if (id && !people.has(id)) {
+          const person = await ctx.db.get(row.assignedToId!);
+          people.set(
+            id,
+            person && isLiveTenantRow(person, tenantId) ? person : null,
+          );
+        }
+      }
+      return table(
+        args.reportId,
+        [
+          { key: "item", label: "Prep task", kind: "text" },
+          { key: "station", label: "Station", kind: "text" },
+          { key: "cook", label: "Cook", kind: "text" },
+          { key: "started", label: "Started", kind: "datetime" },
+          { key: "finished", label: "Finished", kind: "datetime" },
+          { key: "hours", label: "Hours", kind: "number" },
+          ...(seesCost
+            ? [{ key: "cost", label: "Labor cost", kind: "money" as const }]
+            : []),
+          { key: "status", label: "Status", kind: "text" },
+        ],
+        live.map((row) => {
+          const person = row.assignedToId
+            ? people.get(String(row.assignedToId))
+            : null;
+          const hours =
+            row.startedAt != null &&
+            row.completedAt != null &&
+            row.completedAt > row.startedAt
+              ? Math.round(
+                  ((row.completedAt - row.startedAt) / 3_600_000) * 100,
+                ) / 100
+              : null;
+          const rate = person?.hourlyRate;
+          return {
+            id: row._id,
+            values: {
+              item: row.name,
+              station: row.station ?? row.category,
+              cook: !seesPeople
+                ? ""
+                : person
+                  ? `${person.givenName} ${person.familyName}`.trim()
+                  : row.assignedToId
+                    ? "Assigned"
+                    : "Nobody yet",
+              started: row.startedAt ?? null,
+              finished: row.completedAt ?? null,
+              hours,
+              ...(seesCost
+                ? {
+                    cost:
+                      hours != null && rate != null
+                        ? Math.round(hours * rate * 100) / 100
+                        : null,
+                  }
+                : {}),
+              status: row.status,
+            },
+          };
+        }),
+      );
+    }
+
+    if (args.reportId === "production-summary") {
       const prep = await ctx.db
         .query("prepTasks")
         .withIndex("by_eventId", (q) => q.eq("eventId", event._id))

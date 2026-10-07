@@ -5,6 +5,7 @@ import { formatDate, formatMoneyExact } from "../../lib/format";
 import { PRICING_BASIS_LABELS, type PricingBasis } from "../../lib/pricing";
 import { publicErrorMessage } from "../../lib/publicErrorMessage";
 import { ErrorState, TableSkeleton } from "../../ui/primitives";
+import { ProposalPaymentScheduleList } from "./ProposalPaymentScheduleList";
 
 /**
  * Client-facing proposal acceptance page (#115).
@@ -251,6 +252,10 @@ export function ProposalAcceptancePage({
                 </div>
               </div>
             </div>
+
+            {pending.paymentSchedule ? (
+              <ProposalPaymentScheduleList schedule={pending.paymentSchedule} />
+            ) : null}
 
             {(pending.proposal.visibleSections.length === 0 ||
               pending.proposal.visibleSections.includes("terms")) &&

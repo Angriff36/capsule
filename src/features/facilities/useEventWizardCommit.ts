@@ -19,12 +19,19 @@ export function eventWizardEventArgs(
 ): Record<string, unknown> {
   return eventPlanEngagementFormMapper.toCommandArgs({
     clientId: draft.clientId,
+    client: draft.clientName ? { name: draft.clientName } : undefined,
     venueId: draft.venueId,
-    venue: undefined,
+    venue: draft.bookedVenue as Parameters<
+      typeof eventPlanEngagementFormMapper.toCommandArgs
+    >[0]["venue"],
+    pickup: draft.pickup === true,
     title: draft.title,
     eventTypeRaw: draft.eventType,
     occasionId: "",
     serviceStyleId: draft.serviceStyleId ?? "",
+    serviceStyle: draft.serviceStyleName
+      ? { name: draft.serviceStyleName }
+      : undefined,
     salespersonId: "",
     referralSourceId: "",
     startsAtRaw: draft.startsAt,

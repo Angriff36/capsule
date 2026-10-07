@@ -1,7 +1,8 @@
+import { useOverdueVehicleService } from "./vehicleServiceDue";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
-import { formatCountNoun } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import {
   useListDelivery,
   useListVehicle,
@@ -51,6 +52,7 @@ type VehicleRow = {
 
 export function VehicleSchedulePage() {
   const vehicles = useListVehicle() as VehicleRow[] | undefined;
+  const overdueService = useOverdueVehicleService();
   const deliveries = useListDelivery() as DeliveryRow[] | undefined;
   const eventIds = useMemo(
     () =>
@@ -159,7 +161,7 @@ export function VehicleSchedulePage() {
         <div className="ledger-heading">
           <div>
             <p className="eyebrow">Day view</p>
-            <h2>{new Date(dayStart).toLocaleDateString()}</h2>
+            <h2>{formatDate(dayStart)}</h2>
           </div>
           <span>
             {formatCountNoun(fleet.length, "vehicle")} ·{" "}
@@ -215,6 +217,12 @@ export function VehicleSchedulePage() {
                         ? "available all day"
                         : `${runs.length} run${runs.length === 1 ? "" : "s"}`}
                     </small>
+                    {overdueService.has(String(vehicle._id)) ? (
+                      <small className="block text-warn" role="status">
+                        Overdue:{" "}
+                        {overdueService.get(String(vehicle._id))!.join(", ")}
+                      </small>
+                    ) : null}
                   </div>
                   <div className="relative h-9 flex-1 rounded-xs bg-inset">
                     {HOUR_MARKS.slice(1, -1).map((hour) => (

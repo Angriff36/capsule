@@ -117,4 +117,38 @@ describe("runtime proof: venue term captured at booking", () => {
     expect(await splitsFor(finance, quiet)).toEqual([]);
     expect(await splitsFor(finance, eventId)).toHaveLength(1);
   });
+
+  it("cancelling a booked event closes its open venue split", async () => {
+    const proof = harness();
+    const tenantId = "tenant-cancel-split";
+    const { finance, events, sales, venueId, clientId } = await seedFinance(
+      proof,
+      tenantId,
+    );
+    await run(proof, finance, M.VenueCommissionTerm_createViaDefine, {
+      venueId,
+      commissionPercent: 10,
+      effectiveStartDate: Date.now() - 10 * DAY,
+    });
+    const eventId = await planEvent(
+      proof,
+      sales,
+      clientId,
+      venueId,
+      "Called off",
+      4000,
+    );
+    await book(proof, events, eventId);
+    const [split] = await splitsFor(finance, eventId);
+    expect(split).toMatchObject({ status: "draft" });
+
+    await run(proof, events, M.Event_cancel, {
+      docId: eventId,
+      reason: "Client called it off",
+    });
+    expect(await readDoc<Split>(finance, split._id)).toMatchObject({
+      status: "rejected",
+      rejectionReason: "The event was cancelled",
+    });
+  });
 });

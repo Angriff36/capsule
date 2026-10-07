@@ -163,19 +163,39 @@ describe("runtime proof: callers cannot set totals the server works out (AC-372)
     );
     expect(invoices).toHaveLength(0);
 
+    // Tax worked out before the discount is refused: tax follows the
+    // discounted price.
+    await expect(
+      issue("INV-T-6", {
+        subtotal: 205,
+        taxAmount: 10,
+        discountAmount: 15,
+        total: 200,
+        lineItems: worked.lineItems,
+        taxBreakdown: worked.taxBreakdown,
+      }),
+    ).rejects.toThrow(/don't add up/);
+
     // The honest invoice, with a discount the person chose, is issued.
+    // $15 off spreads $9.15 onto the food; 8% of $115.85 is $9.27.
+    const discounted = calculateInvoiceTax(LINES, rates, false, 15);
+    expect(discounted.taxAmount).toBe(9.27);
     const honest = (await issue("INV-T-4", {
       subtotal: 205,
-      taxAmount: 10,
+      taxAmount: 9.27,
       discountAmount: 15,
-      total: 200,
-      lineItems: worked.lineItems,
-      taxBreakdown: worked.taxBreakdown,
+      total: 199.27,
+      lineItems: discounted.lineItems,
+      taxBreakdown: discounted.taxBreakdown,
     })) as { docId: string };
     const stored = await finance.run(async (ctx) =>
       ctx.db.get(honest.docId as never),
     );
-    expect(stored).toMatchObject({ subtotal: 205, taxAmount: 10, total: 200 });
+    expect(stored).toMatchObject({
+      subtotal: 205,
+      taxAmount: 9.27,
+      total: 199.27,
+    });
 
     // A single-amount invoice (no lines), as the approval cascade and
     // imports make, is not line-checked.

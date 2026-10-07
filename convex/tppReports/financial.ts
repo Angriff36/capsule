@@ -147,7 +147,11 @@ function invoiceLines(value: unknown): {
     if (!item) return [];
     const quantity = Number(item.quantity ?? 1);
     const amount = Number(
-      item.amount ?? item.total ?? Number(item.unitPrice ?? 0) * quantity,
+      // Before tax: a worked line's total already holds its tax.
+      item.amount ??
+        item.subtotal ??
+        item.total ??
+        Number(item.unitPrice ?? 0) * quantity,
     );
     const cost = Number(item.cost ?? Number(item.unitCost ?? 0) * quantity);
     return [
@@ -161,6 +165,12 @@ function invoiceLines(value: unknown): {
       },
     ];
   });
+}
+
+/** "ach" -> "ACH", "card" -> "Card". */
+function paymentMethodLabel(method: string): string {
+  if (method === "ach") return "ACH";
+  return method.charAt(0).toUpperCase() + method.slice(1);
 }
 
 export const run = query({
@@ -178,10 +188,19 @@ export const run = query({
     const seeVenues = canRead(auth, VENUE_READ);
     const seeClients = canRead(auth, CLIENT_READ);
     const parameters = (args.parameters ?? {}) as Parameters;
-    const [rawEvents, invoices, clients] = await Promise.all([
+    // Events in the chosen dates, plus the events and clients the invoices
+    // name, read one by one. Reading every client or event first stopped at
+    // the read limit, so newer ones showed as "Unknown contact".
+    const [fromAt, toAt] = range(parameters);
+    const [datedEvents, invoices] = await Promise.all([
       ctx.db
         .query("events")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .withIndex("by_tenantId_and_startsAt", (q) =>
+          q
+            .eq("tenantId", tenantId)
+            .gte("startsAt", fromAt)
+            .lte("startsAt", toAt),
+        )
         .take(REPORT_ROW_LIMIT + 1)
         .then(keepReportRows(ctx, "events")),
       ctx.db
@@ -189,12 +208,32 @@ export const run = query({
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
         .take(REPORT_ROW_LIMIT + 1)
         .then(keepReportRows(ctx, "invoices")),
-      ctx.db
-        .query("clients")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .take(REPORT_ROW_LIMIT + 1)
-        .then(keepReportRows(ctx, "clients")),
     ]);
+    const datedIds = new Set(datedEvents.map((row) => String(row._id)));
+    const invoiceEventIds = [
+      ...new Set(
+        invoices
+          .map((row) => row.eventId)
+          .filter((id): id is NonNullable<typeof id> => id != null)
+          .filter((id) => !datedIds.has(String(id))),
+      ),
+    ];
+    const invoiceClientIds = [
+      ...new Set(
+        invoices
+          .map((row) => row.clientId)
+          .filter((id): id is NonNullable<typeof id> => id != null),
+      ),
+    ];
+    const [invoiceEvents, clientRows] = await Promise.all([
+      Promise.all(invoiceEventIds.map((id) => ctx.db.get(id))),
+      Promise.all(invoiceClientIds.map((id) => ctx.db.get(id))),
+    ]);
+    const rawEvents = [
+      ...datedEvents,
+      ...invoiceEvents.filter((row) => row != null),
+    ];
+    const clients = clientRows.filter((row) => row != null);
     // The event's own venue snapshot follows eventRead; filling it from the
     // Venue record follows venueRead.
     const events = await Promise.all(
@@ -215,6 +254,24 @@ export const run = query({
         .filter((row) => isLiveTenantRow(row, tenantId))
         .map((row) => [String(row._id), row]),
     );
+    // Referral source names, not their record ids.
+    const referralIds = [
+      ...new Set(
+        events
+          .map((row) => row.referralSourceId)
+          .filter((id): id is NonNullable<typeof id> => id != null),
+      ),
+    ];
+    const referralName = new Map<string, string>();
+    // Referral sources follow their own read rule (event or sales access).
+    const seeReferrals = canRead(auth, ["eventAccess", "salesAccess"]);
+    for (const id of seeReferrals ? referralIds : []) {
+      const source = await ctx.db.get(id);
+      if (source && isLiveTenantRow(source, tenantId))
+        referralName.set(String(id), source.name);
+    }
+    const referralOf = (id: unknown) =>
+      id ? (referralName.get(String(id)) ?? "Unassigned") : "Unassigned";
     const clientById = new Map(
       clients
         .filter((row) => isLiveTenantRow(row, tenantId))
@@ -331,7 +388,7 @@ export const run = query({
           );
         const rows = [...totals].map(([method, amount]) => ({
           id: method,
-          values: { method, amount },
+          values: { method: paymentMethodLabel(method), amount },
         }));
         return financial(
           args.reportId,
@@ -348,7 +405,7 @@ export const run = query({
         values: {
           date: row.settledAt ?? row.recordedAt ?? null,
           contact: contactOf(row.clientId),
-          method: row.method,
+          method: paymentMethodLabel(row.method),
           amount: row.amount,
           source: row.externalSource ?? "",
           transaction:
@@ -702,19 +759,24 @@ export const run = query({
       "taxable-sales",
     ]);
     if (lineReportIds.has(args.reportId)) {
-      const matcher = args.reportId.includes("beverage")
-        ? /beverage|drink|bar|wine|beer/i
-        : args.reportId.includes("rental")
-          ? /rental|equipment/i
-          : args.reportId.includes("staff")
-            ? /staff|labor/i
-            : args.reportId.includes("miscellaneous")
-              ? /misc|other/i
-              : args.reportId.includes("platform-fee")
-                ? /platform|gratuity|tip/i
-                : args.reportId === "event-other-fees"
-                  ? /other fee|service fee|delivery fee|fee/i
-                  : null;
+      // The food & beverage ledger is both; only "beverage" matched before,
+      // which left every food line out.
+      const matcher =
+        args.reportId === "ledger-food-beverage-sales"
+          ? /food|menu|catering|beverage|drink|bar|wine|beer/i
+          : args.reportId.includes("beverage")
+            ? /beverage|drink|bar|wine|beer/i
+            : args.reportId.includes("rental")
+              ? /rental|equipment/i
+              : args.reportId.includes("staff")
+                ? /staff|labor/i
+                : args.reportId.includes("miscellaneous")
+                  ? /misc|other/i
+                  : args.reportId.includes("platform-fee")
+                    ? /platform|gratuity|tip/i
+                    : args.reportId === "event-other-fees"
+                      ? /other fee|service fee|delivery fee|fee/i
+                      : null;
       // #426: the invoice discount is shared across its lines by line amount
       // (cents, the leftover cent on the last line), so the lines add back
       // to the invoice discount instead of repeating it on every line.
@@ -881,9 +943,7 @@ export const run = query({
           event: event?.title ?? "",
           contact: contactOf(invoice.clientId),
           venue: event?.venueName ?? "",
-          referral: event?.referralSourceId
-            ? String(event.referralSourceId)
-            : "Unassigned",
+          referral: referralOf(event?.referralSourceId),
           guests: event?.expectedHeadcount ?? 0,
           subtotal: invoice.subtotal,
           tax: invoice.taxAmount,
@@ -914,9 +974,7 @@ export const run = query({
                 event: event?.title ?? "",
                 contact: contactOf(invoice.clientId),
                 venue: event?.venueName ?? "",
-                referral: event?.referralSourceId
-                  ? String(event.referralSourceId)
-                  : "Unassigned",
+                referral: referralOf(event?.referralSourceId),
                 guests: event?.expectedHeadcount ?? 0,
                 subtotal: invoice.subtotal,
                 tax: invoice.taxAmount,
@@ -951,9 +1009,7 @@ export const run = query({
               event: event.title,
               contact: event.primaryContactName ?? "",
               venue: event.venueName ?? "",
-              referral: event.referralSourceId
-                ? String(event.referralSourceId)
-                : "Unassigned",
+              referral: referralOf(event.referralSourceId),
               guests: event.expectedHeadcount ?? null,
               subtotal: event.quotedPrice ?? null,
               tax: 0,

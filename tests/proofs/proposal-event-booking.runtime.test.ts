@@ -164,6 +164,11 @@ const EVENT_ARGS = {
   budgetAmount: 0,
   quotedPrice: 1300,
   venueName: "Riverside Hall",
+  // The event form sends these name snapshots too.
+  clientName: "Casey Client",
+  serviceStyleName: "Plated",
+  occasionName: "Gala",
+  ownerName: "Sam Sales",
 };
 
 async function liveEventDishes(actor: Actor, eventId: string) {

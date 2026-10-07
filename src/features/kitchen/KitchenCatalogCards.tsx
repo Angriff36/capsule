@@ -16,6 +16,9 @@ import { useListScrollRestoration } from "../list-state/ListScrollCoordinator";
 import { type ListOrigin } from "../list-state/listOrigin";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { AllergenIconRow } from "./AllergenIconRow";
+import { deriveDishAllergens } from "./dishAllergens";
+import { recipeDishIdOf } from "./dishVersions";
+import { useMenuRecipeRows } from "../../lib/useMenuRecipeRows";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { KitchenCatalogLifecycleButtons } from "./KitchenCatalogLifecycleButtons";
 import { CulinaryCatalogCardCopy } from "./culinary-studio/CulinaryCatalogCardCopy";
@@ -417,6 +420,15 @@ function CatalogPreview({
   item,
 }: Readonly<{ section: KitchenSection; item: CatalogItem }>) {
   const facts = previewFacts(section, item);
+  // A dish's allergens come from its recipe, as on the full card; the stored
+  // summary alone can be empty while the ingredients say otherwise.
+  const recipeRows = useMenuRecipeRows(
+    section === "dishes" ? [recipeDishIdOf(item)] : [],
+  );
+  const allergenCodes =
+    section === "dishes" && recipeRows
+      ? deriveDishAllergens({ ...item }, recipeRows).codes
+      : item.allergenSummary;
   return (
     <div className="culinary-preview">
       {section === "dishes" || section === "ingredients" ? (
@@ -457,10 +469,10 @@ function CatalogPreview({
         </section>
       ) : null}
 
-      {item.allergenSummary ? (
+      {allergenCodes ? (
         <section className="culinary-preview-section">
           <h3>Allergens</h3>
-          <AllergenIconRow codes={item.allergenSummary} />
+          <AllergenIconRow codes={allergenCodes} words />
         </section>
       ) : null}
     </div>

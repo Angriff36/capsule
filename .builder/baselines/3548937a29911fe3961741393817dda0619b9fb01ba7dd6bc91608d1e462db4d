@@ -441,7 +441,9 @@ import {
   InvoiceApplyCreditParamsSchema,
   InvoiceApplyPaymentParamsSchema,
   InvoiceAssignNumberParamsSchema,
+  InvoiceFollowEventClientParamsSchema,
   InvoiceFollowEventPriceParamsSchema,
+  InvoiceFollowEventPriceTaxedParamsSchema,
   InvoiceIssueParamsSchema,
   InvoiceMarkDepositPaidParamsSchema,
   InvoiceMarkOverdueParamsSchema,
@@ -458,10 +460,12 @@ import {
   ItemUnitMappingRecordParamsSchema,
   ItemUnitMappingRetireParamsSchema,
   LeadCaptureParamsSchema,
+  LeadCloseParamsSchema,
   LeadConfirmConversionParamsSchema,
   LeadConfirmProposalSentParamsSchema,
   LeadReassignClientParamsSchema,
   LeadRecordSourceHistoryParamsSchema,
+  LeadReopenParamsSchema,
   LeadReviseDetailsParamsSchema,
   LeadStageClientMergeParamsSchema,
   LeadStageConversionParamsSchema,
@@ -477,6 +481,7 @@ import {
   LeftoverDispositionReviseParamsSchema,
   MenuArchiveParamsSchema,
   MenuDishAddParamsSchema,
+  MenuDishCancelPriceChangeParamsSchema,
   MenuDishRemoveParamsSchema,
   MenuDishSchedulePriceChangeParamsSchema,
   MenuDishUpdateDetailsParamsSchema,
@@ -701,6 +706,7 @@ import {
   ProposalReviseDraftParamsSchema,
   ProposalRevisionCaptureParamsSchema,
   ProposalSendParamsSchema,
+  ProposalSetPaymentScheduleParamsSchema,
   ProposalStageClientMergeParamsSchema,
   ProposalStageEventLinkParamsSchema,
   ProposalSupersedeParamsSchema,
@@ -710,6 +716,7 @@ import {
   ProposalTemplateReviseParamsSchema,
   PurchaseNeedAssignToDraftParamsSchema,
   PurchaseNeedCancelParamsSchema,
+  PurchaseNeedCloseWithFinishedEventParamsSchema,
   PurchaseNeedCreateParamsSchema,
   PurchaseNeedMarkDraftOrderedParamsSchema,
   PurchaseNeedMarkFulfilledParamsSchema,
@@ -755,6 +762,7 @@ import {
   RevenueAttributionApplyParamsSchema,
   RevenueAttributionApproveParamsSchema,
   RevenueAttributionChangeSplitParamsSchema,
+  RevenueAttributionCloseForCancelledEventParamsSchema,
   RevenueAttributionCreateParamsSchema,
   RevenueAttributionRejectParamsSchema,
   RevenueAttributionRequestApprovalParamsSchema,
@@ -866,6 +874,7 @@ import {
   TimeRecordClockInParamsSchema,
   TimeRecordClockOutParamsSchema,
   TimeRecordCorrectParamsSchema,
+  TimeRecordRemoveParamsSchema,
   TrailerRegisterParamsSchema,
   TrailerReviseDetailsParamsSchema,
   TrailerSetCargoFactsParamsSchema,
@@ -7027,12 +7036,32 @@ export function useInvoiceAssignNumber() {
   };
 }
 
+/** Mutation hook for Invoice.followEventClient. */
+export function useInvoiceFollowEventClient() {
+  const mutate = useMutation(api.mutations.Invoice_followEventClient);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceFollowEventClientParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Invoice.followEventPrice. */
 export function useInvoiceFollowEventPrice() {
   const mutate = useMutation(api.mutations.Invoice_followEventPrice);
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = InvoiceFollowEventPriceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Invoice.followEventPriceTaxed. */
+export function useInvoiceFollowEventPriceTaxed() {
+  const mutate = useMutation(api.mutations.Invoice_followEventPriceTaxed);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceFollowEventPriceTaxedParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -7249,6 +7278,16 @@ export function useLeadCapture() {
   };
 }
 
+/** Mutation hook for Lead.close. */
+export function useLeadClose() {
+  const mutate = useMutation(api.mutations.Lead_close);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadCloseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Lead.confirmConversion. */
 export function useLeadConfirmConversion() {
   const mutate = useMutation(api.mutations.Lead_confirmConversion);
@@ -7285,6 +7324,16 @@ export function useLeadRecordSourceHistory() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = LeadRecordSourceHistoryParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Lead.reopen. */
+export function useLeadReopen() {
+  const mutate = useMutation(api.mutations.Lead_reopen);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadReopenParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -7609,6 +7658,16 @@ export function useMenuDishAdd() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = MenuDishAddParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for MenuDish.cancelPriceChange. */
+export function useMenuDishCancelPriceChange() {
+  const mutate = useMutation(api.mutations.MenuDish_cancelPriceChange);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = MenuDishCancelPriceChangeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -10333,6 +10392,16 @@ export function useProposalSend() {
   };
 }
 
+/** Mutation hook for Proposal.setPaymentSchedule. */
+export function useProposalSetPaymentSchedule() {
+  const mutate = useMutation(api.mutations.Proposal_setPaymentSchedule);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalSetPaymentScheduleParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Proposal.stageClientMerge. */
 export function useProposalStageClientMerge() {
   const mutate = useMutation(api.mutations.Proposal_stageClientMerge);
@@ -10645,6 +10714,16 @@ export function usePurchaseNeedCancel() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = PurchaseNeedCancelParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PurchaseNeed.closeWithFinishedEvent. */
+export function usePurchaseNeedCloseWithFinishedEvent() {
+  const mutate = useMutation(api.mutations.PurchaseNeed_closeWithFinishedEvent);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PurchaseNeedCloseWithFinishedEventParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -11262,6 +11341,16 @@ export function useRevenueAttributionChangeSplit() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = RevenueAttributionChangeSplitParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RevenueAttribution.closeForCancelledEvent. */
+export function useRevenueAttributionCloseForCancelledEvent() {
+  const mutate = useMutation(api.mutations.RevenueAttribution_closeForCancelledEvent);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RevenueAttributionCloseForCancelledEventParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -12959,6 +13048,16 @@ export function useTimeRecordCorrect() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = TimeRecordCorrectParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for TimeRecord.remove. */
+export function useTimeRecordRemove() {
+  const mutate = useMutation(api.mutations.TimeRecord_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TimeRecordRemoveParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -14770,4 +14869,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1562 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1571 as const;

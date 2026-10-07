@@ -190,5 +190,22 @@ describe("runtime proof: Event.approve → ProductionBatch.plan", () => {
     expect(Number((still[0] as { plannedYield?: number }).plannedYield)).toBe(
       S.headcount,
     );
+
+    // Cancelling the event stands down the batch nobody started.
+    const current = (await events.run(async (ctx) =>
+      ctx.db.get(event.docId as never),
+    )) as { version: number };
+    await proof.executeCommand(events, api.mutations.Event_cancel, {
+      docId: event.docId,
+      version: current.version,
+      reason: "Client called it off",
+    });
+    const afterCancel = (await kitchen.run(async (ctx) =>
+      ctx.db.get((still[0] as { _id: string })._id as never),
+    )) as { status?: string; cancellationReason?: string };
+    expect(afterCancel).toMatchObject({
+      status: "cancelled",
+      cancellationReason: "Client called it off",
+    });
   });
 });

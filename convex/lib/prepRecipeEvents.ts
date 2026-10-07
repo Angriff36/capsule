@@ -1,4 +1,5 @@
 import type { Id } from "../_generated/dataModel";
+import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
 import type { MutationCtx } from "../_generated/server";
 import { api } from "../_generated/api";
 import { getAuthContext, requireTenant } from "./authContext";
@@ -64,6 +65,25 @@ export async function standDownEventPrep(
       continue;
     await ctx.runMutation(api.mutations.PrepTask_standDown, {
       docId: task._id,
+      reason,
+    });
+  }
+  // Batches not started yet stand down too; one already cooking stays.
+  if (!("eventId" in scope)) return;
+  const batches = await ctx.db
+    .query("productionBatches")
+    .withIndex("by_eventId", (q) => q.eq("eventId", scope.eventId))
+    .collect();
+  const system = TenantSystemCommandRunner.forTenant(ctx, tenantId).context;
+  for (const batch of batches) {
+    if (
+      batch.tenantId !== tenantId ||
+      batch.deletedAt != null ||
+      batch.status !== "planned"
+    )
+      continue;
+    await system.runMutation(api.mutations.ProductionBatch_cancel, {
+      docId: batch._id,
       reason,
     });
   }

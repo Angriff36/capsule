@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   useListLead,
+  useListProposal,
   useListEventCloseout,
   useListLeadershipItem,
   useListPerson,
@@ -20,6 +21,7 @@ import {
   foodCostPercent,
   isBookedEvent,
   isCompletedEvent,
+  acceptedProposalIds,
   percentText,
 } from "./dashboardRecordSets";
 import { MetricDefinitionList } from "./MetricDefinitionList";
@@ -71,6 +73,7 @@ export function L10DashboardPage() {
   }, [now]);
   const events = useEventsInRange(eventWindow);
   const leads = useListLead();
+  const proposals = useListProposal();
   const closeouts = useListEventCloseout();
   const items = useListLeadershipItem();
   const targets = useListScorecardTarget();
@@ -93,11 +96,12 @@ export function L10DashboardPage() {
           events: events ?? [],
           closeouts: closeouts ?? [],
           leads: leads ?? [],
+          acceptedProposalIds: acceptedProposalIds(proposals),
         },
         (targets ?? []) as ScorecardTargetRow[],
         now,
       ),
-    [events, closeouts, leads, targets, now],
+    [events, closeouts, leads, proposals, targets, now],
   );
 
   const history = useMemo(
@@ -134,10 +138,17 @@ export function L10DashboardPage() {
       return created >= weekAgo && created <= now;
     }).length;
 
+    // Counted in the week the client accepted the lead's proposal.
+    const acceptedAt = new Map(
+      (proposals ?? [])
+        .filter((p) => p.status === "accepted" && p.acceptedAt != null)
+        .map((p) => [String(p._id), Number(p.acceptedAt)]),
+    );
     const convertedLeads = (leads || []).filter((l) => {
-      if (!l.updatedAt) return false;
-      const updated = new Date(l.updatedAt);
-      return l.stage === "converted" && updated >= weekAgo && updated <= now;
+      const at = l.proposalId ? acceptedAt.get(String(l.proposalId)) : null;
+      if (at == null) return false;
+      const when = new Date(at);
+      return when >= weekAgo && when <= now;
     }).length;
 
     return {
@@ -146,7 +157,7 @@ export function L10DashboardPage() {
       newLeads,
       convertedLeads,
     };
-  }, [events, leads]);
+  }, [events, leads, proposals]);
 
   // Scorecard metrics (key L10 KPIs)
   const scorecardMetrics = useMemo(() => {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { Link, useParams } from "react-router-dom";
 import { useIngredientLookupApplyToIngredient } from "../../lib/ingredientLookupClient";
 import {
@@ -545,7 +546,9 @@ export function IngredientDetailPage() {
                 <span className="chip chip-tone-ok mr-2">Gluten free</span>
               ) : null}
               {(ingredient.allergens ?? []).length
-                ? (ingredient.allergens ?? []).join(", ")
+                ? (ingredient.allergens ?? [])
+                    .map((code: string) => formatStatusLabel(code))
+                    .join(", ")
                 : ingredient.isGlutenFree
                   ? "None flagged"
                   : "None on file"}

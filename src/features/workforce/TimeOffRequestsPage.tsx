@@ -6,6 +6,7 @@ import {
   useTimeOffRequestDecline,
 } from "../../lib/manifest-convex-react";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 
@@ -15,10 +16,13 @@ const dateRange = new Intl.DateTimeFormat(undefined, {
   year: "numeric",
 });
 
-const formatRange = (startsAt?: number | null, endsAt?: number | null) =>
-  startsAt == null || endsAt == null
-    ? "Dates unavailable"
-    : `${dateRange.format(startsAt)} – ${dateRange.format(endsAt - 1)}`;
+const formatRange = (startsAt?: number | null, endsAt?: number | null) => {
+  if (startsAt == null || endsAt == null) return "Dates unavailable";
+  const first = dateRange.format(startsAt);
+  const last = dateRange.format(endsAt - 1);
+  // One day off reads as one date.
+  return first === last ? first : `${first} – ${last}`;
+};
 
 export function TimeOffRequestsPage() {
   const requests = useListTimeOffRequest();
@@ -27,6 +31,7 @@ export function TimeOffRequestsPage() {
   const decline = useTimeOffRequestDecline();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const { prompt, host } = useActionPrompt();
 
   const personName = (personId: string) => {
     const person = people?.find((row) => row._id === personId);
@@ -49,12 +54,32 @@ export function TimeOffRequestsPage() {
     request: (typeof visible)[number],
     decision: "approve" | "decline",
   ) => {
+    // A "no" says why, so the person is not left guessing.
+    let responseNote: string | undefined;
+    if (decision === "decline") {
+      const values = await prompt.askFields({
+        title: "Deny this time off",
+        description: `${personName(String(request.personId))} will see your note.`,
+        confirmLabel: "Deny",
+        tone: "danger",
+        fields: [
+          {
+            name: "note",
+            label: "Why (optional)",
+            inputType: "text",
+            required: false,
+          },
+        ],
+      });
+      if (!values) return;
+      responseNote = values.note?.trim() || undefined;
+    }
     setFailure(null);
     setBusy(`${request._id}:${decision}`);
     try {
       const args = { docId: request._id, version: request.version };
       if (decision === "approve") await approve(args);
-      else await decline(args);
+      else await decline({ ...args, responseNote });
     } catch (error) {
       setFailure(error);
     } finally {
@@ -64,6 +89,7 @@ export function TimeOffRequestsPage() {
 
   return (
     <div className="operations-stage supply-stage">
+      {host}
       <header className="supply-masthead">
         <div>
           <p className="eyebrow">Staff · Time off</p>
@@ -175,6 +201,11 @@ export function TimeOffRequestsPage() {
                     <td>{request.reason}</td>
                     <td>
                       <StatusChip status={String(request.status)} />
+                      {request.responseNote ? (
+                        <small className="block text-ink-3">
+                          {request.responseNote}
+                        </small>
+                      ) : null}
                     </td>
                   </tr>
                 ))}

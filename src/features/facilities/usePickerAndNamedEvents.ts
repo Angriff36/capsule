@@ -31,11 +31,15 @@ export function usePickerAndNamedEvents(
     if (picker === undefined || named === undefined) return undefined;
     const seen = new Set<string>(picker.map((event) => event._id));
     // The old every-event list left removed events out; so does this one.
+    // Closest to today first, so a picker opens on the events being worked.
+    const now = Date.now();
+    const distance = (event: EventLookupRow) =>
+      Math.abs(Number(event.startsAt ?? 0) - now);
     return [
       ...picker,
       ...named.filter(
         (event) => !seen.has(event._id) && event.deletedAt == null,
       ),
-    ];
+    ].sort((a, b) => distance(a) - distance(b));
   }, [picker, named]);
 }

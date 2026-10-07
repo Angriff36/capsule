@@ -1,3 +1,4 @@
+import { useOverdueVehicleService } from "./vehicleServiceDue";
 import { Fragment, useMemo, useState, type FormEvent } from "react";
 import { useEventTimingPlan } from "../../lib/operational-transactions";
 import { localDateTime } from "../events/eventDetailFormHelpers";
@@ -62,6 +63,7 @@ export function DeliveriesPage() {
   const events = useEventsById(eventIds);
   const people = useListPerson();
   const vehicles = useListVehicle();
+  const overdueService = useOverdueVehicleService();
   const assignDriver = useAssignDriver();
   const unassignDriver = useUnassignDriver();
   const assignVehicle = useAssignVehicle();
@@ -570,6 +572,15 @@ export function DeliveriesPage() {
                             (vehicle) => vehicle._id === row.vehicleId,
                           )?.registration ?? "—")
                         )}
+                        {row.vehicleId &&
+                        overdueService.has(String(row.vehicleId)) ? (
+                          <small className="block text-warn" role="status">
+                            Overdue:{" "}
+                            {overdueService
+                              .get(String(row.vehicleId))!
+                              .join(", ")}
+                          </small>
+                        ) : null}
                       </td>
                       <td data-label="Window">
                         {formatDateTimeRange(

@@ -96,6 +96,12 @@ export function CloseoutPage() {
   const visibleRows = showFinalized
     ? scopedCloseouts
     : scopedCloseouts.filter((row) => String(row.status) !== "finalized");
+  // Newest event first, the order the team closes them out.
+  const startsAt = (row: { eventId?: unknown }) =>
+    Number(
+      events?.find((event) => event._id === String(row.eventId))?.startsAt ?? 0,
+    );
+  visibleRows.sort((a, b) => startsAt(b) - startsAt(a));
   const closedOutEventIds = new Set(
     activeCloseouts.map((row) => String(row.eventId)),
   );
@@ -492,9 +498,9 @@ export function CloseoutPage() {
                             {String(row.status) === "finalized" ? (
                               <>
                                 <span className="text-sm text-ink-3">
-                                  Frozen
+                                  Final
                                   {Number(row.revision ?? 1) > 1
-                                    ? ` · version ${Number(row.revision)}`
+                                    ? ` · corrected ${Number(row.revision) - 1 === 1 ? "once" : `${Number(row.revision) - 1} times`}`
                                     : ""}
                                 </span>
                                 <button

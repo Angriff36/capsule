@@ -4,6 +4,7 @@ import { useEventMoveToClient } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { resolveManifestPolicies } from "../admin/rolePermissionAudit";
 import { clientDisplayName } from "./clientName";
+import { SearchSelect } from "../../ui/SearchSelect";
 
 interface EventClientFormProps {
   eventId: Id<"events">;
@@ -83,28 +84,24 @@ export function EventClientForm({
       </p>
       <label className="field-label">
         <span>Move to client</span>
-        <select
+        <SearchSelect
           name="clientId"
           value={nextClientId}
-          onChange={(changeEvent) => {
-            const picked = choices.find(
-              (choice) => choice.client._id === changeEvent.target.value,
-            );
-            setNextClientId(changeEvent.target.value);
+          onChange={(id) => {
+            const picked = choices.find((choice) => choice.client._id === id);
+            setNextClientId(id);
             // A person client is usually the contact; a company is not.
             setUseClientContact(picked?.client.clientType === "person");
           }}
-          className="input"
+          placeholder="Type a client's name…"
+          aria-label="Move to client"
           disabled={!canChange || clients === undefined}
-          title={blockedReason}
-        >
-          <option value="">Pick a client</option>
-          {choices.map((choice) => (
-            <option key={choice.client._id} value={choice.client._id}>
-              {choice.name}
-            </option>
-          ))}
-        </select>
+          options={choices.map((choice) => ({
+            id: choice.client._id,
+            label: choice.name,
+            hint: choice.client.email ?? null,
+          }))}
+        />
       </label>
       {next ? (
         <label className="flex items-center gap-2 text-sm">
@@ -119,8 +116,8 @@ export function EventClientForm({
         </label>
       ) : null}
       <p className="text-xs text-ink-3">
-        Proposals and contracts move with the event. Invoices and payments stay
-        with the client they were billed to.
+        Proposals, contracts and unsent draft invoices move with the event. Sent
+        or paid invoices and payments stay with the client billed.
       </p>
       <button
         type="submit"

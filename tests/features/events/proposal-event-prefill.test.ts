@@ -3,6 +3,21 @@ import { proposalEventPrefill } from "../../../src/features/events/ProposalEvent
 import { formatDate, formatTime } from "../../../src/lib/format";
 
 describe("ProposalEventPrefill", () => {
+  it("names the event after the occasion, not the offer", () => {
+    const title = (proposal: object) =>
+      proposalEventPrefill.values({ total: 1, ...proposal } as never).title;
+    expect(
+      title({
+        title: "Dana Whitfield catering proposal",
+        eventType: "Retirement party",
+      }),
+    ).toBe("Dana Whitfield retirement party");
+    expect(title({ title: "Proposal for Kim Family" })).toBe(
+      "Kim Family event",
+    );
+    expect(title({ title: "Anniversary dinner" })).toBe("Anniversary dinner");
+  });
+
   it("leaves an absent end date unset and links only accepted unbooked proposals", () => {
     expect(
       proposalEventPrefill.values({ title: "T", total: 1 } as never)

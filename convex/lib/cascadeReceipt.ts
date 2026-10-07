@@ -59,9 +59,35 @@ const LIST: Record<string, string> = {
   VendorOrderLine: "/inventory/orders",
 };
 
+/** Bookkeeping rows nobody works by hand; the receipt leaves them out. */
+const HIDDEN = new Set([
+  "VendorOrderLineDemand",
+  "EventIngredientContribution",
+  "WeeklyPurchasingConfig",
+  "EventDishComponentSeed",
+]);
+
+/** Kitchen words for record kinds whose code names read badly. */
+const NAMES: Record<string, string> = {
+  PurchaseNeed: "item to buy",
+  IngredientDemand: "ingredient amount",
+  VendorOrderLine: "order line",
+  InventoryReservation: "stock hold",
+  EventDish: "dish",
+  ProductionBatch: "kitchen batch",
+  PrepTask: "prep task",
+};
+
 /** "PurchaseNeed" -> "purchase need". */
 function words(entity: string): string {
   return entity.replace(/([a-z0-9])([A-Z])/g, "$1 $2").toLowerCase();
+}
+
+/** "item to buy" -> "items to buy". */
+function pluralName(entity: string, count: number): string {
+  const name = NAMES[entity] ?? words(entity);
+  const [head, ...rest] = name.split(" to ");
+  return [plural(head, count), ...rest].join(" to ");
 }
 
 function plural(label: string, count: number): string {
@@ -133,7 +159,7 @@ export async function cascadeReceiptFor(
 
   const byEntity = new Map<string, Map<string, boolean>>();
   for (const row of rows) {
-    if (row.entityId === trigger.entityId) continue;
+    if (row.entityId === trigger.entityId || HIDDEN.has(row.entity)) continue;
     const seen = byEntity.get(row.entity) ?? new Map<string, boolean>();
     if (seen.has(row.entityId)) continue;
     const doc = await ownDoc(ctx, tenantId, row.entityId);
@@ -154,7 +180,7 @@ export async function cascadeReceiptFor(
       const detail = DETAIL[entity];
       groups.push({
         entity,
-        label: plural(words(entity), list.length),
+        label: pluralName(entity, list.length),
         count: list.length,
         verb,
         href: detail ? (list.length === 1 ? detail(list[0]) : null) : LIST[entity] ?? null,

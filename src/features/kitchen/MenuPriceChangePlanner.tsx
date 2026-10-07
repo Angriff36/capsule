@@ -1,6 +1,9 @@
 import { useState, type FormEvent } from "react";
-import { useMenuDishSchedulePriceChange } from "../../lib/manifest-convex-react";
-import { formatMoneyExact } from "../../lib/format";
+import {
+  useMenuDishCancelPriceChange,
+  useMenuDishSchedulePriceChange,
+} from "../../lib/manifest-convex-react";
+import { formatDate, formatMoneyExact } from "../../lib/format";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 // Plan a dish's new price from a date. From that day on, new quotes, new
@@ -28,6 +31,7 @@ export function MenuPriceChangePlanner({
   onDone: (message: string) => void;
 }>) {
   const schedule = useMenuDishSchedulePriceChange();
+  const cancelChange = useMenuDishCancelPriceChange();
   const [lineId, setLineId] = useState("");
   const [price, setPrice] = useState("");
   const [day, setDay] = useState("");
@@ -56,7 +60,7 @@ export function MenuPriceChangePlanner({
           effectiveAt: new Date(`${day}T00:00:00`).getTime(),
         });
         onDone(
-          `${line.dishName} goes to ${formatMoneyExact(amount)} on ${day}.`,
+          `${line.dishName} goes to ${formatMoneyExact(amount)} on ${formatDate(new Date(`${day}T00:00:00`).getTime())}.`,
         );
         setPrice("");
         setDay("");
@@ -92,7 +96,31 @@ export function MenuPriceChangePlanner({
                 ? "no price"
                 : formatMoneyExact(Number(line.sellingPrice))}{" "}
               → {formatMoneyExact(Number(line.scheduledSellingPrice))} from{" "}
-              {new Date(line.scheduledPriceEffectiveAt!).toLocaleDateString()}
+              {formatDate(line.scheduledPriceEffectiveAt!)}{" "}
+              {canEdit ? (
+                <button
+                  type="button"
+                  className="btn-link btn-link-compact"
+                  disabled={saving}
+                  onClick={() => {
+                    setSaving(true);
+                    onFailure(null);
+                    void cancelChange({
+                      docId: line._id,
+                      version: line.version,
+                    })
+                      .then(() =>
+                        onDone(
+                          `${line.dishName} keeps its price; the change is cancelled.`,
+                        ),
+                      )
+                      .catch(onFailure)
+                      .finally(() => setSaving(false));
+                  }}
+                >
+                  Cancel
+                </button>
+              ) : null}
             </li>
           ))}
         </ul>

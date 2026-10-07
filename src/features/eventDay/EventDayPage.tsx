@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { PICKUP_PLACE, useIsPickupEvent } from "../events/eventVenueLabel";
 import { Link, useParams } from "react-router-dom";
 import "./EventDay.css";
 import { useEventDayBriefing } from "../../lib/eventDayBriefing";
@@ -75,6 +76,7 @@ export function EventDayPage() {
     };
   }, [briefing]);
 
+  const pickup = useIsPickupEvent(briefing?.event ?? {});
   if (briefing === undefined)
     return (
       <CenteredNote>
@@ -91,12 +93,13 @@ export function EventDayPage() {
     );
   const event = briefing.event;
 
-  const summary = deriveEventDay(data);
+  const summary = deriveEventDay({ ...data, pickup });
   const sealed = ["final", "executing", "completed", "closed_out"].includes(
     String(event.stage),
   );
   const active = summary.sections.find((row) => row.key === open) ?? null;
-  const place = data.venue?.name ?? event.venueName;
+  const place =
+    data.venue?.name ?? event.venueName ?? (pickup ? PICKUP_PLACE : undefined);
   const headcount =
     event.expectedHeadcount != null
       ? `${formatCount(Number(event.expectedHeadcount))} guests`

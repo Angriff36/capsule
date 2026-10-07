@@ -1721,8 +1721,9 @@ entity Event mixin TenantScoped, SoftDeletable {
   // client, or a planner company replaced by the end client. Allowed in every
   // stage so a wrong booking stays correctable. Sales access, because the
   // proposals and contracts that follow the event are sales records. They follow
-  // the event (reactions in proposal.manifest / contract.manifest). Invoices
-  // and payments stay with the client they were billed to.
+  // the event (reactions in proposal.manifest / contract.manifest). An
+  // unsent, unpaid draft invoice follows too (operational event handler);
+  // sent or paid invoices and payments stay with the client billed.
   command moveToClient(
     clientId: uuid,
     optional primaryContactName: string,
@@ -2142,7 +2143,8 @@ entity Event mixin TenantScoped, SoftDeletable {
     // lists cannot be planned without a name, a place and a service style.
     // Only this office step checks them; later stages show warnings only.
     constraint lockTitle: length(trim(self.title)) > 0 "Give this event a name before you lock it for sales."
-    constraint lockVenue: self.venueId != null or (self.venueName != null and length(trim(self.venueName)) > 0) "Pick a venue before you lock this event for sales."
+    // A pickup is collected from the kitchen, so it has no venue to pick.
+    constraint lockVenue: self.venueId != null or (self.venueName != null and length(trim(self.venueName)) > 0) or (self.serviceStyle != null and self.serviceStyle.code == "pickup") "Pick a venue before you lock this event for sales."
     constraint lockServiceStyle: self.serviceStyleId != null or (self.serviceStyleName != null and length(trim(self.serviceStyleName)) > 0) "Pick a service style before you lock this event for sales."
     mutate stage = "sales_lock"
     mutate salesLockedAt = now()

@@ -19,6 +19,11 @@ import {
 } from "../../src/features/facilities/venueReferrals";
 import { eventMatches } from "../../src/features/reports/reportFilters";
 import {
+  proposalPaymentSchedule,
+  type ProposalPaymentSchedule,
+} from "../../src/lib/proposalPaymentSchedule";
+import { projectProposalPdf } from "../../src/features/clients/proposalPdfProjection";
+import {
   action,
   emitted,
   eventRows,
@@ -51,6 +56,9 @@ import {
 } from "./weekly-purchasing.runtime.helpers";
 
 const M = api.mutations;
+// AC-654: the payment schedule frozen at send (step 02), checked on the
+// signing page (03) and the event's draft invoice (06).
+let frozenSchedule: ProposalPaymentSchedule | null = null;
 const LONG = 120_000;
 const MIN = 60_000;
 const DAY = 24 * 60 * MIN;
@@ -308,6 +316,14 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
         2,
       );
 
+      // AC-654: a 30% deposit when the client accepts, the rest 14 days
+      // before the event.
+      await w.run.sales(M.Proposal_setPaymentSchedule, {
+        docId: id.proposal,
+        depositPercent: 30,
+        balanceDueDaysBefore: 14,
+      });
+
       // Sent as revision 1: the frozen web/PDF snapshot carries the same money.
       await w.roles.sales.mutation(
         api.lib.proposalRevision.sendProposalWithRevisionCapture,
@@ -326,6 +342,37 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
         total: proposal.total,
       });
       expect(snapshot.tenant.name).toBe("Golden Kitchen Catering");
+      // The schedule is frozen with the money it splits: deposit + balance
+      // is the total.
+      frozenSchedule = snapshot.paymentSchedule;
+      expect(frozenSchedule).toEqual(
+        proposalPaymentSchedule({
+          total: proposal.total,
+          depositPercent: 30,
+          balanceDueDaysBefore: 14,
+          eventDate: snapshot.proposal.eventDate,
+        }),
+      );
+      expect(frozenSchedule!.depositAmount).toBeGreaterThan(0);
+      expect(
+        frozenSchedule!.depositAmount + frozenSchedule!.balanceAmount,
+      ).toBeCloseTo(proposal.total, 2);
+      // The proposal file prints the same frozen schedule.
+      expect(
+        projectProposalPdf(
+          {
+            _id: id.proposal,
+            title: "live",
+            guestCount: 0,
+            subtotal: 0,
+            taxAmount: 0,
+            discountAmount: 0,
+            total: 0,
+          },
+          "Client",
+          revisions[0],
+        ).proposal.paymentSchedule,
+      ).toEqual(frozenSchedule);
       // The send freezes the picture; the client's web page shows it.
       expect(snapshot.pictures).toEqual([
         {
@@ -343,7 +390,11 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
       // The client opens the link signed out.
       const shared = (await w.raw.query(api.shareLinks.getSharedProposal, {
         token: link._id,
-      })) as { pictures: { dishName: string; imageUrl: string }[] };
+      })) as {
+        pictures: { dishName: string; imageUrl: string }[];
+        paymentSchedule: ProposalPaymentSchedule | null;
+      };
+      expect(shared.paymentSchedule).toEqual(frozenSchedule);
       expect(shared.pictures).toHaveLength(1);
       expect(shared.pictures[0].dishName).toBe(snapshot.pictures[0].dishName);
       expect(shared.pictures[0].imageUrl).toMatch(/^https?:\/\//);
@@ -367,6 +418,12 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
           recipientName: QUOTE.clientName,
         },
       )) as { docId: string };
+      // The signing page shows the schedule the client agrees to.
+      const pending = (await w.raw.query(
+        api.signatureAcceptance.getPendingSignatureRequest,
+        { token: request.docId },
+      )) as { paymentSchedule: ProposalPaymentSchedule | null };
+      expect(pending.paymentSchedule).toEqual(frozenSchedule);
       for (let click = 0; click < 2; click++) {
         const result = (await w.owner.mutation(
           api.signatureAcceptance.completeSignature,
@@ -580,12 +637,16 @@ describe.sequential("golden event journey (AC-653..AC-674)", () => {
         ].sort(),
       );
 
-      const invoices = await eventRows<{ tenantId: string; status: string }>(
-        w,
-        "invoices",
-        id.golden,
-      );
+      const invoices = await eventRows<{
+        tenantId: string;
+        status: string;
+        depositAmount?: number | null;
+        balanceReminderLeadDays?: number | null;
+      }>(w, "invoices", id.golden);
       expect(invoices.map((i) => i.status)).toEqual(["draft"]);
+      // AC-654: the draft invoice asks for the deposit the client accepted.
+      expect(invoices[0].depositAmount).toBe(frozenSchedule!.depositAmount);
+      expect(invoices[0].balanceReminderLeadDays).toBe(14);
       expect(await eventRows(w, "packLists", id.golden)).toHaveLength(1);
     },
     LONG,

@@ -123,15 +123,30 @@ const styleKey = (name: string | null | undefined) =>
     .toLowerCase()
     .replace(/[\s_-]+/g, " ");
 
+/** Styles that are full or limited service, as the service style list groups them. */
+const FULL_SERVICE_STYLES = [
+  "plated",
+  "buffet cook onsite",
+  "action station",
+  "family style",
+  "private chef",
+  "bar",
+];
+const LIMITED_SERVICE_STYLES = ["buffet bring hot", "ready to heat"];
+
 /** Setup before serve for the booked service style; unknown for any other
  * style (drop-off and the like have no company setup rule). */
 export function policySetupMinutes(
   serviceStyleName: string | null | undefined,
   policy: TimingPolicy,
 ): number | null {
-  const key = styleKey(serviceStyleName);
-  if (key === "full service") return policy.fullServiceSetupMinutes;
-  if (key === "limited service") return policy.limitedServiceSetupMinutes;
+  const key = styleKey(serviceStyleName)
+    .replace(/[–—]/g, " ")
+    .replace(/\s+/g, " ");
+  if (key === "full service" || FULL_SERVICE_STYLES.includes(key))
+    return policy.fullServiceSetupMinutes;
+  if (key === "limited service" || LIMITED_SERVICE_STYLES.includes(key))
+    return policy.limitedServiceSetupMinutes;
   return null;
 }
 

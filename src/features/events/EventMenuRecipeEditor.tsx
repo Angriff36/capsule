@@ -540,7 +540,7 @@ export function EventMenuRecipeEditor({
                       >
                         {SELECTABLE_UNITS.map((value) => (
                           <option key={value} value={value}>
-                            {value}
+                            {value.replaceAll("_", " ")}
                           </option>
                         ))}
                       </select>
@@ -694,7 +694,7 @@ export function EventMenuRecipeEditor({
               >
                 {SELECTABLE_UNITS.map((value) => (
                   <option key={value} value={value}>
-                    {value}
+                    {value.replaceAll("_", " ")}
                   </option>
                 ))}
               </select>
@@ -828,7 +828,7 @@ export function EventMenuRecipeEditor({
             >
               {SELECTABLE_UNITS.map((value) => (
                 <option key={value} value={value}>
-                  {value}
+                  {value.replaceAll("_", " ")}
                 </option>
               ))}
             </select>

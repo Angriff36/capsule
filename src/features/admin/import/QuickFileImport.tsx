@@ -14,6 +14,7 @@ import { tppMenuTableToRows } from "../../../lib/tppMenuCsv";
 import { importRunDetailPath } from "./importRoutes";
 import { sourceFileGrid } from "./sourceFileGrid";
 import { Link } from "react-router-dom";
+import { classifyCommandFailure } from "../../events/CommandFailure";
 
 const CHUNK_SIZE = 500;
 
@@ -55,15 +56,31 @@ export function QuickFileImport() {
   const [kind, setKind] = useState<(typeof KINDS)[number]["value"]>("menus");
   const [columns, setColumns] = useState("");
 
+  // A file refused under the wrong kind is read again when the kind changes,
+  // so nobody has to pick the same file twice.
+  const refusedFile = useRef<File | null>(null);
   const handleFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
+    await readAndImport(file, kind);
+  };
+
+  const readAndImport = async (
+    file: File,
+    kind: (typeof KINDS)[number]["value"],
+  ) => {
+    refusedFile.current = null;
     setError(null);
     setResults([]);
     setSkippedRows(0);
     setColumns("");
     setBusy(true);
+    // Once any rows went to the server some may be saved even if the call
+    // failed, so only a file refused before that is brought in again under
+    // another kind.
+    const chunks: ChunkResult[] = [];
+    let sent = false;
     try {
       const checksum = await fileChecksum(await file.arrayBuffer());
       let grid: string[][];
@@ -101,12 +118,12 @@ export function QuickFileImport() {
               : ""),
         );
       }
-      const chunks: ChunkResult[] = [];
       for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
         const part = rows.slice(i, i + CHUNK_SIZE);
         setProgress(
           `Importing ${Math.min(i + part.length, rows.length)} of ${rows.length}…`,
         );
+        sent = true;
         const result = await importFile({
           datasetType: kind,
           sourceSystem: "tpp_legacy",
@@ -120,7 +137,14 @@ export function QuickFileImport() {
         rows.length === 0 ? "No rows found in the file." : "Import complete.",
       );
     } catch (cause: unknown) {
-      setError(cause instanceof Error ? cause.message : "Import failed");
+      if (!sent) refusedFile.current = file;
+      // Server faults arrive wrapped in request ids; show the plain sentence.
+      const failure = classifyCommandFailure(cause);
+      setError(
+        failure.detail && failure.detail !== failure.title
+          ? `${failure.title} ${failure.detail}`
+          : failure.title,
+      );
       setProgress("");
     } finally {
       setBusy(false);
@@ -156,9 +180,13 @@ export function QuickFileImport() {
           <select
             className="input"
             value={kind}
-            onChange={(event) =>
-              setKind(event.target.value as (typeof KINDS)[number]["value"])
-            }
+            onChange={(event) => {
+              const next = event.target
+                .value as (typeof KINDS)[number]["value"];
+              setKind(next);
+              if (refusedFile.current)
+                void readAndImport(refusedFile.current, next);
+            }}
             disabled={busy}
             data-testid="quick-import-kind"
           >
@@ -222,15 +250,16 @@ export function QuickFileImport() {
             </p>
           ) : null}
           <p className="mt-1 text-xs text-ink-3">
-            {results.length} import{results.length === 1 ? "" : "s"}:{" "}
             {results.map((r, i) => (
               <span key={r.importRunId}>
-                {i > 0 ? ", " : ""}
+                {i > 0 ? " · " : ""}
                 <Link
                   to={importRunDetailPath(r.importRunId)}
                   className="text-brand"
                 >
-                  {r.importRunId.slice(0, 8)}…
+                  {results.length === 1
+                    ? "See what came in"
+                    : `See part ${i + 1} of ${results.length}`}
                 </Link>
               </span>
             ))}

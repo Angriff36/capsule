@@ -1,5 +1,5 @@
 import type { ConvexCommandEvent } from "@angriff36/manifest/projections/convex";
-import { internal } from "../_generated/api";
+import { api, internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { reconcileEventPrepWork } from "./prepWorkReconciliation";
@@ -31,7 +31,7 @@ import { eventStyleReconciliation } from "./styleReconciliation";
 import { eventRentalReconciliation } from "./rentalReconciliation";
 import {
   assertInvoiceCommercialSource, ensureEventDraftInvoice, eventInvoicePricingReconciliation,
-  followAcceptedProposalPrice,
+  followAcceptedProposalPrice, retaxDraftForClient,
 } from "./invoicePricingReconciliation";
 import { eventCloseoutCommercialReconciliation } from "./closeoutCommercialReconciliation";
 import {
@@ -120,6 +120,20 @@ export async function handleManifestEvent(
   // PL-RETURNS: the truck leaving, the return check and the vendor return.
   if (event.entity === "PackList" && event.type === "PackListDispatched") {
     await checkOutDispatchedEquipment(ctx, event.entityId as Id<"packLists">);
+    return;
+  }
+  // The truck leaving with a loaded list is that list leaving the kitchen.
+  if (event.entity === "Delivery" && event.type === "DeliveryTransitStarted") {
+    const packListId = event.payload.packListId;
+    if (typeof packListId !== "string") return;
+    const list = await ctx.db.get(packListId as Id<"packLists">);
+    if (!list || list.deletedAt != null || list.status !== "loaded") return;
+    await TenantSystemCommandRunner.forTenant(
+      ctx,
+      list.tenantId,
+    ).context.runMutation(api.mutations.PackList_dispatch, {
+      docId: list._id,
+    });
     return;
   }
   if (event.entity === "EquipmentReservation" && event.type === "EquipmentReturned") {
@@ -604,6 +618,70 @@ export async function handleManifestEvent(
       { triggerEventId: String(event.eventId), triggerType: event.type },
       String(event.payload.reason),
     );
+    // Its open revenue splits close with it.
+    const cancelled = await ctx.db.get(event.entityId as Id<"events">);
+    if (cancelled) {
+      const splits = (
+        await ctx.db
+          .query("revenueAttributions")
+          .withIndex("by_eventId", (q) => q.eq("eventId", cancelled._id))
+          .collect()
+      ).filter((split) => split.tenantId === cancelled.tenantId);
+      const system = TenantSystemCommandRunner.forTenant(
+        ctx,
+        cancelled.tenantId,
+      ).context;
+      for (const split of splits) {
+        if (
+          String(split.eventId) !== String(cancelled._id) ||
+          split.deletedAt != null ||
+          !["draft", "pending_approval", "approved"].includes(String(split.status))
+        )
+          continue;
+        await system.runMutation(
+          api.mutations.RevenueAttribution_closeForCancelledEvent,
+          { docId: split._id },
+        );
+      }
+    }
+    return;
+  }
+  // An event moved to another client takes its unsent, unpaid draft bills;
+  // sent or paid bills stay with the client billed.
+  if (event.entity === "Event" && event.type === "EventClientChanged") {
+    const moved = await ctx.db.get(event.entityId as Id<"events">);
+    if (!moved || moved.deletedAt != null || !moved.clientId) return;
+    const clientId = moved.clientId;
+    // Only the former client's drafts move; a draft billed to someone else
+    // (another payer for the same event) stays as it is.
+    const previousClientId = (event.payload as { previousClientId?: string | null })
+      ?.previousClientId;
+    if (!previousClientId) return;
+    const system = TenantSystemCommandRunner.forTenant(
+      ctx,
+      moved.tenantId,
+    ).context;
+    const invoices = await ctx.db
+      .query("invoices")
+      .withIndex("by_eventId", (q) => q.eq("eventId", moved._id))
+      .collect();
+    for (const invoice of invoices) {
+      if (
+        invoice.tenantId !== moved.tenantId ||
+        invoice.deletedAt != null ||
+        invoice.status !== "draft" ||
+        invoice.sentAt != null ||
+        Number(invoice.amountPaid ?? 0) !== 0 ||
+        String(invoice.clientId) !== String(previousClientId)
+      )
+        continue;
+      await system.runMutation(api.mutations.Invoice_followEventClient, {
+        docId: invoice._id,
+        clientId,
+        ...(await retaxDraftForClient(ctx, invoice, invoice.clientId, clientId)),
+        paymentTermsDays: Number((await ctx.db.get(clientId))?.paymentTermsDays ?? 30),
+      });
+    }
     return;
   }
   if (event.entity === "Event" && event.type === "EventCompleted") {

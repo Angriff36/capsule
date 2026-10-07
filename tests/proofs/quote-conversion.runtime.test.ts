@@ -489,7 +489,10 @@ describe("runtime proof: free-text style/occasion with empty catalogs (AC-011, A
     };
     expect(proposal.eventId).toBe(converted.eventId);
     expect(proposal.notes).toContain("Service style: Family-style buffet");
-    expect(proposal.notes).toContain("Occasion: Retirement party");
+    // The occasion is the proposal's event type, not a note.
+    expect((proposal as { eventType?: string }).eventType).toBe(
+      "Retirement party",
+    );
   });
 });
 

@@ -13,9 +13,12 @@ import type { TppReportResult as Result } from "./types";
 export function TppReportResult({
   result,
   summary,
+  emptyText,
 }: {
   result: Result;
   summary?: Summary;
+  /** What an empty result means where it is shown; search wording if not given. */
+  emptyText?: string;
 }) {
   const header = (
     <TppReportSummary summary={summary} notices={result.notices ?? []} />
@@ -25,8 +28,14 @@ export function TppReportResult({
       <>
         {header}
         <div className="document-empty tpp-result-empty">
-          <p>Nothing matches.</p>
-          <span>Try another event, contact, or date range.</span>
+          {emptyText ? (
+            <p>{emptyText}</p>
+          ) : (
+            <>
+              <p>Nothing matches.</p>
+              <span>Try another event, contact, or date range.</span>
+            </>
+          )}
         </div>
       </>
     );

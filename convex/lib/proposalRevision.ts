@@ -13,6 +13,10 @@ import {
 } from "./venueFactsSnapshot";
 import { effectiveSellingPrice } from "../../src/lib/catalogEligibility";
 import { proposalPictureRefs, type ProposalPictureRef } from "./proposalPictures";
+import {
+  proposalPaymentSchedule,
+  type ProposalPaymentSchedule,
+} from "../../src/lib/proposalPaymentSchedule";
 
 // 2dp rounding for comparing stored money(12,2) values (float-stable).
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
@@ -179,6 +183,9 @@ export interface ProposalRevisionSnapshot {
   // AC-654: the pictures of the dishes on the proposal when it went out.
   // Absent on revisions made before pictures were frozen.
   pictures?: ProposalPictureRef[];
+  // AC-654: deposit and balance amounts and due days when it went out. Null
+  // when the proposal has no schedule; absent on older revisions.
+  paymentSchedule?: ProposalPaymentSchedule | null;
   tenant: {
     /** Null when the company has no name on record (AC-096). */
     name: string | null;
@@ -424,6 +431,12 @@ export async function buildProposalRevisionSnapshot(
     lineItems: lineItemsData,
     enhancements: enhancementsData,
     pictures: await proposalPictureRefs(ctx, proposal),
+    paymentSchedule: proposalPaymentSchedule({
+      total: proposal.total,
+      depositPercent: proposal.depositPercent,
+      balanceDueDaysBefore: proposal.balanceDueDaysBefore,
+      eventDate: proposal.eventDate,
+    }),
     tenant: {
       name: tenantName,
     },

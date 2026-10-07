@@ -30,6 +30,7 @@ import { useScheduleShift } from "../../lib/workforceScheduling";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { reportActionOk } from "../../ui/action-result";
 import { runBulkItems } from "../../ui/bulk-select";
 import { useWorkingEventId } from "../events/workingEvent";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
@@ -188,9 +189,25 @@ export function RosterPage() {
     assignEventStage === "completed" || assignEventStage === "closed_out";
   const eventName = (id: string | null | undefined) =>
     events?.find((event) => event._id === id)?.title ?? "—";
+  // Events a shift can be for: coming ones first, by date, plus the working
+  // event; finished and cancelled events stay out of the way.
+  const DAY_MS = 86_400_000;
+  const pickableEvents = (events ?? [])
+    .filter(
+      (item) =>
+        item.deletedAt == null &&
+        (item._id === workingId ||
+          (!["cancelled", "closed_out", "completed"].includes(
+            String(item.stage),
+          ) &&
+            Number(item.endsAt ?? item.startsAt ?? 0) >= Date.now() - DAY_MS)),
+    )
+    .sort((a, b) => Number(a.startsAt ?? 0) - Number(b.startsAt ?? 0));
   const personName = (id: string) => {
     const person = people?.find((row) => row._id === id);
-    return person ? `${person.givenName} ${person.familyName}` : "Unknown";
+    return person
+      ? `${person.givenName} ${person.familyName ?? ""}`.trim()
+      : "Unknown";
   };
   const liveEventIds = new Set(
     (events ?? [])
@@ -408,6 +425,10 @@ export function RosterPage() {
         setShiftEndsAt("");
         setShiftEndWasEdited(false);
         setShowForm(null);
+        // The roster may show another week, so say where the shift went.
+        reportActionOk(
+          `${personName(personId)} scheduled ${formatDate(startsAt)}, ${formatTime(startsAt)}.`,
+        );
       });
     })();
   };
@@ -589,13 +610,13 @@ export function RosterPage() {
                   required
                 >
                   <option value="">Select event</option>
-                  {(events ?? [])
-                    .filter((item) => item.deletedAt == null)
-                    .map((item) => (
-                      <option key={item._id} value={item._id}>
-                        {item.title}
-                      </option>
-                    ))}
+                  {pickableEvents.map((item) => (
+                    <option key={item._id} value={item._id}>
+                      {item.startsAt != null
+                        ? `${item.title} · ${formatDate(item.startsAt)}`
+                        : item.title}
+                    </option>
+                  ))}
                 </select>
               </label>
               <label className="field-label">
@@ -829,13 +850,13 @@ export function RosterPage() {
                   defaultValue={workingId ?? ""}
                 >
                   <option value="">No event</option>
-                  {(events ?? [])
-                    .filter((item) => item.deletedAt == null)
-                    .map((item) => (
-                      <option key={item._id} value={item._id}>
-                        {item.title}
-                      </option>
-                    ))}
+                  {pickableEvents.map((item) => (
+                    <option key={item._id} value={item._id}>
+                      {item.startsAt != null
+                        ? `${item.title} · ${formatDate(item.startsAt)}`
+                        : item.title}
+                    </option>
+                  ))}
                 </select>
               </label>
               <label className="field-label">

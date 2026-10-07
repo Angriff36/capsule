@@ -7,6 +7,8 @@
  * - A second press for the same balance sends nothing and says when and to
  *   whom the first one went.
  * - A refused email names a plain remedy and shows in the invoice's list.
+ * - A send the email service already took on an earlier try (409 on the same
+ *   key) is not called a refused address.
  * - The sent email shows in the invoice's email conversation.
  */
 import { convexTest } from "convex-test";
@@ -32,7 +34,7 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
-function stubEmail(state: { status: number }) {
+function stubEmail(state: { status: number; name?: string }) {
   const sent: Array<{
     to: string[];
     key: string | undefined;
@@ -56,7 +58,7 @@ function stubEmail(state: { status: number }) {
         sent.push({ ...body, key: init.headers?.["Idempotency-Key"] });
         if (state.status !== 200) {
           return Response.json(
-            { message: "Email service said no" },
+            { name: state.name, message: "Email service said no" },
             { status: state.status },
           );
         }
@@ -211,6 +213,24 @@ describe("email the invoice", () => {
       words: "Invoice email not sent.",
     });
     expect(history[0].remedy).toMatch(/Check the client's email address/u);
+  });
+
+  it("a send the service took on an earlier try is not called a refused address", async () => {
+    const env = await setup();
+    await markSent(env);
+    stubEmail({ status: 409, name: "invalid_idempotent_request" });
+    await expect(
+      env.finance.action(api.invoiceEmail.send, { invoiceId: env.invoiceId }),
+    ).rejects.toThrow(/already took this email on an earlier try/u);
+    const history = await env.finance.action(api.invoiceReminders.getHistory, {
+      invoiceId: env.invoiceId,
+    });
+    expect(history[0].remedy).not.toMatch(/email address/u);
+
+    stubEmail({ status: 409, name: "concurrent_idempotent_requests" });
+    await expect(
+      env.finance.action(api.invoiceEmail.send, { invoiceId: env.invoiceId }),
+    ).rejects.toThrow(/Send again in a few minutes/u);
   });
 
   it("without email setup it says so in plain words", async () => {

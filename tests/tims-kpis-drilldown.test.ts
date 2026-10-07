@@ -15,6 +15,7 @@ vi.mock("../src/lib/manifest-convex-react", () => {
     useListEvent: list("events"),
     useListEventCloseout: list("closeouts"),
     useListLead: list("leads"),
+    useListProposal: list("proposals"),
     useListVenue: list("venues"),
     useListServiceStyle: list("serviceStyles"),
   };
@@ -77,8 +78,15 @@ describe("Tim's KPIs drill-down", () => {
         budgetedCost: 500,
       },
     ];
+    seed.proposals = [{ _id: "pr1", status: "accepted" }];
     seed.leads = [
-      { _id: "l1", companyName: "Acme", stage: "converted" },
+      // Converted: the client accepted this lead's proposal.
+      {
+        _id: "l1",
+        companyName: "Acme",
+        stage: "proposalSent",
+        proposalId: "pr1",
+      },
       { _id: "l2", givenName: "Ann", familyName: "Lee", stage: "new" },
     ];
     seed.venues = [];

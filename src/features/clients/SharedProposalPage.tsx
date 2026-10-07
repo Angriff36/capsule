@@ -8,6 +8,7 @@ import {
   formatTime,
 } from "../../lib/format";
 import { proposalSectionSequence } from "../../lib/proposalSectionOrder";
+import { ProposalPaymentScheduleList } from "./ProposalPaymentScheduleList";
 import { ErrorState, TableSkeleton } from "../../ui/primitives";
 import { useLatestDefined, useMinuteClock } from "../../lib/useMinuteClock";
 import { loadWindowLabel } from "../facilities/venueOperatingFacts";
@@ -363,6 +364,11 @@ export function SharedProposalPage({ token }: { token: string }) {
       </div>
     </div>
   ) : null;
+  // AC-654: what is due when, frozen with the proposal; kept with pricing.
+  const paymentScheduleBlock =
+    sectionVisible("pricing_summary") && data.paymentSchedule ? (
+      <ProposalPaymentScheduleList schedule={data.paymentSchedule} />
+    ) : null;
   const termsBlock = sectionVisible("terms") && proposal.terms && (
     <div className="mb-6">
       <h2 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-2">
@@ -380,7 +386,11 @@ export function SharedProposalPage({ token }: { token: string }) {
     menu_sections: [menuBlock, picturesBlock],
     timeline: [timelineBlock],
     venue_logistics: [venueBlock],
-    pricing_summary: [pricingBreakdownBlock, pricingTotalBlock],
+    pricing_summary: [
+      pricingBreakdownBlock,
+      pricingTotalBlock,
+      paymentScheduleBlock,
+    ],
     enhancements: [enhancementsBlock],
     terms: [termsBlock],
   };
@@ -396,6 +406,7 @@ export function SharedProposalPage({ token }: { token: string }) {
         pricingBreakdownBlock,
         enhancementsBlock,
         pricingTotalBlock,
+        paymentScheduleBlock,
         termsBlock,
       ];
 

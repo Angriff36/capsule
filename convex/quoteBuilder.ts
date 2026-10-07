@@ -921,14 +921,17 @@ export const processQuoteSubmission = action({
     if (!submission.serviceStyleId && submission.serviceStyleText) {
       freeTextNotes.push(`Service style: ${submission.serviceStyleText}`);
     }
-    if (!submission.occasionId && submission.occasionText) {
-      freeTextNotes.push(`Occasion: ${submission.occasionText}`);
-    }
-    const proposalNotes = [
-      submission.notes ??
-        "Draft proposal created from quote request. Menu selection and pricing to follow.",
-      ...freeTextNotes,
-    ].join(" ");
+    // The client reads these notes: their own words, or a plain next step
+    // when they picked no menu. The occasion is the proposal's event type.
+    const pickedMenu = Boolean(submission.menuId || submission.selectionsJson);
+    const proposalNotes =
+      [
+        submission.notes?.trim() ||
+          (pickedMenu ? "" : "We will send menu choices and pricing next."),
+        ...freeTextNotes,
+      ]
+        .filter(Boolean)
+        .join(" ") || undefined;
     // Draft proposal — reused from the checkpoint on retry, else created
     // fresh.
     let proposalId: Id<"proposals"> | null = submission.proposalId ?? null;
@@ -962,7 +965,7 @@ export const processQuoteSubmission = action({
               // The submission's end time carries onto the draft proposal
               // (C2) so the create-event prefill can seed the event's endsAt.
               eventEndDate: submission.eventEndTime ?? undefined,
-              eventType: "Catering Inquiry",
+              eventType: submission.occasionText?.trim() || "Catering",
               venueName: submission.venueName ?? undefined,
               venueAddress: submission.venueAddress ?? undefined,
               guestCount: submission.guestCount ?? 0,

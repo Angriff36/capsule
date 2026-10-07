@@ -8,6 +8,7 @@ import {
 } from "./formatters";
 import type { TppColumn, TppRow, TppTotal, TppReportContext } from "./types";
 import { CulinaryEntityLink } from "../../kitchen/CulinaryEntityLink";
+import { formatStatusLabel } from "../../../lib/statusLabels";
 
 function cell(value: TppRow["values"][string], column: TppColumn): string {
   if (column.kind === "date" && typeof value === "number")
@@ -21,6 +22,11 @@ function cell(value: TppRow["values"][string], column: TppColumn): string {
     typeof value === "number"
   )
     return formatTppQuantity(value);
+  // Stored words ("in_progress", "fluid_ounce") read as words.
+  if (column.key === "status" && typeof value === "string" && value)
+    return formatStatusLabel(value);
+  if (column.key === "unit" && typeof value === "string")
+    return value.replaceAll("_", " ");
   return displayCell(value ?? null);
 }
 

@@ -167,6 +167,10 @@ export function ClientPortalView({
   };
   const currentStageIndex = PORTAL_STAGES.indexOf(portal.event.stage);
   const statusLabel = STAGE_LABEL[portal.event.stage];
+  // Date and count are "confirmed" only once the event is approved.
+  const confirmed = !["quote", "planning", "pending_approval"].includes(
+    portal.event.stage,
+  );
   const brandInitial =
     portal.organization.displayName.trim().charAt(0).toUpperCase() || "C";
 
@@ -213,7 +217,7 @@ export function ClientPortalView({
 
         <section className="client-portal-facts" aria-label="Event details">
           <div className="client-portal-date-block">
-            <p>Confirmed date</p>
+            <p>{confirmed ? "Confirmed date" : "Planned date"}</p>
             {portal.event.startsAt == null ? (
               <strong>Being confirmed</strong>
             ) : (
@@ -227,7 +231,7 @@ export function ClientPortalView({
             )}
           </div>
           <div className="client-portal-headcount-block">
-            <p>Confirmed headcount</p>
+            <p>{confirmed ? "Confirmed headcount" : "Expected guests"}</p>
             <strong>
               {new Intl.NumberFormat().format(portal.event.expectedHeadcount)}
             </strong>

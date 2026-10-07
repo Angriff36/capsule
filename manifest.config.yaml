@@ -49,18 +49,26 @@ projections:
           - fields: [tenantId, status]
             name: by_tenantId_and_status
         Shift:
+          - fields: [tenantId, endsAt]
+            name: by_tenantId_and_endsAt
           - fields: [tenantId, personId, status, endsAt]
             name: by_staff_status_end
         TimeOffRequest:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
           - fields: [tenantId, personId, status, endsAt]
             name: by_staff_status_end
         Qualification:
+          - fields: [tenantId, status, expiresAt]
+            name: by_tenantId_and_status_and_expiresAt
           - fields: [tenantId, personId, status, name, expiresAt]
             name: by_staff_certification_expiry
         TrainingCompletion:
           - fields: [tenantId, personId, trainingModuleId]
             name: by_staff_training_module
         ShiftSwapRequest:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
           - fields: [recipientPersonId, status]
             name: by_recipientPersonId_and_status
         StaffChatReadCursor:
@@ -80,6 +88,34 @@ projections:
         Ingredient:
           - fields: [primaryImageStorageId]
             name: by_primaryImageStorageId
+        # The bell (convex/notifications.ts) reads only rows in an alerting
+        # state, so an old open item is never cut off by newer closed ones.
+        # Not staged: on production these tables are small (counted
+        # 2026-10-07: inventoryItems 311, reviewFlags 17, vendorOrders 9,
+        # shifts 8, deliveries 3, incidents 2, timeOffRequests 1,
+        # qualifications 1, others 0), so the backfill is immediate and the
+        # bell needs the indexes in the same deploy.
+        Incident:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        VendorOrder:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        ReviewFlag:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        EquipmentIssue:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        Delivery:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        InventoryItem:
+          - fields: [tenantId, reorderThreshold]
+            name: by_tenantId_and_reorderThreshold
+        EquipmentMaintenanceTask:
+          - fields: [tenantId, nextDueAt]
+            name: by_tenantId_and_nextDueAt
         # Invoice numbers are unique per tenant; the numbering seam
         # (convex/lib/invoiceNumbering.ts) checks a proposed number with a point
         # lookup instead of reading the tenant's invoice history.
@@ -128,6 +164,8 @@ projections:
         # Public quote dedup: one point read per submit instead of scanning the
         # tenant's submissions (convex/quoteBuilder.ts ingressQuoteSubmission).
         QuoteSubmission:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
           - fields: [tenantId, dedupKey]
             name: by_tenantId_and_dedupKey
         EventIngredientContribution:

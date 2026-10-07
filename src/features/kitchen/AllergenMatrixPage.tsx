@@ -52,8 +52,24 @@ export function deriveAllergenRows(input: {
     .map((dishId) => {
       const dish = input.dishes.find((item) => item._id === dishId);
       if (!dish || dish.deletedAt != null) return null;
-      const { sources } = deriveDishAllergens(dish, input);
-      return { dish, sources };
+      const report = deriveDishAllergens(dish, input);
+      // Recipes on the dish with no ingredient lines: their allergens are
+      // simply not known yet.
+      const recipeId = String(dish.recipeDishId ?? dish._id);
+      const componentIds = input.dishComponents
+        .filter(
+          (line) => line.deletedAt == null && String(line.dishId) === recipeId,
+        )
+        .map((line) => String(line.componentId));
+      const unwritten = componentIds.filter(
+        (id) =>
+          !input.componentIngredients.some(
+            (line) => line.deletedAt == null && String(line.componentId) === id,
+          ),
+      ).length;
+      const unknown =
+        report.lineCount === 0 || unwritten > 0 || report.unflaggedCount > 0;
+      return { dish, sources: report.sources, unwritten, unknown, report };
     })
     .filter((row) => row != null)
     .sort((a, b) => String(a.dish.name).localeCompare(String(b.dish.name)));
@@ -193,6 +209,8 @@ export function AllergenMatrixPage() {
               {liveEvents.map((event) => (
                 <option key={event._id} value={`event:${event._id}`}>
                   {event.title}
+                  {event.startsAt ? ` · ${formatDate(event.startsAt)}` : ""}
+                  {String(event.stage) === "cancelled" ? " · cancelled" : ""}
                 </option>
               ))}
             </optgroup>
@@ -237,12 +255,21 @@ export function AllergenMatrixPage() {
                 </tr>
               </thead>
               <tbody>
-                {rows.map(({ dish, sources }) => (
+                {rows.map(({ dish, sources, unknown, unwritten, report }) => (
                   <tr key={dish._id}>
                     <td>
                       <strong>{String(dish.name)}</strong>
                       {dish.course ? (
                         <small>{String(dish.course)}</small>
+                      ) : null}
+                      {unknown ? (
+                        <small className="text-warn">
+                          {unwritten > 0
+                            ? `${unwritten} recipe${unwritten === 1 ? "" : "s"} not written — allergens may be missing`
+                            : report.lineCount === 0
+                              ? "No ingredients on file — allergens not known"
+                              : "Some ingredients have no allergen check"}
+                        </small>
                       ) : null}
                     </td>
                     {ALLERGENS.map((allergen) => {
@@ -263,6 +290,13 @@ export function AllergenMatrixPage() {
                               aria-label="Contains"
                             >
                               ●
+                            </span>
+                          ) : unknown ? (
+                            <span
+                              className="allergen-clear"
+                              aria-label="Not known"
+                            >
+                              ?
                             </span>
                           ) : (
                             <span

@@ -284,7 +284,7 @@
      `.chip-state` + `chip-state-ok|warn|danger` is the older spelling. */
   .chip,
   .chip-state {
-    @apply inline-flex h-[26px] items-center gap-1.5 rounded-sm border border-line bg-panel pr-2.5 pl-2 text-sm font-medium whitespace-nowrap text-ink capitalize;
+    @apply inline-flex h-[26px] items-center gap-1.5 rounded-sm border border-line bg-panel pr-2.5 pl-2 text-sm font-medium whitespace-nowrap text-ink;
   }
   .chip:is(
       .chip-tone-mute,

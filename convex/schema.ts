@@ -695,7 +695,8 @@ export default defineSchema({
     .index("by_packListId", ["packListId"])
     .index("by_eventId", ["eventId"])
     .index("by_driverId", ["driverId"])
-    .index("by_vehicleId", ["vehicleId"]),
+    .index("by_vehicleId", ["vehicleId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   departureOverrides: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -963,6 +964,7 @@ export default defineSchema({
     .index("by_equipmentId", ["equipmentId"])
     .index("by_eventId", ["eventId"])
     .index("by_vendorId", ["vendorId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"])
     .searchIndex("search_description", { searchField: "description", filterFields: ["tenantId"] }),
   equipmentMaintenanceTasks: defineTable({
     tenantId: v.string(),
@@ -980,6 +982,7 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_equipmentId", ["equipmentId"])
+    .index("by_tenantId_and_nextDueAt", ["tenantId", "nextDueAt"])
     .searchIndex("search_taskName", { searchField: "taskName", filterFields: ["tenantId"] }),
   equipmentParts: defineTable({
     tenantId: v.string(),
@@ -1931,7 +1934,8 @@ export default defineSchema({
     .index("by_eventId", ["eventId"])
     .index("by_prepTaskId", ["prepTaskId"])
     .index("by_deliveryId", ["deliveryId"])
-    .index("by_shiftId", ["shiftId"]),
+    .index("by_shiftId", ["shiftId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   ingredients: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2086,7 +2090,8 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_ingredientId", ["ingredientId"])
-    .index("by_locationId", ["locationId"]),
+    .index("by_locationId", ["locationId"])
+    .index("by_tenantId_and_reorderThreshold", ["tenantId", "reorderThreshold"]),
   inventoryLots: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2257,6 +2262,7 @@ export default defineSchema({
     guestCount: v.optional(v.union(v.number(), v.null())),
     eventType: v.optional(v.union(v.string(), v.null())),
     closedAt: v.optional(v.union(v.number(), v.null())),
+    closeReason: v.optional(v.union(v.string(), v.null())),
     clientMergeAuthorizationId: v.optional(v.union(v.id("clientMerges"), v.null())),
     mergeTargetClientId: v.optional(v.union(v.id("clients"), v.null())),
     createdAt: v.optional(v.number()),
@@ -3265,6 +3271,8 @@ export default defineSchema({
     expiresAt: v.optional(v.union(v.number(), v.null())),
     notes: v.optional(v.union(v.string(), v.null())),
     terms: v.optional(v.union(v.string(), v.null())),
+    depositPercent: v.optional(v.union(v.number(), v.null())),
+    balanceDueDaysBefore: v.optional(v.union(v.number(), v.null())),
     visibleSections: v.optional(v.array(v.union(v.string(), v.null()))),
     sectionOrder: v.optional(v.array(v.union(v.string(), v.null()))),
     status: v.union(v.literal("draft"), v.literal("sent"), v.literal("viewed"), v.literal("accepted"), v.literal("declined"), v.literal("expired"), v.literal("superseded")),
@@ -3273,6 +3281,7 @@ export default defineSchema({
     viewedAt: v.optional(v.union(v.number(), v.null())),
     acceptedAt: v.optional(v.union(v.number(), v.null())),
     declinedAt: v.optional(v.union(v.number(), v.null())),
+    declineReason: v.optional(v.union(v.string(), v.null())),
     expiredAt: v.optional(v.union(v.number(), v.null())),
     supersededAt: v.optional(v.union(v.number(), v.null())),
     supersedeReason: v.optional(v.union(v.string(), v.null())),
@@ -3468,6 +3477,7 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_personId", ["personId"])
+    .index("by_tenantId_and_status_and_expiresAt", ["tenantId", "status", "expiresAt"])
     .index("by_staff_certification_expiry", ["tenantId", "personId", "status", "name", "expiresAt"]),
   qualityChecks: defineTable({
     tenantId: v.string(),
@@ -3546,6 +3556,7 @@ export default defineSchema({
     .index("by_serviceStyleId", ["serviceStyleId"])
     .index("by_occasionId", ["occasionId"])
     .index("by_referralSourceId", ["referralSourceId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"])
     .index("by_tenantId_and_dedupKey", ["tenantId", "dedupKey"])
     .searchIndex("search_venueName", { searchField: "venueName", filterFields: ["tenantId"] })
     .searchIndex("search_venueAddress", { searchField: "venueAddress", filterFields: ["tenantId"] }),
@@ -3710,7 +3721,8 @@ export default defineSchema({
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
-    .index("by_eventId", ["eventId"]),
+    .index("by_eventId", ["eventId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   roleScorecards: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -3887,6 +3899,7 @@ export default defineSchema({
     .index("by_swapTargetPersonId", ["swapTargetPersonId"])
     .index("by_swapTargetQualificationId", ["swapTargetQualificationId"])
     .index("by_swapTargetTrainingCompletionId", ["swapTargetTrainingCompletionId"])
+    .index("by_tenantId_and_endsAt", ["tenantId", "endsAt"])
     .index("by_staff_status_end", ["tenantId", "personId", "status", "endsAt"]),
   shiftSwapRequests: defineTable({
     tenantId: v.string(),
@@ -3919,6 +3932,7 @@ export default defineSchema({
     .index("by_sourceQualificationId", ["sourceQualificationId"])
     .index("by_targetQualificationId", ["targetQualificationId"])
     .index("by_targetTrainingCompletionId", ["targetTrainingCompletionId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"])
     .index("by_recipientPersonId_and_status", ["recipientPersonId", "status"]),
   shiftTypes: defineTable({
     tenantId: v.string(),
@@ -4271,6 +4285,7 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_personId", ["personId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"])
     .index("by_staff_status_end", ["tenantId", "personId", "status", "endsAt"]),
   timeRecords: defineTable({
     tenantId: v.string(),
@@ -4715,7 +4730,8 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_vendorId", ["vendorId"])
     .index("by_eventId", ["eventId"])
-    .index("by_purchasingConfigId", ["purchasingConfigId"]),
+    .index("by_purchasingConfigId", ["purchasingConfigId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   vendorOrderLines: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

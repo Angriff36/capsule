@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { formatDate } from "../../lib/format";
 import { Link } from "react-router-dom";
 import {
   useListDelivery,
@@ -10,6 +11,7 @@ import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import {
   geocodeDestination,
   routeLegs,
+  KM_PER_MILE,
   routeLegLabel,
   suggestVisitOrder,
   type GeoPoint,
@@ -18,12 +20,14 @@ import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { useRouteDriveLegs } from "../../lib/routePlannerClient";
 
 type RoadLeg = { seconds: number; meters: number } | null;
+// Miles, as the fleet's odometers and service intervals use.
+const METERS_PER_MILE = 1609.344;
 
 const roadLegLabel = (leg: RoadLeg, index: number) =>
   index === 0
     ? "Start"
     : leg
-      ? `${Math.round(leg.seconds / 60)} min · ${(leg.meters / 1000).toFixed(1)} km`
+      ? `${Math.round(leg.seconds / 60)} min · ${(leg.meters / METERS_PER_MILE).toFixed(1)} mi`
       : "No road route found";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -221,8 +225,8 @@ export function RoutePlannerPage() {
     (sum, leg) => sum + (leg ? leg.seconds / 60 : 0),
     0,
   );
-  const roadKm = (roadLegs ?? []).reduce(
-    (sum, leg) => sum + (leg ? leg.meters / 1000 : 0),
+  const roadMiles = (roadLegs ?? []).reduce(
+    (sum, leg) => sum + (leg ? leg.meters / METERS_PER_MILE : 0),
     0,
   );
 
@@ -247,7 +251,7 @@ export function RoutePlannerPage() {
           <h1 className="display-title mt-2">Suggested visit order</h1>
           <p className="mt-3 max-w-160 text-ink-2">
             {roadConfigured === false
-              ? "Stops in the shortest straight-line order. Drive times are a rough guess at 40 km/h until the map service is switched on."
+              ? "Stops in the shortest straight-line order. Drive times are a rough guess at 25 mph until the map service is switched on."
               : "Stops in the shortest order, with real road times from the map service."}{" "}
             Move a stop up or down if you need to; your order is kept on this
             screen only and is not saved.
@@ -288,17 +292,17 @@ export function RoutePlannerPage() {
           <div>
             <p className="eyebrow">
               {selectedVehicle
-                ? `${selectedVehicle.registration} · ${new Date(dayStart).toLocaleDateString()}`
-                : new Date(dayStart).toLocaleDateString()}
+                ? `${selectedVehicle.registration} · ${formatDate(dayStart)}`
+                : formatDate(dayStart)}
             </p>
             <h2>Stop list</h2>
           </div>
           <span>
             {stops.length} stop{stops.length === 1 ? "" : "s"}
             {roadLegs && roadMinutes > 0
-              ? ` · ${Math.round(roadMinutes)} min driving · ${roadKm.toFixed(1)} km`
+              ? ` · ${Math.round(roadMinutes)} min driving · ${roadMiles.toFixed(1)} mi`
               : totalKm > 0
-                ? ` · ${totalKm.toFixed(1)} km straight-line · ~${Math.round(totalMinutes)} min at 40 km/h`
+                ? ` · ${(totalKm / KM_PER_MILE).toFixed(1)} mi straight-line · ~${Math.round(totalMinutes)} min at 25 mph`
                 : ""}
             {geocoding ? " · finding the stops on the map…" : ""}
           </span>

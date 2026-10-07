@@ -89,6 +89,9 @@ export function CandidatesPage() {
   const advance = useCandidateAdvance();
   const reject = useCandidateReject();
   const scheduleInterview = useCreateInterview();
+  const [interviewNotes, setInterviewNotes] = useState<Record<string, string>>(
+    {},
+  );
   const recordOutcome = useInterviewRecordOutcome();
   const ingestKm = useIngestKmCandidates();
   const hireIntoTeam = useHireCandidateIntoTeam();
@@ -281,6 +284,23 @@ export function CandidatesPage() {
     }
   };
 
+  // Booking an interview, and passing it, move the candidate along so
+  // nobody has to move the stage by hand as well.
+  const STAGE_ORDER = ["application", "screening", "interview", "decision"];
+  const moveUpTo = async (
+    candidate: { _id: string; version?: number; stage?: string } | undefined,
+    toStage: string,
+  ) => {
+    if (!candidate) return;
+    const at = STAGE_ORDER.indexOf(String(candidate.stage));
+    if (at < 0 || at >= STAGE_ORDER.indexOf(toStage)) return;
+    await advance({
+      docId: candidate._id,
+      toStage,
+      version: candidate.version,
+    });
+  };
+
   const addInterview = (
     event: FormEvent<HTMLFormElement>,
     candidateId: string,
@@ -298,6 +318,10 @@ export function CandidatesPage() {
             String(data.get("interviewerPersonId") || "") || undefined,
         });
         form.reset();
+        await moveUpTo(
+          candidates?.find((row) => row._id === candidateId),
+          "interview",
+        );
       } catch (error) {
         setFailure(error);
       }
@@ -308,10 +332,18 @@ export function CandidatesPage() {
     interviewId: string,
     version: number | undefined,
     outcome: "passed" | "failed",
+    candidateId: string,
   ) => {
     setFailure(null);
     try {
-      await recordOutcome({ docId: interviewId, outcome, version });
+      const notes = interviewNotes[interviewId]?.trim() || undefined;
+      await recordOutcome({ docId: interviewId, outcome, version, notes });
+      if (outcome === "passed") {
+        await moveUpTo(
+          candidates?.find((row) => row._id === candidateId),
+          "decision",
+        );
+      }
     } catch (error) {
       setFailure(error);
     }
@@ -536,124 +568,125 @@ export function CandidatesPage() {
                   />
                 ) : null}
                 <div className="supply-form-grid">
-                  <label className="field-label">
-                    Move to stage
-                    <select
-                      name="toStage"
-                      className="input"
-                      defaultValue={
-                        (STAGES_MOVE as readonly string[]).includes(
-                          candidate.stage,
-                        )
-                          ? candidate.stage
-                          : "screening"
-                      }
-                    >
-                      {STAGES_MOVE.map((stage) => (
-                        <option key={stage} value={stage}>
-                          {STAGE_LABEL[stage]}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="field-label">
-                    <span>&nbsp;</span>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      disabled={
-                        busy ||
-                        (candidate.stage === "hired" &&
-                          candidate.hiredPersonId != null)
-                      }
-                      title={
-                        candidate.stage === "hired" &&
-                        candidate.hiredPersonId != null
-                          ? "This hire has a team profile — use Revoke hire above so their profile is handled in the same step."
-                          : undefined
-                      }
-                      onClick={(e) => {
-                        const select = e.currentTarget
-                          .closest(".supply-form-grid")
-                          ?.querySelector<HTMLSelectElement>(
-                            'select[name="toStage"]',
-                          );
-                        if (select) {
-                          void moveStage(
-                            candidate._id,
-                            candidate.version,
-                            select.value,
-                          );
-                        }
-                      }}
-                    >
-                      Move
-                    </button>
-                  </label>
-                  <label className="field-label">
-                    Rejection note (optional)
-                    <input
-                      name="rejectReason"
-                      className="input"
-                      placeholder="Optional"
-                      disabled={terminal}
-                    />
-                  </label>
+                  {/* A hire is settled: Revoke hire undoes it, not a move. */}
+                  {candidate.stage !== "hired" ? (
+                    <>
+                      <label className="field-label">
+                        Move to stage
+                        <select
+                          name="toStage"
+                          className="input"
+                          defaultValue={
+                            (STAGES_MOVE as readonly string[]).includes(
+                              candidate.stage,
+                            )
+                              ? candidate.stage
+                              : "screening"
+                          }
+                        >
+                          {STAGES_MOVE.map((stage) => (
+                            <option key={stage} value={stage}>
+                              {STAGE_LABEL[stage]}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="field-label">
+                        <span>&nbsp;</span>
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          disabled={busy}
+                          onClick={(e) => {
+                            const select = e.currentTarget
+                              .closest(".supply-form-grid")
+                              ?.querySelector<HTMLSelectElement>(
+                                'select[name="toStage"]',
+                              );
+                            if (select) {
+                              void moveStage(
+                                candidate._id,
+                                candidate.version,
+                                select.value,
+                              );
+                            }
+                          }}
+                        >
+                          Move
+                        </button>
+                      </label>
+                    </>
+                  ) : null}
+                  {!terminal ? (
+                    <label className="field-label">
+                      Rejection note (optional)
+                      <input
+                        name="rejectReason"
+                        className="input"
+                        placeholder="Optional"
+                        disabled={terminal}
+                      />
+                    </label>
+                  ) : null}
                   <div className="field-label">
                     <span>&nbsp;</span>
                     <div className="supply-row-actions">
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        disabled={terminal}
-                        onClick={(e) => {
-                          const input = e.currentTarget
-                            .closest(".supply-form-grid")
-                            ?.querySelector<HTMLInputElement>(
-                              'input[name="rejectReason"]',
+                      {!terminal ? (
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          disabled={terminal}
+                          onClick={(e) => {
+                            const input = e.currentTarget
+                              .closest(".supply-form-grid")
+                              ?.querySelector<HTMLInputElement>(
+                                'input[name="rejectReason"]',
+                              );
+                            void rejectCandidate(
+                              candidate._id,
+                              candidate.version,
+                              (input?.value ?? "").trim(),
                             );
-                          void rejectCandidate(
-                            candidate._id,
-                            candidate.version,
-                            (input?.value ?? "").trim(),
-                          );
-                        }}
-                      >
-                        Reject
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-primary"
-                        disabled={
-                          busy ||
-                          (candidate.stage === "hired" &&
-                            ((candidate.hiredPersonId == null &&
-                              !hasUsableEmail(candidate.email)) ||
-                              removedProfile))
-                        }
-                        onClick={() => void hireCandidate(candidate)}
-                      >
-                        {candidate.stage !== "hired"
-                          ? restoreReady.has(candidate._id)
-                            ? "Restore and resend"
-                            : "Hire into team"
-                          : removedProfile
-                            ? "Profile removed"
-                            : candidate.hiredPersonId == null
-                              ? restoreReady.has(candidate._id)
-                                ? "Restore and resend"
-                                : "Finish team setup"
-                              : inactiveProfile
-                                ? "Restore and resend"
-                                : "Resend sign-in"}
-                      </button>
+                          }}
+                        >
+                          Reject
+                        </button>
+                      ) : null}
+                      {candidate.stage === "rejected" ? null : (
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          disabled={
+                            busy ||
+                            (candidate.stage === "hired" &&
+                              ((candidate.hiredPersonId == null &&
+                                !hasUsableEmail(candidate.email)) ||
+                                removedProfile))
+                          }
+                          onClick={() => void hireCandidate(candidate)}
+                        >
+                          {candidate.stage !== "hired"
+                            ? restoreReady.has(candidate._id)
+                              ? "Restore and resend"
+                              : "Hire into team"
+                            : removedProfile
+                              ? "Profile removed"
+                              : candidate.hiredPersonId == null
+                                ? restoreReady.has(candidate._id)
+                                  ? "Restore and resend"
+                                  : "Finish team setup"
+                                : inactiveProfile
+                                  ? "Restore and resend"
+                                  : "Resend sign-in"}
+                        </button>
+                      )}
                       {candidate.stage === "hired" &&
                       candidate.hiredPersonId == null &&
                       !hasUsableEmail(candidate.email) ? (
                         <p className="text-sm text-ink-2 mt-2">
                           This hire has no usable email, so no sign-in can be
-                          set up. Re-import the candidate with an email, or add
-                          them under Administration → Permissions → Team roles.
+                          set up. Add them with their email under Administration
+                          → Permissions → Team roles.
                         </p>
                       ) : null}
                       {removedProfile ? (
@@ -692,7 +725,24 @@ export function CandidatesPage() {
                             <td>
                               <StatusChip status={String(row.outcome)} />
                             </td>
-                            <td>{row.notes || "—"}</td>
+                            <td>
+                              {row.outcome === "pending" ? (
+                                <input
+                                  className="input"
+                                  aria-label="Interview note"
+                                  placeholder="How did it go? (optional)"
+                                  value={interviewNotes[row._id] ?? ""}
+                                  onChange={(e) =>
+                                    setInterviewNotes((notes) => ({
+                                      ...notes,
+                                      [row._id]: e.target.value,
+                                    }))
+                                  }
+                                />
+                              ) : (
+                                row.notes || "—"
+                              )}
+                            </td>
                             <td className="text-right">
                               {row.outcome === "pending" ? (
                                 <span className="inline-flex items-center gap-3">
@@ -703,6 +753,7 @@ export function CandidatesPage() {
                                         row._id,
                                         row.version,
                                         "passed",
+                                        candidate._id,
                                       )
                                     }
                                   >
@@ -715,6 +766,7 @@ export function CandidatesPage() {
                                         row._id,
                                         row.version,
                                         "failed",
+                                        candidate._id,
                                       )
                                     }
                                   >
@@ -734,33 +786,35 @@ export function CandidatesPage() {
                   </div>
                 ) : null}
 
-                <form
-                  className="supply-form-grid mt-4"
-                  onSubmit={(e) => addInterview(e, candidate._id)}
-                >
-                  <label className="field-label">
-                    Interviewer
-                    <SearchSelect
-                      name="interviewerPersonId"
-                      recentsKey="staff"
-                      placeholder="Unassigned"
-                      options={activePeople.map((person) => ({
-                        id: person._id,
-                        label: `${person.givenName} ${person.familyName}`,
-                      }))}
-                    />
-                  </label>
-                  <label className="field-label">
-                    Scheduled for (optional)
-                    <BoundedDateInput name="scheduledFor" className="input" />
-                  </label>
-                  <div className="field-label">
-                    <span>&nbsp;</span>
-                    <button className="btn btn-secondary">
-                      Schedule interview
-                    </button>
-                  </div>
-                </form>
+                {!terminal ? (
+                  <form
+                    className="supply-form-grid mt-4"
+                    onSubmit={(e) => addInterview(e, candidate._id)}
+                  >
+                    <label className="field-label">
+                      Interviewer
+                      <SearchSelect
+                        name="interviewerPersonId"
+                        recentsKey="staff"
+                        placeholder="Unassigned"
+                        options={activePeople.map((person) => ({
+                          id: person._id,
+                          label: `${person.givenName} ${person.familyName}`,
+                        }))}
+                      />
+                    </label>
+                    <label className="field-label">
+                      Scheduled for (optional)
+                      <BoundedDateInput name="scheduledFor" className="input" />
+                    </label>
+                    <div className="field-label">
+                      <span>&nbsp;</span>
+                      <button className="btn btn-secondary">
+                        Schedule interview
+                      </button>
+                    </div>
+                  </form>
+                ) : null}
               </div>
             );
           })}

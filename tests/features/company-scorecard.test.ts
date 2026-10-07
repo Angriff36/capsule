@@ -21,6 +21,7 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
   return {
     useListEvent: list("events"),
     useListLead: list("leads"),
+    useListProposal: list("proposals"),
     useListEventCloseout: list("closeouts"),
     useListPerson: list("people"),
     useListScorecardTarget: list("targets"),
@@ -98,8 +99,15 @@ function seedRows() {
       finalizedAt: thisMonth,
     },
   ];
+  seed.proposals = [{ _id: "pr1", status: "accepted" }];
   seed.leads = [
-    { _id: "l1", stage: "converted", createdAt: thisMonth },
+    // Converted: the client accepted this lead's proposal.
+    {
+      _id: "l1",
+      stage: "proposalSent",
+      proposalId: "pr1",
+      createdAt: thisMonth,
+    },
     { _id: "l2", stage: "new", createdAt: thisMonth },
   ];
   seed.people = [

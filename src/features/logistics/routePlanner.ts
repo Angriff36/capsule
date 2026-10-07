@@ -10,7 +10,9 @@ export type RouteStop = {
 };
 
 // ponytail: flat city-driving estimate; swap for a routing API if precision matters.
-export const AVG_SPEED_KMH = 40;
+export const KM_PER_MILE = 1.609344;
+// 25 mph, the rough local catering-van speed the screens name.
+export const AVG_SPEED_KMH = 25 * KM_PER_MILE;
 
 const EARTH_RADIUS_KM = 6371;
 
@@ -63,7 +65,7 @@ export type RouteLeg = { distanceKm: number; minutes: number } | null;
 export function routeLegLabel(leg: RouteLeg, index: number): string {
   if (index === 0) return "Start";
   if (!leg) return "Missing — no coordinates for this leg";
-  return `${leg.distanceKm.toFixed(1)} km straight-line · ~${Math.round(leg.minutes)} min at 40 km/h`;
+  return `${(leg.distanceKm / KM_PER_MILE).toFixed(1)} mi straight-line · ~${Math.round(leg.minutes)} min at 25 mph`;
 }
 
 // Leg from the previous stop to each stop (first leg and legs touching an

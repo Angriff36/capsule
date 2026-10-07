@@ -1,4 +1,6 @@
 import { useState, type FormEvent } from "react";
+import { isRenewed } from "../../lib/qualificationRenewal";
+import { reportActionOk } from "../../ui/action-result";
 import {
   useCreateQualification,
   useListPerson,
@@ -56,7 +58,8 @@ export function QualificationsPage() {
     (row) =>
       row.status === "active" &&
       row.expiresAt != null &&
-      row.expiresAt <= now + EXPIRY_ALERT_WINDOW_MS,
+      row.expiresAt <= now + EXPIRY_ALERT_WINDOW_MS &&
+      !isRenewed(row, activeRows),
   ).length;
   const activePeople = (people ?? []).filter(
     (person) => person.deletedAt == null && person.status === "active",
@@ -109,6 +112,9 @@ export function QualificationsPage() {
       });
       form.reset();
       setShowCreate(false);
+      reportActionOk(
+        `${String(data.get("name"))} added for ${personName(String(data.get("personId")))}.`,
+      );
     });
   };
 
@@ -271,6 +277,8 @@ export function QualificationsPage() {
                     <td data-label="Expires">
                       {row.expiresAt ? formatDate(row.expiresAt) : "—"}
                       {(() => {
+                        if (isRenewed(row, activeRows))
+                          return <small>Renewed</small>;
                         const expiry = expiryLabel(row.expiresAt, now);
                         return expiry ? (
                           <small className={expiry.className}>

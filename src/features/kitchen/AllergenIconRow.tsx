@@ -18,10 +18,12 @@ const LETTER: Record<CulinaryAllergenCode, string> = {
 type Props = {
   codes: readonly string[] | null | undefined;
   className?: string;
+  /** Spell each allergen out ("Milk"); tables keep the short letter. */
+  words?: boolean;
 };
 
 /** Compact allergen badges: letter + accessible name (not color-only). */
-export function AllergenIconRow({ codes, className }: Props) {
+export function AllergenIconRow({ codes, className, words }: Props) {
   const resolved = (codes ?? [])
     .map((code) => CULINARY_ALLERGENS.find((entry) => entry.code === code))
     .filter((entry): entry is (typeof CULINARY_ALLERGENS)[number] => !!entry);
@@ -50,7 +52,7 @@ export function AllergenIconRow({ codes, className }: Props) {
             title={allergen.label}
             aria-label={allergen.label}
           >
-            {LETTER[allergen.code]}
+            {words ? allergen.label : LETTER[allergen.code]}
           </span>
         </li>
       ))}

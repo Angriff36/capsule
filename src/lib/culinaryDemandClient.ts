@@ -4,7 +4,7 @@
 // seams, the same way safeCulinaryOperations.ts holds the culinary operations.
 import { useMutation, useQuery } from "convex/react";
 import { api, type Id } from "./api";
-import { formatMoney } from "./format";
+import { formatMoneyExact } from "./format";
 
 export const useEventDemandReview = (eventId: string, enabled = true) =>
   useQuery(
@@ -262,5 +262,5 @@ export function recipeCostLine(cost: {
   const undated = cost.undatedLines
     ? ` · ${cost.undatedLines} from catalog prices with no date`
     : "";
-  return `Known subtotal ${formatMoney(cost.knownSubtotal)} for ${known} of ${cost.totalLines} lines · ${costConfidenceText(cost.confidence).toLowerCase()}${undated}`;
+  return `Known subtotal ${formatMoneyExact(cost.knownSubtotal)} for ${known} of ${cost.totalLines} lines · ${costConfidenceText(cost.confidence).toLowerCase()}${undated}`;
 }

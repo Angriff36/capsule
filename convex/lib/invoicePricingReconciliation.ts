@@ -20,6 +20,7 @@ import type { MutationCtx } from "../_generated/server";
 import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
 import { calculateInvoiceTax, type InvoiceLineDraft } from "../../src/features/finance/invoiceTax";
 import { LedgerMoney } from "../../src/lib/ledgerMoney";
+import { applyAcceptedDeposit } from "./proposalDepositSeed";
 import { eventReconciliationReceipt } from "./reconciliationReceipt";import type { ReconciliationReceiptOutput, TimingWindow } from "./reconciliationReceipt";
 
 /** Which ledger command triggered this reconcile — recorded on the receipt. */
@@ -47,6 +48,71 @@ function followsEventPrice(invoice: InvoiceRow): boolean {
   );
 }
 
+/** Marks the one line of a draft made from the event's own quoted price. */
+const EVENT_PRICE_LINE = "event_price";
+
+/**
+ * True for the taxed one-line draft the approval made from the event's price
+ * and nobody has touched: unsent, unpaid, no discount, credit or deposit.
+ */
+function isEventPriceDraft(invoice: InvoiceRow): boolean {
+  const lines = invoice.lineItems as unknown;
+  return (
+    invoice.status === "draft" &&
+    invoice.sentAt == null &&
+    isZero(invoice.amountPaid) &&
+    isZero(invoice.discountAmount) &&
+    isZero(invoice.amountCredited) &&
+    isZero(invoice.depositAmount) &&
+    Array.isArray(lines) &&
+    lines.length === 1 &&
+    (lines[0] as { source?: unknown })?.source === EVENT_PRICE_LINE
+  );
+}
+
+/**
+ * One "Catering for …" line at the event's quoted price, taxed with the
+ * workspace's rates the same way the invoice form does; none for a
+ * tax-exempt client.
+ */
+async function eventPriceTotals(
+  ctx: MutationCtx,
+  event: Doc<"events">,
+  price: number,
+) {
+  const client = event.clientId ? await ctx.db.get(event.clientId) : null;
+  const taxExempt =
+    client?.tenantId === event.tenantId && client.taxExempt === true;
+  const rates = await ctx.db
+    .query("taxRates")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", event.tenantId))
+    .collect();
+  const worked = calculateInvoiceTax(
+    [
+      {
+        id: "0",
+        description: `Catering for ${event.title}`,
+        category: "food",
+        quantity: 1,
+        unitPrice: price,
+      },
+    ],
+    rates,
+    taxExempt,
+  );
+  return {
+    subtotal: worked.subtotal,
+    taxAmount: worked.taxAmount,
+    // Added the same way the invoice rules check it (total == subtotal + tax).
+    total: worked.subtotal + worked.taxAmount,
+    lineItems: worked.lineItems.map((line) => ({
+      ...line,
+      source: EVENT_PRICE_LINE,
+    })),
+    taxBreakdown: worked.taxBreakdown,
+  };
+}
+
 /** Identity + exactly-once receipting for the invoice side of an Event price
  * change. Writes invoices only through Invoice.followEventPrice. */
 export class EventInvoicePricingReconciliation {
@@ -68,7 +134,10 @@ export class EventInvoicePricingReconciliation {
         row.tenantId === event.tenantId &&
         row.deletedAt == null &&
         row.status !== "voided" &&
-        Number(row.total) !== quotedPrice,
+        // A taxed event-price draft is at the price when its subtotal is.
+        (isEventPriceDraft(row)
+          ? Number(row.subtotal) !== quotedPrice
+          : Number(row.total) !== quotedPrice),
     );
     if (differing.length === 0) return;
     const windows: TimingWindow[] = [
@@ -96,11 +165,17 @@ export class EventInvoicePricingReconciliation {
     let updatedCount = 0;
     const unresolved: ReconciliationReceiptOutput["unresolved"] = [];
     for (const invoice of differing) {
-      if (followsEventPrice(invoice)) {
-        // The command reads the event's price itself (AC-372).
-        await ctx.runMutation(api.mutations.Invoice_followEventPrice, {
+      // An untouched draft (the older untaxed shape, or the taxed one-line
+      // one) moves to the new price as a taxed one-line draft.
+      if (followsEventPrice(invoice) || isEventPriceDraft(invoice)) {
+        // The command checks the subtotal is the event's own price (AC-372).
+        await TenantSystemCommandRunner.forTenant(
+          ctx,
+          event.tenantId,
+        ).context.runMutation(api.mutations.Invoice_followEventPriceTaxed, {
           docId: invoice._id,
           version: invoice.version,
+          ...(await eventPriceTotals(ctx, event, quotedPrice)),
         });
         updatedCount += 1;
         continue;
@@ -156,16 +231,32 @@ export async function ensureEventDraftInvoice(
     .collect();
   if (existing.some((row) => row.tenantId === event.tenantId && row.deletedAt == null)) return;
   const source = await acceptedProposalFor(ctx, event);
+  // An accepted proposal's total already includes its tax: the draft is that
+  // proposal's own subtotal, tax, discount and total as one amount, so it is
+  // never taxed a second time and matches what the client signed. Without
+  // one: one taxed line at the event's price, which follows later price
+  // changes until finance changes or sends it.
+  const totals =
+    source && Number(source.total ?? 0) > 0
+      ? await signedProposalTotals(ctx, event, source)
+      : {
+          ...(await eventPriceTotals(ctx, event, quotedPrice)),
+          discountAmount: 0,
+        };
+  // The client's own payment terms, so the due date set on sending is right.
+  const client = event.clientId ? await ctx.db.get(event.clientId) : null;
+  const termsDays =
+    client?.tenantId === event.tenantId && client.paymentTermsDays != null
+      ? Number(client.paymentTermsDays)
+      : 30;
   await TenantSystemCommandRunner.forTenant(ctx, event.tenantId).context.runMutation(
     api.mutations.Invoice_createViaIssue,
     {
       clientId: event.clientId,
       eventId,
       invoiceSequence: 0,
-      subtotal: quotedPrice,
-      taxAmount: 0,
-      discountAmount: 0,
-      total: quotedPrice,
+      paymentTermsDays: termsDays,
+      ...totals,
       ...(source
         ? {
             proposalId: String(source._id),
@@ -177,6 +268,7 @@ export async function ensureEventDraftInvoice(
       idempotencyKey: `event-draft-invoice:${eventId}`,
     },
   );
+  if (source) await applyAcceptedDeposit(ctx, event, source);
 }
 
 /**
@@ -215,9 +307,15 @@ export async function followAcceptedProposalPrice(
   ).filter((row) => row.tenantId === event.tenantId && row.deletedAt == null && row.status !== "voided");
   if (invoices.length !== 1) return;
   const draft = (await ctx.db.get(invoices[0]._id)) as InvoiceRow;
-  if (!followsEventPrice(draft)) return;
-  const itemized = await itemizedFromProposal(ctx, proposal);
-  if (!itemized) return;
+  if (!followsEventPrice(draft) && !isEventPriceDraft(draft)) return;
+  // A proposal with no priced lines becomes the single amount it signed.
+  // Lines whose worked total is not what the client signed (an older
+  // proposal taxed another way) also become the signed amount.
+  const lines = await itemizedFromProposal(ctx, proposal);
+  const itemized =
+    lines && Math.round(lines.total * 100) === Math.round(total * 100)
+      ? lines
+      : await signedProposalTotals(ctx, event, proposal);
   await system.runMutation(api.mutations.Invoice_markVoided, {
     docId: draft._id,
     version: draft.version,
@@ -237,6 +335,7 @@ export async function followAcceptedProposalPrice(
     ...(proposal.acceptedRevisionId ? { proposalRevisionId: String(proposal.acceptedRevisionId) } : {}),
     idempotencyKey: `accepted-proposal-invoice:${proposalId}`,
   });
+  await applyAcceptedDeposit(ctx, event, proposal);
 }
 
 /**
@@ -273,8 +372,10 @@ async function itemizedFromProposal(ctx: MutationCtx, proposal: Doc<"proposals">
     .query("taxRates")
     .withIndex("by_tenantId", (q) => q.eq("tenantId", proposal.tenantId))
     .collect();
-  const worked = calculateInvoiceTax(drafts, rates, taxExempt);
+  // Tax is due on the price after the discount (invoiceTax.ts), the same
+  // way the server checks an issued bill.
   const discount = Number(proposal.discountAmount ?? 0);
+  const worked = calculateInvoiceTax(drafts, rates, taxExempt, discount);
   return {
     subtotal: worked.subtotal,
     taxAmount: worked.taxAmount,
@@ -286,6 +387,101 @@ async function itemizedFromProposal(ctx: MutationCtx, proposal: Doc<"proposals">
     lineItems: worked.lineItems,
     taxBreakdown: worked.taxBreakdown,
   };
+}
+
+/**
+ * A proposal's own subtotal, tax, discount and total as one amount, so it is
+ * never taxed a second time and matches what the client signed.
+ */
+async function signedProposalTotals(
+  ctx: MutationCtx,
+  event: Doc<"events">,
+  proposal: Doc<"proposals">,
+) {
+  return {
+    subtotal: Number(proposal.subtotal ?? 0),
+    taxAmount: Number(proposal.taxAmount ?? 0),
+    discountAmount: Number(proposal.discountAmount ?? 0),
+    total: Number(proposal.total ?? 0),
+    lineItems: [],
+    // The tax report adds up the per-rate lines, so the signed tax is
+    // spread over them as well.
+    taxBreakdown: signedTaxBreakdown(proposal),
+  };
+}
+
+/**
+ * A draft bill's amounts worked again for another client: the same lines,
+ * taxed or not by that client's tax exemption. A bill with no lines is one
+ * amount at its subtotal. Same exemption as before: nothing changes.
+ */
+export async function retaxDraftForClient(
+  ctx: MutationCtx,
+  invoice: InvoiceRow,
+  previousClientId: Id<"clients"> | undefined,
+  clientId: Id<"clients">,
+) {
+  const exempt = async (id: Id<"clients"> | undefined) => {
+    const client = id ? await ctx.db.get(id) : null;
+    return client?.tenantId === invoice.tenantId && client.taxExempt === true;
+  };
+  const current = {
+    subtotal: Number(invoice.subtotal ?? 0),
+    taxAmount: Number(invoice.taxAmount ?? 0),
+    total: Number(invoice.total ?? 0),
+    lineItems: (invoice.lineItems as unknown) ?? [],
+    taxBreakdown: (invoice.taxBreakdown as unknown) ?? [],
+  };
+  const taxExempt = await exempt(clientId);
+  if (taxExempt === (await exempt(previousClientId))) return current;
+  const stored = Array.isArray(invoice.lineItems)
+    ? (invoice.lineItems as Array<InvoiceLineDraft & { source?: string }>)
+    : [];
+  const drafts: InvoiceLineDraft[] =
+    stored.length > 0
+      ? stored.map((line) => ({
+          id: String(line.id),
+          description: line.description,
+          category: line.category,
+          quantity: Number(line.quantity),
+          unitPrice: Number(line.unitPrice),
+        }))
+      : [{ id: "0", description: "Catering", category: "food", quantity: 1, unitPrice: current.subtotal }];
+  const rates = await ctx.db
+    .query("taxRates")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", invoice.tenantId))
+    .collect();
+  const discount = Number(invoice.discountAmount ?? 0);
+  const worked = calculateInvoiceTax(drafts, rates, taxExempt, discount);
+  return {
+    subtotal: worked.subtotal,
+    taxAmount: worked.taxAmount,
+    total: LedgerMoney.fromDollars(worked.subtotal)
+      .add(LedgerMoney.fromDollars(worked.taxAmount))
+      .subtract(LedgerMoney.fromDollars(discount))
+      .toDollars(),
+    // Lines keep their marks (the event-price line still follows the price).
+    lineItems:
+      stored.length > 0
+        ? worked.lineItems.map((line, index) =>
+            stored[index]?.source ? { ...line, source: stored[index].source } : line,
+          )
+        : [],
+    taxBreakdown: worked.taxBreakdown,
+  };
+}
+
+/**
+ * The signed tax as one line with no rate attached: which rates the client
+ * was charged under is not kept, and today's rates may differ, so the tax
+ * report counts it as signed rather than under a guessed rate.
+ */
+function signedTaxBreakdown(proposal: Doc<"proposals">) {
+  const signed = Number(proposal.taxAmount ?? 0);
+  if (!(signed > 0)) return [];
+  const subtotal = Number(proposal.subtotal ?? 0);
+  const percentage = subtotal > 0 ? Math.round((signed / subtotal) * 10000) / 100 : 0;
+  return [{ name: "Sales tax as signed", percentage, amount: signed }];
 }
 
 /** The newest accepted proposal booked onto this event, if any. */

@@ -11,7 +11,7 @@ import { eventRevenueEstimate } from "../../src/features/finance/revenueAttribut
 import { calculateCommissionMetrics } from "../../src/features/reports/compMasterValues";
 
 describe("factual values", () => {
-  it("calculates straight-line route distance and 40 km/h travel time while preserving missing legs", () => {
+  it("calculates straight-line route distance in miles and 25 mph travel time while preserving missing legs", () => {
     const legs = routeLegs(
       ["a", "b", "missing", "c"],
       new Map([
@@ -22,11 +22,11 @@ describe("factual values", () => {
     );
     expect(legs[0]).toBeNull();
     expect(legs[1]!.distanceKm).toBeCloseTo(111.19, 1);
-    expect(legs[1]!.minutes).toBeCloseTo(166.79, 1);
+    expect(legs[1]!.minutes).toBeCloseTo(165.82, 1);
     expect(legs[2]).toBeNull();
     expect(legs[3]).toBeNull();
     expect(routeLegLabel(legs[1], 1)).toBe(
-      "111.2 km straight-line · ~167 min at 40 km/h",
+      "69.1 mi straight-line · ~166 min at 25 mph",
     );
     expect(routeLegLabel(legs[2], 2)).toBe(
       "Missing — no coordinates for this leg",

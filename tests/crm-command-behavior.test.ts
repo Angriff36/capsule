@@ -174,7 +174,13 @@ it("shares, copies, revokes and replaces a proposal link", async () => {
 });
 it("reports proposal publication and contract sent-recording as internal status changes", async () => {
   backend.values.set("useListProposal", [
-    { _id: "proposal-a", title: "Supper", status: "draft", version: 3 },
+    {
+      _id: "proposal-a",
+      title: "Supper",
+      status: "draft",
+      version: 3,
+      total: 1200,
+    },
   ]);
   const publish = command(
     "lib/proposalRevision:sendProposalWithRevisionCapture",

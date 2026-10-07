@@ -170,6 +170,8 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess")
     constraint correctDates: clockOutAt >= clockInAt "The corrected clock-out has to be at or after the clock-in."
+    // Pay is for hours already worked; a few minutes of slack for clocks.
+    constraint correctNotAhead: clockOutAt <= now() + (15 * 60 * 1000) "These hours haven't happened yet. Enter them after the shift is worked."
     constraint correctBreakNonNegative: breakMinutes == null or breakMinutes >= 0 "Break minutes can't be negative. Use zero or more."
     compute previousClockInAt = self.clockInAt
     compute previousClockOutAt = self.clockOutAt
@@ -232,6 +234,23 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
       breakMinutes: self.breakMinutes
       paidBreakMinutes: self.paidBreakMinutes
       approvedById: user.personId
+    }
+  }
+
+  // A wrong entry (typed for the wrong person, a double clock-in) is taken
+  // off the time sheet. Approved hours are pay records and stay.
+  command remove(reason: string) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint removeNotApproved: self.approvedAt == null "These hours are approved for payroll. Correct them instead."
+    constraint removeReasonPresent: length(trim(reason)) > 0 "Say why you're removing this time entry."
+    mutate deletedAt = now()
+    mutate correctionReason = reason
+    emit TimeRecordRemoved {
+      timeRecordId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      reason: reason
     }
   }
 
@@ -376,6 +395,13 @@ event TimeRecordClockedOut: "time_record.clocked_out" {
   breakMinutes: number?
   paidBreakMinutes: number?
   status: TimeRecordStatus
+}
+
+event TimeRecordRemoved: "time_record.removed" {
+  timeRecordId: string
+  tenantId: string
+  personId: string
+  reason: string
 }
 
 event TimeRecordApproved: "time_record.approved" {

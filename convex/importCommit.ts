@@ -1083,7 +1083,7 @@ export const commitImportRun = action({
 
       if (committed === 0 && skipped === 0 && pending > 0) {
         throw new ConvexError(
-          `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
+          `None of these rows could be saved (${pending} ${pending === 1 ? "row" : "rows"} held back). Open Imports › Match leftover items to see why, then import the file again.`,
         );
       }
 
@@ -1486,7 +1486,7 @@ export const commitImportRun = action({
 
       if (committed === 0 && skipped === 0 && pending > 0) {
         throw new ConvexError(
-          `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
+          `None of these rows could be saved (${pending} ${pending === 1 ? "row" : "rows"} held back). Open Imports › Match leftover items to see why, then import the file again.`,
         );
       }
 
@@ -1651,7 +1651,7 @@ export const commitImportRun = action({
 
       if (committed === 0 && skipped === 0 && pending > 0) {
         throw new ConvexError(
-          `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
+          `None of these rows could be saved (${pending} ${pending === 1 ? "row" : "rows"} held back). Open Imports › Match leftover items to see why, then import the file again.`,
         );
       }
 
@@ -1989,7 +1989,7 @@ export const commitImportRun = action({
 
       if (committed === 0 && skipped === 0 && pending > 0) {
         throw new ConvexError(
-          `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
+          `None of these rows could be saved (${pending} ${pending === 1 ? "row" : "rows"} held back). Open Imports › Match leftover items to see why, then import the file again.`,
         );
       }
 
@@ -2211,7 +2211,7 @@ export const commitImportRun = action({
 
       if (committed === 0 && skipped === 0 && pending > 0) {
         throw new ConvexError(
-          `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
+          `None of these rows could be saved (${pending} ${pending === 1 ? "row" : "rows"} held back). Open Imports › Match leftover items to see why, then import the file again.`,
         );
       }
 
@@ -2459,7 +2459,7 @@ export const commitImportRun = action({
 
     if (committed === 0 && skipped === 0 && pending > 0) {
       throw new ConvexError(
-        `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
+        `None of these rows could be saved (${pending} ${pending === 1 ? "row" : "rows"} held back). Open Imports › Match leftover items to see why, then import the file again.`,
       );
     }
 

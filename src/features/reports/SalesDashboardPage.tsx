@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import {
   useListLead,
+  useListProposal,
   useListClient,
   useListPerson,
 } from "@/lib/manifest-convex-react";
@@ -18,6 +19,8 @@ import { formatMoney } from "@/lib/format";
 import {
   commissionBasis,
   isBookedEvent,
+  acceptedProposalIds,
+  isConvertedLead,
   isQualifiedLead,
   NOT_KNOWN,
   percentOf,
@@ -54,6 +57,7 @@ const STAGE_ORDER: Record<LeadStage, number> = {
 export function SalesDashboardPage() {
   const events = useAllEventReportRows();
   const leads = useListLead();
+  const proposals = useListProposal();
   const clients = useListClient();
   const people = useListPerson();
 
@@ -85,13 +89,13 @@ export function SalesDashboardPage() {
     const totalLeads = all.length;
     // A lead has no "converted" stage: it is converted once it became a
     // client account.
-    const converted = all.filter(
-      (l) =>
-        String(l.stage) === "converted" ||
-        l.convertedAt != null ||
-        l.clientId != null,
+    const accepted = acceptedProposalIds(proposals);
+    const converted = all.filter((lead) =>
+      isConvertedLead(lead, accepted),
     ).length;
-    const qualified = all.filter(isQualifiedLead).length;
+    const qualified = all.filter(
+      (lead) => isQualifiedLead(lead) || isConvertedLead(lead, accepted),
+    ).length;
 
     return {
       totalLeads,
@@ -99,7 +103,7 @@ export function SalesDashboardPage() {
       qualifiedRate: percentOf(qualified, totalLeads),
       convertedCount: converted,
     };
-  }, [leads]);
+  }, [leads, proposals]);
 
   // Calculate revenue metrics
   const revenueMetrics = useMemo(() => {

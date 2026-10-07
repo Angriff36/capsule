@@ -281,8 +281,8 @@ describe("daily production plan (AC-455)", () => {
       const braise = rows.find((row) =>
         row.textContent?.includes("Braise short rib"),
       )!;
-      expect(braise.textContent).toContain("Harbor gala 40 portion");
-      expect(braise.textContent).toContain("Lee wedding 60 portion · done");
+      expect(braise.textContent).toContain("Harbor gala 40 portions");
+      expect(braise.textContent).toContain("Lee wedding 60 portions · done");
       expect(braise.textContent).toMatch(/Make 1–2 days ahead/);
       const slice = rows.find((row) =>
         row.textContent?.includes("Slice short rib"),

@@ -14,6 +14,7 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
   return {
     useListEvent: list("events"),
     useListLead: list("leads"),
+    useListProposal: list("proposals"),
     useListClient: list("clients"),
     useListPerson: list("people"),
   };
@@ -92,9 +93,11 @@ describe("sales dashboard", () => {
     seed.leads = [
       { _id: "l1", stage: "new" },
       { _id: "l2", stage: "qualified" },
-      { _id: "l3", stage: "converted" },
+      // Converted: the client accepted this lead's proposal.
+      { _id: "l3", stage: "proposalSent", proposalId: "pr1" },
       { _id: "l4", stage: "lost" },
     ];
+    seed.proposals = [{ _id: "pr1", status: "accepted" }];
     seed.people = [
       { _id: "p1", givenName: "Sam", familyName: "Seller" },
       { _id: "p2", givenName: "Pat", familyName: "Planner" },

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { classifyCommandFailure } from "../events/CommandFailure";
 import type { FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ReturnToListLink } from "../list-state/listOrigin";
@@ -379,13 +380,8 @@ export function InvoiceDetailPage() {
       void run(key, async () => {
         const args = { docId: invoice._id, version: invoice.version };
         if (key === "send") {
+          // Sending sets the due date from the terms when it had none.
           await send(args);
-          if (dueDate == null) {
-            setNotice(
-              "Invoice marked sent. Press Email the invoice to send the client the PDF. Automatic reminders need a due date set when the invoice is issued.",
-            );
-            return;
-          }
           try {
             const schedule = await configureReminderSchedule({
               invoiceId: String(invoice._id),
@@ -397,9 +393,10 @@ export function InvoiceDetailPage() {
               "Invoice marked sent and payment reminders scheduled. Press Email the invoice to send the client the PDF.",
             );
           } catch (error) {
-            const detail = error instanceof Error ? ` (${error.message})` : "";
-            throw new Error(
-              `Invoice marked sent, but its automatic reminders were not saved${detail}. Check the due date, then press Enable reminders below.`,
+            // The send already worked; only the reminders are off.
+            const detail = ` ${classifyCommandFailure(error).detail}`;
+            setNotice(
+              `Invoice marked sent. Automatic reminders are not on yet.${detail}`,
             );
           }
           return;
@@ -1065,6 +1062,13 @@ export function InvoiceDetailPage() {
             <dd>{usd(availableClientCredit)}</dd>
           </div>
         </dl>
+        {invoice.status !== "paid" &&
+        invoice.status !== "voided" &&
+        invoice.status !== "written_off" ? (
+          <p className="mt-3 text-base text-ink-2" role="status">
+            A credit memo can be issued once this invoice is paid in full.
+          </p>
+        ) : null}
         {invoice.status === "paid" && !canIssueCreditMemo ? (
           <p className="mt-3 text-base text-ink-2" role="status">
             The full paid amount has already been credited.
@@ -1391,7 +1395,7 @@ export function InvoiceDetailPage() {
             </button>
           ) : null}
         </div>
-        {!paymentLinkAvailable && !paymentLink ? (
+        {!paymentLinkAvailable && !paymentLink && amountDue > 0 ? (
           <p className="mt-3 text-base text-ink-2" role="status">
             Send the invoice with a balance due to generate a payment link.
           </p>
@@ -1449,10 +1453,10 @@ export function InvoiceDetailPage() {
             </span>
           </div>
         ) : null}
-        {dueDate == null ? (
+        {amountDue <= 0 ? null : dueDate == null ? (
           <p className="mt-3 text-base text-ink-2" role="status">
-            This invoice was issued without a due date, so automatic reminders
-            cannot be scheduled.
+            This invoice has no due date, so automatic reminders cannot be
+            scheduled.
           </p>
         ) : !reminderAutomationAvailable ? (
           <p className="mt-3 text-base text-ink-2" role="status">

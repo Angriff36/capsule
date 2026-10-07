@@ -72,6 +72,8 @@ export type EventDaySummary = {
 
 export type EventDayInputs = {
   packetReadiness?: EventDayPacketReadiness;
+  /** Collected at the kitchen: no venue is needed. */
+  pickup?: boolean;
   event: EventDayEvent;
   venue: EventDayVenue | undefined;
   assignments: readonly EventDayAssignment[];
@@ -168,7 +170,9 @@ export function deriveSections(inputs: EventDayInputs): EventDaySection[] {
   // Venue
   const venueKnown =
     event.venueId != null || String(event.venueName ?? "").trim().length > 0;
-  if (!venueKnown) {
+  if (!venueKnown && inputs.pickup) {
+    out.push(section("venue", "ready", "Pickup at the kitchen"));
+  } else if (!venueKnown) {
     out.push(section("venue", emptyStatus("venue", rank), "Not set"));
   } else {
     const place =

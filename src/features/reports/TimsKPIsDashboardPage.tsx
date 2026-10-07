@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import {
   useListEventCloseout,
   useListLead,
+  useListProposal,
   useListServiceStyle,
   useListVenue,
 } from "@/lib/manifest-convex-react";
@@ -24,6 +25,8 @@ import {
   budgetedFoodCostPercent,
   foodCostPercent,
   isCompletedEvent,
+  acceptedProposalIds,
+  isConvertedLead,
   isQualifiedLead,
   NOT_KNOWN,
   percentOf,
@@ -53,6 +56,7 @@ export function TimsKPIsDashboardPage() {
   const events = useAllEventReportRows();
   const closeouts = useListEventCloseout();
   const leads = useListLead();
+  const proposals = useListProposal();
   const venues = useListVenue();
   const serviceStyles = useListServiceStyle();
 
@@ -127,10 +131,15 @@ export function TimsKPIsDashboardPage() {
     const all = leads ?? [];
     const totalLeads = all.length;
     const newLeads = all.filter((l) => l.stage === "new").length;
-    const converted = all.filter((l) => l.stage === "converted").length;
+    const accepted = acceptedProposalIds(proposals);
+    const converted = all.filter((lead) =>
+      isConvertedLead(lead, accepted),
+    ).length;
 
     const qualifiedRate = percentOf(
-      all.filter(isQualifiedLead).length,
+      all.filter(
+        (lead) => isQualifiedLead(lead) || isConvertedLead(lead, accepted),
+      ).length,
       totalLeads,
     );
     const conversionRate = percentOf(converted, totalLeads);
@@ -142,7 +151,7 @@ export function TimsKPIsDashboardPage() {
       conversionRate,
       converted,
     };
-  }, [leads]);
+  }, [leads, proposals]);
 
   // Venue Performance Data
   const venuePerformanceData = useMemo(() => {
@@ -490,6 +499,7 @@ export function TimsKPIsDashboardPage() {
         events={events ?? []}
         closeouts={closeouts ?? []}
         leads={leads ?? []}
+        acceptedProposals={acceptedProposalIds(proposals)}
       />
 
       {/* Reconciliation Note */}

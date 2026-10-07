@@ -57,7 +57,23 @@ export const list = query({
     return {
       events: events
         .filter((row) => isLiveTenantRow(row, tenantId))
-        .map((row) => ({ id: row._id, label: row.title }))
+        // Same-named events tell apart by date; a cancelled one says so.
+        .map((row) => ({
+          id: row._id,
+          label: [
+            row.title,
+            row.startsAt
+              ? new Date(row.startsAt).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                  year: "numeric",
+                })
+              : "",
+            row.stage === "cancelled" ? "cancelled" : "",
+          ]
+            .filter(Boolean)
+            .join(" · "),
+        }))
         .sort(byLabel),
       clients: clients
         .filter(

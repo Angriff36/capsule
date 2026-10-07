@@ -214,7 +214,8 @@ it("navigates from the one primary Open event link for an already-linked proposa
   );
   expect(openEvent?.textContent).toContain("Open event");
   expect(openEvent?.className).toContain("btn-primary");
-  expect(field("primaryContactName").value).toBe("");
+  // The contact starts as the client, as on every booking.
+  expect(field("primaryContactName").value).toBe("Client A");
   // A real click navigates — an unclicked href proves nothing.
   await click(openEvent!);
   expect(location).toBe("/events/event-7?tab=overview");
@@ -253,7 +254,8 @@ it("navigates from the same primary Open event link for a draft event-first prop
     'a[href="/events/event-7?tab=overview"]',
   );
   expect(openEvent?.className).toContain("btn-primary");
-  expect(field("primaryContactName").value).toBe("");
+  // The contact starts as the client, as on every booking.
+  expect(field("primaryContactName").value).toBe("Client A");
   await click(openEvent!);
   expect(location).toBe("/events/event-7?tab=overview");
   expect(book).not.toHaveBeenCalled();

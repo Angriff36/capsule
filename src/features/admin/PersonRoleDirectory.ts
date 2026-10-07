@@ -27,8 +27,10 @@ export class PersonRoleDirectory {
     "owner",
   ] as const;
 
+  /** "kitchen_staff" -> "Kitchen staff". */
   static label(role: string): string {
-    return role.replaceAll("_", " ");
+    const words = role.replaceAll("_", " ");
+    return words.charAt(0).toUpperCase() + words.slice(1);
   }
 
   static isAssignable(

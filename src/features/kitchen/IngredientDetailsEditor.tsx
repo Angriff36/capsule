@@ -153,7 +153,7 @@ export function IngredientDetailsEditor({
           >
             {unitOptionsFor(ingredient.unit).map((option) => (
               <option key={option} value={option}>
-                {option}
+                {option.replaceAll("_", " ")}
               </option>
             ))}
           </select>

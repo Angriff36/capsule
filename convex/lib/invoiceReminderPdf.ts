@@ -17,6 +17,12 @@ export interface InvoiceReminderPdfInput {
   companyAddress?: string | null;
   primaryColor?: string | null;
   accentColor?: string | null;
+  /**
+   * When the PDF counts as made. A retried reminder passes the same time so
+   * the file is byte-for-byte the same and the email service can recognize
+   * the repeat by its key (jsPDF otherwise stamps the clock and a random id).
+   */
+  generatedAt?: number;
 }
 
 const MARGIN = 54;
@@ -51,7 +57,10 @@ export function buildInvoiceReminderPdf(
 ): Uint8Array {
   const primary = colorRgb(input.primaryColor, "#233E35");
   const accent = colorRgb(input.accentColor, "#BE773F");
+  const generatedAt = input.generatedAt ?? Date.now();
   const doc = new jsPDF({ unit: "pt", format: "letter" });
+  doc.setCreationDate(new Date(generatedAt));
+  doc.setFileId(Math.trunc(generatedAt).toString(16).padStart(32, "0"));
   let y = 66;
 
   doc.setFont("helvetica", "bold");
@@ -143,7 +152,7 @@ export function buildInvoiceReminderPdf(
   doc.setFontSize(9);
   doc.setTextColor(110, 110, 110);
   doc.text(
-    `${input.companyName} · Invoice ${input.invoiceNumber} · Generated ${dateText(Date.now())}`,
+    `${input.companyName} · Invoice ${input.invoiceNumber} · Generated ${dateText(generatedAt)}`,
     MARGIN,
     758,
   );

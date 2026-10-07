@@ -51,6 +51,7 @@ import { observationsByIngredient } from "./lib/culinaryModel/pricing";
 import { editionInUse } from "./lib/culinaryModel/recipeEdition";
 import { withUnresolvedText } from "./lib/culinaryModel/unresolvedText";
 import {
+  convertQuantity,
   isUnitCode,
   type ItemUnitMappingLike,
   type QuantityBasis,
@@ -1219,30 +1220,40 @@ async function buildDemandChangePreview(
     }
     for (const removed of plan.supersede) next.delete(removed.id);
   }
-  const totals = (rows: Iterable<PreviewContribution>) => {
-    const grouped = new Map<string, DemandChangeLine>();
-    for (const row of rows) {
-      const key = `${row.ingredientId}:${row.unit}`;
-      const found = grouped.get(key) ?? {
-        key,
-        ingredientId: row.ingredientId,
-        ingredientName: row.ingredientName,
-        unit: row.unit,
-        currentQuantity: 0,
-        nextQuantity: 0,
-      };
-      grouped.set(key, found);
+  // One line per ingredient: a recipe now in pounds is compared with the
+  // ounces already saved, not shown as one removed and one added line.
+  const linesByKey = new Map<string, DemandChangeLine>();
+  const lineFor = (row: PreviewContribution) => {
+    for (const line of linesByKey.values()) {
+      if (line.ingredientId !== row.ingredientId) continue;
+      const converted = convertQuantity(
+        row.quantity,
+        row.unit,
+        line.unit as UnitCode,
+      );
+      if (converted.status === "resolved") {
+        return { line, quantity: converted.quantity };
+      }
     }
-    return grouped;
+    const key = `${row.ingredientId}:${row.unit}`;
+    const line: DemandChangeLine = {
+      key,
+      ingredientId: row.ingredientId,
+      ingredientName: row.ingredientName,
+      unit: row.unit,
+      currentQuantity: 0,
+      nextQuantity: 0,
+    };
+    linesByKey.set(key, line);
+    return { line, quantity: row.quantity };
   };
-  const linesByKey = totals([...current.values(), ...next.values()]);
   for (const row of current.values()) {
-    const line = linesByKey.get(`${row.ingredientId}:${row.unit}`)!;
-    line.currentQuantity += row.quantity;
+    const { line, quantity } = lineFor(row);
+    line.currentQuantity += quantity;
   }
   for (const row of next.values()) {
-    const line = linesByKey.get(`${row.ingredientId}:${row.unit}`)!;
-    line.nextQuantity += row.quantity;
+    const { line, quantity } = lineFor(row);
+    line.nextQuantity += quantity;
   }
   const lines = [...linesByKey.values()]
     .map((line) => ({

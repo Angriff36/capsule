@@ -19,6 +19,7 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
   return {
     useListEvent: list("events"),
     useListLead: list("leads"),
+    useListProposal: list("proposals"),
     useListEventCloseout: list("closeouts"),
     useListPerson: list("people"),
     useListScorecardTarget: list("targets"),

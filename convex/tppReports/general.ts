@@ -198,12 +198,18 @@ export const run = query({
     }
 
     if (args.reportId === "events-pending-final-confirmation") {
+      const [start, end] = range(parameters);
+      // Only the chosen dates, so old imported events never fill the limit.
       const events = await ctx.db
         .query("events")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .withIndex("by_tenantId_and_startsAt", (q) =>
+          q
+            .eq("tenantId", tenantId)
+            .gte("startsAt", start)
+            .lte("startsAt", end),
+        )
         .take(REPORT_ROW_LIMIT + 1)
         .then(keepReportRows(ctx, "events"));
-      const [start, end] = range(parameters);
       // The event's own venue snapshot is event data; filling it from the
       // Venue record follows the venue read policy.
       const seeVenues = canRead(auth, VENUE_READ);

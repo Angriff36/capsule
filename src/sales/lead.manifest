@@ -40,6 +40,8 @@ entity Lead mixin TenantScoped, SoftDeletable {
   property guestCount: int?
   property eventType: string?
   property closedAt: datetime?
+  // Why it left the pipeline, as the salesperson wrote it.
+  property closeReason: string?
   // A client merge moves the lead to the client kept (PL-SOURCE-MERGE).
   property clientMergeAuthorizationId: uuid?
   property mergeTargetClientId: uuid?
@@ -279,7 +281,40 @@ entity Lead mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // A dead inquiry leaves the pipeline; the reason is optional.
+  command close(optional reason: string) {
+    guard self.closedAt == null
+    guard self.deletedAt == null
+    mutate closedAt = now()
+    mutate closeReason = reason
+    emit LeadClosed {
+      leadId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reopen() {
+    guard self.closedAt != null
+    guard self.deletedAt == null
+    mutate closedAt = null
+    mutate closeReason = null
+    emit LeadReopened {
+      leadId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   store Lead in durable
+}
+
+event LeadClosed: "lead.closed" {
+  leadId: string
+  tenantId: string
+}
+
+event LeadReopened: "lead.reopened" {
+  leadId: string
+  tenantId: string
 }
 
 event LeadClientMergeStaged: "lead.client_merge_staged" {

@@ -5,12 +5,15 @@ import {
   useCreateClientContact,
   useCreateLead,
   useCreateProposal,
+  useLeadClose,
   useLeadConfirmConversion,
+  useLeadReopen,
   useLeadConfirmProposalSent,
   useLeadStageConversion,
   useLeadStageProposal,
   useLeadUpdatePipeline,
   useListLead,
+  useListProposal,
   useListReferralSource,
 } from "../../lib/manifest-convex-react";
 import { type Id } from "../../lib/api";
@@ -26,6 +29,7 @@ import { useSendProposalWithRevisionCapture } from "./useSendProposalWithRevisio
 import "./LeadPipelinePage.css";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { useActionNotice } from "../../ui/action-result";
+import { useActionPrompt } from "../../ui/action-prompt";
 
 const STAGES = [
   { key: "new", label: "New", caption: "Fresh inquiries" },
@@ -65,6 +69,7 @@ interface LeadRow {
   convertedAt?: number | null;
   proposalLinkedAt?: number | null;
   closedAt?: number | null;
+  closeReason?: string | null;
   deletedAt?: number | null;
 }
 
@@ -114,6 +119,10 @@ export function LeadPipelinePage() {
   const sendProposal = useSendProposalWithRevisionCapture();
   const stageProposal = useLeadStageProposal();
   const confirmProposalSent = useLeadConfirmProposalSent();
+  const closeLead = useLeadClose();
+  const reopenLead = useLeadReopen();
+  const proposals = useListProposal();
+  const [showClosed, setShowClosed] = useState(false);
 
   const [showCapture, setShowCapture] = useState(false);
   const [leadType, setLeadType] = useState<"company" | "person">("company");
@@ -125,13 +134,54 @@ export function LeadPipelinePage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
+  const { prompt, host: promptHost } = useActionPrompt(busy != null);
 
   const capturedLeads = ((leads ?? []) as LeadRow[]).filter(
     (lead) => lead.deletedAt == null && lead.capturedAt != null,
   );
-  // A lead the old system closed (won or lost) is history, not pipeline.
-  const activeLeads = capturedLeads.filter((lead) => lead.closedAt == null);
-  const closedCount = capturedLeads.length - activeLeads.length;
+  // A closed lead (won or lost) is history, not pipeline; so is a lead whose
+  // proposal the client accepted, which is booked business now.
+  const acceptedProposals = new Set(
+    ((proposals ?? []) as Array<{ _id: string; status?: unknown }>)
+      .filter((proposal) => proposal.status === "accepted")
+      .map((proposal) => String(proposal._id)),
+  );
+  const isBooked = (lead: LeadRow) =>
+    lead.proposalId != null && acceptedProposals.has(String(lead.proposalId));
+  const activeLeads = capturedLeads.filter(
+    (lead) => lead.closedAt == null && !isBooked(lead),
+  );
+  const closedLeads = capturedLeads.filter(
+    (lead) => lead.closedAt != null || isBooked(lead),
+  );
+  const closedCount = closedLeads.length;
+
+  const askClose = (lead: LeadRow) => {
+    void (async () => {
+      const values = await prompt.askFields({
+        title: "Close lead",
+        description: `${leadName(lead)} leaves the pipeline. You can reopen it later.`,
+        confirmLabel: "Close lead",
+        fields: [
+          {
+            name: "reason",
+            label: "Why? (optional)",
+            inputType: "text",
+            required: false,
+          },
+        ],
+      });
+      if (!values) return;
+      void run(`${lead._id}:close`, async () => {
+        await closeLead({
+          docId: lead._id as Id<"leads">,
+          version: lead.version,
+          reason: values.reason?.trim() || undefined,
+        });
+        setNotice(`${leadName(lead)} closed.`);
+      });
+    })();
+  };
 
   const activeReferralSources = (
     (referralSources ?? []) as Array<{
@@ -652,6 +702,14 @@ export function LeadPipelinePage() {
                       >
                         {editLeadId === lead._id ? "Close" : "Edit details"}
                       </button>
+                      <button
+                        className="btn btn-ghost"
+                        type="button"
+                        onClick={() => askClose(lead)}
+                        disabled={busy != null}
+                      >
+                        Close lead
+                      </button>
                       {lead.convertedAt == null ? (
                         <button
                           className="btn btn-secondary"
@@ -842,12 +900,54 @@ export function LeadPipelinePage() {
         })}
       </section>
       {closedCount > 0 ? (
-        <p className="lead-pipeline-closed-note">
-          {closedCount === 1
-            ? "1 closed deal from the old system is kept off the board."
-            : `${closedCount} closed deals from the old system are kept off the board.`}
-        </p>
+        <section className="lead-pipeline-closed-note">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => setShowClosed((open) => !open)}
+          >
+            {showClosed
+              ? "Hide closed and booked leads"
+              : `Show closed and booked leads (${closedCount})`}
+          </button>
+          {showClosed ? (
+            <ul className="mt-2 space-y-1">
+              {closedLeads.map((lead) => (
+                <li
+                  key={lead._id}
+                  className="flex flex-wrap items-center gap-2"
+                >
+                  <strong>{leadName(lead)}</strong>
+                  <span className="text-ink-2">
+                    {isBooked(lead)
+                      ? "Booked: the client accepted the proposal"
+                      : `Closed${lead.closedAt ? ` ${formatDate(lead.closedAt)}` : ""}${lead.closeReason ? ` · ${lead.closeReason}` : ""}`}
+                  </span>
+                  {lead.closedAt != null && !isBooked(lead) ? (
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      disabled={busy != null}
+                      onClick={() =>
+                        void run(`${lead._id}:reopen`, async () => {
+                          await reopenLead({
+                            docId: lead._id as Id<"leads">,
+                            version: lead.version,
+                          });
+                          setNotice(`${leadName(lead)} is back on the board.`);
+                        })
+                      }
+                    >
+                      Reopen
+                    </button>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </section>
       ) : null}
+      {promptHost}
 
       <LeadSourceReport leads={capturedLeads} />
     </div>

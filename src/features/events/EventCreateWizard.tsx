@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatMoney } from "../../lib/format";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { addLocalDateTimeHours } from "../../ui/naturalDate";
 import { SearchSelect } from "../../ui/SearchSelect";
 import {
   InlineReferenceCreateSheet,
@@ -206,7 +207,21 @@ export function EventCreateWizard({
     try {
       await runEventWizardCreate({
         draft: draftRef.current,
-        commit,
+        // The booked client and venue names go on the event with it.
+        commit: (draft, onProgress) => {
+          const client = (clients ?? []).find(
+            (row) => row._id === draft.clientId,
+          );
+          const venue = (venues ?? []).find((row) => row._id === draft.venueId);
+          return commit(
+            {
+              ...draft,
+              clientName: client ? clientName(client) : undefined,
+              bookedVenue: venue ?? undefined,
+            },
+            onProgress,
+          );
+        },
         storage: sessionStorage,
         onProgress: (commitProgress) =>
           saveDraft({ ...draftRef.current, commitProgress }),
@@ -487,7 +502,16 @@ function BasicsStep({
           className="field-input"
           value={draft.startsAt}
           disabled={locked}
-          onChange={(event) => update({ startsAt: event.target.value })}
+          onChange={(event) => {
+            const startsAt = event.target.value;
+            // An empty or earlier end follows the start, 4 hours on, as the
+            // long form does.
+            update(
+              startsAt && (!draft.endsAt || draft.endsAt <= startsAt)
+                ? { startsAt, endsAt: addLocalDateTimeHours(startsAt, 4) }
+                : { startsAt },
+            );
+          }}
         />
       </label>
       <label className="field-label">
@@ -509,7 +533,16 @@ function BasicsStep({
           className="field-input"
           value={draft.serviceStyleId ?? ""}
           disabled={locked}
-          onChange={(event) => update({ serviceStyleId: event.target.value })}
+          onChange={(event) => {
+            const style = (serviceStyles ?? []).find(
+              (row) => row._id === event.target.value,
+            );
+            update({
+              serviceStyleId: event.target.value,
+              serviceStyleName: style?.name,
+              pickup: style?.code === "pickup",
+            });
+          }}
         >
           <option value="">Choose later</option>
           {(serviceStyles ?? [])
@@ -614,7 +647,13 @@ function ClientHeadcountStep({
             update({
               clientId: id,
               ...(!draft.primaryContactName && client
-                ? { primaryContactName: clientName(client) }
+                ? {
+                    // The person at the client, else the company.
+                    primaryContactName:
+                      [client.givenName, client.familyName]
+                        .filter(Boolean)
+                        .join(" ") || clientName(client),
+                  }
                 : {}),
             });
           }}
@@ -668,7 +707,8 @@ function DishStep({
   const menuDishes = useListMenuDish();
   const add = (id: string) => {
     const dish = dishes.find((item) => item._id === id);
-    if (dish)
+    // Picking a dish that is already on the list does not add it twice.
+    if (dish && !draft.dishes.some((line) => line.dishId === id))
       update({
         dishes: [
           ...draft.dishes,
@@ -812,6 +852,15 @@ function StaffStep({
     const person = people.find((item) => item._id === personId);
     if (!person || !role.trim()) {
       setAddError("Select a person and enter a role before adding staff.");
+      return;
+    }
+    const already = draft.staff.some(
+      (line) =>
+        line.personId === personId &&
+        line.role.trim().toLowerCase() === role.trim().toLowerCase(),
+    );
+    if (already) {
+      setAddError(`${personName(person)} is already on as ${role.trim()}.`);
       return;
     }
     update({
@@ -968,7 +1017,8 @@ function ReviewStep({
           <p className="text-sm text-ink-2">
             {draft.title || "Incomplete"} · {draft.eventType || "Incomplete"} ·{" "}
             {localDate(draft.startsAt)} – {localDate(draft.endsAt)} ·{" "}
-            {venue?.name ?? "Incomplete"}
+            {venue?.name ??
+              (draft.pickup ? "Picked up from the kitchen" : "Incomplete")}
           </p>
         </div>
         <div>

@@ -1,3 +1,4 @@
+import { useEventRentalOrderLines } from "../../lib/useEventRows";
 import { useMemo } from "react";
 import { formatMoney } from "../../lib/format";
 import { useEventLaborSummary } from "../facilities/useLaborSummary";
@@ -47,6 +48,7 @@ type Props = {
 export function EventMarginTab({ eventId }: Props) {
   const event = useGetEvent(eventId);
   const eventDishes = useEventMenuLines(eventId);
+  const rentalLines = useEventRentalOrderLines(eventId);
   const dishIngredients = useListDishIngredient();
   const dishComponents = useListDishComponent();
   const components = useListComponent();
@@ -164,6 +166,7 @@ export function EventMarginTab({ eventId }: Props) {
         payrollInputs: payroll ?? [],
         equipment: equipment ?? [],
         equipmentReservations: equipmentReservations ?? [],
+        rentalLines: rentalLines ?? [],
         clockedLabor,
         recipeEstimatedFoodCost: foodCost,
       }),
@@ -172,6 +175,7 @@ export function EventMarginTab({ eventId }: Props) {
       demands,
       equipment,
       equipmentReservations,
+      rentalLines,
       eventId,
       invoices,
       lineDemands,

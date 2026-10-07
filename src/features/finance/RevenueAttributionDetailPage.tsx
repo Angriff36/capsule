@@ -9,6 +9,7 @@ import {
   useGetRevenueAttribution,
   useGetEvent,
   useListVenue,
+  useListVenueCommissionTerm,
   useListPerson,
   useListReferralSource,
   useListClient,
@@ -68,6 +69,7 @@ export function RevenueAttributionDetailPage() {
 
   const attribution = useRouteRecord(useGetRevenueAttribution, id);
   const venues = useListVenue();
+  const commissionTerms = useListVenueCommissionTerm();
   const people = useListPerson();
   const referralSources = useListReferralSource();
   const clients = useListClient();
@@ -78,9 +80,10 @@ export function RevenueAttributionDetailPage() {
   const [eventId, setEventId] = useState(searchParams.get("eventId") ?? "");
   // The chosen event stays a choice even when it is older than the window.
   const events = usePickerAndNamedEvents([eventId]);
-  const eventChoices = (events ?? [])
-    .filter((e) => e.deletedAt == null && e.stage !== "cancelled")
-    .sort((a, b) => (b.startsAt ?? 0) - (a.startsAt ?? 0));
+  // Closest to today first (usePickerAndNamedEvents).
+  const eventChoices = (events ?? []).filter(
+    (e) => e.deletedAt == null && e.stage !== "cancelled",
+  );
 
   const create = useRevenueAttributionCreate();
   const apply = useRevenueAttributionApply();
@@ -404,13 +407,38 @@ export function RevenueAttributionDetailPage() {
               <select
                 className="input"
                 value={eventId}
-                onChange={(e) => setEventId(e.target.value)}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setEventId(next);
+                  // The event's venue, and that venue's commission on the
+                  // event date, so the split needs no lookup by hand.
+                  const picked = eventChoices.find((row) => row._id === next);
+                  if (attributionType !== "venue_commission" || !picked) return;
+                  if (picked.venueId) setVenueId(String(picked.venueId));
+                  const at = Number(picked.startsAt ?? Date.now());
+                  const term = (commissionTerms ?? []).find(
+                    (row) =>
+                      row.deletedAt == null &&
+                      row.status === "active" &&
+                      String(row.venueId) === String(picked.venueId) &&
+                      row.effectiveStartDate <= at &&
+                      (row.effectiveEndDate == null ||
+                        row.effectiveEndDate >= at),
+                  );
+                  if (term) {
+                    setAllocationMethod("percent");
+                    setPercentBasis(Number(term.commissionPercent));
+                  }
+                }}
                 required
               >
                 <option value="">Pick the event this split is for</option>
                 {eventChoices.map((choice) => (
                   <option key={choice._id} value={choice._id}>
                     {choice.title}
+                    {choice.startsAt
+                      ? ` · ${formatDate(Number(choice.startsAt))}`
+                      : ""}
                   </option>
                 ))}
               </select>

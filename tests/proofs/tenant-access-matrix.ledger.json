@@ -1983,7 +1983,7 @@
     "mutations:RevenueAttribution_approve": "no owner change: Error: Guard 1 failed",
     "mutations:RevenueAttribution_create": "no owner change: Error: Validator error: Expected one of literal, literal, literal, literal, literal, got `\"matrix-probe\"`",
     "mutations:RevenueAttribution_reject": "no owner change: Error: Guard 1 failed",
-    "mutations:RevenueAttribution_requestApproval": "changes workspace A records",
+    "mutations:RevenueAttribution_requestApproval": "no owner change: Error: Guard 1 failed",
     "mutations:RevenueAttribution_update": "no owner change: Error: Guard 1 failed",
     "mutations:ReviewFlag_createViaRaise": "no owner change: Error: Validator error: Expected one of literal, literal, literal, literal, literal, literal, literal, got `\"matrix-probe\"`",
     "mutations:ReviewFlag_dismiss": "no owner change: Error: Guard 1 failed",

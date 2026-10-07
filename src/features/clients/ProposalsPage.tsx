@@ -54,6 +54,8 @@ import {
 import { ProposalCreateForm } from "./ProposalCreateForm";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
 import { ProposalTermsPanel } from "./ProposalTermsPanel";
+import { ProposalPaymentSchedulePanel } from "./ProposalPaymentSchedulePanel";
+import { proposalPaymentSchedule } from "../../lib/proposalPaymentSchedule";
 import { ProposalReadinessNotice } from "./ProposalReadinessNotice";
 import {
   ProposalDraftCheck,
@@ -314,6 +316,7 @@ export function ProposalsPage() {
       status: unknown;
       clientId?: unknown;
       eventId?: unknown;
+      total?: unknown;
     },
     key: string,
   ) => {
@@ -389,15 +392,27 @@ export function ProposalsPage() {
         return;
       }
       if (key === "decline") {
-        const ok = await prompt.askConfirm({
+        const values = await prompt.askFields({
           title: "Decline proposal",
           description: "Marks this offer as declined.",
           confirmLabel: "Decline",
           tone: "danger",
+          fields: [
+            {
+              name: "reason",
+              label: "Why did they say no? (optional)",
+              inputType: "text",
+              required: false,
+            },
+          ],
         });
-        if (!ok) return;
+        if (!values) return;
         void run(`${row._id}:decline`, async () => {
-          await decline({ docId: row._id, version: row.version });
+          await decline({
+            docId: row._id,
+            version: row.version,
+            reason: values.reason?.trim() || undefined,
+          });
           setNotice("Proposal declined.");
         });
         return;
@@ -537,6 +552,31 @@ export function ProposalsPage() {
         });
         return;
       }
+      // A proposal with no price usually went out by mistake.
+      if (
+        key === "send" &&
+        Number(row.total ?? 0) === 0 &&
+        !(await prompt.askConfirm({
+          title: "Send without a price?",
+          description:
+            "This proposal has no price yet, so the client sees $0. Add pricing first, or send it as a menu-only proposal.",
+          confirmLabel: "Send anyway",
+          cancelLabel: "Add pricing first",
+        }))
+      )
+        return;
+      // Expired is final (no way back), so it asks once.
+      if (
+        key === "expire" &&
+        !(await prompt.askConfirm({
+          title: "Expire proposal",
+          description:
+            "The client can no longer accept it. To offer it again, make a new proposal.",
+          confirmLabel: "Expire proposal",
+          cancelLabel: "Keep it open",
+        }))
+      )
+        return;
       void run(`${row._id}:${key}`, async () => {
         const args = { docId: row._id, version: row.version };
         if (key === "send")
@@ -592,6 +632,12 @@ export function ProposalsPage() {
       sectionOrder: (row.sectionOrder ?? []).filter(
         (section): section is string => typeof section === "string",
       ),
+      paymentSchedule: proposalPaymentSchedule({
+        total: Number(row.total) || 0,
+        depositPercent: row.depositPercent,
+        balanceDueDaysBefore: row.balanceDueDaysBefore,
+        eventDate: row.eventDate,
+      }),
       timelineItems: transformTimelineActivities(eventTimelineItems),
       venueLogistics: event
         ? transformVenueLogistics(venue || null, event)
@@ -860,6 +906,11 @@ export function ProposalsPage() {
                       </td>
                       <td>
                         <StatusChip status={String(row.status)} />
+                        {row.status === "declined" && row.declineReason ? (
+                          <small className="block text-ink-3">
+                            {row.declineReason}
+                          </small>
+                        ) : null}
                       </td>
                       <td className="supply-row-actions">
                         <button
@@ -1170,6 +1221,12 @@ export function ProposalsPage() {
                             onFailure={setFailure}
                           />
                           <ProposalTermsPanel
+                            proposal={row}
+                            editable={String(row.status) === "draft"}
+                            onFailure={setFailure}
+                            onNotice={setNotice}
+                          />
+                          <ProposalPaymentSchedulePanel
                             proposal={row}
                             editable={String(row.status) === "draft"}
                             onFailure={setFailure}
