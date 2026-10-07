@@ -638,9 +638,9 @@ export function parseTppEvent(record: TppEventRecord): ParsedCapsuleEvent {
     serviceStyleId: record.ServiceStyle?.toLowerCase().replace(/\s+/g, "_"),
     startsAt,
     endsAt,
-    guaranteedHeadcount: record.GuaranteedCount,
-    expectedHeadcount: record.ExpectedCount || 0,
-    actualHeadcount: record.ActualCount,
+    guaranteedHeadcount: sheetNumber(record.GuaranteedCount),
+    expectedHeadcount: sheetNumber(record.ExpectedCount) ?? 0,
+    actualHeadcount: sheetNumber(record.ActualCount),
     venueId: record.VenueID,
     venueName: record.VenueName,
     venueAddress: [
@@ -659,7 +659,7 @@ export function parseTppEvent(record: TppEventRecord): ParsedCapsuleEvent {
     budgetAmount: parseTppMoney(record.BudgetAmount),
     stage: mapTppEventStage(record.EventStatus),
     rawEventStatus: record.EventStatus,
-    probability: record.Probability,
+    probability: sheetNumber(record.Probability),
     notes: record.EventNotes,
     operationalRequirements: record.SpecialRequirements,
     accessibilityNeeds:
@@ -837,7 +837,7 @@ export function parseTppVenue(record: TppVenueRecord): ParsedCapsuleVenue {
     city: record.City,
     region: record.State,
     postalCode: record.ZipCode,
-    capacity: capacityNumber(record.Capacity),
+    capacity: sheetNumber(record.Capacity),
     contactName: record.ContactName,
     contactPhone: record.ContactPhone,
     contactEmail: record.ContactEmail,
@@ -893,7 +893,7 @@ export function parseTppLead(record: TppLeadRecord): ParsedCapsuleLead {
     estimatedValue: parseTppMoney(record.EstimatedValue) ?? 0,
     stage: mapTppLeadStage(record.Stage),
     rawStage: record.Stage,
-    probability: record.Probability,
+    probability: sheetNumber(record.Probability),
     clientId: record.ClientID,
     referralSource: record.ReferralSource,
     eventDate: parseTppDateTime(record.EventDate),
@@ -1291,11 +1291,11 @@ export function parseTppContacts(
 /**
  * Batch parse TPP venues
  */
-/** A spreadsheet's capacity cell ("220", "1,200", 220) as a number, else none. */
-function capacityNumber(value: unknown): number | undefined {
+/** A spreadsheet's number cell ("220", "1,200", 220) as a number, else none. */
+function sheetNumber(value: unknown): number | undefined {
   if (typeof value === "number")
     return Number.isFinite(value) ? value : undefined;
-  const text = String(value ?? "").replace(/[,\s]/g, "");
+  const text = String(value ?? "").replace(/[,\s%]/g, "");
   if (!text) return undefined;
   const parsed = Number(text);
   return Number.isFinite(parsed) ? parsed : undefined;
