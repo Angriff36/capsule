@@ -51,30 +51,31 @@ export const QUALIFIED_LEAD_STAGES: readonly string[] = [
   "converted",
 ];
 
-/** A lead is converted once it became a client account, whatever its stage. */
-export function isConvertedLead(lead: {
-  readonly stage?: string | null;
-  readonly convertedAt?: number | null;
-  readonly clientId?: string | null;
-}) {
-  return (
-    lead.stage === "converted" ||
-    lead.convertedAt != null ||
-    lead.clientId != null
+/**
+ * A lead became business when its proposal was accepted. (A client record
+ * alone is not a booking: the online quote form makes one at once.)
+ */
+export function isConvertedLead(
+  lead: { readonly proposalId?: string | null },
+  acceptedProposalIds: ReadonlySet<string>,
+) {
+  return lead.proposalId != null && acceptedProposalIds.has(lead.proposalId);
+}
+
+/** The proposals a client accepted, for isConvertedLead. */
+export function acceptedProposalIds(
+  proposals:
+    readonly { readonly _id: string; readonly status?: unknown }[] | undefined,
+): ReadonlySet<string> {
+  return new Set(
+    (proposals ?? [])
+      .filter((proposal) => proposal.status === "accepted")
+      .map((proposal) => String(proposal._id)),
   );
 }
 
-/** A lead that became a client went past qualified, whatever its stage says. */
-export function isQualifiedLead(lead: {
-  readonly stage?: string | null;
-  readonly convertedAt?: number | null;
-  readonly clientId?: string | null;
-}) {
-  return (
-    QUALIFIED_LEAD_STAGES.includes(lead.stage ?? "") ||
-    lead.convertedAt != null ||
-    lead.clientId != null
-  );
+export function isQualifiedLead(lead: { readonly stage?: string | null }) {
+  return QUALIFIED_LEAD_STAGES.includes(lead.stage ?? "");
 }
 
 /** The sales compensation basis named in the spec (§7.4): 3% of booked revenue. */

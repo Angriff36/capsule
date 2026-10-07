@@ -94,8 +94,7 @@ export interface ScorecardCloseout {
 export interface ScorecardLead {
   readonly createdAt?: number | null;
   readonly stage?: string | null;
-  readonly convertedAt?: number | null;
-  readonly clientId?: string | null;
+  readonly proposalId?: string | null;
 }
 
 export interface ScorecardTargetRow {
@@ -115,6 +114,8 @@ export interface ScorecardSources {
   readonly events: readonly ScorecardEvent[];
   readonly closeouts: readonly ScorecardCloseout[];
   readonly leads: readonly ScorecardLead[];
+  /** Proposals the client accepted; a lead on one became business. */
+  readonly acceptedProposalIds?: ReadonlySet<string>;
 }
 
 export interface ScorecardMonth {
@@ -152,7 +153,9 @@ export function measureMonth(
     food_cost_percent: foodCostPercent(closeouts),
     profit_margin: profitMarginPercent(closeouts),
     lead_conversion: percentOf(
-      leads.filter(isConvertedLead).length,
+      leads.filter((lead) =>
+        isConvertedLead(lead, sources.acceptedProposalIds ?? new Set()),
+      ).length,
       leads.length,
     ),
     events_completed: monthEvents.filter((e) =>

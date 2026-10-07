@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import {
   useListEventCloseout,
   useListLead,
+  useListProposal,
   useListPerson,
   useListScorecardTarget,
 } from "@/lib/manifest-convex-react";
@@ -14,7 +15,7 @@ import { EmptyState, PageHeader, StatusChip } from "@/ui/primitives";
 import { CHIP_TONE_CLASS } from "@/lib/statusLabels";
 import { formatMoney } from "@/lib/format";
 import { useEventsInRange } from "../facilities/useEventsById";
-import { isBookedEvent } from "./dashboardRecordSets";
+import { acceptedProposalIds, isBookedEvent } from "./dashboardRecordSets";
 import { MetricDefinitionList } from "./MetricDefinitionList";
 import {
   SCORECARD_MEASURES,
@@ -62,6 +63,7 @@ export function CompanyScorecardDashboardPage() {
   const events = useEventsInRange(eventWindow);
   const closeouts = useListEventCloseout();
   const leads = useListLead();
+  const proposals = useListProposal();
   const targets = useListScorecardTarget();
   const people = useListPerson();
   const [editing, setEditing] = useState<string | null>(null);
@@ -73,11 +75,12 @@ export function CompanyScorecardDashboardPage() {
           events: events ?? [],
           closeouts: closeouts ?? [],
           leads: leads ?? [],
+          acceptedProposalIds: acceptedProposalIds(proposals),
         },
         (targets ?? []) as ScorecardTargetRow[],
         new Date(currentYear, currentMonth, 15),
       ),
-    [events, closeouts, leads, targets, currentYear, currentMonth],
+    [events, closeouts, leads, proposals, targets, currentYear, currentMonth],
   );
 
   const activePeople: ScorecardPerson[] = (people ?? []).filter(

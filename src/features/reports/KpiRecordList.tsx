@@ -36,6 +36,7 @@ interface KpiLead {
   readonly givenName?: string | null;
   readonly familyName?: string | null;
   readonly stage?: string | null;
+  readonly proposalId?: string | null;
 }
 
 const LEAD_STAGE_LABEL: Record<string, string> = {
@@ -56,10 +57,12 @@ export function KpiRecordList({
   events,
   closeouts,
   leads,
+  acceptedProposals,
 }: {
   events: readonly KpiEvent[];
   closeouts: readonly KpiCloseout[];
   leads: readonly KpiLead[];
+  acceptedProposals: ReadonlySet<string>;
 }) {
   const completed = events.filter(isCompletedEvent);
   const eventTitle = new Map(events.map((e) => [e._id, e.title ?? "Event"]));
@@ -69,7 +72,9 @@ export function KpiRecordList({
     0,
   );
   const profitTotal = closeouts.reduce((s, c) => s + (c.grossProfit ?? 0), 0);
-  const converted = leads.filter(isConvertedLead).length;
+  const converted = leads.filter((lead) =>
+    isConvertedLead(lead, acceptedProposals),
+  ).length;
 
   return (
     <section className="mt-6 grid gap-3" data-testid="kpi-records">
@@ -174,7 +179,11 @@ export function KpiRecordList({
               {leads.map((lead) => (
                 <tr key={lead._id}>
                   <td>{leadName(lead)}</td>
-                  <td>{LEAD_STAGE_LABEL[lead.stage ?? ""] ?? "—"}</td>
+                  <td>
+                    {isConvertedLead(lead, acceptedProposals)
+                      ? "Converted"
+                      : (LEAD_STAGE_LABEL[lead.stage ?? ""] ?? "—")}
+                  </td>
                 </tr>
               ))}
             </tbody>
