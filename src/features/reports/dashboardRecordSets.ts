@@ -51,8 +51,17 @@ export const QUALIFIED_LEAD_STAGES: readonly string[] = [
   "converted",
 ];
 
-export function isQualifiedLead(lead: { readonly stage?: string | null }) {
-  return QUALIFIED_LEAD_STAGES.includes(lead.stage ?? "");
+/** A lead that became a client went past qualified, whatever its stage says. */
+export function isQualifiedLead(lead: {
+  readonly stage?: string | null;
+  readonly convertedAt?: number | null;
+  readonly clientId?: string | null;
+}) {
+  return (
+    QUALIFIED_LEAD_STAGES.includes(lead.stage ?? "") ||
+    lead.convertedAt != null ||
+    lead.clientId != null
+  );
 }
 
 /** The sales compensation basis named in the spec (§7.4): 3% of booked revenue. */
