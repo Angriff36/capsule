@@ -30,6 +30,7 @@ import { useScheduleShift } from "../../lib/workforceScheduling";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { reportActionOk } from "../../ui/action-result";
 import { runBulkItems } from "../../ui/bulk-select";
 import { useWorkingEventId } from "../events/workingEvent";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
@@ -424,6 +425,10 @@ export function RosterPage() {
         setShiftEndsAt("");
         setShiftEndWasEdited(false);
         setShowForm(null);
+        // The roster may show another week, so say where the shift went.
+        reportActionOk(
+          `${personName(personId)} scheduled ${formatDate(startsAt)}, ${formatTime(startsAt)}.`,
+        );
       });
     })();
   };
