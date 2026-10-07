@@ -105,6 +105,15 @@ function can(auth: AppAuthContext, ...capabilities: string[]): boolean {
   );
 }
 
+/**
+ * The newest rows read per source. A whole table read every time the bell
+ * loads timed out on production after a large import and stalled every other
+ * screen; the bell is about recent and open items, so the newest rows do.
+ */
+const SOURCE_CAP = 500;
+/** People are read for names, so more of them. */
+const PEOPLE_CAP = 2000;
+
 export const listNotifications = query({
   args: {},
   handler: async (ctx) => {
@@ -154,71 +163,90 @@ export const listNotifications = query({
             .withIndex("by_tenantId_and_stage_and_startsAt", (q) =>
               q.eq("tenantId", tenantId).eq("stage", "pending_approval"),
             )
-            .collect(),
+            .take(SOURCE_CAP),
           ctx.db
             .query("events")
             .withIndex("by_tenantId_and_approvedAt", (q) =>
               q.eq("tenantId", tenantId).gte("approvedAt", since),
             )
-            .collect(),
+            .take(SOURCE_CAP),
           ctx.db
             .query("events")
             .withIndex("by_tenantId_and_executionStartedAt", (q) =>
               q.eq("tenantId", tenantId).gte("executionStartedAt", since),
             )
-            .collect(),
+            .take(SOURCE_CAP),
           ctx.db
             .query("events")
             .withIndex("by_tenantId_and_completedAt", (q) =>
               q.eq("tenantId", tenantId).gte("completedAt", since),
             )
-            .collect(),
+            .take(SOURCE_CAP),
           ctx.db
             .query("events")
             .withIndex("by_tenantId_and_cancelledAt", (q) =>
               q.eq("tenantId", tenantId).gte("cancelledAt", since),
             )
-            .collect(),
+            .take(SOURCE_CAP),
           ctx.db
             .query("events")
             .withIndex("by_tenantId_and_closedOutAt", (q) =>
               q.eq("tenantId", tenantId).gte("closedOutAt", since),
             )
-            .collect(),
+            .take(SOURCE_CAP),
         ]);
         const byId = new Map<string, Doc<"events">>();
         for (const row of lists.flat()) byId.set(String(row._id), row);
         return [...byId.values()];
       }),
       when(can(auth, "eventAccess", "kitchenAccess"), () =>
-        ctx.db.query("incidents").withIndex("by_tenantId", byTenant).collect(),
+        ctx.db
+          .query("incidents")
+          .withIndex("by_tenantId", byTenant)
+          .order("desc")
+          .take(SOURCE_CAP),
       ),
       when(can(auth, "financeAccess", "manageAccess"), () =>
-        ctx.db.query("invoices").withIndex("by_tenantId", byTenant).collect(),
+        ctx.db
+          .query("invoices")
+          .withIndex("by_tenantId", byTenant)
+          .order("desc")
+          .take(SOURCE_CAP),
       ),
       when(can(auth, "inventoryAccess"), () =>
         ctx.db
           .query("inventoryItems")
           .withIndex("by_tenantId", byTenant)
-          .collect(),
+          .order("desc")
+          .take(SOURCE_CAP),
       ),
       when(can(auth, "kitchenAccess"), () =>
         ctx.db
           .query("ingredients")
           .withIndex("by_tenantId", byTenant)
-          .collect(),
+          .order("desc")
+          .take(SOURCE_CAP),
       ),
       when(can(auth, "workforceAccess"), () =>
-        ctx.db.query("shifts").withIndex("by_tenantId", byTenant).collect(),
+        ctx.db
+          .query("shifts")
+          .withIndex("by_tenantId", byTenant)
+          .order("desc")
+          .take(SOURCE_CAP),
       ),
       when(can(auth, "staffAccess"), () =>
-        ctx.db.query("people").withIndex("by_tenantId", byTenant).collect(),
+        ctx.db
+          .query("people")
+          .withIndex("by_tenantId", byTenant)
+          .order("desc")
+          .take(PEOPLE_CAP),
       ),
       when(can(auth, "workforceAccess"), () =>
         ctx.db
           .query("qualifications")
           .withIndex("by_tenantId", byTenant)
-          .collect(),
+          .order("desc")
+          .take(SOURCE_CAP),
       ),
       // Row policy: workforceManageAccess, or the requester's own row. Own
       // rows never notify, so only the manage capability matters here.
@@ -226,13 +254,15 @@ export const listNotifications = query({
         ctx.db
           .query("timeOffRequests")
           .withIndex("by_tenantId", byTenant)
-          .collect(),
+          .order("desc")
+          .take(SOURCE_CAP),
       ),
       when(can(auth, "procurementAccess", "manageAccess"), () =>
         ctx.db
           .query("vendorOrders")
           .withIndex("by_tenantId", byTenant)
-          .collect(),
+          .order("desc")
+          .take(SOURCE_CAP),
       ),
       // Team chat made staffMessages a high-volume table, so this is no
       // longer a tenant-wide collect: the caller's direct messages — received
@@ -305,18 +335,24 @@ export const listNotifications = query({
         ctx.db
           .query("prepTaskComments")
           .withIndex("by_tenantId", byTenant)
-          .collect(),
+          .order("desc")
+          .take(SOURCE_CAP),
       ),
       // Date holds and their waitlist: low-volume sales rows (listDateHold /
       // listDateWaitlistEntry read guard; the tray prompt is for sales).
       when(can(auth, "salesAccess"), () =>
-        ctx.db.query("dateHolds").withIndex("by_tenantId", byTenant).collect(),
+        ctx.db
+          .query("dateHolds")
+          .withIndex("by_tenantId", byTenant)
+          .order("desc")
+          .take(SOURCE_CAP),
       ),
       when(can(auth, "salesAccess"), () =>
         ctx.db
           .query("dateWaitlistEntries")
           .withIndex("by_tenantId", byTenant)
-          .collect(),
+          .order("desc")
+          .take(SOURCE_CAP),
       ),
       // Open flags and crew questions: the kitchen and the event team are
       // told, not only whoever opens the event next.
@@ -324,7 +360,8 @@ export const listNotifications = query({
         ctx.db
           .query("reviewFlags")
           .withIndex("by_tenantId", byTenant)
-          .collect()
+          .order("desc")
+          .take(SOURCE_CAP)
           .then((rows) => rows.filter((row) => row.status === "open")),
       ),
       // Open equipment problems (listEquipmentIssue read guard).
@@ -340,7 +377,8 @@ export const listNotifications = query({
           ctx.db
             .query("equipmentIssues")
             .withIndex("by_tenantId", byTenant)
-            .collect()
+            .order("desc")
+            .take(SOURCE_CAP)
             .then((rows) =>
               rows.filter(
                 (row) => row.status === "open" && row.deletedAt == null,
@@ -352,7 +390,8 @@ export const listNotifications = query({
         ctx.db
           .query("quoteSubmissions")
           .withIndex("by_tenantId", byTenant)
-          .collect()
+          .order("desc")
+          .take(SOURCE_CAP)
           .then((rows) => rows.filter((row) => row.status === "pending")),
       ),
       // Swaps a coworker asked this person to take.
@@ -394,7 +433,8 @@ export const listNotifications = query({
         ctx.db
           .query("shiftSwapRequests")
           .withIndex("by_tenantId", byTenant)
-          .collect()
+          .order("desc")
+          .take(SOURCE_CAP)
           .then((rows) =>
             rows.filter(
               (row) =>
@@ -407,7 +447,8 @@ export const listNotifications = query({
         ctx.db
           .query("deliveries")
           .withIndex("by_tenantId", byTenant)
-          .collect()
+          .order("desc")
+          .take(SOURCE_CAP)
           .then((rows) =>
             rows.filter(
               (row) =>
@@ -428,16 +469,23 @@ export const listNotifications = query({
         ctx.db
           .query("vehicleMaintenanceSchedules")
           .withIndex("by_tenantId", byTenant)
-          .collect(),
-        ctx.db.query("vehicles").withIndex("by_tenantId", byTenant).collect(),
+          .order("desc")
+          .take(SOURCE_CAP),
+        ctx.db
+          .query("vehicles")
+          .withIndex("by_tenantId", byTenant)
+          .order("desc")
+          .take(SOURCE_CAP),
         ctx.db
           .query("vehicleFuelLogs")
           .withIndex("by_tenantId", byTenant)
-          .collect(),
+          .order("desc")
+          .take(SOURCE_CAP),
         ctx.db
           .query("vehicleServiceEntries")
           .withIndex("by_tenantId", byTenant)
-          .collect(),
+          .order("desc")
+          .take(SOURCE_CAP),
       ]);
       const odometer = new Map<string, number>();
       for (const row of [...fuel, ...service]) {
@@ -469,7 +517,8 @@ export const listNotifications = query({
       const tasks = await ctx.db
         .query("equipmentMaintenanceTasks")
         .withIndex("by_tenantId", byTenant)
-        .collect();
+        .order("desc")
+        .take(SOURCE_CAP);
       for (const task of tasks) {
         if (task.deletedAt != null || task.nextDueAt == null) continue;
         if (task.nextDueAt >= now) continue;
