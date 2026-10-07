@@ -370,10 +370,10 @@ describe("runtime proof: money reports follow the read policy (AC-212)", () => {
       expect.objectContaining({ contact: "Harbor Foods", amount: 500 }),
     ]);
     expect(await rows(as("finance_staff"), "credit-card-transactions")).toEqual(
-      [expect.objectContaining({ method: "card", amount: 500 })],
+      [expect.objectContaining({ method: "Card", amount: 500 })],
     );
     expect(await rows(as("finance_staff"), "payment-totals")).toEqual([
-      { method: "card", amount: 500 },
+      { method: "Card", amount: 500 },
     ]);
     for (const reportId of [
       "contact-payments",

@@ -163,6 +163,12 @@ function invoiceLines(value: unknown): {
   });
 }
 
+/** "ach" -> "ACH", "card" -> "Card". */
+function paymentMethodLabel(method: string): string {
+  if (method === "ach") return "ACH";
+  return method.charAt(0).toUpperCase() + method.slice(1);
+}
+
 export const run = query({
   args: { reportId: v.string(), parameters: v.any() },
   handler: reportHandler(async (ctx, args): Promise<TppReportResult> => {
@@ -376,7 +382,7 @@ export const run = query({
           );
         const rows = [...totals].map(([method, amount]) => ({
           id: method,
-          values: { method, amount },
+          values: { method: paymentMethodLabel(method), amount },
         }));
         return financial(
           args.reportId,
@@ -393,7 +399,7 @@ export const run = query({
         values: {
           date: row.settledAt ?? row.recordedAt ?? null,
           contact: contactOf(row.clientId),
-          method: row.method,
+          method: paymentMethodLabel(row.method),
           amount: row.amount,
           source: row.externalSource ?? "",
           transaction:
