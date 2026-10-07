@@ -1,0 +1,190 @@
+import { report, type TppArchiveWorkbook } from "./workbookInventory.shared";
+
+const F = "financial_history/";
+
+export const TPP_ARCHIVE_FINANCIAL_WORKBOOKS: readonly TppArchiveWorkbook[] = [
+  // Financial history (trailing 12 months).
+  report(
+    `${F}A_R_Aging_Detail.xlsx`,
+    "A/R Aging Detail",
+    "ar-aging-detail",
+    "A/R Aging Detail",
+  ),
+  report(
+    `${F}Accounts_Receivable.xlsx`,
+    "Accounts Receivable",
+    "accounts-receivable",
+    "Accounts Receivable Invoices by Contact",
+  ),
+  report(
+    `${F}Accounts_Receivable_-_New.xlsx`,
+    "Accounts Receivable - New",
+    "accounts-receivable-new",
+    "Accounts Receivable (Summary)",
+  ),
+  report(
+    `${F}Average_Event_Spending_per_Guest.xlsx`,
+    "Average Event Spending per Guest",
+    "average-event-spending-per-guest",
+    "Average Event Spending per Guest",
+  ),
+  report(
+    `${F}Beverage_Costs.xlsx`,
+    "Beverage Costs",
+    "beverage-costs",
+    "Beverage Costs",
+  ),
+  report(
+    `${F}Beverage_Totals.xlsx`,
+    "Beverage Totals",
+    "beverage-totals",
+    "Beverage Totals",
+  ),
+  report(
+    `${F}Contact_Payments.xlsx`,
+    "Contact Payments",
+    "contact-payments",
+    "Contact Payments",
+  ),
+  report(
+    `${F}Contact_Statement_Receivables.xlsx`,
+    "Contact Statement/Receivables",
+    "contact-statement-receivables",
+    "Contact Statement",
+  ),
+  report(
+    `${F}Credit_Card_Transactions.xlsx`,
+    "Credit Card Transactions",
+    "credit-card-transactions",
+    "TRANSACTION PAYMENTS",
+  ),
+  report(
+    `${F}Event_Discount_Summary.xlsx`,
+    "Event Discount Summary",
+    "event-discount-summary",
+    "Event Discount Summary",
+  ),
+  report(
+    `${F}Event_Other_Fee(s).xlsx`,
+    "Event Other Fee(s)",
+    "event-other-fees",
+    "Event Other Fee(s)",
+  ),
+  report(
+    `${F}Event_Revenue_by_Client.xlsx`,
+    "Event Revenue by Client",
+    "event-revenue-by-client",
+    null,
+  ),
+  report(
+    `${F}Event_Sales_by_Referral.xlsx`,
+    "Event Sales by Referral",
+    "event-sales-by-referral",
+    "Event Sales By Referral",
+  ),
+  report(
+    `${F}Event_Scheduled_Payments.xlsx`,
+    "Event Scheduled Payments",
+    "event-scheduled-payments",
+    "Scheduled Payments for Events",
+  ),
+  report(
+    `${F}Ledger_Food_and_Beverage_Sales.xlsx`,
+    "Ledger / Food and Beverage Sales",
+    "ledger-food-beverage-sales",
+    "Ledger / Sales Totals(Summary)",
+  ),
+  report(
+    `${F}Lost_Revenue_by_Cancellation_Reason.xlsx`,
+    "Lost Revenue by Cancellation Reason",
+    "lost-revenue-by-cancellation-reason",
+    "Lost Revenue by Cancellation Reason",
+  ),
+  report(
+    `${F}Menu_Item_Itemized_Sales.xlsx`,
+    "Menu Item Itemized Sales",
+    "menu-item-itemized-sales",
+    "Menu Item Sales",
+  ),
+  report(
+    `${F}Menu_Item_Sales_by_Category.xlsx`,
+    "Menu Item Sales by Category",
+    "menu-item-sales-by-category",
+    "Menu Item Sales By Category",
+  ),
+  report(
+    `${F}Miscellaneous_Totals.xlsx`,
+    "Miscellaneous Totals",
+    "miscellaneous-totals",
+    "Miscellaneous Totals",
+  ),
+  report(
+    `${F}Outstanding_Deposits.xlsx`,
+    "Outstanding Deposits",
+    "outstanding-deposits",
+    "Outstanding Deposits",
+  ),
+  report(
+    `${F}Outstanding_Proposals.xlsx`,
+    "Outstanding Proposals",
+    "outstanding-proposals",
+    "Outstanding Proposals by Date",
+  ),
+  report(`${F}Payment_Totals.xlsx`, "Payment Totals", "payment-totals", null),
+  report(
+    `${F}Platform_Fee_+_Gratuity_Summary.xlsx`,
+    "Platform Fee + Gratuity Summary",
+    "platform-fee-gratuity-summary",
+    null,
+    "Gratuity is native. TPP's own card platform fee has no Capsule counterpart; its past amounts stay in this file.",
+  ),
+  report(
+    `${F}Profit_Summary.xlsx`,
+    "Profit Summary",
+    "profit-summary",
+    "Profit Summary By Date Range",
+  ),
+  report(
+    `${F}Rental_Charges.xlsx`,
+    "Rental Charges",
+    "rental-charges",
+    "Rental Charges",
+  ),
+  report(
+    `${F}Sales_Forecasting.xlsx`,
+    "Sales Forecasting",
+    "sales-forecasting",
+    "Sales Forecasting",
+  ),
+  report(
+    `${F}Snapshot_Revenue.xlsx`,
+    "Snapshot Revenue",
+    "snapshot-revenue",
+    "Snapshot Revenue/Forecast",
+  ),
+  report(
+    `${F}Staff_Earnings.xlsx`,
+    "Staff Earnings",
+    "staff-earnings",
+    "Staff Earnings",
+  ),
+  report(
+    `${F}Staffing_Charges.xlsx`,
+    "Staffing Charges",
+    "staffing-charges",
+    "Staffing Charges",
+  ),
+  report(
+    `${F}Tax_Exempt_-_New.xlsx`,
+    "Tax Exempt - New",
+    "tax-exempt-new",
+    "Tax Exempt",
+  ),
+  report(
+    `${F}Taxable_Sales.xlsx`,
+    "Taxable Sales",
+    "taxable-sales",
+    "Taxable Sales Detail",
+  ),
+  report(`${F}Venue_Sales.xlsx`, "Venue Sales", "venue-sales", "Venue Sales"),
+];

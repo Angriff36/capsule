@@ -212,6 +212,7 @@ import type * as lib_prepWorkReconciliation from "../lib/prepWorkReconciliation.
 import type * as lib_proposalAcceptanceRevision from "../lib/proposalAcceptanceRevision.js";
 import type * as lib_proposalBookingVenue from "../lib/proposalBookingVenue.js";
 import type * as lib_proposalChangeDraft from "../lib/proposalChangeDraft.js";
+import type * as lib_proposalDepositSeed from "../lib/proposalDepositSeed.js";
 import type * as lib_proposalDraft from "../lib/proposalDraft.js";
 import type * as lib_proposalDraftReport from "../lib/proposalDraftReport.js";
 import type * as lib_proposalEventCreation from "../lib/proposalEventCreation.js";
@@ -330,6 +331,7 @@ import type * as tppReports_contacts from "../tppReports/contacts.js";
 import type * as tppReports_events from "../tppReports/events.js";
 import type * as tppReports_financial from "../tppReports/financial.js";
 import type * as tppReports_general from "../tppReports/general.js";
+import type * as tppReports_menuItemCosting from "../tppReports/menuItemCosting.js";
 import type * as tppReports_options from "../tppReports/options.js";
 import type * as tppReports_shared from "../tppReports/shared.js";
 import type * as tppUpload from "../tppUpload.js";
@@ -553,6 +555,7 @@ declare const fullApi: ApiFromModules<{
   "lib/proposalAcceptanceRevision": typeof lib_proposalAcceptanceRevision;
   "lib/proposalBookingVenue": typeof lib_proposalBookingVenue;
   "lib/proposalChangeDraft": typeof lib_proposalChangeDraft;
+  "lib/proposalDepositSeed": typeof lib_proposalDepositSeed;
   "lib/proposalDraft": typeof lib_proposalDraft;
   "lib/proposalDraftReport": typeof lib_proposalDraftReport;
   "lib/proposalEventCreation": typeof lib_proposalEventCreation;
@@ -671,6 +674,7 @@ declare const fullApi: ApiFromModules<{
   "tppReports/events": typeof tppReports_events;
   "tppReports/financial": typeof tppReports_financial;
   "tppReports/general": typeof tppReports_general;
+  "tppReports/menuItemCosting": typeof tppReports_menuItemCosting;
   "tppReports/options": typeof tppReports_options;
   "tppReports/shared": typeof tppReports_shared;
   tppUpload: typeof tppUpload;

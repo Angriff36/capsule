@@ -119,7 +119,20 @@ export const TPP_FINANCIAL_REPORTS: readonly TppReportDefinition[] = [
     "Menu Item Cost per Event",
     "Detailed breakdown of food costs, per menu item, for selected event or date range.",
   ),
-  financial("menu-item-costing", "Menu Item Costing", ""),
+  financial(
+    "menu-item-costing",
+    "Menu Item Costing",
+    "Cost per portion of each active menu item from its recipe and ingredient costs. Items missing a cost say so.",
+    [
+      {
+        key: "category",
+        type: "text",
+        label: "Category (leave empty for every menu item)",
+        required: false,
+        lines: 1,
+      },
+    ],
+  ),
   financial(
     "menu-item-itemized-sales",
     "Menu Item Itemized Sales",
