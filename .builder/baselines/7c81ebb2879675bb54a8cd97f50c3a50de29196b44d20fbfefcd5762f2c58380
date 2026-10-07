@@ -9198,6 +9198,7 @@ export const InvoiceFollowEventClientParamsSchema = z.object({
   total: z.number(),
   lineItems: z.unknown(),
   taxBreakdown: z.unknown(),
+  paymentTermsDays: z.number(),
 });
 
 export type InvoiceFollowEventClientParams = z.infer<typeof InvoiceFollowEventClientParamsSchema>;

@@ -2206,8 +2206,8 @@ const COMMAND_DISPATCH = {
   },
   "Invoice.followEventClient": {
     ref: api.mutations.Invoice_followEventClient,
-    params: ["docId","clientId","subtotal","taxAmount","total","lineItems","taxBreakdown","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"clientId","type":"uuid","required":true},{"name":"subtotal","type":"money","required":true},{"name":"taxAmount","type":"money","required":true},{"name":"total","type":"money","required":true},{"name":"lineItems","type":"json","required":true},{"name":"taxBreakdown","type":"json","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","clientId","subtotal","taxAmount","total","lineItems","taxBreakdown","paymentTermsDays","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"clientId","type":"uuid","required":true},{"name":"subtotal","type":"money","required":true},{"name":"taxAmount","type":"money","required":true},{"name":"total","type":"money","required":true},{"name":"lineItems","type":"json","required":true},{"name":"taxBreakdown","type":"json","required":true},{"name":"paymentTermsDays","type":"number","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "Invoice.followEventPrice": {
     ref: api.mutations.Invoice_followEventPrice,

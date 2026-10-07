@@ -552,15 +552,20 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     taxAmount: money(12, 2),
     total: money(12, 2),
     lineItems: json,
-    taxBreakdown: json
+    taxBreakdown: json,
+    paymentTermsDays: number
   ) {
     guard self.status == "draft"
     guard self.deletedAt == null
     guard self.sentAt == null
     guard self.amountPaid == 0
+    constraint followClientTerms: paymentTermsDays >= 0 "Payment terms can't be negative."
     constraint followClientTotal: total == subtotal + taxAmount - self.discountAmount "Invoice total must equal subtotal plus tax less discount."
     compute previousClientId = self.clientId
     mutate clientId = clientId
+    // The new client's terms; a due date already set (a signed payment
+    // schedule) stays.
+    mutate paymentTermsDays = paymentTermsDays
     mutate subtotal = subtotal
     mutate taxAmount = taxAmount
     mutate total = total

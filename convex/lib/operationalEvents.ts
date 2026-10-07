@@ -679,6 +679,7 @@ export async function handleManifestEvent(
         docId: invoice._id,
         clientId,
         ...(await retaxDraftForClient(ctx, invoice, invoice.clientId, clientId)),
+        paymentTermsDays: Number((await ctx.db.get(clientId))?.paymentTermsDays ?? 30),
       });
     }
     return;

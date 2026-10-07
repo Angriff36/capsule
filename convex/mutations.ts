@@ -34475,7 +34475,7 @@ export const Invoice_assignNumber = mutation({
   },
 });
 
-async function __runInvoiceFollowEventClient(ctx: MutationCtx, { docId, clientId, subtotal, taxAmount, total, lineItems, taxBreakdown, version }: any, __creation = false) {
+async function __runInvoiceFollowEventClient(ctx: MutationCtx, { docId, clientId, subtotal, taxAmount, total, lineItems, taxBreakdown, paymentTermsDays, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -34488,6 +34488,7 @@ async function __runInvoiceFollowEventClient(ctx: MutationCtx, { docId, clientId
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.sentAt == null))) throw new Error("Guard 2 failed");
     if (!((doc.amountPaid === 0))) throw new Error("Guard 3 failed");
+    if (!((paymentTermsDays >= 0))) throw new Error("Payment terms can't be negative.");
     if (!((total === ((subtotal + taxAmount) - doc.discountAmount)))) throw new Error("Invoice total must equal subtotal plus tax less discount.");
     const previousClientId = doc.clientId;
     if (version !== undefined && (doc as any).version !== version) {
@@ -34495,6 +34496,7 @@ async function __runInvoiceFollowEventClient(ctx: MutationCtx, { docId, clientId
     }
     const updates = {
       clientId: clientId,
+      paymentTermsDays: paymentTermsDays,
       subtotal: subtotal,
       taxAmount: taxAmount,
       total: total,
@@ -34522,6 +34524,7 @@ export const Invoice_followEventClient = mutation({
     total: v.number(),
     lineItems: v.any(),
     taxBreakdown: v.any(),
+    paymentTermsDays: v.any(),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
