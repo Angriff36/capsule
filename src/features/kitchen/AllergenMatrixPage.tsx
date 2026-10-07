@@ -210,6 +210,7 @@ export function AllergenMatrixPage() {
                 <option key={event._id} value={`event:${event._id}`}>
                   {event.title}
                   {event.startsAt ? ` · ${formatDate(event.startsAt)}` : ""}
+                  {String(event.stage) === "cancelled" ? " · cancelled" : ""}
                 </option>
               ))}
             </optgroup>
