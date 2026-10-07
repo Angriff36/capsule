@@ -72,10 +72,17 @@ export function TipDistributionPage() {
         .filter(
           (event) => event.deletedAt == null && event.stage !== "cancelled",
         )
-        .sort(
-          (left, right) =>
-            Number(right.startsAt ?? 0) - Number(left.startsAt ?? 0),
-        ),
+        // Tips come after the work: events that already started come
+        // first, newest first; events still ahead go last.
+        .sort((left, right) => {
+          const now = Date.now();
+          const leftDone = Number(left.startsAt ?? 0) <= now;
+          const rightDone = Number(right.startsAt ?? 0) <= now;
+          if (leftDone !== rightDone) return leftDone ? -1 : 1;
+          return leftDone
+            ? Number(right.startsAt ?? 0) - Number(left.startsAt ?? 0)
+            : Number(left.startsAt ?? 0) - Number(right.startsAt ?? 0);
+        }),
     [events],
   );
   const selectedEvent = activeEvents.find((event) => event._id === eventId);
@@ -217,7 +224,7 @@ export function TipDistributionPage() {
         });
       }
       setNotice(
-        `${calculation.shares.length} prepared payroll input${calculation.shares.length === 1 ? "" : "s"} created. Review and finalize them in Payroll.`,
+        `${calculation.shares.length} tip share${calculation.shares.length === 1 ? "" : "s"} sent to Payroll. Check and finalize them there.`,
       );
     } catch (error) {
       setFailure(error);
@@ -289,6 +296,7 @@ export function TipDistributionPage() {
             {activeEvents.map((event) => (
               <option key={event._id} value={event._id}>
                 {event.title || "Untitled event"}
+                {event.startsAt ? ` · ${formatDate(event.startsAt)}` : ""}
               </option>
             ))}
           </select>
@@ -546,9 +554,9 @@ export function TipDistributionPage() {
             </button>
           </div>
           <p className="tip-bridge-note tip-no-print">
-            Each share is created as a prepared payroll input for review — no
-            pay goes out until you finalize it in Payroll. The gratuity amount
-            goes on the payroll note and carries into the payroll export.
+            Each share goes to Payroll to be checked — no pay goes out until you
+            finalize it there. The tip amount is written on the payroll line and
+            is part of the payroll file.
           </p>
         </>
       )}
