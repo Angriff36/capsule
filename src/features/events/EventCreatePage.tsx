@@ -410,7 +410,10 @@ export function EventCreatePage() {
         (serviceStyles ?? []).find((style) => style._id === id)?.name ??
         SERVICE_STYLE_CATALOG.find((row) => row.code === serviceStyleId.trim())
           ?.name;
-      return { id, name: name?.trim() || undefined };
+      const code =
+        (serviceStyles ?? []).find((style) => style._id === id)?.code ??
+        serviceStyleId.trim();
+      return { id, name: name?.trim() || undefined, pickup: code === "pickup" };
     };
     const buildArgs = async () => {
       const serviceStyle = await resolveServiceStyle();
@@ -442,6 +445,7 @@ export function EventCreatePage() {
         serviceStyle: serviceStyle.name
           ? { name: serviceStyle.name }
           : undefined,
+        pickup: serviceStyle.pickup,
         salespersonId,
         salesperson: selectedSalesperson
           ? {

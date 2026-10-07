@@ -21,6 +21,7 @@ export function eventWizardEventArgs(
     clientId: draft.clientId,
     venueId: draft.venueId,
     venue: undefined,
+    pickup: draft.pickup === true,
     title: draft.title,
     eventTypeRaw: draft.eventType,
     occasionId: "",

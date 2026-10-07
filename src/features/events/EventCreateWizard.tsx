@@ -509,7 +509,15 @@ function BasicsStep({
           className="field-input"
           value={draft.serviceStyleId ?? ""}
           disabled={locked}
-          onChange={(event) => update({ serviceStyleId: event.target.value })}
+          onChange={(event) =>
+            update({
+              serviceStyleId: event.target.value,
+              pickup:
+                (serviceStyles ?? []).find(
+                  (style) => style._id === event.target.value,
+                )?.code === "pickup",
+            })
+          }
         >
           <option value="">Choose later</option>
           {(serviceStyles ?? [])
@@ -978,7 +986,8 @@ function ReviewStep({
           <p className="text-sm text-ink-2">
             {draft.title || "Incomplete"} · {draft.eventType || "Incomplete"} ·{" "}
             {localDate(draft.startsAt)} – {localDate(draft.endsAt)} ·{" "}
-            {venue?.name ?? "Incomplete"}
+            {venue?.name ??
+              (draft.pickup ? "Picked up from the kitchen" : "Incomplete")}
           </p>
         </div>
         <div>

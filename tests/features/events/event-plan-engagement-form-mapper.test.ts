@@ -49,6 +49,16 @@ describe("EventPlanEngagementFormMapper", () => {
     ).toThrow("Pick what type of event this is.");
   });
 
+  it("needs a venue unless the client picks the order up", () => {
+    const mapper = new EventPlanEngagementFormMapper();
+    expect(() => mapper.toCommandArgs(validInput({ venueId: "" }))).toThrow(
+      "Select a venue before creating the event.",
+    );
+    expect(
+      mapper.toCommandArgs(validInput({ venueId: "", pickup: true })),
+    ).not.toHaveProperty("venueId");
+  });
+
   it("stamps the trimmed service style name next to the style id", () => {
     const args = new EventPlanEngagementFormMapper().toCommandArgs(
       validInput({

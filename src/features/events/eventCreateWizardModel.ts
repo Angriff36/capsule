@@ -40,6 +40,8 @@ export type EventWizardDraft = {
   eventType: string;
   /** Plated, buffet, drop off… Sales lock needs it; drafts saved before it existed lack it. */
   serviceStyleId?: string;
+  /** The picked style is Pickup: the client collects, so no venue is needed. */
+  pickup?: boolean;
   startsAt: string;
   endsAt: string;
   expectedHeadcount: string;
@@ -173,7 +175,7 @@ function basicsErrors(draft: EventWizardDraft): string[] {
     Number.isFinite(start) && Number.isFinite(end) && end <= start
       ? "End must be after the start time."
       : "",
-    !draft.venueId ? "Select a venue." : "",
+    !draft.venueId && !draft.pickup ? "Select a venue." : "",
   ].filter(Boolean);
 }
 function clientHeadcountErrors(draft: EventWizardDraft): string[] {

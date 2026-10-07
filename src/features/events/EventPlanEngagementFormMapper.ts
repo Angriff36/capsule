@@ -14,6 +14,8 @@ export type EventPlanEngagementFormInput = {
   serviceStyleId: string;
   /** Selected style row (or built-in catalog name) — stamped as the snapshot. */
   serviceStyle?: { name: string } | undefined;
+  /** A pickup is collected from the kitchen, so it needs no venue. */
+  pickup?: boolean;
   salespersonId: string;
   /** Selected salesperson row — stamped as the snapshot. */
   salesperson?: { name: string } | undefined;
@@ -42,7 +44,7 @@ type ScheduleValues = {
 /** Builds a clean Event.planEngagement payload from the create-event form. */
 export class EventPlanEngagementFormMapper {
   toCommandArgs(input: EventPlanEngagementFormInput): Record<string, unknown> {
-    this.requireIds(input.clientId, input.venueId);
+    this.requireIds(input.clientId, input.venueId, input.pickup === true);
     const schedule = this.parseSchedule(input);
     const title = input.title.trim();
     // Event.planEngagement requires eventType — omitting it fails the command
@@ -57,7 +59,9 @@ export class EventPlanEngagementFormMapper {
 
     const args: Record<string, unknown> = {
       clientId: input.clientId as Id<"clients">,
-      venueId: input.venueId as Id<"venues">,
+      ...(input.venueId.trim()
+        ? { venueId: input.venueId as Id<"venues"> }
+        : {}),
       title,
       eventType,
       startsAt: schedule.startsAt,
@@ -88,11 +92,11 @@ export class EventPlanEngagementFormMapper {
     return args;
   }
 
-  private requireIds(clientId: string, venueId: string): void {
+  private requireIds(clientId: string, venueId: string, pickup: boolean): void {
     if (!clientId.trim()) {
       throw new Error("Select a client before creating the event.");
     }
-    if (!venueId.trim()) {
+    if (!venueId.trim() && !pickup) {
       throw new Error("Select a venue before creating the event.");
     }
   }

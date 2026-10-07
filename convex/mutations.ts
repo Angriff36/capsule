@@ -17348,6 +17348,8 @@ async function __runEventLockForSales(ctx: MutationCtx, { docId, version }: any,
     if (!__storedDoc) throw new Error("Event not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Event not found");
     const doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone","importDraftJson"], __storedDoc) as Record<string, any>;
+    const __rel_serviceStyle = await __resolveRelation(ctx, "serviceStyles", [__auth.tenantId, doc.serviceStyleId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    ((doc as any) as any).serviceStyle = __rel_serviceStyle;
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may see shared event plans and operational context");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may update events");
     if (!((checkRole(user, "eventAccess") || checkRole(user, "salesAccess")))) throw new Error("Event and sales staff may change events");
@@ -17360,7 +17362,7 @@ async function __runEventLockForSales(ctx: MutationCtx, { docId, version }: any,
     if (!((doc.endsAt != null))) throw new Error("Guard 6 failed");
     if (!((doc.expectedHeadcount > 0))) throw new Error("Guard 7 failed");
     if (!((((doc.title).trim()).length > 0))) throw new Error("Give this event a name before you lock it for sales.");
-    if (!(((doc.venueId != null) || ((doc.venueName != null) && (((doc.venueName).trim()).length > 0))))) throw new Error("Pick a venue before you lock this event for sales.");
+    if (!((((doc.venueId != null) || ((doc.venueName != null) && (((doc.venueName).trim()).length > 0))) || ((__rel_serviceStyle != null) && (__rel_serviceStyle.code === "pickup"))))) throw new Error("Pick a venue before you lock this event for sales.");
     if (!(((doc.serviceStyleId != null) || ((doc.serviceStyleName != null) && (((doc.serviceStyleName).trim()).length > 0))))) throw new Error("Pick a service style before you lock this event for sales.");
     {
       const __cur = doc.stage;
