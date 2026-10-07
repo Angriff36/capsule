@@ -188,8 +188,14 @@ export function AvgEventValueGrowthDashboardPage() {
     if (!occasions) return [];
     return breakdownBy(
       completedEvents,
-      (event) => event.occasionId,
-      (id) => occasions.find((o) => o._id === id)?.name || "Occasion not found",
+      // The occasion from the list, else the occasion typed on the event.
+      (event) =>
+        (event.occasionId
+          ? occasions.find((o) => o._id === event.occasionId)?.name
+          : null) ||
+        event.eventType?.trim().toLowerCase() ||
+        null,
+      (name) => name.charAt(0).toUpperCase() + name.slice(1),
       "No occasion",
     ).map((row) => ({
       occasion: row.label,
