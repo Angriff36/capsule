@@ -9198,6 +9198,17 @@ export const InvoiceFollowEventPriceParamsSchema = z.object({});
 
 export type InvoiceFollowEventPriceParams = z.infer<typeof InvoiceFollowEventPriceParamsSchema>;
 
+// Command: followEventPriceTaxed on Invoice
+export const InvoiceFollowEventPriceTaxedParamsSchema = z.object({
+  subtotal: z.number(),
+  taxAmount: z.number(),
+  total: z.number(),
+  lineItems: z.unknown(),
+  taxBreakdown: z.unknown(),
+});
+
+export type InvoiceFollowEventPriceTaxedParams = z.infer<typeof InvoiceFollowEventPriceTaxedParamsSchema>;
+
 // Command: issue on Invoice
 export const InvoiceIssueParamsSchema = z.object({
   clientId: z.string().min(1),

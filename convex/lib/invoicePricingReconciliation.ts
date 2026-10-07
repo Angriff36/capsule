@@ -47,6 +47,71 @@ function followsEventPrice(invoice: InvoiceRow): boolean {
   );
 }
 
+/** Marks the one line of a draft made from the event's own quoted price. */
+const EVENT_PRICE_LINE = "event_price";
+
+/**
+ * True for the taxed one-line draft the approval made from the event's price
+ * and nobody has touched: unsent, unpaid, no discount, credit or deposit.
+ */
+function isEventPriceDraft(invoice: InvoiceRow): boolean {
+  const lines = invoice.lineItems as unknown;
+  return (
+    invoice.status === "draft" &&
+    invoice.sentAt == null &&
+    isZero(invoice.amountPaid) &&
+    isZero(invoice.discountAmount) &&
+    isZero(invoice.amountCredited) &&
+    isZero(invoice.depositAmount) &&
+    Array.isArray(lines) &&
+    lines.length === 1 &&
+    (lines[0] as { source?: unknown })?.source === EVENT_PRICE_LINE
+  );
+}
+
+/**
+ * One "Catering for …" line at the event's quoted price, taxed with the
+ * workspace's rates the same way the invoice form does; none for a
+ * tax-exempt client.
+ */
+async function eventPriceTotals(
+  ctx: MutationCtx,
+  event: Doc<"events">,
+  price: number,
+) {
+  const client = event.clientId ? await ctx.db.get(event.clientId) : null;
+  const taxExempt =
+    client?.tenantId === event.tenantId && client.taxExempt === true;
+  const rates = await ctx.db
+    .query("taxRates")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", event.tenantId))
+    .collect();
+  const worked = calculateInvoiceTax(
+    [
+      {
+        id: "0",
+        description: `Catering for ${event.title}`,
+        category: "food",
+        quantity: 1,
+        unitPrice: price,
+      },
+    ],
+    rates,
+    taxExempt,
+  );
+  return {
+    subtotal: worked.subtotal,
+    taxAmount: worked.taxAmount,
+    // Added the same way the invoice rules check it (total == subtotal + tax).
+    total: worked.subtotal + worked.taxAmount,
+    lineItems: worked.lineItems.map((line) => ({
+      ...line,
+      source: EVENT_PRICE_LINE,
+    })),
+    taxBreakdown: worked.taxBreakdown,
+  };
+}
+
 /** Identity + exactly-once receipting for the invoice side of an Event price
  * change. Writes invoices only through Invoice.followEventPrice. */
 export class EventInvoicePricingReconciliation {
@@ -68,7 +133,10 @@ export class EventInvoicePricingReconciliation {
         row.tenantId === event.tenantId &&
         row.deletedAt == null &&
         row.status !== "voided" &&
-        Number(row.total) !== quotedPrice,
+        // A taxed event-price draft is at the price when its subtotal is.
+        (isEventPriceDraft(row)
+          ? Number(row.subtotal) !== quotedPrice
+          : Number(row.total) !== quotedPrice),
     );
     if (differing.length === 0) return;
     const windows: TimingWindow[] = [
@@ -96,11 +164,14 @@ export class EventInvoicePricingReconciliation {
     let updatedCount = 0;
     const unresolved: ReconciliationReceiptOutput["unresolved"] = [];
     for (const invoice of differing) {
-      if (followsEventPrice(invoice)) {
-        // The command reads the event's price itself (AC-372).
-        await ctx.runMutation(api.mutations.Invoice_followEventPrice, {
+      // An untouched draft (the older untaxed shape, or the taxed one-line
+      // one) moves to the new price as a taxed one-line draft.
+      if (followsEventPrice(invoice) || isEventPriceDraft(invoice)) {
+        // The command checks the subtotal is the event's own price (AC-372).
+        await ctx.runMutation(api.mutations.Invoice_followEventPriceTaxed, {
           docId: invoice._id,
           version: invoice.version,
+          ...(await eventPriceTotals(ctx, event, quotedPrice)),
         });
         updatedCount += 1;
         continue;
@@ -156,16 +227,19 @@ export async function ensureEventDraftInvoice(
     .collect();
   if (existing.some((row) => row.tenantId === event.tenantId && row.deletedAt == null)) return;
   const source = await acceptedProposalFor(ctx, event);
+  // Taxed like any invoice: one line at the event's price, which follows
+  // later price changes until finance changes or sends it.
+  const totals = {
+    ...(await eventPriceTotals(ctx, event, quotedPrice)),
+    discountAmount: 0,
+  };
   await TenantSystemCommandRunner.forTenant(ctx, event.tenantId).context.runMutation(
     api.mutations.Invoice_createViaIssue,
     {
       clientId: event.clientId,
       eventId,
       invoiceSequence: 0,
-      subtotal: quotedPrice,
-      taxAmount: 0,
-      discountAmount: 0,
-      total: quotedPrice,
+      ...totals,
       ...(source
         ? {
             proposalId: String(source._id),
@@ -215,7 +289,7 @@ export async function followAcceptedProposalPrice(
   ).filter((row) => row.tenantId === event.tenantId && row.deletedAt == null && row.status !== "voided");
   if (invoices.length !== 1) return;
   const draft = (await ctx.db.get(invoices[0]._id)) as InvoiceRow;
-  if (!followsEventPrice(draft)) return;
+  if (!followsEventPrice(draft) && !isEventPriceDraft(draft)) return;
   const itemized = await itemizedFromProposal(ctx, proposal);
   if (!itemized) return;
   await system.runMutation(api.mutations.Invoice_markVoided, {

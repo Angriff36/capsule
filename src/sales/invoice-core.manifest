@@ -469,6 +469,42 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The taxed one-line draft made from the event's price follows a new
+  // price. The seam works out the tax with the workspace rates; the subtotal
+  // must be the event's own quoted price, never a caller's number (AC-372).
+  command followEventPriceTaxed(
+    subtotal: money(12, 2),
+    taxAmount: money(12, 2),
+    total: money(12, 2),
+    lineItems: json,
+    taxBreakdown: json
+  ) {
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    guard self.sentAt == null
+    guard self.amountPaid == 0
+    guard self.discountAmount == 0
+    guard self.amountCredited == null or self.amountCredited == 0
+    constraint followTaxedEvent: self.event != null and self.event.quotedPrice != null and subtotal == self.event.quotedPrice "This bill has no event price to follow."
+    constraint followTaxedNonnegative: subtotal >= 0 and taxAmount >= 0 "This invoice's money amounts can't be negative. Use zero or more."
+    constraint followTaxedTotal: total == subtotal + taxAmount "Invoice total must equal subtotal plus tax."
+    compute previousTotal = self.total
+    mutate subtotal = subtotal
+    mutate taxAmount = taxAmount
+    mutate total = total
+    mutate amountDue = total
+    mutate lineItems = lineItems
+    mutate taxBreakdown = taxBreakdown
+    emit InvoiceEventPriceFollowed {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
+      previousTotal: previousTotal
+      total: total
+    }
+  }
+
   command writeOff(reason: string, writeOffAmount: money(12, 2)) {
     guard self.status == "overdue" or self.status == "partial"
     guard self.deletedAt == null
