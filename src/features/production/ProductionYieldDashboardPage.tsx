@@ -15,7 +15,15 @@ import {
   type ProductionYieldRow,
   type ProductionYieldWindow,
 } from "./productionYield";
+import { unitLabel as shortUnit } from "../../lib/unitQuantity";
 import "./ProductionYieldDashboardPage.css";
+
+/** "200 portions", "1 portion", "5 lb": count words take a plural. */
+function unitWord(amount: number, unit: string) {
+  const label = shortUnit(unit);
+  if (label !== unit.replace(/_/g, " ") || Math.abs(amount) === 1) return label;
+  return label.endsWith("s") ? label : `${label}s`;
+}
 
 const WINDOWS: readonly {
   value: ProductionYieldWindow;
@@ -104,7 +112,9 @@ export function ProductionYieldDashboard({
     () => buildProductionYieldReport({ batches, components, windowDays, now }),
     [batches, components, windowDays, now],
   );
-  const unitLabel = report.summaryUnit ?? "See rows";
+  const unitLabel = report.summaryUnit
+    ? unitWord(report.totalPlannedYield, report.summaryUnit)
+    : "See rows";
 
   return (
     <div className="operations-stage supply-stage production-yield-stage">
@@ -196,14 +206,18 @@ export function ProductionYieldDashboard({
                   ? quantity.format(report.totalActualYield)
                   : "Mixed units"}
               </strong>
-              <small>{unitLabel}</small>
+              <small>
+                {report.summaryUnit
+                  ? unitWord(report.totalActualYield, report.summaryUnit)
+                  : unitLabel}
+              </small>
             </div>
             <div className={varianceClass(report.totalVariancePercentage ?? 0)}>
               <span>Net variance</span>
               <strong>{percentage(report.totalVariancePercentage)}</strong>
               <small>
                 {report.summaryUnit
-                  ? `${signed(report.totalVarianceYield)} ${report.summaryUnit}`
+                  ? `${signed(report.totalVarianceYield)} ${unitWord(report.totalVarianceYield, report.summaryUnit)}`
                   : "Calculated per component and unit below"}
               </small>
             </div>
@@ -272,7 +286,11 @@ export function ProductionYieldDashboard({
                             >
                               Recipe says{" "}
                               {quantity.format(row.suggestion.currentYield)}{" "}
-                              {row.suggestion.yieldUnit}; these batches suggest{" "}
+                              {unitWord(
+                                row.suggestion.currentYield,
+                                row.suggestion.yieldUnit,
+                              )}
+                              ; these batches suggest{" "}
                               {quantity.format(row.suggestion.suggestedYield)}.
                               Check the recipe
                             </Link>
@@ -284,14 +302,18 @@ export function ProductionYieldDashboard({
                         {row.batchCount === 1 ? "batch" : "batches"}
                       </td>
                       <td>
-                        {quantity.format(row.plannedYield)} {row.yieldUnit}
+                        {quantity.format(row.plannedYield)}{" "}
+                        {unitWord(row.plannedYield, row.yieldUnit)}
                       </td>
                       <td>
-                        {quantity.format(row.actualYield)} {row.yieldUnit}
+                        {quantity.format(row.actualYield)}{" "}
+                        {unitWord(row.actualYield, row.yieldUnit)}
                       </td>
                       <td>
                         <strong>{signed(row.varianceYield)}</strong>
-                        <small>{row.yieldUnit}</small>
+                        <small>
+                          {unitWord(row.varianceYield, row.yieldUnit)}
+                        </small>
                       </td>
                       <td>
                         <strong className="production-yield-percent">

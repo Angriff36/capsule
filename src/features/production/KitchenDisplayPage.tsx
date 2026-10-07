@@ -124,6 +124,8 @@ export function KitchenDisplayPage() {
   const [eventFilter, setEventFilter] = useState<string>("all");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  // The card the failure came from, so the cook sees it where they tapped.
+  const [failedItem, setFailedItem] = useState<string | null>(null);
   const [batchEntries, setBatchEntries] = useState<
     Record<string, BatchCompletionEntry>
   >({});
@@ -285,6 +287,7 @@ export function KitchenDisplayPage() {
       }
     } catch (error) {
       setFailure(error);
+      setFailedItem(item.id);
     } finally {
       setBusy(null);
       optimistic.end(item.id);
@@ -310,6 +313,7 @@ export function KitchenDisplayPage() {
         await batchCancel({ docId: item.id, version: item.version, reason });
       } catch (error) {
         setFailure(error);
+        setFailedItem(item.id);
       } finally {
         setBusy(null);
       }
@@ -343,7 +347,9 @@ export function KitchenDisplayPage() {
           </Link>
         </div>
       </header>
-      {failure != null ? <ProductionFailureBanner error={failure} /> : null}
+      {failure != null && failedItem == null ? (
+        <ProductionFailureBanner error={failure} />
+      ) : null}
       {host}
       {isLoading ? (
         <TableSkeleton rows={6} />
@@ -427,6 +433,9 @@ export function KitchenDisplayPage() {
                     status={item.status}
                     actions={[]}
                   />
+                ) : null}
+                {failure != null && failedItem === item.id ? (
+                  <ProductionFailureBanner error={failure} />
                 ) : null}
                 {bumpAction ? (
                   <button
