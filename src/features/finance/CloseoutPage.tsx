@@ -498,9 +498,9 @@ export function CloseoutPage() {
                             {String(row.status) === "finalized" ? (
                               <>
                                 <span className="text-sm text-ink-3">
-                                  Frozen
+                                  Final
                                   {Number(row.revision ?? 1) > 1
-                                    ? ` · version ${Number(row.revision)}`
+                                    ? ` · corrected ${Number(row.revision) - 1 === 1 ? "once" : `${Number(row.revision) - 1} times`}`
                                     : ""}
                                 </span>
                                 <button
