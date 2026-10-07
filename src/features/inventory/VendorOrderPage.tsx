@@ -808,6 +808,9 @@ export function VendorOrderPage() {
                         <small>
                           Current calculation:{" "}
                           {formatQuantity(line.plannedQuantity)} {line.unit}
+                          {Number(line.stockAppliedQuantity ?? 0) > 0
+                            ? ` after ${formatQuantity(Number(line.stockAppliedQuantity))} ${line.unit} already in stock`
+                            : ""}
                           {line.quantityIsManual !== false
                             ? " · order quantity kept"
                             : " · updates with event requirements"}
