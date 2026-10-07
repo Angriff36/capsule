@@ -1,3 +1,4 @@
+import { formatStatusLabel } from "../../src/lib/statusLabels";
 import {
   packingItemDescription,
   packingAssociationMissing,
@@ -166,10 +167,14 @@ async function eventsInRange(
   seeVenues: boolean,
 ) {
   const [start, end] = range(parameters);
+  // Read only the chosen dates: years of imported events would otherwise
+  // fill the read limit before this month's events are reached.
   const events = (
     await ctx.db
       .query("events")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .withIndex("by_tenantId_and_startsAt", (q) =>
+        q.eq("tenantId", tenantId).gte("startsAt", start).lte("startsAt", end),
+      )
       .take(REPORT_ROW_LIMIT + 1)
       .then(keepReportRows(ctx, "events"))
   ).filter(
@@ -630,14 +635,40 @@ async function productionWorksheet(
   };
 }
 
-function eventRows(events: Doc<"events">[]): TppRow[] {
+/** Each event's invoice numbers, for people who may see invoices. */
+async function invoiceNumbers(
+  ctx: QueryCtx,
+  tenantId: string,
+  events: Doc<"events">[],
+  seeInvoices: boolean,
+): Promise<Map<string, string>> {
+  const out = new Map<string, string>();
+  if (!seeInvoices) return out;
+  for (const event of events) {
+    const numbers = (
+      await ctx.db
+        .query("invoices")
+        .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+        .take(20)
+    )
+      .filter((row) => isLiveTenantRow(row, tenantId) && row.invoiceNumber)
+      .map((row) => String(row.invoiceNumber));
+    if (numbers.length) out.set(String(event._id), numbers.join(", "));
+  }
+  return out;
+}
+
+function eventRows(
+  events: Doc<"events">[],
+  invoices: Map<string, string> = new Map(),
+): TppRow[] {
   return events.map((event) => ({
     id: event._id,
     values: {
       date: event.startsAt ?? null,
       event: event.title,
-      status: event.stage,
-      invoice: "",
+      status: formatStatusLabel(String(event.stage)),
+      invoice: invoices.get(String(event._id)) ?? "",
       contact: event.primaryContactName ?? "",
       guests: event.expectedHeadcount ?? null,
       venue: event.venueName ?? "",
@@ -793,7 +824,19 @@ export const run = query({
               { key: "changed", label: "Last changed", kind: "date" as const },
             ]
           : EVENT_COLUMNS;
-      return table(args.reportId, columns, eventRows(events));
+      return table(
+        args.reportId,
+        columns,
+        eventRows(
+          events,
+          await invoiceNumbers(
+            ctx,
+            tenantId,
+            events,
+            canRead(auth, INVOICE_READ),
+          ),
+        ),
+      );
     }
 
     if (["invoice-number-history", "staff-schedules"].includes(args.reportId)) {
@@ -1058,7 +1101,19 @@ export const run = query({
 
     const event = await selectedEvent(ctx, tenantId, parameters, seeVenues);
     if (args.reportId === "event-booking")
-      return table(args.reportId, EVENT_COLUMNS, eventRows([event]));
+      return table(
+        args.reportId,
+        EVENT_COLUMNS,
+        eventRows(
+          [event],
+          await invoiceNumbers(
+            ctx,
+            tenantId,
+            [event],
+            canRead(auth, INVOICE_READ),
+          ),
+        ),
+      );
     // Menu lines show dish names, so they follow the event dish and dish
     // read policies (the menu reports require both; the BEO drops the menu).
     const menu =
