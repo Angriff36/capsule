@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { PageGuide } from "../guide/PageGuide";
 import { WifiOffIcon } from "../../ui/icons";
@@ -10,6 +10,7 @@ import { ActionResultHost } from "../../ui/action-result";
 import { CommandPalette } from "./CommandPalette";
 import { NewVersionBanner } from "./NewVersionBanner";
 import { RouteErrorBoundary } from "./RouteErrorBoundary";
+import { TableSkeleton } from "../../ui/primitives";
 import { ShellOnlineMonitor } from "./ShellOnlineMonitor";
 import { ShortcutReferenceOverlay } from "./ShortcutReferenceOverlay";
 import { Sidebar } from "./Sidebar";
@@ -108,7 +109,11 @@ export function AppShell() {
               <PageGuide />
               <RouteErrorBoundary>
                 <SwitchedOffAreaGuard>
-                  <Outlet />
+                  {/* A page not loaded yet shows a placeholder while it
+                      loads, instead of failing on an in-app click. */}
+                  <Suspense fallback={<TableSkeleton rows={8} />}>
+                    <Outlet />
+                  </Suspense>
                 </SwitchedOffAreaGuard>
               </RouteErrorBoundary>
             </div>
