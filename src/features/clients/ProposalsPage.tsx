@@ -316,6 +316,7 @@ export function ProposalsPage() {
       status: unknown;
       clientId?: unknown;
       eventId?: unknown;
+      total?: unknown;
     },
     key: string,
   ) => {
@@ -551,6 +552,19 @@ export function ProposalsPage() {
         });
         return;
       }
+      // A proposal with no price usually went out by mistake.
+      if (
+        key === "send" &&
+        Number(row.total ?? 0) === 0 &&
+        !(await prompt.askConfirm({
+          title: "Send without a price?",
+          description:
+            "This proposal has no price yet, so the client sees $0. Add pricing first, or send it as a menu-only proposal.",
+          confirmLabel: "Send anyway",
+          cancelLabel: "Add pricing first",
+        }))
+      )
+        return;
       // Expired is final (no way back), so it asks once.
       if (
         key === "expire" &&
