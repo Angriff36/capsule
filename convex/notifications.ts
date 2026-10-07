@@ -137,6 +137,8 @@ export const listNotifications = query({
       reviewFlags,
       equipmentIssues,
       quoteSubmissions,
+      swapsForMe,
+      swapsToApprove,
     ] = await Promise.all([
       // Not every event (13 s at 10,000 events, and the socket holds every
       // other read of the screen until this one answers): only the events
@@ -350,6 +352,36 @@ export const listNotifications = query({
           .withIndex("by_tenantId", byTenant)
           .collect()
           .then((rows) => rows.filter((row) => row.status === "pending")),
+      ),
+      // Swaps a coworker asked this person to take.
+      auth.personId
+        ? ctx.db
+            .query("shiftSwapRequests")
+            .withIndex("by_recipientPersonId", (q) =>
+              q.eq("recipientPersonId", auth.personId as Id<"people">),
+            )
+            .collect()
+            .then((rows) =>
+              rows.filter(
+                (row) =>
+                  row.tenantId === tenantId &&
+                  row.status === "pending_recipient" &&
+                  row.deletedAt == null,
+              ),
+            )
+        : [],
+      // Swaps both staff agreed to, waiting for a manager.
+      when(can(auth, "workforceManageAccess"), () =>
+        ctx.db
+          .query("shiftSwapRequests")
+          .withIndex("by_tenantId", byTenant)
+          .collect()
+          .then((rows) =>
+            rows.filter(
+              (row) =>
+                row.status === "awaiting_manager" && row.deletedAt == null,
+            ),
+          ),
       ),
     ]);
 
@@ -592,6 +624,7 @@ export const listNotifications = query({
       equipmentNames,
       maintenanceDue,
       quoteSubmissions,
+      shiftSwaps: [...(swapsForMe ?? []), ...(swapsToApprove ?? [])],
     });
   },
 });

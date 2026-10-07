@@ -30,7 +30,8 @@ export interface AppNotification {
     | "review_flag"
     | "equipment_problem"
     | "maintenance_due"
-    | "quote_request";
+    | "quote_request"
+    | "shift_swap";
   message: string;
   /** Route to the relevant record. */
   link: string;
@@ -57,6 +58,7 @@ export const NOTIFICATION_KIND_LABELS: Record<AppNotification["kind"], string> =
     equipment_problem: "Equipment",
     maintenance_due: "Upkeep",
     quote_request: "Quote request",
+    shift_swap: "Shift swap",
   };
 
 /** Stage changes older than this are history, not notifications. */
@@ -113,6 +115,8 @@ export interface NotificationSources {
   /** Open equipment problems, and the names of the equipment they are about. */
   equipmentIssues?: Doc<"equipmentIssues">[] | undefined;
   equipmentNames?: Record<string, string>;
+  /** Swaps asked of this person, and swaps waiting for a manager. */
+  shiftSwaps?: Doc<"shiftSwapRequests">[] | undefined;
   /** Quote requests from the website that nobody has answered yet. */
   quoteSubmissions?: Doc<"quoteSubmissions">[] | undefined;
   /** Truck and equipment service that is past due (worked out on the server). */
@@ -277,6 +281,41 @@ export function deriveNotifications(
       link: "/staff/time-off",
       at: request.submittedAt,
     });
+  }
+
+  // A coworker asks this person to take a shift; then a manager approves.
+  for (const swap of src.shiftSwaps ?? []) {
+    const who =
+      personNames.get(swap.requesterPersonId as string) ?? "A coworker";
+    const shift = (src.shifts ?? []).find((row) => row._id === swap.shiftId);
+    const when =
+      shift?.startsAt != null ? ` on ${formatDate(shift.startsAt)}` : "";
+    if (
+      swap.status === "pending_recipient" &&
+      swap.recipientPersonId === src.currentPersonId
+    ) {
+      out.push({
+        id: `shift-swap:${swap._id}`,
+        kind: "shift_swap",
+        message: `${who} asked you to take their shift${when}`,
+        link: "/my",
+        at: Number(swap.createdAt ?? swap._creationTime),
+      });
+    } else if (
+      swap.status === "awaiting_manager" &&
+      swap.requesterPersonId !== src.currentPersonId
+    ) {
+      const taker = personNames.get(swap.recipientPersonId as string);
+      out.push({
+        id: `shift-swap:${swap._id}`,
+        kind: "shift_swap",
+        message: `Shift swap to approve: ${who}${taker ? ` to ${taker}` : ""}${when}`,
+        link: "/staff/swaps",
+        at: Number(
+          swap.recipientConfirmedAt ?? swap.createdAt ?? swap._creationTime,
+        ),
+      });
+    }
   }
 
   // The caller's identity for chat is their CURRENT linked Person as the

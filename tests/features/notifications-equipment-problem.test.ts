@@ -122,3 +122,49 @@ describe("quote request notifications", () => {
     ]);
   });
 });
+
+describe("shift swap notifications", () => {
+  const swap = (fields: Record<string, unknown>) =>
+    ({
+      _id: "swap-1",
+      _creationTime: 1_699_999_000_000,
+      shiftId: "shift-1",
+      requesterPersonId: "person-b",
+      recipientPersonId: "person-a",
+      status: "pending_recipient",
+      createdAt: 1_699_999_000_000,
+      ...fields,
+    }) as never;
+
+  it("tells the coworker they were asked, and the manager when both agreed", () => {
+    const asked = deriveNotifications(
+      sources({ shiftSwaps: [swap({})] }),
+    ).filter((row) => row.kind === "shift_swap");
+    expect(asked).toEqual([
+      expect.objectContaining({
+        message: "A coworker asked you to take their shift",
+        link: "/my",
+      }),
+    ]);
+
+    const toApprove = deriveNotifications(
+      sources({
+        currentPersonId: "manager-1",
+        shiftSwaps: [swap({ status: "awaiting_manager" })],
+      }),
+    ).filter((row) => row.kind === "shift_swap");
+    expect(toApprove).toEqual([
+      expect.objectContaining({ link: "/staff/swaps" }),
+    ]);
+
+    // The person who asked is not told about their own request.
+    expect(
+      deriveNotifications(
+        sources({
+          currentPersonId: "person-b",
+          shiftSwaps: [swap({ status: "awaiting_manager" })],
+        }),
+      ).filter((row) => row.kind === "shift_swap"),
+    ).toEqual([]);
+  });
+});
