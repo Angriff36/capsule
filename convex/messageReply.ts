@@ -205,10 +205,11 @@ export const sendEmailReply = action({
       }
       const result = (await response.json().catch(() => null)) as {
         id?: unknown;
+        name?: unknown;
       } | null;
       if (!response.ok) {
         throw new ReminderDeliveryError(
-          emailServiceFailureKind(response.status),
+          emailServiceFailureKind(response.status, result?.name),
           `Reply email failed (${response.status}).`,
         );
       }
