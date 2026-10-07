@@ -290,8 +290,18 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     guard self.status == "ordered" or self.status == "fulfilled"
     guard self.deletedAt == null
     guard self.event != null and (self.event.stage == "completed" or self.event.stage == "closed_out")
+    compute previousStatus = self.status
     mutate status = "used"
     mutate usedAt = now()
+    emit PurchaseNeedUsed {
+      purchaseNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientDemandId: self.ingredientDemandId
+      ingredientId: self.ingredientId
+      previousStatus: previousStatus
+      status: "used"
+    }
   }
 
   // Rescheduled event (#328): an open need follows its event to the new
@@ -411,6 +421,16 @@ event PurchaseNeedDraftAssigned: "purchase_need.draft_assigned" {
 }
 
 event PurchaseNeedFulfilled: "purchase_need.fulfilled" {
+  purchaseNeedId: string
+  tenantId: string
+  eventId: string
+  ingredientDemandId: string
+  ingredientId: string
+  previousStatus: PurchaseNeedStatus
+  status: PurchaseNeedStatus
+}
+
+event PurchaseNeedUsed: "purchase_need.used" {
   purchaseNeedId: string
   tenantId: string
   eventId: string

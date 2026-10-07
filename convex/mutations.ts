@@ -22609,18 +22609,6 @@ async function __runEventGuestInvite(ctx: MutationCtx, { docId, eventId, name, e
     if (!((doc.invitedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Give this guest a name.");
-    {
-      const __cur = doc.rsvpStatus;
-      if (__cur !== undefined) {
-        const __from = String(__cur);
-        const __to = "pending";
-        const __allowed: Record<string, string[]> = { "pending": ["confirmed", "declined"], "confirmed": ["confirmed", "declined"], "declined": ["confirmed"] };
-        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
-          const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
-          throw new Error("Invalid state transition for " + "'rsvpStatus'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
-        }
-      }
-    }
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -22633,7 +22621,6 @@ async function __runEventGuestInvite(ctx: MutationCtx, { docId, eventId, name, e
       allergenRestrictions: ((allergenRestrictions != null) ? allergenRestrictions : []),
       accessibilityNeeds: ((accessibilityNeeds != null) ? accessibilityNeeds : []),
       specialMealRequired: ((specialMealRequired != null) ? specialMealRequired : false),
-      rsvpStatus: "pending",
       invitedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -22706,9 +22693,9 @@ export const EventGuest_createViaInvite = mutation({
       allergenRestrictions: args.allergenRestrictions !== undefined ? args.allergenRestrictions : [],
       accessibilityNeeds: args.accessibilityNeeds !== undefined ? args.accessibilityNeeds : [],
       specialMealRequired: args.specialMealRequired !== undefined ? args.specialMealRequired : false,
+      rsvpStatus: "pending",
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      rsvpStatus: "pending",
       email: args.email,
       eventId: args.eventId,
       name: args.name,
@@ -22732,7 +22719,6 @@ export const EventGuest_createViaInvite = mutation({
     doc.allergenRestrictions = ((allergenRestrictions != null) ? allergenRestrictions : []);
     doc.accessibilityNeeds = ((accessibilityNeeds != null) ? accessibilityNeeds : []);
     doc.specialMealRequired = ((specialMealRequired != null) ? specialMealRequired : false);
-    doc.rsvpStatus = "pending";
     doc.invitedAt = Date.now();
     const __storedDoc = await __encryptDoc(ctx, "EventGuest", ["email","phone"], doc);
     const docId = await ctx.db.insert("eventGuests", __storedDoc as any);
@@ -55323,6 +55309,7 @@ async function __runPurchaseNeedSettleWithEvent(ctx: MutationCtx, { docId, versi
     if (!(((doc.status === "ordered") || (doc.status === "fulfilled")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((__rel_event != null) && ((__rel_event.stage === "completed") || (__rel_event.stage === "closed_out"))))) throw new Error("Guard 2 failed");
+    const previousStatus = doc.status;
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
@@ -55344,6 +55331,11 @@ async function __runPurchaseNeedSettleWithEvent(ctx: MutationCtx, { docId, versi
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, purchaseNeedId: docId, tenantId: __after.tenantId, eventId: __after.eventId, ingredientDemandId: __after.ingredientDemandId, ingredientId: __after.ingredientId, previousStatus: previousStatus, status: "used", _subject: { entity: "PurchaseNeed", command: "settleWithEvent", id: docId } };
+    const __manifestEvent0 = { type: "PurchaseNeedUsed", entity: "PurchaseNeed", entityId: docId, payload: { purchaseNeedId: docId, tenantId: __after.tenantId, eventId: __after.eventId, ingredientDemandId: __after.ingredientDemandId, ingredientId: __after.ingredientId, previousStatus: previousStatus, status: "used" }, createdAt: Date.now() };
+    const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
+    await __handleManifestEvent(ctx, { ...__manifestEvent0, eventId: __manifestEventId0, command: "settleWithEvent", emitIndex: 0 });
     return { ...doc, ...updates };
 }
 

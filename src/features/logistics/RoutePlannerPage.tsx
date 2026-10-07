@@ -250,7 +250,7 @@ export function RoutePlannerPage() {
               ? "Stops in the shortest straight-line order. Drive times are a rough guess at 40 km/h until the map service is switched on."
               : "Stops in the shortest order, with real road times from the map service."}{" "}
             Move a stop up or down if you need to; your order is kept on this
-            screen only.
+            screen only and is not saved.
           </p>
         </div>
         <div className="supply-row-actions">

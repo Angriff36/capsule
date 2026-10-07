@@ -2272,7 +2272,6 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
     mutate allergenRestrictions = allergenRestrictions != null ? allergenRestrictions : []
     mutate accessibilityNeeds = accessibilityNeeds != null ? accessibilityNeeds : []
     mutate specialMealRequired = specialMealRequired != null ? specialMealRequired : false
-    mutate rsvpStatus = "pending"
     mutate invitedAt = now()
     emit EventGuestInvited {
       guestId: self.id
