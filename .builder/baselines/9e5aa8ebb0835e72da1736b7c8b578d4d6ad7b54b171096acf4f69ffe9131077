@@ -35353,6 +35353,7 @@ async function __runInvoiceSend(ctx: MutationCtx, { docId, version }: any, __cre
     const updates = {
       status: "sent",
       sentAt: Date.now(),
+      dueDate: ((doc.dueDate != null) ? doc.dueDate : (Date.now() + ((((((doc.paymentTermsDays != null) ? doc.paymentTermsDays : 30) * 24) * 60) * 60) * 1000))),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);

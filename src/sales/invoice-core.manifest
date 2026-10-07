@@ -213,6 +213,8 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     constraint sendBalance: self.amountDue > 0 "Cannot send an invoice with zero balance"
     mutate status = "sent"
     mutate sentAt = now()
+    // A draft made from the event has terms but no date: the terms count from the day it is sent.
+    mutate dueDate = self.dueDate != null ? self.dueDate : now() + ((self.paymentTermsDays != null ? self.paymentTermsDays : 30) * 24 * 60 * 60 * 1000)
     emit InvoiceSent {
       invoiceId: self.id
       tenantId: self.tenantId

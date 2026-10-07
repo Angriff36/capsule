@@ -64,6 +64,7 @@ const HIDDEN = new Set([
   "VendorOrderLineDemand",
   "EventIngredientContribution",
   "WeeklyPurchasingConfig",
+  "EventDishComponentSeed",
 ]);
 
 /** Kitchen words for record kinds whose code names read badly. */

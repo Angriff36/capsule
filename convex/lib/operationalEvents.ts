@@ -122,6 +122,20 @@ export async function handleManifestEvent(
     await checkOutDispatchedEquipment(ctx, event.entityId as Id<"packLists">);
     return;
   }
+  // The truck leaving with a loaded list is that list leaving the kitchen.
+  if (event.entity === "Delivery" && event.type === "DeliveryTransitStarted") {
+    const packListId = event.payload.packListId;
+    if (typeof packListId !== "string") return;
+    const list = await ctx.db.get(packListId as Id<"packLists">);
+    if (!list || list.deletedAt != null || list.status !== "loaded") return;
+    await TenantSystemCommandRunner.forTenant(
+      ctx,
+      list.tenantId,
+    ).context.runMutation(api.mutations.PackList_dispatch, {
+      docId: list._id,
+    });
+    return;
+  }
   if (event.entity === "EquipmentReservation" && event.type === "EquipmentReturned") {
     await raiseReturnIssues(ctx, event.entityId as Id<"equipmentReservations">);
     return;
