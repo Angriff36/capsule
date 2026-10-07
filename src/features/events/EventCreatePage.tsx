@@ -14,6 +14,7 @@ import {
   useDateHoldConvert,
   useGetEventTemplate,
   useGetProposal,
+  useGetLead,
   useListClient,
   useListMenu,
   useListOccasion,
@@ -176,6 +177,20 @@ export function EventCreatePage() {
     ? (searchParams.get("date") as string)
     : "";
   const holdId = searchParams.get("holdId")?.trim() || "";
+  // The lead behind a held date: its type, guest count and name start the form.
+  const leadId = searchParams.get("leadId")?.trim() || "";
+  const lead = useGetLead(leadId || "skip");
+  const leadName = [lead?.companyName, lead?.givenName, lead?.familyName]
+    .map((part) => part?.trim())
+    .find(Boolean);
+  const leadEventType = lead?.eventType?.trim() || undefined;
+  const leadTitle = leadName
+    ? leadEventType
+      ? `${leadName} ${leadEventType.toLowerCase()}`
+      : leadName
+    : undefined;
+  const leadHeadcount =
+    Number(lead?.guestCount ?? 0) > 0 ? Number(lead?.guestCount) : undefined;
   const convertHold = useDateHoldConvert();
   const guidedAvailable = guidedEventCreateAvailable({
     clientId: prefillClientId,
@@ -619,7 +634,7 @@ export function EventCreatePage() {
 
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.48fr)]">
         <form
-          key={`${template?._id ?? "blank"}:${proposal?._id ?? "blank"}`}
+          key={`${template?._id ?? "blank"}:${proposal?._id ?? "blank"}:${lead?._id ?? "blank"}`}
           id="event-create-form"
           ref={draftForm.formRef}
           onSubmit={(event) => {
@@ -641,7 +656,7 @@ export function EventCreatePage() {
                 <input
                   name="title"
                   className="input"
-                  defaultValue={proposalPrefill.title}
+                  defaultValue={proposalPrefill.title ?? leadTitle}
                   required
                   autoFocus
                 />
@@ -656,6 +671,7 @@ export function EventCreatePage() {
                   defaultValue={
                     proposalPrefill.eventType ??
                     template?.eventType ??
+                    leadEventType ??
                     undefined
                   }
                   required
@@ -717,6 +733,7 @@ export function EventCreatePage() {
                   defaultValue={
                     proposalPrefill.expectedHeadcount ??
                     template?.defaultHeadcount ??
+                    leadHeadcount ??
                     1
                   }
                   className="input"
