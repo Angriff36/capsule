@@ -170,8 +170,13 @@ export function MenuProfitabilityPanel({
                   <div className="menu-profitability__dish">
                     <Link to={dishPath(row.dishId)}>{row.dishName}</Link>
                     <span>
-                      {row.course || "Unassigned course"} · {row.componentCount}{" "}
-                      {row.componentCount === 1 ? "recipe" : "recipes"}
+                      {row.course || "No course set"}
+                      {/* Sub-recipes only; a dish costed from its own
+                          ingredients has none, and saying "0 recipes"
+                          beside its cost reads as wrong. */}
+                      {row.componentCount > 0
+                        ? ` · ${row.componentCount} ${row.componentCount === 1 ? "recipe" : "recipes"}`
+                        : ""}
                     </span>
                   </div>
                   <div className="menu-profitability__metric is-cost">
