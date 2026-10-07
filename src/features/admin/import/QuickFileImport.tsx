@@ -15,6 +15,10 @@ import {
   contactTaskRowsFromGrid,
   isContactTasksReport,
 } from "../../../lib/tppReports/parseContactTasks";
+import {
+  isVenueListingReport,
+  venueListingRowsFromGrid,
+} from "../../../lib/tppReports/parseVenueListing";
 import { importRunDetailPath } from "./importRoutes";
 import { sourceFileGrid } from "./sourceFileGrid";
 import { Link } from "react-router-dom";
@@ -109,6 +113,13 @@ export function QuickFileImport() {
         rows = contactTaskRowsFromGrid(grid);
         setColumns(
           `Read as the old system's Contact Tasks & Notes: ${rows.length.toLocaleString()} tasks. Each joins its event by event number, or its client by name.`,
+        );
+      } else if (kind === "venues" && isVenueListingReport(grid)) {
+        // TPP's Venue Listing repeats its headings on every page and puts
+        // the part of the site under the venue as an "Area:" line.
+        rows = venueListingRowsFromGrid(grid);
+        setColumns(
+          `Read as the old system's Venue Listing: ${rows.length.toLocaleString()} venues. Each area under a venue goes to its access notes.`,
         );
       } else {
         const read = sourceRowsFromGrid(grid, kind);
