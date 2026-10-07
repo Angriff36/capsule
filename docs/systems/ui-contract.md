@@ -741,7 +741,7 @@ Screens (66): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: EventGuestCheckedIn
   - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
 - `mutations.EventGuest_createViaInvite` (EventGuest.invite)
@@ -755,7 +755,7 @@ Screens (66): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "ConcurrencyConflict:"; "EventGuest not found"
   - effects: EventGuestRsvpConfirmed
   - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
 - `mutations.EventGuest_rsvpDecline` (EventGuest.rsvpDecline)
@@ -3900,6 +3900,7 @@ Screens (30): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 - `reasonedChanges.assignRigWithReason` - mutation; authored step; live reads update by themselves
 - `reasonedChanges.holdEquipmentWithReason` - mutation; authored step; live reads update by themselves
 - `reasonedChanges.sendOutWithReason` - mutation; authored step; live reads update by themselves
+- `routePlanner.driveLegs` - action; one-time call (not live); the live reads it changes update by themselves
 - `sourceProvenance.listByCapsuleId` - query; live read, updates by itself
 - `sourceProvenance.listMergedClients` - query; live read, updates by itself
 - `vehicleAssignment.assign` - mutation; authored step; live reads update by themselves

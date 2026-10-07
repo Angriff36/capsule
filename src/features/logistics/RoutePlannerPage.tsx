@@ -15,6 +15,16 @@ import {
   type GeoPoint,
 } from "./routePlanner";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { useRouteDriveLegs } from "../../lib/routePlannerClient";
+
+type RoadLeg = { seconds: number; meters: number } | null;
+
+const roadLegLabel = (leg: RoadLeg, index: number) =>
+  index === 0
+    ? "Start"
+    : leg
+      ? `${Math.round(leg.seconds / 60)} min · ${(leg.meters / 1000).toFixed(1)} km`
+      : "No road route found";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -66,6 +76,12 @@ export function RoutePlannerPage() {
   );
   const [geocoding, setGeocoding] = useState(false);
   const [manualOrder, setManualOrder] = useState<string[] | null>(null);
+  const driveLegs = useRouteDriveLegs();
+  // null until the server says whether the map service is switched on.
+  const [roadConfigured, setRoadConfigured] = useState<boolean | null>(null);
+  const [road, setRoad] = useState<{ key: string; legs: RoadLeg[] } | null>(
+    null,
+  );
 
   const dayStart = new Date(`${day}T00:00`).getTime();
   const dayEnd = dayStart + DAY_MS;
@@ -113,6 +129,8 @@ export function RoutePlannerPage() {
       setCoords(new Map());
       return;
     }
+    // The map service on the server finds the stops itself (below).
+    if (roadConfigured !== false) return;
     let cancelled = false;
     setGeocoding(true);
     void Promise.all(
@@ -131,7 +149,7 @@ export function RoutePlannerPage() {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [destinationsKey]);
+  }, [destinationsKey, roadConfigured]);
 
   const suggested = useMemo(
     () =>
@@ -162,6 +180,52 @@ export function RoutePlannerPage() {
     setManualOrder(next);
   };
 
+  // Real road time for the order on screen, from the map service.
+  const orderKey = order
+    .map((id) => `${id}:${stops.find((stop) => stop._id === id)?.destination}`)
+    .join("|");
+  useEffect(() => {
+    if (order.length === 0 || roadConfigured === false) return;
+    let cancelled = false;
+    const addresses = order.map(
+      (id) => stops.find((stop) => stop._id === id)?.destination ?? "",
+    );
+    setGeocoding(true);
+    void driveLegs({ addresses })
+      .then((answer) => {
+        if (cancelled) return;
+        setRoadConfigured(answer.configured);
+        if (!answer.configured) return;
+        setCoords((prev) => {
+          const next = new Map(prev);
+          answer.points.forEach((point, index) => {
+            if (point) next.set(order[index]!, point);
+          });
+          return next;
+        });
+        setRoad({ key: orderKey, legs: answer.legs });
+      })
+      .catch(() => {
+        if (!cancelled) setRoadConfigured(false);
+      })
+      .finally(() => {
+        if (!cancelled) setGeocoding(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderKey, roadConfigured]);
+  const roadLegs = road?.key === orderKey ? road.legs : null;
+  const roadMinutes = (roadLegs ?? []).reduce(
+    (sum, leg) => sum + (leg ? leg.seconds / 60 : 0),
+    0,
+  );
+  const roadKm = (roadLegs ?? []).reduce(
+    (sum, leg) => sum + (leg ? leg.meters / 1000 : 0),
+    0,
+  );
+
   const stopById = new Map(stops.map((stop) => [stop._id, stop]));
   const orderedStops = order
     .map((id) => stopById.get(id))
@@ -182,9 +246,11 @@ export function RoutePlannerPage() {
           <p className="eyebrow">Logistics · Route planner</p>
           <h1 className="display-title mt-2">Suggested visit order</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Browser-local suggestion using straight-line distance between
-            geocoded stops. Drive time assumes 40 km/h; reorder changes stay
-            only in this browser session and are not saved.
+            {roadConfigured === false
+              ? "Stops in the shortest straight-line order. Drive times are a rough guess at 40 km/h until the map service is switched on."
+              : "Stops in the shortest order, with real road times from the map service."}{" "}
+            Move a stop up or down if you need to; your order is kept on this
+            screen only and is not saved.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -229,10 +295,12 @@ export function RoutePlannerPage() {
           </div>
           <span>
             {stops.length} stop{stops.length === 1 ? "" : "s"}
-            {totalKm > 0
-              ? ` · ${totalKm.toFixed(1)} km straight-line · ~${Math.round(totalMinutes)} min at 40 km/h`
-              : ""}
-            {geocoding ? " · geocoding…" : ""}
+            {roadLegs && roadMinutes > 0
+              ? ` · ${Math.round(roadMinutes)} min driving · ${roadKm.toFixed(1)} km`
+              : totalKm > 0
+                ? ` · ${totalKm.toFixed(1)} km straight-line · ~${Math.round(totalMinutes)} min at 40 km/h`
+                : ""}
+            {geocoding ? " · finding the stops on the map…" : ""}
           </span>
         </div>
         {loading ? (
@@ -265,7 +333,7 @@ export function RoutePlannerPage() {
                   <th>Destination</th>
                   <th>Event</th>
                   <th>Window</th>
-                  <th>Straight-line leg (40 km/h estimate)</th>
+                  <th>Drive from the stop before</th>
                   <th>Reorder</th>
                 </tr>
               </thead>
@@ -279,7 +347,7 @@ export function RoutePlannerPage() {
                         <strong>{stop.destination}</strong>
                         {!geocoding && !coords.has(stop._id) ? (
                           <small className="block text-ink-2">
-                            Address not geocoded — placed last
+                            Address not found on the map — placed last
                           </small>
                         ) : null}
                       </td>
@@ -288,7 +356,11 @@ export function RoutePlannerPage() {
                         {formatTime(stop.windowStartsAt ?? dayStart)} →{" "}
                         {formatTime(stop.windowEndsAt ?? dayEnd)}
                       </td>
-                      <td>{routeLegLabel(leg, index)}</td>
+                      <td>
+                        {roadLegs
+                          ? roadLegLabel(roadLegs[index] ?? null, index)
+                          : routeLegLabel(leg, index)}
+                      </td>
                       <td>
                         <div className="supply-row-actions">
                           <button
@@ -318,7 +390,7 @@ export function RoutePlannerPage() {
             </table>
             {manualOrder ? (
               <p className="mt-3 text-base text-ink-2">
-                Browser-local custom order (not saved).{" "}
+                Your own order (kept on this screen only).{" "}
                 <button
                   className="text-link"
                   type="button"

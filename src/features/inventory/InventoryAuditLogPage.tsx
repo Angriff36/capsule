@@ -103,6 +103,9 @@ export function InventoryAuditLogPage() {
   const rootHash =
     entries.at(-1)?.integrityHash ?? INVENTORY_AUDIT_GENESIS_HASH;
   const newestFirst = [...entries].reverse();
+  // Holds were saved without a unit; they are in the stock line's unit.
+  const shownUnit = (unit: string) =>
+    unit === "unit" && selectedItem?.unit ? selectedItem.unit : unit;
   const physicalChanges = entries.filter(
     (entry) => entry.measure === "on_hand",
   ).length;
@@ -302,7 +305,13 @@ export function InventoryAuditLogPage() {
                       <span className={actionToneClass(entryTone(entry))}>
                         {entry.action}
                       </span>
-                      <strong>{entry.reason}</strong>
+                      <strong>
+                        {entry.eventTitle
+                          ? entry.action === "Reserved"
+                            ? `Held for ${entry.eventTitle}`
+                            : `Used by ${entry.eventTitle}`
+                          : entry.reason}
+                      </strong>
                       <small>{formatStatusLabel(entry.eventType)}</small>
                     </td>
                     <td>
@@ -310,9 +319,10 @@ export function InventoryAuditLogPage() {
                         className="inventory-audit-actor"
                         title={entry.actorId ?? undefined}
                       >
-                        {entry.actorId
-                          ? abbreviateActor(entry.actorId)
-                          : "Legacy · not captured"}
+                        {entry.actorName ??
+                          (entry.actorId
+                            ? abbreviateActor(entry.actorId)
+                            : "Not recorded")}
                       </code>
                     </td>
                     <td>
@@ -321,11 +331,13 @@ export function InventoryAuditLogPage() {
                       </span>
                     </td>
                     <td className="supply-number">
-                      {formatQuantity(entry.quantityBefore)} {entry.unit}
+                      {formatQuantity(entry.quantityBefore)}{" "}
+                      {shownUnit(entry.unit)}
                     </td>
                     <td className="supply-number">
                       <strong>
-                        {formatQuantity(entry.quantityAfter)} {entry.unit}
+                        {formatQuantity(entry.quantityAfter)}{" "}
+                        {shownUnit(entry.unit)}
                       </strong>
                     </td>
                     <td className={deltaClass(entry.delta)}>

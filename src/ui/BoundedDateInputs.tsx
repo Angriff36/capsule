@@ -31,6 +31,8 @@ type BoundedDateInputProps = Omit<
   onResolvedValue?: (value: string) => void;
   /** Lets an end field resolve phrases such as `+4h` against its start. */
   naturalDateAnchor?: string;
+  /** "any" keeps a typed day in this year even when it has passed. */
+  naturalDateDirection?: "future" | "any";
 };
 
 /** An empty-string `max` (e.g. from cleared range state) is the same as no
@@ -44,6 +46,7 @@ function NaturalDateInput({
   max,
   onResolvedValue,
   naturalDateAnchor,
+  naturalDateDirection,
   className,
   defaultValue,
   value,
@@ -74,6 +77,19 @@ function NaturalDateInput({
     if (value !== undefined) setText(display(String(value ?? "")));
   }, [value]);
 
+  // A cleared form clears the words shown too, not only the hidden value.
+  useEffect(() => {
+    const form = nativeRef.current?.form;
+    if (!form || value !== undefined) return;
+    const onReset = () => {
+      setText(display(String(defaultValue ?? "")));
+      setMessage("");
+    };
+    form.addEventListener("reset", onReset);
+    return () => form.removeEventListener("reset", onReset);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value === undefined, defaultValue]);
+
   const writeNative = (next: string) => {
     if (nativeRef.current && nativeRef.current.value !== next) {
       // The prototype setter bypasses React's value tracker, so the dispatched
@@ -92,6 +108,7 @@ function NaturalDateInput({
     const parsed = parseNaturalDate(text, {
       kind,
       anchor: naturalDateAnchor,
+      direction: naturalDateDirection,
     });
     if (!parsed.ok) {
       setMessage(

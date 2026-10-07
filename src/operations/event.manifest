@@ -2244,7 +2244,8 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
 
   transition rsvpStatus from "pending" to ["confirmed", "declined"]
   transition rsvpStatus from "confirmed" to ["confirmed", "declined"]
-  transition rsvpStatus from "declined" to []
+  // A guest who said no can still change their mind or turn up.
+  transition rsvpStatus from "declined" to ["confirmed"]
 
   default policy eventGuestRead read: roleAllows(user.role, "eventAccess") "Event staff may see guest attendance"
   default policy eventGuestWrite write: roleAllows(user.role, "eventAccess") "Event staff may update the guest list"
@@ -2271,7 +2272,6 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
     mutate allergenRestrictions = allergenRestrictions != null ? allergenRestrictions : []
     mutate accessibilityNeeds = accessibilityNeeds != null ? accessibilityNeeds : []
     mutate specialMealRequired = specialMealRequired != null ? specialMealRequired : false
-    mutate rsvpStatus = "pending"
     mutate invitedAt = now()
     emit EventGuestInvited {
       guestId: self.id
@@ -2282,7 +2282,6 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
   }
 
   command rsvpConfirm() {
-    guard self.rsvpStatus == "pending" or self.rsvpStatus == "confirmed"
     guard self.deletedAt == null
     mutate rsvpStatus = "confirmed"
     mutate respondedAt = now()
@@ -2308,11 +2307,15 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Arriving is a yes: a guest who never answered, or said no, is checked in
+  // and confirmed in one step at the door.
   command checkIn() {
-    guard self.rsvpStatus == "confirmed"
     guard self.checkedInAt == null
     guard self.deletedAt == null
     compute checkInTime = now()
+    mutate rsvpStatus = "confirmed"
+    mutate respondedAt = self.respondedAt != null ? self.respondedAt : checkInTime
+    mutate declineReason = null
     mutate checkedInAt = checkInTime
     emit EventGuestCheckedIn {
       guestId: self.id

@@ -182,6 +182,17 @@ describe("stock import resolution (AC-076)", () => {
     expect(same!.sourceRow).toBe(walkIn!.sourceRow);
   });
 
+  it("matches names that differ only in commas and dashes", () => {
+    const draft = row({
+      Name: "olive-oil",
+      Quantity: "2",
+      Unit: "liter",
+      Location: "Dry Storage,",
+    });
+    expect(draft.ingredientId).toBe("ing-oil");
+    expect(draft.locationId).toBe("loc-dry");
+  });
+
   it("reads plain unit words the way count sheets write them", () => {
     expect(unitFromText("lbs")).toBe("pound");
     expect(unitFromText("Oz - Fld")).toBe("fluid_ounce");

@@ -1,4 +1,5 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { ROLE_GUIDE } from "./roleGuide";
+import { Fragment, useMemo, useState, type FormEvent } from "react";
 import { useAction, useQuery } from "convex/react";
 import { api } from "../../lib/api";
 import { usePayRates } from "../facilities/useLaborSummary";
@@ -252,6 +253,19 @@ export function TeamRolesPanel({
           and they are in the app. Their Capsule role on this row is what they
           can do — not a separate login website.
         </p>
+        <details className="max-w-3xl text-sm">
+          <summary className="cursor-pointer font-semibold text-ink-2">
+            What each role can do
+          </summary>
+          <dl className="mt-2 grid gap-x-4 gap-y-1 sm:grid-cols-[10rem_1fr]">
+            {ROLE_GUIDE.map(([role, can]) => (
+              <Fragment key={role}>
+                <dt className="font-semibold capitalize text-ink">{role}</dt>
+                <dd className="text-ink-2">{can}</dd>
+              </Fragment>
+            ))}
+          </dl>
+        </details>
         {error ? (
           <ErrorState title="Team role update failed" detail={error} />
         ) : null}
@@ -291,7 +305,7 @@ export function TeamRolesPanel({
           </label>
           <label className="block text-sm">
             <span className="meta-term">Capsule role</span>
-            <select name="role" className="input mt-1" defaultValue="admin">
+            <select name="role" className="input mt-1" defaultValue="staff">
               {PersonRoleDirectory.ASSIGNABLE_ROLES.map((role) => (
                 <option key={role} value={role}>
                   {PersonRoleDirectory.label(role)}

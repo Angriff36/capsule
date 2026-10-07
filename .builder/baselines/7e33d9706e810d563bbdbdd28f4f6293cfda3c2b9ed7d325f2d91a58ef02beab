@@ -3653,10 +3653,11 @@ export const PurchaseNeedSchema = z.object({
   purchasingWeekStart: z.coerce.date().nullable().optional(),
   vendorOrderId: z.string().uuid().nullable().optional(),
   vendorOrderLineId: z.string().uuid().nullable().optional(),
-  status: z.enum(["open", "ordered", "fulfilled", "cancelled"]).default("open"),
+  status: z.enum(["open", "ordered", "fulfilled", "used", "cancelled"]).default("open"),
   openedAt: z.coerce.date().nullable().optional(),
   orderedAt: z.coerce.date().nullable().optional(),
   fulfilledAt: z.coerce.date().nullable().optional(),
+  usedAt: z.coerce.date().nullable().optional(),
   cancelledAt: z.coerce.date().nullable().optional(),
   cancellationReason: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -11549,6 +11550,11 @@ export const PurchaseNeedReviseRequiredParamsSchema = z.object({
 });
 
 export type PurchaseNeedReviseRequiredParams = z.infer<typeof PurchaseNeedReviseRequiredParamsSchema>;
+
+// Command: settleWithEvent on PurchaseNeed
+export const PurchaseNeedSettleWithEventParamsSchema = z.object({});
+
+export type PurchaseNeedSettleWithEventParams = z.infer<typeof PurchaseNeedSettleWithEventParamsSchema>;
 
 // Command: standDownWithEvent on PurchaseNeed
 export const PurchaseNeedStandDownWithEventParamsSchema = z.object({});

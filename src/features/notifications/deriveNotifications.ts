@@ -27,7 +27,9 @@ export interface AppNotification {
     | "prep_task_comment"
     | "system_health"
     | "date_opened"
-    | "review_flag";
+    | "review_flag"
+    | "equipment_problem"
+    | "maintenance_due";
   message: string;
   /** Route to the relevant record. */
   link: string;
@@ -51,6 +53,8 @@ export const NOTIFICATION_KIND_LABELS: Record<AppNotification["kind"], string> =
     system_health: "System health",
     date_opened: "Date open",
     review_flag: "Question",
+    equipment_problem: "Equipment",
+    maintenance_due: "Upkeep",
   };
 
 /** Stage changes older than this are history, not notifications. */
@@ -104,6 +108,17 @@ export interface NotificationSources {
   clientNames?: Record<string, string>;
   /** Open flags and crew questions on events. */
   reviewFlags?: Doc<"reviewFlags">[] | undefined;
+  /** Open equipment problems, and the names of the equipment they are about. */
+  equipmentIssues?: Doc<"equipmentIssues">[] | undefined;
+  equipmentNames?: Record<string, string>;
+  /** Truck and equipment service that is past due (worked out on the server). */
+  maintenanceDue?: Array<{
+    id: string;
+    name: string;
+    task: string;
+    link: string;
+    at: number;
+  }>;
 }
 
 /** Staff messages are retained for 90 days; older ones drop out of the UI. */
@@ -481,6 +496,43 @@ export function deriveNotifications(
       message: `Question on ${title}${what ? ` (${what})` : ""}${question ? `: ${question}` : ""}`,
       link: `/events/${eventId}`,
       at: flag.raisedAt,
+    });
+  }
+
+  // An open equipment problem tells the people who look after equipment,
+  // except the person who reported it, until it is sorted out.
+  for (const issue of src.equipmentIssues ?? []) {
+    if (
+      issue.deletedAt != null ||
+      issue.status !== "open" ||
+      issue.raisedAt == null ||
+      (issue.issueRaisedById != null &&
+        issue.issueRaisedById === src.currentPersonId)
+    ) {
+      continue;
+    }
+    const name =
+      (issue.equipmentId && src.equipmentNames?.[String(issue.equipmentId)]) ||
+      "Equipment";
+    const urgent = issue.severity === "high" ? "Urgent: " : "";
+    out.push({
+      id: `equipment-problem:${issue._id}`,
+      kind: "equipment_problem",
+      message: `${urgent}${name}: ${issue.description}`,
+      link: issue.eventId
+        ? `/events/${issue.eventId}`
+        : "/facilities/equipment",
+      at: issue.raisedAt,
+    });
+  }
+
+  for (const due of src.maintenanceDue ?? []) {
+    out.push({
+      id: `maintenance-due:${due.id}`,
+      kind: "maintenance_due",
+      message: `${due.name}: ${due.task} is overdue`,
+      link: due.link,
+      at: due.at,
     });
   }
 

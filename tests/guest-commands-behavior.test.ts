@@ -112,3 +112,14 @@ it("checks in a confirmed guest and prevents another check-in after the server u
     ),
   ).toBe(false);
 });
+
+it("checks in a guest who never answered in one step at the door", async () => {
+  backend.values.set("queries:listEventGuestByEventId", [guest]);
+  const checkIn = command("useEventGuestCheckIn");
+  await mount(page());
+  await click(button("Check in"));
+  expect(checkIn).toHaveBeenCalledExactlyOnceWith({
+    docId: "guest-a",
+    version: 4,
+  });
+});

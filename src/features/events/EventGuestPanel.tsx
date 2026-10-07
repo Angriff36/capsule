@@ -1,3 +1,4 @@
+import { readGuestPaste } from "./guestListPaste";
 import { useMemo, useState, type FormEvent } from "react";
 import { useQuery } from "convex/react";
 import { api, type Id } from "../../lib/api";
@@ -100,6 +101,8 @@ export function EventGuestPanel({
   const menuLines = useEventMenuLines(eventId);
   const menuDishes = useDishesByIds(menuLines?.map((line) => line.dishId));
   const [showInvite, setShowInvite] = useState(false);
+  const [showPaste, setShowPaste] = useState(false);
+  const [pasteNote, setPasteNote] = useState<string | null>(null);
   const [action, setAction] = useState<GuestAction>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
@@ -177,6 +180,32 @@ export function EventGuestPanel({
       });
       form.reset();
       setShowInvite(false);
+    });
+  };
+
+  // One guest per line; a name already on the list is skipped.
+  const submitPaste = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const rows = readGuestPaste(
+      String(new FormData(form).get("guestList") ?? ""),
+      guests.map((guest) => guest.name),
+    );
+    if (rows.length === 0) {
+      setPasteNote("No new names found. Put one guest on each line.");
+      return;
+    }
+    setPasteNote(null);
+    void run("paste", async () => {
+      let added = 0;
+      for (const row of rows) {
+        await invite({ eventId, specialMealRequired: false, ...row });
+        added += 1;
+        setPasteNote(`Adding ${added} of ${rows.length}…`);
+      }
+      form.reset();
+      setShowPaste(false);
+      setPasteNote(`${added} guests added.`);
     });
   };
 
@@ -275,6 +304,13 @@ export function EventGuestPanel({
             <button
               type="button"
               className="btn btn-ghost btn-sm"
+              onClick={() => setShowPaste((value) => !value)}
+            >
+              {showPaste ? "Close list" : "Paste a guest list"}
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
               onClick={() => setShowInvite((value) => !value)}
             >
               <PlusIcon width={13} height={13} />
@@ -283,6 +319,38 @@ export function EventGuestPanel({
           </div>
         </div>
 
+        {pasteNote ? (
+          <p className="text-sm text-ink-2" role="status">
+            {pasteNote}
+          </p>
+        ) : null}
+        {showPaste ? (
+          <form className="card space-y-3 p-4" onSubmit={submitPaste}>
+            <label className="field-label">
+              Guest list
+              <textarea
+                name="guestList"
+                className="input min-h-40 font-mono text-sm"
+                placeholder={
+                  "One guest per line. Copy rows from a spreadsheet, or type:\nName, email, phone, dietary needs, allergies\nMaria Lopez, maria@example.com, , vegetarian, peanuts; shellfish"
+                }
+                required
+              />
+            </label>
+            <div className="flex gap-2">
+              <button className="btn btn-primary" disabled={busy != null}>
+                {busy === "paste" ? "Adding…" : "Add these guests"}
+              </button>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() => setShowPaste(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : null}
         {showInvite ? (
           <EventGuestInviteForm
             busy={busy === "invite"}

@@ -90,8 +90,10 @@ export function VendorContractsPage() {
       await createContract({
         vendorId: String(data.get("vendorId")),
         title: String(data.get("title")),
-        startsAt: new Date(String(data.get("startsAt"))).getTime(),
-        endsAt: new Date(String(data.get("endsAt"))).getTime(),
+        startsAt: new Date(
+          `${String(data.get("startsAt"))}T12:00:00`,
+        ).getTime(),
+        endsAt: new Date(`${String(data.get("endsAt"))}T12:00:00`).getTime(),
         contractNumber:
           String(data.get("contractNumber") ?? "").trim() || undefined,
         paymentTermsDays: Number(data.get("paymentTermsDays")),
@@ -227,7 +229,12 @@ export function VendorContractsPage() {
             </label>
             <label className="field-label">
               Starts
-              <BoundedDateInput name="startsAt" className="input" required />
+              <BoundedDateInput
+                name="startsAt"
+                className="input"
+                naturalDateDirection="any"
+                required
+              />
             </label>
             <label className="field-label">
               Ends

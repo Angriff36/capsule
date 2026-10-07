@@ -13,8 +13,11 @@ import {
   drafts,
   lineFor,
   linkedEventIds,
+  liveRows,
   rolesFor,
+  runner,
   seedCatalog,
+  versionOf,
 } from "./weekly-purchasing.runtime.helpers";
 
 const S = {
@@ -529,5 +532,41 @@ describe("runtime proof: event dishes → shared weekly VendorOrder draft", () =
     expect(
       await linkedEventIds(roles.procurement, tenantId, after!._id),
     ).toEqual([...eventIds].sort());
+  });
+  it("a finished event's bought needs stop counting toward the week", async () => {
+    const proof = harness();
+    const tenantId = "tenant-settle-finished-needs";
+    const roles = rolesFor(proof, tenantId);
+    const catalog = await seedCatalog(proof, tenantId, [
+      { name: "Flour", perServing: S.flourPerServing },
+    ]);
+    const eventId = await approvedEvent(proof, tenantId, {
+      title: "Settle first",
+      headcount: 40,
+      dishIds: catalog.dishIds,
+    });
+    const [draft] = await drafts(roles.procurement, tenantId);
+    await runner(proof, roles.procurement)(api.mutations.VendorOrder_submit, {
+      docId: draft!._id,
+      version: draft!.version,
+    });
+    const needs = () =>
+      liveRows<{ tenantId: string; eventId: string; status: string }>(
+        roles.procurement,
+        "purchaseNeeds",
+        tenantId,
+      ).then((rows) => rows.filter((row) => row.eventId === eventId));
+    expect((await needs()).map((need) => need.status)).toEqual(["ordered"]);
+
+    // Service steps are covered elsewhere; start from the last one.
+    await roles.events.run(async (ctx) =>
+      ctx.db.patch(eventId as never, { stage: "final" } as never),
+    );
+    await runner(proof, roles.events)(api.mutations.Event_complete as never, {
+      docId: eventId,
+      version: await versionOf(roles.events, eventId),
+    });
+
+    expect((await needs()).map((need) => need.status)).toEqual(["used"]);
   });
 });

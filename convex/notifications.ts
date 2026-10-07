@@ -20,7 +20,10 @@
 // sync with src/foundation/base.manifest if a role grant moves.
 import type { Doc, Id } from "./_generated/dataModel";
 import { query } from "./_generated/server";
-import { deriveNotifications } from "../src/features/notifications/deriveNotifications";
+import {
+  deriveNotifications,
+  type NotificationSources,
+} from "../src/features/notifications/deriveNotifications";
 import { findRosterConflicts } from "../src/features/workforce/rosterConflicts";
 import { getAuthContext, type AppAuthContext } from "./lib/authContext";
 import { orgCapabilityDeniesAction } from "./lib/orgCapabilityGate";
@@ -28,9 +31,11 @@ import { CURSOR_DUPLICATES_CAP } from "./lib/teamChatRead";
 
 const ALL_ACCESS = [
   "eventAccess",
+  "eventManageAccess",
   "financeAccess",
   "inventoryAccess",
   "kitchenAccess",
+  "logisticsAccess",
   "manageAccess",
   "procurementAccess",
   "salesAccess",
@@ -46,8 +51,13 @@ const ROLE_CAPABILITIES: Record<string, readonly string[]> = {
   system: ALL_ACCESS,
   manager: ["manageAccess", "staffAccess"],
   staff: ["staffAccess"],
-  driver: ["staffAccess"],
-  event_manager: ["eventAccess", "manageAccess", "staffAccess"],
+  driver: ["logisticsAccess", "staffAccess"],
+  event_manager: [
+    "eventAccess",
+    "eventManageAccess",
+    "manageAccess",
+    "staffAccess",
+  ],
   event_staff: ["eventAccess", "staffAccess"],
   finance_manager: ["financeAccess", "manageAccess", "staffAccess"],
   finance_staff: ["financeAccess", "staffAccess"],
@@ -61,8 +71,8 @@ const ROLE_CAPABILITIES: Record<string, readonly string[]> = {
   kitchen_lead: ["kitchenAccess", "staffAccess"],
   kitchen_manager: ["kitchenAccess", "manageAccess", "staffAccess"],
   kitchen_staff: ["kitchenAccess", "staffAccess"],
-  logistics_manager: ["manageAccess", "staffAccess"],
-  logistics_staff: ["staffAccess"],
+  logistics_manager: ["logisticsAccess", "manageAccess", "staffAccess"],
+  logistics_staff: ["logisticsAccess", "staffAccess"],
   procurement_staff: ["inventoryAccess", "procurementAccess", "staffAccess"],
   sales_manager: ["manageAccess", "salesAccess", "staffAccess"],
   sales_staff: ["salesAccess", "staffAccess"],
@@ -125,6 +135,7 @@ export const listNotifications = query({
       dateHolds,
       dateWaitlistEntries,
       reviewFlags,
+      equipmentIssues,
     ] = await Promise.all([
       // Not every event (13 s at 10,000 events, and the socket holds every
       // other read of the screen until this one answers): only the events
@@ -311,7 +322,110 @@ export const listNotifications = query({
           .collect()
           .then((rows) => rows.filter((row) => row.status === "open")),
       ),
+      // Open equipment problems (listEquipmentIssue read guard).
+      when(
+        can(
+          auth,
+          "inventoryAccess",
+          "logisticsAccess",
+          "eventManageAccess",
+          "financeAccess",
+        ),
+        () =>
+          ctx.db
+            .query("equipmentIssues")
+            .withIndex("by_tenantId", byTenant)
+            .collect()
+            .then((rows) =>
+              rows.filter(
+                (row) => row.status === "open" && row.deletedAt == null,
+              ),
+            ),
+      ),
     ]);
+
+    // Service that is past due: trucks (by date or by miles) and equipment.
+    const maintenanceDue: NonNullable<NotificationSources["maintenanceDue"]> =
+      [];
+    const now = Date.now();
+    if (can(auth, "logisticsAccess", "manageAccess")) {
+      const [schedules, vehicles, fuel, service] = await Promise.all([
+        ctx.db
+          .query("vehicleMaintenanceSchedules")
+          .withIndex("by_tenantId", byTenant)
+          .collect(),
+        ctx.db.query("vehicles").withIndex("by_tenantId", byTenant).collect(),
+        ctx.db
+          .query("vehicleFuelLogs")
+          .withIndex("by_tenantId", byTenant)
+          .collect(),
+        ctx.db
+          .query("vehicleServiceEntries")
+          .withIndex("by_tenantId", byTenant)
+          .collect(),
+      ]);
+      const odometer = new Map<string, number>();
+      for (const row of [...fuel, ...service]) {
+        if (row.deletedAt != null) continue;
+        const id = String(row.vehicleId);
+        odometer.set(id, Math.max(odometer.get(id) ?? 0, row.odometer));
+      }
+      for (const schedule of schedules) {
+        if (schedule.deletedAt != null) continue;
+        const vehicle = vehicles.find((row) => row._id === schedule.vehicleId);
+        if (!vehicle || vehicle.deletedAt != null) continue;
+        const overdue =
+          schedule.intervalType === "mileage"
+            ? schedule.nextDueMileage != null &&
+              (odometer.get(String(schedule.vehicleId)) ?? 0) >=
+                schedule.nextDueMileage
+            : schedule.nextDueAt != null && schedule.nextDueAt < now;
+        if (!overdue) continue;
+        maintenanceDue.push({
+          id: `vehicle:${schedule._id}:${schedule.nextDueAt ?? schedule.nextDueMileage}`,
+          name: `${vehicle.registration} ${vehicle.make} ${vehicle.model}`.trim(),
+          task: schedule.taskName,
+          link: "/logistics/maintenance",
+          at: schedule.nextDueAt ?? schedule.updatedAt ?? now,
+        });
+      }
+    }
+    if (can(auth, "inventoryAccess", "logisticsAccess")) {
+      const tasks = await ctx.db
+        .query("equipmentMaintenanceTasks")
+        .withIndex("by_tenantId", byTenant)
+        .collect();
+      for (const task of tasks) {
+        if (task.deletedAt != null || task.nextDueAt == null) continue;
+        if (task.nextDueAt >= now) continue;
+        const item = await ctx.db.get(task.equipmentId);
+        if (!item || item.tenantId !== tenantId || item.deletedAt != null)
+          continue;
+        maintenanceDue.push({
+          id: `equipment:${task._id}:${task.nextDueAt}`,
+          name: item.name,
+          task: task.taskName,
+          link: "/facilities/equipment",
+          at: task.nextDueAt,
+        });
+      }
+    }
+
+    // Names of the equipment those problems are about, tenant-checked.
+    const equipmentNames: Record<string, string> = {};
+    await Promise.all(
+      [
+        ...new Set(
+          (equipmentIssues ?? [])
+            .filter((row) => row.equipmentId)
+            .map((row) => String(row.equipmentId)),
+        ),
+      ].map(async (id) => {
+        const equipmentId = ctx.db.normalizeId("equipments", id);
+        const row = equipmentId ? await ctx.db.get(equipmentId) : null;
+        if (row && row.tenantId === tenantId) equipmentNames[id] = row.name;
+      }),
+    );
 
     // Names of waiting clients, tenant-checked, for the date-opened prompt.
     const clientNames: Record<string, string> = {};
@@ -465,6 +579,9 @@ export const listNotifications = query({
       dateWaitlistEntries,
       clientNames,
       reviewFlags,
+      equipmentIssues,
+      equipmentNames,
+      maintenanceDue,
     });
   },
 });

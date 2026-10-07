@@ -167,11 +167,12 @@ export function VehicleMaintenancePage() {
       return `${milesFmt.format(remaining)} mi left`;
     }
     if (schedule.nextDueAt == null) return "Set due date";
-    const days = Math.max(
-      1,
-      Math.ceil(Math.abs(schedule.nextDueAt - now) / DAY_MS),
-    );
-    return schedule.nextDueAt < now ? `${days}d overdue` : `Due in ${days}d`;
+    // Whole days passed for overdue, days still to go for due.
+    const overdue = schedule.nextDueAt < now;
+    const span = Math.abs(schedule.nextDueAt - now) / DAY_MS;
+    const days = Math.max(1, overdue ? Math.floor(span) : Math.ceil(span));
+    const unit = days === 1 ? "day" : "days";
+    return overdue ? `${days} ${unit} overdue` : `Due in ${days} ${unit}`;
   };
 
   const withDue = activeSchedules

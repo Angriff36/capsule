@@ -184,79 +184,100 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
     });
   };
 
-  const act = (row: RentalRow, action: string) => {
+  // Ask first, then save: the prompt locks while the panel is busy, so
+  // opening it inside run() left both of its buttons disabled.
+  const act = async (row: RentalRow, action: string) => {
     const base = { docId: row._id, version: row.version };
-    void run(`${row._id}:${action}`, async () => {
-      if (action === "confirm") {
-        const values = await prompt.askFields({
-          title: `Vendor confirmed ${row.description}?`,
-          description: "Add the vendor's order number if they gave one.",
-          fields: [{ name: "reference", label: "Vendor order number" }],
-          confirmLabel: "Mark confirmed",
-        });
-        if (!values) return;
-        await confirm({
+    const key = `${row._id}:${action}`;
+    if (action === "confirm") {
+      const values = await prompt.askFields({
+        title: `Vendor confirmed ${row.description}?`,
+        description: "Add the vendor's order number if they gave one.",
+        fields: [
+          { name: "reference", label: "Vendor order number", required: false },
+        ],
+        confirmLabel: "Mark confirmed",
+      });
+      if (!values) return;
+      await run(key, () =>
+        confirm({
           ...base,
           vendorReference: values.reference?.trim() || undefined,
-        });
-      }
-      if (action === "arrived") {
-        const values = await prompt.askFields({
-          title: `How many ${row.description} arrived?`,
-          description: "Enter the count that came off the vendor's truck.",
-          fields: [
-            {
-              name: "count",
-              label: "Arrived",
-              inputType: "number",
-              defaultValue: String(row.quantity),
-              required: true,
-            },
-          ],
-          confirmLabel: "Save count",
-        });
-        if (!values) return;
-        await markDelivered({
+        }),
+      );
+    }
+    if (action === "arrived") {
+      const values = await prompt.askFields({
+        title: `How many ${row.description} arrived?`,
+        description: "Enter the count that came off the vendor's truck.",
+        fields: [
+          {
+            name: "count",
+            label: "Arrived",
+            inputType: "number",
+            defaultValue: String(row.quantity),
+            required: true,
+          },
+        ],
+        confirmLabel: "Save count",
+      });
+      if (!values) return;
+      await run(key, () =>
+        markDelivered({
           ...base,
           deliveredQuantity: Number(values.count),
-        });
-      }
-      if (action === "returned") {
-        const came = row.deliveredQuantity ?? row.quantity;
-        const values = await prompt.askFields({
-          title: `How many ${row.description} went back?`,
-          description:
-            "Anything short is what the vendor will bill as missing or broken.",
-          fields: [
-            {
-              name: "count",
-              label: "Sent back",
-              inputType: "number",
-              defaultValue: String(came),
-              required: true,
-            },
-            { name: "note", label: "What happened (if any are short)" },
-          ],
-          confirmLabel: "Save return",
-        });
-        if (!values) return;
-        await markReturned({
+        }),
+      );
+    }
+    if (action === "returned") {
+      const came = row.deliveredQuantity ?? row.quantity;
+      const values = await prompt.askFields({
+        title: `How many ${row.description} went back?`,
+        description:
+          "Anything short is what the vendor will bill as missing or broken.",
+        fields: [
+          {
+            name: "count",
+            label: "Sent back",
+            inputType: "number",
+            defaultValue: String(came),
+            required: true,
+          },
+          {
+            name: "note",
+            label: "What happened (if any are short)",
+            required: false,
+          },
+        ],
+        confirmLabel: "Save return",
+      });
+      if (!values) return;
+      await run(key, () =>
+        markReturned({
           ...base,
           returnedQuantity: Number(values.count),
           note: values.note?.trim() || undefined,
-        });
-      }
-      if (action === "cancel") {
-        const values = await prompt.askFields({
-          title: `Cancel ${row.description}?`,
-          description: "Tell the vendor too. The line stays in the history.",
-          fields: [{ name: "reason", label: "Why (if you want to say)" }],
-          confirmLabel: "Cancel rental",
-        });
-        if (!values) return;
-        await cancel({ ...base, reason: values.reason?.trim() || undefined });
-      }
-    });
+        }),
+      );
+    }
+    if (action === "cancel") {
+      const values = await prompt.askFields({
+        title: `Cancel ${row.description}?`,
+        description: "Tell the vendor too. The line stays in the history.",
+        fields: [
+          {
+            name: "reason",
+            label: "Why (if you want to say)",
+            required: false,
+          },
+        ],
+        confirmLabel: "Cancel rental",
+      });
+      if (!values) return;
+      await run(key, () =>
+        cancel({ ...base, reason: values.reason?.trim() || undefined }),
+      );
+    }
   };
 
   return (
@@ -320,7 +341,7 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
                   <button
                     className="btn btn-ghost btn-sm"
                     disabled={busy != null}
-                    onClick={() => act(row, "confirm")}
+                    onClick={() => void act(row, "confirm")}
                   >
                     Confirmed
                   </button>
@@ -330,14 +351,14 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
                     <button
                       className="btn btn-ghost btn-sm"
                       disabled={busy != null}
-                      onClick={() => act(row, "arrived")}
+                      onClick={() => void act(row, "arrived")}
                     >
                       Arrived
                     </button>
                     <button
                       className="btn btn-ghost btn-sm"
                       disabled={busy != null}
-                      onClick={() => act(row, "cancel")}
+                      onClick={() => void act(row, "cancel")}
                     >
                       Cancel
                     </button>
@@ -347,7 +368,7 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
                   <button
                     className="btn btn-ghost btn-sm"
                     disabled={busy != null}
-                    onClick={() => act(row, "returned")}
+                    onClick={() => void act(row, "returned")}
                   >
                     Sent back
                   </button>

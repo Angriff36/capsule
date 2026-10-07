@@ -67,8 +67,8 @@ export function routeProviderConfigured(): boolean {
 
 export const MAPBOX_ROUTES_PROVIDER = "mapbox_directions";
 
-async function mapboxPoint(
-  endpoint: RouteEndpoint,
+export async function mapboxPoint(
+  endpoint: Pick<RouteEndpoint, "address" | "latitude" | "longitude">,
   token: string,
 ): Promise<{ lat: number; lon: number } | null> {
   if (endpoint.latitude != null && endpoint.longitude != null)
@@ -83,6 +83,61 @@ async function mapboxPoint(
   };
   const [lon, lat] = body.features?.[0]?.geometry?.coordinates ?? [];
   return Number.isFinite(lat) && Number.isFinite(lon) ? { lat, lon } : null;
+}
+
+/**
+ * Real road time for each leg of a run, in the order given (route planner).
+ * One Directions call covers up to 25 stops. Null means that stop or leg
+ * could not be found on the map.
+ */
+export async function computeMapboxTrip(
+  addresses: string[],
+  token: string,
+): Promise<{
+  points: ({ lat: number; lon: number } | null)[];
+  legs: ({ seconds: number; meters: number } | null)[];
+}> {
+  const points = await Promise.all(
+    addresses.map((address) =>
+      mapboxPoint({ address, latitude: null, longitude: null }, token).catch(() => null),
+    ),
+  );
+  const legs: ({ seconds: number; meters: number } | null)[] = addresses.map(
+    () => null,
+  );
+  const found = points
+    .map((point, index) => ({ point, index }))
+    .filter(
+      (row): row is { point: { lat: number; lon: number }; index: number } =>
+        row.point != null,
+    )
+    .slice(0, 25);
+  if (found.length >= 2) {
+    try {
+      const path = found.map(({ point }) => `${point.lon},${point.lat}`).join(";");
+      const response = await fetch(
+        `https://api.mapbox.com/directions/v5/mapbox/driving-traffic/${path}?overview=false&access_token=${encodeURIComponent(token)}`,
+      );
+      if (response.ok) {
+        const body = (await response.json()) as {
+          code?: string;
+          routes?: { legs?: { duration?: number; distance?: number }[] }[];
+        };
+        const routeLegs = body.code === "Ok" ? body.routes?.[0]?.legs : null;
+        routeLegs?.forEach((leg, i) => {
+          if (leg.duration == null || leg.distance == null) return;
+          // A leg ends at the next stop that was found on the map.
+          legs[found[i + 1]!.index] = {
+            seconds: Math.round(leg.duration),
+            meters: Math.round(leg.distance),
+          };
+        });
+      }
+    } catch {
+      // Unreachable service: every leg stays unknown.
+    }
+  }
+  return { points, legs };
 }
 
 /** Mapbox Directions (driving with live and typical traffic). */

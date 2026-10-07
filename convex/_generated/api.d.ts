@@ -296,6 +296,7 @@ import type * as recordHistory from "../recordHistory.js";
 import type * as recurringEvents from "../recurringEvents.js";
 import type * as rentalSales from "../rentalSales.js";
 import type * as rigTrailer from "../rigTrailer.js";
+import type * as routePlanner from "../routePlanner.js";
 import type * as runOfShowAlerts from "../runOfShowAlerts.js";
 import type * as runOfShowAlertsSend from "../runOfShowAlertsSend.js";
 import type * as sagas from "../sagas.js";
@@ -636,6 +637,7 @@ declare const fullApi: ApiFromModules<{
   recurringEvents: typeof recurringEvents;
   rentalSales: typeof rentalSales;
   rigTrailer: typeof rigTrailer;
+  routePlanner: typeof routePlanner;
   runOfShowAlerts: typeof runOfShowAlerts;
   runOfShowAlertsSend: typeof runOfShowAlertsSend;
   sagas: typeof sagas;
