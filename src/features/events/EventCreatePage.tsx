@@ -205,13 +205,12 @@ export function EventCreatePage() {
   const [clientId, setClientId] = useState(prefillClientId);
   const contactNameRef = useRef<HTMLInputElement>(null);
   const contactEmailRef = useRef<HTMLInputElement>(null);
-  // Start the day-of contact as the chosen client; the boxes stay editable
-  // and a value the user typed is never replaced.
+  const contactPhoneRef = useRef<HTMLInputElement>(null);
+  // Start the day-of contact as the chosen client, also when booking from a
+  // proposal (a proposal holds no contact); the boxes stay editable and a
+  // value the user typed is never replaced.
   useEffect(() => {
-    // Proposal bookings carry their own contact over (ProposalEventPrefill).
-    const client = proposalId
-      ? undefined
-      : clients?.find((row) => row._id === clientId);
+    const client = clients?.find((row) => row._id === clientId);
     if (!client) return;
     if (contactNameRef.current && !contactNameRef.current.value)
       contactNameRef.current.value = clientDisplayName(client._id, [client]);
@@ -221,7 +220,13 @@ export function EventCreatePage() {
       client.email
     )
       contactEmailRef.current.value = client.email;
-  }, [clientId, clients, proposalId]);
+    if (
+      contactPhoneRef.current &&
+      !contactPhoneRef.current.value &&
+      client.phone
+    )
+      contactPhoneRef.current.value = client.phone;
+  }, [clientId, clients]);
   const [venueId, setVenueId] = useState("");
   const [inlineCreate, setInlineCreate] = useState<{
     kind: "client" | "venue";
@@ -259,6 +264,14 @@ export function EventCreatePage() {
     if (!endsAtValue && proposalPrefill.endsAtLocal) {
       setEndsAtValue(proposalPrefill.endsAtLocal);
       setEndWasEdited(true);
+    } else if (!endsAtValue && proposalPrefill.startsAtLocal) {
+      // A proposal with only a start date gets the usual event length.
+      setEndsAtValue(
+        addLocalDateTimeHours(
+          proposalPrefill.startsAtLocal,
+          EVENT_DEFAULT_HOURS,
+        ),
+      );
     }
   }, [proposalPrefill.endsAtLocal, proposalPrefill.startsAtLocal]);
   const proposalLinkable = proposalEventPrefill.canLinkOnCreate(proposal);
@@ -778,6 +791,7 @@ export function EventCreatePage() {
                 <label className="field-label">
                   Phone
                   <input
+                    ref={contactPhoneRef}
                     name="primaryContactPhone"
                     type="tel"
                     className="input"
