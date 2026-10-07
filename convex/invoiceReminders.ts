@@ -140,7 +140,11 @@ interface DeliveryResult {
 }
 
 interface SentEmail {
-  emailId: string;
+  /**
+   * null = the email service had already taken a reminder under this key on
+   * an earlier try whose answer Capsule never recorded; nothing went now.
+   */
+  emailId: string | null;
   from: string;
   subject: string;
   text: string;
@@ -809,6 +813,8 @@ async function sendReminderEmail(
     companyAddress: context.organization.address,
     primaryColor: context.organization.primaryColor,
     accentColor: context.organization.accentColor,
+    // Every try of one reminder sends the same bytes under the same key.
+    generatedAt: attempt.scheduledFor,
   });
   const from = fromAddress(
     context.organization.senderName,
@@ -852,15 +858,29 @@ async function sendReminderEmail(
     );
   }
   const responseBody = asRecord(await response.json().catch(() => null));
-  if (!response.ok) {
+  let emailId: string | null = null;
+  if (response.status === 409) {
+    // 409 on a repeated key: the service either still works on the first
+    // request (try again later) or took an email under this key before and
+    // will not take a changed one. Either way this address is fine.
+    if (stringValue(responseBody.name) !== "invalid_idempotent_request") {
+      throw new ReminderDeliveryError(
+        "service_down",
+        "The email service is still working on this reminder.",
+      );
+    }
+  } else if (!response.ok) {
     throw new ReminderDeliveryError(
       emailServiceFailureKind(response.status),
       stringValue(responseBody.message) ||
         `Reminder email delivery failed (${response.status}).`,
     );
+  } else {
+    emailId = stringValue(responseBody.id);
+    if (!emailId) {
+      throw new Error("Email provider did not return a delivery id.");
+    }
   }
-  const emailId = stringValue(responseBody.id);
-  if (!emailId) throw new Error("Email provider did not return a delivery id.");
   return {
     emailId,
     from,
@@ -1053,8 +1073,9 @@ async function deliverReminder(
     throw cause;
   }
   await recordReminderEvent(ctx, EVENT.delivered, attempt, {
-    emailId: sent.emailId,
-    providerState: "accepted",
+    ...(sent.emailId
+      ? { emailId: sent.emailId, providerState: "accepted" }
+      : { providerState: "accepted_earlier" }),
     sessionId: currentSession.sessionId,
     amountDue: Number(context.invoice.amountDue),
     dueDate: Number(context.invoice.dueDate),
@@ -1071,6 +1092,9 @@ async function deliverReminder(
     attachments: [sent.attachmentName],
     artifactFingerprint: sent.fingerprint,
   });
+  if (!sent.emailId) {
+    return { status: "delivered", to: maskEmail(context.recipient.email) };
+  }
   try {
     await ctx.runMutation(internal.outboundEmailThread.recordInvoiceEmail, {
       tenantId: attempt.tenantId,

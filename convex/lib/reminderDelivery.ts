@@ -223,9 +223,12 @@ export function reminderHistory(
         source,
         attempt,
         to,
-        words: to
-          ? `Taken by the email service for ${to}.`
-          : "Taken by the email service.",
+        words:
+          payload.providerState === "accepted_earlier"
+            ? "Taken by the email service on an earlier try. Not sent again."
+            : to
+              ? `Taken by the email service for ${to}.`
+              : "Taken by the email service.",
         remedy: null,
         willRetry: false,
       });
