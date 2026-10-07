@@ -399,7 +399,7 @@ async function signedProposalTotals(
     lineItems: [],
     // The tax report adds up the per-rate lines, so the signed tax is
     // spread over them as well.
-    taxBreakdown: await signedTaxBreakdown(ctx, event, proposal),
+    taxBreakdown: signedTaxBreakdown(proposal),
   };
 }
 
@@ -465,41 +465,16 @@ export async function retaxDraftForClient(
 }
 
 /**
- * Per-rate tax lines for a proposal's signed tax: the workspace rates worked
- * on its subtotal, scaled so they add up to exactly the tax the client
- * signed. With no rate, one line carries it all.
+ * The signed tax as one line with no rate attached: which rates the client
+ * was charged under is not kept, and today's rates may differ, so the tax
+ * report counts it as signed rather than under a guessed rate.
  */
-async function signedTaxBreakdown(
-  ctx: MutationCtx,
-  event: Doc<"events">,
-  proposal: Doc<"proposals">,
-) {
+function signedTaxBreakdown(proposal: Doc<"proposals">) {
   const signed = Number(proposal.taxAmount ?? 0);
   if (!(signed > 0)) return [];
   const subtotal = Number(proposal.subtotal ?? 0);
-  const worked = (await eventPriceTotals(ctx, event, subtotal)).taxBreakdown as Array<{
-    amount: number;
-    name: string;
-    percentage: number;
-    taxRateId?: string;
-  }>;
-  const workedTotal = worked.reduce((sum, row) => sum + Number(row.amount), 0);
-  if (worked.length === 0 || !(workedTotal > 0)) {
-    const percentage =
-      subtotal > 0 ? Math.round((signed / subtotal) * 10000) / 100 : 0;
-    return [{ name: "Sales tax", percentage, amount: signed }];
-  }
-  // Scale in cents; the last line takes the rounding so the sum is exact.
-  const signedCents = Math.round(signed * 100);
-  let given = 0;
-  return worked.map((row, index) => {
-    const cents =
-      index === worked.length - 1
-        ? signedCents - given
-        : Math.round((Number(row.amount) / workedTotal) * signedCents);
-    given += cents;
-    return { ...row, amount: cents / 100 };
-  });
+  const percentage = subtotal > 0 ? Math.round((signed / subtotal) * 10000) / 100 : 0;
+  return [{ name: "Sales tax as signed", percentage, amount: signed }];
 }
 
 /** The newest accepted proposal booked onto this event, if any. */
