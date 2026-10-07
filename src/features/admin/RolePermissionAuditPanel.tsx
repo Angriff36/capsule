@@ -14,6 +14,32 @@ const snapshotTime = new Intl.DateTimeFormat(undefined, {
   timeStyle: "short",
 });
 
+// Plain names for the access each role grants (src/foundation/base.manifest).
+const ACCESS_LABELS: Record<string, string> = {
+  staffAccess: "Staff basics",
+  workforceSelfAccess: "Own hours and shifts",
+  manageAccess: "Manager views",
+  importAccess: "Data imports",
+  adminAccess: "Admin settings",
+  kitchenAccess: "Kitchen",
+  kitchenLeadAccess: "Kitchen lead",
+  kitchenManageAccess: "Kitchen manager",
+  salesAccess: "Sales",
+  salesManageAccess: "Sales manager",
+  eventAccess: "Events",
+  eventManageAccess: "Event manager",
+  inventoryAccess: "Stock",
+  procurementAccess: "Buying",
+  inventoryManageAccess: "Stock manager",
+  logisticsAccess: "Logistics",
+  logisticsManageAccess: "Logistics manager",
+  workforceAccess: "Workforce",
+  workforceManageAccess: "Workforce manager",
+  financeAccess: "Finance",
+  financeManageAccess: "Finance manager",
+};
+const accessLabel = (policy: string) => ACCESS_LABELS[policy] ?? policy;
+
 export function RolePermissionAudit({
   members,
   loading,
@@ -155,9 +181,6 @@ export function RolePermissionAuditView({
                         <span className="chip chip-tone-mute">
                           {member.roleLabel}
                         </span>
-                        <code className="mt-1.5 block text-2xs text-ink-3">
-                          {member.role}
-                        </code>
                       </td>
                       <td className="border-b border-line px-3 py-3">
                         {member.manifestPolicies.length === 0 ? (
@@ -179,7 +202,7 @@ export function RolePermissionAuditView({
                                       : "border-line bg-inset text-ink-2")
                                   }
                                 >
-                                  {policy}
+                                  {accessLabel(policy)}
                                 </code>
                               );
                             })}
@@ -193,7 +216,9 @@ export function RolePermissionAuditView({
                               Elevated access
                             </span>
                             <p className="mt-1.5 max-w-xs text-2xs leading-relaxed text-ink-3">
-                              {member.elevatedPolicies.join(", ")}
+                              {member.elevatedPolicies
+                                .map(accessLabel)
+                                .join(", ")}
                             </p>
                           </div>
                         ) : (
