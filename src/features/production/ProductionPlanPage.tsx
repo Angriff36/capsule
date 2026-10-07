@@ -56,8 +56,16 @@ export function makeAheadLabel(window: MakeAheadWindow | null): string {
   return `Make ${days} ${noun} ahead (${range})`;
 }
 
-const amount = (value: number, unit: string) =>
-  `${prepQuantityLabel(value, unit)} ${unit}`;
+// Count words read "45 portions"; "1 portion" and short marks stay as they are.
+const COUNTED = ["portion", "serving", "piece", "tray", "pan"];
+const amount = (value: number, unit: string) => {
+  const label = prepQuantityLabel(value, unit);
+  const word =
+    COUNTED.includes(unit) && Number(label) !== 1
+      ? `${unit}s`
+      : unit.replaceAll("_", " ");
+  return `${label} ${word}`;
+};
 
 export function ProductionPlanView({
   days,
@@ -238,7 +246,13 @@ export function ProductionPlanPage() {
   const days = useMemo(
     () =>
       buildProductionPlan({
-        events: events ?? [],
+        // Finished and cancelled events need no more prep.
+        events: (events ?? []).filter(
+          (event) =>
+            !["cancelled", "completed", "closed_out"].includes(
+              String(event.stage),
+            ),
+        ),
         prepTasks: prepTasks ?? [],
         dishTasks: dishTasks ?? [],
         batches: batches ?? [],
