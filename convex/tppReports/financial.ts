@@ -147,7 +147,11 @@ function invoiceLines(value: unknown): {
     if (!item) return [];
     const quantity = Number(item.quantity ?? 1);
     const amount = Number(
-      item.amount ?? item.total ?? Number(item.unitPrice ?? 0) * quantity,
+      // Before tax: a worked line's total already holds its tax.
+      item.amount ??
+        item.subtotal ??
+        item.total ??
+        Number(item.unitPrice ?? 0) * quantity,
     );
     const cost = Number(item.cost ?? Number(item.unitCost ?? 0) * quantity);
     return [

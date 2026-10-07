@@ -146,11 +146,9 @@ export function IngredientQuickCreate({
             data-testid="ingredient-quick-create-name"
             onChange={(event) => setName(event.target.value)}
             onKeyDown={(event) => {
-              // Enter here must not submit the recipe line form.
-              if (event.key === "Enter") {
-                event.preventDefault();
-                void save();
-              }
+              // Enter here must not submit the recipe line form, and does
+              // not save: the cook checks the allergen boxes first.
+              if (event.key === "Enter") event.preventDefault();
             }}
           />
         </label>

@@ -150,7 +150,8 @@ export function InvoiceIssueForm({
         first != null &&
         first.description === filled.description &&
         first.unitPrice === filled.unitPrice &&
-        first.quantity === filled.quantity;
+        first.quantity === filled.quantity &&
+        first.category === filled.category;
       return untouched ? [priceLine(eventId), ...current.slice(1)] : current;
     });
   const [discountAmount, setDiscountAmount] = useState(0);
