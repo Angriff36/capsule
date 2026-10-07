@@ -1522,6 +1522,8 @@ export const commitImportRun = action({
       let skipped = 0;
       let pending = 0;
       const delta: DeltaTally = { updated: 0, conflicted: 0 };
+      // Read once per batch, only when a row names a referral source.
+      let lookups: BatchLookups | null = null;
 
       for (const [index, lead] of (
         parsed.records as ParsedCapsuleLead[]
@@ -1584,12 +1586,27 @@ export const commitImportRun = action({
         // confirmConversion), a separate operator action.
         const idempotencyKey = `tenant-shared/import:${args.importRunId}:lead:${lead.externalId}`;
         const notes = lead.clientId ? `TPP client ${lead.clientId}` : undefined;
+        // AC-057: the old referral name joins the company's referral source
+        // of that name (added once when missing), as event imports do.
+        const referralSource = lead.referralSource?.trim();
+        if (!lookups && referralSource)
+          lookups = {
+            ...(await ctx.runQuery(internal.importEventLookups.eventLookups, {
+              tenantId,
+            })),
+            refused: new Set<string>(),
+          };
+        const { referralSourceId } =
+          lookups && referralSource
+            ? await eventLookupFields(ctx, lookups, { referralSource })
+            : {};
         try {
           const created = await ctx.runMutation(
             api.mutations.Lead_createViaCapture,
             {
               leadType: "company",
               source: lead.source,
+              referralSourceId,
               estimatedValue: lead.estimatedValue,
               companyName: lead.opportunityName,
               probability: lead.probability,

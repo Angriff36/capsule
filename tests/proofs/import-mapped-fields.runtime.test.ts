@@ -5,6 +5,8 @@
  *   access / catering notes, load-in instructions and parking.
  * - AC-276: an imported closed lead keeps its old stage word for word, its
  *   event date and its close date; an open lead stays open.
+ * - AC-057: an imported lead's old referral name joins the company's referral
+ *   source of that name (added once when missing).
  * - AC-274: every event field the documented map sends to the event lands on
  *   it (notes and special requirements both), and the literal EventStatus and
  *   every column stay on the import link.
@@ -162,6 +164,45 @@ describe("runtime proof: documented TPP field maps are executed", () => {
     expect(open.sourceStage).toBe("Qualified");
     expect(open.source).toBe("Referral");
     expect(open.notes).toBe("TPP client C-2");
+  });
+
+  it("an imported lead joins the company's referral source of its old referral name", async () => {
+    const tenantId = "tenant-import-lead-referral";
+    const actor = owner(tenantId);
+    const result = await importRows(actor, "leads", [
+      {
+        LeadID: "L-10",
+        OpportunityName: "Lentz Wedding",
+        Stage: "Qualified",
+        EstimatedValue: 9000,
+        Source: "Referral",
+        ReferralSource: "Bridal Fair",
+      },
+      {
+        LeadID: "L-11",
+        OpportunityName: "Pullman Lunch",
+        Stage: "Qualified",
+        EstimatedValue: 800,
+        Source: "Referral",
+        ReferralSource: "bridal fair",
+      },
+      {
+        LeadID: "L-12",
+        OpportunityName: "Walk In",
+        Stage: "New",
+        EstimatedValue: 0,
+        Source: "Phone",
+      },
+    ]);
+    expect(result.committed).toBe(3);
+    const sources = await tableRows(actor, "referralSources", tenantId);
+    expect(sources.map((row) => row.name)).toEqual(["Bridal Fair"]);
+    const leads = await tableRows(actor, "leads", tenantId);
+    const byName = (name: string) =>
+      leads.find((lead) => lead.companyName === name)!;
+    expect(byName("Lentz Wedding").referralSourceId).toBe(sources[0]!._id);
+    expect(byName("Pullman Lunch").referralSourceId).toBe(sources[0]!._id);
+    expect(byName("Walk In").referralSourceId ?? null).toBeNull();
   });
 
   it("the executed event mapping covers the documented fields and preserves literal EventStatus", async () => {
