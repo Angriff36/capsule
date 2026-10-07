@@ -151,10 +151,21 @@ export function KitchenDashboardPage() {
 
   // Only the events starting inside the 7-day window are read (and only their
   // id, title and start time are used here).
-  const events = useEventsInRange({
+  const windowEvents = useEventsInRange({
     from: horizon.start().getTime(),
     to: horizon.end().getTime(),
   });
+  // Finished and cancelled events need no more prep.
+  const events = useMemo(
+    () =>
+      windowEvents?.filter(
+        (event) =>
+          !["cancelled", "completed", "closed_out"].includes(
+            String(event.stage),
+          ),
+      ),
+    [windowEvents],
+  );
   // Menu lines of those events only, never every event's (PL-SCALE).
   const eventDishes = useMenuLinesForEvents(
     useMemo(() => events?.map((event) => event._id), [events]),
