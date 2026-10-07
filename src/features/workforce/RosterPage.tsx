@@ -190,7 +190,9 @@ export function RosterPage() {
     events?.find((event) => event._id === id)?.title ?? "—";
   const personName = (id: string) => {
     const person = people?.find((row) => row._id === id);
-    return person ? `${person.givenName} ${person.familyName}` : "Unknown";
+    return person
+      ? `${person.givenName} ${person.familyName ?? ""}`.trim()
+      : "Unknown";
   };
   const liveEventIds = new Set(
     (events ?? [])
