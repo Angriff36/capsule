@@ -24,6 +24,7 @@ import {
   budgetedFoodCostPercent,
   foodCostPercent,
   isCompletedEvent,
+  isConvertedLead,
   isQualifiedLead,
   NOT_KNOWN,
   percentOf,
@@ -127,7 +128,7 @@ export function TimsKPIsDashboardPage() {
     const all = leads ?? [];
     const totalLeads = all.length;
     const newLeads = all.filter((l) => l.stage === "new").length;
-    const converted = all.filter((l) => l.stage === "converted").length;
+    const converted = all.filter(isConvertedLead).length;
 
     const qualifiedRate = percentOf(
       all.filter(isQualifiedLead).length,

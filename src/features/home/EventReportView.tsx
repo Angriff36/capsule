@@ -175,7 +175,10 @@ export function EventReportView({
           Running report…
         </p>
       ) : (
-        <TppReportResult result={result} />
+        <TppReportResult
+          result={result}
+          emptyText={`Nothing on the ${definition.name} for this event yet.`}
+        />
       )}
     </div>
   );

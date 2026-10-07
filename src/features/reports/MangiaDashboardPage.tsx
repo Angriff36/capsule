@@ -151,12 +151,20 @@ export function MangiaDashboardPage() {
 
   // Pack status
   const packStatus = useMemo(() => {
-    const todayPacks = (packLists || []).filter((p) => {
-      if (!p.createdAt) return false;
-      const createdDate = new Date(p.createdAt);
-      createdDate.setHours(0, 0, 0, 0);
-      return createdDate.getTime() === today.getTime();
-    });
+    // The pack lists for events that run today, whenever they were opened.
+    const todayEventIds = new Set(
+      (events || [])
+        .filter((e) => {
+          if (!e.startsAt || e.stage === "cancelled") return false;
+          const eventDate = new Date(e.startsAt);
+          eventDate.setHours(0, 0, 0, 0);
+          return eventDate.getTime() === today.getTime();
+        })
+        .map((e) => String(e._id)),
+    );
+    const todayPacks = (packLists || []).filter(
+      (p) => p.deletedAt == null && todayEventIds.has(String(p.eventId)),
+    );
 
     const opened = todayPacks.filter((p) => p.status === "opened").length;
     const packing = todayPacks.filter((p) => p.status === "packing").length;
@@ -173,7 +181,7 @@ export function MangiaDashboardPage() {
       dispatched,
       pctReady: percentOf(packed + dispatched, todayPacks.length),
     };
-  }, [packLists, today]);
+  }, [packLists, events, today]);
 
   // Staff status
   const staffStatus = useMemo(() => {

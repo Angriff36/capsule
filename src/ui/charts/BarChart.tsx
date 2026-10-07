@@ -72,6 +72,9 @@ export function BarChart({
             type={orientation === "horizontal" ? "number" : "category"}
             className="text-2xs text-ink-2"
             tick={{ fill: "currentColor" }}
+            tickFormatter={
+              orientation === "horizontal" ? formatYAxis : undefined
+            }
           />
           <YAxis
             type={orientation === "horizontal" ? "category" : "number"}
@@ -79,6 +82,8 @@ export function BarChart({
             className="text-2xs text-ink-2"
             tick={{ fill: "currentColor" }}
             tickFormatter={orientation === "vertical" ? formatYAxis : undefined}
+            // Names on a sideways chart need room, or the words overlap.
+            width={orientation === "horizontal" ? 180 : undefined}
           />
           <Tooltip
             contentStyle={{

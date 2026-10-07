@@ -8,6 +8,7 @@ import type {
 import { query, type QueryCtx } from "../_generated/server";
 import { getAuthContext } from "../lib/authContext";
 import { canRead } from "../search";
+import { formatMoneyExact } from "../../src/lib/format";
 import {
   REPORT_ROW_LIMIT,
   keepReportRows,
@@ -99,7 +100,20 @@ function clientName(client: {
 }
 
 function dateText(value: number | null | undefined): string {
-  return value == null ? "" : new Date(value).toLocaleDateString("en-US");
+  return value == null
+    ? ""
+    : new Date(value).toLocaleDateString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+}
+
+/** "entree" prints as "Entree", like the courses typed with a capital. */
+function courseLabel(course: string | null | undefined): string {
+  const text = (course ?? "").trim();
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : "";
 }
 
 /** "YYYY-MM-DD" → epoch ms at UTC noon, so no zone shifts the calendar day. */
@@ -614,7 +628,7 @@ export const run = query({
           heading:
             args.reportId === "packing-slip" ? "Packed menu items" : "Menu",
           rows: bundle.menu.map((dish) => ({
-            label: dish.course,
+            label: courseLabel(dish.course),
             value: `${dish.name}${dish.quantity ? ` — ${dish.quantity} servings` : ""}${dish.notes ? ` — ${dish.notes}` : ""}`,
           })),
         },
@@ -633,12 +647,21 @@ export const run = query({
           rows: invoice
             ? [
                 { label: "Invoice number", value: invoice.invoiceNumber ?? "" },
-                { label: "Subtotal", value: String(invoice.subtotal) },
-                { label: "Tax", value: String(invoice.taxAmount) },
-                { label: "Discount", value: String(invoice.discountAmount) },
-                { label: "Total", value: String(invoice.total) },
-                { label: "Paid", value: String(invoice.amountPaid) },
-                { label: "Balance due", value: String(invoice.amountDue) },
+                {
+                  label: "Subtotal",
+                  value: formatMoneyExact(invoice.subtotal),
+                },
+                { label: "Tax", value: formatMoneyExact(invoice.taxAmount) },
+                {
+                  label: "Discount",
+                  value: formatMoneyExact(invoice.discountAmount),
+                },
+                { label: "Total", value: formatMoneyExact(invoice.total) },
+                { label: "Paid", value: formatMoneyExact(invoice.amountPaid) },
+                {
+                  label: "Balance due",
+                  value: formatMoneyExact(invoice.amountDue),
+                },
               ]
             : [{ value: "No invoice has been created for this event." }],
         },
@@ -655,7 +678,7 @@ export const run = query({
           id: "menu",
           heading: "Menu",
           rows: bundle.menu.map((dish) => ({
-            label: dish.course,
+            label: courseLabel(dish.course),
             value: dish.name,
           })),
         },
@@ -664,14 +687,28 @@ export const run = query({
           heading: "Pricing",
           rows: proposal
             ? [
-                { label: "Subtotal", value: String(proposal.subtotal) },
-                { label: "Tax", value: String(proposal.taxAmount) },
-                { label: "Discount", value: String(proposal.discountAmount) },
-                { label: "Total", value: String(proposal.total) },
+                {
+                  label: "Subtotal",
+                  value: formatMoneyExact(proposal.subtotal),
+                },
+                { label: "Tax", value: formatMoneyExact(proposal.taxAmount) },
+                {
+                  label: "Discount",
+                  value: formatMoneyExact(proposal.discountAmount),
+                },
+                { label: "Total", value: formatMoneyExact(proposal.total) },
                 { label: "Terms", value: proposal.terms ?? "" },
                 { label: "Notes", value: proposal.notes ?? "" },
               ]
-            : [{ value: "No proposal has been created for this event." }],
+            : bundle.event.quotedPrice
+              ? [
+                  {
+                    label: "Quoted price",
+                    value: formatMoneyExact(bundle.event.quotedPrice),
+                  },
+                  { value: "Tax is added on the invoice." },
+                ]
+              : [{ value: "No price on this event yet." }],
         },
       ]);
     }

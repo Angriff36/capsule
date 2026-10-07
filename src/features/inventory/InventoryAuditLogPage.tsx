@@ -125,11 +125,11 @@ export function InventoryAuditLogPage() {
     <div className="operations-stage supply-stage inventory-audit-page">
       <header className="supply-masthead inventory-audit-masthead">
         <div>
-          <p className="eyebrow">Inventory · Evidence ledger</p>
-          <h1 className="display-title mt-2">Quantity audit log</h1>
+          <p className="eyebrow">Inventory · Stock history</p>
+          <h1 className="display-title mt-2">Stock history</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Follow every on-hand and reservation change back to its actor,
-            timestamp, and before/after quantity.
+            Every change to what is on the shelf or held for an event: who made
+            it, when, and the amount before and after.
           </p>
         </div>
         <button
@@ -138,7 +138,7 @@ export function InventoryAuditLogPage() {
           disabled={!selectedId || loading}
           onClick={() => setRefreshKey((value) => value + 1)}
         >
-          {loading ? "Reading ledger…" : "Refresh evidence"}
+          {loading ? "Loading…" : "Refresh"}
         </button>
       </header>
       <InventoryWorkspaceNav />
@@ -172,7 +172,7 @@ export function InventoryAuditLogPage() {
           </select>
         </label>
         <div className="inventory-audit-subject">
-          <span>Current subject</span>
+          <span>Showing</span>
           <strong>{ingredientName}</strong>
           <small>
             {locationName}
@@ -190,35 +190,38 @@ export function InventoryAuditLogPage() {
         </div>
       ) : null}
 
-      <section
-        className="inventory-integrity-rail"
-        aria-label="Integrity chain"
-      >
-        <div className="inventory-integrity-mark" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-        </div>
-        <div className="inventory-integrity-copy">
-          <p className="eyebrow">SHA-256 chain checkpoint</p>
-          <strong data-testid="inventory-audit-root">
-            {abbreviateHash(rootHash)}
-          </strong>
-          <span>
-            Each row includes the prior digest. Changing, removing, inserting,
-            or reordering history changes this root; record it for later
-            comparison.
-          </span>
-        </div>
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm"
-          disabled={entries.length === 0}
-          onClick={copyRoot}
+      {/* A code an auditor can note to prove history was not edited later. */}
+      <details className="inventory-integrity-details">
+        <summary className="text-sm text-ink-2">Tamper check code</summary>
+        <section
+          className="inventory-integrity-rail"
+          aria-label="Integrity chain"
         >
-          {copied ? "Root copied" : "Copy root"}
-        </button>
-      </section>
+          <div className="inventory-integrity-mark" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </div>
+          <div className="inventory-integrity-copy">
+            <p className="eyebrow">Tamper check code</p>
+            <strong data-testid="inventory-audit-root">
+              {abbreviateHash(rootHash)}
+            </strong>
+            <span>
+              Write this code down. If anyone later edits, removes, or reorders
+              this history, the code changes.
+            </span>
+          </div>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            disabled={entries.length === 0}
+            onClick={copyRoot}
+          >
+            {copied ? "Code copied" : "Copy code"}
+          </button>
+        </section>
+      </details>
 
       {ledgerCheck && !ledgerCheck.matches ? (
         <div className="inventory-audit-error" role="alert">
@@ -237,11 +240,11 @@ export function InventoryAuditLogPage() {
       ) : null}
 
       <div className="inventory-audit-stats" aria-live="polite">
-        <AuditStat label="Ledger entries" value={entries.length} />
-        <AuditStat label="On-hand changes" value={physicalChanges} />
-        <AuditStat label="Reservation changes" value={reservationChanges} />
+        <AuditStat label="Changes" value={entries.length} />
+        <AuditStat label="On-shelf changes" value={physicalChanges} />
+        <AuditStat label="Held-for-event changes" value={reservationChanges} />
         <AuditStat
-          label="Latest evidence"
+          label="Last change"
           value={
             entries.length
               ? formatCompactTimestamp(entries.at(-1)!.occurredAt)
@@ -253,12 +256,12 @@ export function InventoryAuditLogPage() {
       <section className="working-ledger inventory-audit-ledger">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">
-              Newest first · chain computed oldest first
-            </p>
-            <h2>Movement evidence</h2>
+            <p className="eyebrow">Newest first</p>
+            <h2>Every change</h2>
           </div>
-          <span>{entries.length} immutable facts</span>
+          <span>
+            {entries.length} {entries.length === 1 ? "change" : "changes"}
+          </span>
         </div>
 
         {loading || items === undefined ? (
@@ -266,16 +269,14 @@ export function InventoryAuditLogPage() {
         ) : !selectedItem ? (
           <div className="document-empty">
             <p>Open a stock line first.</p>
-            <span>
-              The audit ledger appears once this item has a stock line.
-            </span>
+            <span>Its history appears once this item has a stock line.</span>
           </div>
         ) : newestFirst.length === 0 ? (
           <div className="document-empty">
-            <p>No quantity events were found.</p>
+            <p>No changes yet.</p>
             <span>
               Opening, receiving, adjusting, recounting, reserving, issuing,
-              wasting, or transferring stock will add evidence here.
+              wasting, or moving stock will show here.
             </span>
           </div>
         ) : (
@@ -285,31 +286,36 @@ export function InventoryAuditLogPage() {
                 <tr>
                   <th>When</th>
                   <th>Change</th>
-                  <th>Actor</th>
-                  <th>Measure</th>
+                  <th>By</th>
+                  <th>Amount</th>
                   <th>Before</th>
                   <th>After</th>
-                  <th>Delta</th>
-                  <th>Evidence</th>
+                  <th>Change</th>
                 </tr>
               </thead>
               <tbody>
                 {newestFirst.map((entry) => (
-                  <tr key={entry.eventId} data-testid="inventory-audit-entry">
+                  <tr
+                    key={entry.eventId}
+                    data-testid="inventory-audit-entry"
+                    title={`Check code ${entry.integrityHash.slice(0, 12)}`}
+                  >
                     <td className="inventory-audit-when">
                       <strong>{formatDate(entry.occurredAt)}</strong>
                       <small>{formatTime(entry.occurredAt)}</small>
                     </td>
                     <td>
                       <span className={actionToneClass(entryTone(entry))}>
-                        {entry.action}
+                        {ACTION_WORDS[entry.action] ?? entry.action}
                       </span>
                       <strong>
                         {entry.eventTitle
                           ? entry.action === "Reserved"
                             ? `Held for ${entry.eventTitle}`
                             : `Used by ${entry.eventTitle}`
-                          : entry.reason}
+                          : entry.reason === "Reservation consumed"
+                            ? "Taken for an event"
+                            : entry.reason}
                       </strong>
                     </td>
                     <td>
@@ -325,7 +331,9 @@ export function InventoryAuditLogPage() {
                     </td>
                     <td>
                       <span className="inventory-audit-measure">
-                        {entry.measure === "on_hand" ? "On hand" : "Reserved"}
+                        {entry.measure === "on_hand"
+                          ? "On shelf"
+                          : "Held for event"}
                       </span>
                     </td>
                     <td className="supply-number">
@@ -340,17 +348,6 @@ export function InventoryAuditLogPage() {
                     </td>
                     <td className={deltaClass(entry.delta)}>
                       {formatSignedQuantity(entry.delta)}
-                    </td>
-                    <td>
-                      <code
-                        className="inventory-audit-hash"
-                        title={entry.integrityHash}
-                      >
-                        {entry.integrityHash.slice(0, 12)}
-                      </code>
-                      <small title={entry.previousHash}>
-                        prev {entry.previousHash.slice(0, 8)}
-                      </small>
                     </td>
                   </tr>
                 ))}
@@ -377,6 +374,14 @@ function AuditStat({
     </div>
   );
 }
+
+/** Stock words a cook uses for the stored change names. */
+const ACTION_WORDS: Record<string, string> = {
+  Reserved: "Held",
+  "Reservation consumed": "Used at event",
+  "Reservation released": "Hold released",
+  Issued: "Taken off shelf",
+};
 
 function entryTone(
   entry: ChainedInventoryAuditEntry,

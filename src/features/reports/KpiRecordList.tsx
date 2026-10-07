@@ -1,6 +1,10 @@
 import { Link } from "react-router-dom";
 import { formatDate, formatMoney } from "@/lib/format";
-import { closeoutRevenue, isCompletedEvent } from "./dashboardRecordSets";
+import {
+  closeoutRevenue,
+  isCompletedEvent,
+  isConvertedLead,
+} from "./dashboardRecordSets";
 
 /**
  * The records behind each KPI on Tim's KPIs (spec §7.4): every completed
@@ -65,7 +69,7 @@ export function KpiRecordList({
     0,
   );
   const profitTotal = closeouts.reduce((s, c) => s + (c.grossProfit ?? 0), 0);
-  const converted = leads.filter((l) => l.stage === "converted").length;
+  const converted = leads.filter(isConvertedLead).length;
 
   return (
     <section className="mt-6 grid gap-3" data-testid="kpi-records">

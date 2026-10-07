@@ -76,5 +76,13 @@ export function readableRecipeAmount(quantity: number, unit: string): string {
     teaspoon: "tsp",
   };
   const label = scale === 32 ? "fl oz" : (labels[unit] ?? unit);
-  return `${copy} ${label}`;
+  // Count words read "40 portions"; short marks and "each" stay as they are.
+  const counted = ["portion", "serving", "piece", "batch", "tray", "pan"];
+  const plural =
+    counted.includes(label) && amount !== 1
+      ? label === "batch"
+        ? "batches"
+        : `${label}s`
+      : label.replaceAll("_", " ");
+  return `${copy} ${plural}`;
 }
