@@ -815,6 +815,15 @@ function StaffStep({
       setAddError("Select a person and enter a role before adding staff.");
       return;
     }
+    const already = draft.staff.some(
+      (line) =>
+        line.personId === personId &&
+        line.role.trim().toLowerCase() === role.trim().toLowerCase(),
+    );
+    if (already) {
+      setAddError(`${personName(person)} is already on as ${role.trim()}.`);
+      return;
+    }
     update({
       staff: [
         ...draft.staff,
