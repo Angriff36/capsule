@@ -11,6 +11,7 @@ import {
   useListVendorOrderLineDemand,
 } from "../../lib/manifest-convex-react";
 import { formatMoney } from "../../lib/format";
+import { useEventRentalOrderLines } from "../../lib/useEventRows";
 import { buildLiveEventProfitability } from "./liveEventProfitability";
 import "./LiveEventProfitabilityWidget.css";
 
@@ -41,6 +42,7 @@ export function LiveEventProfitabilityWidget({
   const payrollInputs = useListPayrollInput();
   const equipment = useListEquipment();
   const equipmentReservations = useListEquipmentReservation();
+  const rentalLines = useEventRentalOrderLines(eventId);
   // Live labor from clocked time × pay rates (laborSummary seam).
   const clockedLabor = useEventLaborSummary(eventId);
   const loading = [
@@ -66,6 +68,7 @@ export function LiveEventProfitabilityWidget({
         payrollInputs: payrollInputs ?? [],
         equipment: equipment ?? [],
         equipmentReservations: equipmentReservations ?? [],
+        rentalLines: rentalLines ?? [],
         clockedLabor,
         recipeEstimatedFoodCost,
       }),
@@ -74,6 +77,7 @@ export function LiveEventProfitabilityWidget({
       demands,
       equipment,
       equipmentReservations,
+      rentalLines,
       eventId,
       invoices,
       lineDemands,

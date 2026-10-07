@@ -305,6 +305,7 @@ export function buildLiveEventProfitability({
   payrollInputs,
   equipment,
   equipmentReservations,
+  rentalLines = [],
   clockedLabor,
   recipeEstimatedFoodCost,
 }: {
@@ -316,6 +317,13 @@ export function buildLiveEventProfitability({
   lineDemands: readonly ProfitabilityVendorOrderLineDemand[];
   payrollInputs: readonly ProfitabilityPayrollInput[];
   equipment: readonly ProfitabilityEquipment[];
+  /** Items rented from outside vendors for the event, with what they cost. */
+  rentalLines?: readonly {
+    readonly eventId?: unknown;
+    readonly status?: unknown;
+    readonly vendorCost?: number | null;
+    readonly deletedAt?: number | null;
+  }[];
   equipmentReservations: readonly ProfitabilityEquipmentReservation[];
   /**
    * Live clocked-hours labor from the laborSummary seam. When present with
@@ -372,11 +380,24 @@ export function buildLiveEventProfitability({
           inputCount: clockedLabor!.scheduledShiftCount ?? 0,
         }
       : payrollLabor;
-  const equipmentTotal = calculateEquipmentCost(
+  const ownTotal = calculateEquipmentCost(
     eventKey,
     equipment,
     equipmentReservations,
   );
+  // Vendor rentals cost what the vendor charges for the whole line.
+  const vendorRentalCost = rentalLines
+    .filter(
+      (line) =>
+        line.deletedAt == null &&
+        key(line.eventId) === eventKey &&
+        key(line.status) !== "cancelled",
+    )
+    .reduce((sum, line) => sum + Math.max(0, Number(line.vendorCost ?? 0)), 0);
+  const equipmentTotal = {
+    ...ownTotal,
+    cost: ownTotal.cost + vendorRentalCost,
+  };
   const recipeProvided =
     recipeEstimatedFoodCost != null &&
     Number.isFinite(Number(recipeEstimatedFoodCost));
