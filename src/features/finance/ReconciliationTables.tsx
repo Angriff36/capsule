@@ -18,7 +18,12 @@ function money(value: number | null, currency: string): string {
  */
 export function ReconciliationTables({
   report,
-}: Readonly<{ report: FinanceReconciliationReport }>) {
+  paymentLabel,
+}: Readonly<{
+  report: FinanceReconciliationReport;
+  /** The invoice a payment was for, in words; the id when not given. */
+  paymentLabel?: (paymentId: string) => string | undefined;
+}>) {
   if (report.periods.length === 0) {
     return (
       <div className="document-empty">
@@ -133,7 +138,11 @@ export function ReconciliationTables({
                     <td title={line.sourceRowId ?? undefined}>
                       {line.externalId ?? "—"}
                     </td>
-                    <td>{line.paymentId ?? "—"}</td>
+                    <td title={line.paymentId ?? undefined}>
+                      {line.paymentId
+                        ? (paymentLabel?.(line.paymentId) ?? line.paymentId)
+                        : "—"}
+                    </td>
                     <td>{money(line.sourceAmount, line.currency)}</td>
                     <td>{money(line.ledgerAmount, line.currency)}</td>
                     <td>

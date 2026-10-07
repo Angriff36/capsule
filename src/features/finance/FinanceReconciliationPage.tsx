@@ -145,7 +145,18 @@ export function FinanceReconciliationPage() {
         {loading ? (
           <TableSkeleton rows={6} />
         ) : (
-          <ReconciliationTables report={report} />
+          <ReconciliationTables
+            report={report}
+            paymentLabel={(paymentId) => {
+              const payment = payments?.find((row) => row._id === paymentId);
+              const invoice = invoices?.find(
+                (row) => row._id === String(payment?.invoiceId),
+              );
+              return invoice?.invoiceNumber
+                ? `Payment on ${invoice.invoiceNumber}`
+                : undefined;
+            }}
+          />
         )}
       </div>
     </div>
