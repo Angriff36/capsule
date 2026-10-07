@@ -55,10 +55,21 @@ export function QuickFileImport() {
   const [kind, setKind] = useState<(typeof KINDS)[number]["value"]>("menus");
   const [columns, setColumns] = useState("");
 
+  // A file refused under the wrong kind is read again when the kind changes,
+  // so nobody has to pick the same file twice.
+  const refusedFile = useRef<File | null>(null);
   const handleFile = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
+    await readAndImport(file, kind);
+  };
+
+  const readAndImport = async (
+    file: File,
+    kind: (typeof KINDS)[number]["value"],
+  ) => {
+    refusedFile.current = null;
     setError(null);
     setResults([]);
     setSkippedRows(0);
@@ -120,6 +131,7 @@ export function QuickFileImport() {
         rows.length === 0 ? "No rows found in the file." : "Import complete.",
       );
     } catch (cause: unknown) {
+      refusedFile.current = file;
       setError(cause instanceof Error ? cause.message : "Import failed");
       setProgress("");
     } finally {
@@ -156,9 +168,13 @@ export function QuickFileImport() {
           <select
             className="input"
             value={kind}
-            onChange={(event) =>
-              setKind(event.target.value as (typeof KINDS)[number]["value"])
-            }
+            onChange={(event) => {
+              const next = event.target
+                .value as (typeof KINDS)[number]["value"];
+              setKind(next);
+              if (refusedFile.current)
+                void readAndImport(refusedFile.current, next);
+            }}
             disabled={busy}
             data-testid="quick-import-kind"
           >
