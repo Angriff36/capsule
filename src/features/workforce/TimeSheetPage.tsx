@@ -8,6 +8,7 @@ import {
   useListShift,
   useListTimeRecord,
   useTimeRecordApprove,
+  useTimeRecordRemove,
   useTimeRecordClockOut,
   useTimeRecordCorrect,
 } from "../../lib/manifest-convex-react";
@@ -323,6 +324,7 @@ export function TimeSheetPage() {
   const clockOut = useTimeRecordClockOut();
   const correct = useTimeRecordCorrect();
   const approve = useTimeRecordApprove();
+  const removeRecord = useTimeRecordRemove();
   const declare = useCreateAvailabilityWindow();
   const withdraw = useAvailabilityWindowWithdraw();
   const { prompt, host } = useActionPrompt();
@@ -346,12 +348,24 @@ export function TimeSheetPage() {
   const activePeople = (people ?? []).filter(
     (person) => person.deletedAt == null && person.status === "active",
   );
+  // Hours belong to work already done: today's and past events first,
+  // newest first, then what is coming; cancelled events stay out.
+  const cutoff = Date.now() + 86_400_000;
   const activeEvents = (events ?? [])
-    .filter((event) => event.deletedAt == null)
-    .sort((a, b) => (b.startsAt ?? 0) - (a.startsAt ?? 0));
+    .filter((event) => event.deletedAt == null && event.stage !== "cancelled")
+    .sort((a, b) => {
+      const aStart = a.startsAt ?? 0;
+      const bStart = b.startsAt ?? 0;
+      const aDone = aStart <= cutoff;
+      const bDone = bStart <= cutoff;
+      if (aDone !== bDone) return aDone ? -1 : 1;
+      return aDone ? bStart - aStart : aStart - bStart;
+    });
   const personName = (id: string) => {
     const person = people?.find((row) => row._id === id);
-    return person ? `${person.givenName} ${person.familyName}` : "Unknown";
+    return person
+      ? `${person.givenName} ${person.familyName ?? ""}`.trim()
+      : "Unknown";
   };
   const eventTitle = (id: string | null | undefined) => {
     if (id == null || id === "") return "—";
@@ -500,6 +514,26 @@ export function TimeSheetPage() {
         });
       }
       if (key === "approve") await approve(args);
+      if (key === "remove") {
+        const values = await prompt.askFields({
+          title: "Remove this time entry",
+          description: "Take a wrong entry off the time sheet. It is not paid.",
+          fields: [
+            {
+              name: "reason",
+              label: "Why",
+              inputType: "text",
+              required: true,
+            },
+          ],
+          confirmLabel: "Remove entry",
+        });
+        if (!values) return;
+        await removeRecord({
+          ...args,
+          reason: String(values.reason ?? "").trim(),
+        });
+      }
     });
   };
 
@@ -781,6 +815,9 @@ export function TimeSheetPage() {
                           ...policy.timeActions(String(row.status)),
                           ...(waitingApproval.includes(row)
                             ? [{ key: "approve", label: "Approve" }]
+                            : []),
+                          ...(row.approvedAt == null
+                            ? [{ key: "remove", label: "Remove" }]
                             : []),
                         ].map((action) => (
                           <button

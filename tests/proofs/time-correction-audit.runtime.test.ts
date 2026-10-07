@@ -4,7 +4,7 @@
  * reason. Elapsed time across an overnight daylight-saving change is the real
  * number of minutes, and a retried clock-in never makes a second open entry.
  */
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { api } from "../../convex/_generated/api";
 import type { Doc } from "../../convex/_generated/dataModel";
 import {
@@ -19,6 +19,16 @@ import { paidMinutes } from "../../src/features/workforce/timePay";
 
 const M = api.mutations;
 const TENANT = "tenant-time-correction-audit";
+
+// Corrected hours must already be worked; these fixtures use dates in late
+// 2026, so the clock reads 2030.
+beforeAll(() => {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date("2030-01-01T12:00:00Z"));
+});
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 beforeAll(() => {
   process.env.CONVEX_FIELD_ENCRYPTION_KEY ??=

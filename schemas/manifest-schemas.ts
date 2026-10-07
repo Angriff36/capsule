@@ -12806,6 +12806,13 @@ export const TimeRecordCorrectParamsSchema = z.object({
 
 export type TimeRecordCorrectParams = z.infer<typeof TimeRecordCorrectParamsSchema>;
 
+// Command: remove on TimeRecord
+export const TimeRecordRemoveParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type TimeRecordRemoveParams = z.infer<typeof TimeRecordRemoveParamsSchema>;
+
 // Command: register on Trailer
 export const TrailerRegisterParamsSchema = z.object({
   make: z.string(),

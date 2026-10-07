@@ -6,7 +6,7 @@
  * - AC-383: approved time (unpaid lunch off, paid breaks kept, split at 40 h
  *   a week) becomes the payroll input and the payroll export row.
  */
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { api } from "../../convex/_generated/api";
 import type { Doc } from "../../convex/_generated/dataModel";
 import {
@@ -23,6 +23,16 @@ import type { PersonPeriodLaborSummary } from "../../src/features/facilities/use
 const M = api.mutations;
 const TENANT = "tenant-clock-alerts";
 const MIN = 60_000;
+
+// Corrected hours must already be worked; these fixtures use dates in late
+// 2026, so the clock reads 2030.
+beforeAll(() => {
+  vi.useFakeTimers({ toFake: ["Date"] });
+  vi.setSystemTime(new Date("2030-01-01T12:00:00Z"));
+});
+afterAll(() => {
+  vi.useRealTimers();
+});
 
 beforeAll(() => {
   process.env.CONVEX_FIELD_ENCRYPTION_KEY ??=

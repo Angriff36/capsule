@@ -869,6 +869,7 @@ import {
   TimeRecordClockInParamsSchema,
   TimeRecordClockOutParamsSchema,
   TimeRecordCorrectParamsSchema,
+  TimeRecordRemoveParamsSchema,
   TrailerRegisterParamsSchema,
   TrailerReviseDetailsParamsSchema,
   TrailerSetCargoFactsParamsSchema,
@@ -12996,6 +12997,16 @@ export function useTimeRecordCorrect() {
   };
 }
 
+/** Mutation hook for TimeRecord.remove. */
+export function useTimeRecordRemove() {
+  const mutate = useMutation(api.mutations.TimeRecord_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = TimeRecordRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Governed creation hook for TimeRecord.clockIn. */
 export function useCreateTimeRecord() {
   const mutate = useMutation(api.mutations.TimeRecord_createViaClockIn);
@@ -14803,4 +14814,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1565 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1566 as const;

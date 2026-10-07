@@ -54,6 +54,11 @@ export const TYPED_CLOCK_OUT_REASON =
 
 const SHIFT_SLACK_MS = 2 * 60 * 60 * 1000;
 
+/** Same slack as the server's correct rule (src/workforce/time.manifest). */
+const AHEAD_SLACK_MS = 15 * 60 * 1000;
+export const NOT_WORKED_YET =
+  "These hours haven't happened yet. Enter them after the shift is worked.";
+
 export function toEpoch(value: unknown): number | null {
   if (value == null || value === "") return null;
   if (typeof value === "number") return Number.isFinite(value) ? value : null;
@@ -197,8 +202,8 @@ export async function persistPrimaryTimeRecord(
       "This clock-in is in the past. Enter the clock-out time too, or set clock-in to now.",
     );
   }
-  const createArgs = buildClockInCreateArgs(input);
-  const created = await api.clockIn(createArgs);
+  // Check the typed window before writing anything, so a refused time
+  // leaves no half-made entry behind.
   const window = wantsWindow
     ? parseTimeWindow(input.clockInAt, input.clockOutAt)
     : null;
@@ -207,6 +212,11 @@ export async function persistPrimaryTimeRecord(
       "The clock-out time has to be at or after the clock-in time.",
     );
   }
+  if (window && window.clockOutAt > Date.now() + AHEAD_SLACK_MS) {
+    throw new Error(NOT_WORKED_YET);
+  }
+  const createArgs = buildClockInCreateArgs(input);
+  const created = await api.clockIn(createArgs);
   if (window) {
     const closed = await api.clockOut({
       docId: created.docId,
@@ -251,6 +261,9 @@ export async function persistClockOut(
     throw new Error(
       "The clock-out time has to be at or after the clock-in time.",
     );
+  }
+  if (desiredOut != null && desiredOut > Date.now() + AHEAD_SLACK_MS) {
+    throw new Error(NOT_WORKED_YET);
   }
   const closed = await api.clockOut({
     docId: input.docId,
