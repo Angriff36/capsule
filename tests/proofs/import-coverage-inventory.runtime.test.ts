@@ -22,6 +22,7 @@ import {
   TPP_MENU_COLUMNS,
   tppMenuTableToRows,
 } from "../../src/lib/tppMenuCsv";
+import { TPP_STAFF_LIST_COLUMNS } from "../../src/lib/tppStaffList";
 import {
   ensureEncryptionKey,
   importRows,
@@ -141,5 +142,20 @@ describe("runtime proof: every source dataset maps, keeps or reports each presen
       );
     });
     expect(unnamed).toEqual([]);
+  });
+
+  it("the Staff Address & Phone List: every heading has a home on the person", () => {
+    const heading = [
+      "Staff Member",
+      "Home",
+      "Work",
+      "Mobile",
+      "Email",
+      "Address",
+    ];
+    const named = TPP_STAFF_LIST_COLUMNS.map((entry) => entry.column);
+    expect(heading.filter((column) => !named.includes(column))).toEqual([]);
+    for (const entry of TPP_STAFF_LIST_COLUMNS)
+      expect(entry.note.length, entry.column).toBeGreaterThan(2);
   });
 });
