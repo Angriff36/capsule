@@ -213,7 +213,12 @@ export function EventCreatePage() {
     const client = clients?.find((row) => row._id === clientId);
     if (!client) return;
     if (contactNameRef.current && !contactNameRef.current.value)
-      contactNameRef.current.value = clientDisplayName(client._id, [client]);
+      // The person at the client, else the company.
+      contactNameRef.current.value =
+        [client.givenName, client.familyName]
+          .map((part) => part?.trim())
+          .filter(Boolean)
+          .join(" ") || clientDisplayName(client._id, [client]);
     if (
       contactEmailRef.current &&
       !contactEmailRef.current.value &&

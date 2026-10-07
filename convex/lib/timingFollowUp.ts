@@ -8,9 +8,6 @@ import type { MutationCtx } from "../_generated/server";
  * date also queue a drive-time check (routeFollowUp.ts).
  */
 const EVENT_INPUTS = new Set([
-  // A new event gets the company times straight away.
-  "EventPlanned",
-  "EventDraftCaptured",
   "EventVenueChanged",
   "EventScheduleChanged",
   "EventServiceStyleChanged",

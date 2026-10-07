@@ -647,7 +647,13 @@ function ClientHeadcountStep({
             update({
               clientId: id,
               ...(!draft.primaryContactName && client
-                ? { primaryContactName: clientName(client) }
+                ? {
+                    // The person at the client, else the company.
+                    primaryContactName:
+                      [client.givenName, client.familyName]
+                        .filter(Boolean)
+                        .join(" ") || clientName(client),
+                  }
                 : {}),
             });
           }}

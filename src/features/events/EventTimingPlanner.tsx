@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { Id } from "../../lib/api";
 import { useEventTimingPlan } from "../../lib/operational-transactions";
+import { useEventTimingRules } from "../../lib/useEventTimingRules";
 import {
   useEventConfigureTiming,
   useEventTimelineActivityPlanTiming,
@@ -28,6 +29,7 @@ type Milestone = Plan["milestones"][number];
 /** Event inputs and their shared milestones, with visible preserved exceptions. */
 export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
   const plan = useEventTimingPlan(eventId);
+  const rules = useEventTimingRules(eventId);
   const save = useEventConfigureTiming();
   const resume = useEventTimelineActivityUseCalculatedTiming();
   const link = useEventTimelineActivityPlanTiming();
@@ -132,7 +134,12 @@ export function EventTimingPlanner({ eventId }: { eventId: Id<"events"> }) {
             className="btn btn-ghost min-h-10"
             disabled={busy}
             onClick={() => {
-              setDraft(startDraft(plan));
+              setDraft(
+                startDraft(plan, {
+                  setupMinutes: rules?.setup.ruleMinutes,
+                  loadMinutes: rules?.load.ruleMinutes,
+                }),
+              );
               setFailure(null);
               setSaved(false);
             }}
