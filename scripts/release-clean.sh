@@ -45,6 +45,20 @@ if [ ! -d "$COPY/.git" ]; then
   git clone -q --branch dev "$ORIGIN_URL" "$COPY"
 fi
 
+# One release at a time: a second run resets and cleans the copy under the
+# first one, so its check loses files (coverage .tmp ENOENT, 2026-10-07).
+LOCK="$COPY.lock"
+if ! mkdir "$LOCK" 2>/dev/null; then
+  holder="$(cat "$LOCK/pid" 2>/dev/null || true)"
+  if [ -n "$holder" ] && kill -0 "$holder" 2>/dev/null; then
+    say "another release is running (pid $holder); run this again when it ends"
+    exit 1
+  fi
+  rm -rf "$LOCK"; mkdir "$LOCK"
+fi
+echo $$ >"$LOCK/pid"
+trap 'rm -rf "$LOCK"' EXIT
+
 cd "$COPY"
 git fetch -q origin
 candidate="$(git rev-parse --verify -q "$candidate^{commit}" || true)"
