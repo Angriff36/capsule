@@ -551,6 +551,18 @@ export function ProposalsPage() {
         });
         return;
       }
+      // Expired is final (no way back), so it asks once.
+      if (
+        key === "expire" &&
+        !(await prompt.askConfirm({
+          title: "Expire proposal",
+          description:
+            "The client can no longer accept it. To offer it again, make a new proposal.",
+          confirmLabel: "Expire proposal",
+          cancelLabel: "Keep it open",
+        }))
+      )
+        return;
       void run(`${row._id}:${key}`, async () => {
         const args = { docId: row._id, version: row.version };
         if (key === "send")
