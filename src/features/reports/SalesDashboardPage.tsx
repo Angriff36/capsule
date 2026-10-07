@@ -18,6 +18,7 @@ import { formatMoney } from "@/lib/format";
 import {
   commissionBasis,
   isBookedEvent,
+  isConvertedLead,
   isQualifiedLead,
   NOT_KNOWN,
   percentOf,
@@ -85,12 +86,7 @@ export function SalesDashboardPage() {
     const totalLeads = all.length;
     // A lead has no "converted" stage: it is converted once it became a
     // client account.
-    const converted = all.filter(
-      (l) =>
-        String(l.stage) === "converted" ||
-        l.convertedAt != null ||
-        l.clientId != null,
-    ).length;
+    const converted = all.filter(isConvertedLead).length;
     const qualified = all.filter(isQualifiedLead).length;
 
     return {

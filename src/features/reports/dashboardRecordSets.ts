@@ -51,6 +51,19 @@ export const QUALIFIED_LEAD_STAGES: readonly string[] = [
   "converted",
 ];
 
+/** A lead is converted once it became a client account, whatever its stage. */
+export function isConvertedLead(lead: {
+  readonly stage?: string | null;
+  readonly convertedAt?: number | null;
+  readonly clientId?: string | null;
+}) {
+  return (
+    lead.stage === "converted" ||
+    lead.convertedAt != null ||
+    lead.clientId != null
+  );
+}
+
 /** A lead that became a client went past qualified, whatever its stage says. */
 export function isQualifiedLead(lead: {
   readonly stage?: string | null;
