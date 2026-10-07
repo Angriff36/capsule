@@ -76,9 +76,11 @@ export function QuickFileImport() {
     setSkippedRows(0);
     setColumns("");
     setBusy(true);
-    // Chunks already saved stay saved; a file with any saved part is never
-    // brought in again under another kind.
+    // Once any rows went to the server some may be saved even if the call
+    // failed, so only a file refused before that is brought in again under
+    // another kind.
     const chunks: ChunkResult[] = [];
+    let sent = false;
     try {
       const checksum = await fileChecksum(await file.arrayBuffer());
       let grid: string[][];
@@ -121,6 +123,7 @@ export function QuickFileImport() {
         setProgress(
           `Importing ${Math.min(i + part.length, rows.length)} of ${rows.length}…`,
         );
+        sent = true;
         const result = await importFile({
           datasetType: kind,
           sourceSystem: "tpp_legacy",
@@ -134,7 +137,7 @@ export function QuickFileImport() {
         rows.length === 0 ? "No rows found in the file." : "Import complete.",
       );
     } catch (cause: unknown) {
-      if (chunks.length === 0) refusedFile.current = file;
+      if (!sent) refusedFile.current = file;
       // Server faults arrive wrapped in request ids; show the plain sentence.
       const failure = classifyCommandFailure(cause);
       setError(
