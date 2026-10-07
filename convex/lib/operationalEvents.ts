@@ -652,6 +652,11 @@ export async function handleManifestEvent(
     const moved = await ctx.db.get(event.entityId as Id<"events">);
     if (!moved || moved.deletedAt != null || !moved.clientId) return;
     const clientId = moved.clientId;
+    // Only the former client's drafts move; a draft billed to someone else
+    // (another payer for the same event) stays as it is.
+    const previousClientId = (event.payload as { previousClientId?: string | null })
+      ?.previousClientId;
+    if (!previousClientId) return;
     const system = TenantSystemCommandRunner.forTenant(
       ctx,
       moved.tenantId,
@@ -667,7 +672,7 @@ export async function handleManifestEvent(
         invoice.status !== "draft" ||
         invoice.sentAt != null ||
         Number(invoice.amountPaid ?? 0) !== 0 ||
-        invoice.clientId === clientId
+        String(invoice.clientId) !== String(previousClientId)
       )
         continue;
       await system.runMutation(api.mutations.Invoice_followEventClient, {
