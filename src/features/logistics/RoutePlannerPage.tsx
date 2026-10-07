@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { formatDate } from "../../lib/format";
 import { Link } from "react-router-dom";
 import {
   useListDelivery,
@@ -290,8 +291,8 @@ export function RoutePlannerPage() {
           <div>
             <p className="eyebrow">
               {selectedVehicle
-                ? `${selectedVehicle.registration} · ${new Date(dayStart).toLocaleDateString()}`
-                : new Date(dayStart).toLocaleDateString()}
+                ? `${selectedVehicle.registration} · ${formatDate(dayStart)}`
+                : formatDate(dayStart)}
             </p>
             <h2>Stop list</h2>
           </div>

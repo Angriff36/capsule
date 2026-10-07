@@ -2,7 +2,7 @@ import { useOverdueVehicleService } from "./vehicleServiceDue";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
-import { formatCountNoun } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import {
   useListDelivery,
   useListVehicle,
@@ -161,7 +161,7 @@ export function VehicleSchedulePage() {
         <div className="ledger-heading">
           <div>
             <p className="eyebrow">Day view</p>
-            <h2>{new Date(dayStart).toLocaleDateString()}</h2>
+            <h2>{formatDate(dayStart)}</h2>
           </div>
           <span>
             {formatCountNoun(fleet.length, "vehicle")} ·{" "}
