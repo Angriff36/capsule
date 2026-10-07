@@ -1072,25 +1072,31 @@ async function deliverReminder(
     if (cause instanceof ReminderDeliveryError) cause.recipientKey = toKey;
     throw cause;
   }
+  // An email the provider accepted on an earlier try may have carried other
+  // amounts or another address than this retry, so its details are not
+  // recorded from this retry: only that it went.
   await recordReminderEvent(ctx, EVENT.delivered, attempt, {
     ...(sent.emailId
-      ? { emailId: sent.emailId, providerState: "accepted" }
-      : { providerState: "accepted_earlier" }),
-    sessionId: currentSession.sessionId,
-    amountDue: Number(context.invoice.amountDue),
-    dueDate: Number(context.invoice.dueDate),
+      ? {
+          emailId: sent.emailId,
+          providerState: "accepted",
+          sessionId: currentSession.sessionId,
+          amountDue: Number(context.invoice.amountDue),
+          dueDate: Number(context.invoice.dueDate),
+          recipientMasked: maskEmail(context.recipient.email),
+          recipientSource: context.recipient.source,
+          recipientContactId: context.recipient.contactId,
+          sender: sent.from,
+          replyTo: context.organization.replyTo,
+          subject: sent.subject,
+          attachments: [sent.attachmentName],
+          artifactFingerprint: sent.fingerprint,
+        }
+      : { providerState: "accepted_earlier", detailsKnown: false }),
     timing: reminderOffsetLabel(attempt.offsetDays),
     attempt: attempt.attempt,
-    recipientMasked: maskEmail(context.recipient.email),
-    recipientSource: context.recipient.source,
-    recipientContactId: context.recipient.contactId,
-    sender: sent.from,
-    replyTo: context.organization.replyTo,
-    subject: sent.subject,
     template: INVOICE_REMINDER_TEMPLATE.id,
     templateVersion: INVOICE_REMINDER_TEMPLATE.version,
-    attachments: [sent.attachmentName],
-    artifactFingerprint: sent.fingerprint,
   });
   if (!sent.emailId) {
     return { status: "delivered", to: maskEmail(context.recipient.email) };
