@@ -303,6 +303,17 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
     emit RevenueAttributionRejected
   }
 
+  // A cancelled event earns no revenue to split: its open split closes.
+  command closeForCancelledEvent() {
+    guard self.deletedAt == null
+    guard self.status == "draft" or self.status == "pending_approval"
+    guard roleAllows(user.role, "financeAccess") or roleAllows(user.role, "salesManageAccess")
+
+    mutate status = "rejected"
+    mutate rejectionReason = "The event was cancelled"
+    emit RevenueAttributionRejected
+  }
+
   command apply(eventRevenue: money(12, 2)) {
     guard self.deletedAt == null
     guard self.status == "approved"

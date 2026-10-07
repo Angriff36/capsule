@@ -11894,6 +11894,11 @@ export const RevenueAttributionChangeSplitParamsSchema = z.object({
 
 export type RevenueAttributionChangeSplitParams = z.infer<typeof RevenueAttributionChangeSplitParamsSchema>;
 
+// Command: closeForCancelledEvent on RevenueAttribution
+export const RevenueAttributionCloseForCancelledEventParamsSchema = z.object({});
+
+export type RevenueAttributionCloseForCancelledEventParams = z.infer<typeof RevenueAttributionCloseForCancelledEventParamsSchema>;
+
 // Command: create on RevenueAttribution
 export const RevenueAttributionCreateParamsSchema = z.object({
   eventId: z.string().min(1),

@@ -618,6 +618,30 @@ export async function handleManifestEvent(
       { triggerEventId: String(event.eventId), triggerType: event.type },
       String(event.payload.reason),
     );
+    // Its open revenue splits close with it.
+    const cancelled = await ctx.db.get(event.entityId as Id<"events">);
+    if (cancelled) {
+      const splits = await ctx.db
+        .query("revenueAttributions")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", cancelled.tenantId))
+        .collect();
+      const system = TenantSystemCommandRunner.forTenant(
+        ctx,
+        cancelled.tenantId,
+      ).context;
+      for (const split of splits) {
+        if (
+          String(split.eventId) !== String(cancelled._id) ||
+          split.deletedAt != null ||
+          !["draft", "pending_approval"].includes(String(split.status))
+        )
+          continue;
+        await system.runMutation(
+          api.mutations.RevenueAttribution_closeForCancelledEvent,
+          { docId: split._id },
+        );
+      }
+    }
     return;
   }
   // An event moved to another client takes its unsent, unpaid draft bills;

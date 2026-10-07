@@ -758,6 +758,7 @@ import {
   RevenueAttributionApplyParamsSchema,
   RevenueAttributionApproveParamsSchema,
   RevenueAttributionChangeSplitParamsSchema,
+  RevenueAttributionCloseForCancelledEventParamsSchema,
   RevenueAttributionCreateParamsSchema,
   RevenueAttributionRejectParamsSchema,
   RevenueAttributionRequestApprovalParamsSchema,
@@ -11300,6 +11301,16 @@ export function useRevenueAttributionChangeSplit() {
   };
 }
 
+/** Mutation hook for RevenueAttribution.closeForCancelledEvent. */
+export function useRevenueAttributionCloseForCancelledEvent() {
+  const mutate = useMutation(api.mutations.RevenueAttribution_closeForCancelledEvent);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RevenueAttributionCloseForCancelledEventParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for RevenueAttribution.create. */
 export function useRevenueAttributionCreate() {
   const mutate = useMutation(api.mutations.RevenueAttribution_create);
@@ -14814,4 +14825,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1566 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1567 as const;
