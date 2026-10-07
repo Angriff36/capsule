@@ -220,6 +220,22 @@ export function KitchenDisplayPage() {
       (item) =>
         eventFilter === "all" || (item.eventId ?? "house") === eventFilter,
     )
+    // Prep for an event that is finished, cancelled or two days gone can't be
+    // cooked any more; it stays on the prep board, off the live screen
+    // (unless that event is picked above).
+    .filter((item) => {
+      if (eventFilter !== "all" || !item.eventId) return true;
+      const event =
+        namedEvents?.find((row) => row._id === item.eventId) ??
+        events?.find((row) => row._id === item.eventId);
+      if (
+        ["cancelled", "completed", "closed_out"].includes(String(event?.stage))
+      )
+        return false;
+      return !(
+        event?.startsAt != null && event.startsAt < now - 2 * 86_400_000
+      );
+    })
     .sort((left, right) => {
       const rank = urgencyRank(left, now) - urgencyRank(right, now);
       if (rank !== 0) return rank;
