@@ -289,8 +289,10 @@ function MetricCard({
       >
         {row.trend.map((point) => (
           <li key={point.month}>
-            {point.month.slice(5)}:{" "}
-            {point.value == null ? "—" : formatValue(point.value)}
+            {new Date(`${point.month}-01T12:00:00`).toLocaleString("en-US", {
+              month: "short",
+            })}
+            : {point.value == null ? "—" : formatValue(point.value)}
           </li>
         ))}
       </ol>
