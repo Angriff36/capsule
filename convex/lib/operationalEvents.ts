@@ -633,7 +633,7 @@ export async function handleManifestEvent(
         if (
           String(split.eventId) !== String(cancelled._id) ||
           split.deletedAt != null ||
-          !["draft", "pending_approval"].includes(String(split.status))
+          !["draft", "pending_approval", "approved"].includes(String(split.status))
         )
           continue;
         await system.runMutation(

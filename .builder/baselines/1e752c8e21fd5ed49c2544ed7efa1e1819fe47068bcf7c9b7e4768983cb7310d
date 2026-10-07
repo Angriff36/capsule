@@ -58468,7 +58468,7 @@ async function __runRevenueAttributionApply(ctx: MutationCtx, { docId, eventReve
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "applied";
-        const __allowed: Record<string, string[]> = { "draft": ["pending_approval", "approved", "rejected"], "pending_approval": ["approved", "rejected", "draft"], "approved": ["applied"], "rejected": ["draft"], "applied": [] };
+        const __allowed: Record<string, string[]> = { "draft": ["pending_approval", "approved", "rejected"], "pending_approval": ["approved", "rejected", "draft"], "approved": ["applied", "rejected"], "rejected": ["draft"], "applied": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -58535,7 +58535,7 @@ async function __runRevenueAttributionApprove(ctx: MutationCtx, { docId, version
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "approved";
-        const __allowed: Record<string, string[]> = { "draft": ["pending_approval", "approved", "rejected"], "pending_approval": ["approved", "rejected", "draft"], "approved": ["applied"], "rejected": ["draft"], "applied": [] };
+        const __allowed: Record<string, string[]> = { "draft": ["pending_approval", "approved", "rejected"], "pending_approval": ["approved", "rejected", "draft"], "approved": ["applied", "rejected"], "rejected": ["draft"], "applied": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -58652,14 +58652,14 @@ async function __runRevenueAttributionCloseForCancelledEvent(ctx: MutationCtx, {
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may update attributions");
     if (!(checkRole(user, "financeAccess"))) throw new Error("Finance staff may change attributions");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!(((doc.status === "draft") || (doc.status === "pending_approval")))) throw new Error("Guard 1 failed");
+    if (!((((doc.status === "draft") || (doc.status === "pending_approval")) || (doc.status === "approved")))) throw new Error("Guard 1 failed");
     if (!((checkRole(user, "financeAccess") || checkRole(user, "salesManageAccess")))) throw new Error("Guard 2 failed");
     {
       const __cur = doc.status;
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "rejected";
-        const __allowed: Record<string, string[]> = { "draft": ["pending_approval", "approved", "rejected"], "pending_approval": ["approved", "rejected", "draft"], "approved": ["applied"], "rejected": ["draft"], "applied": [] };
+        const __allowed: Record<string, string[]> = { "draft": ["pending_approval", "approved", "rejected"], "pending_approval": ["approved", "rejected", "draft"], "approved": ["applied", "rejected"], "rejected": ["draft"], "applied": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -58815,7 +58815,7 @@ async function __runRevenueAttributionReject(ctx: MutationCtx, { docId, rejectio
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "rejected";
-        const __allowed: Record<string, string[]> = { "draft": ["pending_approval", "approved", "rejected"], "pending_approval": ["approved", "rejected", "draft"], "approved": ["applied"], "rejected": ["draft"], "applied": [] };
+        const __allowed: Record<string, string[]> = { "draft": ["pending_approval", "approved", "rejected"], "pending_approval": ["approved", "rejected", "draft"], "approved": ["applied", "rejected"], "rejected": ["draft"], "applied": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -58878,7 +58878,7 @@ async function __runRevenueAttributionRequestApproval(ctx: MutationCtx, { docId,
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "pending_approval";
-        const __allowed: Record<string, string[]> = { "draft": ["pending_approval", "approved", "rejected"], "pending_approval": ["approved", "rejected", "draft"], "approved": ["applied"], "rejected": ["draft"], "applied": [] };
+        const __allowed: Record<string, string[]> = { "draft": ["pending_approval", "approved", "rejected"], "pending_approval": ["approved", "rejected", "draft"], "approved": ["applied", "rejected"], "rejected": ["draft"], "applied": [] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");

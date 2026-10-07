@@ -176,7 +176,7 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
 
   transition status from "draft" to ["pending_approval", "approved", "rejected"]
   transition status from "pending_approval" to ["approved", "rejected", "draft"]
-  transition status from "approved" to ["applied"]
+  transition status from "approved" to ["applied", "rejected"]
   transition status from "rejected" to ["draft"]
   transition status from "applied" to []
 
@@ -306,7 +306,8 @@ entity RevenueAttribution mixin TenantScoped, SoftDeletable {
   // A cancelled event earns no revenue to split: its open split closes.
   private command closeForCancelledEvent() {
     guard self.deletedAt == null
-    guard self.status == "draft" or self.status == "pending_approval"
+    // Approved but not yet applied also closes: nothing was posted yet.
+    guard self.status == "draft" or self.status == "pending_approval" or self.status == "approved"
     guard roleAllows(user.role, "financeAccess") or roleAllows(user.role, "salesManageAccess")
 
     mutate status = "rejected"
