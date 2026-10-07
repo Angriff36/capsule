@@ -9,6 +9,40 @@
 // place a task whose event is not in Capsule.
 import { interpretSerial } from "./xlsxValues";
 
+/** Where every column of the report goes (history fields, TPP_HISTORY_MAPPINGS). */
+export const TPP_CONTACT_TASK_COLUMNS: ReadonlyArray<{
+  column: string;
+  field: string;
+  note: string;
+}> = [
+  {
+    column: "Name:",
+    field: "ContactName",
+    note: "the client the task is under",
+  },
+  {
+    column: "Business Name: / Work #: / Home #: / Mobile #: / Email:",
+    field: "",
+    note: "the client's own details; they come in from the Address / Phone List",
+  },
+  { column: "Task Owner", field: "CreatedBy", note: "who the task was for" },
+  {
+    column: "Task Type",
+    field: "HistoryType",
+    note: 'blank in the report; every line is a "Task"',
+  },
+  { column: "Task Date", field: "HistoryDate", note: "also the due date" },
+  { column: "Priority", field: "Priority", note: "kept on the import link" },
+  { column: "Complete ?", field: "Completed", note: "Yes = done" },
+  { column: "Task Subject", field: "Subject", note: "the task's title" },
+  { column: "Task Description", field: "Notes", note: "the task's details" },
+  {
+    column: "Event Information",
+    field: "EventID",
+    note: 'the "(Event #: 5098)" number puts the task on its event; the text is kept on the import link',
+  },
+];
+
 /** True when the grid is TPP's Contact Tasks & Notes report. */
 export function isContactTasksReport(
   grid: ReadonlyArray<ReadonlyArray<string>>,
