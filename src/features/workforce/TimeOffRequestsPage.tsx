@@ -16,10 +16,13 @@ const dateRange = new Intl.DateTimeFormat(undefined, {
   year: "numeric",
 });
 
-const formatRange = (startsAt?: number | null, endsAt?: number | null) =>
-  startsAt == null || endsAt == null
-    ? "Dates unavailable"
-    : `${dateRange.format(startsAt)} – ${dateRange.format(endsAt - 1)}`;
+const formatRange = (startsAt?: number | null, endsAt?: number | null) => {
+  if (startsAt == null || endsAt == null) return "Dates unavailable";
+  const first = dateRange.format(startsAt);
+  const last = dateRange.format(endsAt - 1);
+  // One day off reads as one date.
+  return first === last ? first : `${first} – ${last}`;
+};
 
 export function TimeOffRequestsPage() {
   const requests = useListTimeOffRequest();
