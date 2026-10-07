@@ -207,7 +207,10 @@ describe("runtime proof: quote to booked event (AC-017)", () => {
     expect(proposalBefore.notes).toContain(
       "Service style: Family-style buffet",
     );
-    expect(proposalBefore.notes).toContain("Occasion: Retirement party");
+    // The occasion is the proposal's event type, not a note.
+    expect((proposalBefore as { eventType?: string }).eventType).toBe(
+      "Retirement party",
+    );
     // The proposal points at the event the same conversion created (A1) —
     // accept will reuse it instead of booking a second event.
     expect(proposalBefore.eventId).toBe(converted.eventId);
