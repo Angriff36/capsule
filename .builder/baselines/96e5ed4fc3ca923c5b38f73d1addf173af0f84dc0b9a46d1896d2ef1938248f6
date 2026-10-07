@@ -2257,6 +2257,7 @@ export default defineSchema({
     guestCount: v.optional(v.union(v.number(), v.null())),
     eventType: v.optional(v.union(v.string(), v.null())),
     closedAt: v.optional(v.union(v.number(), v.null())),
+    closeReason: v.optional(v.union(v.string(), v.null())),
     clientMergeAuthorizationId: v.optional(v.union(v.id("clientMerges"), v.null())),
     mergeTargetClientId: v.optional(v.union(v.id("clients"), v.null())),
     createdAt: v.optional(v.number()),

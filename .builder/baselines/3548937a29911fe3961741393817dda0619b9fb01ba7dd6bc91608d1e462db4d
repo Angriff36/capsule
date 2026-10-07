@@ -460,10 +460,12 @@ import {
   ItemUnitMappingRecordParamsSchema,
   ItemUnitMappingRetireParamsSchema,
   LeadCaptureParamsSchema,
+  LeadCloseParamsSchema,
   LeadConfirmConversionParamsSchema,
   LeadConfirmProposalSentParamsSchema,
   LeadReassignClientParamsSchema,
   LeadRecordSourceHistoryParamsSchema,
+  LeadReopenParamsSchema,
   LeadReviseDetailsParamsSchema,
   LeadStageClientMergeParamsSchema,
   LeadStageConversionParamsSchema,
@@ -7276,6 +7278,16 @@ export function useLeadCapture() {
   };
 }
 
+/** Mutation hook for Lead.close. */
+export function useLeadClose() {
+  const mutate = useMutation(api.mutations.Lead_close);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadCloseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Lead.confirmConversion. */
 export function useLeadConfirmConversion() {
   const mutate = useMutation(api.mutations.Lead_confirmConversion);
@@ -7312,6 +7324,16 @@ export function useLeadRecordSourceHistory() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = LeadRecordSourceHistoryParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Lead.reopen. */
+export function useLeadReopen() {
+  const mutate = useMutation(api.mutations.Lead_reopen);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadReopenParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -14847,4 +14869,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1569 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1571 as const;

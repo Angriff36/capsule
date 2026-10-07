@@ -2417,6 +2417,7 @@ export const LeadSchema = z.object({
   guestCount: z.number().int().nullable().optional(),
   eventType: z.string().nullable().optional(),
   closedAt: z.coerce.date().nullable().optional(),
+  closeReason: z.string().nullable().optional(),
   clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
   mergeTargetClientId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -9354,6 +9355,13 @@ export const LeadCaptureParamsSchema = z.object({
 
 export type LeadCaptureParams = z.infer<typeof LeadCaptureParamsSchema>;
 
+// Command: close on Lead
+export const LeadCloseParamsSchema = z.object({
+  reason: z.string().optional(),
+});
+
+export type LeadCloseParams = z.infer<typeof LeadCloseParamsSchema>;
+
 // Command: confirmConversion on Lead
 export const LeadConfirmConversionParamsSchema = z.object({});
 
@@ -9378,6 +9386,11 @@ export const LeadRecordSourceHistoryParamsSchema = z.object({
 });
 
 export type LeadRecordSourceHistoryParams = z.infer<typeof LeadRecordSourceHistoryParamsSchema>;
+
+// Command: reopen on Lead
+export const LeadReopenParamsSchema = z.object({});
+
+export type LeadReopenParams = z.infer<typeof LeadReopenParamsSchema>;
 
 // Command: reviseDetails on Lead
 export const LeadReviseDetailsParamsSchema = z.object({

@@ -435,6 +435,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.ItemUnitMapping_createViaRecord, { "ingredientId": "ingredientId-item-unit-mapping-1", "componentId": "componentId-item-unit-mapping-1", "kind": "demo-kind-1", "unit": "demo-unit-1", "equalsQuantity": 1, "equalsUnit": "demo-equalsUnit-1", "fromBasis": "demo-fromBasis-1", "toBasis": "demo-toBasis-1", "source": "demo-source-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.ItemUnitMapping_createViaRecord, { "ingredientId": "ingredientId-item-unit-mapping-2", "componentId": "componentId-item-unit-mapping-2", "kind": "demo-kind-2", "unit": "demo-unit-2", "equalsQuantity": 2, "equalsUnit": "demo-equalsUnit-2", "fromBasis": "demo-fromBasis-2", "toBasis": "demo-toBasis-2", "source": "demo-source-2" } as any);
+  // Lead has multiple initialization commands (capture, close); using the selected initialization command: capture.
   // Lead → api.mutations.Lead_createViaCapture
   rowsAttempted += 1;
   await client.mutation(api.mutations.Lead_createViaCapture, { "leadType": "demo-leadType-1", "companyName": "Lead 1", "givenName": "Lead 1", "familyName": "Lead 1", "email": "user1@example.com", "phone": "demo-phone-1", "source": "demo-source-1", "referralSourceId": "referralSourceId-lead-1", "estimatedValue": 1, "probability": 1, "notes": "demo-notes-1", "eventDate": 1767268800000, "guestCount": 1, "eventType": "demo-eventType-1" } as any);
