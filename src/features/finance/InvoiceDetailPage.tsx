@@ -1395,7 +1395,7 @@ export function InvoiceDetailPage() {
             </button>
           ) : null}
         </div>
-        {!paymentLinkAvailable && !paymentLink ? (
+        {!paymentLinkAvailable && !paymentLink && amountDue > 0 ? (
           <p className="mt-3 text-base text-ink-2" role="status">
             Send the invoice with a balance due to generate a payment link.
           </p>
@@ -1453,10 +1453,10 @@ export function InvoiceDetailPage() {
             </span>
           </div>
         ) : null}
-        {dueDate == null ? (
+        {amountDue <= 0 ? null : dueDate == null ? (
           <p className="mt-3 text-base text-ink-2" role="status">
-            This invoice was issued without a due date, so automatic reminders
-            cannot be scheduled.
+            This invoice has no due date, so automatic reminders cannot be
+            scheduled.
           </p>
         ) : !reminderAutomationAvailable ? (
           <p className="mt-3 text-base text-ink-2" role="status">
