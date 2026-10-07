@@ -347,6 +347,18 @@ export function ClientRetentionPage() {
                     >
                       {clientDisplayName(String(task.clientId), clients ?? [])}
                     </Link>
+                    {/* Who to call, without opening the client first. */}
+                    {(() => {
+                      const row = clients?.find(
+                        (client) => client._id === task.clientId,
+                      );
+                      const reach = [row?.phone, row?.email]
+                        .filter(Boolean)
+                        .join(" · ");
+                      return reach ? (
+                        <p className="text-xs text-ink-3">{reach}</p>
+                      ) : null;
+                    })()}
                   </td>
                   <td data-label="Reason">{String(task.reason)}</td>
                   <td data-label="Opened">{formatDate(task.openedAt)}</td>
