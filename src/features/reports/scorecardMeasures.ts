@@ -3,6 +3,7 @@ import {
   COMPLETED_STAGES,
   foodCostPercent,
   isBookedEvent,
+  isConvertedLead,
   percentOf,
   profitMarginPercent,
 } from "./dashboardRecordSets";
@@ -93,6 +94,8 @@ export interface ScorecardCloseout {
 export interface ScorecardLead {
   readonly createdAt?: number | null;
   readonly stage?: string | null;
+  readonly convertedAt?: number | null;
+  readonly clientId?: string | null;
 }
 
 export interface ScorecardTargetRow {
@@ -149,7 +152,7 @@ export function measureMonth(
     food_cost_percent: foodCostPercent(closeouts),
     profit_margin: profitMarginPercent(closeouts),
     lead_conversion: percentOf(
-      leads.filter((l) => l.stage === "converted").length,
+      leads.filter(isConvertedLead).length,
       leads.length,
     ),
     events_completed: monthEvents.filter((e) =>

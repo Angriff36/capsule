@@ -20,6 +20,7 @@ import {
   foodCostPercent,
   isBookedEvent,
   isCompletedEvent,
+  isConvertedLead,
   percentText,
 } from "./dashboardRecordSets";
 import { MetricDefinitionList } from "./MetricDefinitionList";
@@ -135,9 +136,11 @@ export function L10DashboardPage() {
     }).length;
 
     const convertedLeads = (leads || []).filter((l) => {
-      if (!l.updatedAt) return false;
-      const updated = new Date(l.updatedAt);
-      return l.stage === "converted" && updated >= weekAgo && updated <= now;
+      // Counted in the week it was converted (or last touched, for old rows).
+      const at = l.convertedAt ?? l.updatedAt;
+      if (!at || !isConvertedLead(l)) return false;
+      const when = new Date(at);
+      return when >= weekAgo && when <= now;
     }).length;
 
     return {
