@@ -18,7 +18,14 @@ import {
   normalizeCurrencyCode,
   SUPPORTED_CURRENCY_CODES,
 } from "../../lib/currency";
-import { formatMoney } from "../../lib/format";
+import {
+  formatMoney as formatMoneyShort,
+  formatMoneyExact,
+} from "../../lib/format";
+
+// An invoice shows every cent; whole-dollar rounding hid tax and totals.
+const formatMoney = (n: number, code: string) =>
+  code === "USD" ? formatMoneyExact(n) : formatMoneyShort(n, code);
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { InvoiceEquipmentCharges } from "./InvoiceEquipmentCharges";
 import { InvoiceTravelFee } from "./InvoiceTravelFee";
@@ -122,8 +129,8 @@ export function InvoiceIssueForm({
     (rate) => rate.active === true && rate.deletedAt == null,
   );
   const calculation = useMemo(
-    () => calculateInvoiceTax(lines, taxRates, taxExempt),
-    [lines, taxExempt, taxRates],
+    () => calculateInvoiceTax(lines, taxRates, taxExempt, discountAmount),
+    [lines, taxExempt, taxRates, discountAmount],
   );
   const total = roundMoney(
     Math.max(0, calculation.total - Math.max(0, discountAmount)),

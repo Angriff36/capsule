@@ -19,7 +19,7 @@ import { LedgerMoney } from "../../src/lib/ledgerMoney";
  * each line's subtotal, tax and total, the tax per rate, and the invoice
  * subtotal and tax - from the workspace's own tax rates and the client's
  * tax-exempt setting, with the same calculation the issue form shows
- * (src/features/finance/invoiceTax.ts). The generated command already holds
+ * (src/features/finance/invoiceTax.ts), taxed after the discount. The generated command already holds
  * total = subtotal + tax - discount.
  *
  * An invoice with no lines is a single amount: the approval cascade copies the
@@ -43,7 +43,12 @@ export async function assertInvoiceIssueTotals(
     .query("taxRates")
     .withIndex("by_tenantId", (q) => q.eq("tenantId", invoice.tenantId))
     .collect();
-  const worked = calculateInvoiceTax(drafts, rates, taxExempt);
+  const worked = calculateInvoiceTax(
+    drafts,
+    rates,
+    taxExempt,
+    Number(invoice.discountAmount ?? 0),
+  );
 
   const matches =
     cents(invoice.subtotal) === cents(worked.subtotal) &&
