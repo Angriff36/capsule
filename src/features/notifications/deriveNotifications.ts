@@ -32,7 +32,8 @@ export interface AppNotification {
     | "equipment_problem"
     | "maintenance_due"
     | "quote_request"
-    | "shift_swap";
+    | "shift_swap"
+    | "delivery_failed";
   message: string;
   /** Route to the relevant record. */
   link: string;
@@ -60,6 +61,7 @@ export const NOTIFICATION_KIND_LABELS: Record<AppNotification["kind"], string> =
     maintenance_due: "Upkeep",
     quote_request: "Quote request",
     shift_swap: "Shift swap",
+    delivery_failed: "Delivery",
   };
 
 /** Stage changes older than this are history, not notifications. */
@@ -116,6 +118,14 @@ export interface NotificationSources {
   /** Open equipment problems, and the names of the equipment they are about. */
   equipmentIssues?: Doc<"equipmentIssues">[] | undefined;
   equipmentNames?: Record<string, string>;
+  /** Deliveries that failed this past week (worked out on the server). */
+  failedDeliveries?: Array<{
+    id: string;
+    eventId: string;
+    eventTitle: string;
+    reason: string | null;
+    at: number;
+  }>;
   /** This person's answered time-off requests. */
   myTimeOff?: Doc<"timeOffRequests">[] | undefined;
   /** Swaps asked of this person, and swaps waiting for a manager. */
@@ -283,6 +293,17 @@ export function deriveNotifications(
       message: `${who} requested time off · ${range}`,
       link: "/staff/time-off",
       at: request.submittedAt,
+    });
+  }
+
+  // A delivery that did not arrive needs someone on it.
+  for (const delivery of src.failedDeliveries ?? []) {
+    out.push({
+      id: `delivery-failed:${delivery.id}`,
+      kind: "delivery_failed",
+      message: `Delivery failed for ${delivery.eventTitle}${delivery.reason ? `: ${delivery.reason}` : ""}`,
+      link: `/events/${delivery.eventId}`,
+      at: delivery.at,
     });
   }
 

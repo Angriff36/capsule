@@ -140,6 +140,7 @@ export const listNotifications = query({
       swapsForMe,
       myTimeOff,
       swapsToApprove,
+      failedDeliveries,
     ] = await Promise.all([
       // Not every event (13 s at 10,000 events, and the socket holds every
       // other read of the screen until this one answers): only the events
@@ -401,6 +402,21 @@ export const listNotifications = query({
             ),
           ),
       ),
+      // Deliveries that failed this past week.
+      when(can(auth, "logisticsAccess", "eventManageAccess"), () =>
+        ctx.db
+          .query("deliveries")
+          .withIndex("by_tenantId", byTenant)
+          .collect()
+          .then((rows) =>
+            rows.filter(
+              (row) =>
+                row.status === "failed" &&
+                row.deletedAt == null &&
+                Number(row.failedAt ?? 0) > Date.now() - 7 * 86_400_000,
+            ),
+          ),
+      ),
     ]);
 
     // Service that is past due: trucks (by date or by miles) and equipment.
@@ -584,6 +600,19 @@ export const listNotifications = query({
       );
     }
 
+    // The events those failed deliveries were for.
+    const deliveryEventTitles: Record<string, string> = {};
+    await Promise.all(
+      [
+        ...new Set((failedDeliveries ?? []).map((row) => String(row.eventId))),
+      ].map(async (id) => {
+        const eventId = ctx.db.normalizeId("events", id);
+        const event = eventId ? await ctx.db.get(eventId) : null;
+        if (event && event.tenantId === tenantId)
+          deliveryEventTitles[id] = String(event.title ?? "Untitled event");
+      }),
+    );
+
     // A mention needs its channel's title: hydrate only the events of the
     // caller's own mentions inside the mention window, tenant-checked, title
     // only (same narrow projection as eventDayBriefing).
@@ -644,6 +673,13 @@ export const listNotifications = query({
       quoteSubmissions,
       shiftSwaps: [...(swapsForMe ?? []), ...(swapsToApprove ?? [])],
       myTimeOff,
+      failedDeliveries: (failedDeliveries ?? []).map((row) => ({
+        id: String(row._id),
+        eventId: String(row.eventId),
+        eventTitle: deliveryEventTitles[String(row.eventId)] ?? "an event",
+        reason: row.failureReason ?? null,
+        at: Number(row.failedAt ?? row._creationTime),
+      })),
     });
   },
 });
