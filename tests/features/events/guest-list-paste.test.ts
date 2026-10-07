@@ -32,3 +32,28 @@ describe("pasted guest list", () => {
     ]);
   });
 });
+
+describe("guest paste with headings", () => {
+  it("reads columns by their headings, in any order", () => {
+    const guests = readGuestPaste(
+      "Name\tEmail\tDietary\tAllergies\nMaria Lopez\tmaria@example.test\tVegetarian\t\nSam Chen\t\t\tShellfish",
+      [],
+    );
+    expect(guests).toEqual([
+      {
+        name: "Maria Lopez",
+        email: "maria@example.test",
+        phone: undefined,
+        dietaryRestrictions: ["Vegetarian"],
+        allergenRestrictions: undefined,
+      },
+      {
+        name: "Sam Chen",
+        email: undefined,
+        phone: undefined,
+        dietaryRestrictions: undefined,
+        allergenRestrictions: ["Shellfish"],
+      },
+    ]);
+  });
+});
