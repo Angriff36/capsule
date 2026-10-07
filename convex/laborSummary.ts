@@ -51,7 +51,7 @@ function canReadRates(role: string): boolean {
  * workforce tier — everyone who reconciles events or manages labor may see
  * aggregate labor cost. Aggregates only; no raw rates in the payload.
  */
-function canReadLaborAggregates(role: string): boolean {
+export function canReadLaborAggregates(role: string): boolean {
   return (
     role === "finance_staff" ||
     role === "workforce_staff" ||

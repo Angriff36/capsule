@@ -12,6 +12,7 @@ import { displayEventMenuNotes } from "../../src/features/events/eventMenuLineFi
 import { v } from "convex/values";
 import { TPP_EVENT_REPORTS } from "../../src/features/reports/tpp/catalog.event";
 import { EventTimelineStaffRoster } from "../../src/features/events/eventTimelineStaffRoster";
+import { canReadLaborAggregates } from "../laborSummary";
 import { loadWindowLabel } from "../../src/features/facilities/venueOperatingFacts";
 import {
   STAGE_LABEL,
@@ -151,6 +152,17 @@ function venueRows(
           value: "No load-in notes on file yet. Add them on the venue.",
         },
       ];
+}
+/** A prep task's status in kitchen words. */
+function workStatus(status: string): string {
+  const words: Record<string, string> = {
+    pending: "Not started",
+    in_progress: "In progress",
+    completed: "Done",
+    blocked: "Blocked",
+    cancelled: "Cancelled",
+  };
+  return words[status] ?? status.replaceAll("_", " ");
 }
 function dateText(value: number | null | undefined): string {
   return value == null
@@ -327,10 +339,21 @@ function staffWindowText(window: {
   startsAt?: number | null;
   endsAt?: number | null;
 }): string {
-  if (window.startsAt == null && window.endsAt == null) return "Time not set";
-  return [dateText(window.startsAt), dateText(window.endsAt)]
-    .filter(Boolean)
-    .join(" – ");
+  if (window.startsAt == null && window.endsAt == null)
+    return "No shift time yet";
+  // An end on the same day shows only its time.
+  const sameDay =
+    window.startsAt != null &&
+    window.endsAt != null &&
+    new Date(window.startsAt).toDateString() ===
+      new Date(window.endsAt).toDateString();
+  const end = sameDay
+    ? new Date(window.endsAt!).toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+      })
+    : dateText(window.endsAt);
+  return [dateText(window.startsAt), end].filter(Boolean).join(" – ");
 }
 
 function staffDetails(
@@ -342,12 +365,20 @@ function staffDetails(
     ? entry.shiftWindows
     : (entry.plannedWindows ?? []);
   const sources = [...new Set(entry.sources ?? [entry.source])]
+    // A plain assignment needs no note; the other routes say how they came.
     .map((source) =>
-      source === "filled_need" ? "filled staffing request" : source,
+      source === "filled_need"
+        ? "filled staffing request"
+        : source === "shift"
+          ? "scheduled shift"
+          : "",
     )
+    .filter(Boolean)
     .join(" + ");
   return [
-    windows.length ? windows.map(staffWindowText).join("; ") : "Time not set",
+    windows.length
+      ? windows.map(staffWindowText).join("; ")
+      : "No shift time yet",
     entry.status.replaceAll("_", " "),
     sources,
     ...(entry.notes ?? []),
@@ -559,7 +590,7 @@ async function productionWorksheet(
         if (sharedWork && task._id === firstTask._id)
           sectionRows.push({
             label: "Work status",
-            value: [task.station, human(task.status), owner]
+            value: [task.station, workStatus(task.status), owner]
               .filter(Boolean)
               .join(" / "),
           });
@@ -581,7 +612,9 @@ async function productionWorksheet(
           quantity,
           [
             sharedCategory ? "" : human(task.category),
-            ...(sharedWork ? [] : [task.station, human(task.status), owner]),
+            ...(sharedWork
+              ? []
+              : [task.station, workStatus(task.status), owner]),
           ]
             .filter(Boolean)
             .join("  /  "),
@@ -1449,7 +1482,87 @@ export const run = query({
       );
     }
 
-    if (["production-summary", "kitchen-labor"].includes(args.reportId)) {
+    if (args.reportId === "kitchen-labor") {
+      const prep = await ctx.db
+        .query("prepTasks")
+        .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+        .take(REPORT_ROW_LIMIT + 1)
+        .then(keepReportRows(ctx, "prep tasks"));
+      // Labor cost follows the labor-cost read rule; names follow people.
+      const seesCost = canReadLaborAggregates(auth.role);
+      const seesPeople = canRead(auth, PERSON_READ);
+      const live = prep.filter(
+        (row) => isLiveTenantRow(row, tenantId) && row.status !== "cancelled",
+      );
+      const people = new Map<string, Doc<"people"> | null>();
+      for (const row of live) {
+        const id = row.assignedToId ? String(row.assignedToId) : "";
+        if (id && !people.has(id)) {
+          const person = await ctx.db.get(row.assignedToId!);
+          people.set(
+            id,
+            person && isLiveTenantRow(person, tenantId) ? person : null,
+          );
+        }
+      }
+      return table(
+        args.reportId,
+        [
+          { key: "item", label: "Prep task", kind: "text" },
+          { key: "station", label: "Station", kind: "text" },
+          { key: "cook", label: "Cook", kind: "text" },
+          { key: "started", label: "Started", kind: "datetime" },
+          { key: "finished", label: "Finished", kind: "datetime" },
+          { key: "hours", label: "Hours", kind: "number" },
+          ...(seesCost
+            ? [{ key: "cost", label: "Labor cost", kind: "money" as const }]
+            : []),
+          { key: "status", label: "Status", kind: "text" },
+        ],
+        live.map((row) => {
+          const person = row.assignedToId
+            ? people.get(String(row.assignedToId))
+            : null;
+          const hours =
+            row.startedAt != null &&
+            row.completedAt != null &&
+            row.completedAt > row.startedAt
+              ? Math.round(
+                  ((row.completedAt - row.startedAt) / 3_600_000) * 100,
+                ) / 100
+              : null;
+          const rate = person?.hourlyRate;
+          return {
+            id: row._id,
+            values: {
+              item: row.name,
+              station: row.station ?? row.category,
+              cook: !seesPeople
+                ? ""
+                : person
+                  ? `${person.givenName} ${person.familyName}`.trim()
+                  : row.assignedToId
+                    ? "Assigned"
+                    : "Nobody yet",
+              started: row.startedAt ?? null,
+              finished: row.completedAt ?? null,
+              hours,
+              ...(seesCost
+                ? {
+                    cost:
+                      hours != null && rate != null
+                        ? Math.round(hours * rate * 100) / 100
+                        : null,
+                  }
+                : {}),
+              status: row.status,
+            },
+          };
+        }),
+      );
+    }
+
+    if (args.reportId === "production-summary") {
       const prep = await ctx.db
         .query("prepTasks")
         .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
