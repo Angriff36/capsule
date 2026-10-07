@@ -86,9 +86,15 @@ export function CatalogsSection({
     const form = event.currentTarget;
     const data = new FormData(form);
     const name = String(data.get("name") ?? "").trim();
-    const code = String(data.get("code") ?? "").trim();
+    // A blank code is made from the name: "Wedding Reception" → wedding-reception.
+    const code =
+      String(data.get("code") ?? "").trim() ||
+      name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
     if (!name || !code) {
-      setError(`Give this ${singular} a name and a code.`);
+      setError(`Give this ${singular} a name.`);
       return;
     }
     const sortRaw = String(data.get("sortOrder") ?? "").trim();
@@ -242,12 +248,11 @@ export function CatalogsSection({
           <input
             name="code"
             className="input"
-            placeholder="full_service"
-            required
+            placeholder="Made from the name if left blank"
             disabled={busy != null}
           />
           <span className="field-hint">
-            Stable identifier for imports and reporting.
+            Optional. A short fixed name that imports and reports use.
           </span>
         </label>
         <label className="field-label">
