@@ -851,7 +851,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.TimeOffRequest_createViaSubmit, { "personId": "personId-time-off-request-1", "startsAt": 1767268800000, "endsAt": 1767268800000, "reason": "demo-reason-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.TimeOffRequest_createViaSubmit, { "personId": "personId-time-off-request-2", "startsAt": 1767355200000, "endsAt": 1767355200000, "reason": "demo-reason-2" } as any);
-  // TimeRecord has multiple initialization commands (clockIn, clockOut); using the selected initialization command: clockIn.
+  // TimeRecord has multiple initialization commands (clockIn, clockOut, remove); using the selected initialization command: clockIn.
   // TimeRecord → api.mutations.TimeRecord_createViaClockIn
   rowsAttempted += 1;
   await client.mutation(api.mutations.TimeRecord_createViaClockIn, { "personId": "personId-time-record-1", "shiftId": "shiftId-time-record-1", "eventId": "eventId-time-record-1", "timeZone": "demo-timeZone-1", "notes": "demo-notes-1" } as any);
