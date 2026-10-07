@@ -698,6 +698,9 @@ async function productionWorksheet(
   };
 }
 
+// Newest invoices only: well inside the read limit even with large bills.
+const INVOICE_NUMBER_SCAN = 3000;
+
 /** Each event's invoice numbers, for people who may see invoices. */
 async function invoiceNumbers(
   ctx: QueryCtx,
@@ -707,16 +710,27 @@ async function invoiceNumbers(
 ): Promise<Map<string, string>> {
   const out = new Map<string, string>();
   if (!seeInvoices) return out;
-  for (const event of events) {
-    const numbers = (
-      await ctx.db
-        .query("invoices")
-        .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-        .take(20)
+  // One bounded read of the workspace's invoices, grouped by event, instead
+  // of one lookup per event.
+  const wanted = new Set(events.map((event) => String(event._id)));
+  const invoices = await ctx.db
+    .query("invoices")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .order("desc")
+    .take(INVOICE_NUMBER_SCAN);
+  for (const row of invoices) {
+    const eventId = row.eventId ? String(row.eventId) : "";
+    if (
+      !wanted.has(eventId) ||
+      !isLiveTenantRow(row, tenantId) ||
+      !row.invoiceNumber
     )
-      .filter((row) => isLiveTenantRow(row, tenantId) && row.invoiceNumber)
-      .map((row) => String(row.invoiceNumber));
-    if (numbers.length) out.set(String(event._id), numbers.join(", "));
+      continue;
+    const prior = out.get(eventId);
+    out.set(
+      eventId,
+      prior ? `${prior}, ${row.invoiceNumber}` : String(row.invoiceNumber),
+    );
   }
   return out;
 }
