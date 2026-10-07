@@ -668,7 +668,8 @@ function DishStep({
   const menuDishes = useListMenuDish();
   const add = (id: string) => {
     const dish = dishes.find((item) => item._id === id);
-    if (dish)
+    // Picking a dish that is already on the list does not add it twice.
+    if (dish && !draft.dishes.some((line) => line.dishId === id))
       update({
         dishes: [
           ...draft.dishes,
