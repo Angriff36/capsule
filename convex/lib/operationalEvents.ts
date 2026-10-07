@@ -1,5 +1,5 @@
 import type { ConvexCommandEvent } from "@angriff36/manifest/projections/convex";
-import { internal } from "../_generated/api";
+import { api, internal } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
 import { reconcileEventPrepWork } from "./prepWorkReconciliation";
@@ -604,6 +604,37 @@ export async function handleManifestEvent(
       { triggerEventId: String(event.eventId), triggerType: event.type },
       String(event.payload.reason),
     );
+    return;
+  }
+  // An event moved to another client takes its unsent, unpaid draft bills;
+  // sent or paid bills stay with the client billed.
+  if (event.entity === "Event" && event.type === "EventClientChanged") {
+    const moved = await ctx.db.get(event.entityId as Id<"events">);
+    if (!moved || moved.deletedAt != null || !moved.clientId) return;
+    const clientId = moved.clientId;
+    const system = TenantSystemCommandRunner.forTenant(
+      ctx,
+      moved.tenantId,
+    ).context;
+    const invoices = await ctx.db
+      .query("invoices")
+      .withIndex("by_eventId", (q) => q.eq("eventId", moved._id))
+      .collect();
+    for (const invoice of invoices) {
+      if (
+        invoice.tenantId !== moved.tenantId ||
+        invoice.deletedAt != null ||
+        invoice.status !== "draft" ||
+        invoice.sentAt != null ||
+        Number(invoice.amountPaid ?? 0) !== 0 ||
+        invoice.clientId === clientId
+      )
+        continue;
+      await system.runMutation(api.mutations.Invoice_followEventClient, {
+        docId: invoice._id,
+        clientId,
+      });
+    }
     return;
   }
   if (event.entity === "Event" && event.type === "EventCompleted") {

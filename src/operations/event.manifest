@@ -1721,8 +1721,9 @@ entity Event mixin TenantScoped, SoftDeletable {
   // client, or a planner company replaced by the end client. Allowed in every
   // stage so a wrong booking stays correctable. Sales access, because the
   // proposals and contracts that follow the event are sales records. They follow
-  // the event (reactions in proposal.manifest / contract.manifest). Invoices
-  // and payments stay with the client they were billed to.
+  // the event (reactions in proposal.manifest / contract.manifest). An
+  // unsent, unpaid draft invoice follows too (operational event handler);
+  // sent or paid invoices and payments stay with the client billed.
   command moveToClient(
     clientId: uuid,
     optional primaryContactName: string,

@@ -1,7 +1,7 @@
 /**
  * Runtime proof (#378): sales can move an event to a different client. The
- * event's proposals and contracts follow it; invoices stay with the client
- * they were billed to; an archived or unknown client is refused.
+ * event's proposals, contracts and unsent draft invoices follow it; sent
+ * invoices stay with the client they were billed to; an archived or unknown client is refused.
  */
 import { describe, expect, it } from "vitest";
 import {
@@ -13,7 +13,7 @@ import {
 } from "./venue-layout.runtime.helpers";
 
 describe("runtime proof: move an event to another client", () => {
-  it("moves event, proposal and contract; leaves the invoice; refuses bad targets", async () => {
+  it("moves event, proposal, contract and draft invoice; leaves the sent invoice; refuses bad targets", async () => {
     const proof = harness();
     const tenantId = "tenant-move-client";
     const { roles, clientId, eventId } = await seedVenueEvent(proof, tenantId);
@@ -84,6 +84,32 @@ describe("runtime proof: move an event to another client", () => {
       ),
     );
 
+    const draftId = await roles.owner.run(async (ctx) =>
+      ctx.db.insert(
+        "invoices" as never,
+        {
+          tenantId,
+          version: 1,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+          deletedAt: null,
+          status: "draft",
+          taxAmount: 0,
+          discountAmount: 0,
+          amountPaid: 0,
+          depositAmount: 0,
+          paymentTermsDays: 30,
+          lineItems: [],
+          clientId,
+          eventId,
+          invoiceNumber: "INV-DRAFT",
+          subtotal: 4500,
+          total: 4500,
+          amountDue: 4500,
+        } as never,
+      ),
+    );
+
     const version = async () =>
       (await readDoc<{ version: number }>(roles.sales, eventId)).version;
 
@@ -127,6 +153,11 @@ describe("runtime proof: move an event to another client", () => {
       (await readDoc<{ clientId: string }>(roles.sales, invoiceId as string))
         .clientId,
     ).toBe(clientId);
+    // The unsent, unpaid draft follows the event.
+    expect(
+      (await readDoc<{ clientId: string }>(roles.sales, draftId as string))
+        .clientId,
+    ).toBe(endClient.docId);
 
     // Moving without a contact name keeps the contact already on the event.
     await proof.executeCommand(roles.sales, M.Event_moveToClient, {
