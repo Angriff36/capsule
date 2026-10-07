@@ -59,7 +59,7 @@ export function EventDetailReviseContactPanels({
   onChangeRequirements,
 }: Props) {
   return (
-    <div className="mt-4 grid gap-4 lg:grid-cols-2">
+    <div className="mt-4 grid gap-4 @3xl:grid-cols-2">
       <EventFormCluster title="Client" hint="Who the event is booked for">
         <EventClientForm
           eventId={eventId}
@@ -74,7 +74,7 @@ export function EventDetailReviseContactPanels({
       <EventFormCluster title="Primary contact" hint="Who we call on the day">
         <form
           key={`contact-${primaryContactName}-${primaryContactEmail}-${primaryContactPhone}`}
-          className="grid gap-3 sm:grid-cols-3"
+          className="grid gap-3 @xl:grid-cols-3 @3xl:grid-cols-1 @5xl:grid-cols-3"
           onSubmit={(formEvent) => {
             formEvent.preventDefault();
             const data = new FormData(formEvent.currentTarget);
@@ -138,7 +138,7 @@ export function EventDetailReviseContactPanels({
       >
         <form
           key={`requirements-${(accessibilityNeeds ?? []).join("|")}-${serviceRequirements}-${operationalRequirements}`}
-          className="grid gap-3 sm:grid-cols-2"
+          className="grid gap-3 @xl:grid-cols-2"
           onSubmit={(formEvent) => {
             formEvent.preventDefault();
             const data = new FormData(formEvent.currentTarget);

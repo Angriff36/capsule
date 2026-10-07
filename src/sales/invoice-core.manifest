@@ -501,6 +501,25 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // An event moved to another client takes its unsent, unpaid draft bill
+  // with it; a bill that was sent or paid stays with the client it was billed
+  // to. The event handler runs this only for such drafts.
+  command followEventClient(clientId: uuid) {
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    guard self.sentAt == null
+    guard self.amountPaid == 0
+    compute previousClientId = self.clientId
+    mutate clientId = clientId
+    emit InvoiceClientFollowedEvent {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      previousClientId: previousClientId
+      clientId: clientId
+    }
+  }
+
   command reassignClient() {
     guard self.deletedAt == null
     guard roleAllows(user.role, "adminAccess")
@@ -552,6 +571,14 @@ event InvoiceIssued: "invoice.issued" {
   amountDue: money(12, 2)
   currencyCode: string?
   exchangeRate: decimal(18, 8)?
+}
+
+event InvoiceClientFollowedEvent: "invoice.client_followed_event" {
+  invoiceId: string
+  tenantId: string
+  eventId: string?
+  previousClientId: string
+  clientId: string
 }
 
 event InvoiceEventPriceFollowed: "invoice.event_price_followed" {

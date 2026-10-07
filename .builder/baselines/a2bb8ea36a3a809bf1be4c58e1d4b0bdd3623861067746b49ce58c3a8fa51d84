@@ -422,7 +422,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.InventorySettings_createViaRegister, { "stockLevelsTracked": false } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.InventorySettings_createViaRegister, { "stockLevelsTracked": false } as any);
-  // Invoice has multiple initialization commands (issue, markDepositPaid, sendBalanceReminder); using the selected initialization command: issue.
+  // Invoice has multiple initialization commands (followEventClient, issue, markDepositPaid, sendBalanceReminder); using the selected initialization command: issue.
   // Invoice → api.mutations.Invoice_createViaIssue
   rowsAttempted += 1;
   await client.mutation(api.mutations.Invoice_createViaIssue, { "clientId": "clientId-invoice-1", "eventId": "eventId-invoice-1", "proposalId": "proposalId-invoice-1", "proposalRevisionId": "proposalRevisionId-invoice-1", "invoiceNumber": "demo-invoiceNumber-1", "subtotal": 1, "taxAmount": 1, "discountAmount": 1, "total": 1, "lineItems": "demo-lineItems-1", "taxBreakdown": "demo-taxBreakdown-1", "paymentTermsDays": 1, "dueDate": 1767268800000, "notes": "demo-notes-1", "currencyCode": "demo-currencyCode-1", "exchangeRate": 1 } as any);
