@@ -222,15 +222,16 @@ export function QuickFileImport() {
             </p>
           ) : null}
           <p className="mt-1 text-xs text-ink-3">
-            {results.length} import{results.length === 1 ? "" : "s"}:{" "}
             {results.map((r, i) => (
               <span key={r.importRunId}>
-                {i > 0 ? ", " : ""}
+                {i > 0 ? " · " : ""}
                 <Link
                   to={importRunDetailPath(r.importRunId)}
                   className="text-brand"
                 >
-                  {r.importRunId.slice(0, 8)}…
+                  {results.length === 1
+                    ? "See what came in"
+                    : `See part ${i + 1} of ${results.length}`}
                 </Link>
               </span>
             ))}

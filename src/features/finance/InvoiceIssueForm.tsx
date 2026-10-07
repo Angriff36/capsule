@@ -1,3 +1,7 @@
+import {
+  formatAutoInvoiceNumber,
+  parseAutoInvoiceNumber,
+} from "../../../convex/lib/invoiceNumberFormat";
 import { useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -49,17 +53,18 @@ const clientLabel = (row: ClientOption) => {
   return row.companyName?.trim() || "Client";
 };
 
-/** Next INV-<year>-<nnn> after the highest one used this year. */
+/**
+ * Next number in the same INV-<n> series the app gives its own invoices, so
+ * one company never runs two numbering series.
+ */
 function nextInvoiceNumber(
   used: readonly (string | null | undefined)[],
 ): string {
-  const year = new Date().getFullYear();
-  const pattern = new RegExp(`^INV-${year}-([0-9]+)$`);
-  const highest = used.reduce((max, number) => {
-    const match = String(number ?? "").match(pattern);
-    return match ? Math.max(max, Number(match[1])) : max;
-  }, 0);
-  return `INV-${year}-${String(highest + 1).padStart(3, "0")}`;
+  const highest = used.reduce(
+    (max, number) => Math.max(max, parseAutoInvoiceNumber(number) ?? 0),
+    0,
+  );
+  return formatAutoInvoiceNumber(highest + 1);
 }
 
 const categoryLabel = (category: InvoiceLineCategory) =>
