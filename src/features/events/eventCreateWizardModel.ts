@@ -40,6 +40,8 @@ export type EventWizardDraft = {
   eventType: string;
   /** Plated, buffet, drop off… Sales lock needs it; drafts saved before it existed lack it. */
   serviceStyleId?: string;
+  /** The picked style's name, kept on the event as it was booked. */
+  serviceStyleName?: string;
   /** The picked style is Pickup: the client collects, so no venue is needed. */
   pickup?: boolean;
   startsAt: string;

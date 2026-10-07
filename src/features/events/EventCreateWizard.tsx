@@ -509,15 +509,16 @@ function BasicsStep({
           className="field-input"
           value={draft.serviceStyleId ?? ""}
           disabled={locked}
-          onChange={(event) =>
+          onChange={(event) => {
+            const style = (serviceStyles ?? []).find(
+              (row) => row._id === event.target.value,
+            );
             update({
               serviceStyleId: event.target.value,
-              pickup:
-                (serviceStyles ?? []).find(
-                  (style) => style._id === event.target.value,
-                )?.code === "pickup",
-            })
-          }
+              serviceStyleName: style?.name,
+              pickup: style?.code === "pickup",
+            });
+          }}
         >
           <option value="">Choose later</option>
           {(serviceStyles ?? [])
