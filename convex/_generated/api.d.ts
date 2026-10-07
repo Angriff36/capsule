@@ -164,6 +164,7 @@ import type * as lib_headcountReconciliation from "../lib/headcountReconciliatio
 import type * as lib_headcountStaffingReconciliation from "../lib/headcountStaffingReconciliation.js";
 import type * as lib_householdVolumeParse from "../lib/householdVolumeParse.js";
 import type * as lib_importCompanies from "../lib/importCompanies.js";
+import type * as lib_importEquipmentRows from "../lib/importEquipmentRows.js";
 import type * as lib_importEventFiles from "../lib/importEventFiles.js";
 import type * as lib_importEventStage from "../lib/importEventStage.js";
 import type * as lib_importIdentity from "../lib/importIdentity.js";
@@ -325,6 +326,7 @@ import type * as teamChatPush from "../teamChatPush.js";
 import type * as teamChatPushSend from "../teamChatPushSend.js";
 import type * as teamChatSend from "../teamChatSend.js";
 import type * as todayDesk from "../todayDesk.js";
+import type * as tppEquipmentItems from "../tppEquipmentItems.js";
 import type * as tppParser from "../tppParser.js";
 import type * as tppReportFavorites from "../tppReportFavorites.js";
 import type * as tppReports_contacts from "../tppReports/contacts.js";
@@ -507,6 +509,7 @@ declare const fullApi: ApiFromModules<{
   "lib/headcountStaffingReconciliation": typeof lib_headcountStaffingReconciliation;
   "lib/householdVolumeParse": typeof lib_householdVolumeParse;
   "lib/importCompanies": typeof lib_importCompanies;
+  "lib/importEquipmentRows": typeof lib_importEquipmentRows;
   "lib/importEventFiles": typeof lib_importEventFiles;
   "lib/importEventStage": typeof lib_importEventStage;
   "lib/importIdentity": typeof lib_importIdentity;
@@ -668,6 +671,7 @@ declare const fullApi: ApiFromModules<{
   teamChatPushSend: typeof teamChatPushSend;
   teamChatSend: typeof teamChatSend;
   todayDesk: typeof todayDesk;
+  tppEquipmentItems: typeof tppEquipmentItems;
   tppParser: typeof tppParser;
   tppReportFavorites: typeof tppReportFavorites;
   "tppReports/contacts": typeof tppReports_contacts;

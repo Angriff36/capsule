@@ -9,3 +9,8 @@ export function useImportGoodshuffleItems() {
 export function useBringInGoodshufflePicture() {
   return useAction(api.goodshuffleItems.bringInPicture);
 }
+
+/** Authored hook for the old-system equipment list seam (convex/tppEquipmentItems.ts). */
+export function useImportTppEquipmentItems() {
+  return useMutation(api.tppEquipmentItems.importTppEquipmentItems);
+}

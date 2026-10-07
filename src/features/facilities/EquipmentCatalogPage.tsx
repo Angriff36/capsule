@@ -282,7 +282,7 @@ export function EquipmentCatalogPage() {
             }}
             data-testid="equipment-open-goodshuffle"
           >
-            Bring in Goodshuffle items
+            Bring in an item list
           </button>
           <button
             className="btn btn-primary"

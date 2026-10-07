@@ -180,7 +180,7 @@ event on approval (and on an accepted change), as many as are free; the rest
 shows on the event as "approved by the client but not held".
 
 History: Goodshuffle items come in from the Goodshuffle inventory export
-(.xlsx or .csv) on `/facilities/equipment`, "Bring in Goodshuffle items"
+(.xlsx or .csv) on `/facilities/equipment`, "Bring in an item list"
 (`proofs/goodshuffle-items-import`, since 2026-10-04). Each product becomes an
 equipment item tagged GS-<Product ID> with its count, client price, storage
 place, description, details and first picture; services and delivery fees are
