@@ -34501,6 +34501,7 @@ async function __runInvoiceFollowEventClient(ctx: MutationCtx, { docId, clientId
       amountDue: total,
       lineItems: lineItems,
       taxBreakdown: taxBreakdown,
+      depositAmount: (((doc.depositAmount != null) && (doc.depositAmount > total)) ? total : doc.depositAmount),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);

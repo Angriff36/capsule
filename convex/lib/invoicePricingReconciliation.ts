@@ -302,9 +302,13 @@ export async function followAcceptedProposalPrice(
   const draft = (await ctx.db.get(invoices[0]._id)) as InvoiceRow;
   if (!followsEventPrice(draft) && !isEventPriceDraft(draft)) return;
   // A proposal with no priced lines becomes the single amount it signed.
+  // Lines whose worked total is not what the client signed (an older
+  // proposal taxed another way) also become the signed amount.
+  const lines = await itemizedFromProposal(ctx, proposal);
   const itemized =
-    (await itemizedFromProposal(ctx, proposal)) ??
-    (await signedProposalTotals(ctx, event, proposal));
+    lines && Math.round(lines.total * 100) === Math.round(total * 100)
+      ? lines
+      : await signedProposalTotals(ctx, event, proposal);
   await system.runMutation(api.mutations.Invoice_markVoided, {
     docId: draft._id,
     version: draft.version,

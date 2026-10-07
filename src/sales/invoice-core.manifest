@@ -567,6 +567,8 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     mutate amountDue = total
     mutate lineItems = lineItems
     mutate taxBreakdown = taxBreakdown
+    // A deposit never asks for more than the bill now totals.
+    mutate depositAmount = self.depositAmount != null and self.depositAmount > total ? total : self.depositAmount
     emit InvoiceClientFollowedEvent {
       invoiceId: self.id
       tenantId: self.tenantId
