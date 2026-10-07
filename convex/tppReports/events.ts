@@ -1082,6 +1082,39 @@ export const run = query({
               status: row.status,
             },
           }));
+        // Items rented from a vendor on the event's Equipment tab.
+        if (canRead(auth, RENTAL_READ)) {
+          for (const event of eventById.values()) {
+            const lines = await ctx.db
+              .query("rentalOrderLines")
+              .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+              .take(REPORT_ROW_LIMIT + 1)
+              .then(keepReportRows(ctx, "rental lines"));
+            for (const line of lines) {
+              if (!isLiveTenantRow(line, tenantId)) continue;
+              if (line.status === "cancelled") continue;
+              const vendor = seeVendors
+                ? await ctx.db.get(line.vendorId)
+                : null;
+              rows.push({
+                id: line._id,
+                values: {
+                  vendor:
+                    vendor && isLiveTenantRow(vendor, tenantId)
+                      ? vendor.name
+                      : "Rental",
+                  item: line.description,
+                  category: "Rented from a vendor",
+                  quantity: line.quantity,
+                  unit: line.countUnit,
+                  event: event.title,
+                  due: line.deliverBy ?? event.startsAt ?? null,
+                  status: formatStatusLabel(line.status),
+                },
+              });
+            }
+          }
+        }
       }
       return table(
         args.reportId,
