@@ -60,12 +60,10 @@
  * reference model), not omission.
  *
  * Menus materialize as Dish entities, one per TPP dish-catalog row (the
- * work/dishes.csv export has no menu grouping, no external id, and EMPTY price
- * columns). Dish has no price field, so price_per_person / cost_per_person are
- * preserved on the link's rawSourceData (the §6.2 "prices" captured verbatim
- * from the source) rather than inventing a Menu+MenuDish pricing graph for
- * empty data. A future TPP export with real prices is the follow-up slice for a
- * queryable MenuDish.sellingPrice. `Dish_createViaIntroduce` is kitchenAccess-
+ * export has no menu grouping and no external id). Dish has no price field: a
+ * priced row also goes on the draft "Old system prices - <category>" menu at
+ * its price (queryable MenuDish.sellingPrice, AC-277), and price_per_person /
+ * cost_per_person stay on the link's rawSourceData verbatim. `Dish_createViaIntroduce` is kitchenAccess-
  * guarded (not salesAccess), so a role with importAccess but not kitchenAccess
  * sees every dish land as pending_conflict; the dish name is slugified into the
  * link externalId (no id column in the feed).
@@ -133,7 +131,12 @@ import {
 } from "./lib/importIdentity";
 import { SERVICE_STYLE_RECORD_TYPE } from "./importServiceStyle";
 import { inquiryVenueMatch } from "./lib/quoteInquiryVenue";
-import { eventLookupFields, type BatchLookups } from "./importEventLookups";
+import {
+  addOldMenuPrice,
+  eventLookupFields,
+  type BatchLookups,
+  type OldPriceMenus,
+} from "./importEventLookups";
 import {
   matchClientByName,
   type ClientName,
@@ -1866,15 +1869,13 @@ export const commitImportRun = action({
 
     if (importRun.datasetType === "menus") {
       // ponytail: each TPP dish-catalog row → a Dish entity (the menu catalog
-      // item). The TPP dishes export (work/dishes.csv) has no menu grouping, no
-      // external id, and EMPTY price columns, so a Dish per row is the faithful
-      // one-entity mapping (mirrors venues/contacts/events/leads). Dish has no
-      // price field, so price_per_person / cost_per_person are preserved on the
-      // link's rawSourceData (captured verbatim from the source — they are empty
-      // in the real feed) rather than inventing a Menu+MenuDish pricing graph.
-      // Menu/MenuDish assembly (to make prices queryable) is a documented
-      // follow-up if a TPP export with real prices arrives. The dish name is
-      // slugified into the link externalId (no id column in the feed).
+      // item). The export has no menu grouping and no external id, so a Dish
+      // per row is the faithful one-entity mapping (mirrors venues/contacts/
+      // events/leads). Dish has no price field: a priced row (839 of the real
+      // 2,783) also goes on its old category's draft price list (AC-277,
+      // addOldMenuPrice), and price_per_person / cost_per_person stay on the
+      // link's rawSourceData verbatim. The dish name is slugified into the
+      // link externalId (no id column in the feed).
       // Dish_createViaIntroduce is kitchenAccess-guarded (NOT salesAccess like
       // the other branches), so a role with importAccess but not kitchenAccess
       // sees every dish land as pending_conflict (managers/admins/owners hold
@@ -1893,6 +1894,31 @@ export const commitImportRun = action({
       let skipped = 0;
       let pending = 0;
       const delta: DeltaTally = { updated: 0, conflicted: 0 };
+      // Read once per batch, only when a row has a price (AC-277).
+      let priceMenus: OldPriceMenus | null = null;
+      const addPrice = async (
+        menu: ParsedCapsuleMenu,
+        dishId: string,
+        idempotencyKey: string,
+      ) => {
+        if (!menu.pricePerPerson || menu.pricePerPerson <= 0) return;
+        priceMenus ??= new Map(
+          (
+            await ctx.runQuery(internal.importEventLookups.oldPriceMenus, {
+              tenantId,
+            })
+          ).map(({ key, dishIds, ...row }) => [
+            key,
+            { ...row, dishIds: new Set(dishIds) },
+          ]),
+        );
+        await addOldMenuPrice(ctx, priceMenus, {
+          category: menu.category,
+          dishId,
+          price: menu.pricePerPerson,
+          idempotencyKey,
+        });
+      };
 
       for (const [index, menu] of (
         parsed.records as ParsedCapsuleMenu[]
@@ -1941,6 +1967,12 @@ export const commitImportRun = action({
           });
           if (outcome === "resumed") continue;
           countDelta(delta, outcome);
+          // A dish brought in before prices were read gets its price once.
+          await addPrice(
+            menu,
+            existing.capsuleId,
+            `tenant-shared/import:${args.importRunId}:menu:${menu.externalId}`,
+          );
           skipped += 1;
           continue;
         }
@@ -1962,6 +1994,7 @@ export const commitImportRun = action({
             },
           );
           const dishId: string = (created as { docId: string }).docId;
+          await addPrice(menu, dishId, idempotencyKey);
           await ctx.runMutation(internal.importCommit.upsertLink, {
             tenantId,
             sourceSystem,

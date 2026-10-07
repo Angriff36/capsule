@@ -187,8 +187,8 @@ export interface TppMenuRecord {
   // grouping — the dish name is the only stable identity (slugified into
   // externalId). MenuItemID is kept for parity with sibling records + a future
   // real export. price_per_person / cost_per_person have no Dish field to land
-  // on (Dish has no price) and are EMPTY in the source feed; they are preserved
-  // on the link's rawSourceData rather than inventing a Menu+MenuDish graph.
+  // on (Dish has no price); a price goes on the old category's draft price
+  // list (AC-277) and both stay on the link's rawSourceData.
   MenuItemID?: string;
   Name: string;
   RecipeName?: string;
@@ -424,7 +424,8 @@ export interface ParsedCapsuleMenu {
   rawAllergens?: string;
   rawTags?: string;
   rawPortionDescription?: string;
-  // Preserved for fidelity (Dish has no price field); EMPTY in the real feed.
+  // Dish has no price field: a price also goes on the old category's draft
+  // price list (AC-277); both stay on the link for fidelity.
   pricePerPerson?: number;
   costPerPerson?: number;
 }

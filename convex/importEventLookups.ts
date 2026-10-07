@@ -178,3 +178,105 @@ async function findOrAdd(
     return null;
   }
 }
+
+// AC-277: the old system's menu export prices about a third of its items
+// (Portion Price). An imported dish with a price goes on the company's draft
+// price list for its old category ("Old system prices - Air Catering") at
+// that price, so the price is a real menu price a manager can check and
+// publish. A draft is never on the public menu or the proposal picker, so an
+// old price is not quoted to a client until someone publishes the list. A row
+// with no price (blank or 0) adds nothing; the price stays on the import.
+// A dish imported before (a later file, or dishes brought in before prices
+// were read) is added once; a dish already on its list is left as it is.
+
+type OldPriceMenu = { id: string; status: string; dishIds: Set<string> };
+
+/** Menus by plain name; null = the name could not be made (not allowed). */
+export type OldPriceMenus = Map<string, OldPriceMenu | null>;
+
+const OLD_PRICE_LIST = "Old system prices - ";
+
+export const oldPriceMenuName = (category: string | undefined) =>
+  `${OLD_PRICE_LIST}${category?.trim() || "No category"}`;
+
+/** The company's live old-system price lists and the dishes on each. */
+export const oldPriceMenus = internalQuery({
+  args: { tenantId: v.string() },
+  handler: async (ctx, { tenantId }) => {
+    const prefix = plainName(OLD_PRICE_LIST);
+    const menus = (
+      await ctx.db
+        .query("menus")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .collect()
+    ).filter(
+      (menu) =>
+        menu.deletedAt == null && plainName(menu.name).startsWith(prefix),
+    );
+    return await Promise.all(
+      menus.map(async (menu) => ({
+        key: plainName(menu.name),
+        id: String(menu._id),
+        status: String(menu.status),
+        dishIds: (
+          await ctx.db
+            .query("menuDishes")
+            .withIndex("by_menuId", (q) => q.eq("menuId", menu._id))
+            .collect()
+        )
+          .filter((line) => line.deletedAt == null && line.removedAt == null)
+          .map((line) => String(line.dishId)),
+      })),
+    );
+  },
+});
+
+/** Put one imported dish on its old-category price list; false = not added. */
+export async function addOldMenuPrice(
+  ctx: ActionCtx,
+  menus: OldPriceMenus,
+  args: {
+    category: string | undefined;
+    dishId: string;
+    price: number;
+    idempotencyKey: string;
+  },
+): Promise<boolean> {
+  const name = oldPriceMenuName(args.category);
+  const key = plainName(name);
+  let menu = menus.get(key);
+  if (menu === undefined) {
+    try {
+      const created = (await ctx.runMutation(
+        api.mutations.Menu_createViaDraft,
+        {
+          name,
+          category: args.category?.trim() || undefined,
+          description:
+            "Prices from the old system's menu export. Check them, then publish this menu to quote from it.",
+          idempotencyKey: `${args.idempotencyKey}:price-list`,
+        },
+      )) as { docId: string };
+      menu = { id: created.docId, status: "draft", dishIds: new Set() };
+    } catch {
+      // Not allowed to make menus: the price stays on the import only.
+      menu = null;
+    }
+    menus.set(key, menu);
+  }
+  // A list someone already published or archived is left as it is.
+  if (!menu || menu.status !== "draft" || menu.dishIds.has(args.dishId))
+    return false;
+  try {
+    await ctx.runMutation(api.mutations.MenuDish_createViaAdd, {
+      menuId: menu.id,
+      dishId: args.dishId,
+      sellingPrice: args.price,
+      idempotencyKey: `${args.idempotencyKey}:price`,
+    });
+    menu.dishIds.add(args.dishId);
+    return true;
+  } catch {
+    return false;
+  }
+}

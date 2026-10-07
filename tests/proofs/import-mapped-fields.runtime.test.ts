@@ -205,6 +205,72 @@ describe("runtime proof: documented TPP field maps are executed", () => {
     expect(byName("Walk In").referralSourceId ?? null).toBeNull();
   });
 
+  it("an imported menu row with a price lands on its category's draft price list; no price adds nothing", async () => {
+    const tenantId = "tenant-import-menu-prices";
+    const actor = owner(tenantId);
+    const first = await importRows(actor, "menus", [
+      {
+        name: "Breakfast Burrito",
+        category: "Air Catering",
+        price_per_person: 13.99,
+      },
+      { name: "Desserts", category: "Air Catering", price_per_person: "$6.00" },
+      { name: "Crab Cakes", category: "Apps", price_per_person: 7.5 },
+      { name: "Pesto Crostini", category: "Apps", price_per_person: 0 },
+      { name: "House Salad", category: "Salads", price_per_person: "" },
+    ]);
+    expect(first.committed).toBe(5);
+    // A later file adds to the same category list instead of a second one.
+    const second = await importRows(actor, "menus", [
+      {
+        name: "FBO Brownies",
+        category: "Air Catering",
+        price_per_person: 10.4,
+      },
+    ]);
+    expect(second.committed).toBe(1);
+    // The same file again adds nothing twice; a dish that came in with no
+    // price and now has one gets it once.
+    await importRows(actor, "menus", [
+      { name: "Crab Cakes", category: "Apps", price_per_person: 7.5 },
+      { name: "House Salad", category: "Salads", price_per_person: 9 },
+    ]);
+
+    const menus = await tableRows(actor, "menus", tenantId);
+    expect(menus.map((menu) => menu.name).sort()).toEqual([
+      "Old system prices - Air Catering",
+      "Old system prices - Apps",
+      "Old system prices - Salads",
+    ]);
+    for (const menu of menus) expect(menu.status).toBe("draft");
+    const dishes = await tableRows(actor, "dishes", tenantId);
+    const dishName = (id: unknown) =>
+      dishes.find((dish) => dish._id === id)!.name;
+    const lines = await tableRows(actor, "menuDishes", tenantId);
+    const priced = (menuName: string) =>
+      Object.fromEntries(
+        lines
+          .filter(
+            (line) =>
+              line.menuId === menus.find((m) => m.name === menuName)!._id,
+          )
+          .map((line) => [dishName(line.dishId), line.sellingPrice]),
+      );
+    expect(priced("Old system prices - Air Catering")).toEqual({
+      "Breakfast Burrito": 13.99,
+      Desserts: 6,
+      "FBO Brownies": 10.4,
+    });
+    expect(priced("Old system prices - Apps")).toEqual({ "Crab Cakes": 7.5 });
+    expect(priced("Old system prices - Salads")).toEqual({ "House Salad": 9 });
+    expect(lines).toHaveLength(5);
+    // The price also stays on the import word for word.
+    const pesto = await linkFor(actor, tenantId, "pesto_crostini");
+    expect(JSON.parse(String(pesto.rawSourceData)).sourceRow).toMatchObject({
+      price_per_person: 0,
+    });
+  });
+
   it("the executed event mapping covers the documented fields and preserves literal EventStatus", async () => {
     const tenantId = "tenant-import-event-mapping";
     const actor = owner(tenantId);
