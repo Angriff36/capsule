@@ -26,6 +26,7 @@ vi.mock("../src/lib/manifest-convex-react", () => ({
   useGetEvent: () => hooks.event,
   useListEvent: () => (hooks.event ? [hooks.event] : []),
   useListVenue: () => [],
+  useListVenueCommissionTerm: () => [],
   useListPerson: () => [],
   useListReferralSource: () => [],
   useListClient: () => [],

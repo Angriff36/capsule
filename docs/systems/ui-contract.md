@@ -202,6 +202,13 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
   - refusals (role, stage and rules): "Sales staff may see contracts"; "Sales staff may update contracts"; "Sales staff may change contracts"; "Guard 0 failed"; "Guard 1 failed"; "Give the name of who signed"; and 2 more
   - effects: ContractSigned
   - refresh: live reads update by themselves; reads affected: Contract.list, Contract.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get
+- `mutations.Lead_close` (Lead.close)
+  - inputs from the screen: reason; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see leads"; "Sales staff may update leads"; "Sales staff may change leads"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: LeadClosed
+  - refresh: live reads update by themselves; reads affected: Lead.list, Lead.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 14 more
 - `mutations.Lead_confirmConversion` (Lead.confirmConversion)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -222,6 +229,13 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
   - result: allocation `{ docId: string }`
   - refusals (role, stage and rules): "Sales staff may see leads"; "Sales staff may update leads"; "Sales staff may change leads"; "Guard 0 failed"; "Guard 1 failed"; "Give a company name for a company lead, or a given name for a person lead"; and 3 more
   - effects: LeadCaptured
+  - refresh: live reads update by themselves; reads affected: Lead.list, Lead.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 14 more
+- `mutations.Lead_reopen` (Lead.reopen)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see leads"; "Sales staff may update leads"; "Sales staff may change leads"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: LeadReopened
   - refresh: live reads update by themselves; reads affected: Lead.list, Lead.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 14 more
 - `mutations.Lead_reviseDetails` (Lead.reviseDetails)
   - inputs from the screen: leadType, source, referralSourceId, companyName, givenName, familyName, email, phone, notes, eventDate, guestCount, eventType; filled by the server: none
@@ -4322,25 +4336,38 @@ Screens (70): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `queries.listDishIngredient` - live read
 - `queries.listEquipment` - live read
 - `queries.listEquipmentReservation` - live read
+- `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignment` - live read
+- `queries.listEventAssignmentByEventId` - live read
 - `queries.listEventCloseout` - live read
 - `queries.listEventDishByEventId` - live read
+- `queries.listEventGuestByEventId` - live read
+- `queries.listEventStaffNeedByEventId` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
 - `queries.listIngredient` - live read
 - `queries.listIngredientDemand` - live read
+- `queries.listIngredientDemandByEventId` - live read
 - `queries.listIngredientPriceObservation` - live read
 - `queries.listInvoice` - live read
 - `queries.listItemUnitMapping` - live read
 - `queries.listLeftoverDisposition` - live read
 - `queries.listOrganization` - live read
+- `queries.listPackListByEventId` - live read
 - `queries.listPayment` - live read
 - `queries.listPaymentMethod` - live read
 - `queries.listPayrollExportRecord` - live read
 - `queries.listPayrollInput` - live read
 - `queries.listPerson` - live read
+- `queries.listPrepTaskByEventId` - live read
+- `queries.listProposalByEventId` - live read
 - `queries.listReferralSource` - live read
+- `queries.listRentalOrderLineByEventId` - live read
 - `queries.listRevenueAttribution` - live read
+- `queries.listReviewFlagByEventId` - live read
 - `queries.listShift` - live read
+- `queries.listShiftByEventId` - live read
 - `queries.listTaxRate` - live read
 - `queries.listVendorOrder` - live read
 - `queries.listVendorOrderLine` - live read
@@ -4421,7 +4448,7 @@ Screens (70): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
   - effects: InvoiceBalanceReminderSent
   - refresh: live reads update by themselves; reads affected: Invoice.list, Invoice.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, CreditMemo.list, CreditMemo.get and 4 more
 - `mutations.Invoice_setDeposit` (Invoice.setDeposit)
-  - inputs from the screen: depositAmount, balanceReminderLeadDays; filled by the server: none
+  - inputs from the screen: depositAmount, balanceReminderLeadDays, balanceDueAt; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Finance staff and managers may see invoices"; "Finance staff and managers may update invoices"; "Finance staff and managers may change invoices"; "Guard 0 failed"; "Guard 1 failed"; "This deposit amount can't be negative. Use zero or more."; and 4 more

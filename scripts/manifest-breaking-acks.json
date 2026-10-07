@@ -3258,6 +3258,12 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-07",
       "reason": "Optional string (string?): why a lead was closed, set by the close/reopen lead step already on dev. Old leads simply have no reason. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "setDeposit.parameters.balanceDueAt",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-07",
+      "reason": "Optional date on the invoice deposit step, already on dev (signed due date). Callers that leave it out keep the invoice's own due date, so nothing that works today breaks."
     }
   ]
 }

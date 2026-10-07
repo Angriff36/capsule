@@ -30,6 +30,12 @@ type Actor = ReturnType<ReturnType<typeof harness>["asRole"]>;
 
 const tenantId = "tenant-report-picker-reads";
 const day = Date.UTC(2026, 8, 20);
+// The event picker adds the date (local time) so same-named events tell apart.
+const gala = `Harbor Gala · ${new Date(day).toLocaleDateString("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+})}`;
 
 /** The labels of each picker list the caller gets. */
 async function pickers(actor: Actor) {
@@ -114,7 +120,7 @@ describe("runtime proof: report pickers follow each record read policy (AC-212)"
 
     // Control: the owner sees every live record, never the removed client.
     expect(await pickers(owner)).toEqual({
-      events: ["Harbor Gala"],
+      events: [gala],
       clients: ["Harbor Foods"],
       people: ["Pat Cook"],
       vendors: ["Fresh Fish Co"],
@@ -123,7 +129,7 @@ describe("runtime proof: report pickers follow each record read policy (AC-212)"
 
     // Sales reads events, clients and people, not vendors or venues.
     const sales = await pickers(as("sales_staff"));
-    expect(sales.events).toEqual(["Harbor Gala"]);
+    expect(sales.events).toEqual([gala]);
     expect(sales.clients).toEqual(["Harbor Foods"]);
     expect(sales.people).toEqual(["Pat Cook"]);
     expect(sales.vendors).toEqual([]);
@@ -148,7 +154,7 @@ describe("runtime proof: report pickers follow each record read policy (AC-212)"
 
     // A driver reads events and people only.
     expect(await pickers(as("driver"))).toEqual({
-      events: ["Harbor Gala"],
+      events: [gala],
       clients: [],
       people: ["Pat Cook"],
       vendors: [],
