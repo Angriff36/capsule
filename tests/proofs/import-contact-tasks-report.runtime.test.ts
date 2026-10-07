@@ -204,6 +204,13 @@ describe("runtime proof: TPP Contact Tasks & Notes report import (AC-057)", () =
     expect(waiting.conflictStatus).toBe("pending_conflict");
     expect(String(waiting.resolutionNote)).toContain("not in Capsule yet");
 
+    // A part of a file where every task waits still finishes: the waiting
+    // rows are on the match list, not lost.
+    const onlyWaiting = await importRows("history", [
+      { ...rows[3]!, HistoryID: "task:client:someone else:2025-12-22:x" },
+    ]);
+    expect(onlyWaiting).toMatchObject({ committed: 0, pending: 1 });
+
     const again = await importRows("history", rows);
     expect(again.committed).toBe(0);
     expect(await table("clientCommunications")).toHaveLength(3);

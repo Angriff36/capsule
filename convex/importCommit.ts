@@ -2284,11 +2284,15 @@ export const commitImportRun = action({
       if (result.stoppedEarly) {
         return await stopEarly(result.parseErrors, invocation);
       }
-      if (result.committed === 0 && result.skipped === 0) {
+      // Rows waiting on the match list are saved there, so a part of a file
+      // where every row waits still finishes (a later run brings them in).
+      if (
+        result.committed === 0 &&
+        result.skipped === 0 &&
+        result.pending === 0
+      ) {
         throw new ConvexError(
-          result.pending > 0
-            ? `No history brought in (${result.pending} waiting on the match list). Bring in the contacts and events first.`
-            : `No history rows could be read (${result.parseErrors} row(s) with problems). Nothing to commit.`,
+          `No history rows could be read (${result.parseErrors} row(s) with problems). Nothing to commit.`,
         );
       }
       await completeRun(invocation);
