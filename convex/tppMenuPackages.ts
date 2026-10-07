@@ -7,8 +7,8 @@
  * with its dishes on it, each dish's course the package's choice group, and
  * the "select 1" groups as the menu's pick-one courses. A dish is joined to
  * the one dish of that name already in Capsule (the Menu Items Export brought
- * them in); a name with no dish, or with more than one, is sent back so the
- * page can list it. A draft is never on the public menu or the proposal
+ * them in); of two dishes with one name, the one that import made. A name
+ * with no dish, or still more than one, is sent back so the page can list it. A draft is never on the public menu or the proposal
  * picker, so a manager checks the package and publishes it.
  *
  * Reading the file again: a package menu still in draft gets only the dishes
@@ -25,21 +25,30 @@ import { getAuthContext, requireTenant } from "./lib/authContext";
 
 export const OLD_PACKAGE_MENU = "Old system package - ";
 
-/** Pick the one dish a printed name means: the main dish over its versions. */
-function dishByName(dishes: Doc<"dishes">[]) {
+/**
+ * Pick the one dish a printed name means: the main dish over its versions,
+ * then the dish the old system's menu import made over one made by hand.
+ */
+function dishByName(
+  dishes: Doc<"dishes">[],
+  fromOldSystem: () => Promise<Set<string>>,
+) {
   const byName = new Map<string, Doc<"dishes">[]>();
   for (const dish of dishes) {
     const key = plainName(dish.name);
     byName.set(key, [...(byName.get(key) ?? []), dish]);
   }
-  return (name: string): Doc<"dishes"> | "none" | "several" => {
+  return async (name: string): Promise<Doc<"dishes"> | "none" | "several"> => {
     const all = byName.get(plainName(name)) ?? [];
     const main = all.filter(
       (dish) => dish.versionOfDishId == null && dish.canonicalDishId == null,
     );
     const pick = main.length > 0 ? main : all;
     if (pick.length === 0) return "none";
-    return pick.length === 1 ? pick[0]! : "several";
+    if (pick.length === 1) return pick[0]!;
+    const linked = await fromOldSystem();
+    const old = pick.filter((dish) => linked.has(String(dish._id)));
+    return old.length === 1 ? old[0]! : "several";
   };
 }
 
@@ -62,6 +71,8 @@ export const importTppMenuPackages = mutation({
   },
   handler: async (ctx, args) => {
     const tenantId = requireTenant(await getAuthContext(ctx));
+    // Read only when two dishes share a printed name.
+    let oldDishIds: Set<string> | null = null;
     const findDish = dishByName(
       (
         await ctx.db
@@ -74,6 +85,27 @@ export const importTppMenuPackages = mutation({
           dish.mergedIntoDishId == null &&
           dish.status === "active",
       ),
+      async () => {
+        oldDishIds ??= new Set(
+          (
+            await ctx.db
+              .query("externalRecordLinks")
+              .withIndex("by_tenantId_and_recordType", (q) =>
+                q.eq("tenantId", tenantId).eq("recordType", "menu"),
+              )
+              .collect()
+          )
+            // Older imports labelled the dish link "menu"; both are the dish.
+            .filter(
+              (link) =>
+                link.deletedAt == null &&
+                link.sourceSystem === "tpp_legacy" &&
+                link.capsuleId !== "",
+            )
+            .map((link) => link.capsuleId),
+        );
+        return oldDishIds;
+      },
     );
     const menus = new Map(
       (
@@ -141,7 +173,7 @@ export const importTppMenuPackages = mutation({
       for (const group of pack.groups) {
         for (const dishName of group.dishes) {
           sortOrder += 1;
-          const dish = findDish(dishName);
+          const dish = await findDish(dishName);
           if (dish === "none") notFound.add(dishName);
           if (dish === "several") several.add(dishName);
           if (typeof dish === "string" || onMenu.has(String(dish._id)))

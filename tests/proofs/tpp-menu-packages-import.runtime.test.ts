@@ -6,7 +6,9 @@
  *   - each dish joins the one dish of that name already in Capsule; its
  *     course is the package's choice group, and "select 1" groups become the
  *     menu's pick-one courses
- *   - a name with no dish, or with two dishes, is sent back to be listed
+ *   - of two dishes with one name, the one the old system's menu import
+ *     made is used; a name with no dish, or two hand-made dishes, is sent
+ *     back to be listed
  *   - group notes and groups with no dishes go in the menu description
  *   - reading the file again adds nothing; a dish added since is put on the
  *     draft once; a menu someone published is left as it is
@@ -39,6 +41,7 @@ const HAM: OldMenuPackage = {
       dishes: ["Honey Glazed Ham"],
     },
     { label: "Starch", note: "", pickOne: false, dishes: ["Mac n Cheese"] },
+    { label: "Veggie", note: "", pickOne: false, dishes: ["Corn"] },
     {
       label: "Salad (select 1)",
       note: "",
@@ -91,6 +94,28 @@ describe("runtime proof: old-system menu packages", () => {
     const italian = await dish("Mixed Green Salad with Italian Dressing");
     await dish("Mac n Cheese");
     await dish("Mac N' Cheese");
+    await dish("Corn");
+    const oldCorn = await dish("Corn");
+    // The menus import links the dish it made to its old-system row (older
+    // imports labelled that link "menu").
+    await roles.kitchen.run(async (ctx) => {
+      const now = Date.now();
+      await ctx.db.insert("externalRecordLinks", {
+        tenantId: TENANT,
+        sourceSystem: "tpp_legacy",
+        recordType: "menu",
+        externalId: "corn",
+        linkKey: "tpp_legacy||menu|corn||0",
+        capsuleEntity: "menu",
+        capsuleId: oldCorn,
+        verified: false,
+        conflictStatus: "resolved",
+        deletedAt: null,
+        createdAt: now,
+        updatedAt: now,
+        version: 0,
+      } as never);
+    });
 
     const bringIn = (packages: OldMenuPackage[]) =>
       roles.kitchen.mutation(api.tppMenuPackages.importTppMenuPackages, {
@@ -115,7 +140,7 @@ describe("runtime proof: old-system menu packages", () => {
       added: 1,
       updated: 0,
       unchanged: 0,
-      lines: 3,
+      lines: 4,
       notFound: ["Fresh Baked Dinner Rolls with Butter"],
       several: ["Mac n Cheese"],
     });
@@ -138,8 +163,9 @@ describe("runtime proof: old-system menu packages", () => {
         .sort((a, b) => Number(a[2]) - Number(b[2])),
     ).toEqual([
       [String(ham), "Protein", 1],
-      [String(ranch), "Salad (select 1)", 3],
-      [String(italian), "Salad (select 1)", 4],
+      [String(oldCorn), "Veggie", 3],
+      [String(ranch), "Salad (select 1)", 4],
+      [String(italian), "Salad (select 1)", 5],
     ]);
 
     expect(await bringIn([HAM])).toMatchObject({
@@ -164,7 +190,7 @@ describe("runtime proof: old-system menu packages", () => {
       added: 0,
       leftAlone: ["Traditional Option 3 - Glazed Ham"],
     });
-    expect(await lines(String(menu._id))).toHaveLength(4);
+    expect(await lines(String(menu._id))).toHaveLength(5);
 
     await expect(
       roles.inventory.mutation(api.tppMenuPackages.importTppMenuPackages, {
