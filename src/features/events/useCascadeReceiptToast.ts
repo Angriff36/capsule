@@ -24,7 +24,7 @@ export function useCascadeReceiptToast(recordId: string | null | undefined) {
     if (!receipt || shown.current === id) return;
     shown.current = id;
     reportActionOk(
-      `${receipt.text} → ${receipt.summary}`,
+      `${receipt.text}. Also: ${receipt.summary}.`,
       receipt.groups.flatMap((group) => {
         const href = group.href ?? group.links[0]?.href;
         return href ? [{ label: `${group.count} ${group.label}`, href }] : [];
