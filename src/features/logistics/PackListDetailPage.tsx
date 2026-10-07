@@ -988,6 +988,30 @@ export function PackListDetailPage() {
     });
   };
 
+  // Everything not counted yet came back whole: one step instead of a count
+  // per line. Lines with losses are counted on their own first.
+  const uncountedReturns = listItems.filter(
+    (item) => item.returnedQuantity == null && packWentOut(item) > 0,
+  );
+  const runAllBack = () => {
+    if (uncountedReturns.length === 0) return;
+    void run("all-back", async () => {
+      await bulk.runBulk(uncountedReturns, async (item) => {
+        await recordReturn({
+          docId: item._id,
+          version: item.version,
+          returnedQuantity: packWentOut(item),
+          usedQuantity: 0,
+          lostQuantity: 0,
+          damagedQuantity: 0,
+        });
+      });
+      setNotice(
+        `${uncountedReturns.length} ${uncountedReturns.length === 1 ? "line" : "lines"} counted as all back.`,
+      );
+    });
+  };
+
   const runBulkMissing = () => {
     const targets = selection.selected.filter(itemCanMiss);
     if (targets.length === 0) return;
@@ -1273,6 +1297,16 @@ export function PackListDetailPage() {
           </div>
           <span>{formatCountNoun(listItems.length, "item")}</span>
         </div>
+        {view === "returns" && uncountedReturns.length > 0 ? (
+          <button
+            type="button"
+            className="btn btn-primary btn-sm mb-3"
+            disabled={busy != null}
+            onClick={runAllBack}
+          >
+            Count the rest as all back ({uncountedReturns.length})
+          </button>
+        ) : null}
         <PackListViews
           view={view}
           onViewChange={setView}

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { type Id } from "../../lib/api";
-import { formatStatusLabel } from "../../lib/statusLabels";
 import { useInventoryAuditForItem } from "../../lib/inventoryAuditClient";
 import {
   useListIngredient,
@@ -312,7 +311,6 @@ export function InventoryAuditLogPage() {
                             : `Used by ${entry.eventTitle}`
                           : entry.reason}
                       </strong>
-                      <small>{formatStatusLabel(entry.eventType)}</small>
                     </td>
                     <td>
                       <code
