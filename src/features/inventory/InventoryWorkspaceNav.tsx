@@ -6,7 +6,7 @@ const sections = [
   { label: "Locations", path: "/inventory/locations" },
   { label: "Counts", path: "/inventory/counts" },
   { label: "Opening stock", path: "/inventory/opening-stock" },
-  { label: "Audit log", path: "/inventory/audit" },
+  { label: "Stock history", path: "/inventory/audit" },
   { label: "Waste", path: "/inventory/waste" },
   { label: "Lot trace", path: "/inventory/traceability" },
   { label: "Purchasing", path: "/inventory/purchasing" },
