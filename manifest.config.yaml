@@ -90,6 +90,11 @@ projections:
             name: by_primaryImageStorageId
         # The bell (convex/notifications.ts) reads only rows in an alerting
         # state, so an old open item is never cut off by newer closed ones.
+        # Not staged: on production these tables are small (counted
+        # 2026-10-07: inventoryItems 311, reviewFlags 17, vendorOrders 9,
+        # shifts 8, deliveries 3, incidents 2, timeOffRequests 1,
+        # qualifications 1, others 0), so the backfill is immediate and the
+        # bell needs the indexes in the same deploy.
         Incident:
           - fields: [tenantId, status]
             name: by_tenantId_and_status

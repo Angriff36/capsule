@@ -621,10 +621,12 @@ export async function handleManifestEvent(
     // Its open revenue splits close with it.
     const cancelled = await ctx.db.get(event.entityId as Id<"events">);
     if (cancelled) {
-      const splits = await ctx.db
-        .query("revenueAttributions")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", cancelled.tenantId))
-        .collect();
+      const splits = (
+        await ctx.db
+          .query("revenueAttributions")
+          .withIndex("by_eventId", (q) => q.eq("eventId", cancelled._id))
+          .collect()
+      ).filter((split) => split.tenantId === cancelled.tenantId);
       const system = TenantSystemCommandRunner.forTenant(
         ctx,
         cancelled.tenantId,

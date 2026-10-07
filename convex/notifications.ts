@@ -149,6 +149,8 @@ export const listNotifications = query({
               .withIndex("by_tenantId_and_status", (q: any) =>
                 q.eq("tenantId", tenantId).eq("status", status),
               )
+              // Newest first, so a burst of old rows never hides new ones.
+              .order("desc")
               .take(SOURCE_CAP),
           ),
         )
