@@ -3451,22 +3451,22 @@
       "key": "PR07-05",
       "source": "specs/ralph/production-07-communication-delivery.md",
       "locator": "PR07-05",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-DELIVERY-RECOVERY"],
-      "gap": "The invoice-reminder crash-recovery leg is payment work, paused.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/proofs/invoice-reminder-crash-reconcile.runtime.test.ts 'failure injected between provider acceptance and ledger write recovers without a second provider send' (stub fetch; assert one provider email id). 2026-10-01: invoice-reminder leg paused by Ryan's 2026-09-29 no-money rule; the same crash window is closed for webhooks (claim before send + same delivery id: tests/proofs/outbox-replay.runtime.test.ts, durable-work-recovery) and the sign-in email (staff-signin-email-retry 'not sure' state)"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/proofs/invoice-reminder-crash-reconcile.runtime.test.ts 'failure injected between provider acceptance and ledger write recovers without a second provider send' (stub fetch; assert one provider email id). 2026-10-01: invoice-reminder leg paused by Ryan's 2026-09-29 no-money rule; the same crash window is closed for webhooks (claim before send + same delivery id: tests/proofs/outbox-replay.runtime.test.ts, durable-work-recovery) and the sign-in email (staff-signin-email-retry 'not sure' state). 2026-10-07: invoice-reminder leg PASS (it is an email, not a payment step): tests/proofs/invoice-reminder-crash-reconcile.runtime.test.ts 2/2 - lost answer after the email service took it, retry sends the same bytes under the same key and records the first email id (one send); a changed email under that key (409 invalid_idempotent_request) is recorded as 'taken on an earlier try', not as a refused address. Both fail without the fix."
       ],
-      "waitsOn": "no-money-rule",
+      "waitsOn": null,
       "owners": [
         "convex/qboSync.ts",
         "convex/googleCalendar.ts",
         "convex/invoiceReminders.ts",
         "durable delivery owners"
       ],
-      "environment": "Not verified yet",
-      "sha": "6fc72eab"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "16f2cae7"
     },
     {
       "id": "AC-109",
@@ -15151,12 +15151,12 @@
       "key": "BE-20.1-02",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "20.1-02",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-NATIVE-JOURNEY"],
-      "gap": "Picture section done (2026-10-04: dish pictures on the client page, the proposal file and the office check; golden event 02). Open only for the payment schedule part (deposit terms), paused under the no-money rule.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/proofs/backend-golden-event.runtime.test.ts — golden event 02: From the inquiry/Event facts, generate a branded Proposal containing the selected menu, rental/ 2026-10-04 picture leg PASS: convex/lib/proposalPictures.ts picks the priced dishes' pictures, send freezes them in the revision, the client link page, the proposal file (download + email) and the office draft check \"Dish pictures\" show them; proof tests/proofs/backend-golden-event.runtime.test.ts golden event 02, tests/proposal-pdf-projection.test.ts, tests/proposal-public-renderers.test.ts; browser check at 360 + 1280. Still open: payment schedule part (deposit terms), paused under the no-money rule."
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/proofs/backend-golden-event.runtime.test.ts — golden event 02: From the inquiry/Event facts, generate a branded Proposal containing the selected menu, rental/ 2026-10-04 picture leg PASS: convex/lib/proposalPictures.ts picks the priced dishes' pictures, send freezes them in the revision, the client link page, the proposal file (download + email) and the office draft check \"Dish pictures\" show them; proof tests/proofs/backend-golden-event.runtime.test.ts golden event 02, tests/proposal-pdf-projection.test.ts, tests/proposal-public-renderers.test.ts; browser check at 360 + 1280. 2026-10-07 payment schedule leg PASS: Proposal.depositPercent/balanceDueDaysBefore, src/lib/proposalPaymentSchedule.ts, frozen in the revision; link page, signing page, proposal file and the draft invoice deposit agree (golden event 02/03/06, tests/proposal-payment-schedule.test.ts); browser check at 360 + 1280."
       ],
       "waitsOn": null,
       "owners": [
@@ -15164,8 +15164,8 @@
         "authenticated existing product routes",
         "qualification scripts and docs"
       ],
-      "environment": "Not verified yet",
-      "sha": "827866ef"
+      "environment": "automated test in the repository (vitest / convex-test); signed-in browser on the local dev stack",
+      "sha": "ebcf9a09"
     },
     {
       "id": "AC-655",

@@ -55,6 +55,17 @@ describe("AC-654 proposal payment schedule", () => {
     ]);
   });
 
+  it("an unpriced draft still shows the deposit share it will ask for", () => {
+    const schedule = proposalPaymentSchedule({
+      total: 0,
+      depositPercent: 25,
+      balanceDueDaysBefore: 7,
+    })!;
+    expect(
+      paymentScheduleLines(schedule, date).map((line) => line.label),
+    ).toEqual(["Deposit (25%)", "Balance"]);
+  });
+
   it("reads a frozen copy back and ignores anything else", () => {
     const schedule = proposalPaymentSchedule({
       total: 800,
