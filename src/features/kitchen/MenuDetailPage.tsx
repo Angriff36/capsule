@@ -1,3 +1,4 @@
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
@@ -348,7 +349,9 @@ export function MenuDetailPage() {
       <header className="culinary-header-compact">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className="eyebrow">Menu · Edition {menu.version}</p>
+            <p className="eyebrow">
+              Menu · {formatStatusLabel(String(menu.status ?? "draft"))}
+            </p>
             <h1 className="culinary-title-compact">{menu.name}</h1>
           </div>
           <div className="flex flex-wrap gap-2">
