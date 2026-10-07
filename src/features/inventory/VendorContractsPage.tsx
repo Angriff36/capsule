@@ -322,6 +322,14 @@ export function VendorContractsPage() {
                     </div>
                     <div>
                       <StatusChip status={String(contract.status)} />
+                      {/* Signed, but its prices do not apply yet. */}
+                      {isActive &&
+                      contract.startsAt != null &&
+                      Number(contract.startsAt) > Date.now() ? (
+                        <span role="status">
+                          Starts {formatDate(Number(contract.startsAt))}
+                        </span>
+                      ) : null}
                       {isActive && days != null && days <= EXPIRY_ALERT_DAYS ? (
                         <span role="status">
                           {days <= 0
