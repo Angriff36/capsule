@@ -322,6 +322,7 @@ export function DishDetailPage() {
             <dt>Allergens</dt>
             <dd>
               <AllergenIconRow
+                words
                 codes={
                   recipeRows
                     ? deriveDishAllergens(dish, recipeRows).codes
