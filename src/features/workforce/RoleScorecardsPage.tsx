@@ -61,6 +61,13 @@ export function RoleScorecardsPage() {
   const { prompt, host } = useActionPrompt();
 
   const rows = (scorecards ?? []).filter((row) => row.deletedAt == null);
+  // A role's scorecards numbered in the order they were made: v1, v2, ...
+  const editionOf = (row: (typeof rows)[number]) =>
+    rows.filter(
+      (other) =>
+        other.role === row.role &&
+        Number(other._creationTime) <= Number(row._creationTime),
+    ).length;
   const editing =
     editingId != null ? rows.find((r) => r._id === editingId) : null;
 
@@ -375,7 +382,7 @@ export function RoleScorecardsPage() {
                               : ""}
                           </td>
                           <td className="text-ink-2" data-label="Version">
-                            v{row.version}
+                            v{editionOf(row)}
                           </td>
                           <td data-label="Status">
                             <StatusChip status={String(row.status)} />
