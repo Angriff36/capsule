@@ -57,6 +57,8 @@ export async function applyAcceptedDeposit(
       version: draft.version,
       depositAmount: total > 0 ? Math.min(schedule.depositAmount, total) : schedule.depositAmount,
       balanceReminderLeadDays: schedule.balanceDueDaysBefore,
+      // The balance is due when the signed schedule says, not by client terms.
+      ...(schedule.balanceDueAt != null ? { balanceDueAt: schedule.balanceDueAt } : {}),
       idempotencyKey: `accepted-proposal-deposit:${draft._id}`,
     },
   );

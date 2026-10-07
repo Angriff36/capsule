@@ -34475,7 +34475,7 @@ export const Invoice_assignNumber = mutation({
   },
 });
 
-async function __runInvoiceFollowEventClient(ctx: MutationCtx, { docId, clientId, version }: any, __creation = false) {
+async function __runInvoiceFollowEventClient(ctx: MutationCtx, { docId, clientId, subtotal, taxAmount, total, lineItems, taxBreakdown, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -34488,12 +34488,19 @@ async function __runInvoiceFollowEventClient(ctx: MutationCtx, { docId, clientId
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.sentAt == null))) throw new Error("Guard 2 failed");
     if (!((doc.amountPaid === 0))) throw new Error("Guard 3 failed");
+    if (!((total === ((subtotal + taxAmount) - doc.discountAmount)))) throw new Error("Invoice total must equal subtotal plus tax less discount.");
     const previousClientId = doc.clientId;
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
       clientId: clientId,
+      subtotal: subtotal,
+      taxAmount: taxAmount,
+      total: total,
+      amountDue: total,
+      lineItems: lineItems,
+      taxBreakdown: taxBreakdown,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -34509,6 +34516,11 @@ export const Invoice_followEventClient = mutation({
   args: {
     docId: v.id("invoices"),
     clientId: v.string(),
+    subtotal: v.number(),
+    taxAmount: v.number(),
+    total: v.number(),
+    lineItems: v.any(),
+    taxBreakdown: v.any(),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -35439,7 +35451,7 @@ export const Invoice_sendBalanceReminder = mutation({
   },
 });
 
-async function __runInvoiceSetDeposit(ctx: MutationCtx, { docId, depositAmount, balanceReminderLeadDays, version }: any, __creation = false) {
+async function __runInvoiceSetDeposit(ctx: MutationCtx, { docId, depositAmount, balanceReminderLeadDays, balanceDueAt, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -35459,6 +35471,7 @@ async function __runInvoiceSetDeposit(ctx: MutationCtx, { docId, depositAmount, 
     const updates = {
       depositAmount: depositAmount,
       balanceReminderLeadDays: ((balanceReminderLeadDays != null) ? balanceReminderLeadDays : doc.balanceReminderLeadDays),
+      dueDate: (((balanceDueAt != null) && (doc.status === "draft")) ? balanceDueAt : doc.dueDate),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -35475,6 +35488,7 @@ export const Invoice_setDeposit = mutation({
     docId: v.id("invoices"),
     depositAmount: v.number(),
     balanceReminderLeadDays: v.optional(v.any()),
+    balanceDueAt: v.optional(v.number()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },

@@ -9193,6 +9193,11 @@ export type InvoiceAssignNumberParams = z.infer<typeof InvoiceAssignNumberParams
 // Command: followEventClient on Invoice
 export const InvoiceFollowEventClientParamsSchema = z.object({
   clientId: z.string().min(1),
+  subtotal: z.number(),
+  taxAmount: z.number(),
+  total: z.number(),
+  lineItems: z.unknown(),
+  taxBreakdown: z.unknown(),
 });
 
 export type InvoiceFollowEventClientParams = z.infer<typeof InvoiceFollowEventClientParamsSchema>;
@@ -9293,6 +9298,7 @@ export type InvoiceSendBalanceReminderParams = z.infer<typeof InvoiceSendBalance
 export const InvoiceSetDepositParamsSchema = z.object({
   depositAmount: z.number(),
   balanceReminderLeadDays: z.number().optional(),
+  balanceDueAt: z.coerce.date().optional(),
 });
 
 export type InvoiceSetDepositParams = z.infer<typeof InvoiceSetDepositParamsSchema>;

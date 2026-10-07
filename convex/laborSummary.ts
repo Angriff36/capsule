@@ -36,7 +36,7 @@ import {
 } from "../src/features/workforce/timePay";
 
 /** Mirrors financeManageAccess | workforceManageAccess (+ admin tier). */
-function canReadRates(role: string): boolean {
+export function canReadRates(role: string): boolean {
   return (
     role === "finance_manager" ||
     role === "workforce_manager" ||

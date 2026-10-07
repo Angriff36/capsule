@@ -12,7 +12,7 @@ import { displayEventMenuNotes } from "../../src/features/events/eventMenuLineFi
 import { v } from "convex/values";
 import { TPP_EVENT_REPORTS } from "../../src/features/reports/tpp/catalog.event";
 import { EventTimelineStaffRoster } from "../../src/features/events/eventTimelineStaffRoster";
-import { canReadLaborAggregates } from "../laborSummary";
+import { canReadRates } from "../laborSummary";
 import { loadWindowLabel } from "../../src/features/facilities/venueOperatingFacts";
 import {
   STAGE_LABEL,
@@ -1488,8 +1488,9 @@ export const run = query({
         .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
         .take(REPORT_ROW_LIMIT + 1)
         .then(keepReportRows(ctx, "prep tasks"));
-      // Labor cost follows the labor-cost read rule; names follow people.
-      const seesCost = canReadLaborAggregates(auth.role);
+      // One cook's cost over their hours is their pay rate, so the cost
+      // column follows the pay-rate read rule; names follow people.
+      const seesCost = canReadRates(auth.role);
       const seesPeople = canRead(auth, PERSON_READ);
       const live = prep.filter(
         (row) => isLiveTenantRow(row, tenantId) && row.status !== "cancelled",

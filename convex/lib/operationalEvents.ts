@@ -31,7 +31,7 @@ import { eventStyleReconciliation } from "./styleReconciliation";
 import { eventRentalReconciliation } from "./rentalReconciliation";
 import {
   assertInvoiceCommercialSource, ensureEventDraftInvoice, eventInvoicePricingReconciliation,
-  followAcceptedProposalPrice,
+  followAcceptedProposalPrice, retaxDraftForClient,
 } from "./invoicePricingReconciliation";
 import { eventCloseoutCommercialReconciliation } from "./closeoutCommercialReconciliation";
 import {
@@ -671,6 +671,7 @@ export async function handleManifestEvent(
       await system.runMutation(api.mutations.Invoice_followEventClient, {
         docId: invoice._id,
         clientId,
+        ...(await retaxDraftForClient(ctx, invoice, invoice.clientId, clientId)),
       });
     }
     return;

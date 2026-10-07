@@ -2206,8 +2206,8 @@ const COMMAND_DISPATCH = {
   },
   "Invoice.followEventClient": {
     ref: api.mutations.Invoice_followEventClient,
-    params: ["docId","clientId","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"clientId","type":"uuid","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","clientId","subtotal","taxAmount","total","lineItems","taxBreakdown","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"clientId","type":"uuid","required":true},{"name":"subtotal","type":"money","required":true},{"name":"taxAmount","type":"money","required":true},{"name":"total","type":"money","required":true},{"name":"lineItems","type":"json","required":true},{"name":"taxBreakdown","type":"json","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "Invoice.followEventPrice": {
     ref: api.mutations.Invoice_followEventPrice,
@@ -2271,8 +2271,8 @@ const COMMAND_DISPATCH = {
   },
   "Invoice.setDeposit": {
     ref: api.mutations.Invoice_setDeposit,
-    params: ["docId","depositAmount","balanceReminderLeadDays","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"depositAmount","type":"money","required":true},{"name":"balanceReminderLeadDays","type":"number","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","depositAmount","balanceReminderLeadDays","balanceDueAt","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"depositAmount","type":"money","required":true},{"name":"balanceReminderLeadDays","type":"number","required":false},{"name":"balanceDueAt","type":"datetime","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "Invoice.stageClientMerge": {
     ref: api.mutations.Invoice_stageClientMerge,

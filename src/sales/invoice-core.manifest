@@ -270,7 +270,7 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command setDeposit(depositAmount: money(12, 2), optional balanceReminderLeadDays: number) {
+  command setDeposit(depositAmount: money(12, 2), optional balanceReminderLeadDays: number, optional balanceDueAt: datetime) {
     guard self.deletedAt == null
     guard self.depositPaidAt == null
     constraint depositNonnegative: depositAmount >= 0 "This deposit amount can't be negative. Use zero or more."
@@ -278,6 +278,7 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     constraint depositLeadDays: balanceReminderLeadDays == null or balanceReminderLeadDays >= 0 "The reminder lead days can't be negative. Use zero or more."
     mutate depositAmount = depositAmount
     mutate balanceReminderLeadDays = balanceReminderLeadDays != null ? balanceReminderLeadDays : self.balanceReminderLeadDays
+    mutate dueDate = balanceDueAt != null and self.status == "draft" ? balanceDueAt : self.dueDate
     emit InvoiceDepositSet {
       invoiceId: self.id
       tenantId: self.tenantId
@@ -543,13 +544,29 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   // An event moved to another client takes its unsent, unpaid draft bill
   // with it; a bill that was sent or paid stays with the client it was billed
   // to. The event handler runs this only for such drafts.
-  private command followEventClient(clientId: uuid) {
+  // The handler works the bill's tax again for the new client (taxable or
+  // exempt) and passes the new amounts.
+  private command followEventClient(
+    clientId: uuid,
+    subtotal: money(12, 2),
+    taxAmount: money(12, 2),
+    total: money(12, 2),
+    lineItems: json,
+    taxBreakdown: json
+  ) {
     guard self.status == "draft"
     guard self.deletedAt == null
     guard self.sentAt == null
     guard self.amountPaid == 0
+    constraint followClientTotal: total == subtotal + taxAmount - self.discountAmount "Invoice total must equal subtotal plus tax less discount."
     compute previousClientId = self.clientId
     mutate clientId = clientId
+    mutate subtotal = subtotal
+    mutate taxAmount = taxAmount
+    mutate total = total
+    mutate amountDue = total
+    mutate lineItems = lineItems
+    mutate taxBreakdown = taxBreakdown
     emit InvoiceClientFollowedEvent {
       invoiceId: self.id
       tenantId: self.tenantId
