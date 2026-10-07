@@ -42,6 +42,17 @@ export type EventWizardDraft = {
   serviceStyleId?: string;
   /** The picked style's name, kept on the event as it was booked. */
   serviceStyleName?: string;
+  /** Filled at create time only: the booked client's name and venue row,
+   *  kept on the event as they were booked (like the long form). */
+  clientName?: string;
+  bookedVenue?: {
+    name: string;
+    addressLine1?: string | null;
+    city?: string | null;
+    region?: string | null;
+    postalCode?: string | null;
+    capacity?: number | null;
+  };
   /** The picked style is Pickup: the client collects, so no venue is needed. */
   pickup?: boolean;
   startsAt: string;
