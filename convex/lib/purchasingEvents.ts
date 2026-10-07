@@ -362,7 +362,10 @@ export async function releaseNeedDraftContributions(
   }
 }
 
-/** A finished event's bought needs stop counting toward its week's buying. */
+/**
+ * A finished event stops counting toward its week's buying: bought needs
+ * become used, unbought ones close.
+ */
 export async function settleEventPurchasing(
   ctx: MutationCtx,
   eventId: Id<"events">,
@@ -373,15 +376,15 @@ export async function settleEventPurchasing(
     .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
     .collect();
   for (const need of needs) {
-    if (
-      need.tenantId !== tenantId ||
-      need.deletedAt != null ||
-      !["ordered", "fulfilled"].includes(need.status)
-    )
-      continue;
-    await ctx.runMutation(api.mutations.PurchaseNeed_settleWithEvent, {
-      docId: need._id,
-    });
+    if (need.tenantId !== tenantId || need.deletedAt != null) continue;
+    if (["ordered", "fulfilled"].includes(need.status))
+      await ctx.runMutation(api.mutations.PurchaseNeed_settleWithEvent, {
+        docId: need._id,
+      });
+    else if (need.status === "open")
+      await ctx.runMutation(api.mutations.PurchaseNeed_closeWithFinishedEvent, {
+        docId: need._id,
+      });
   }
 }
 

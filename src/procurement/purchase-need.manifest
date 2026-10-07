@@ -304,6 +304,29 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // A need still unbought when its event finished will never be bought: it
+  // closes, and its draft order line lets it go (PurchaseNeedCancelled).
+  command closeWithFinishedEvent() {
+    guard self.status == "open"
+    guard self.deletedAt == null
+    guard self.event != null and (self.event.stage == "completed" or self.event.stage == "closed_out")
+    compute previousStatus = self.status
+    compute reason = "The event finished before this was bought"
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate cancellationReason = reason
+    emit PurchaseNeedCancelled {
+      purchaseNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientDemandId: self.ingredientDemandId
+      ingredientId: self.ingredientId
+      previousStatus: previousStatus
+      status: "cancelled"
+      reason: reason
+    }
+  }
+
   // Rescheduled event (#328): an open need follows its event to the new
   // purchasing week. The transactional handler has already retired this need's
   // link on the old editable draft; the re-emitted PurchaseNeedOpened routes it

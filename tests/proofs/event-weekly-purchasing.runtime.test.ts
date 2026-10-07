@@ -568,5 +568,27 @@ describe("runtime proof: event dishes → shared weekly VendorOrder draft", () =
     });
 
     expect((await needs()).map((need) => need.status)).toEqual(["used"]);
+
+    // An event whose need was never ordered: it closes when the event ends.
+    const unbought = await approvedEvent(proof, tenantId, {
+      title: "Settle second",
+      headcount: 20,
+      dishIds: catalog.dishIds,
+    });
+    await roles.events.run(async (ctx) =>
+      ctx.db.patch(unbought as never, { stage: "final" } as never),
+    );
+    await runner(proof, roles.events)(api.mutations.Event_complete as never, {
+      docId: unbought,
+      version: await versionOf(roles.events, unbought),
+    });
+    const second = (
+      await liveRows<{ tenantId: string; eventId: string; status: string }>(
+        roles.procurement,
+        "purchaseNeeds",
+        tenantId,
+      )
+    ).filter((row) => row.eventId === unbought);
+    expect(second.map((need) => need.status)).toEqual(["cancelled"]);
   });
 });

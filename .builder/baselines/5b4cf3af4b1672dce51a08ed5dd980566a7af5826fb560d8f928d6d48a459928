@@ -11511,6 +11511,11 @@ export const PurchaseNeedCancelParamsSchema = z.object({
 
 export type PurchaseNeedCancelParams = z.infer<typeof PurchaseNeedCancelParamsSchema>;
 
+// Command: closeWithFinishedEvent on PurchaseNeed
+export const PurchaseNeedCloseWithFinishedEventParamsSchema = z.object({});
+
+export type PurchaseNeedCloseWithFinishedEventParams = z.infer<typeof PurchaseNeedCloseWithFinishedEventParamsSchema>;
+
 // Command: create on PurchaseNeed
 export const PurchaseNeedCreateParamsSchema = z.object({
   eventId: z.string().min(1),

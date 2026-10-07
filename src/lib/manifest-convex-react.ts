@@ -712,6 +712,7 @@ import {
   ProposalTemplateReviseParamsSchema,
   PurchaseNeedAssignToDraftParamsSchema,
   PurchaseNeedCancelParamsSchema,
+  PurchaseNeedCloseWithFinishedEventParamsSchema,
   PurchaseNeedCreateParamsSchema,
   PurchaseNeedMarkDraftOrderedParamsSchema,
   PurchaseNeedMarkFulfilledParamsSchema,
@@ -10671,6 +10672,16 @@ export function usePurchaseNeedCancel() {
   };
 }
 
+/** Mutation hook for PurchaseNeed.closeWithFinishedEvent. */
+export function usePurchaseNeedCloseWithFinishedEvent() {
+  const mutate = useMutation(api.mutations.PurchaseNeed_closeWithFinishedEvent);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PurchaseNeedCloseWithFinishedEventParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for PurchaseNeed.create. */
 export function usePurchaseNeedCreate() {
   const mutate = useMutation(api.mutations.PurchaseNeed_create);
@@ -14792,4 +14803,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1564 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1565 as const;
