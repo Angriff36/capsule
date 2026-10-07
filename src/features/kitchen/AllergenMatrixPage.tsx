@@ -209,6 +209,7 @@ export function AllergenMatrixPage() {
               {liveEvents.map((event) => (
                 <option key={event._id} value={`event:${event._id}`}>
                   {event.title}
+                  {event.startsAt ? ` · ${formatDate(event.startsAt)}` : ""}
                 </option>
               ))}
             </optgroup>
