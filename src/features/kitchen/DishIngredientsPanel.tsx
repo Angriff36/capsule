@@ -255,7 +255,7 @@ export function DishIngredientsPanel({ dishId }: Props) {
                       ) : null}
                       {SELECTABLE_UNITS.map((value) => (
                         <option key={value} value={value}>
-                          {value}
+                          {value.replaceAll("_", " ")}
                         </option>
                       ))}
                     </select>
@@ -324,7 +324,7 @@ export function DishIngredientsPanel({ dishId }: Props) {
             >
               {SELECTABLE_UNITS.map((u) => (
                 <option key={u} value={u}>
-                  {u}
+                  {u.replaceAll("_", " ")}
                 </option>
               ))}
             </select>

@@ -255,7 +255,9 @@ export function ComponentPortionSpecsPanel({
           Piece unit
           <select name="pieceUnit" className="input" defaultValue="ounce">
             {SELECTABLE_UNITS.map((unit) => (
-              <option key={unit}>{unit}</option>
+              <option key={unit} value={unit}>
+                {unit.replaceAll("_", " ")}
+              </option>
             ))}
           </select>
         </label>

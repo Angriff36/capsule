@@ -297,7 +297,7 @@ export function DishDetailsEditor({
           >
             {unitOptionsFor(String(dish.portionUnit)).map((option) => (
               <option key={option} value={option}>
-                {option}
+                {option.replaceAll("_", " ")}
               </option>
             ))}
           </select>
