@@ -17,6 +17,7 @@ import {
 import { classifyCommandFailure } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
 import { formatTime } from "../../lib/format";
+import { readInquiryFacts, senderName } from "./inquiryFacts";
 import { TableSkeleton } from "../../ui/primitives";
 import { ClientsWorkspaceNav } from "../clients/ClientsWorkspaceNav";
 import { PasteIncomingMessageForm } from "./PasteIncomingMessageForm";
@@ -296,12 +297,14 @@ export function MessageInboxPage() {
     try {
       const created = (await createLead({
         leadType: "person",
-        givenName: sender,
+        givenName: senderName(sender),
         email: /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(sender) ? sender : undefined,
         phone: /^[+\d][\d\s().-]{6,}$/.test(sender) ? sender : undefined,
         source: PROVIDER_LABEL[selected.provider] ?? selected.provider,
         estimatedValue: 0,
         notes: firstInbound?.bodyText?.slice(0, 2000) || undefined,
+        // Guests and the date, when the message says them in plain words.
+        ...readInquiryFacts(firstInbound?.bodyText ?? ""),
       })) as { docId: string };
       await linkLead({
         docId: selected._id,
@@ -490,8 +493,18 @@ export function MessageInboxPage() {
                       </span>
                     </div>
                     <p className="text-xs text-ink-3">
-                      {contactName(t.contactId) ?? t.senderIdentity ?? "—"}
-                      {leadName(t.leadId) ? ` · ${leadName(t.leadId)}` : ""}
+                      {/* Who wrote, when the title does not already say it. */}
+                      {[
+                        (contactName(t.contactId) ?? t.senderIdentity) !==
+                        threadTitle(t)
+                          ? (contactName(t.contactId) ?? t.senderIdentity)
+                          : null,
+                        leadName(t.leadId)
+                          ? `Lead: ${leadName(t.leadId)}`
+                          : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" · ")}
                       {t.mergedIntoThreadId
                         ? " · merged"
                         : t.status === "archived"
