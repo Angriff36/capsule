@@ -73,7 +73,6 @@ export function MessageInboxPage() {
   const linkLead = useMessageThreadLinkLead();
   const createLead = useCreateLead();
   const setStatus = useMessageThreadSetStatus();
-  const qualify = useAction(api.messageInbox.qualifyThreadAsLead);
   const sendEmailReply = useSendEmailReply();
   // One id per typed email reply: pressing Send again after a failure or a
   // lost answer never emails the client twice.
@@ -84,7 +83,6 @@ export function MessageInboxPage() {
   const { notice, setNotice } = useActionNotice();
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
-  const [qualifying, setQualifying] = useState(false);
 
   // New-thread inline form.
   const [showNew, setShowNew] = useState(false);
@@ -344,29 +342,6 @@ export function MessageInboxPage() {
     }
   };
 
-  // One-click qualify: create a new Lead from this thread and link it (spec
-  // §4.4 "create an Inquiry/Lead when the thread first becomes sales-
-  // qualified"). Replaces the old "leave the inbox → create a lead elsewhere →
-  // come back → pick it from the dropdown" flow. Idempotent server-side.
-  const qualifySelected = async () => {
-    if (!selected || qualifying) return;
-    setFailure(null);
-    setNotice(null);
-    setQualifying(true);
-    try {
-      const result = await qualify({ threadId: selected._id });
-      setNotice(
-        result.created
-          ? "Created a new lead from this thread and linked it."
-          : "This thread is already linked to a lead.",
-      );
-    } catch (e) {
-      fail(e);
-    } finally {
-      setQualifying(false);
-    }
-  };
-
   return (
     <div className="operations-stage supply-stage">
       <header className="supply-masthead">
@@ -599,17 +574,7 @@ export function MessageInboxPage() {
                         );
                       })}
                   </select>
-                  {!selected.leadId ? (
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={() => void qualifySelected()}
-                      disabled={qualifying}
-                      title="Create a new lead from this thread and link it"
-                    >
-                      {qualifying ? "Qualifying…" : "Qualify as Lead"}
-                    </button>
-                  ) : null}
+
                   <button
                     type="button"
                     className="btn"
