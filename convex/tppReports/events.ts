@@ -1161,17 +1161,26 @@ export const run = query({
           }));
         // Items rented from a vendor on the event's Equipment tab.
         if (canRead(auth, RENTAL_READ)) {
-          for (const event of eventById.values()) {
-            const lines = await ctx.db
-              .query("rentalOrderLines")
-              .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
-              .take(REPORT_ROW_LIMIT + 1)
-              .then(keepReportRows(ctx, "rental lines"));
-            for (const line of lines) {
+          // One bounded read of the workspace's rental lines, kept for the
+          // chosen events; each vendor is read once.
+          const lines = await ctx.db
+            .query("rentalOrderLines")
+            .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+            .order("desc")
+            .take(REPORT_ROW_LIMIT + 1)
+            .then(keepReportRows(ctx, "rental lines"));
+          const vendors = new Map<string, Doc<"vendors"> | null>();
+          for (const line of lines) {
+            const event = eventById.get(String(line.eventId));
+            if (!event) continue;
+            {
               if (!isLiveTenantRow(line, tenantId)) continue;
               if (line.status === "cancelled") continue;
+              const vendorKey = String(line.vendorId);
+              if (seeVendors && !vendors.has(vendorKey))
+                vendors.set(vendorKey, await ctx.db.get(line.vendorId));
               const vendor = seeVendors
-                ? await ctx.db.get(line.vendorId)
+                ? (vendors.get(vendorKey) ?? null)
                 : null;
               rows.push({
                 id: line._id,

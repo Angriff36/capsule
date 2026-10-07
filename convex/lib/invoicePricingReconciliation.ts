@@ -243,12 +243,19 @@ export async function ensureEventDraftInvoice(
           ...(await eventPriceTotals(ctx, event, quotedPrice)),
           discountAmount: 0,
         };
+  // The client's own payment terms, so the due date set on sending is right.
+  const client = event.clientId ? await ctx.db.get(event.clientId) : null;
+  const termsDays =
+    client?.tenantId === event.tenantId && client.paymentTermsDays != null
+      ? Number(client.paymentTermsDays)
+      : 30;
   await TenantSystemCommandRunner.forTenant(ctx, event.tenantId).context.runMutation(
     api.mutations.Invoice_createViaIssue,
     {
       clientId: event.clientId,
       eventId,
       invoiceSequence: 0,
+      paymentTermsDays: termsDays,
       ...totals,
       ...(source
         ? {
