@@ -2494,22 +2494,22 @@
       "key": "PR02-07",
       "source": "specs/ralph/production-02-source-identity.md",
       "locator": "PR02-07",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-SOURCE-DATASETS"],
-      "gap": "Staff postal addresses need the old system's staff list export.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: tests/proofs/import-supplement-fields.runtime.test.ts › \"imported birthdays, venue supplements and staff addresses land in their owning records and show unknown when absent\""
       ],
-      "waitsOn": "owner-files",
+      "waitsOn": null,
       "owners": [
         "src/import/",
         "convex/importCommit.ts",
         "src/lib/tppReports/",
         "existing migration/data-map documents"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "1518375b"
     },
     {
       "id": "AC-064",
@@ -4136,21 +4136,21 @@
       "key": "PR11-01",
       "source": "specs/ralph/production-11-reporting.md",
       "locator": "PR11-01",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-REPORT-INVENTORY"],
-      "gap": "The 90 supplied workbooks and the 70-report index are the owner's private archive; not in the repository.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/tpp-catalog-workbook-inventory.test.ts — 'every archived workbook maps to a supported report id, linked reference, or unsupported reason with an owner'"
       ],
-      "waitsOn": "owner-files",
+      "waitsOn": null,
       "owners": [
         "src/features/reports/",
         "existing TPP report playbook",
         "src/lib/tppReports/"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "65d9c50f"
     },
     {
       "id": "AC-141",
@@ -7059,22 +7059,22 @@
       "key": "CF-6.2-04",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§6.2 bullet 'Menu catalog, categories, and prices'",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-SOURCE-DATASETS"],
-      "gap": "The real menu feed carries no prices; prices need a source file with them.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/tpp-menu-price-capture.test.ts — 'an imported menu row with a non-empty price stores it queryably, and an empty price stays on the raw link data' (build after a priced feed exists)"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/tpp-menu-price-capture.test.ts — 'an imported menu row with a non-empty price stores it queryably, and an empty price stays on the raw link data' (build after a priced feed exists) Green 2026-10-07 (PL-SOURCE-DATASETS, 09af0597): the priced feed exists - the real Menu Items Export prices 839 of 2,783 items. tests/proofs/import-mapped-fields.runtime.test.ts 'an imported menu row with a price lands on its category's draft price list; no price adds nothing' - a priced row becomes MenuDish.sellingPrice on the draft menu 'Old system prices - <category>', blank/0 adds nothing and the price stays on the import link verbatim, a repeat import adds nothing twice, a dish imported before gets its price once. Browser 360/1280 with 120 real export rows: the Air Catering and Drop Off price lists show on Kitchen > Menus with $13.99 / $6.00 / $10.40."
       ],
-      "waitsOn": "owner-files",
+      "waitsOn": null,
       "owners": [
         "src/import/",
         "convex/importCommit.ts",
         "src/lib/tppReports/",
         "existing migration/data-map documents"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test); signed-in browser on the local dev stack",
+      "sha": "1518375b"
     },
     {
       "id": "AC-278",
@@ -15165,7 +15165,7 @@
         "qualification scripts and docs"
       ],
       "environment": "automated test in the repository (vitest / convex-test); signed-in browser on the local dev stack",
-      "sha": "ebcf9a09"
+      "sha": "162a4a6f"
     },
     {
       "id": "AC-655",

@@ -89,13 +89,19 @@ export function StaffListImport({
     try {
       for (const step of steps) {
         if (step.kind === "add") {
-          await createPerson({
+          const created = await createPerson({
             givenName: step.row.givenName,
             familyName: step.row.familyName,
             email: step.row.email,
             role: "staff",
             ...(step.row.phone ? { phone: step.row.phone } : {}),
           });
+          if (step.row.address) {
+            await changeAddress({
+              docId: created.docId,
+              addressLine1: step.row.address,
+            });
+          }
           added += 1;
         } else if (step.kind === "fill") {
           const person = people.find((one) => one._id === step.person._id);
