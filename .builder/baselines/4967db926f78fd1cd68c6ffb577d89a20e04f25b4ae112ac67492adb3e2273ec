@@ -68369,7 +68369,7 @@ async function __runTrainingCompletionRecord(ctx: MutationCtx, { docId, personId
     if (!((personId === doc.personId))) throw new Error("This training completion is for a different person. Pick the staff member already on this training completion.");
     if (!((trainingModuleId === doc.trainingModuleId))) throw new Error("This training completion is for a different module. Pick the training module already on this completion.");
     if (!(((assessmentScore >= 0) && (assessmentScore <= 100)))) throw new Error("Give an assessment score between 0 and 100.");
-    if (!((assessmentScore >= __rel_trainingModule.passingScore))) throw new Error("That score is below this module's pass mark. Only passes are recorded here: use a score at or above the pass mark once they pass.");
+    if (!((assessmentScore >= __rel_trainingModule.passingScore))) throw new Error("That score is below this module's pass mark. Only passes are saved here: use a score at or above the pass mark once they pass.");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -68462,7 +68462,7 @@ export const TrainingCompletion_createViaRecord = mutation({
     if (!((personId === __draft.personId))) throw new Error("This training completion is for a different person. Pick the staff member already on this training completion.");
     if (!((trainingModuleId === __draft.trainingModuleId))) throw new Error("This training completion is for a different module. Pick the training module already on this completion.");
     if (!(((assessmentScore >= 0) && (assessmentScore <= 100)))) throw new Error("Give an assessment score between 0 and 100.");
-    if (!((assessmentScore >= __rel_trainingModule.passingScore))) throw new Error("That score is below this module's pass mark. Only passes are recorded here: use a score at or above the pass mark once they pass.");
+    if (!((assessmentScore >= __rel_trainingModule.passingScore))) throw new Error("That score is below this module's pass mark. Only passes are saved here: use a score at or above the pass mark once they pass.");
     const doc: Record<string, any> = {
       ...__draft,
       version: 1,

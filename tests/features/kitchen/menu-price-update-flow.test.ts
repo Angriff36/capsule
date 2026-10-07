@@ -21,6 +21,7 @@ const harness = vi.hoisted(() => ({
 
 vi.mock("../../../src/lib/manifest-convex-react", () => ({
   useMenuDishSchedulePriceChange: () => harness.schedule,
+  useMenuDishCancelPriceChange: () => vi.fn(),
   useMenuSetSeason: () => harness.setSeason,
   useMenuSetService: () => harness.setService,
   useMenuReviseDetails: () => vi.fn(async () => null),
@@ -112,7 +113,7 @@ describe("menu price update flow (AC-332)", () => {
       effectiveAt: new Date("2026-12-01T00:00:00").getTime(),
     });
     expect(done).toHaveBeenCalledWith(
-      "Short rib goes to $60.00 on 2026-12-01.",
+      "Short rib goes to $60.00 on Dec 1, 2026.",
     );
   });
 
