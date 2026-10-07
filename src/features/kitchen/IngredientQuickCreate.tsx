@@ -6,6 +6,50 @@ import {
   type UnitOfMeasure,
 } from "./import/UnitOfMeasureMapper";
 
+const ALLERGENS = [
+  ["wheat", "Wheat"],
+  ["milk", "Milk"],
+  ["eggs", "Eggs"],
+  ["soybeans", "Soy"],
+  ["peanuts", "Peanuts"],
+  ["tree_nuts", "Tree nuts"],
+  ["fish", "Fish"],
+  ["crustacean_shellfish", "Shellfish"],
+  ["sesame", "Sesame"],
+] as const;
+type AllergenCode = (typeof ALLERGENS)[number][0];
+
+/** Words in a name that point to an allergen; the cook confirms them. */
+const ALLERGEN_WORDS: Array<[AllergenCode, RegExp]> = [
+  [
+    "wheat",
+    /flour|wheat|bread|bun|roll|pasta|penne|noodle|cracker|crouton|panko|baguette|tortilla|semolina|barley|rye/i,
+  ],
+  [
+    "milk",
+    /milk|cream|cheese|butter|yogurt|yoghurt|whey|ghee|parmesan|mozzarella|cheddar|ricotta|gorgonzola/i,
+  ],
+  ["eggs", /(^|[^a-z])eggs?([^a-z]|$)|mayo|aioli|meringue/i],
+  ["soybeans", /(^|[^a-z])soy|tofu|edamame|miso|tamari/i],
+  ["peanuts", /peanut/i],
+  [
+    "tree_nuts",
+    /almond|walnut|pecan|cashew|pistachio|hazelnut|macadamia|pine nut|praline/i,
+  ],
+  [
+    "fish",
+    /salmon|tuna|(^|[^a-z])cod([^a-z]|$)|halibut|anchov|tilapia|trout|fish/i,
+  ],
+  ["crustacean_shellfish", /shrimp|prawn|crab|lobster|crawfish|langoustine/i],
+  ["sesame", /sesame|tahini/i],
+];
+
+export function suggestAllergens(name: string): AllergenCode[] {
+  return ALLERGEN_WORDS.filter(([, words]) => words.test(name)).map(
+    ([code]) => code,
+  );
+}
+
 /**
  * "+ New ingredient" inside a recipe-line picker. The fields carry no `name`,
  * so the surrounding line form never submits them; saving creates the
@@ -23,6 +67,9 @@ export function IngredientQuickCreate({
   const [name, setName] = useState("");
   const [unit, setUnit] = useState<UnitOfMeasure>("each");
   const [cost, setCost] = useState("");
+  // Pre-ticked from the name until the cook changes a box.
+  const [allergens, setAllergens] = useState<AllergenCode[] | null>(null);
+  const shownAllergens = allergens ?? suggestAllergens(name);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,10 +108,12 @@ export function IngredientQuickCreate({
         name: trimmed,
         unit,
         costPerUnit,
+        allergens: shownAllergens,
       })) as { docId: string };
       onCreated({ id: created.docId, name: trimmed });
       setOpen(false);
       setCost("");
+      setAllergens(null);
     } catch (failure) {
       console.error("[ingredient-quick-create]", failure);
       const classified = classifyCommandFailure(failure);
@@ -111,7 +160,7 @@ export function IngredientQuickCreate({
           >
             {SELECTABLE_UNITS.map((value) => (
               <option key={value} value={value}>
-                {value}
+                {value.replaceAll("_", " ")}
               </option>
             ))}
           </select>
@@ -129,6 +178,27 @@ export function IngredientQuickCreate({
           />
         </label>
       </div>
+      <fieldset className="field-label">
+        <legend>Contains (check before saving)</legend>
+        <div className="flex flex-wrap gap-3">
+          {ALLERGENS.map(([code, label]) => (
+            <label key={code} className="inline-flex items-center gap-1">
+              <input
+                type="checkbox"
+                checked={shownAllergens.includes(code)}
+                onChange={(event) =>
+                  setAllergens(
+                    event.target.checked
+                      ? [...shownAllergens, code]
+                      : shownAllergens.filter((value) => value !== code),
+                  )
+                }
+              />
+              {label}
+            </label>
+          ))}
+        </div>
+      </fieldset>
       {error ? (
         <p className="text-sm text-danger" role="alert">
           {error}
