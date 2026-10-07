@@ -253,7 +253,13 @@ export function EventCreatePage() {
   const [startsAtValue, setStartsAtValue] = useState(
     proposalPrefill.startsAtLocal || (holdDate ? `${holdDate}T09:00` : ""),
   );
-  const [endsAtValue, setEndsAtValue] = useState(proposalPrefill.endsAtLocal);
+  // A held date starts at 9:00 and runs the usual event length.
+  const [endsAtValue, setEndsAtValue] = useState(
+    proposalPrefill.endsAtLocal ||
+      (holdDate
+        ? addLocalDateTimeHours(`${holdDate}T09:00`, EVENT_DEFAULT_HOURS)
+        : undefined),
+  );
   const [endWasEdited, setEndWasEdited] = useState(
     Boolean(proposalPrefill.endsAtLocal),
   );
