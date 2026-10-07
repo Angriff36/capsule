@@ -1,4 +1,5 @@
 import type { Doc } from "../../lib/api";
+import { isRenewed } from "../../lib/qualificationRenewal";
 import { formatDate, formatMoney } from "../../lib/format";
 import { isBelowReorder, stockLineLink } from "../inventory/stockLevels";
 import { findRosterConflicts } from "../workforce/rosterConflicts";
@@ -459,7 +460,8 @@ export function deriveNotifications(
       qualification.deletedAt != null ||
       qualification.status !== "active" ||
       qualification.expiresAt == null ||
-      qualification.expiresAt > certificationWindowEnd
+      qualification.expiresAt > certificationWindowEnd ||
+      isRenewed(qualification, src.qualifications ?? [])
     ) {
       continue;
     }

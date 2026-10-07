@@ -168,3 +168,32 @@ describe("shift swap notifications", () => {
     ).toEqual([]);
   });
 });
+
+describe("certification renewal", () => {
+  it("a renewed card stops warning about the old one running out", () => {
+    const card = (fields: Record<string, unknown>) =>
+      ({
+        _id: "card-old",
+        personId: "person-c",
+        name: "Washington food worker card",
+        certificationType: "food_handler",
+        status: "active",
+        expiresAt: 1_700_000_000_000 + 10 * 86_400_000,
+        ...fields,
+      }) as never;
+    const expiring = (qualifications: never[]) =>
+      deriveNotifications(sources({ qualifications })).filter(
+        (row) => row.kind === "certification_expiry",
+      );
+    expect(expiring([card({})])).toHaveLength(1);
+    expect(
+      expiring([
+        card({}),
+        card({
+          _id: "card-new",
+          expiresAt: 1_700_000_000_000 + 700 * 86_400_000,
+        }),
+      ]),
+    ).toEqual([]);
+  });
+});
