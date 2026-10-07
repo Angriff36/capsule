@@ -479,6 +479,7 @@ import {
   LeftoverDispositionReviseParamsSchema,
   MenuArchiveParamsSchema,
   MenuDishAddParamsSchema,
+  MenuDishCancelPriceChangeParamsSchema,
   MenuDishRemoveParamsSchema,
   MenuDishSchedulePriceChangeParamsSchema,
   MenuDishUpdateDetailsParamsSchema,
@@ -7634,6 +7635,16 @@ export function useMenuDishAdd() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = MenuDishAddParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for MenuDish.cancelPriceChange. */
+export function useMenuDishCancelPriceChange() {
+  const mutate = useMutation(api.mutations.MenuDish_cancelPriceChange);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = MenuDishCancelPriceChangeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -14825,4 +14836,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1567 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1568 as const;

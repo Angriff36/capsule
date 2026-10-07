@@ -9591,6 +9591,11 @@ export const MenuDishAddParamsSchema = z.object({
 
 export type MenuDishAddParams = z.infer<typeof MenuDishAddParamsSchema>;
 
+// Command: cancelPriceChange on MenuDish
+export const MenuDishCancelPriceChangeParamsSchema = z.object({});
+
+export type MenuDishCancelPriceChangeParams = z.infer<typeof MenuDishCancelPriceChangeParamsSchema>;
+
 // Command: remove on MenuDish
 export const MenuDishRemoveParamsSchema = z.object({
   reason: z.string(),
