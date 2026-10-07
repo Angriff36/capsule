@@ -14,6 +14,7 @@ import { tppMenuTableToRows } from "../../../lib/tppMenuCsv";
 import { importRunDetailPath } from "./importRoutes";
 import { sourceFileGrid } from "./sourceFileGrid";
 import { Link } from "react-router-dom";
+import { classifyCommandFailure } from "../../events/CommandFailure";
 
 const CHUNK_SIZE = 500;
 
@@ -132,7 +133,13 @@ export function QuickFileImport() {
       );
     } catch (cause: unknown) {
       refusedFile.current = file;
-      setError(cause instanceof Error ? cause.message : "Import failed");
+      // Server faults arrive wrapped in request ids; show the plain sentence.
+      const failure = classifyCommandFailure(cause);
+      setError(
+        failure.detail && failure.detail !== failure.title
+          ? `${failure.title} ${failure.detail}`
+          : failure.title,
+      );
       setProgress("");
     } finally {
       setBusy(false);

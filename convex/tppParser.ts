@@ -837,7 +837,7 @@ export function parseTppVenue(record: TppVenueRecord): ParsedCapsuleVenue {
     city: record.City,
     region: record.State,
     postalCode: record.ZipCode,
-    capacity: record.Capacity,
+    capacity: capacityNumber(record.Capacity),
     contactName: record.ContactName,
     contactPhone: record.ContactPhone,
     contactEmail: record.ContactEmail,
@@ -1291,6 +1291,16 @@ export function parseTppContacts(
 /**
  * Batch parse TPP venues
  */
+/** A spreadsheet's capacity cell ("220", "1,200", 220) as a number, else none. */
+function capacityNumber(value: unknown): number | undefined {
+  if (typeof value === "number")
+    return Number.isFinite(value) ? value : undefined;
+  const text = String(value ?? "").replace(/[,\s]/g, "");
+  if (!text) return undefined;
+  const parsed = Number(text);
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
 export function parseTppVenues(
   records: TppVenueRecord[],
 ): ParserResult<ParsedCapsuleVenue> {
