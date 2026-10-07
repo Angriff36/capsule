@@ -250,7 +250,7 @@ export function RoutePlannerPage() {
           <h1 className="display-title mt-2">Suggested visit order</h1>
           <p className="mt-3 max-w-160 text-ink-2">
             {roadConfigured === false
-              ? "Stops in the shortest straight-line order. Drive times are a rough guess at 40 km/h until the map service is switched on."
+              ? "Stops in the shortest straight-line order. Drive times are a rough guess at 25 mph until the map service is switched on."
               : "Stops in the shortest order, with real road times from the map service."}{" "}
             Move a stop up or down if you need to; your order is kept on this
             screen only and is not saved.
@@ -301,7 +301,7 @@ export function RoutePlannerPage() {
             {roadLegs && roadMinutes > 0
               ? ` · ${Math.round(roadMinutes)} min driving · ${roadMiles.toFixed(1)} mi`
               : totalKm > 0
-                ? ` · ${totalKm.toFixed(1)} km straight-line · ~${Math.round(totalMinutes)} min at 40 km/h`
+                ? ` · ${(totalKm / 1.609344).toFixed(1)} mi straight-line · ~${Math.round(totalMinutes)} min at 25 mph`
                 : ""}
             {geocoding ? " · finding the stops on the map…" : ""}
           </span>

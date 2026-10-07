@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatMoney } from "../../lib/format";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { addLocalDateTimeHours } from "../../ui/naturalDate";
 import { SearchSelect } from "../../ui/SearchSelect";
 import {
   InlineReferenceCreateSheet,
@@ -501,7 +502,16 @@ function BasicsStep({
           className="field-input"
           value={draft.startsAt}
           disabled={locked}
-          onChange={(event) => update({ startsAt: event.target.value })}
+          onChange={(event) => {
+            const startsAt = event.target.value;
+            // An empty or earlier end follows the start, 4 hours on, as the
+            // long form does.
+            update(
+              startsAt && (!draft.endsAt || draft.endsAt <= startsAt)
+                ? { startsAt, endsAt: addLocalDateTimeHours(startsAt, 4) }
+                : { startsAt },
+            );
+          }}
         />
       </label>
       <label className="field-label">

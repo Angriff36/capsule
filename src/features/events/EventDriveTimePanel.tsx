@@ -22,7 +22,7 @@ function legLine(leg: Leg): string {
   const minutes = Math.ceil(fact.durationSeconds / 60);
   const km =
     fact.distanceMeters != null
-      ? ` · ${(fact.distanceMeters / 1000).toFixed(1)} km`
+      ? ` · ${(fact.distanceMeters / 1609.344).toFixed(1)} mi`
       : "";
   const traffic = fact.trafficApplied ? "with expected traffic" : "no traffic";
   return `${minutes} min drive${km} · ${traffic} · checked ${timeLabel(fact.fetchedAt)}`;
