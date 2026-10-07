@@ -137,6 +137,16 @@ export function OpeningStockPage() {
       return `${row.itemName}: opening stock set to ${amount(result.quantityOnHand)} ${unitOf.get(String(row.ingredientId)) ?? ""}.`;
     });
 
+  // Every ready food row at once, instead of one press per row.
+  const readyFood = all.filter(
+    (row) => row.status === "ready" && row.kind === "ingredient",
+  );
+  const applyAll = () =>
+    run("apply-all", async () => {
+      for (const row of readyFood) await apply({ recordId: row._id as never });
+      return `${readyFood.length} ${readyFood.length === 1 ? "count" : "counts"} used as opening stock.`;
+    });
+
   const setRowAside = (row: (typeof all)[number]) => {
     void (async () => {
       const reason = (
@@ -178,6 +188,17 @@ export function OpeningStockPage() {
             <p className="eyebrow">Inventory · Opening stock</p>
             <h2>Count sheet rows</h2>
           </div>
+          {tab === "ready" && readyFood.length > 1 ? (
+            <button
+              className="btn btn-primary btn-sm"
+              disabled={busy != null}
+              onClick={() => void applyAll()}
+            >
+              {busy === "apply-all"
+                ? "Working…"
+                : `Use all ${readyFood.length} as opening stock`}
+            </button>
+          ) : null}
           <div className="flex flex-wrap gap-2" role="tablist">
             {TABS.map(([value, label]) => (
               <button
