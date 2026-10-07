@@ -652,32 +652,34 @@ export function CandidatesPage() {
                           Reject
                         </button>
                       ) : null}
-                      <button
-                        type="button"
-                        className="btn btn-primary"
-                        disabled={
-                          busy ||
-                          (candidate.stage === "hired" &&
-                            ((candidate.hiredPersonId == null &&
-                              !hasUsableEmail(candidate.email)) ||
-                              removedProfile))
-                        }
-                        onClick={() => void hireCandidate(candidate)}
-                      >
-                        {candidate.stage !== "hired"
-                          ? restoreReady.has(candidate._id)
-                            ? "Restore and resend"
-                            : "Hire into team"
-                          : removedProfile
-                            ? "Profile removed"
-                            : candidate.hiredPersonId == null
-                              ? restoreReady.has(candidate._id)
-                                ? "Restore and resend"
-                                : "Finish team setup"
-                              : inactiveProfile
-                                ? "Restore and resend"
-                                : "Resend sign-in"}
-                      </button>
+                      {candidate.stage === "rejected" ? null : (
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          disabled={
+                            busy ||
+                            (candidate.stage === "hired" &&
+                              ((candidate.hiredPersonId == null &&
+                                !hasUsableEmail(candidate.email)) ||
+                                removedProfile))
+                          }
+                          onClick={() => void hireCandidate(candidate)}
+                        >
+                          {candidate.stage !== "hired"
+                            ? restoreReady.has(candidate._id)
+                              ? "Restore and resend"
+                              : "Hire into team"
+                            : removedProfile
+                              ? "Profile removed"
+                              : candidate.hiredPersonId == null
+                                ? restoreReady.has(candidate._id)
+                                  ? "Restore and resend"
+                                  : "Finish team setup"
+                                : inactiveProfile
+                                  ? "Restore and resend"
+                                  : "Resend sign-in"}
+                        </button>
+                      )}
                       {candidate.stage === "hired" &&
                       candidate.hiredPersonId == null &&
                       !hasUsableEmail(candidate.email) ? (
