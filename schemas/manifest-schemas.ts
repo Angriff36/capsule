@@ -3500,6 +3500,8 @@ export const ProposalSchema = z.object({
   expiresAt: z.coerce.date().nullable().optional(),
   notes: z.string().nullable().optional(),
   terms: z.string().nullable().optional(),
+  depositPercent: z.number().int().nullable().optional(),
+  balanceDueDaysBefore: z.number().int().nullable().optional(),
   visibleSections: z.array(z.string()).nullable().optional(),
   sectionOrder: z.array(z.string()).nullable().optional(),
   status: z.enum(["draft", "sent", "viewed", "accepted", "declined", "expired", "superseded"]).default("draft"),
@@ -11260,6 +11262,8 @@ export const ProposalDraftParamsSchema = z.object({
   eventId: z.string().min(1).optional(),
   replacesProposalId: z.string().min(1).optional(),
   sectionOrder: z.array(z.string()).optional(),
+  depositPercent: z.number().optional(),
+  balanceDueDaysBefore: z.number().optional(),
 });
 
 export type ProposalDraftParams = z.infer<typeof ProposalDraftParamsSchema>;
@@ -11334,6 +11338,14 @@ export type ProposalReviseDraftParams = z.infer<typeof ProposalReviseDraftParams
 export const ProposalSendParamsSchema = z.object({});
 
 export type ProposalSendParams = z.infer<typeof ProposalSendParamsSchema>;
+
+// Command: setPaymentSchedule on Proposal
+export const ProposalSetPaymentScheduleParamsSchema = z.object({
+  depositPercent: z.number().optional(),
+  balanceDueDaysBefore: z.number().optional(),
+});
+
+export type ProposalSetPaymentScheduleParams = z.infer<typeof ProposalSetPaymentScheduleParamsSchema>;
 
 // Command: stageClientMerge on Proposal
 export const ProposalStageClientMergeParamsSchema = z.object({

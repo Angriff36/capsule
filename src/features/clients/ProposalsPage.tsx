@@ -54,6 +54,8 @@ import {
 import { ProposalCreateForm } from "./ProposalCreateForm";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
 import { ProposalTermsPanel } from "./ProposalTermsPanel";
+import { ProposalPaymentSchedulePanel } from "./ProposalPaymentSchedulePanel";
+import { proposalPaymentSchedule } from "../../lib/proposalPaymentSchedule";
 import { ProposalReadinessNotice } from "./ProposalReadinessNotice";
 import {
   ProposalDraftCheck,
@@ -604,6 +606,12 @@ export function ProposalsPage() {
       sectionOrder: (row.sectionOrder ?? []).filter(
         (section): section is string => typeof section === "string",
       ),
+      paymentSchedule: proposalPaymentSchedule({
+        total: Number(row.total) || 0,
+        depositPercent: row.depositPercent,
+        balanceDueDaysBefore: row.balanceDueDaysBefore,
+        eventDate: row.eventDate,
+      }),
       timelineItems: transformTimelineActivities(eventTimelineItems),
       venueLogistics: event
         ? transformVenueLogistics(venue || null, event)
@@ -1187,6 +1195,12 @@ export function ProposalsPage() {
                             onFailure={setFailure}
                           />
                           <ProposalTermsPanel
+                            proposal={row}
+                            editable={String(row.status) === "draft"}
+                            onFailure={setFailure}
+                            onNotice={setNotice}
+                          />
+                          <ProposalPaymentSchedulePanel
                             proposal={row}
                             editable={String(row.status) === "draft"}
                             onFailure={setFailure}

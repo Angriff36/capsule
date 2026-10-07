@@ -1,6 +1,7 @@
 import type { PricingBasis } from "../../lib/pricing";
 import type { ProposalPdfRecord } from "./proposalPdf";
 import { loadWindowLabel } from "../facilities/venueOperatingFacts";
+import { frozenPaymentSchedule } from "../../lib/proposalPaymentSchedule";
 
 type Revision = { snapshot?: string | null } | null | undefined;
 export type ProposalPdfSource =
@@ -105,6 +106,8 @@ export function projectProposalPdf(
         enhancements: Array.isArray(frozen.enhancements)
           ? frozen.enhancements
           : [],
+        // AC-654: the schedule frozen at send; none on older sends.
+        paymentSchedule: frozenPaymentSchedule(frozen.paymentSchedule),
         venueLogistics: frozen.venue
           ? {
               loadIn:

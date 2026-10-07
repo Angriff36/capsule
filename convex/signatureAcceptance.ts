@@ -5,6 +5,10 @@ import { mutation, query, type QueryCtx } from "./_generated/server";
 import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 import { insertStepEvent } from "./lib/commandAudit";
 import { byLineDisplayOrder } from "../src/lib/pricing";
+import {
+  frozenPaymentSchedule,
+  type ProposalPaymentSchedule,
+} from "../src/lib/proposalPaymentSchedule";
 
 /**
  * AUTHOR SEAM — public, token-authorized digital proposal acceptance (#115).
@@ -54,6 +58,8 @@ type PendingSignatureView = {
     description: string | null;
     price: number;
   }>;
+  // AC-654: the payment schedule of the sent copy (null when none).
+  paymentSchedule: ProposalPaymentSchedule | null;
   // The dishes and priced lines of the sent copy, so the client sees what
   // they accept. Empty when that part is hidden on the proposal.
   dishes: Array<{ name: string; description: string | null }>;
@@ -154,6 +160,7 @@ export const getPendingSignatureRequest = query({
         venueName: str(proposal.venueName),
         visibleSections,
       },
+      paymentSchedule: frozenPaymentSchedule(snapshot.paymentSchedule),
       dishes: shows("menu_sections")
         ? rows(snapshot.dishSelections)
             .map((dish) => ({

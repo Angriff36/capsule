@@ -54,6 +54,8 @@ function changeDraftArgs(proposal: Doc<"proposals">) {
     terms: presentText(proposal.terms),
     visibleSections: proposal.visibleSections ?? undefined,
     sectionOrder: proposal.sectionOrder ?? undefined,
+    depositPercent: proposal.depositPercent ?? undefined,
+    balanceDueDaysBefore: proposal.balanceDueDaysBefore ?? undefined,
     eventId: proposal.eventId ?? undefined,
   };
 }

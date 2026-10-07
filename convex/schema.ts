@@ -3265,6 +3265,8 @@ export default defineSchema({
     expiresAt: v.optional(v.union(v.number(), v.null())),
     notes: v.optional(v.union(v.string(), v.null())),
     terms: v.optional(v.union(v.string(), v.null())),
+    depositPercent: v.optional(v.union(v.number(), v.null())),
+    balanceDueDaysBefore: v.optional(v.union(v.number(), v.null())),
     visibleSections: v.optional(v.array(v.union(v.string(), v.null()))),
     sectionOrder: v.optional(v.array(v.union(v.string(), v.null()))),
     status: v.union(v.literal("draft"), v.literal("sent"), v.literal("viewed"), v.literal("accepted"), v.literal("declined"), v.literal("expired"), v.literal("superseded")),
