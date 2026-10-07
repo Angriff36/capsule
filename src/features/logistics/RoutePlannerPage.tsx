@@ -11,6 +11,7 @@ import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import {
   geocodeDestination,
   routeLegs,
+  KM_PER_MILE,
   routeLegLabel,
   suggestVisitOrder,
   type GeoPoint,
@@ -301,7 +302,7 @@ export function RoutePlannerPage() {
             {roadLegs && roadMinutes > 0
               ? ` · ${Math.round(roadMinutes)} min driving · ${roadMiles.toFixed(1)} mi`
               : totalKm > 0
-                ? ` · ${(totalKm / 1.609344).toFixed(1)} mi straight-line · ~${Math.round(totalMinutes)} min at 25 mph`
+                ? ` · ${(totalKm / KM_PER_MILE).toFixed(1)} mi straight-line · ~${Math.round(totalMinutes)} min at 25 mph`
                 : ""}
             {geocoding ? " · finding the stops on the map…" : ""}
           </span>

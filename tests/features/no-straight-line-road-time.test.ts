@@ -1,6 +1,6 @@
 /**
  * AC-389 (spec §1.4 "never guess travel"): the straight-line distance and
- * 40 km/h estimate in the route planner is a browser-only suggestion. No
+ * 25 mph estimate in the route planner is a browser-only suggestion. No
  * server code and no screen that saves anything may use it, so no saved
  * road time (event timing, route legs, Final Lock) can come from it.
  */
