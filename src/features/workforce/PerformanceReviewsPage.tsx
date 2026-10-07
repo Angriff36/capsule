@@ -194,11 +194,16 @@ export function PerformanceReviewsPage() {
                 defaultValue={workingId ?? ""}
               >
                 <option value="">No specific event</option>
-                {events?.map((event) => (
-                  <option key={event._id} value={event._id}>
-                    {event.title} — {formatDate(event.startsAt ?? 0)}
-                  </option>
-                ))}
+                {/* Reviews follow work: the latest events first. */}
+                {[...(events ?? [])]
+                  .sort(
+                    (a, b) => Number(b.startsAt ?? 0) - Number(a.startsAt ?? 0),
+                  )
+                  .map((event) => (
+                    <option key={event._id} value={event._id}>
+                      {event.title} — {formatDate(event.startsAt ?? 0)}
+                    </option>
+                  ))}
               </select>
             </label>
             <label className="field-label">
