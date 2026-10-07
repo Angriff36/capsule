@@ -1062,6 +1062,13 @@ export function InvoiceDetailPage() {
             <dd>{usd(availableClientCredit)}</dd>
           </div>
         </dl>
+        {invoice.status !== "paid" &&
+        invoice.status !== "voided" &&
+        invoice.status !== "written_off" ? (
+          <p className="mt-3 text-base text-ink-2" role="status">
+            A credit memo can be issued once this invoice is paid in full.
+          </p>
+        ) : null}
         {invoice.status === "paid" && !canIssueCreditMemo ? (
           <p className="mt-3 text-base text-ink-2" role="status">
             The full paid amount has already been credited.
