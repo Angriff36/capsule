@@ -116,6 +116,8 @@ export interface NotificationSources {
   /** Open equipment problems, and the names of the equipment they are about. */
   equipmentIssues?: Doc<"equipmentIssues">[] | undefined;
   equipmentNames?: Record<string, string>;
+  /** This person's answered time-off requests. */
+  myTimeOff?: Doc<"timeOffRequests">[] | undefined;
   /** Swaps asked of this person, and swaps waiting for a manager. */
   shiftSwaps?: Doc<"shiftSwapRequests">[] | undefined;
   /** Quote requests from the website that nobody has answered yet. */
@@ -281,6 +283,28 @@ export function deriveNotifications(
       message: `${who} requested time off · ${range}`,
       link: "/staff/time-off",
       at: request.submittedAt,
+    });
+  }
+
+  // The answer to this person's own time-off request, for a week.
+  for (const request of src.myTimeOff ?? []) {
+    if (
+      request.status === "pending" ||
+      request.reviewedAt == null ||
+      request.reviewedAt < now - RECENT_WINDOW_MS
+    )
+      continue;
+    const range =
+      request.startsAt != null && request.endsAt != null
+        ? `${formatDate(request.startsAt)} – ${formatDate(request.endsAt - 1)}`
+        : "your dates";
+    out.push({
+      id: `time-off-answer:${request._id}`,
+      kind: "time_off_request",
+      // The manager's note is stored sealed; My Day shows it in full.
+      message: `Your time off ${range} was ${request.status === "approved" ? "approved" : "denied"}${request.responseNote ? " · see the manager's note" : ""}`,
+      link: "/my",
+      at: request.reviewedAt,
     });
   }
 

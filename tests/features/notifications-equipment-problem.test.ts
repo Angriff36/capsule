@@ -197,3 +197,25 @@ describe("certification renewal", () => {
     ).toEqual([]);
   });
 });
+
+describe("time-off answer notifications", () => {
+  it("tells the person their request was answered, without the sealed note", () => {
+    const out = deriveNotifications(
+      sources({
+        myTimeOff: [
+          {
+            _id: "to-1",
+            status: "denied",
+            startsAt: 1_699_000_000_000,
+            endsAt: 1_699_086_400_000,
+            reviewedAt: 1_699_999_000_000,
+            responseNote: '{"v":1,"ct":"sealed"}',
+          } as never,
+        ],
+      }),
+    ).filter((row) => row.id.startsWith("time-off-answer"));
+    expect(out).toHaveLength(1);
+    expect(out[0].message).toMatch(/was denied · see the manager's note$/);
+    expect(out[0].message).not.toContain("sealed");
+  });
+});

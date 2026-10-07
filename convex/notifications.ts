@@ -138,6 +138,7 @@ export const listNotifications = query({
       equipmentIssues,
       quoteSubmissions,
       swapsForMe,
+      myTimeOff,
       swapsToApprove,
     ] = await Promise.all([
       // Not every event (13 s at 10,000 events, and the socket holds every
@@ -367,6 +368,23 @@ export const listNotifications = query({
                   row.tenantId === tenantId &&
                   row.status === "pending_recipient" &&
                   row.deletedAt == null,
+              ),
+            )
+        : [],
+      // This person's own time-off requests, for the answer.
+      auth.personId
+        ? ctx.db
+            .query("timeOffRequests")
+            .withIndex("by_personId", (q) =>
+              q.eq("personId", auth.personId as Id<"people">),
+            )
+            .collect()
+            .then((rows) =>
+              rows.filter(
+                (row) =>
+                  row.tenantId === tenantId &&
+                  row.deletedAt == null &&
+                  row.status !== "pending",
               ),
             )
         : [],
@@ -625,6 +643,7 @@ export const listNotifications = query({
       maintenanceDue,
       quoteSubmissions,
       shiftSwaps: [...(swapsForMe ?? []), ...(swapsToApprove ?? [])],
+      myTimeOff,
     });
   },
 });
