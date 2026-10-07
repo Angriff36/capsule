@@ -34643,6 +34643,7 @@ export const Invoice_followEventPriceTaxed = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertServerOnlyStep(ctx);
     const __idem = args.idempotencyKey === undefined ? null : await __commandIdempotencyScope(ctx, "Invoice_followEventPriceTaxed", args.idempotencyKey as string);
     if (__idem !== null) {
       const __hit = await __lookupCommandIdempotency(ctx, __idem, args.idempotencyKey as string);

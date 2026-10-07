@@ -474,7 +474,8 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   // The taxed one-line draft made from the event's price follows a new
   // price. The seam works out the tax with the workspace rates; the subtotal
   // must be the event's own quoted price, never a caller's number (AC-372).
-  command followEventPriceTaxed(
+  // Private: only the server runs it, so no caller can set its tax lines.
+  private command followEventPriceTaxed(
     subtotal: money(12, 2),
     taxAmount: money(12, 2),
     total: money(12, 2),

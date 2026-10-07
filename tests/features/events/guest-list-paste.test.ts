@@ -56,4 +56,22 @@ describe("guest paste with headings", () => {
       },
     ]);
   });
+  it("reads a heading row that does not start with the name", () => {
+    expect(
+      readGuestPaste(
+        ["Email,Name,Allergies", "maria@example.test,Maria Lopez,nuts"].join(
+          "\n",
+        ),
+        [],
+      ),
+    ).toEqual([
+      {
+        name: "Maria Lopez",
+        email: "maria@example.test",
+        phone: undefined,
+        dietaryRestrictions: undefined,
+        allergenRestrictions: ["nuts"],
+      },
+    ]);
+  });
 });

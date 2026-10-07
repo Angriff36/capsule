@@ -169,7 +169,10 @@ export class EventInvoicePricingReconciliation {
       // one) moves to the new price as a taxed one-line draft.
       if (followsEventPrice(invoice) || isEventPriceDraft(invoice)) {
         // The command checks the subtotal is the event's own price (AC-372).
-        await ctx.runMutation(api.mutations.Invoice_followEventPriceTaxed, {
+        await TenantSystemCommandRunner.forTenant(
+          ctx,
+          event.tenantId,
+        ).context.runMutation(api.mutations.Invoice_followEventPriceTaxed, {
           docId: invoice._id,
           version: invoice.version,
           ...(await eventPriceTotals(ctx, event, quotedPrice)),
@@ -228,12 +231,26 @@ export async function ensureEventDraftInvoice(
     .collect();
   if (existing.some((row) => row.tenantId === event.tenantId && row.deletedAt == null)) return;
   const source = await acceptedProposalFor(ctx, event);
-  // Taxed like any invoice: one line at the event's price, which follows
-  // later price changes until finance changes or sends it.
-  const totals = {
-    ...(await eventPriceTotals(ctx, event, quotedPrice)),
-    discountAmount: 0,
-  };
+  // An accepted proposal's total already includes its tax: the draft is that
+  // proposal's own subtotal, tax, discount and total as one amount, so it is
+  // never taxed a second time and matches what the client signed. Without
+  // one: one taxed line at the event's price, which follows later price
+  // changes until finance changes or sends it.
+  const signedTotal = Number(source?.total ?? 0);
+  const totals =
+    source && signedTotal > 0
+      ? {
+          subtotal: Number(source.subtotal ?? 0),
+          taxAmount: Number(source.taxAmount ?? 0),
+          discountAmount: Number(source.discountAmount ?? 0),
+          total: signedTotal,
+          lineItems: [],
+          taxBreakdown: [],
+        }
+      : {
+          ...(await eventPriceTotals(ctx, event, quotedPrice)),
+          discountAmount: 0,
+        };
   await TenantSystemCommandRunner.forTenant(ctx, event.tenantId).context.runMutation(
     api.mutations.Invoice_createViaIssue,
     {

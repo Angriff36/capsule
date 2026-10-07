@@ -56,7 +56,11 @@ export function readGuestPaste(
     ).map((cell) => cell.trim());
     // A heading row says which column is which.
     const headings = cells.map(headingColumn);
-    if (headings[0] === "name" && headings.some((col, i) => i > 0 && col)) {
+    // A heading row names the guest column and one more, in any order.
+    if (
+      headings.includes("name") &&
+      headings.some((col) => col != null && col !== "name")
+    ) {
       columns = headings;
       continue;
     }
