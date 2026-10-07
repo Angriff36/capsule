@@ -77,6 +77,8 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   property viewedAt: datetime?
   property acceptedAt: datetime?
   property declinedAt: datetime?
+  // Why the client said no, in sales' words (optional).
+  property declineReason: string?
   property expiredAt: datetime?
 
   // Revision tracking fields - superseded proposals when creating new revisions
@@ -415,11 +417,12 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command decline() {
+  command decline(optional reason: string) {
     guard self.status == "sent" or self.status == "viewed"
     guard self.deletedAt == null
     mutate status = "declined"
     mutate declinedAt = now()
+    mutate declineReason = reason != null and length(trim(reason)) > 0 ? trim(reason) : null
     emit ProposalDeclined {
       proposalId: self.id
       tenantId: self.tenantId

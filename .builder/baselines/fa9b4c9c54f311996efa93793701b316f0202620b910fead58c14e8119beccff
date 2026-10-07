@@ -3273,6 +3273,7 @@ export default defineSchema({
     viewedAt: v.optional(v.union(v.number(), v.null())),
     acceptedAt: v.optional(v.union(v.number(), v.null())),
     declinedAt: v.optional(v.union(v.number(), v.null())),
+    declineReason: v.optional(v.union(v.string(), v.null())),
     expiredAt: v.optional(v.union(v.number(), v.null())),
     supersededAt: v.optional(v.union(v.number(), v.null())),
     supersedeReason: v.optional(v.union(v.string(), v.null())),

@@ -52458,7 +52458,7 @@ export const Proposal_confirmChangeSource = mutation({
   },
 });
 
-async function __runProposalDecline(ctx: MutationCtx, { docId, version }: any, __creation = false) {
+async function __runProposalDecline(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -52487,6 +52487,7 @@ async function __runProposalDecline(ctx: MutationCtx, { docId, version }: any, _
     const updates = {
       status: "declined",
       declinedAt: Date.now(),
+      declineReason: (((reason != null) && (((reason).trim()).length > 0)) ? (reason).trim() : null),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -52501,6 +52502,7 @@ async function __runProposalDecline(ctx: MutationCtx, { docId, version }: any, _
 export const Proposal_decline = mutation({
   args: {
     docId: v.id("proposals"),
+    reason: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },

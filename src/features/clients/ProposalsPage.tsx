@@ -389,15 +389,27 @@ export function ProposalsPage() {
         return;
       }
       if (key === "decline") {
-        const ok = await prompt.askConfirm({
+        const values = await prompt.askFields({
           title: "Decline proposal",
           description: "Marks this offer as declined.",
           confirmLabel: "Decline",
           tone: "danger",
+          fields: [
+            {
+              name: "reason",
+              label: "Why did they say no? (optional)",
+              inputType: "text",
+              required: false,
+            },
+          ],
         });
-        if (!ok) return;
+        if (!values) return;
         void run(`${row._id}:decline`, async () => {
-          await decline({ docId: row._id, version: row.version });
+          await decline({
+            docId: row._id,
+            version: row.version,
+            reason: values.reason?.trim() || undefined,
+          });
           setNotice("Proposal declined.");
         });
         return;
@@ -860,6 +872,11 @@ export function ProposalsPage() {
                       </td>
                       <td>
                         <StatusChip status={String(row.status)} />
+                        {row.status === "declined" && row.declineReason ? (
+                          <small className="block text-ink-3">
+                            {row.declineReason}
+                          </small>
+                        ) : null}
                       </td>
                       <td className="supply-row-actions">
                         <button

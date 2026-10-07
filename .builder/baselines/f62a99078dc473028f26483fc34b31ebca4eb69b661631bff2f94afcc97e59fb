@@ -3508,6 +3508,7 @@ export const ProposalSchema = z.object({
   viewedAt: z.coerce.date().nullable().optional(),
   acceptedAt: z.coerce.date().nullable().optional(),
   declinedAt: z.coerce.date().nullable().optional(),
+  declineReason: z.string().nullable().optional(),
   expiredAt: z.coerce.date().nullable().optional(),
   supersededAt: z.coerce.date().nullable().optional(),
   supersedeReason: z.string().nullable().optional(),
@@ -11231,7 +11232,9 @@ export const ProposalConfirmChangeSourceParamsSchema = z.object({});
 export type ProposalConfirmChangeSourceParams = z.infer<typeof ProposalConfirmChangeSourceParamsSchema>;
 
 // Command: decline on Proposal
-export const ProposalDeclineParamsSchema = z.object({});
+export const ProposalDeclineParamsSchema = z.object({
+  reason: z.string().optional(),
+});
 
 export type ProposalDeclineParams = z.infer<typeof ProposalDeclineParamsSchema>;
 

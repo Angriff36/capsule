@@ -3411,8 +3411,8 @@ const COMMAND_DISPATCH = {
   },
   "Proposal.decline": {
     ref: api.mutations.Proposal_decline,
-    params: ["docId","version","idempotencyKey"] as const,
-    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
+    params: ["docId","reason","version","idempotencyKey"] as const,
+    paramMeta: [{"name":"docId","type":"string","required":true},{"name":"reason","type":"string","required":false},{"name":"version","type":"number","required":false},{"name":"idempotencyKey","type":"string","required":false}] as const,
   },
   "Proposal.draft": {
     ref: api.mutations.Proposal_createViaDraft,
