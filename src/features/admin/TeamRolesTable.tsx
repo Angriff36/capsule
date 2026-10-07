@@ -287,7 +287,7 @@ export function PersonPayRateCell({
       <button type="submit" className="btn btn-ghost btn-sm" disabled={busy}>
         {busy ? "…" : "Set"}
       </button>
-      {hasRate ? null : <span className="text-xs text-warn">unset</span>}
+      {hasRate ? null : <span className="text-xs text-warn">No pay rate</span>}
     </form>
   );
 }

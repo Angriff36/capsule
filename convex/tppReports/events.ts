@@ -14,6 +14,10 @@ import { TPP_EVENT_REPORTS } from "../../src/features/reports/tpp/catalog.event"
 import { EventTimelineStaffRoster } from "../../src/features/events/eventTimelineStaffRoster";
 import { loadWindowLabel } from "../../src/features/facilities/venueOperatingFacts";
 import {
+  STAGE_LABEL,
+  type EventStage,
+} from "../../src/features/events/eventStatus";
+import {
   eventDocumentSections,
   serviceRows,
   type EventDocumentTemplate,
@@ -131,8 +135,34 @@ function table(
     totals: [],
   };
 }
+/** A picked venue with no load-in notes says so, not "no venue picked". */
+function venueRows(
+  venue: Doc<"venues">,
+  answers: ReadonlyArray<
+    readonly [label: string, value: string | boolean | null | undefined]
+  >,
+) {
+  const rows = serviceRows(answers);
+  return rows.length > 0
+    ? rows
+    : [
+        {
+          label: venue.name,
+          value: "No load-in notes on file yet. Add them on the venue.",
+        },
+      ];
+}
 function dateText(value: number | null | undefined): string {
-  return value == null ? "" : new Date(value).toLocaleString("en-US");
+  return value == null
+    ? ""
+    : new Date(value).toLocaleString("en-US", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      });
 }
 function range(parameters: Parameters): [number, number] {
   return [
@@ -1170,7 +1200,10 @@ export const run = query({
         label: "Guests",
         value: String(event.expectedHeadcount ?? "Not recorded"),
       },
-      { label: "Status", value: event.stage },
+      {
+        label: "Status",
+        value: STAGE_LABEL[event.stage as EventStage] ?? event.stage,
+      },
     ];
 
     if (
@@ -1334,7 +1367,7 @@ export const run = query({
               venue: !seeVenues
                 ? null
                 : liveVenue
-                  ? serviceRows([
+                  ? venueRows(liveVenue, [
                       ["Load-in window", loadWindowLabel(liveVenue)],
                       ["Load-in", liveVenue.loadInInstructions],
                       ["Access", liveVenue.accessNotes],
