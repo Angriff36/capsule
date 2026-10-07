@@ -66,6 +66,8 @@ const GRID = [
   row("Printed Date:", "9/4/2026", "Page", "", "", "1 of 2"),
   heading,
   venue("Hilltop Barn", "*Unassigned*", "Hayden", "ID", "83835"),
+  // The real file prints some phones alone on the next line.
+  row("(509) 555-0199"),
 ];
 
 describe("runtime proof: TPP Venue Listing report import (AC-057)", () => {
@@ -100,6 +102,7 @@ describe("runtime proof: TPP Venue Listing report import (AC-057)", () => {
         City: "Hayden",
         State: "ID",
         ZipCode: "83835",
+        ContactPhone: "(509) 555-0199",
       },
     ]);
 

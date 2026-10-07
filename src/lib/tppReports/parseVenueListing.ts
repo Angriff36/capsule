@@ -78,6 +78,17 @@ export function venueListingRowsFromGrid(
           : `Area: ${area}`;
       continue;
     }
+    // A phone number alone on the next line belongs to the venue above it
+    // ("Madison Farm Weddings" then "(509) 558-7468"); it is not a venue.
+    if (
+      last &&
+      cells.slice(1).every((cell) => cell === "") &&
+      !/[a-z]/i.test(first) &&
+      first.replace(/\D/g, "").length >= 10
+    ) {
+      last.ContactPhone ??= first;
+      continue;
+    }
     const row: Record<string, string> = {};
     for (const { index, field } of columns) {
       const value = cells[index] ?? "";
