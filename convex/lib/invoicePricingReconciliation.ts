@@ -347,8 +347,10 @@ async function itemizedFromProposal(ctx: MutationCtx, proposal: Doc<"proposals">
     .query("taxRates")
     .withIndex("by_tenantId", (q) => q.eq("tenantId", proposal.tenantId))
     .collect();
-  const worked = calculateInvoiceTax(drafts, rates, taxExempt);
+  // Tax is due on the price after the discount (invoiceTax.ts), the same
+  // way the server checks an issued bill.
   const discount = Number(proposal.discountAmount ?? 0);
+  const worked = calculateInvoiceTax(drafts, rates, taxExempt, discount);
   return {
     subtotal: worked.subtotal,
     taxAmount: worked.taxAmount,
