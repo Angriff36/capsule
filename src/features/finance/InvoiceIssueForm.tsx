@@ -48,6 +48,7 @@ type ClientOption = {
 type EventOption = {
   _id: string;
   title?: string | null;
+  quotedPrice?: number | null;
   clientId?: string | null;
   deletedAt?: number | null;
 };
@@ -117,9 +118,41 @@ export function InvoiceIssueForm({
       ? defaultEventId
       : "";
   const functionalCode = normalizeCurrencyCode(functionalCurrencyCode, "USD");
-  const [selectedClientId, setSelectedClientId] = useState(clientDefault);
+  // With no client given, the chosen event's client is the one billed.
+  const eventClient = (eventId: string) => {
+    const id = events.find((row) => row._id === eventId)?.clientId ?? "";
+    return clients.some((row) => row._id === id) ? id : "";
+  };
+  const [selectedClientId, setSelectedClientId] = useState(
+    clientDefault || eventClient(eventDefault),
+  );
   const [selectedEventId, setSelectedEventId] = useState(eventDefault);
-  const [lines, setLines] = useState<InvoiceLineDraft[]>([initialLine()]);
+  // The first line starts at the chosen event's quoted price; a line someone
+  // already typed in stays as it is.
+  const priceLine = (eventId: string): InvoiceLineDraft => {
+    const event = events.find((row) => row._id === eventId);
+    return event?.quotedPrice
+      ? {
+          ...initialLine(),
+          description: `Catering for ${event.title ?? "the event"}`,
+          unitPrice: event.quotedPrice,
+        }
+      : initialLine();
+  };
+  const [lines, setLines] = useState<InvoiceLineDraft[]>(() => [
+    priceLine(eventDefault),
+  ]);
+  const choosePriceLine = (eventId: string) =>
+    setLines((current) => {
+      const first = current[0];
+      const filled = priceLine(selectedEventId);
+      const untouched =
+        first != null &&
+        first.description === filled.description &&
+        first.unitPrice === filled.unitPrice &&
+        first.quantity === filled.quantity;
+      return untouched ? [priceLine(eventId), ...current.slice(1)] : current;
+    });
   const [discountAmount, setDiscountAmount] = useState(0);
   const [currencyCode, setCurrencyCode] = useState(functionalCode);
   const [exchangeRate, setExchangeRate] = useState("1");
@@ -230,7 +263,9 @@ export function InvoiceIssueForm({
                 (row) => row.deletedAt == null && row.clientId === clientId,
               );
               if (!theirs.some((row) => row._id === selectedEventId)) {
-                setSelectedEventId(theirs.length === 1 ? theirs[0]._id : "");
+                const next = theirs.length === 1 ? theirs[0]._id : "";
+                choosePriceLine(next);
+                setSelectedEventId(next);
               }
             }}
             recentsKey="client"
@@ -260,7 +295,12 @@ export function InvoiceIssueForm({
             className="input"
             name="eventId"
             value={selectedEventId}
-            onChange={(event) => setSelectedEventId(event.target.value)}
+            onChange={(event) => {
+              choosePriceLine(event.target.value);
+              setSelectedEventId(event.target.value);
+              if (!selectedClientId)
+                setSelectedClientId(eventClient(event.target.value));
+            }}
           >
             <option value="">No linked event</option>
             {events
