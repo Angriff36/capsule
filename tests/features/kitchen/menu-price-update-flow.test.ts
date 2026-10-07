@@ -21,7 +21,7 @@ const harness = vi.hoisted(() => ({
 
 vi.mock("../../../src/lib/manifest-convex-react", () => ({
   useMenuDishSchedulePriceChange: () => harness.schedule,
-  useMenuDishCancelPriceChange: () => vi.fn(async () => null),
+  useMenuDishCancelPriceChange: () => vi.fn(),
   useMenuSetSeason: () => harness.setSeason,
   useMenuSetService: () => harness.setService,
   useMenuReviseDetails: () => vi.fn(async () => null),
