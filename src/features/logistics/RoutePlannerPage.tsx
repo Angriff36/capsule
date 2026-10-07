@@ -18,12 +18,14 @@ import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { useRouteDriveLegs } from "../../lib/routePlannerClient";
 
 type RoadLeg = { seconds: number; meters: number } | null;
+// Miles, as the fleet's odometers and service intervals use.
+const METERS_PER_MILE = 1609.344;
 
 const roadLegLabel = (leg: RoadLeg, index: number) =>
   index === 0
     ? "Start"
     : leg
-      ? `${Math.round(leg.seconds / 60)} min · ${(leg.meters / 1000).toFixed(1)} km`
+      ? `${Math.round(leg.seconds / 60)} min · ${(leg.meters / METERS_PER_MILE).toFixed(1)} mi`
       : "No road route found";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -221,8 +223,8 @@ export function RoutePlannerPage() {
     (sum, leg) => sum + (leg ? leg.seconds / 60 : 0),
     0,
   );
-  const roadKm = (roadLegs ?? []).reduce(
-    (sum, leg) => sum + (leg ? leg.meters / 1000 : 0),
+  const roadMiles = (roadLegs ?? []).reduce(
+    (sum, leg) => sum + (leg ? leg.meters / METERS_PER_MILE : 0),
     0,
   );
 
@@ -296,7 +298,7 @@ export function RoutePlannerPage() {
           <span>
             {stops.length} stop{stops.length === 1 ? "" : "s"}
             {roadLegs && roadMinutes > 0
-              ? ` · ${Math.round(roadMinutes)} min driving · ${roadKm.toFixed(1)} km`
+              ? ` · ${Math.round(roadMinutes)} min driving · ${roadMiles.toFixed(1)} mi`
               : totalKm > 0
                 ? ` · ${totalKm.toFixed(1)} km straight-line · ~${Math.round(totalMinutes)} min at 40 km/h`
                 : ""}
