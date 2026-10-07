@@ -34513,6 +34513,7 @@ export const Invoice_followEventClient = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertServerOnlyStep(ctx);
     const __idem = args.idempotencyKey === undefined ? null : await __commandIdempotencyScope(ctx, "Invoice_followEventClient", args.idempotencyKey as string);
     if (__idem !== null) {
       const __hit = await __lookupCommandIdempotency(ctx, __idem, args.idempotencyKey as string);
@@ -58674,6 +58675,7 @@ export const RevenueAttribution_closeForCancelledEvent = mutation({
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args) => {
+    await __assertServerOnlyStep(ctx);
     const __idem = args.idempotencyKey === undefined ? null : await __commandIdempotencyScope(ctx, "RevenueAttribution_closeForCancelledEvent", args.idempotencyKey as string);
     if (__idem !== null) {
       const __hit = await __lookupCommandIdempotency(ctx, __idem, args.idempotencyKey as string);

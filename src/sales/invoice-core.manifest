@@ -543,7 +543,7 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   // An event moved to another client takes its unsent, unpaid draft bill
   // with it; a bill that was sent or paid stays with the client it was billed
   // to. The event handler runs this only for such drafts.
-  command followEventClient(clientId: uuid) {
+  private command followEventClient(clientId: uuid) {
     guard self.status == "draft"
     guard self.deletedAt == null
     guard self.sentAt == null

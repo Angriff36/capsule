@@ -259,7 +259,9 @@ export const run = query({
       ),
     ];
     const referralName = new Map<string, string>();
-    for (const id of referralIds) {
+    // Referral sources follow their own read rule (event or sales access).
+    const seeReferrals = canRead(auth, ["eventAccess", "salesAccess"]);
+    for (const id of seeReferrals ? referralIds : []) {
       const source = await ctx.db.get(id);
       if (source && isLiveTenantRow(source, tenantId))
         referralName.set(String(id), source.name);
