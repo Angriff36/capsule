@@ -94,3 +94,31 @@ describe("equipment problems reach the bell", () => {
     ]);
   });
 });
+
+describe("quote request notifications", () => {
+  it("a website quote request waits in the bell until someone answers it", () => {
+    const quote = (fields: Record<string, unknown>) =>
+      ({
+        _id: "quote-1",
+        status: "pending",
+        clientName: "Marcus Lee",
+        guestCount: 45,
+        submittedAt: 1_699_999_500_000,
+        ...fields,
+      }) as never;
+    const out = deriveNotifications(
+      sources({
+        quoteSubmissions: [
+          quote({}),
+          quote({ _id: "quote-2", status: "completed" }),
+        ],
+      }),
+    ).filter((row) => row.kind === "quote_request");
+    expect(out).toEqual([
+      expect.objectContaining({
+        message: "Marcus Lee asked for a quote · 45 guests",
+        link: "/clients/quote-requests",
+      }),
+    ]);
+  });
+});

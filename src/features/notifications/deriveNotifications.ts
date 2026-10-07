@@ -29,7 +29,8 @@ export interface AppNotification {
     | "date_opened"
     | "review_flag"
     | "equipment_problem"
-    | "maintenance_due";
+    | "maintenance_due"
+    | "quote_request";
   message: string;
   /** Route to the relevant record. */
   link: string;
@@ -55,6 +56,7 @@ export const NOTIFICATION_KIND_LABELS: Record<AppNotification["kind"], string> =
     review_flag: "Question",
     equipment_problem: "Equipment",
     maintenance_due: "Upkeep",
+    quote_request: "Quote request",
   };
 
 /** Stage changes older than this are history, not notifications. */
@@ -111,6 +113,8 @@ export interface NotificationSources {
   /** Open equipment problems, and the names of the equipment they are about. */
   equipmentIssues?: Doc<"equipmentIssues">[] | undefined;
   equipmentNames?: Record<string, string>;
+  /** Quote requests from the website that nobody has answered yet. */
+  quoteSubmissions?: Doc<"quoteSubmissions">[] | undefined;
   /** Truck and equipment service that is past due (worked out on the server). */
   maintenanceDue?: Array<{
     id: string;
@@ -523,6 +527,19 @@ export function deriveNotifications(
         ? `/events/${issue.eventId}`
         : "/facilities/equipment",
       at: issue.raisedAt,
+    });
+  }
+
+  // A quote request from the website waits for someone in sales to answer.
+  for (const quote of src.quoteSubmissions ?? []) {
+    if (quote.status !== "pending" || quote.submittedAt == null) continue;
+    const guests = quote.guestCount ? ` · ${quote.guestCount} guests` : "";
+    out.push({
+      id: `quote-request:${quote._id}`,
+      kind: "quote_request",
+      message: `${quote.clientName || "Someone"} asked for a quote${guests}`,
+      link: "/clients/quote-requests",
+      at: quote.submittedAt,
     });
   }
 

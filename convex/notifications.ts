@@ -136,6 +136,7 @@ export const listNotifications = query({
       dateWaitlistEntries,
       reviewFlags,
       equipmentIssues,
+      quoteSubmissions,
     ] = await Promise.all([
       // Not every event (13 s at 10,000 events, and the socket holds every
       // other read of the screen until this one answers): only the events
@@ -341,6 +342,14 @@ export const listNotifications = query({
                 (row) => row.status === "open" && row.deletedAt == null,
               ),
             ),
+      ),
+      // Unanswered website quote requests (sales reads them).
+      when(can(auth, "salesAccess"), () =>
+        ctx.db
+          .query("quoteSubmissions")
+          .withIndex("by_tenantId", byTenant)
+          .collect()
+          .then((rows) => rows.filter((row) => row.status === "pending")),
       ),
     ]);
 
@@ -582,6 +591,7 @@ export const listNotifications = query({
       equipmentIssues,
       equipmentNames,
       maintenanceDue,
+      quoteSubmissions,
     });
   },
 });
