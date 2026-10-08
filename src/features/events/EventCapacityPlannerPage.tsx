@@ -58,11 +58,14 @@ function CapacityTile({ card }: { card: CapacityEventCard }) {
   const occupancy =
     card.capacity == null
       ? "Capacity not set"
-      : `${formatCount(card.confirmedHeadcount)} / ${formatCount(card.capacity)}`;
+      : `${formatCount(card.roomHeadcount)} / ${formatCount(card.capacity)}`;
+  const counted = card.fromGuestList
+    ? "guests who said yes"
+    : "guests expected";
   const accessibleOccupancy =
     card.capacity == null
-      ? `${card.confirmedHeadcount} confirmed guests; capacity not on file`
-      : `${card.confirmedHeadcount} confirmed guests of ${card.capacity} capacity`;
+      ? `${card.roomHeadcount} ${counted}; capacity not on file`
+      : `${card.roomHeadcount} ${counted} of ${card.capacity} capacity`;
 
   return (
     <Link
@@ -90,7 +93,7 @@ function CapacityTile({ card }: { card: CapacityEventCard }) {
             ? `${formatCount(event.expectedHeadcount)} expected`
             : card.utilization == null
               ? "—"
-              : percent.format(card.utilization)}
+              : `${percent.format(card.utilization)}${card.fromGuestList ? " said yes" : " expected"}`}
         </small>
       </span>
       {card.conflictingEventIds.length ? (

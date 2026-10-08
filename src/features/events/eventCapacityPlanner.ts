@@ -34,6 +34,10 @@ export type CapacityHeat = "unknown" | "quiet" | "steady" | "busy" | "full";
 export interface CapacityEventCard {
   event: CapacityPlannerEvent;
   confirmedHeadcount: number;
+  /** Guests set against the room: who said yes on a guest list, or, with no
+   * guest list, the expected headcount. */
+  roomHeadcount: number;
+  fromGuestList: boolean;
   capacity: number | null;
   utilization: number | null;
   heat: CapacityHeat;
@@ -168,7 +172,9 @@ export function buildCapacityPlan({
     .sort((first, second) => (first.startsAt ?? 0) - (second.startsAt ?? 0));
 
   const confirmedByEvent = new Map<string, number>();
+  const listedEvents = new Set<string>();
   for (const guest of guests) {
+    if (guest.deletedAt == null) listedEvents.add(guest.eventId);
     if (guest.deletedAt != null || guest.rsvpStatus !== "confirmed") continue;
     confirmedByEvent.set(
       guest.eventId,
@@ -209,10 +215,18 @@ export function buildCapacityPlan({
     const rawCapacity = event.venueCapacity ?? fallbackCapacity ?? null;
     const capacity =
       rawCapacity != null && rawCapacity > 0 ? rawCapacity : null;
-    const utilization = capacity == null ? null : confirmedHeadcount / capacity;
+    // Most bookings have no guest list; their expected headcount is what
+    // fills the room, not zero.
+    const fromGuestList = listedEvents.has(event._id);
+    const roomHeadcount = fromGuestList
+      ? confirmedHeadcount
+      : Math.max(0, Number(event.expectedHeadcount ?? 0));
+    const utilization = capacity == null ? null : roomHeadcount / capacity;
     return {
       event,
       confirmedHeadcount,
+      roomHeadcount,
+      fromGuestList,
       capacity,
       utilization,
       heat: heatFor(utilization),
@@ -256,8 +270,7 @@ export function buildCapacityPlan({
       0,
     ),
     overCapacityCount: cards.filter(
-      (card) =>
-        card.capacity != null && card.confirmedHeadcount > card.capacity,
+      (card) => card.capacity != null && card.roomHeadcount > card.capacity,
     ).length,
   };
 }
