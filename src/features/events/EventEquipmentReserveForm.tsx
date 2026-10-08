@@ -79,7 +79,11 @@ export function EventEquipmentReserveForm({
                   ? `${item.quantity} in the catalog`
                   : free.blocked === "out_of_service"
                     ? "out of service"
-                    : `${free.free} of ${item.quantity} free`}
+                    : `${free.free} of ${item.quantity} free${
+                        free.onEvent
+                          ? ` · ${free.onEvent} already on this event`
+                          : ""
+                      }`}
               </option>
             );
           })}

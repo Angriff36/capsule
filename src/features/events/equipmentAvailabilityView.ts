@@ -21,6 +21,8 @@ export type ItemAvailability = {
   readonly location: string | null;
   readonly quantity: number;
   readonly free: number;
+  /** Units this same event already holds (not counted in `free`). */
+  readonly onEvent?: number;
   /** PL-RETURNS: broken, being cleaned or in repair right now. */
   readonly outOfUse?: number;
   readonly blocked: "out_of_service" | "retired" | null;
