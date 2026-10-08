@@ -193,7 +193,11 @@ export function ReturnsPage() {
     const broken = Number(line.damagedQuantity ?? 0);
     const lost = Number(line.lostQuantity ?? 0);
     const values = await prompt.askFields({
-      title: `Send ${line.description} to repairs?`,
+      // Lost, not broken: it is filed as missing, not as a repair.
+      title:
+        broken > 0
+          ? `Send ${line.description} to repairs?`
+          : `Report ${line.description} missing?`,
       description: "It goes on the equipment problem list and tells the team.",
       fields: [
         {
@@ -206,7 +210,7 @@ export function ReturnsPage() {
           defaultValue: choices[0]?.row._id ?? "",
         },
       ],
-      confirmLabel: "Send to repairs",
+      confirmLabel: broken > 0 ? "Send to repairs" : "Report missing",
     });
     if (!values) return;
     setError(null);
@@ -317,7 +321,9 @@ export function ReturnsPage() {
                         >
                           {sending === line._id
                             ? "Sending…"
-                            : "Send to repairs"}
+                            : Number(line.damagedQuantity ?? 0) > 0
+                              ? "Send to repairs"
+                              : "Report missing"}
                         </button>
                       )}
                       <Link
