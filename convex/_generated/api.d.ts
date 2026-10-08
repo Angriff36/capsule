@@ -282,6 +282,7 @@ import type * as personEmail from "../personEmail.js";
 import type * as personEmployeeNumber from "../personEmployeeNumber.js";
 import type * as personalDataErasure from "../personalDataErasure.js";
 import type * as personalDataExport from "../personalDataExport.js";
+import type * as planWindow from "../planWindow.js";
 import type * as proposalEmail from "../proposalEmail.js";
 import type * as publicMenu from "../publicMenu.js";
 import type * as pushDeviceHealth from "../pushDeviceHealth.js";
@@ -628,6 +629,7 @@ declare const fullApi: ApiFromModules<{
   personEmployeeNumber: typeof personEmployeeNumber;
   personalDataErasure: typeof personalDataErasure;
   personalDataExport: typeof personalDataExport;
+  planWindow: typeof planWindow;
   proposalEmail: typeof proposalEmail;
   publicMenu: typeof publicMenu;
   pushDeviceHealth: typeof pushDeviceHealth;

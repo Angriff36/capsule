@@ -1,17 +1,12 @@
 import { useMemo } from "react";
+import { useQuery } from "convex/react";
+import { api } from "../../../lib/api";
 import {
   useListAvailabilityWindow,
   useListEquipment,
   useListEquipmentIssue,
   useListEquipmentPart,
-  useListEquipmentReservation,
-  useListEventAssignment,
-  useListEventPlanNeeds,
-  useListEventStaffNeed,
-  useListEventVehicleAssignment,
   useListOrganization,
-  useListPackList,
-  useListPackListItem,
   useListPerson,
   useListQualification,
   useListTimeOffRequest,
@@ -53,9 +48,20 @@ export function usePlanSnapshot(anchor: number): PlanData {
     [anchor],
   );
   const events = useEventRecordsInRange(eventWindow);
-  const assignments = useListEventAssignment();
-  const staffNeeds = useListEventStaffNeed();
-  const rigs = useListEventVehicleAssignment();
+  // Staff, trucks, holds and pack lists of the events in the window only
+  // (convex/planWindow.ts), not every row the company ever had.
+  const eventIdsKey = (events ?? []).map((row) => row._id).join(",");
+  const eventIds = useMemo(
+    () => (eventIdsKey ? eventIdsKey.split(",") : []),
+    [eventIdsKey],
+  );
+  const forEvents = useQuery(
+    api.planWindow.forEvents,
+    events === undefined ? "skip" : { eventIds },
+  );
+  const assignments = forEvents?.assignments;
+  const staffNeeds = forEvents?.staffNeeds;
+  const rigs = forEvents?.rigs;
   const vehicles = useListVehicle();
   const trailers = useListTrailer();
   const people = useListPerson();
@@ -63,12 +69,12 @@ export function usePlanSnapshot(anchor: number): PlanData {
   const availability = useListAvailabilityWindow();
   const qualifications = useListQualification();
   const equipment = useListEquipment();
-  const reservations = useListEquipmentReservation();
+  const reservations = forEvents?.reservations;
   const parts = useListEquipmentPart();
   const equipmentIssues = useListEquipmentIssue();
-  const packLists = useListPackList();
-  const packLines = useListPackListItem();
-  const planNeeds = useListEventPlanNeeds();
+  const packLists = forEvents?.packLists;
+  const packLines = forEvents?.packLines;
+  const planNeeds = forEvents?.planNeeds;
   const organizations = useListOrganization();
 
   const lists = [
