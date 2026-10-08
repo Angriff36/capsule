@@ -147,4 +147,27 @@ describe("old staff list", () => {
       )[0]!.kind,
     ).toBe("cannotAdd");
   });
+
+  it("does not fill a person by name when two people share it", () => {
+    const twin = (id: string): StaffListPerson => ({
+      _id: id,
+      givenName: "Sam",
+      familyName: "Lee",
+      email: `${id}@example.test`,
+      status: "active",
+      phone: null,
+    });
+    const [step] = planStaffList(
+      [
+        {
+          givenName: "Sam",
+          familyName: "Lee",
+          phone: "509-555-0100",
+          otherPhones: [],
+        },
+      ],
+      [twin("a"), twin("b")],
+    );
+    expect(step!.kind).toBe("cannotAdd");
+  });
 });

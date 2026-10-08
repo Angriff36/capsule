@@ -184,15 +184,17 @@ export function planStaffList(
     (person) => person.deletedAt == null && person.status !== "terminated",
   );
   return rows.map((row): StaffListStep => {
+    // A name match counts only when one person has that name; with two, the
+    // row could fill the wrong person's phone or address.
+    const sameName = current.filter(
+      (one) =>
+        key(one.givenName) === key(row.givenName) &&
+        key(one.familyName) === key(row.familyName),
+    );
     const person =
       (row.email
         ? current.find((one) => key(one.email) === key(row.email))
-        : undefined) ??
-      current.find(
-        (one) =>
-          key(one.givenName) === key(row.givenName) &&
-          key(one.familyName) === key(row.familyName),
-      );
+        : undefined) ?? (sameName.length === 1 ? sameName[0] : undefined);
     if (!person) {
       return row.email && row.givenName && row.familyName
         ? { kind: "add", row }
