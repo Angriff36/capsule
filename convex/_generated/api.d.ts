@@ -8,6 +8,8 @@
  * @module
  */
 
+import type * as adminWindow from "../adminWindow.js";
+import type * as agentHistoryWindow from "../agentHistoryWindow.js";
 import type * as apiKeys from "../apiKeys.js";
 import type * as archiveDisposition from "../archiveDisposition.js";
 import type * as archiveInventory from "../archiveInventory.js";
@@ -57,13 +59,17 @@ import type * as eventReadiness from "../eventReadiness.js";
 import type * as eventRouteLegs from "../eventRouteLegs.js";
 import type * as eventRoutes from "../eventRoutes.js";
 import type * as eventTimingRules from "../eventTimingRules.js";
+import type * as eventsAreaWindow from "../eventsAreaWindow.js";
 import type * as externalRecordLinkLists from "../externalRecordLinkLists.js";
+import type * as facilitiesHistoryWindow from "../facilitiesHistoryWindow.js";
 import type * as fileStorage from "../fileStorage.js";
+import type * as financeWindow from "../financeWindow.js";
 import type * as geocode from "../geocode.js";
 import type * as goodshuffleItems from "../goodshuffleItems.js";
 import type * as googleCalendar from "../googleCalendar.js";
 import type * as googleCalendarHealth from "../googleCalendarHealth.js";
 import type * as hiringPipeline from "../hiringPipeline.js";
+import type * as historyWindow from "../historyWindow.js";
 import type * as http from "../http.js";
 import type * as importCancel from "../importCancel.js";
 import type * as importClientByName from "../importClientByName.js";
@@ -78,6 +84,8 @@ import type * as importServiceStyle from "../importServiceStyle.js";
 import type * as importSourceDelta from "../importSourceDelta.js";
 import type * as ingredientLookup from "../ingredientLookup.js";
 import type * as inventoryAudit from "../inventoryAudit.js";
+import type * as inventoryHistoryWindow from "../inventoryHistoryWindow.js";
+import type * as inventoryWindow from "../inventoryWindow.js";
 import type * as invoiceEmail from "../invoiceEmail.js";
 import type * as invoicePayments from "../invoicePayments.js";
 import type * as invoiceReminders from "../invoiceReminders.js";
@@ -267,6 +275,7 @@ import type * as lib_vendorItemPriceHistory from "../lib/vendorItemPriceHistory.
 import type * as lib_venueFactsSnapshot from "../lib/venueFactsSnapshot.js";
 import type * as lib_venueReconciliation from "../lib/venueReconciliation.js";
 import type * as lib_volumeUnitMl from "../lib/volumeUnitMl.js";
+import type * as logisticsWindow from "../logisticsWindow.js";
 import type * as menuRecipeLookup from "../menuRecipeLookup.js";
 import type * as messageInbox from "../messageInbox.js";
 import type * as messageInboxPages from "../messageInboxPages.js";
@@ -282,6 +291,8 @@ import type * as personEmail from "../personEmail.js";
 import type * as personEmployeeNumber from "../personEmployeeNumber.js";
 import type * as personalDataErasure from "../personalDataErasure.js";
 import type * as personalDataExport from "../personalDataExport.js";
+import type * as planWindow from "../planWindow.js";
+import type * as productionWindow from "../productionWindow.js";
 import type * as proposalEmail from "../proposalEmail.js";
 import type * as publicMenu from "../publicMenu.js";
 import type * as pushDeviceHealth from "../pushDeviceHealth.js";
@@ -291,6 +302,7 @@ import type * as queries from "../queries.js";
 import type * as quickImport from "../quickImport.js";
 import type * as quoteBuilder from "../quoteBuilder.js";
 import type * as reasonedChanges from "../reasonedChanges.js";
+import type * as recipeWindow from "../recipeWindow.js";
 import type * as recordHistory from "../recordHistory.js";
 import type * as recurringEvents from "../recurringEvents.js";
 import type * as rentalSales from "../rentalSales.js";
@@ -345,7 +357,9 @@ import type * as venueGallery from "../venueGallery.js";
 import type * as venueVendorPolicy from "../venueVendorPolicy.js";
 import type * as webhookDeliveries from "../webhookDeliveries.js";
 import type * as webhookIntegrations from "../webhookIntegrations.js";
+import type * as workforceHistoryWindow from "../workforceHistoryWindow.js";
 import type * as workforceScheduling from "../workforceScheduling.js";
+import type * as workforceWindow from "../workforceWindow.js";
 
 import type {
   ApiFromModules,
@@ -354,6 +368,8 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  adminWindow: typeof adminWindow;
+  agentHistoryWindow: typeof agentHistoryWindow;
   apiKeys: typeof apiKeys;
   archiveDisposition: typeof archiveDisposition;
   archiveInventory: typeof archiveInventory;
@@ -403,13 +419,17 @@ declare const fullApi: ApiFromModules<{
   eventRouteLegs: typeof eventRouteLegs;
   eventRoutes: typeof eventRoutes;
   eventTimingRules: typeof eventTimingRules;
+  eventsAreaWindow: typeof eventsAreaWindow;
   externalRecordLinkLists: typeof externalRecordLinkLists;
+  facilitiesHistoryWindow: typeof facilitiesHistoryWindow;
   fileStorage: typeof fileStorage;
+  financeWindow: typeof financeWindow;
   geocode: typeof geocode;
   goodshuffleItems: typeof goodshuffleItems;
   googleCalendar: typeof googleCalendar;
   googleCalendarHealth: typeof googleCalendarHealth;
   hiringPipeline: typeof hiringPipeline;
+  historyWindow: typeof historyWindow;
   http: typeof http;
   importCancel: typeof importCancel;
   importClientByName: typeof importClientByName;
@@ -424,6 +444,8 @@ declare const fullApi: ApiFromModules<{
   importSourceDelta: typeof importSourceDelta;
   ingredientLookup: typeof ingredientLookup;
   inventoryAudit: typeof inventoryAudit;
+  inventoryHistoryWindow: typeof inventoryHistoryWindow;
+  inventoryWindow: typeof inventoryWindow;
   invoiceEmail: typeof invoiceEmail;
   invoicePayments: typeof invoicePayments;
   invoiceReminders: typeof invoiceReminders;
@@ -613,6 +635,7 @@ declare const fullApi: ApiFromModules<{
   "lib/venueFactsSnapshot": typeof lib_venueFactsSnapshot;
   "lib/venueReconciliation": typeof lib_venueReconciliation;
   "lib/volumeUnitMl": typeof lib_volumeUnitMl;
+  logisticsWindow: typeof logisticsWindow;
   menuRecipeLookup: typeof menuRecipeLookup;
   messageInbox: typeof messageInbox;
   messageInboxPages: typeof messageInboxPages;
@@ -628,6 +651,8 @@ declare const fullApi: ApiFromModules<{
   personEmployeeNumber: typeof personEmployeeNumber;
   personalDataErasure: typeof personalDataErasure;
   personalDataExport: typeof personalDataExport;
+  planWindow: typeof planWindow;
+  productionWindow: typeof productionWindow;
   proposalEmail: typeof proposalEmail;
   publicMenu: typeof publicMenu;
   pushDeviceHealth: typeof pushDeviceHealth;
@@ -637,6 +662,7 @@ declare const fullApi: ApiFromModules<{
   quickImport: typeof quickImport;
   quoteBuilder: typeof quoteBuilder;
   reasonedChanges: typeof reasonedChanges;
+  recipeWindow: typeof recipeWindow;
   recordHistory: typeof recordHistory;
   recurringEvents: typeof recurringEvents;
   rentalSales: typeof rentalSales;
@@ -691,7 +717,9 @@ declare const fullApi: ApiFromModules<{
   venueVendorPolicy: typeof venueVendorPolicy;
   webhookDeliveries: typeof webhookDeliveries;
   webhookIntegrations: typeof webhookIntegrations;
+  workforceHistoryWindow: typeof workforceHistoryWindow;
   workforceScheduling: typeof workforceScheduling;
+  workforceWindow: typeof workforceWindow;
 }>;
 
 /**

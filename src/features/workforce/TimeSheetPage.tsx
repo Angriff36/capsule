@@ -3,16 +3,20 @@ import {
   useAvailabilityWindowWithdraw,
   useCreateAvailabilityWindow,
   useCreateTimeRecord,
-  useListAvailabilityWindow,
   useListPerson,
-  useListShift,
-  useListTimeRecord,
   useTimeRecordApprove,
   useTimeRecordRemove,
   useTimeRecordClockOut,
   useTimeRecordCorrect,
 } from "../../lib/manifest-convex-react";
 import { TimeAttentionPanel } from "./TimeAttentionPanel";
+import {
+  HISTORY_PAGE,
+  useAvailabilityWindowPages,
+  useShiftsByIds,
+  useShiftsInWindow,
+  useTimeRecordPages,
+} from "../../lib/workforceScopedQueries";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import {
@@ -312,14 +316,28 @@ export function PlannedVsRecorded({
 }
 
 export function TimeSheetPage() {
-  const records = useListTimeRecord();
-  const windows = useListAvailabilityWindow();
+  // Newest entries and windows a page at a time ("Load more" for older).
+  const recordPages = useTimeRecordPages();
+  const windowPages = useAvailabilityWindowPages();
+  const records =
+    recordPages.status === "LoadingFirstPage" ? undefined : recordPages.results;
+  const windows =
+    windowPages.status === "LoadingFirstPage" ? undefined : windowPages.results;
   const people = useListPerson();
   const workingId = useWorkingEventId();
   const events = usePickerAndNamedEvents(
     records ? [workingId, ...records.map((row) => row.eventId)] : undefined,
   );
-  const shifts = useListShift();
+  // The planned shifts of the entries shown, and today's shifts for a new
+  // clock-in.
+  const [today] = useState(() => {
+    const start = new Date().setHours(0, 0, 0, 0);
+    return { from: start, to: new Date(start).setHours(24) };
+  });
+  const recordShifts = useShiftsByIds(records?.map((row) => row.shiftId));
+  const todayShifts = useShiftsInWindow(today);
+  const shifts =
+    recordShifts && todayShifts ? [...recordShifts, ...todayShifts] : undefined;
   const clockIn = useCreateTimeRecord();
   const clockOut = useTimeRecordClockOut();
   const correct = useTimeRecordCorrect();
@@ -839,6 +857,15 @@ export function TimeSheetPage() {
             </table>
           </div>
         )}
+        {recordPages.status === "CanLoadMore" ? (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm mt-3"
+            onClick={() => recordPages.loadMore(HISTORY_PAGE)}
+          >
+            Load more
+          </button>
+        ) : null}
       </section>
 
       <section className="working-ledger">
@@ -912,6 +939,15 @@ export function TimeSheetPage() {
             </table>
           </div>
         )}
+        {windowPages.status === "CanLoadMore" ? (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm mt-3"
+            onClick={() => windowPages.loadMore(HISTORY_PAGE)}
+          >
+            Load more
+          </button>
+        ) : null}
       </section>
     </div>
   );

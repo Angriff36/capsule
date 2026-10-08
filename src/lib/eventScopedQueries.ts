@@ -31,3 +31,25 @@ export function useEventTaskRows(eventId: EventId) {
     eventId === "skip" ? "skip" : { eventId },
   );
 }
+
+export function usePlanningReceiptRows(eventId: EventId) {
+  return useQuery(
+    api.queries.listPlanningReceiptByEventId,
+    eventId === "skip" ? "skip" : { eventId },
+  );
+}
+
+export function usePlanningOverrideRows(eventId: EventId) {
+  return useQuery(
+    api.queries.listPlanningOverrideByEventId,
+    eventId === "skip" ? "skip" : { eventId },
+  );
+}
+
+/** Staff, trucks, holds and pack lists of the given events only. */
+export function usePlanWindowRows(eventIds: string[] | "skip") {
+  return useQuery(
+    api.planWindow.forEvents,
+    eventIds === "skip" ? "skip" : { eventIds },
+  );
+}

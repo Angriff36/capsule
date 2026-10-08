@@ -5,8 +5,6 @@ import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { packingItemDescription } from "../../lib/packingDisplay";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
-  useListPackList,
-  useListPackListItem,
   useListPerson,
   usePackListMarkLoaded,
   usePackListMarkPacked,
@@ -17,6 +15,7 @@ import { useActionNotice } from "../../ui/action-result";
 import { EmptyState, PageHeader, TableSkeleton } from "../../ui/primitives";
 import { resolveManifestPolicies } from "../admin/rolePermissionAudit";
 import { useEventsById } from "../facilities/useEventsById";
+import { usePackListsByStatus } from "../facilities/useLogisticsWindow";
 import { eventDetailPath } from "../events/eventRoutes";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
@@ -24,6 +23,8 @@ import { packCategoryLabel } from "./packLineExplanation";
 import "./DispatchBoard.css";
 
 const OPEN_LINES_SHOWN = 6;
+/** Pack lists the warehouse still has to pack or load. */
+const FLOOR_STATUSES = ["draft", "packing", "packed"] as const;
 
 const show = (value: number) =>
   Number.isInteger(value) ? String(value) : String(Number(value.toFixed(2)));
@@ -36,7 +37,9 @@ const show = (value: number) =>
  */
 export function PackingFloorPage() {
   const authStatus = useAuthStatus();
-  const packLists = useListPackList();
+  // Only the open lists and their lines, read by status.
+  const floor = usePackListsByStatus(FLOOR_STATUSES, true);
+  const packLists = floor?.packLists;
   const eventIds = useMemo(
     () =>
       packLists === undefined
@@ -45,7 +48,7 @@ export function PackingFloorPage() {
     [packLists],
   );
   const events = useEventsById(eventIds);
-  const packLines = useListPackListItem();
+  const packLines = floor?.packLines;
   const people = useListPerson();
   const startPacking = usePackListStartPacking();
   const markPacked = usePackListMarkPacked();

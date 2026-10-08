@@ -4,8 +4,8 @@ import {
   useCreateLeftoverDisposition,
   useLeftoverDispositionRemove,
   useLeftoverDispositionRevise,
-  useListLeftoverDisposition,
 } from "../../lib/manifest-convex-react";
+import { useEventLeftovers } from "../../lib/financeScopedQueries";
 import { formatMoneyExact } from "../../lib/format";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
@@ -26,7 +26,7 @@ import {
  * summary has what the tax file and Good Samaritan records need.
  */
 export function LeftoverDispositionPanel({ eventId }: { eventId: string }) {
-  const rows = useListLeftoverDisposition();
+  const rows = useEventLeftovers(eventId) as LeftoverDisposition[] | undefined;
   const create = useCreateLeftoverDisposition();
   const revise = useLeftoverDispositionRevise();
   const remove = useLeftoverDispositionRemove();

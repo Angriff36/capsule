@@ -170,6 +170,20 @@ export type ScanFind =
         "not_found" | "two_match" | "two_lines" | "wrong_event" | "wrong_truck";
     };
 
+/** The catalog pieces an equipment label names. */
+export function scanPieces(
+  target: Extract<ScanTarget, { kind: "equipment" }>,
+  equipment: readonly ScanEquipment[],
+): ScanEquipment[] {
+  return equipment.filter(
+    (row) =>
+      row.deletedAt == null &&
+      (target.id != null
+        ? row._id === target.id
+        : sameLabel(target.tag ?? "", row.assetTag)),
+  );
+}
+
 /** Find what a label means on this list. */
 export function findScanTarget(
   target: ScanTarget,
@@ -194,13 +208,7 @@ export function findScanTarget(
       ? { found: "truck", rigId: rig.id }
       : { found: "none", outcome: "wrong_truck" };
   }
-  const pieces = context.equipment.filter(
-    (row) =>
-      row.deletedAt == null &&
-      (target.id != null
-        ? row._id === target.id
-        : sameLabel(target.tag ?? "", row.assetTag)),
-  );
+  const pieces = scanPieces(target, context.equipment);
   // Two tags that read the same (they differ only in capitals): never guess.
   if (pieces.length > 1) return { found: "none", outcome: "two_match" };
   const piece = pieces[0];

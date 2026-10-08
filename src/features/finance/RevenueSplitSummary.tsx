@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { formatMoneyExact } from "../../lib/format";
 import {
   revenueSplitMeasures,
@@ -6,10 +6,10 @@ import {
   type SplitRow,
 } from "./revenueSplitMeasures";
 
-const monthValue = (date: Date) =>
+export const monthValue = (date: Date) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 
-function monthRange(value: string): [number, number] {
+export function monthRange(value: string): [number, number] {
   const [year, month] = value.split("-").map(Number);
   return [
     new Date(year, month - 1, 1).getTime(),
@@ -21,11 +21,17 @@ function monthRange(value: string): [number, number] {
 export function RevenueSplitSummary({
   events,
   splits,
+  onMonthChange,
 }: {
   readonly events: readonly SplitEvent[];
   readonly splits: readonly SplitRow[];
+  /** The page reads only the picked month's events and splits. */
+  readonly onMonthChange?: (month: string) => void;
 }) {
   const [month, setMonth] = useState(() => monthValue(new Date()));
+  useEffect(() => {
+    onMonthChange?.(month);
+  }, [onMonthChange, month]);
   const measures = useMemo(() => {
     const [start, end] = monthRange(month);
     return revenueSplitMeasures(events, splits, start, end);

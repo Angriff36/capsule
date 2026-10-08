@@ -19,10 +19,6 @@ import {
   useEventLockForSales,
   useEventReschedule,
   useEventSubmitForApproval,
-  useListDelivery,
-  useListEventNumberAssignment,
-  useListEventVehicleAssignment,
-  useListInvoice,
   useListPerson,
   useListServiceStyle,
   useListTrailer,
@@ -31,6 +27,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useApplyDemandHeadcount } from "../../lib/culinaryDemandClient";
 import { useEventRecordsInRange } from "../facilities/useEventsById";
+import { useTrackerRows } from "../../lib/useEventAreaRows";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
@@ -52,8 +49,8 @@ import { DemandChangePreviewDialog } from "../inventory/DemandChangePreviewDialo
 import { CascadePreviewDialog } from "./CascadePreviewDialog";
 
 const LANE_DAYS = 14;
-const TRACKER_DAYS_BACK = 60;
-const TRACKER_DAYS_AHEAD = 731;
+// "Later" loads this many more days each time it is asked.
+const LATER_STEP_DAYS = 30;
 // Mirrors the Event command guards in src/operations/event.manifest so a card
 // never offers an edit the command would refuse: reschedule / changeVenue /
 // changePrimaryContact / changeRequirements run through sales_lock;
@@ -157,27 +154,32 @@ const NO_VENUE = "no-venue";
 export function EventTrackerPage() {
   const authStatus = useAuthStatus();
   const today = startOfDay(Date.now());
-  // Events from 60 days back (so a job still running shows on Today) to two
-  // years ahead, plus undated ones. The window moves once a day.
+  // Only the lanes on screen: the next two weeks, jobs that started earlier
+  // and still run today, and undated events. "Later" loads more days only
+  // when asked.
+  const [laterDays, setLaterDays] = useState(0);
   const eventWindow = useMemo(
     () => ({
-      from: addDays(today, -TRACKER_DAYS_BACK),
-      to: addDays(today, TRACKER_DAYS_AHEAD),
+      from: today,
+      to: addDays(today, LANE_DAYS + laterDays),
       withUndated: true,
+      runningIn: true,
     }),
-    [today],
+    [today, laterDays],
   );
   const events = useEventRecordsInRange(eventWindow);
   const clients = useClientDirectory();
   const venues = useListVenue();
-  const deliveries = useListDelivery();
+  // Deliveries, invoices, trucks and numbers of the events on the board only.
+  const trackerRows = useTrackerRows(events?.map((event) => event._id));
+  const deliveries = trackerRows?.deliveries;
   const vehicles = useListVehicle();
   const serviceStyles = useListServiceStyle();
   const people = useListPerson();
-  const invoices = useListInvoice();
-  const assignments = useListEventVehicleAssignment();
+  const invoices = trackerRows?.invoices;
+  const assignments = trackerRows?.vehicleAssignments;
   const trailers = useListTrailer();
-  const numberAssignments = useListEventNumberAssignment();
+  const numberAssignments = trackerRows?.numberAssignments;
 
   const reschedule = useEventReschedule();
   const applyDemandHeadcount = useApplyDemandHeadcount();
@@ -293,7 +295,10 @@ export function EventTrackerPage() {
       {
         key: "later",
         label: "Later",
-        sublabel: `after ${laneDate(horizon - DAY_MS)}`,
+        sublabel:
+          laterDays === 0
+            ? `after ${laneDate(horizon - DAY_MS)}`
+            : `to ${laneDate(addDays(horizon, laterDays) - DAY_MS)}`,
         dayStart: null,
         events: later,
       },
@@ -608,7 +613,11 @@ export function EventTrackerPage() {
               <div className="tracker-lane-body">
                 {lane.events.length === 0 ? (
                   <p className="tracker-lane-empty">
-                    {droppable ? "Drop here" : "Nothing booked"}
+                    {droppable
+                      ? "Drop here"
+                      : lane.key === "later" && laterDays === 0
+                        ? "Later days are not shown yet"
+                        : "Nothing booked"}
                   </p>
                 ) : null}
                 {lane.events.map((event) => {
@@ -850,6 +859,17 @@ export function EventTrackerPage() {
                     </article>
                   );
                 })}
+                {lane.key === "later" ? (
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() =>
+                      setLaterDays((days) => days + LATER_STEP_DAYS)
+                    }
+                  >
+                    Show the next {LATER_STEP_DAYS} days
+                  </button>
+                ) : null}
               </div>
             </section>
           );

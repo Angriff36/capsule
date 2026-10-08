@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from "react";
 import {
   useCreateVendorItem,
-  useListVendorItem,
   useVendorItemRemove,
   useVendorItemUpdate,
 } from "../../lib/manifest-convex-react";
+import { useIngredientVendorItemRows } from "../../lib/recipeScopedQueries";
 import { useVendorItemPriceHistory } from "../facilities/vendorPriceList";
 import { formatMoneyExact } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
@@ -54,7 +54,7 @@ export function VendorItemsPanel({
   vendors: readonly VendorOption[] | undefined;
   onFailure: (error: unknown) => void;
 }) {
-  const items = useListVendorItem();
+  const items = useIngredientVendorItemRows(ingredientId);
   const priceHistory = useVendorItemPriceHistory(ingredientId);
   const addItem = useCreateVendorItem();
   const updateItem = useVendorItemUpdate();

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { useListLeftoverDisposition } from "../../lib/manifest-convex-react";
+import { useLeftoversInYear } from "../../lib/financeScopedQueries";
 import { formatMoneyExact } from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
 import { useEventsById } from "../facilities/useEventsById";
@@ -11,7 +11,21 @@ import {
   donationYearSummary,
   formatPounds,
   leftoverYears,
+  type LeftoverDisposition,
 } from "./leftoverDispositions";
+
+/** Every year from the first recorded one to this year, and the one picked. */
+function pickerYears(
+  recorded: LeftoverDisposition[],
+  currentYear: number,
+  picked: number,
+  firstYear: number | null,
+): number[] {
+  const years = new Set(leftoverYears(recorded, currentYear));
+  years.add(picked);
+  for (let y = firstYear ?? currentYear; y <= currentYear; y++) years.add(y);
+  return [...years].sort((a, b) => b - a);
+}
 
 /**
  * One calendar year of food donations from event leftovers, by recipient
@@ -19,9 +33,12 @@ import {
  * records. Leftovers are recorded on each closeout.
  */
 export function DonationSummaryPage() {
-  const rows = useListLeftoverDisposition();
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
+  // Only the picked year's leftovers.
+  const yearRows = useLeftoversInYear(year);
+  const rows = yearRows?.rows as LeftoverDisposition[] | undefined;
+  const firstYear = yearRows?.firstYear ?? null;
   const recorded = useMemo(() => activeLeftovers(rows), [rows]);
   const summary = useMemo(
     () => donationYearSummary(recorded, year),
@@ -62,11 +79,13 @@ export function DonationSummaryPage() {
               value={year}
               onChange={(event) => setYear(Number(event.target.value))}
             >
-              {leftoverYears(recorded, currentYear).map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
+              {pickerYears(recorded, currentYear, year, firstYear).map(
+                (option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ),
+              )}
             </select>
           </label>
           <button

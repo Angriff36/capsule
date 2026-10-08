@@ -1,14 +1,6 @@
 import { useMemo } from "react";
 import { formatMoneyExact } from "../../lib/format";
-import {
-  useListComponent,
-  useListComponentIngredient,
-  useListDishComponent,
-  useListDishIngredient,
-  useListIngredient,
-  useListIngredientPriceObservation,
-  useListItemUnitMapping,
-} from "../../lib/manifest-convex-react";
+import { useMenuRecipeRows } from "../../lib/useMenuRecipeRows";
 import { buildEventMenuCost } from "../events/eventMenuCost";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 
@@ -26,13 +18,15 @@ export type DishPlateCost = {
  * disagree (#145). Returns undefined while any list is still loading.
  */
 export function useDishPlateCost(dishId: string): DishPlateCost | undefined {
-  const dishIngredients = useListDishIngredient();
-  const dishComponents = useListDishComponent();
-  const components = useListComponent();
-  const componentIngredients = useListComponentIngredient();
-  const ingredients = useListIngredient();
-  const priceObservations = useListIngredientPriceObservation();
-  const itemUnitMappings = useListItemUnitMapping();
+  // This dish's recipe, price and unit rows only, never the whole lists.
+  const recipeRows = useMenuRecipeRows(useMemo(() => [dishId], [dishId]));
+  const dishIngredients = recipeRows?.dishIngredients;
+  const dishComponents = recipeRows?.dishComponents;
+  const components = recipeRows?.components;
+  const componentIngredients = recipeRows?.componentIngredients;
+  const ingredients = recipeRows?.ingredients;
+  const priceObservations = recipeRows?.priceObservations;
+  const itemUnitMappings = recipeRows?.unitMappings;
   return useMemo(() => {
     if (
       !dishIngredients ||

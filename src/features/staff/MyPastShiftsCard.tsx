@@ -37,11 +37,14 @@ export function MyPastShiftsCard({
   records,
   eventTitle,
   plannedFor = () => null,
+  onShowAll,
 }: {
   readonly records: readonly TimeRecordRow[];
   readonly eventTitle: (eventId: string) => string;
   /** The scheduled window of a shift, to show recorded against planned. */
   readonly plannedFor?: (shiftId: string) => PlannedWindow | null;
+  /** Set while only recent weeks are loaded: loads the older ones. */
+  readonly onShowAll?: () => void;
 }) {
   const [showAll, setShowAll] = useState(false);
   const shifts = workedShifts(records);
@@ -52,7 +55,7 @@ export function MyPastShiftsCard({
   return (
     <div id="my-day-past-shifts" data-testid="my-past-shifts">
       <Section title="Past shifts" count={shifts.length}>
-        {shifts.length === 0 ? (
+        {shifts.length === 0 && !onShowAll ? (
           <EmptyState
             title="No worked shifts yet"
             hint="Each shift shows up here after you clock out."
@@ -61,7 +64,8 @@ export function MyPastShiftsCard({
           <div className="px-4 pb-4">
             <p className="py-2 text-sm text-ink-2">
               {hoursLabel(totalHours)} worked across {shifts.length} shift
-              {shifts.length === 1 ? "" : "s"}.
+              {shifts.length === 1 ? "" : "s"}
+              {onShowAll ? " in recent weeks" : ""}.
             </p>
             {shown.map((week) => (
               <div key={week.weekStart} className="mt-3">
@@ -85,15 +89,20 @@ export function MyPastShiftsCard({
                 </ul>
               </div>
             ))}
-            {weeks.length > WEEKS_SHOWN ? (
+            {weeks.length > WEEKS_SHOWN || onShowAll ? (
               <button
                 type="button"
                 className="btn btn-ghost btn-sm mt-3"
-                onClick={() => setShowAll((value) => !value)}
+                onClick={() => {
+                  onShowAll?.();
+                  setShowAll((value) => !value);
+                }}
               >
                 {showAll
                   ? "Show recent weeks only"
-                  : `Show all ${weeks.length} weeks`}
+                  : onShowAll
+                    ? "Show all weeks"
+                    : `Show all ${weeks.length} weeks`}
               </button>
             ) : null}
           </div>

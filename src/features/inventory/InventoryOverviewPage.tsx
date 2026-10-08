@@ -1,14 +1,14 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   useListIngredient,
-  useListInventoryItem,
   useListVendor,
-  useListVendorOrder,
-  useListVendorOrderLine,
 } from "../../lib/manifest-convex-react";
+import { useStockLines } from "../facilities/useInventoryHistory";
 import { formatCount, formatDate, formatMoneyExact } from "../../lib/format";
 import { PageHeader, Skeleton, StatusChip } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
+import { useVendorOrdersInStatuses } from "../facilities/useLogisticsWindow";
 import {
   catalogUnitForStockLine,
   isBelowReorder,
@@ -24,6 +24,13 @@ const AWAITING_RECEIPT = new Set([
   "partially_received",
 ]);
 const CLOSED_ORDER = new Set(["received", "cancelled"]);
+const OPEN_ORDER_STATUSES = [
+  "draft",
+  "pending_approval",
+  "submitted",
+  "confirmed",
+  "partially_received",
+] as const;
 
 type Urgency = "now" | "soon" | "watch";
 
@@ -46,9 +53,13 @@ const URGENCY_CHIP: Record<Urgency, string> = {
 };
 
 export function InventoryOverviewPage() {
-  const items = useListInventoryItem();
-  const orders = useListVendorOrder();
-  const lines = useListVendorOrderLine();
+  const items = useStockLines("none");
+  // Only the orders still open (all this page counts), with their lines.
+  const orders = useVendorOrdersInStatuses(OPEN_ORDER_STATUSES);
+  const lines = useMemo(
+    () => orders?.flatMap((order) => order.lines ?? []),
+    [orders],
+  );
   const vendors = useListVendor();
   const ingredients = useListIngredient();
 

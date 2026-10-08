@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { useClientDirectory } from "../../lib/useClientDirectory";
 import {
-  useListInvoice,
   useListOrganization,
   useListVenue,
 } from "../../lib/manifest-convex-react";
@@ -22,7 +21,9 @@ import {
   type RevenuePeriod,
   type RevenueTrend,
   type RevenueVenue,
+  revenueWindowRanges,
 } from "./revenueTrend";
+import { useWindowRows } from "../../lib/financeScopedQueries";
 
 const CATEGORY_COLORS = [
   "#31574f",
@@ -350,6 +351,8 @@ export function RevenueTrendsDashboard({
   functionalCurrencyCode,
   loading = false,
   now,
+  granularity: controlledGranularity,
+  onGranularityChange,
 }: {
   invoices: readonly RevenueInvoice[];
   clients: readonly RevenueClient[];
@@ -358,8 +361,17 @@ export function RevenueTrendsDashboard({
   functionalCurrencyCode: string;
   loading?: boolean;
   now: Date;
+  /** When the page owns the period (it reads only that period's invoices). */
+  granularity?: RevenueGranularity;
+  onGranularityChange?: (next: RevenueGranularity) => void;
 }) {
-  const [granularity, setGranularity] = useState<RevenueGranularity>("month");
+  const [ownGranularity, setOwnGranularity] =
+    useState<RevenueGranularity>("month");
+  const granularity = controlledGranularity ?? ownGranularity;
+  const setGranularity = (next: RevenueGranularity) => {
+    setOwnGranularity(next);
+    onGranularityChange?.(next);
+  };
   const [breakdown, setBreakdown] = useState<RevenueBreakdown>("event_type");
   const compactMoney = compactMoneyFmt(functionalCurrencyCode);
   const trend = useMemo(
@@ -570,7 +582,18 @@ export function RevenueTrendsDashboard({
 }
 
 export function RevenueTrendsPage() {
-  const invoices = useListInvoice();
+  const now = useMemo(() => new Date(), []);
+  const [granularity, setGranularity] = useState<RevenueGranularity>("month");
+  // Only invoices issued in the shown periods and the same periods a year
+  // earlier.
+  const invoiceWindow = useMemo(
+    () => ({
+      fields: ["issuedAt", "createdAt"],
+      ranges: revenueWindowRanges(now, granularity),
+    }),
+    [now, granularity],
+  );
+  const invoices = useWindowRows("invoices", invoiceWindow);
   const clients = useClientDirectory();
   const eventIds = useMemo(
     () =>
@@ -580,7 +603,6 @@ export function RevenueTrendsPage() {
   const events = useEventsById(eventIds);
   const venueRows = useListVenue();
   const organizations = useListOrganization();
-  const now = useMemo(() => new Date(), []);
   const venues = useMemo(
     () => (venueRows ?? []).filter((row) => row.deletedAt == null),
     [venueRows],
@@ -605,6 +627,8 @@ export function RevenueTrendsPage() {
         organizations === undefined
       }
       now={now}
+      granularity={granularity}
+      onGranularityChange={setGranularity}
     />
   );
 }

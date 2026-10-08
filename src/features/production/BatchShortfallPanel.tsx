@@ -2,10 +2,10 @@ import { useMemo, useState } from "react";
 import {
   useCreateProductionBatch,
   useListComponent,
-  useListProductionBatch,
   useProductionBatchCorrectYield,
   useProductionBatchResolveShortfall,
 } from "../../lib/manifest-convex-react";
+import { useFinishedBatches } from "../../lib/productionScopedQueries";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useEventsById } from "../facilities/useEventsById";
 import { batchShortfallLabel } from "./batchCompletion";
@@ -19,7 +19,10 @@ const RECENT_MS = 24 * 60 * 60 * 1000;
  * is needed, or fixes a miscount. The plan itself never changes.
  */
 export function BatchShortfallPanel() {
-  const batches = useListProductionBatch();
+  // Only finished batches this card shows (still owed, or done in the last
+  // day), newest first; older ones load when the cook asks.
+  const finished = useFinishedBatches();
+  const batches = finished.batches;
   const components = useListComponent();
   const eventIds = useMemo(
     () =>
@@ -223,6 +226,16 @@ export function BatchShortfallPanel() {
           );
         })}
       </ul>
+      {finished.canLoadMore || finished.loadingMore ? (
+        <button
+          type="button"
+          className="kds-secondary"
+          disabled={finished.loadingMore}
+          onClick={finished.loadMore}
+        >
+          {finished.loadingMore ? "Loading…" : "Load more"}
+        </button>
+      ) : null}
     </section>
   );
 }

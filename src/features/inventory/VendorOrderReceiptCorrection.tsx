@@ -1,8 +1,6 @@
 import { useState, type FormEvent } from "react";
-import {
-  useListReceiptCorrection,
-  useVendorOrderLineCorrectReceipt,
-} from "../../lib/manifest-convex-react";
+import { useVendorOrderLineCorrectReceipt } from "../../lib/manifest-convex-react";
+import { useReceiptCorrectionsForLine } from "../facilities/useLogisticsWindow";
 
 type CorrectionLine = {
   _id: string;
@@ -76,7 +74,8 @@ export function VendorOrderReceiptCorrection({
   run,
 }: ReceiptCorrectionProps) {
   const correctReceipt = useVendorOrderLineCorrectReceipt();
-  const listed = useListReceiptCorrection() as ListedCorrection[] | undefined;
+  const listed = useReceiptCorrectionsForLine(line._id) as
+    ListedCorrection[] | undefined;
   const history = correctionsForLine(listed, line._id);
   const [open, setOpen] = useState(false);
   const received = Number(line.receivedQuantity);

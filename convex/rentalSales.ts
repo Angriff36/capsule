@@ -19,9 +19,15 @@ export const acceptedRentalSales = query({
     const auth = await getAuthContext(ctx);
     if (!auth.tenantId || !canRead(auth, ["salesAccess"])) return [];
     const tenantId = auth.tenantId;
+    // The period's events only, one read on start time.
     const events = await ctx.db
       .query("events")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .withIndex("by_tenantId_and_startsAt", (q) =>
+        q
+          .eq("tenantId", tenantId)
+          .gte("startsAt", periodStart)
+          .lt("startsAt", periodEnd),
+      )
       .collect();
     const rows: Array<{ eventId: string; amount: number; lines: number }> = [];
     for (const event of events) {

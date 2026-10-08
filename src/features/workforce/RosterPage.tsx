@@ -8,16 +8,10 @@ import {
   useEventAssignmentDecline,
   useEventAssignmentMarkNoShow,
   useEventAssignmentUnassign,
-  useListEventAssignment,
-  useListEventStaffNeed,
   useListPerson,
   useListQualification,
-  useListShift,
   useListShiftType,
-  useListTrainingCompletion,
   useListTrainingModule,
-  useListTimeOffRequest,
-  useListWeeklyScheduleNotice,
   useShiftCancel,
   useShiftComplete,
   useShiftMarkNoShow,
@@ -27,6 +21,14 @@ import {
 import type { Id } from "../../lib/api";
 import { findApprovedTimeOffConflict } from "../../lib/timeOff";
 import { useScheduleShift } from "../../lib/workforceScheduling";
+import {
+  useApprovedTimeOff,
+  usePersonTrainingCompletions,
+  useShiftsInWindow,
+  useStaffForEvents,
+  useWeekNotices,
+} from "../../lib/workforceScopedQueries";
+import { useEventsInRange } from "../facilities/useEventsById";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
@@ -38,6 +40,7 @@ import { AvailabilityGridSection } from "./AvailabilityGridSection";
 import {
   DEFAULT_OVERTIME_THRESHOLD_HOURS,
   projectWeeklyHours,
+  startOfLocalWeek,
 } from "./overtimeProjection";
 import {
   addScheduleWeeks,
@@ -92,15 +95,70 @@ function initialOvertimeThreshold(): number {
 
 export function RosterPage() {
   const workingId = useWorkingEventId();
-  const assignments = useListEventAssignment();
-  const shifts = useListShift();
-  const scheduleNotices = useListWeeklyScheduleNotice();
+  const [shiftPersonId, setShiftPersonId] = useState("");
+  const [shiftStartsAt, setShiftStartsAt] = useState("");
+  const [shiftEndsAt, setShiftEndsAt] = useState("");
+  const [selectedWeekStartsAt, setSelectedWeekStartsAt] = useState(() =>
+    startOfScheduleWeek(Date.now()),
+  );
+  // Only the week on screen: its shifts, its events' staff and staffing
+  // needs, its approved time off and its schedule notices. Typing a new
+  // shift reads the weeks it falls in, for the overtime check.
+  const week = {
+    from: selectedWeekStartsAt,
+    to: addScheduleWeeks(selectedWeekStartsAt, 1),
+  };
+  const proposedFrom = new Date(shiftStartsAt).getTime();
+  const proposedTo = new Date(shiftEndsAt).getTime();
+  const proposal =
+    Number.isFinite(proposedFrom) &&
+    Number.isFinite(proposedTo) &&
+    proposedTo > proposedFrom
+      ? {
+          from: startOfLocalWeek(proposedFrom),
+          to: addScheduleWeeks(startOfLocalWeek(proposedTo), 1),
+        }
+      : "skip";
+  const weekShifts = useShiftsInWindow(week);
+  const proposalShifts = useShiftsInWindow(proposal);
+  const shifts =
+    weekShifts === undefined
+      ? undefined
+      : [
+          ...weekShifts,
+          ...(proposalShifts ?? []).filter(
+            (row) => !weekShifts.some((shift) => shift._id === row._id),
+          ),
+        ];
+  const weekEvents = useEventsInRange(week);
+  const weekStaff = useStaffForEvents(weekEvents?.map((event) => event._id));
+  const assignments = weekStaff?.assignments;
+  const staffNeeds = weekStaff?.staffNeeds;
+  const scheduleNotices = useWeekNotices(
+    weekShifts === undefined
+      ? undefined
+      : shiftsInScheduleWeek(
+          weekShifts.filter((row) => row.deletedAt == null),
+          selectedWeekStartsAt,
+        ).map((shift) => String(shift.personId)),
+    selectedWeekStartsAt,
+  );
   const people = useListPerson();
   const qualifications = useListQualification();
   const trainingModules = useListTrainingModule();
-  const trainingCompletions = useListTrainingCompletion();
+  const trainingCompletions = usePersonTrainingCompletions(shiftPersonId);
   const shiftTypes = useListShiftType();
-  const timeOffRequests = useListTimeOffRequest();
+  const weekTimeOff = useApprovedTimeOff(week);
+  const proposalTimeOff = useApprovedTimeOff(proposal);
+  const timeOffRequests =
+    weekTimeOff === undefined
+      ? undefined
+      : [
+          ...weekTimeOff,
+          ...(proposalTimeOff ?? []).filter(
+            (row) => !weekTimeOff.some((request) => request._id === row._id),
+          ),
+        ];
   const createAssignment = useCreateEventAssignment();
   const confirm = useEventAssignmentConfirm();
   const checkIn = useEventAssignmentCheckIn();
@@ -108,7 +166,6 @@ export function RosterPage() {
   const assignmentNoShow = useEventAssignmentMarkNoShow();
   const unassign = useEventAssignmentUnassign();
   const decline = useEventAssignmentDecline();
-  const staffNeeds = useListEventStaffNeed();
   const [assignEventId, setAssignEventId] = useState<string | null>(null);
   const events = usePickerAndNamedEvents(
     assignments && shifts && staffNeeds
@@ -129,14 +186,8 @@ export function RosterPage() {
   const shiftNoShow = useShiftMarkNoShow();
   const republishScheduleNotice = useWeeklyScheduleNoticeRepublishSchedule();
   const [showForm, setShowForm] = useState<"assignment" | "shift" | null>(null);
-  const [shiftPersonId, setShiftPersonId] = useState("");
   const [shiftTypeId, setShiftTypeId] = useState("");
-  const [shiftStartsAt, setShiftStartsAt] = useState("");
-  const [shiftEndsAt, setShiftEndsAt] = useState("");
   const [shiftEndWasEdited, setShiftEndWasEdited] = useState(false);
-  const [selectedWeekStartsAt, setSelectedWeekStartsAt] = useState(() =>
-    startOfScheduleWeek(Date.now()),
-  );
   const [overtimeThresholdHours, setOvertimeThresholdHours] = useState(
     initialOvertimeThreshold,
   );
@@ -524,7 +575,6 @@ export function RosterPage() {
     people === undefined ||
     qualifications === undefined ||
     trainingModules === undefined ||
-    trainingCompletions === undefined ||
     shiftTypes === undefined ||
     staffNeeds === undefined ||
     timeOffRequests === undefined;

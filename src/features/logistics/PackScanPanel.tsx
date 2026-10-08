@@ -7,11 +7,13 @@ import {
 } from "react";
 import {
   useListEquipment,
-  useListEquipmentReservation,
-  useListEventVehicleAssignment,
   useListVehicle,
   useCreatePackScan,
 } from "../../lib/manifest-convex-react";
+import {
+  useActiveEventRigs,
+  useEquipmentHoldsLookup,
+} from "../facilities/useLogisticsWindow";
 import { BarcodeLabel } from "../../ui/BarcodeLabel";
 import { usePackScanCount, usePackScansForList } from "../../lib/usePackScans";
 import { classifyCommandFailure } from "../events/CommandFailure";
@@ -19,6 +21,7 @@ import {
   applyScan,
   findScanTarget,
   parseScanLabel,
+  scanPieces,
   SCAN_OUTCOME_TEXT,
   SCAN_STEPS,
   scanLabelFor,
@@ -62,8 +65,9 @@ export function PackScanPanel({
   rigs: PackRig[];
 }) {
   const equipment = useListEquipment();
-  const reservations = useListEquipmentReservation();
-  const assignments = useListEventVehicleAssignment();
+  // Holds are read for the scanned piece only, when it is scanned.
+  const holdsFor = useEquipmentHoldsLookup();
+  const assignments = useActiveEventRigs(packList.eventId);
   const vehicles = useListVehicle();
   const recordScan = useCreatePackScan();
   const countScan = usePackScanCount();
@@ -215,12 +219,22 @@ export function PackScanPanel({
     const target = parseScanLabel(raw);
     if (!target) return;
     labelRef.current = raw;
+    const pieceIds =
+      target.kind === "equipment"
+        ? scanPieces(target, equipment ?? []).map((row) => row._id)
+        : [];
+    const reservations =
+      pieceIds.length > 0 ? await holdsFor(pieceIds).catch(() => null) : [];
+    if (reservations === null) {
+      say(false, "That piece's holds could not be read. Scan it again.");
+      return;
+    }
     const found = findScanTarget(target, {
       eventId: packList.eventId,
       eventNumber,
       lines,
       equipment: equipment ?? [],
-      reservations: (reservations ?? []).map((row) => ({
+      reservations: reservations.map((row) => ({
         ...row,
         status: String(row.status),
       })),

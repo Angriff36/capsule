@@ -5,8 +5,8 @@ import {
   useCreateEquipmentMaintenanceTask,
   useCreateEquipmentServiceEntry,
   useListEquipmentMaintenanceTask,
-  useListEquipmentServiceEntry,
 } from "../../lib/manifest-convex-react";
+import { useEquipmentServiceSummary } from "./useFacilitiesHistory";
 import { TableSkeleton } from "../../ui/primitives";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import "./EquipmentMaintenanceBoard.css";
@@ -37,8 +37,9 @@ export function EquipmentMaintenanceBoard({
 }: {
   equipment: EquipmentRow[];
 }) {
+  // The recurring schedules (one per task, not a growing log); their
+  // service history is summed on the server, latest entry per task only.
   const tasks = useListEquipmentMaintenanceTask();
-  const serviceEntries = useListEquipmentServiceEntry();
   const createTask = useCreateEquipmentMaintenanceTask();
   const createServiceEntry = useCreateEquipmentServiceEntry();
   const [showScheduleForm, setShowScheduleForm] = useState(false);
@@ -65,17 +66,14 @@ export function EquipmentMaintenanceBoard({
         Number(left.nextDueAt ?? Number.MAX_SAFE_INTEGER) -
         Number(right.nextDueAt ?? Number.MAX_SAFE_INTEGER),
     );
-  const entries = (serviceEntries ?? [])
-    .filter((entry) => entry.deletedAt == null && entry.loggedAt != null)
-    .sort(
-      (left, right) =>
-        Number(right.completedAt ?? 0) - Number(left.completedAt ?? 0),
-    );
-  const entriesByTask = new Map<string, typeof entries>();
-  for (const entry of entries) {
-    const taskId = String(entry.maintenanceTaskId);
-    entriesByTask.set(taskId, [...(entriesByTask.get(taskId) ?? []), entry]);
-  }
+  const serviceSummary = useEquipmentServiceSummary(
+    tasks === undefined
+      ? undefined
+      : maintenanceTasks.map((task) => String(task._id)),
+  );
+  const summaryByTask = new Map(
+    (serviceSummary?.tasks ?? []).map((row) => [row.taskId, row]),
+  );
   const overdueTasks = maintenanceTasks.filter(
     (task) => task.nextDueAt != null && task.nextDueAt < now,
   );
@@ -177,7 +175,10 @@ export function EquipmentMaintenanceBoard({
               <b>{dueSoonTasks.length}</b> due soon
             </span>
             <span>
-              <b>{entries.length}</b> services
+              <b>
+                {`${serviceSummary?.total ?? 0}${serviceSummary?.totalCapped ? "+" : ""}`}
+              </b>{" "}
+              services
             </span>
           </div>
           <button
@@ -292,7 +293,7 @@ export function EquipmentMaintenanceBoard({
         </form>
       ) : null}
 
-      {tasks === undefined || serviceEntries === undefined ? (
+      {tasks === undefined || serviceSummary === undefined ? (
         <div className="maintenance-board__loading">
           <TableSkeleton rows={4} />
         </div>
@@ -308,8 +309,9 @@ export function EquipmentMaintenanceBoard({
         <div className="maintenance-ledger">
           {maintenanceTasks.map((task, index) => {
             const item = equipmentById.get(String(task.equipmentId));
-            const taskEntries = entriesByTask.get(String(task._id)) ?? [];
-            const latestEntry = taskEntries[0];
+            const summary = summaryByTask.get(String(task._id));
+            const latestEntry = summary?.latest ?? undefined;
+            const entryCount = summary?.count ?? 0;
             const dueState = maintenanceDueState(task.nextDueAt, now);
             const isServiceOpen = serviceTaskId === String(task._id);
             return (
@@ -375,10 +377,10 @@ export function EquipmentMaintenanceBoard({
                   >
                     {isServiceOpen ? "Close log" : "Log service"}
                   </button>
-                  {taskEntries.length > 1 ? (
+                  {entryCount > 1 ? (
                     <small>
-                      {formatCountNoun(taskEntries.length, "entry", "entries")}{" "}
-                      on file
+                      {formatCountNoun(entryCount, "entry", "entries")}
+                      {summary?.capped ? "+" : ""} on file
                     </small>
                   ) : null}
                 </div>

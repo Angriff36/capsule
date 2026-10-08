@@ -2,19 +2,13 @@ import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   useGetEvent,
-  useListEventTimelineActivity,
+  useGetProposal,
   useListVenue,
-  useListProposal,
-  useListProposalLineItem,
-  useListProposalEnhancement,
-  useListProposalDishSelection,
-  useListProposalRevision,
   useProposalAccept,
   useProposalDecline,
   useProposalExpire,
   useProposalMarkViewed,
   useCreateSignatureRequest,
-  useListShareLink,
   useShareLinkCreate,
   useShareLinkRevoke,
 } from "../../lib/manifest-convex-react";
@@ -25,16 +19,25 @@ import {
   useReadClient,
 } from "../../lib/useClientDirectory";
 import { type Id } from "../../lib/api";
+import {
+  useEventTimelineActivities,
+  usePagedRows,
+  useProposalDishSelections,
+  useProposalEnhancements,
+  useProposalLineItems,
+  useProposalRevisions,
+  useProposalShareLinks,
+  useReadClientEvents,
+  useRowsInStatuses,
+} from "../../lib/financeScopedQueries";
+import { useRouteRecord } from "../../lib/routeRecord";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatDate, formatMoneyExact, formatTime } from "../../lib/format";
 import { useEmailProposal } from "../../lib/proposalEmailActions";
 import { ProposalEmailHistory } from "./ProposalEmailHistory";
 import { clientDisplayName } from "../events/clientName";
-import {
-  useEventRecordsById,
-  useEventRecordsInRange,
-} from "../facilities/useEventsById";
+import { useEventRecordsById } from "../facilities/useEventsById";
 import { eventCreatePath, eventDetailPath } from "../events/eventRoutes";
 import { useTenantBranding } from "../admin/tenantBranding";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
@@ -89,9 +92,8 @@ const LINKABLE_EVENT_STAGES = [
 
 // Proposal statuses where the client is still choosing dishes.
 const MENU_EDITABLE_STATUSES = ["draft", "sent", "viewed"];
-
-const DAY_MS = 86_400_000;
-const PROPOSAL_EVENT_DAYS = 731;
+// Not yet accepted, declined, expired or superseded.
+const OPEN_STATUSES = ["draft", "sent", "viewed"];
 
 const policy = new CrmLifecyclePolicy();
 
@@ -101,51 +103,55 @@ const policy = new CrmLifecyclePolicy();
 export function ProposalsPage() {
   const { branding } = useTenantBranding();
   const withPictureUrls = useProposalPictureUrls();
-  const proposals = useListProposal();
+  // Every open proposal (through the status index), and the newest finished
+  // ones a page at a time ("Load more" reads older ones).
+  const openProposals = useRowsInStatuses("proposals", OPEN_STATUSES);
+  const proposalPages = usePagedRows("proposals");
+  const proposals = useMemo(
+    () =>
+      openProposals === undefined || proposalPages.rows === undefined
+        ? undefined
+        : [
+            ...new Map(
+              [...openProposals, ...proposalPages.rows].map((row) => [
+                row._id,
+                row,
+              ]),
+            ).values(),
+          ],
+    [openProposals, proposalPages.rows],
+  );
   // Names only; the signature request reads the one client's email.
   const clients = useClientDirectory();
   const readClient = useReadClient();
-  // Events from two years back to two years ahead, plus undated ones: the
-  // linked events of recent proposals and the accept-time link picker. The
-  // window moves once a day.
-  const today = Math.floor(Date.now() / DAY_MS) * DAY_MS;
-  const eventWindow = useMemo(
-    () => ({
-      from: today - PROPOSAL_EVENT_DAYS * DAY_MS,
-      to: today + PROPOSAL_EVENT_DAYS * DAY_MS,
-      withUndated: true,
-    }),
-    [today],
-  );
-  const windowEvents = useEventRecordsInRange(eventWindow);
-  // A proposal linked to an event outside that window keeps its event too.
-  const olderEventIds = useMemo(() => {
-    if (!proposals || !windowEvents) return undefined;
-    const inWindow = new Set(windowEvents.map((e) => String(e._id)));
-    return [
-      ...new Set(
-        proposals
-          .map((p) => (p.eventId ? String(p.eventId) : ""))
-          .filter((id) => id && !inWindow.has(id)),
-      ),
-    ];
-  }, [proposals, windowEvents]);
-  const olderEvents = useEventRecordsById(olderEventIds);
-  const events = useMemo(
+  const readClientEvents = useReadClientEvents();
+  // The events the listed proposals are linked to, and nothing else.
+  const linkedEventIds = useMemo(
     () =>
-      windowEvents && olderEvents
-        ? [...windowEvents, ...olderEvents]
-        : windowEvents,
-    [windowEvents, olderEvents],
+      proposals === undefined
+        ? undefined
+        : [
+            ...new Set(
+              proposals
+                .map((p) => (p.eventId ? String(p.eventId) : ""))
+                .filter(Boolean),
+            ),
+          ],
+    [proposals],
   );
-  const timelineActivities = useListEventTimelineActivity();
+  const events = useEventRecordsById(linkedEventIds);
   const venues = useListVenue();
-  // Tenant-wide priced lines; filtered per proposal for the PDF breakdown and
-  // the pricing panel. Same query ProposalPricingPanel subscribes to (cached).
-  const proposalLineItems = useListProposalLineItem();
-  const proposalEnhancements = useListProposalEnhancement();
-  const proposalDishSelections = useListProposalDishSelection();
-  const proposalRevisions = useListProposalRevision();
+  const [openRowId, setOpenRowId] = useState<string | null>(null);
+  // An open row's lines, choices, versions, links and event timeline; the
+  // list itself shows only what is on each proposal.
+  const proposalLineItems = useProposalLineItems(openRowId);
+  const proposalEnhancements = useProposalEnhancements(openRowId);
+  const proposalDishSelections = useProposalDishSelections(openRowId);
+  const proposalRevisions = useProposalRevisions(openRowId);
+  const openEventId = proposals?.find((row) => row._id === openRowId)?.eventId;
+  const timelineActivities = useEventTimelineActivities(
+    openEventId ? String(openEventId) : null,
+  );
   const dishes = useWholeDishList();
   // Send captures a revision snapshot server-side (spec §5.5 / Priority 10) —
   // a thin authored action wraps the generated Proposal_send + best-effort
@@ -158,7 +164,7 @@ export function ProposalsPage() {
   const createSignatureRequest = useCreateSignatureRequest();
   // Revocable proposal share links (spec §4.6). A link is pinned to the
   // proposal's latest captured revision; its Convex _id is the public token.
-  const shareLinks = useListShareLink();
+  const shareLinks = useProposalShareLinks(openRowId);
   const createShareLink = useShareLinkCreate();
   const revokeShareLink = useShareLinkRevoke();
   const emailProposal = useEmailProposal();
@@ -227,32 +233,33 @@ export function ProposalsPage() {
     }
   };
   const fromEventId = searchParams.get("event");
-  const windowFromEvent =
-    fromEventId && events
-      ? events.find((row) => row._id === fromEventId && row.deletedAt == null)
-      : undefined;
-  // An event outside the window above is read on its own.
-  const singleFromEvent = useGetEvent(
-    fromEventId && events && !windowFromEvent ? fromEventId : "skip",
-  );
+  // The event a "build from event" link names, read on its own.
+  const singleFromEvent = useGetEvent(fromEventId ? fromEventId : "skip");
   const fromEvent =
-    windowFromEvent ??
-    (singleFromEvent && singleFromEvent.deletedAt == null
+    singleFromEvent && singleFromEvent.deletedAt == null
       ? singleFromEvent
-      : undefined);
+      : undefined;
 
   const [pricingOpenFor, setPricingOpenFor] = useState<string | null>(null);
   const [enhancementsOpenFor, setEnhancementsOpenFor] = useState<string | null>(
     null,
   );
   const [emailsOpenFor, setEmailsOpenFor] = useState<string | null>(null);
-  const [openRowId, setOpenRowId] = useState<string | null>(null);
   const [emailsKey, setEmailsKey] = useState(0);
 
   // Row deep link: /clients/proposals?proposal=<id> opens that proposal's
   // detail panels (menu, pricing, enhancements) and scrolls the row into view,
   // so each proposal has a shareable URL without a separate detail page.
   const focusedProposalId = searchParams.get("proposal");
+  // A linked proposal older than the loaded pages is read on its own.
+  const focusedProposal = useRouteRecord(
+    useGetProposal,
+    focusedProposalId &&
+      proposals !== undefined &&
+      !proposals.some((row) => row._id === focusedProposalId)
+      ? focusedProposalId
+      : undefined,
+  );
   const proposalsLoaded = proposals !== undefined;
   useEffect(() => {
     if (!focusedProposalId || !proposalsLoaded) return;
@@ -280,7 +287,10 @@ export function ProposalsPage() {
     }
   }, [fromEvent?._id]);
 
-  const activeRows = (proposals ?? []).filter((row) => row.deletedAt == null);
+  const activeRows = [
+    ...(proposals ?? []),
+    ...(focusedProposal ? [focusedProposal] : []),
+  ].filter((row) => row.deletedAt == null);
   // Keep accepted proposals visible — operators create the Event from them.
   const openRows = showTerminal
     ? activeRows
@@ -347,7 +357,11 @@ export function ProposalsPage() {
           });
           return;
         }
-        const linkableEvents = (events ?? []).filter(
+        // Only this client's events, read when accepting.
+        const clientEvents = row.clientId
+          ? await readClientEvents(String(row.clientId))
+          : [];
+        const linkableEvents = clientEvents.filter(
           (event) =>
             event.deletedAt == null &&
             event.clientId === row.clientId &&
@@ -835,13 +849,15 @@ export function ProposalsPage() {
             <p className="eyebrow">Offers</p>
             <h2>Proposals</h2>
           </div>
-          <span>{visibleRows.length}</span>
+          <span>
+            {`${visibleRows.filter((row) => OPEN_STATUSES.includes(String(row.status))).length} open · ${visibleRows.filter((row) => !OPEN_STATUSES.includes(String(row.status))).length} closed shown`}
+          </span>
         </div>
         {openRows.length > 0 ? (
           <input
             type="search"
             className="input my-3 min-h-10 w-full max-w-sm"
-            placeholder="Find by title or client"
+            placeholder="Find loaded proposals by title or client"
             aria-label="Find a proposal"
             value={find}
             onChange={(event) => setFind(event.target.value)}
@@ -1211,6 +1227,7 @@ export function ProposalsPage() {
                             editable={MENU_EDITABLE_STATUSES.includes(
                               String(row.status),
                             )}
+                            draft={String(row.status) === "draft"}
                             onFailure={setFailure}
                           />
                         </td>
@@ -1269,6 +1286,18 @@ export function ProposalsPage() {
             </table>
           </div>
         )}
+        {!loading && proposalPages.canLoadMore ? (
+          <div className="px-4 py-3">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={proposalPages.loadingMore}
+              onClick={proposalPages.loadMore}
+            >
+              {proposalPages.loadingMore ? "Loading…" : "Load older proposals"}
+            </button>
+          </div>
+        ) : null}
       </section>
     </div>
   );

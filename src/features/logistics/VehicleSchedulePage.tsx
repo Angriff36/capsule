@@ -3,11 +3,9 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
 import { formatCountNoun, formatDate } from "../../lib/format";
-import {
-  useListDelivery,
-  useListVehicle,
-} from "../../lib/manifest-convex-react";
+import { useListVehicle } from "../../lib/manifest-convex-react";
 import { useEventsById } from "../facilities/useEventsById";
+import { useDeliveriesByStatus } from "../facilities/useLogisticsWindow";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
@@ -41,6 +39,8 @@ type DeliveryRow = {
   deletedAt?: number | null;
 };
 
+const ACTIVE_RUN_STATUSES = ["scheduled", "in_transit"] as const;
+
 type VehicleRow = {
   _id: string;
   registration: string;
@@ -53,7 +53,9 @@ type VehicleRow = {
 export function VehicleSchedulePage() {
   const vehicles = useListVehicle() as VehicleRow[] | undefined;
   const overdueService = useOverdueVehicleService();
-  const deliveries = useListDelivery() as DeliveryRow[] | undefined;
+  // Only runs still to drive are planned here: read by status.
+  const deliveries = useDeliveriesByStatus(ACTIVE_RUN_STATUSES) as
+    DeliveryRow[] | undefined;
   const eventIds = useMemo(
     () =>
       deliveries === undefined

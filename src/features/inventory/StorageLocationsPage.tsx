@@ -2,12 +2,12 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useListIngredient,
-  useListInventoryItem,
   useListStorageLocation,
   useStorageLocationActivate,
   useStorageLocationDeactivate,
   useStorageLocationReviseDetails,
 } from "../../lib/manifest-convex-react";
+import { useStockLines } from "../facilities/useInventoryHistory";
 import { formatQuantity, formatCountNoun } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -40,7 +40,7 @@ const temperatureLabel = (location: {
 
 export function StorageLocationsPage() {
   const locations = useListStorageLocation();
-  const stockItems = useListInventoryItem();
+  const stockItems = useStockLines("none");
   const ingredients = useListIngredient();
   const reviseDetails = useStorageLocationReviseDetails();
   const deactivate = useStorageLocationDeactivate();

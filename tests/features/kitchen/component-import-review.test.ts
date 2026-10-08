@@ -84,6 +84,31 @@ vi.mock("../../../src/lib/manifest-convex-react", () => {
   );
 });
 
+// One recipe's or import's rows (src/lib/recipeScopedQueries.ts).
+vi.mock("../../../src/lib/recipeScopedQueries", () => {
+  const live = (rows: unknown) =>
+    (rows as { deletedAt?: number | null }[] | undefined)?.filter(
+      (row) => row.deletedAt == null,
+    );
+  return new Proxy(
+    {},
+    {
+      has: () => true,
+      get(_target, prop) {
+        if (typeof prop !== "string" || prop === "then" || prop === "default")
+          return undefined;
+        if (prop === "useOpenComponentImports")
+          return () => live(harness.allImports);
+        if (prop === "useComponentSourceImportRows")
+          return () => harness.allImports;
+        if (prop === "useComponentImportLineRows")
+          return () => harness.storedLines;
+        return () => [];
+      },
+    },
+  );
+});
+
 function storedReviewRow(overrides: Record<string, unknown> = {}) {
   return {
     _id: IMPORT_ID,

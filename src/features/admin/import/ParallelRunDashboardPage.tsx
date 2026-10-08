@@ -7,7 +7,6 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/lib/api";
-import { useListImportRun } from "../../../lib/manifest-convex-react";
 import { useWholeDishList } from "../../../lib/useDishesByIds";
 import {
   useExternalRecordLinksFor,
@@ -128,7 +127,11 @@ export function ParallelRunDashboardPage() {
     to: windowEnd + 1,
   });
   const capsuleDishes = useWholeDishList();
-  const importRuns = useListImportRun();
+  // Runs of the comparison window only. A run gets its start time when it
+  // is created, so its creation time is inside the window too.
+  const importRuns = useQuery(api.adminWindow.importRunsSince, {
+    since: windowEnd - COMPARISON_WINDOW_MS,
+  });
   // The full link list is too long for one read: the menu check is counted
   // on the server, and only links to imported events are listed.
   const menuStats = useMenuLinkStats();

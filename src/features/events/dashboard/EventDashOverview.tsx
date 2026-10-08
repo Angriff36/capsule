@@ -7,11 +7,9 @@ import {
   useEventPacketAccess,
 } from "../../../lib/eventPacket/useEventPacket";
 import { formatCount, formatMoney, formatTime } from "../../../lib/format";
-import {
-  useListInvoice,
-  useListServiceStyle,
-} from "../../../lib/manifest-convex-react";
+import { useListServiceStyle } from "../../../lib/manifest-convex-react";
 import { useEventTimelineComments } from "../../../lib/useEventRows";
+import { useEventInvoices } from "../../../lib/useEventAreaRows";
 import { formatStatusLabel } from "../../../lib/statusLabels";
 import { EventProposalEnhancementsCard } from "../../clients/EventProposalEnhancementsCard";
 import { EventProposalSourceCard } from "../../clients/EventProposalSourceCard";
@@ -128,7 +126,7 @@ export function EventDashOverview({
   // Events link a venue record; the old free-text name is only a fallback.
   const venueName =
     props.venue?.name || event.venueName || (pickup ? PICKUP_PLACE : undefined);
-  const invoices = useListInvoice();
+  const invoices = useEventInvoices(eventId);
   const comments = useEventTimelineComments(eventId);
   const canManagePacket = useEventPacketAccess(eventId);
   const forecast = useEventDayForecast(props.venue, props.startsAt);

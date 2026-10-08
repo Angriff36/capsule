@@ -147,7 +147,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     ready: prepSyncReady,
     syncStockForEvent,
     demandVersionsForEvent,
-  } = useEventMenuSync();
+  } = useEventMenuSync(eventId);
   const [showPicker, setShowPicker] = useState(false);
   const pickerDishes = useWholeDishList(showPicker);
   const venues = useListVenue();

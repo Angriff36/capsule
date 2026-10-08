@@ -3,9 +3,9 @@ import { type Id } from "../../lib/api";
 import { useInventoryAuditForItem } from "../../lib/inventoryAuditClient";
 import {
   useListIngredient,
-  useListInventoryItem,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
+import { useStockLines } from "../facilities/useInventoryHistory";
 import { TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import {
@@ -17,7 +17,7 @@ import { checkStockLedger } from "../../lib/stockBalance";
 import "./InventoryAuditLogPage.css";
 
 export function InventoryAuditLogPage() {
-  const items = useListInventoryItem();
+  const items = useStockLines("none");
   const ingredients = useListIngredient();
   const locations = useListStorageLocation();
   const loadAudit = useInventoryAuditForItem();

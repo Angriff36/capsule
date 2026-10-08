@@ -1,8 +1,8 @@
 import {
-  useListEventVehicleAssignment,
   useListTrailer,
   useListVehicle,
 } from "../../lib/manifest-convex-react";
+import { useActiveEventRigs } from "../facilities/useLogisticsWindow";
 import { TripCheckPanel } from "./TripCheckPanel";
 import { packRigs } from "./usePackRigs";
 
@@ -13,7 +13,7 @@ import { packRigs } from "./usePackRigs";
  * check.
  */
 export function EventTripChecks({ eventId }: { eventId: string }) {
-  const assignments = useListEventVehicleAssignment();
+  const assignments = useActiveEventRigs(eventId);
   const vehicles = useListVehicle();
   const trailers = useListTrailer();
   if (!assignments || !vehicles || !trailers) return null;

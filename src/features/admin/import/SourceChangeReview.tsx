@@ -1,10 +1,8 @@
 import { useMemo, useState } from "react";
 import { useAction } from "convex/react";
 import { api } from "../../../lib/api";
-import {
-  useImportConflictSettle,
-  useListImportConflict,
-} from "../../../lib/manifest-convex-react";
+import { useImportConflictSettle } from "../../../lib/manifest-convex-react";
+import { usePendingImportConflicts } from "../../../lib/workforceHistoryQueries";
 import {
   DATASET_BY_RECORD_TYPE,
   SOURCE_FIELD_MAPS,
@@ -57,7 +55,8 @@ export function SourceChangeReview({
   onDone: (message: string) => void;
   onError: (message: string) => void;
 }>) {
-  const conflicts = useListImportConflict();
+  // Only the conflicts still waiting, never every one ever settled.
+  const conflicts = usePendingImportConflicts();
   const settle = useImportConflictSettle();
   const takeSource = useAction(api.importSourceDelta.takeSourceValue);
   const [busyId, setBusyId] = useState<string | null>(null);

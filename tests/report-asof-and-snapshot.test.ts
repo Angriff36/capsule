@@ -37,6 +37,10 @@ vi.mock("../src/lib/manifest-convex-react", () => ({
   },
   useSavedReportSnapshotRemove: () => async () => undefined,
 }));
+// The screen reads only this report's snapshots.
+vi.mock("../src/lib/financeScopedQueries", () => ({
+  useReportSnapshotRows: () => store.snapshots,
+}));
 vi.mock("../src/lib/useAuthStatus", () => ({
   useAuthStatus: () => ({ personId: "person-me", role: "admin" }),
 }));

@@ -36,7 +36,20 @@ const CANDIDATE = new Set(["pending", "calculated"]);
 // committed history for the same dish + unit + headcount tier by more than
 // `threshold`. Returns only the flagged lines, keyed by demand _id.
 export function computeDemandAnomalies(
-  demands: ReturnType<typeof useListIngredientDemand>,
+  demands:
+    | ReadonlyArray<
+        Pick<
+          NonNullable<ReturnType<typeof useListIngredientDemand>>[number],
+          | "_id"
+          | "deletedAt"
+          | "dishId"
+          | "status"
+          | "requiredQuantity"
+          | "eventId"
+          | "unit"
+        >
+      >
+    | undefined,
   events:
     | ReadonlyArray<
         Pick<EventLookupRow, "_id" | "deletedAt" | "expectedHeadcount">

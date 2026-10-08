@@ -8,10 +8,10 @@ import {
   useEquipmentTransfer,
   useEquipmentUpdateCondition,
   useListEquipment,
-  useListEquipmentIssue,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
 import { equipmentShelfMark, type ShelfIssue } from "./equipmentShelfMark";
+import { useOpenEquipmentIssues } from "./useLogisticsWindow";
 import { formatMoney } from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
@@ -37,7 +37,8 @@ import {
 
 export function EquipmentCatalogPage() {
   const equipment = useListEquipment();
-  const issues = useListEquipmentIssue() as ShelfIssue[] | undefined;
+  // Only open problems mark a shelf.
+  const issues = useOpenEquipmentIssues() as ShelfIssue[] | undefined;
   const vendors = (useRentalVendorChoices() ?? []) as VendorChoice[];
   const vendorNames = new Map(vendors.map((v) => [v.vendorId, v.name]));
   const [detailId, setDetailId] = useState<string | null>(null);

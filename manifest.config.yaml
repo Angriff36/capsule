@@ -58,6 +58,10 @@ projections:
             name: by_tenantId_and_status
           - fields: [tenantId, personId, status, endsAt]
             name: by_staff_status_end
+          # Approved time off of a date window (convex/workforceWindow.ts
+          # approvedTimeOff), not every approved request ever made.
+          - fields: [tenantId, status, endsAt]
+            name: by_tenantId_and_status_and_endsAt
         Qualification:
           - fields: [tenantId, status, expiresAt]
             name: by_tenantId_and_status_and_expiresAt
@@ -101,6 +105,10 @@ projections:
         VendorOrder:
           - fields: [tenantId, status]
             name: by_tenantId_and_status
+          # Orders received since a date (vendor scores), not every order ever
+          # received.
+          - fields: [tenantId, status, receivedAt]
+            name: by_tenantId_and_status_and_receivedAt
         ReviewFlag:
           - fields: [tenantId, status]
             name: by_tenantId_and_status
@@ -127,15 +135,25 @@ projections:
             name: by_tenantId_and_invoiceNumber
           - fields: [tenantId, status]
             name: by_tenantId_and_status
+          # Invoices dated in a window (issued, else created): revenue trends.
+          - fields: [tenantId, issuedAt, createdAt]
+            name: by_tenantId_and_issuedAt_and_createdAt
         PrepTask:
           - fields: [tenantId, status]
             name: by_tenantId_and_status
+          # Prep due in a window (the Mangia board's day).
+          - fields: [tenantId, dueAt]
+            name: by_tenantId_and_dueAt
         PackList:
           - fields: [tenantId, status]
             name: by_tenantId_and_status
         EventCloseout:
           - fields: [tenantId, status]
             name: by_tenantId_and_status
+          # Closeouts dated in a window (finalized, else captured, else
+          # created): the scorecard and L10 dashboards.
+          - fields: [tenantId, finalizedAt, capturedAt, createdAt]
+            name: by_tenantId_and_finalizedAt_and_capturedAt_and_createdAt
         # One outside payment id is used by one payment, and one Capsule
         # payment is matched by one imported payment row (BE-15.2-01/04). The
         # seam (convex/lib/paymentAccounting.ts) checks with point lookups.
@@ -144,6 +162,9 @@ projections:
             name: by_tenantId_and_externalPaymentId
           - fields: [tenantId, matchedExternalId]
             name: by_tenantId_and_matchedExternalId
+          # Payments settled in a month (finance overview).
+          - fields: [tenantId, settledAt]
+            name: by_tenantId_and_settledAt
         ExternalRecordLink:
           - fields: [tenantId, capsuleId]
             name: by_tenantId_and_capsuleId
@@ -177,6 +198,8 @@ projections:
         Event:
           - fields: [tenantId, startsAt]
             name: by_tenantId_and_startsAt
+          - fields: [tenantId, endsAt]
+            name: by_tenantId_and_endsAt
           - fields: [tenantId, stage, startsAt]
             name: by_tenantId_and_stage_and_startsAt
           # The notification bell (convex/notifications.ts) reads only the
@@ -201,3 +224,101 @@ projections:
         DateWaitlistEntry:
           - fields: [tenantId, holdDate, queuedAt]
             name: by_tenantId_and_holdDate_and_queuedAt
+        # Date and state reads of convex/financeWindow.ts, workforceWindow.ts,
+        # productionWindow.ts and recipeWindow.ts: a screen reads only the
+        # rows of its window or state through these, never the company's whole
+        # table filtered row by row (whole-table reads time out on the live
+        # server, 2026-10-08). The status indexes of PurchaseNeed,
+        # ImportConflict and LeadershipItem give their screens generated
+        # by-status lists.
+        # Not staged: on production every table these indexes cover is small
+        # (counted 2026-10-08 with `convex data` on the box: leads 3357,
+        # events 3347, invoices 3324, payments 3254, prepTasks 435,
+        # ingredientDemands 200, purchaseNeeds 87, productionBatches 12,
+        # timeRecords 13, proposals 11, every other one 0-2), so each backfill
+        # takes seconds and the screens need the indexes in the same deploy.
+        Lead:
+          - fields: [tenantId, createdAt]
+            name: by_tenantId_and_createdAt
+          - fields: [tenantId, closedAt]
+            name: by_tenantId_and_closedAt
+        PayrollInput:
+          - fields: [tenantId, periodStart]
+            name: by_tenantId_and_periodStart
+          # Every open row (draft, prepared, sent, viewed, scheduled, active)
+          # of these screens through a status index, so an older open one is
+          # never cut off by a page of newer finished ones.
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        Proposal:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        Contract:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        Tasting:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        MessageThread:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        RevenueAttribution:
+          - fields: [tenantId, appliedAt]
+            name: by_tenantId_and_appliedAt
+        ClientOutreachTask:
+          - fields: [tenantId, resolvedAt]
+            name: by_tenantId_and_resolvedAt
+        SyncError:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        TimeRecord:
+          - fields: [tenantId, clockInAt]
+            name: by_tenantId_and_clockInAt
+        AvailabilityWindow:
+          - fields: [tenantId, endsAt]
+            name: by_tenantId_and_endsAt
+        ProductionBatch:
+          - fields: [tenantId, status, completedAt]
+            name: by_tenantId_and_status_and_completedAt
+          - fields: [tenantId, status, shortfallResolvedAt, shortfallQuantity]
+            name: by_tenant_status_shortfall
+        ProductionBatchAllocation:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        ComponentImport:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        PurchaseNeed:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        ImportConflict:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        LeadershipItem:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        # Supply reads of convex/inventoryWindow.ts by the row's own date
+        # (received, recorded, observed; else when it was made) instead of
+        # save time with a margin, and supply rows by state.
+        InventoryLot:
+          - fields: [tenantId, receivedAt]
+            name: by_tenantId_and_receivedAt
+          # Recall search by lot-number prefix within the company only
+          # (inventoryLots on production: 1 row, 2026-10-08).
+          - fields: [tenantId, supplierLotNumber]
+            name: by_tenantId_and_supplierLotNumber
+        WasteRecord:
+          - fields: [tenantId, recordedAt, createdAt]
+            name: by_tenantId_and_recordedAt_and_createdAt
+        IngredientPriceObservation:
+          - fields: [tenantId, observedAt, createdAt]
+            name: by_tenantId_and_observedAt_and_createdAt
+        InventoryReservation:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        IngredientDemand:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        OpeningStockRecord:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status

@@ -3,7 +3,6 @@ import {
   useCreateTastingDish,
   useListMenu,
   useListMenuDish,
-  useListTastingDish,
   useTastingCancel,
   useTastingMarkTasted,
   useTastingDishRecordFeedback,
@@ -11,6 +10,7 @@ import {
 import { useWholeDishList } from "../../lib/useDishesByIds";
 import { useApplyTastingSelections } from "../../lib/useTastings";
 import type { Id } from "../../lib/api";
+import { useTastingDishes } from "../../lib/financeScopedQueries";
 import { TableSkeleton } from "../../ui/primitives";
 import { TastingPrepList } from "./TastingPrepList";
 
@@ -52,7 +52,8 @@ export function TastingDetail({
   const menus = useListMenu();
   const menuDishes = useListMenuDish();
   const dishes = useWholeDishList();
-  const tastingDishes = useListTastingDish();
+  // Only this tasting's dishes.
+  const tastingDishes = useTastingDishes(tasting._id);
   const addDish = useCreateTastingDish();
   const recordFeedback = useTastingDishRecordFeedback();
   const complete = useTastingMarkTasted();

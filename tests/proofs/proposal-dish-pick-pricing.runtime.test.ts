@@ -191,6 +191,18 @@ describe("runtime proof: proposal dish picks carry their price", () => {
       },
     ]);
 
+    // Both lines name their menu, so the menu panel can flag them once every
+    // dish of that menu is taken off.
+    // Only the two Harvest dinner picks are left at this point.
+    const harvestMenuId = (await picks())[0].menuId;
+    const linked = (
+      (await sales.query(api.queries.listProposalLineItem, {})) as any[]
+    ).filter((row) => row.proposalId === proposalId && row.deletedAt == null);
+    expect(linked.map((row) => row.menuId)).toEqual([
+      harvestMenuId,
+      harvestMenuId,
+    ]);
+
     // A mixed menu: its unpriced dish gets no per-guest line (that would
     // charge the priced dishes twice); the screen warns about it instead.
     await pick(tart);

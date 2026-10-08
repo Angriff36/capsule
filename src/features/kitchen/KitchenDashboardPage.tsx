@@ -9,8 +9,6 @@ import { Link, useSearchParams } from "react-router-dom";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import {
   useListPerson,
-  useListInvoice,
-  useListPrepTask,
   useListComponent,
   useListVenue,
   usePrepTaskAssign,
@@ -19,8 +17,6 @@ import {
   usePrepTaskComplete,
   useCreatePrepTaskDependency,
   useCreateQualityCheck,
-  useListPrepTaskDependency,
-  useListQualityCheck,
   usePrepTaskMarkBlocked,
   useQualityCheckFail,
   useQualityCheckPass,
@@ -35,6 +31,7 @@ import { eventMenuRedirectPath, eventsIndexPath } from "../events/eventRoutes";
 import { useEventsInRange } from "../facilities/useEventsById";
 import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
 import { useDishesByIds } from "../../lib/useDishesByIds";
+import { usePrepBoardRows } from "../../lib/recipeScopedQueries";
 import { setWorkingEvent, useWorkingEventId } from "../events/workingEvent";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { reportActionOk } from "../../ui/action-result";
@@ -90,15 +87,10 @@ import { prepTimeLabel } from "./prepTiming";
 /** Kitchen command deck: 7-day horizon, assign cooks to dishes/steps, crew load. */
 export function KitchenDashboardPage() {
   const components = useListComponent();
-  const tasks = useListPrepTask();
-  // Step order ("do after") and quality checks live on the board itself.
-  const dependencies = useListPrepTaskDependency();
-  const qualityChecks = useListQualityCheck();
   const createDependency = useCreatePrepTaskDependency();
   const openQualityCheck = useCreateQualityCheck();
   const passQualityCheck = useQualityCheckPass();
   const failQualityCheck = useQualityCheckFail();
-  const invoices = useListInvoice();
   const people = useListPerson();
   const venues = useListVenue();
   const authStatus = useAuthStatus();
@@ -166,10 +158,16 @@ export function KitchenDashboardPage() {
       ),
     [windowEvents],
   );
+  const eventIds = useMemo(() => events?.map((event) => event._id), [events]);
   // Menu lines of those events only, never every event's (PL-SCALE).
-  const eventDishes = useMenuLinesForEvents(
-    useMemo(() => events?.map((event) => event._id), [events]),
-  );
+  const eventDishes = useMenuLinesForEvents(eventIds);
+  // Prep steps of those events, with their step order ("do after"), quality
+  // checks and invoice numbers, never the company's whole lists.
+  const board = usePrepBoardRows(eventIds);
+  const tasks = board?.tasks;
+  const dependencies = board?.dependencies;
+  const qualityChecks = board?.qualityChecks;
+  const invoices = board?.invoices;
   // Only the dishes those events' menu lines and prep tasks name.
   const dishes = useDishesByIds(
     useMemo(() => {

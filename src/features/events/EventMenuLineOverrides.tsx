@@ -3,11 +3,13 @@ import {
   useCreateEventDishLineOverride,
   useEventDishLineOverrideRevoke,
   useListComponent,
-  useListDishComponent,
-  useListDishIngredient,
-  useListEventDishLineOverride,
   useListIngredient,
 } from "../../lib/manifest-convex-react";
+import {
+  useDishComponentLines,
+  useDishIngredientLines,
+  useEventDishLineOverrides,
+} from "../../lib/useEventAreaRows";
 import type { ActionPromptSession } from "../../ui/action-prompt";
 import { SELECTABLE_UNITS } from "../kitchen/import/UnitOfMeasureMapper";
 
@@ -55,9 +57,9 @@ export function EventMenuLineOverrides({
   prompt: ActionPromptSession;
   onFailure: (error: unknown) => void;
 }) {
-  const overrides = useListEventDishLineOverride();
-  const dishIngredients = useListDishIngredient();
-  const dishComponents = useListDishComponent();
+  const overrides = useEventDishLineOverrides(eventDishId);
+  const dishIngredients = useDishIngredientLines(dishId);
+  const dishComponents = useDishComponentLines(dishId);
   const ingredients = useListIngredient();
   const components = useListComponent();
   const applyOverride = useCreateEventDishLineOverride();

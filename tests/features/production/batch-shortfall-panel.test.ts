@@ -28,6 +28,45 @@ vi.mock("../../../src/features/facilities/useEventsById", () => ({
   usePickerEvents: () => [{ _id: "event-1", title: "Harbor gala" }],
 }));
 
+// The kitchen screens read through the scoped hooks; feed them the same rows.
+vi.mock("../../../src/lib/productionScopedQueries", async () => {
+  const lists =
+    (await import("../../../src/lib/manifest-convex-react")) as unknown as Record<
+      string,
+      () => unknown[]
+    >;
+  return {
+    usePrepWork: () => ({
+      tasks: lists.useListPrepTask!(),
+      dependencies: lists.useListPrepTaskDependency!(),
+      checks: [],
+      comments: [],
+    }),
+    useOpenBatches: () => lists.useListProductionBatch!(),
+    useFinishedBatches: () => ({
+      batches: lists.useListProductionBatch!(),
+      canLoadMore: false,
+      loadingMore: false,
+      loadMore: () => {},
+    }),
+    useBatchShares: () => ({
+      shares: (
+        lists.useListProductionBatchAllocation!() as {
+          productionBatchId: string;
+        }[]
+      ).map((row) => ({
+        ...row,
+        batch: (lists.useListProductionBatch!() as { _id: string }[]).find(
+          (batch) => batch._id === row.productionBatchId,
+        ),
+      })),
+      canLoadMore: false,
+      loadingMore: false,
+      loadMore: () => {},
+    }),
+  };
+});
+
 vi.mock("../../../src/lib/manifest-convex-react", () => ({
   useListProductionBatch: () => [
     {

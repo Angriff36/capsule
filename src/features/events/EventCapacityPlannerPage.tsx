@@ -1,10 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatCount, formatCountNoun, formatTime } from "../../lib/format";
-import {
-  useListEventGuest,
-  useListVenue,
-} from "../../lib/manifest-convex-react";
+import { useListVenue } from "../../lib/manifest-convex-react";
+import { useGuestsForEvents } from "../../lib/useEventAreaRows";
 import { useEventRecordsInRange } from "../facilities/useEventsById";
 import { ArrowLeftIcon } from "../../ui/icons";
 import { TableSkeleton } from "../../ui/primitives";
@@ -18,8 +16,6 @@ import {
 } from "./eventCapacityPlanner";
 import "./EventCapacityPlannerPage.css";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
-
-const CAPACITY_LOOKBACK_DAYS = 7;
 
 const weekday = new Intl.DateTimeFormat("en-US", { weekday: "short" });
 const monthDay = new Intl.DateTimeFormat("en-US", {
@@ -116,13 +112,18 @@ export function EventCapacityPlannerPage() {
     const through = parseLocalDate(endDate);
     return Number.isFinite(from) && Number.isFinite(through) && from <= through
       ? {
-          from: addLocalDays(from, -CAPACITY_LOOKBACK_DAYS),
+          from,
           to: addLocalDays(through, 1),
+          // Bookings that started before the range and still run into it.
+          runningIn: true,
         }
       : ("skip" as const);
   }, [endDate, startDate]);
   const events = useEventRecordsInRange(eventWindow);
-  const guests = useListEventGuest();
+  // Guests of the events in the range only.
+  const guests = useGuestsForEvents(
+    eventWindow === "skip" ? [] : events?.map((event) => event._id),
+  );
   const venues = useListVenue();
   const loading =
     (events === undefined && eventWindow !== "skip") ||

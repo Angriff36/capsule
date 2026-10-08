@@ -527,7 +527,7 @@ export function StockReceiptScanner({
                   </option>
                 ))}
               </optgroup>
-              <optgroup label="Active demand">
+              <optgroup label="Active demand · next two weeks">
                 {activeDemands.map((demand) => (
                   <option key={demand._id} value={`demand:${demand._id}`}>
                     {ingredientName(demand.ingredientId)} ·{" "}

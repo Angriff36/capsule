@@ -5,8 +5,6 @@ import { listOriginState, useListOrigin } from "../list-state/listOrigin";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreatePackList,
-  useListPackList,
-  useListPackListItem,
   usePackListCancel,
   usePackListDispatch,
   usePackListMarkLoaded,
@@ -25,6 +23,10 @@ import {
 } from "../events/WorkingEventScope";
 import { useWorkingEventId } from "../events/workingEvent";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import {
+  usePackListItemsLookup,
+  usePackListPages,
+} from "../facilities/useLogisticsWindow";
 import { ListStateManager } from "../list-state/ListStateManager";
 import { useListViewState } from "../list-state/useListViewState";
 
@@ -42,8 +44,10 @@ export function PackListsPage() {
   const listOrigin = useListOrigin();
   const eventScope = useWorkingEventScope("pack-lists");
   const workingId = useWorkingEventId();
-  const packLists = useListPackList();
-  const packListItems = useListPackListItem();
+  // The followed event's lists, or the newest lists with more on request.
+  const pages = usePackListPages(eventScope.scopeId);
+  const packLists = pages.rows;
+  const packListLines = usePackListItemsLookup();
   const events = usePickerAndNamedEvents(
     packLists ? [workingId, ...packLists.map((row) => row.eventId)] : undefined,
   );
@@ -125,12 +129,13 @@ export function PackListsPage() {
         // a slip. Warn, never block. While the line rows are still loading
         // the counts are unknown, so ask anyway — skipping then would let an
         // unresolved query bypass the zero-packed check.
-        const lines =
-          packListItems === undefined
-            ? undefined
-            : packListItems.filter(
-                (item) => item.deletedAt == null && item.packListId === row._id,
-              );
+        const lines = await packListLines(row._id).then(
+          (items) =>
+            items.filter(
+              (item) => item.deletedAt == null && item.packListId === row._id,
+            ),
+          () => undefined,
+        );
         const packedCount = lines?.filter(
           (item) => String(item.status) === "packed",
         ).length;
@@ -347,6 +352,17 @@ export function PackListsPage() {
             </table>
           </div>
         )}
+        {pages.canLoadMore ? (
+          <div className="mt-3 flex justify-center">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={pages.loadMore}
+            >
+              Load more
+            </button>
+          </div>
+        ) : null}
       </section>
     </div>
   );

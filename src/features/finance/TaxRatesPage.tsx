@@ -1,7 +1,6 @@
 import { useMemo, useState, type FormEvent } from "react";
 import {
   useCreateTaxRate,
-  useListInvoice,
   useListTaxRate,
   useTaxRateRevise,
   useTaxRateSetActive,
@@ -11,6 +10,7 @@ import { formatMoneyExact } from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { calculateTaxRemittance } from "./invoiceTax";
+import { useAllRowsOnRequest } from "../../lib/financeScopedQueries";
 import "./taxWorkspace.css";
 import { useActionNotice } from "../../ui/action-result";
 
@@ -29,7 +29,10 @@ const applicability = (rate: {
 
 export function TaxRatesPage() {
   const taxRates = useListTaxRate();
-  const invoices = useListInvoice();
+  // Remittance adds up every invoice ever issued, so invoices are read only
+  // when the user asks for the totals.
+  const [remittanceRequested, setRemittanceRequested] = useState(false);
+  const invoices = useAllRowsOnRequest("invoices", remittanceRequested);
   const createTaxRate = useCreateTaxRate();
   const reviseTaxRate = useTaxRateRevise();
   const setActive = useTaxRateSetActive();
@@ -142,7 +145,7 @@ export function TaxRatesPage() {
     });
   };
 
-  if (taxRates === undefined || invoices === undefined) {
+  if (taxRates === undefined) {
     return (
       <div className="operations-stage supply-stage tax-stage">
         <TableSkeleton rows={7} />
@@ -329,18 +332,32 @@ export function TaxRatesPage() {
               excluded; assessed tax stays visible beside cash collected.
             </p>
           </div>
-          <dl>
-            <div>
-              <dt>Assessed</dt>
-              <dd>{usd(assessedTotal)}</dd>
-            </div>
-            <div>
-              <dt>Collected</dt>
-              <dd data-testid="collected-tax-total">{usd(collectedTotal)}</dd>
-            </div>
-          </dl>
+          {invoices !== undefined ? (
+            <dl>
+              <div>
+                <dt>Assessed</dt>
+                <dd>{usd(assessedTotal)}</dd>
+              </div>
+              <div>
+                <dt>Collected</dt>
+                <dd data-testid="collected-tax-total">{usd(collectedTotal)}</dd>
+              </div>
+            </dl>
+          ) : null}
         </div>
-        {remittance.length === 0 ? (
+        {!remittanceRequested ? (
+          <div className="document-empty">
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => setRemittanceRequested(true)}
+            >
+              Show collected tax totals
+            </button>
+          </div>
+        ) : invoices === undefined ? (
+          <TableSkeleton rows={4} />
+        ) : remittance.length === 0 ? (
           <div className="document-empty">
             <p>No invoice tax has been assessed yet.</p>
             <span>

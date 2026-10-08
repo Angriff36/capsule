@@ -2,6 +2,7 @@ import { useClientContacts } from "../../../lib/useClientDirectory";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { CapsuleEventBundleCatalogMatch } from "../../../agent/CapsuleEventBundleExistingState";
+import { bundleIdentity } from "../../../agent/CapsuleEventBundlePlan";
 import { useListVenue } from "../../../lib/manifest-convex-react";
 import { useWholeDishList } from "../../../lib/useDishesByIds";
 import {
@@ -35,7 +36,6 @@ export function EventImportPage() {
   const clients = useClientContacts();
   const venues = useListVenue();
   const dishes = useWholeDishList();
-  const directory = useEventImportDirectory();
 
   const [pastedText, setPastedText] = useState("");
   const [csvFiles, setCsvFiles] = useState<TextReportSource[]>([]);
@@ -47,6 +47,10 @@ export function EventImportPage() {
     return loadEventBundleFromText({ pastedText, csvFiles });
   }, [pastedText, csvFiles]);
   const bundle = loaded?.bundle ?? null;
+  // Existing records for this bundle's number only.
+  const directory = useEventImportDirectory(
+    bundle ? bundleIdentity(bundle.header) : null,
+  );
 
   const activeClients = useMemo(
     () =>

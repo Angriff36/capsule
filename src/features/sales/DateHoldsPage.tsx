@@ -11,11 +11,12 @@ import {
   useDateWaitlistEntryOffer,
   useDateWaitlistEntryPromote,
   useDateWaitlistEntryWithdraw,
-  useListDateHold,
-  useListDateWaitlistEntry,
-  useListLead,
 } from "../../lib/manifest-convex-react";
 import { formatDate } from "../../lib/format";
+import {
+  useDatesFrom,
+  useLeadsForClients,
+} from "../../lib/financeScopedQueries";
 import {
   EmptyState,
   PageHeader,
@@ -48,10 +49,15 @@ const DAY_MS = 86_400_000;
  * Holds only warn; a date may carry several holds and bookings.
  */
 export function DateHoldsPage() {
-  const holds = useListDateHold();
-  const waitlist = useListDateWaitlistEntry();
+  // Only dates from today on (what the board shows), and the leads of the
+  // clients holding them.
+  const board = useDatesFrom(localDateKey(Date.now()));
+  const holds = board?.holds;
+  const waitlist = board?.waitlist;
   const clients = useClientDirectory();
-  const leads = useListLead();
+  const leads = useLeadsForClients(
+    holds?.map((hold) => (hold.clientId ? String(hold.clientId) : null)),
+  );
   // The client's open lead, so booking carries its type and guest count.
   // One for the held day wins over another open one.
   const openLeadId = (hold: { clientId?: string | null; holdDate: string }) => {

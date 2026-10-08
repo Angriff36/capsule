@@ -4,8 +4,8 @@ import {
   useClientOutreachTaskComplete,
   useClientOutreachTaskDismiss,
   useGetClient,
-  useListClientOutreachTask,
 } from "../../lib/manifest-convex-react";
+import { useRowsWithEmpty } from "../../lib/financeScopedQueries";
 import { useEventsInRange } from "../facilities/useEventsById";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -98,6 +98,8 @@ function OutreachReach({ clientId }: { clientId: string }) {
   return reach ? <p className="text-xs text-ink-3">{reach}</p> : null;
 }
 
+const OPEN_TASK = ["resolvedAt"];
+
 export function ClientRetentionPage() {
   const clients = useClientDirectory();
   // Retention only looks at bookings in the prior year and the current year.
@@ -118,7 +120,8 @@ export function ClientRetentionPage() {
         : undefined,
     [priorYearEvents, currentYearEvents],
   );
-  const outreachTasks = useListClientOutreachTask();
+  // Only open follow-ups (never resolved); done ones are not shown.
+  const outreachTasks = useRowsWithEmpty("clientOutreachTasks", OPEN_TASK);
   const ensureOpenOutreachTask = useEnsureOpenClientOutreach();
   const completeOutreachTask = useClientOutreachTaskComplete();
   const dismissOutreachTask = useClientOutreachTaskDismiss();

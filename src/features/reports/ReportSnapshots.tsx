@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
+import { useReportSnapshotRows } from "../../lib/financeScopedQueries";
 import { formatDate, formatTime } from "../../lib/format";
 import {
   useCreateSavedReportSnapshot,
-  useListSavedReportSnapshot,
   useSavedReportSnapshotRemove,
 } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
@@ -64,7 +64,9 @@ export function ReportSnapshots({
   /** False while the live figures are loading, hidden or out of date. */
   canTake: boolean;
 }) {
-  const list = useListSavedReportSnapshot() as SnapshotRow[] | undefined;
+  // Only this report's snapshots.
+  const list = useReportSnapshotRows(String(report._id)) as
+    SnapshotRow[] | undefined;
   const capture = useCreateSavedReportSnapshot();
   const remove = useSavedReportSnapshotRemove();
   const auth = useAuthStatus();

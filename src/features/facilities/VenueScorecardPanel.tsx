@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useAllEventReportRows } from "./useEventsById";
+import { useVenueEvents } from "./useFacilitiesHistory";
 import { Section } from "../../ui/primitives";
 
 // Venue scorecard metrics — spec §8.1 ("…and scorecard metrics").
@@ -62,7 +62,8 @@ function Metric({ label, value }: { label: string; value: string }) {
 }
 
 export function VenueScorecardPanel({ venueId }: { venueId: string }) {
-  const events = useAllEventReportRows();
+  // This venue's events only, read by venue.
+  const events = useVenueEvents(venueId);
 
   const metrics = useMemo<VenueMetrics | null>(() => {
     if (events === undefined) return null;

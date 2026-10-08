@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { type Id } from "../../lib/api";
+import { useQuery } from "convex/react";
+import { api, type Id } from "../../lib/api";
 import { formatDate, formatTime } from "../../lib/format";
 import {
   useCreateVenueNote,
@@ -7,7 +8,6 @@ import {
   useVenueNoteRevise,
   useVenueNotePin,
   useVenueNoteUnpin,
-  useListVenueNote,
   useListPerson,
 } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
@@ -48,7 +48,8 @@ type Props = {
 /** Venue notes panel for structured institutional memory about venues. */
 export function VenueNotesPanel({ venueId }: Props) {
   const authStatus = useAuthStatus();
-  const notes = useListVenueNote();
+  // This venue's notes only, read by venue.
+  const notes = useQuery(api.queries.listVenueNoteByVenueId, { venueId });
   const people = useListPerson();
   const postNote = useCreateVenueNote();
   const removeNote = useVenueNoteRemove();

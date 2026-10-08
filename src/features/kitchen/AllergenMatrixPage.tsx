@@ -1,14 +1,9 @@
 import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import {
-  useListDishComponent,
-  useListDishIngredient,
-  useListIngredient,
-  useListMenu,
-  useListMenuDish,
-  useListComponent,
-  useListComponentIngredient,
-} from "../../lib/manifest-convex-react";
+import { useListMenu } from "../../lib/manifest-convex-react";
+import { useMenuDishRows } from "../../lib/recipeScopedQueries";
+import { useMenuRecipeRows } from "../../lib/useMenuRecipeRows";
+import { isPlausibleConvexId } from "../../lib/routeRecord";
 import { TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import {
@@ -78,25 +73,31 @@ export function deriveAllergenRows(input: {
 export function AllergenMatrixPage() {
   const [params, setParams] = useSearchParams();
   const menus = useListMenu();
-  const menuDishes = useListMenuDish();
-  const dishIngredients = useListDishIngredient();
-  const dishComponents = useListDishComponent();
-  const componentIngredients = useListComponentIngredient();
-  const ingredients = useListIngredient();
-  // Recipes, for allergens marked on the recipe itself.
-  const components = useListComponent();
 
   const menuId = params.get("menu") ?? "";
   const eventId = params.get("event") ?? "";
-  const eventDishes = useMenuLinesForEvents([eventId]);
-  // Only the chosen menu's or event's dishes, never the whole dish list.
-  const dishes = useDishesByIds(
-    menuId
-      ? menuDishes
-          ?.filter((line) => line.deletedAt == null && line.menuId === menuId)
-          .map((line) => line.dishId)
-      : eventDishes?.map((line) => line.dishId),
+  // The chosen menu's lines only; no menu chosen reads none.
+  const chosenMenuDishes = useMenuDishRows(
+    menuId && isPlausibleConvexId(menuId) ? menuId : null,
   );
+  const menuDishes =
+    menuId && isPlausibleConvexId(menuId) ? chosenMenuDishes : [];
+  const eventDishes = useMenuLinesForEvents([eventId]);
+  const scopeDishIds = menuId
+    ? menuDishes
+        ?.filter((line) => line.deletedAt == null && line.menuId === menuId)
+        .map((line) => line.dishId)
+    : eventDishes?.map((line) => line.dishId);
+  // Only the chosen menu's or event's dishes, never the whole dish list.
+  const dishes = useDishesByIds(scopeDishIds);
+  // Their recipe lines, recipes and ingredients only (recipes too, for
+  // allergens marked on the recipe itself).
+  const recipeRows = useMenuRecipeRows(scopeDishIds);
+  const dishIngredients = recipeRows?.dishIngredients;
+  const dishComponents = recipeRows?.dishComponents;
+  const componentIngredients = recipeRows?.componentIngredients;
+  const ingredients = recipeRows?.ingredients;
+  const components = recipeRows?.components;
   const events = usePickerAndNamedEvents([eventId]);
   const scopeValue = menuId
     ? `menu:${menuId}`

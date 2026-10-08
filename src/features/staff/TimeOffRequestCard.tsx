@@ -1,8 +1,6 @@
 import { useState, type FormEvent } from "react";
-import {
-  useCreateTimeOffRequest,
-  useListTimeOffRequest,
-} from "../../lib/manifest-convex-react";
+import { useCreateTimeOffRequest } from "../../lib/manifest-convex-react";
+import { usePersonTimeOffRequests } from "../../lib/workforceScopedQueries";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
@@ -36,7 +34,7 @@ export function TimeOffRequestCard({
   busy: string | null;
   run: (key: string, work: () => Promise<void>) => void;
 }) {
-  const requests = useListTimeOffRequest();
+  const requests = usePersonTimeOffRequests(personId);
   const submitRequest = useCreateTimeOffRequest();
   const [showForm, setShowForm] = useState(false);
 

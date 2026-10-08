@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import {
+  usePagedRows,
+  useQuoteSubmissionsInStatuses,
+} from "../../lib/financeScopedQueries";
 import { Link } from "react-router-dom";
 import { useAction } from "convex/react";
 import { api } from "../../lib/api";
 import {
   useListOccasion,
   useListOrganization,
-  useListQuoteSubmission,
   useListReferralSource,
   useListServiceStyle,
   useQuoteSubmissionDismiss,
@@ -72,8 +75,35 @@ function nameOf(
  * Lead, Event, and draft Proposal in one click (processQuoteSubmission runs
  * with their own auth, so the sales-guarded creates succeed).
  */
+const OPEN_STATUSES = ["pending", "processing", "failed"] as const;
+const DISMISSED = ["dismissed"] as const;
+
 export function QuoteSubmissionsReviewPage() {
-  const submissions = useListQuoteSubmission();
+  const [showDismissed, setShowDismissed] = useState(false);
+  // Requests still waiting on staff, through the status index; finished
+  // (and, when shown, dismissed) ones the newest page at a time.
+  const openSubmissions = useQuoteSubmissionsInStatuses(OPEN_STATUSES);
+  const dismissedSubmissions = useQuoteSubmissionsInStatuses(
+    showDismissed ? DISMISSED : [],
+  );
+  const finishedPages = usePagedRows("quoteSubmissions");
+  const submissions = useMemo(
+    () =>
+      openSubmissions === undefined ||
+      dismissedSubmissions === undefined ||
+      finishedPages.rows === undefined
+        ? undefined
+        : [
+            ...new Map(
+              [
+                ...openSubmissions,
+                ...dismissedSubmissions,
+                ...finishedPages.rows,
+              ].map((sub) => [sub._id, sub]),
+            ).values(),
+          ],
+    [openSubmissions, dismissedSubmissions, finishedPages.rows],
+  );
   const serviceStyles = useListServiceStyle();
   const occasions = useListOccasion();
   const referralSources = useListReferralSource();
@@ -83,7 +113,6 @@ export function QuoteSubmissionsReviewPage() {
   const retrySubmission = useQuoteSubmissionRetry();
   const { prompt, host: promptHost } = useActionPrompt();
 
-  const [showDismissed, setShowDismissed] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [failure, setFailure] = useState<Failure | null>(null);
   const [partialErrors, setPartialErrors] = useState<string | null>(null);
@@ -221,17 +250,15 @@ export function QuoteSubmissionsReviewPage() {
           }
           actions={
             <>
-              {dismissedCount > 0 && (
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => setShowDismissed((value) => !value)}
-                >
-                  {showDismissed
-                    ? "Hide dismissed"
-                    : `Show dismissed (${dismissedCount})`}
-                </button>
-              )}
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => setShowDismissed((value) => !value)}
+              >
+                {showDismissed
+                  ? `Hide dismissed (${dismissedCount})`
+                  : "Show dismissed"}
+              </button>
               <Link
                 to="/clients/pipeline"
                 className="text-xs text-ink-2 hover:text-ink underline"
@@ -508,6 +535,16 @@ export function QuoteSubmissionsReviewPage() {
           ))}
         </div>
       )}
+      {finishedPages.canLoadMore ? (
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm mt-3"
+          disabled={finishedPages.loadingMore}
+          onClick={finishedPages.loadMore}
+        >
+          {finishedPages.loadingMore ? "Loading…" : "Load older requests"}
+        </button>
+      ) : null}
     </div>
   );
 }

@@ -246,6 +246,27 @@ function categoryFor(
   return { key: `event-type:${label.toLowerCase()}`, label };
 }
 
+/**
+ * The date ranges the trend shows for this granularity: its periods and the
+ * same periods a year earlier. Invoices outside them are never counted.
+ */
+export function revenueWindowRanges(
+  now: Date,
+  granularity: RevenueGranularity,
+): { from: number; to: number }[] {
+  const periodCount = PERIOD_COUNT[granularity];
+  const finalStart = startOfPeriod(now, granularity);
+  const rangeStart = shiftPeriod(finalStart, -(periodCount - 1), granularity);
+  const rangeEnd = shiftPeriod(finalStart, 1, granularity);
+  return [
+    {
+      from: priorYearPeriod(rangeStart, granularity).getTime(),
+      to: priorYearPeriod(rangeEnd, granularity).getTime(),
+    },
+    { from: rangeStart.getTime(), to: rangeEnd.getTime() },
+  ];
+}
+
 export function buildRevenueTrend({
   invoices,
   clients,

@@ -8,7 +8,6 @@ import {
   useContractSend,
   useContractSign,
   useCreateContract,
-  useListContract,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -21,12 +20,32 @@ import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
 import { useActionNotice } from "../../ui/action-result";
 import { useWorkingEventId } from "../events/workingEvent";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import {
+  usePagedRows,
+  useRowsInStatuses,
+} from "../../lib/financeScopedQueries";
 
 const policy = new CrmLifecyclePolicy();
+// Not yet signed, expired or voided.
+const OPEN_STATUSES = ["draft", "sent", "viewed"];
 
 export function ContractsPage() {
   const workingId = useWorkingEventId();
-  const contracts = useListContract();
+  // Every unsigned contract (through the status index), and the newest
+  // finished ones a page at a time ("Load more" reads older ones).
+  const openContracts = useRowsInStatuses("contracts", OPEN_STATUSES);
+  const contractPages = usePagedRows("contracts");
+  const contracts =
+    openContracts === undefined || contractPages.rows === undefined
+      ? undefined
+      : [
+          ...new Map(
+            [...openContracts, ...contractPages.rows].map((row) => [
+              row._id,
+              row,
+            ]),
+          ).values(),
+        ];
   const clients = useClientDirectory();
   const events = usePickerAndNamedEvents([workingId]);
   const createContract = useCreateContract();
@@ -285,7 +304,9 @@ export function ContractsPage() {
             <p className="eyebrow">Agreements</p>
             <h2>Contracts</h2>
           </div>
-          <span>{visibleRows.length}</span>
+          <span>
+            {`${visibleRows.filter((row) => OPEN_STATUSES.includes(String(row.status))).length} open · ${visibleRows.filter((row) => !OPEN_STATUSES.includes(String(row.status))).length} closed shown`}
+          </span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />
@@ -350,6 +371,18 @@ export function ContractsPage() {
             </tbody>
           </table>
         )}
+        {contracts !== undefined && contractPages.canLoadMore ? (
+          <div className="px-4 py-3">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={contractPages.loadingMore}
+              onClick={contractPages.loadMore}
+            >
+              {contractPages.loadingMore ? "Loading…" : "Load older contracts"}
+            </button>
+          </div>
+        ) : null}
       </section>
     </div>
   );

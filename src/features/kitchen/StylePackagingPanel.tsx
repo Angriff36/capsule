@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import {
   useCreateStylePackaging,
   useListServiceStyle,
-  useListStylePackaging,
   useStylePackagingRemove,
   useStylePackagingRevise,
 } from "../../lib/manifest-convex-react";
+import { useStylePackagingRows } from "../../lib/recipeScopedQueries";
 import {
   packagingByStyle,
   type PackagingOwner,
@@ -54,7 +54,7 @@ export function StylePackagingPanel({
   onFailure: (error: unknown) => void;
 }) {
   const styles = useListServiceStyle() as ServiceStyleOption[] | undefined;
-  const rows = useListStylePackaging() as StylePackagingRow[] | undefined;
+  const rows = useStylePackagingRows(owner) as StylePackagingRow[] | undefined;
   const create = useCreateStylePackaging();
   const revise = useStylePackagingRevise();
   const remove = useStylePackagingRemove();

@@ -4,9 +4,9 @@ import {
   useCreateDishIngredient,
   useDishIngredientAdjustQuantity,
   useDishIngredientRemove,
-  useListDishIngredient,
   useListIngredient,
 } from "../../lib/manifest-convex-react";
+import { useDishIngredientRows } from "../../lib/recipeScopedQueries";
 import {
   SELECTABLE_UNITS,
   UNIT_OF_MEASURE,
@@ -36,7 +36,7 @@ type Props = {
  * Components, and those carry their own ingredients.
  */
 export function DishIngredientsPanel({ dishId }: Props) {
-  const lines = useListDishIngredient();
+  const lines = useDishIngredientRows(dishId);
   const ingredients = useListIngredient();
   const addLine = useCreateDishIngredient();
   const adjustQuantity = useDishIngredientAdjustQuantity();

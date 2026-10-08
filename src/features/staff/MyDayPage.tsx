@@ -4,17 +4,7 @@ import {
   useAvailabilityWindowWithdraw,
   useCreateAvailabilityWindow,
   useCreateTimeRecord,
-  useListAvailabilityWindow,
-  useListDelivery,
-  useListEventCloseout,
-  useListPackList,
-  useListPackListItem,
   useListPerson,
-  useListPrepTask,
-  useListPrepTaskDependency,
-  useListShift,
-  useListTimeRecord,
-  useListWeeklyScheduleNotice,
   usePackListItemMarkMissing,
   usePackListItemMarkPacked,
   usePrepTaskClaim,
@@ -26,10 +16,20 @@ import {
   useTimeRecordClockOut,
   useWeeklyScheduleNoticeAcknowledge,
   useEventAssignmentConfirm,
-  useListEventAssignment,
-  useListEventStaffNeed,
 } from "../../lib/manifest-convex-react";
-import { useEventsById } from "../facilities/useEventsById";
+import {
+  useDriverDeliveries,
+  useFieldCloseouts,
+  useMyDayPrep,
+  usePackForEvents,
+  usePersonActiveWindows,
+  usePersonOpenShifts,
+  usePersonScheduleNotices,
+  usePersonTimeRecords,
+  useShiftsByIds,
+  useStaffForEvents,
+} from "../../lib/workforceScopedQueries";
+import { useEventsById, useEventsInRange } from "../facilities/useEventsById";
 import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
 import { useDishesByIds } from "../../lib/useDishesByIds";
 import { MyShiftWorkDetails, shiftWorkDetails } from "./MyShiftWorkDetails";
@@ -106,23 +106,77 @@ export function MyDayPage() {
       ? JSON.stringify([user.id, authStatus.tenantId, authStatus.personId])
       : null;
   const people = useCachedRead("people", useListPerson(), offlineScope);
-  const shifts = useCachedRead("shifts", useListShift(), offlineScope);
+  // Only what this page shows: this person's coming shifts, their time for
+  // this month and the recent weeks of past shifts (older on request),
+  // today's prep, packing and drops, and the open shifts ahead.
+  const myPersonId = authStatus?.personId ?? undefined;
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const dayStart = todayStart.getTime();
+  const dayEnd = new Date(dayStart).setHours(23, 59, 59, 999);
+  // The month's hours and the six weeks the past-shift card opens with.
+  const recentFrom = Math.min(
+    new Date(todayStart.getFullYear(), todayStart.getMonth(), 1).getTime(),
+    new Date(dayStart).setDate(
+      todayStart.getDate() - ((todayStart.getDay() + 6) % 7) - 35,
+    ),
+  );
+  const [allPastShifts, setAllPastShifts] = useState(false);
+  const shifts = useCachedRead(
+    "shifts",
+    usePersonOpenShifts(myPersonId, dayStart),
+    offlineScope,
+  );
   const scheduleNotices = useCachedRead(
     "scheduleNotices",
-    useListWeeklyScheduleNotice(),
+    usePersonScheduleNotices(myPersonId, dayStart),
     offlineScope,
+  );
+  const recentRecords = usePersonTimeRecords(myPersonId, recentFrom);
+  const allRecords = usePersonTimeRecords(
+    allPastShifts ? myPersonId : undefined,
+    "all",
   );
   const records = useCachedRead(
     "timeRecords",
-    useListTimeRecord(),
+    allRecords ?? recentRecords,
     offlineScope,
   );
-  const tasks = useCachedRead("prepTasks", useListPrepTask(), offlineScope);
-  const prepLinks = useCachedRead(
-    "prepTaskDependencies",
-    useListPrepTaskDependency(),
+  // The planned shifts behind the time entries shown.
+  const recordShifts = useShiftsByIds(records?.map((row) => row.shiftId));
+  // Events this person works today: their shifts today and an open clock-in.
+  const workEventIds = useMemo(() => {
+    if (!myPersonId || shifts === undefined || records === undefined)
+      return undefined;
+    const ids = shifts
+      .filter(
+        (shift) =>
+          shift.deletedAt == null &&
+          shift.personId === myPersonId &&
+          ["scheduled", "started"].includes(String(shift.status)) &&
+          shift.eventId != null &&
+          shift.startsAt != null &&
+          shift.startsAt <= dayEnd &&
+          (shift.endsAt ?? shift.startsAt) >= dayStart,
+      )
+      .map((shift) => String(shift.eventId));
+    const open = records.find(
+      (row) =>
+        row.deletedAt == null &&
+        row.personId === myPersonId &&
+        String(row.status) === "open" &&
+        row.clockInAt != null,
+    );
+    if (open?.eventId) ids.push(String(open.eventId));
+    return ids;
+  }, [myPersonId, shifts, records, dayStart, dayEnd]);
+  const prep = useCachedRead(
+    "prep",
+    useMyDayPrep(myPersonId, workEventIds, dayEnd),
     offlineScope,
   );
+  const tasks = prep?.tasks;
+  const prepLinks = prep?.links;
   // Menu lines of the events with open prep tasks only, never every
   // event's (PL-SCALE).
   const openTaskEventIds = useMemo(
@@ -168,35 +222,48 @@ export function MyDayPage() {
   );
   const deliveries = useCachedRead(
     "deliveries",
-    useListDelivery(),
+    useDriverDeliveries(myPersonId, dayStart),
     offlineScope,
   );
   const closeouts = useCachedRead(
     "closeouts",
-    useListEventCloseout(),
+    useFieldCloseouts(dayStart),
     offlineScope,
   );
-  const packLists = useCachedRead("packLists", useListPackList(), offlineScope);
-  const packItems = useCachedRead(
-    "packItems",
-    useListPackListItem(),
+  const pack = useCachedRead(
+    "pack",
+    usePackForEvents(workEventIds),
     offlineScope,
   );
+  const packLists = pack?.packLists;
+  const packItems = pack?.packLines;
   const windows = useCachedRead(
     "availabilityWindows",
-    useListAvailabilityWindow(),
+    usePersonActiveWindows(myPersonId),
     offlineScope,
   );
-  const assignments = useCachedRead(
-    "eventAssignments",
-    useListEventAssignment(),
+  // Open shifts are posted on coming events; this person's own shifts may
+  // sit on an event that began before today.
+  const comingEvents = useEventsInRange(
+    myPersonId
+      ? { from: dayStart, to: Number.MAX_SAFE_INTEGER, withUndated: true }
+      : "skip",
+  );
+  const staffing = useCachedRead(
+    "eventStaffing",
+    useStaffForEvents(
+      comingEvents === undefined || shifts === undefined
+        ? undefined
+        : [
+            ...comingEvents.map((event) => event._id),
+            ...shifts.map((shift) => shift.eventId),
+          ],
+      myPersonId,
+    ),
     offlineScope,
   );
-  const staffNeeds = useCachedRead(
-    "eventStaffNeeds",
-    useListEventStaffNeed(),
-    offlineScope,
-  );
+  const assignments = staffing?.assignments;
+  const staffNeeds = staffing?.staffNeeds;
 
   const clockIn = useCreateTimeRecord();
   const clockOut = useTimeRecordClockOut();
@@ -325,8 +392,10 @@ export function MyDayPage() {
             ...eventDishes,
             ...packLists,
             ...deliveries,
+            ...(records ?? []),
           ].map((row) => row.eventId),
     [
+      records,
       shifts,
       tasks,
       eventDishes,
@@ -999,7 +1068,11 @@ export function MyDayPage() {
                 records={myRecords}
                 eventTitle={eventTitle}
                 plannedFor={(shiftId) =>
-                  (shifts ?? []).find((row) => row._id === shiftId) ?? null
+                  (recordShifts ?? []).find((row) => row._id === shiftId) ??
+                  null
+                }
+                onShowAll={
+                  allPastShifts ? undefined : () => setAllPastShifts(true)
                 }
               />
               <div data-testid="staff-schedule-notices">

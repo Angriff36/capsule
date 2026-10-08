@@ -5,9 +5,7 @@ import {
   useCreateComponent,
   useCreateComponentIngredient,
   useGetComponentImport,
-  useListComponentImport,
   useListComponent,
-  useListComponentImportLine,
   useListIngredient,
   useListServiceStyle,
 } from "../../../lib/manifest-convex-react";
@@ -35,6 +33,10 @@ import {
   confirmPendingOperation,
 } from "../../../lib/pendingOperationKey";
 import { isPlausibleConvexId } from "../../../lib/routeRecord";
+import {
+  useComponentImportLineRows,
+  useOpenComponentImports,
+} from "../../../lib/recipeScopedQueries";
 import { componentImportOutcome } from "../culinaryRecovery";
 import {
   ImportSourceReadinessChecker,
@@ -71,6 +73,8 @@ const RESUMABLE_STATUSES: ReadonlySet<string> = new Set([
 
 type MobilePane = "source" | "review";
 
+const NO_LINES: never[] = [];
+
 export function ComponentImportPage() {
   const importComponent = useImportComponentSafely();
   const createReviewMutation = useCreateComponentImportReview();
@@ -83,17 +87,20 @@ export function ComponentImportPage() {
   const components = useListComponent();
   const serviceStyles = useListServiceStyle() as
     ServiceStyleOption[] | undefined;
-  const allImports = useListComponentImport();
-  const allImportLines = useListComponentImportLine();
+  // Imports still in progress, short rows only (never every import's text).
+  const allImports = useOpenComponentImports();
   // Generated id queries throw on malformed ids, so an implausible ?importId
   // never reaches the server — it renders the page's own unavailable state.
   const importIdUsable =
     importIdParam != null && isPlausibleConvexId(importIdParam);
+  // This import's lines only.
+  const importLines = useComponentImportLineRows(
+    importIdUsable ? importIdParam : null,
+  );
+  const allImportLines = importIdUsable ? importLines : NO_LINES;
   const storedImport = useGetComponentImport(
     importIdUsable ? importIdParam : "skip",
   );
-  // Culinary features use generated hooks only (integration guard), so the
-  // import's lines are the tenant list filtered to this import.
   const storedLines = useMemo(() => {
     if (importIdParam == null) return [];
     if (allImportLines === undefined) return undefined;
@@ -179,12 +186,11 @@ export function ComponentImportPage() {
     [components],
   );
 
+  // The server keeps the same rule: live, resumable, newest change, eight.
   const resumableImports = useMemo(
     () =>
       (allImports ?? [])
-        .filter(
-          (row) => row.deletedAt == null && RESUMABLE_STATUSES.has(row.status),
-        )
+        .filter((row) => RESUMABLE_STATUSES.has(row.status))
         .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0))
         .slice(0, 8),
     [allImports],

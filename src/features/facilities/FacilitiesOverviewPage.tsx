@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import {
   useListEquipment,
-  useListEquipmentMaintenanceTask,
   useListVenue,
   useListVenueLayoutTemplate,
 } from "../../lib/manifest-convex-react";
@@ -16,6 +15,7 @@ import {
 } from "../../ui/primitives";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 import { RentalReportCard } from "./RentalReportCard";
+import { useMaintenanceDueWithin } from "./useFacilitiesHistory";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const SOON_MS = 7 * DAY_MS;
@@ -33,7 +33,8 @@ type AttentionRow = {
 export function FacilitiesOverviewPage() {
   const venues = useListVenue();
   const equipment = useListEquipment();
-  const maintenanceTasks = useListEquipmentMaintenanceTask();
+  // Only the tasks due soon or overdue: the attention list and the count.
+  const maintenanceTasks = useMaintenanceDueWithin(SOON_MS);
   const layoutTemplates = useListVenueLayoutTemplate();
 
   const isLoading =

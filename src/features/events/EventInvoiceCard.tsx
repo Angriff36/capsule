@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useListInvoice } from "../../lib/manifest-convex-react";
+import { useEventInvoices } from "../../lib/useEventAreaRows";
 import { formatMoney } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { formatInvoiceNumber } from "../finance/invoiceNumberDisplay";
@@ -30,7 +30,7 @@ export function EventInvoiceCard({
   readonly eventId: string;
   readonly currencyCode: string;
 }) {
-  const invoices = useListInvoice();
+  const invoices = useEventInvoices(eventId);
   const loading = invoices === undefined;
   const rows = (invoices ?? [])
     .filter((row) => row.deletedAt == null && String(row.eventId) === eventId)

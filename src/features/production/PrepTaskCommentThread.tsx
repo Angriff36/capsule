@@ -2,9 +2,9 @@ import { useUser } from "@clerk/react";
 import { useMemo, useState, type FormEvent } from "react";
 import {
   useCreatePrepTaskComment,
-  useListPrepTaskComment,
   useListPerson,
 } from "../../lib/manifest-convex-react";
+import { usePrepTaskComments } from "../../lib/productionScopedQueries";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 
 const CATEGORY_LABEL: Record<string, string> = {
@@ -78,7 +78,8 @@ function personForComment(
 export function PrepTaskCommentThread({ task }: { task: PrepTaskLike }) {
   const { user } = useUser();
   const authStatus = useAuthStatus();
-  const comments = useListPrepTaskComment();
+  // This task's comments only, never every comment of the company.
+  const comments = usePrepTaskComments(task._id);
   const people = useListPerson();
   const createComment = useCreatePrepTaskComment();
 

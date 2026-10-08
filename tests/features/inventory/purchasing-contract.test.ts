@@ -88,16 +88,19 @@ function fixture() {
   ]);
   backend.values.set("useListVendorOrderLineDemand", [
     {
+      vendorOrderId: "order-week",
       vendorOrderLineId: "line-flour",
       ingredientDemandId: "demand-lunch",
       deletedAt: null,
     },
     {
+      vendorOrderId: "order-week",
       vendorOrderLineId: "line-flour",
       ingredientDemandId: "demand-gala",
       deletedAt: null,
     },
     {
+      vendorOrderId: "order-week",
       vendorOrderLineId: "line-oil",
       ingredientDemandId: "demand-gala-oil",
       deletedAt: null,

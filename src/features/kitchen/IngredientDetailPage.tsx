@@ -9,11 +9,13 @@ import {
   useIngredientReinstate,
   useIngredientSetPreferredVendors,
   useListIngredient,
-  useListIngredientPriceObservation,
   useListComponent,
-  useListComponentIngredient,
   useListVendor,
 } from "../../lib/manifest-convex-react";
+import {
+  useIngredientComponentLineRows,
+  useIngredientPriceRows,
+} from "../../lib/recipeScopedQueries";
 import { formatCountNoun, formatMoneyExact } from "../../lib/format";
 import { useTrackRecent } from "../../lib/recents";
 import { useRouteRecord } from "../../lib/routeRecord";
@@ -308,10 +310,11 @@ export function IngredientDetailPage() {
   const ingredient = useRouteRecord(useGetIngredient, id);
   useTrackRecent("Ingredient", ingredient?.name);
   const components = useListComponent();
-  const lines = useListComponentIngredient();
+  // This ingredient's recipe lines and prices only, never the whole lists.
+  const lines = useIngredientComponentLineRows(ingredient?._id);
   const ingredients = useListIngredient();
   const vendors = useListVendor();
-  const priceObservations = useListIngredientPriceObservation();
+  const priceObservations = useIngredientPriceRows(ingredient?._id);
   const purge = useIngredientPurge();
   const reinstate = useIngredientReinstate();
   const discontinue = useIngredientDiscontinue();

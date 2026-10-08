@@ -135,7 +135,7 @@ describe("plain words on workforce UI", () => {
     }
 
     for (const fresh of [
-      'formatCountNoun(activeCompletions.length, "completion")',
+      'formatCountNoun(completionCounts?.total ?? 0, "completion")',
       'formatCountNoun(recordedReviews.length, "review")',
       'formatCountNoun(liveCandidates.length, "candidate")',
       'formatCountNoun(rows.length, "scorecard")',

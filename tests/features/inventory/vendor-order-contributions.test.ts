@@ -57,6 +57,7 @@ function fixture() {
   backend.values.set("useListVendorOrderLineDemand", [
     {
       _id: "link-lunch",
+      vendorOrderId: orderId,
       vendorOrderLineId: "line-flour",
       ingredientDemandId: "demand-lunch",
       deletedAt: null,
@@ -64,6 +65,7 @@ function fixture() {
     },
     {
       _id: "link-gala",
+      vendorOrderId: orderId,
       vendorOrderLineId: "line-flour",
       ingredientDemandId: "demand-gala",
       deletedAt: null,

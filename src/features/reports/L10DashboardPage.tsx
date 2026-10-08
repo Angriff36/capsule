@@ -1,9 +1,6 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
-  useListLead,
-  useListProposal,
-  useListEventCloseout,
   useListLeadershipItem,
   useListPerson,
   useListScorecardTarget,
@@ -37,6 +34,10 @@ import {
   type LeadershipItemRow,
 } from "./leadershipHistory";
 import { useEventsInRange } from "../facilities/useEventsById";
+import {
+  useCloseoutsInRange,
+  useLeadsInRange,
+} from "@/lib/financeScopedQueries";
 import { LeadershipItemsPanel } from "./LeadershipItemsPanel";
 import type { ScorecardPerson } from "./ScorecardTargetEditor";
 
@@ -72,9 +73,9 @@ export function L10DashboardPage() {
     return { from, to };
   }, [now]);
   const events = useEventsInRange(eventWindow);
-  const leads = useListLead();
-  const proposals = useListProposal();
-  const closeouts = useListEventCloseout();
+  // Leads and closeouts of the same weeks and months, and the leads' proposals.
+  const { leads, proposals } = useLeadsInRange(eventWindow);
+  const closeouts = useCloseoutsInRange(eventWindow);
   const items = useListLeadershipItem();
   const targets = useListScorecardTarget();
   const people = useListPerson();

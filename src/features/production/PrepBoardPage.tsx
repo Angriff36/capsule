@@ -1,14 +1,10 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreatePrepTask,
   useCreatePrepTaskDependency,
   useCreateQualityCheck,
   useListIngredient,
-  useListPrepTask,
-  useListPrepTaskComment,
-  useListPrepTaskDependency,
-  useListQualityCheck,
   usePrepTaskCancel,
   usePrepTaskClaim,
   usePrepTaskComplete,
@@ -31,6 +27,7 @@ import { useOptimisticStatus } from "../../ui/useOptimisticStatus";
 import { useEventsById, useEventsInRange } from "../facilities/useEventsById";
 import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
 import { useDishesByIds } from "../../lib/useDishesByIds";
+import { usePrepWork } from "../../lib/productionScopedQueries";
 
 const DAY = 86_400_000;
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
@@ -86,9 +83,6 @@ interface ReasonRequest {
 }
 
 export function PrepBoardPage() {
-  const tasks = useListPrepTask();
-  const dependencies = useListPrepTaskDependency();
-  const checks = useListQualityCheck();
   // Menu lines of the next 60 days' events (the new-task list) and of the
   // events the tasks belong to, never every event's (PL-SCALE).
   const [today] = useState(() => new Date().setHours(0, 0, 0, 0));
@@ -96,6 +90,22 @@ export function PrepBoardPage() {
     from: today - DAY,
     to: today + 60 * DAY,
   });
+  // Every open prep task and the rest of those events' work, with their
+  // links, checks and comments. Finished work of earlier events loads a
+  // week at a time when asked; never every prep task the company ever had.
+  const [weeksBack, setWeeksBack] = useState(0);
+  const latestWork = useRef<ReturnType<typeof usePrepWork>>(undefined);
+  const fetchedWork = usePrepWork(
+    weeksBack === 0
+      ? {}
+      : { from: today - weeksBack * 7 * DAY, to: today + DAY },
+  );
+  if (fetchedWork !== undefined) latestWork.current = fetchedWork;
+  // Keep the board on screen while an earlier week loads.
+  const work = fetchedWork ?? (weeksBack > 0 ? latestWork.current : undefined);
+  const tasks = work?.tasks;
+  const dependencies = work?.dependencies;
+  const checks = work?.checks;
   const lineEventIds = useMemo(
     () =>
       tasks === undefined || upcoming === undefined
@@ -139,7 +149,7 @@ export function PrepBoardPage() {
     ),
   );
   const ingredients = useListIngredient();
-  const comments = useListPrepTaskComment();
+  const comments = work?.comments;
   const createTask = useCreatePrepTask();
   const createDependency = useCreatePrepTaskDependency();
   const claim = usePrepTaskClaim();
@@ -680,6 +690,20 @@ export function PrepBoardPage() {
           <span>
             {activeTasks.length}{" "}
             {activeTasks.length === 1 ? "task line" : "task lines"}
+            {isLoading ? null : (
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm ml-2"
+                disabled={fetchedWork === undefined}
+                onClick={() => setWeeksBack((weeks) => weeks + 1)}
+              >
+                {fetchedWork === undefined
+                  ? "Loading…"
+                  : weeksBack === 0
+                    ? "Show finished work from the past week"
+                    : "Show one more week"}
+              </button>
+            )}
           </span>
         </div>
         {isLoading ? (

@@ -6,13 +6,8 @@ import {
   useGetComponent,
   useGetPrepTask,
   useGetEvent,
-  useListComponentImport,
-  useListDishComponent,
   useListIngredient,
-  useListIngredientPriceObservation,
   useListItemUnitMapping,
-  useListComponentIngredient,
-  useListComponentSnapshot,
   useComponentIngredientAdjustQuantity,
   useComponentIngredientRemove,
   useComponentIngredientSetWasteFactor,
@@ -49,6 +44,13 @@ import {
 import { calculateComponentCost } from "./ComponentCostCalculator";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import { useDishesByIds } from "../../lib/useDishesByIds";
+import {
+  useComponentDishLineRows,
+  useComponentIngredientRows,
+  useComponentSnapshotRows,
+  useComponentSourceImportRows,
+  useLatestIngredientPriceRows,
+} from "../../lib/recipeScopedQueries";
 import { ComponentCostPanel } from "./ComponentCostPanel";
 import {
   calculateComponentNutrition,
@@ -110,10 +112,14 @@ export function ComponentDetailPage() {
   );
   useTrackRecent("Recipe", component?.name);
   const ingredients = useListIngredient();
-  const priceObservations = useListIngredientPriceObservation();
   const itemUnitMappings = useListItemUnitMapping();
-  const lines = useListComponentIngredient();
-  const dishComponents = useListDishComponent();
+  // This recipe's lines, dish uses, saved versions, source import and the
+  // latest price of each of its ingredients only, never the company's whole lists.
+  const lines = useComponentIngredientRows(component?._id);
+  const priceObservations = useLatestIngredientPriceRows(
+    lines?.map((line) => line.ingredientId),
+  );
+  const dishComponents = useComponentDishLineRows(component?._id);
   // Only the dishes that use this recipe, never the whole dish list.
   const dishes = useDishesByIds(
     component == null || dishComponents === undefined
@@ -138,12 +144,11 @@ export function ComponentDetailPage() {
   // not the entity-command hook which targets an existing doc via docId.
   const captureSnapshot = useCreateComponentSnapshot();
   const restoreSnapshotCommand = useRestoreComponentSnapshotSafely();
-  const snapshots = useListComponentSnapshot();
+  const snapshots = useComponentSnapshotRows(component?._id);
   // Completed-import provenance: the original source this component came
   // from. Older native components have none — absence is not an error.
-  // Culinary features use generated hooks only (integration guard), so the
-  // tenant's imports are filtered to this component's completed import.
-  const allImports = useListComponentImport();
+  // The imports that produced this component, filtered to its completed one.
+  const allImports = useComponentSourceImportRows(component?._id);
   const sourceImport = useMemo(() => {
     const rows = (allImports ?? []).filter(
       (row: {

@@ -1,16 +1,15 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
-  useListLead,
   useListPerson,
   useListReferralSource,
   useListVenue,
-  useListVenueNote,
 } from "../../lib/manifest-convex-react";
 import { formatDate } from "../../lib/format";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 import { venueDetailPath } from "./facilitiesRoutes";
-import { useAllEventReportRows } from "./useEventsById";
+import { useVenueScorecardEvents } from "./useLogisticsWindow";
+import { useVenueLeads, useVenuesNotes } from "./useFacilitiesHistory";
 import { handoffStatus, ownerProblem } from "./venueHandoff";
 import { problemStatus } from "./venueEscalation";
 import { onboardingStatus } from "./venueOnboarding";
@@ -36,10 +35,19 @@ const money = (value: number) =>
 export function VenuePartnersPage() {
   const venues = useListVenue();
   const people = useListPerson();
-  const notes = useListVenueNote();
   const sources = useListReferralSource();
-  const leads = useListLead();
-  const events = useAllEventReportRows();
+  // Only the leads sent through venue-linked lead sources.
+  const leads = useVenueLeads(sources);
+  // The partner venues' events of the last two years and their notes only.
+  const partnerIds = useMemo(
+    () =>
+      venues
+        ?.filter((venue) => venue.deletedAt == null && venue.partnerTier)
+        .map((venue) => String(venue._id)),
+    [venues],
+  );
+  const notes = useVenuesNotes(partnerIds);
+  const events = useVenueScorecardEvents(partnerIds);
 
   const rows = useMemo(() => {
     const now = Date.now();

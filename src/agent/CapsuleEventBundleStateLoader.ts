@@ -40,42 +40,38 @@ export class CapsuleEventBundleStateLoader {
     this.injectedClient = client ?? null;
   }
 
-  async loadDirectory(): Promise<CapsuleEventBundleDirectory> {
+  /**
+   * The bundle's own invoice, payments, proposal and vendor orders (found by
+   * the bundle's number, `identity`, and the event it attaches to), not the
+   * company's whole history of each.
+   */
+  async loadDirectory(
+    identity: string,
+    eventId?: string,
+  ): Promise<CapsuleEventBundleDirectory> {
     const client = await this.resolveClient();
-    const [
-      organizations,
-      people,
-      vendors,
-      ingredients,
-      invoices,
-      payments,
-      proposals,
-      vendorOrders,
-      proposalLines,
-      vendorOrderLines,
-    ] = await Promise.all([
-      client.query(api.queries.listOrganization, {}),
-      client.query(api.queries.listPerson, {}),
-      client.query(api.queries.listVendor, {}),
-      client.query(api.queries.listIngredient, {}),
-      client.query(api.queries.listInvoice, {}),
-      client.query(api.queries.listPayment, {}),
-      client.query(api.queries.listProposal, {}),
-      client.query(api.queries.listVendorOrder, {}),
-      client.query(api.queries.listProposalLineItem, {}),
-      client.query(api.queries.listVendorOrderLine, {}),
-    ]);
+    const [organizations, people, vendors, ingredients, records] =
+      await Promise.all([
+        client.query(api.queries.listOrganization, {}),
+        client.query(api.queries.listPerson, {}),
+        client.query(api.queries.listVendor, {}),
+        client.query(api.queries.listIngredient, {}),
+        client.query(
+          api.agentHistoryWindow.bundleDirectory,
+          eventId === undefined ? { identity } : { identity, eventId },
+        ) as Promise<Partial<Record<string, unknown>> | null>,
+      ]);
     return mapBundleDirectory({
       organizations,
       people,
       vendors,
       ingredients,
-      invoices,
-      payments,
-      proposals,
-      vendorOrders,
-      proposalLines,
-      vendorOrderLines,
+      invoices: records?.invoices,
+      payments: records?.payments,
+      proposals: records?.proposals,
+      vendorOrders: records?.vendorOrders,
+      proposalLines: records?.proposalLines,
+      vendorOrderLines: records?.vendorOrderLines,
     });
   }
 
@@ -137,40 +133,54 @@ export class CapsuleEventBundleStateLoader {
     eventId: string,
   ): Promise<CapsuleEventBundleExistingEvent> {
     const client = await this.resolveClient();
-    // Only the event's own client is read (for its email and phone), not the
-    // whole client book.
-    const eventClient = async (events: unknown) => {
-      const event = rows(events).find((row) => String(row._id) === eventId);
-      const clientId = event?.clientId ? String(event.clientId) : "";
-      if (!clientId) return [];
-      const row = await client.query(api.queries.getClient, { id: clientId });
-      return row ? [row] : [];
-    };
+    // Only this event and its own rows are read: its client (for email and
+    // phone) and that client's contacts, its dishes, timeline, prep tasks,
+    // pack lists and their items, and its staff — not the company's whole
+    // history of each. Dishes and venues are the menu and venue books.
+    const event = await client.query(api.queries.getEvent, { id: eventId });
+    const events = event ? [event] : [];
+    const clientId =
+      event && typeof event === "object" && "clientId" in event
+        ? String((event as Row).clientId ?? "")
+        : "";
     const [
-      [events, clients],
+      clients,
       clientContacts,
       eventDishes,
       dishes,
       timeline,
       prepTasks,
       packLists,
-      packListItems,
       assignments,
       venues,
     ] = await Promise.all([
-      client
-        .query(api.queries.listEvent, {})
-        .then(async (events) => [events, await eventClient(events)] as const),
-      client.query(api.queries.listClientContact, {}),
-      client.query(api.queries.listEventDish, {}),
+      clientId
+        ? client
+            .query(api.queries.getClient, { id: clientId })
+            .then((row) => (row ? [row] : []))
+        : [],
+      clientId
+        ? client.query(api.queries.listClientContactByClientId, { clientId })
+        : [],
+      client.query(api.queries.listEventDishByEventId, { eventId }),
       client.query(api.queries.listDish, {}),
-      client.query(api.queries.listEventTimelineActivity, {}),
-      client.query(api.queries.listPrepTask, {}),
-      client.query(api.queries.listPackList, {}),
-      client.query(api.queries.listPackListItem, {}),
-      client.query(api.queries.listEventAssignment, {}),
+      client.query(api.queries.listEventTimelineActivityByEventId, { eventId }),
+      client.query(api.queries.listPrepTaskByEventId, { eventId }),
+      client.query(api.queries.listPackListByEventId, { eventId }),
+      client.query(api.queries.listEventAssignmentByEventId, { eventId }),
       client.query(api.queries.listVenue, {}),
     ]);
+    const packListItems = (
+      await Promise.all(
+        rows(packLists)
+          .filter(live)
+          .map((list) =>
+            client.query(api.queries.listPackListItemByPackListId, {
+              packListId: String(list._id),
+            }),
+          ),
+      )
+    ).flatMap(rows);
     return mapBundleExistingEvent(eventId, {
       events,
       clients,

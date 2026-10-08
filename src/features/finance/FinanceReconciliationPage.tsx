@@ -1,9 +1,6 @@
 import { useMemo, useState } from "react";
-import {
-  useCreateSavedReportDefinition,
-  useListInvoice,
-  useListPayment,
-} from "../../lib/manifest-convex-react";
+import { useCreateSavedReportDefinition } from "../../lib/manifest-convex-react";
+import { useAllRowsOnRequest } from "../../lib/financeScopedQueries";
 import { useExternalRecordLinksFor } from "../../lib/useExternalRecordLinkLists";
 import {
   buildFinanceReconciliation,
@@ -39,8 +36,11 @@ function endOfDay(value: string): number | null {
 export function FinanceReconciliationPage() {
   // Only payment rows: the full link list is too long for one read.
   const links = useExternalRecordLinksFor({ recordTypes: ["payment"] });
-  const payments = useListPayment();
-  const invoices = useListInvoice();
+  // The check covers every Capsule payment ever recorded, so the ledger is
+  // read only when the user asks for the check.
+  const [requested, setRequested] = useState(false);
+  const payments = useAllRowsOnRequest("payments", requested);
+  const invoices = useAllRowsOnRequest("invoices", requested);
   const saveReport = useCreateSavedReportDefinition();
   const { notice, setNotice } = useActionNotice();
   const { error, setError } = useActionFailure();
@@ -142,7 +142,15 @@ export function FinanceReconciliationPage() {
         </button>
       </div>
       <div className="mt-4">
-        {loading ? (
+        {!requested ? (
+          <button
+            type="button"
+            className="btn btn-primary btn-sm"
+            onClick={() => setRequested(true)}
+          >
+            Run the money check
+          </button>
+        ) : loading ? (
           <TableSkeleton rows={6} />
         ) : (
           <ReconciliationTables

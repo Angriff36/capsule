@@ -1,10 +1,9 @@
 import { useUser } from "@clerk/react";
+import { useQuery } from "convex/react";
 import { useMemo, useState } from "react";
-import {
-  useCreateAnnouncementDismissal,
-  useListAnnouncement,
-  useListAnnouncementDismissal,
-} from "../../lib/manifest-convex-react";
+import { api } from "../../lib/api";
+import { useCreateAnnouncementDismissal } from "../../lib/manifest-convex-react";
+import { useActiveAnnouncements } from "../../lib/workforceHistoryQueries";
 import { XIcon } from "../../ui/icons";
 
 type CategoryStyle = {
@@ -51,8 +50,13 @@ const dateFormat = new Intl.DateTimeFormat(undefined, {
  */
 export function AnnouncementBanner() {
   const { user } = useUser();
-  const announcements = useListAnnouncement();
-  const dismissals = useListAnnouncementDismissal();
+  // Only the announcements not yet expired, never every one ever posted.
+  const announcements = useActiveAnnouncements();
+  // This member's own dismissals only, never every member's.
+  const dismissals = useQuery(
+    api.queries.listAnnouncementDismissalByAuthSubjectId,
+    user?.id ? { authSubjectId: user.id } : "skip",
+  );
   const createDismissal = useCreateAnnouncementDismissal();
   const [closing, setClosing] = useState<ReadonlySet<string>>(new Set());
   const [closeError, setCloseError] = useState<string | null>(null);

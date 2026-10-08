@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react";
 import {
   useListComponent,
-  useListProductionBatch,
-  useListProductionBatchAllocation,
   useProductionBatchAllocationMarkPortioned,
 } from "../../lib/manifest-convex-react";
+import { useBatchShares } from "../../lib/productionScopedQueries";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { useEventsById } from "../facilities/useEventsById";
 import { ProductionFailureBanner } from "./ProductionFailureBanner";
@@ -17,8 +16,14 @@ const PORTIONABLE = "produced";
  * separate step this panel gives the floor.
  */
 export function BatchAllocationsPanel() {
-  const allocations = useListProductionBatchAllocation();
-  const batches = useListProductionBatch();
+  // Live shares with their batch, newest first, a page at a time; older
+  // ones load when the cook asks.
+  const shares = useBatchShares();
+  const allocations = shares.shares;
+  const batches = useMemo(
+    () => allocations?.map((row) => row.batch),
+    [allocations],
+  );
   const components = useListComponent();
   const eventIds = useMemo(
     () =>
@@ -133,6 +138,16 @@ export function BatchAllocationsPanel() {
           );
         })}
       </ul>
+      {shares.canLoadMore || shares.loadingMore ? (
+        <button
+          type="button"
+          className="kds-secondary"
+          disabled={shares.loadingMore}
+          onClick={shares.loadMore}
+        >
+          {shares.loadingMore ? "Loading…" : "Load more"}
+        </button>
+      ) : null}
     </section>
   );
 }

@@ -93,6 +93,7 @@ export const docsByIds = query({
 /** A busy year for a large caterer is a few thousand events. */
 export const RANGE_CAP = 3000;
 const UNDATED_CAP = 300;
+const RUNNING_IN_DAYS = 14;
 
 /**
  * Live events that start in [from, to), oldest first, at most RANGE_CAP
@@ -106,6 +107,7 @@ export const range = query({
     from: v.number(),
     to: v.number(),
     withUndated: v.optional(v.boolean()),
+    runningIn: v.optional(v.boolean()),
   },
   handler: async (
     ctx,
@@ -128,6 +130,7 @@ export const rangeDocs = query({
     from: v.number(),
     to: v.number(),
     withUndated: v.optional(v.boolean()),
+    runningIn: v.optional(v.boolean()),
   },
   handler: async (
     ctx,
@@ -235,9 +238,15 @@ async function readRange(
     from,
     to,
     withUndated,
-  }: { from: number; to: number; withUndated?: boolean },
+    runningIn,
+  }: {
+    from: number;
+    to: number;
+    withUndated?: boolean;
+    runningIn?: boolean;
+  },
 ): Promise<{ docs: Doc<"events">[]; capped: boolean }> {
-  const [dated, none, missing] = await Promise.all([
+  const [dated, none, missing, earlier] = await Promise.all([
     ctx.db
       .query("events")
       .withIndex("by_tenantId_and_startsAt", (q) =>
@@ -260,11 +269,34 @@ async function readRange(
           )
           .take(UNDATED_CAP)
       : Promise.resolve([]),
+    // `runningIn`: also the jobs that started before `from` and are still
+    // running on the days shown (end at or after `from`). A job runs for days,
+    // not weeks, so ends up to RUNNING_IN_DAYS past `to` are enough.
+    runningIn
+      ? ctx.db
+          .query("events")
+          .withIndex("by_tenantId_and_endsAt", (q) =>
+            q
+              .eq("tenantId", tenantId)
+              .gte("endsAt", from)
+              .lt("endsAt", to + RUNNING_IN_DAYS * DAY),
+          )
+          .take(RANGE_CAP + 1)
+      : Promise.resolve([]),
   ]);
-  const docs = [...dated.slice(0, RANGE_CAP), ...none, ...missing].filter(
-    (e) => e.deletedAt == null,
+  const startedBefore = earlier.filter(
+    (e) => e.startsAt != null && e.startsAt < from,
   );
-  return { docs, capped: dated.length > RANGE_CAP };
+  const docs = [
+    ...startedBefore,
+    ...dated.slice(0, RANGE_CAP),
+    ...none,
+    ...missing,
+  ].filter((e) => e.deletedAt == null);
+  return {
+    docs,
+    capped: dated.length > RANGE_CAP || earlier.length > RANGE_CAP,
+  };
 }
 
 /**

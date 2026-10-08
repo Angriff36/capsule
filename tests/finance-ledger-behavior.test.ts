@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { createElement } from "react";
 import { Route, Routes } from "react-router-dom";
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
 import {
   backend,
   container,
@@ -10,6 +10,14 @@ import {
   button,
   click,
 } from "./support/mounted-app";
+// Scoped and paged reads answer from the rows the test gives each table's
+// generated list hook.
+vi.mock("../src/lib/financeScopedQueries", async () => {
+  const { financeScopedMock, fromListHooks } =
+    await import("./helpers/financeScopedQueriesMock");
+  const { backend } = await import("./support/mounted-app");
+  return financeScopedMock(fromListHooks(backend.values));
+});
 import { InvoicesPage } from "../src/features/finance/InvoicesPage";
 import { InvoiceDetailPage } from "../src/features/finance/InvoiceDetailPage";
 import { PaymentsPage } from "../src/features/finance/PaymentsPage";
@@ -122,7 +130,7 @@ it("updates invoice-detail send eligibility with the live balance and links to t
   });
 });
 
-it("shows the hidden settled total and reveals the actual payments in one click", async () => {
+it("opens on open payments only and reveals the settled ones in one click", async () => {
   backend.values.set("useListPayment", [
     {
       _id: "payment-a",
@@ -143,17 +151,18 @@ it("shows the hidden settled total and reveals the actual payments in one click"
     { _id: invoiceId, invoiceNumber: "INV-204" },
   ]);
   await mount(createElement(PaymentsPage));
-  expect(container.textContent).toContain("0 open · 2 settled");
-  expect(container.textContent).toContain("2 completed payments");
-  expect(container.textContent).toContain("$15,300.00");
+  // Settled payments are history: nothing about them is read until the
+  // user asks, so no settled count or total shows on opening.
+  expect(container.textContent).toContain("0 open");
+  expect(container.textContent).not.toContain("$15,300.00");
   expect(container.querySelectorAll("tbody tr")).toHaveLength(0);
   await click(
     button(
-      "Show 2 settled payments",
+      "Show settled payments",
       container.querySelector(".document-empty")!,
     ),
   );
-  expect(container.textContent).toContain("2 payments");
+  expect(container.textContent).toContain("0 open · 2 settled shown");
   const rows = [...container.querySelectorAll("tbody tr")];
   expect(rows).toHaveLength(2);
   expect(rows[0].textContent).toContain("INV-204");

@@ -1,8 +1,6 @@
-import { useMemo } from "react";
-import {
-  useListRevenueAttribution,
-  useListPerson,
-} from "@/lib/manifest-convex-react";
+import { useMemo, useState } from "react";
+import { useListPerson } from "@/lib/manifest-convex-react";
+import { useAllRowsOnRequest, useWindowRows } from "@/lib/financeScopedQueries";
 import { useEventsById } from "../facilities/useEventsById";
 import {
   DashboardGrid,
@@ -18,9 +16,24 @@ import { calculateCommissionMetrics } from "./compMasterValues";
 import { MetricDefinitionList } from "./MetricDefinitionList";
 
 const LOADING = "Loading…";
+const NOT_ASKED = "Show all-time to see";
 
 export function CompMasterDashboardPage() {
-  const attributions = useListRevenueAttribution();
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).getTime();
+  // This month's applied splits by default; every split only when the user
+  // asks for the all-time figures.
+  const [showAllTime, setShowAllTime] = useState(false);
+  const monthAttributions = useWindowRows("revenueAttributions", {
+    fields: ["appliedAt"],
+    ranges: [{ from: monthStart, to: monthEnd }],
+  });
+  const allAttributions = useAllRowsOnRequest(
+    "revenueAttributions",
+    showAllTime,
+  );
+  const attributions = showAllTime ? allAttributions : monthAttributions;
   const people = useListPerson();
   const eventIds = useMemo(
     () =>
@@ -39,12 +52,9 @@ export function CompMasterDashboardPage() {
       ),
     [events],
   );
-  const now = new Date();
-  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-  const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).getTime();
   const allTime = useMemo(
     () =>
-      events && attributions && people
+      showAllTime && events && attributions && people
         ? calculateCommissionMetrics({
             periodStart: Number.NEGATIVE_INFINITY,
             periodEnd: Number.POSITIVE_INFINITY,
@@ -53,7 +63,7 @@ export function CompMasterDashboardPage() {
             attributions,
           })
         : null,
-    [events, attributions, people, cancelledEventIds],
+    [showAllTime, events, attributions, people, cancelledEventIds],
   );
   const thisMonth = useMemo(
     () =>
@@ -109,7 +119,8 @@ export function CompMasterDashboardPage() {
         <StatCard
           title="Applied Commission"
           main={{
-            value: allTime?.totalCommission ?? LOADING,
+            value:
+              allTime?.totalCommission ?? (showAllTime ? LOADING : NOT_ASKED),
             format: "currency" as const,
           }}
           rows={[
@@ -147,7 +158,9 @@ export function CompMasterDashboardPage() {
         <StatCard
           title="Salespeople"
           main={{
-            value: allTime?.salespeople.length ?? LOADING,
+            value:
+              allTime?.salespeople.length ??
+              (showAllTime ? LOADING : NOT_ASKED),
             format: "number" as const,
           }}
           rows={[{ label: "Basis", value: "Applied allocations" }]}
@@ -162,7 +175,7 @@ export function CompMasterDashboardPage() {
       title: "Applied Commission by Salesperson",
       content: (
         <BarChart
-          data={(allTime?.salespeople ?? []).map((person) => ({
+          data={((allTime ?? thisMonth)?.salespeople ?? []).map((person) => ({
             salesperson: person.name,
             commission: person.commission,
           }))}
@@ -225,7 +238,7 @@ export function CompMasterDashboardPage() {
         title="Comp Master Dashboard"
         lead="Applied sales commission allocations, taken straight from revenue attribution."
       />
-      {attributions?.length === 0 ? (
+      {showAllTime && attributions?.length === 0 ? (
         <div data-testid="dashboard-empty">
           <EmptyState
             title="No commission applied yet"
@@ -233,6 +246,15 @@ export function CompMasterDashboardPage() {
           />
         </div>
       ) : null}
+      {showAllTime ? null : (
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm mb-4"
+          onClick={() => setShowAllTime(true)}
+        >
+          Show all-time commission
+        </button>
+      )}
       <DashboardGrid items={dashboardItems} />
       <div className="mt-6 rounded-sm border border-line bg-panel p-4">
         <h4 className="text-xs font-semibold text-ink">

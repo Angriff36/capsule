@@ -5,8 +5,6 @@ import {
   useCreateIngredientDemand,
   useIngredientDemandFulfill,
   useListIngredient,
-  useListIngredientDemand,
-  useListPurchaseNeed,
 } from "../../lib/manifest-convex-react";
 import { useApplyDemandSupersede } from "../../lib/culinaryDemandClient";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
@@ -27,20 +25,40 @@ import { useWorkingEventId } from "../events/workingEvent";
 import { IngredientDemandProvenancePanel } from "./IngredientDemandProvenancePanel";
 import { DemandChangePreviewDialog } from "./DemandChangePreviewDialog";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import { useEventsInRange } from "../facilities/useEventsById";
+import {
+  useDemandHistory,
+  useDemandsForEvents,
+} from "../facilities/useInventoryWindow";
 import { DemandLedgerCreateForm, DEMAND_UNITS } from "./DemandLedgerCreateForm";
 import { DemandLedgerMasthead } from "./DemandLedgerMasthead";
 
 const policy = new SupplyLifecyclePolicy();
 const UNITS = DEMAND_UNITS;
+const DAY_MS = 86_400_000;
+/** Days of events shown at first, and added by each "Show" button. */
+const LEDGER_STEP_DAYS = 14;
 
 export function DemandLedgerPage() {
   const workingId = useWorkingEventId();
-  const demands = useListIngredientDemand();
+  // The events of the next two weeks; earlier and later ones on request.
+  // Only their demand lines and purchase needs are read.
+  const [daysBack, setDaysBack] = useState(0);
+  const [daysAhead, setDaysAhead] = useState(LEDGER_STEP_DAYS);
+  const today = new Date().setHours(0, 0, 0, 0);
+  const shownEvents = useEventsInRange({
+    from: today - daysBack * DAY_MS,
+    to: today + daysAhead * DAY_MS,
+  });
+  const forEvents = useDemandsForEvents(shownEvents?.map((event) => event._id));
+  const demands = forEvents?.demands;
   const events = usePickerAndNamedEvents(
     demands ? [workingId, ...demands.map((row) => row.eventId)] : undefined,
   );
   const ingredients = useListIngredient();
-  const purchaseNeeds = useListPurchaseNeed();
+  const purchaseNeeds = forEvents?.needs;
+  // Past committed demand of the dishes on screen, for the anomaly check.
+  const history = useDemandHistory(demands?.map((row) => row.dishId));
   const createDemand = useCreateIngredientDemand();
   const fulfillDemand = useIngredientDemandFulfill();
   const applyDemandSupersede = useApplyDemandSupersede();
@@ -72,8 +90,20 @@ export function DemandLedgerPage() {
         a.eventId.localeCompare(b.eventId),
     );
   const anomalies = useMemo(
-    () => computeDemandAnomalies(demands, events, thresholdPct / 100),
-    [demands, events, thresholdPct],
+    () =>
+      computeDemandAnomalies(
+        demands && history
+          ? [
+              ...demands,
+              ...history.demands.filter(
+                (row) => !demands.some((own) => own._id === row._id),
+              ),
+            ]
+          : undefined,
+        events && history ? [...events, ...history.events] : undefined,
+        thresholdPct / 100,
+      ),
+    [demands, events, history, thresholdPct],
   );
   const eventName = (id: string) =>
     events?.find((event) => event._id === id)?.title ?? "Unknown event";
@@ -268,6 +298,26 @@ export function DemandLedgerPage() {
             <h2>What to have on hand</h2>
           </div>
           <span>{formatCountNoun(activeDemands.length, "line")}</span>
+        </div>
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-ink-2">
+          <span>
+            Events from {formatDate(today - daysBack * DAY_MS)} to{" "}
+            {formatDate(today + daysAhead * DAY_MS - 1)}.
+          </span>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => setDaysBack((days) => days + LEDGER_STEP_DAYS)}
+          >
+            Show earlier events
+          </button>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => setDaysAhead((days) => days + LEDGER_STEP_DAYS)}
+          >
+            Show later events
+          </button>
         </div>
         {demands === undefined ||
         events === undefined ||

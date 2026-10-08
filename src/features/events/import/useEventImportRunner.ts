@@ -19,11 +19,10 @@ import { runPlannedSteps } from "../../../agent/CapsuleEventBundleStepRunner";
 import type { Id } from "../../../lib/api";
 import { useAttachPacketSources } from "../../../lib/eventPacket/useEventPacket";
 import type { EventBundle } from "../../../lib/tppReports/eventBundle";
-import {
-  useListInvoice,
-  useListServiceStyle,
-} from "../../../lib/manifest-convex-react";
-import { useAllEventReportRows } from "../../facilities/useEventsById";
+import { useListServiceStyle } from "../../../lib/manifest-convex-react";
+import { useInvoicesByNumber } from "../../../lib/useEventAreaRows";
+import { useClientEvents, useEventsById } from "../../facilities/useEventsById";
+import { useEventsByNumber } from "../../../lib/eventHistoryQueries";
 import { useAuthStatus } from "../../../lib/useAuthStatus";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { useEventImportCommandExecutor } from "./useEventImportCommandExecutor";
@@ -53,6 +52,8 @@ export interface EventImportResult {
   executedSteps: number;
 }
 
+const NO_INVOICES: never[] = [];
+
 export function useEventImportRunner(input: {
   bundle: EventBundle | null;
   catalog: CapsuleEventBundleCatalogMatch;
@@ -64,10 +65,33 @@ export function useEventImportRunner(input: {
   const commands = useEventImportCommandExecutor();
   const tenantId = useAuthStatus()?.tenantId ?? null;
   const serviceStyleRows = useListServiceStyle();
-  // Light rows of every live event, read in pages (PL-SCALE): the match
-  // below needs only number, client, title, date and stage.
-  const eventRows = useAllEventReportRows();
-  const invoiceRows = useListInvoice();
+  // Only invoices carrying this BEO's number; none to read without one.
+  const headerNumber = input.bundle?.header.invoiceNumber?.trim() || undefined;
+  const numberInvoices = useInvoicesByNumber(tenantId, headerNumber);
+  const invoiceRows = headerNumber === undefined ? NO_INVOICES : numberInvoices;
+  // The events the match below can find, light rows: those carrying this
+  // number, those its invoices name, and the chosen client's events (for
+  // the title-and-date match), not every event of the company.
+  const numberEvents = useEventsByNumber(headerNumber);
+  const invoiceEvents = useEventsById(
+    useMemo(
+      () => invoiceRows?.map((invoice) => invoice.eventId ?? null),
+      [invoiceRows],
+    ),
+  );
+  const clientEvents = useClientEvents(input.catalog?.clientId);
+  const eventRows = useMemo(() => {
+    if (
+      numberEvents === undefined ||
+      invoiceEvents === undefined ||
+      clientEvents === undefined
+    )
+      return undefined;
+    const byId = new Map<string, (typeof clientEvents)[number]>();
+    for (const row of [...numberEvents, ...invoiceEvents, ...clientEvents])
+      if (row.deletedAt == null) byId.set(String(row._id), row);
+    return [...byId.values()];
+  }, [numberEvents, invoiceEvents, clientEvents]);
   const attachPacketSources = useAttachPacketSources();
   const loadExistingRows = useLoadExistingEventRows();
   const serviceStyles = useMemo(

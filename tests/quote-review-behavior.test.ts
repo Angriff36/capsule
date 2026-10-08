@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { createElement } from "react";
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
 import {
   backend,
   container,
@@ -11,6 +11,14 @@ import {
   click,
   submit,
 } from "./support/mounted-app";
+// Scoped and paged reads answer from the rows the test gives each table's
+// generated list hook.
+vi.mock("../src/lib/financeScopedQueries", async () => {
+  const { financeScopedMock, fromListHooks } =
+    await import("./helpers/financeScopedQueriesMock");
+  const { backend } = await import("./support/mounted-app");
+  return financeScopedMock(fromListHooks(backend.values));
+});
 import { QuoteSubmissionsReviewPage } from "../src/features/sales/QuoteSubmissionsReviewPage";
 
 const submission = {
@@ -90,7 +98,8 @@ it("dismisses in one click and keeps the returned dismissed request reachable th
   ]);
   await mount(page());
   expect(container.textContent).not.toContain("Garden Club");
-  await click(button("Show dismissed (1)"));
+  // Dismissed requests load only when asked for, so the toggle has no count.
+  await click(button("Show dismissed"));
   expect(container.textContent).toContain("Garden Club");
   expect(container.textContent).toContain("Dismissed — Dismissed in review");
   expect(container.textContent).toContain("No nuts");

@@ -12,14 +12,18 @@ import {
   useDeliveryMarkFailed,
   useDeliverySchedule,
   useDeliveryStartTransit,
-  useListDelivery,
-  useListEventAssignment,
-  useListPackList,
   useListPerson,
   useListVehicle,
   useListVenue,
 } from "../../lib/manifest-convex-react";
-import { useEventsById } from "../facilities/useEventsById";
+import { useEventsById, useEventsInRange } from "../facilities/useEventsById";
+import {
+  useDeliveriesByStatus,
+  useDeliveriesForPack,
+  useLogisticsForEvents,
+  usePackListsByStatus,
+} from "../facilities/useLogisticsWindow";
+import { useEventAssignmentRows } from "../../lib/eventScopedQueries";
 import {
   useAssignDriver,
   useUnassignDriver,
@@ -44,6 +48,19 @@ import {
 
 const policy = new LogisticsLifecyclePolicy();
 
+const DAY_MS = 86_400_000;
+/** Finished runs shown per step: the events of this many days back. */
+const FINISHED_PAGE_DAYS = 14;
+const ACTIVE_DELIVERY_STATUSES = ["scheduled", "in_transit"] as const;
+const FINISHED_DELIVERY_STATUSES = [
+  "delivered",
+  "failed",
+  "cancelled",
+] as const;
+const DELIVERY_PARTS = ["deliveries"] as const;
+const PACK_PARTS = ["packLists"] as const;
+const READY_PACK_STATUSES = ["packed", "loaded"] as const;
+
 const toEpoch = (value: FormDataEntryValue | null) => {
   const time = new Date(String(value)).getTime();
   return Number.isFinite(time) ? time : Number.NaN;
@@ -51,8 +68,66 @@ const toEpoch = (value: FormDataEntryValue | null) => {
 
 export function DeliveriesPage() {
   const eventScope = useWorkingEventScope("deliveries");
-  const deliveries = useListDelivery();
-  const packLists = useListPackList();
+  const [showCreate, setShowCreate] = useState(false);
+  const [showTerminal, setShowTerminal] = useState(false);
+  const [finishedDays, setFinishedDays] = useState(FINISHED_PAGE_DAYS);
+  // Runs still on the road always; finished runs only when asked, for the
+  // events of the last two weeks, older ones a step at a time.
+  const dayStart = new Date().setHours(0, 0, 0, 0);
+  const activeDeliveries = useDeliveriesByStatus(ACTIVE_DELIVERY_STATUSES);
+  const finishedEvents = useEventsInRange(
+    showTerminal
+      ? { from: dayStart - finishedDays * DAY_MS, to: dayStart + DAY_MS }
+      : "skip",
+  );
+  const finished = useLogisticsForEvents(
+    showTerminal ? finishedEvents?.map((event) => event._id) : [],
+    DELIVERY_PARTS,
+  );
+  const deliveries = useMemo(
+    () =>
+      activeDeliveries === undefined || finished === undefined
+        ? undefined
+        : [
+            ...activeDeliveries,
+            ...(showTerminal ? finished.deliveries : []).filter((row) =>
+              (FINISHED_DELIVERY_STATUSES as readonly string[]).includes(
+                String(row.status),
+              ),
+            ),
+          ],
+    [activeDeliveries, finished, showTerminal],
+  );
+  // Pack lists of the runs shown; while the form is open also every packed
+  // or loaded list and the lists of today's events (dispatched ones).
+  const todayEvents = useEventsInRange(
+    showCreate ? { from: dayStart, to: dayStart + DAY_MS } : "skip",
+  );
+  const rowPacks = useLogisticsForEvents(
+    deliveries === undefined || (showCreate && todayEvents === undefined)
+      ? undefined
+      : [
+          ...deliveries.map((row) => row.eventId),
+          ...(showCreate ? (todayEvents ?? []).map((event) => event._id) : []),
+        ],
+    PACK_PARTS,
+  );
+  const readyPacks = usePackListsByStatus(
+    showCreate ? READY_PACK_STATUSES : "skip",
+    false,
+  );
+  const packLists = useMemo(
+    () =>
+      rowPacks === undefined || (showCreate && readyPacks === undefined)
+        ? undefined
+        : [
+            ...rowPacks.packLists,
+            ...(showCreate ? (readyPacks?.packLists ?? []) : []).filter(
+              (row) => !rowPacks.packLists.some((own) => own._id === row._id),
+            ),
+          ],
+    [rowPacks, readyPacks, showCreate],
+  );
   const eventIds = useMemo(
     () =>
       deliveries === undefined || packLists === undefined
@@ -74,8 +149,6 @@ export function DeliveriesPage() {
   const confirmDelivery = useDeliveryConfirmDelivery();
   const markFailed = useDeliveryMarkFailed();
   const cancel = useDeliveryCancel();
-  const [showCreate, setShowCreate] = useState(false);
-  const [showTerminal, setShowTerminal] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
@@ -84,7 +157,7 @@ export function DeliveriesPage() {
 
   const activeRows = (deliveries ?? []).filter((row) => row.deletedAt == null);
   // Only the list follows the working event; the one-run-per-pack check in
-  // submit must still see every event's deliveries.
+  // submit also reads the picked list's own runs.
   const scopedRows = activeRows.filter(
     (row) =>
       eventScope.scopeId == null ||
@@ -113,7 +186,6 @@ export function DeliveriesPage() {
   // Picking the pack list fills in what the event already knows: the venue
   // address, the trip from the timing plan, and whoever is staffed as driver.
   const venues = useListVenue();
-  const assignments = useListEventAssignment();
   const [pickedPackId, setPickedPackId] = useState("");
   // Opened while the page shows one event: start on that event's pack list.
   const openCreate = () => {
@@ -131,6 +203,12 @@ export function DeliveriesPage() {
   const [driverId, setDriverId] = useState("");
   const pickedEventId =
     packLists?.find((pack) => pack._id === pickedPackId)?.eventId ?? null;
+  // Staff of the picked event only, and every run of the picked list (the
+  // one-run-per-pack check).
+  const assignments = useEventAssignmentRows(
+    pickedEventId ? (pickedEventId as Id<"events">) : "skip",
+  );
+  const pickedPackRuns = useDeliveriesForPack(pickedPackId || null);
   const pickedPlan = useEventTimingPlan(
     pickedEventId ? (pickedEventId as Id<"events">) : null,
   );
@@ -208,7 +286,9 @@ export function DeliveriesPage() {
       driverId: String(data.get("driverId") || "") || undefined,
       notes: String(data.get("notes") || "") || undefined,
     };
-    const existing = activeRows.find((row) => row.packListId === packListId);
+    const existing = [...activeRows, ...(pickedPackRuns ?? [])].find(
+      (row) => row.deletedAt == null && row.packListId === packListId,
+    );
     void run("create-delivery", async () => {
       if (existing) {
         await scheduleDelivery({
@@ -677,6 +757,19 @@ export function DeliveriesPage() {
             </table>
           </div>
         )}
+        {showTerminal && !loading ? (
+          <div className="mt-3 flex justify-center">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={() =>
+                setFinishedDays((days) => days + FINISHED_PAGE_DAYS)
+              }
+            >
+              Show older completed runs
+            </button>
+          </div>
+        ) : null}
       </section>
     </div>
   );

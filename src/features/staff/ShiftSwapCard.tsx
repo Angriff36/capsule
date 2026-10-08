@@ -7,12 +7,16 @@ import {
 import {
   useCreateShiftSwapRequest,
   useListPerson,
-  useListShift,
-  useListShiftSwapRequest,
   useShiftSwapRequestAccept,
   useShiftSwapRequestDecline,
   useShiftSwapRequestWithdraw,
 } from "../../lib/manifest-convex-react";
+import {
+  usePersonOpenShifts,
+  usePersonSwapRequestsSent,
+  usePersonSwapRequestsToAnswer,
+  useShiftsByIds,
+} from "../../lib/workforceScopedQueries";
 import { EmptyState, StatusChip } from "../../ui/primitives";
 import { WorkforceFailureBanner } from "../workforce/WorkforceFailureBanner";
 import { SwapCandidateExclusions } from "./SwapCandidateExclusions";
@@ -41,8 +45,15 @@ const statusLabel = (status: string) =>
 
 export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
   const people = useListPerson();
-  const shifts = useListShift();
-  const requests = useListShiftSwapRequest();
+  // This person's coming shifts and own swaps only; the shifts named by
+  // their swaps are read by id, and a coworker's shift on a swap waiting
+  // for this person comes from useRelatedSwapShifts.
+  const [today] = useState(() => new Date().setHours(0, 0, 0, 0));
+  const shifts = usePersonOpenShifts(String(person._id), today);
+  const sent = usePersonSwapRequestsSent(String(person._id));
+  const toAnswer = usePersonSwapRequestsToAnswer(String(person._id));
+  const requests = sent && toAnswer ? [...sent, ...toAnswer] : undefined;
+  const swapShifts = useShiftsByIds(sent?.map((row) => row.shiftId));
   const propose = useCreateShiftSwapRequest();
   const accept = useShiftSwapRequestAccept();
   const decline = useShiftSwapRequestDecline();
@@ -61,10 +72,10 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
       (row) =>
         row.deletedAt == null &&
         row.status === "scheduled" &&
-        row.startsAt > now &&
+        (row.startsAt ?? 0) > now &&
         String(row.personId) === String(person._id),
     )
-    .sort((left, right) => left.startsAt - right.startsAt);
+    .sort((left, right) => (left.startsAt ?? 0) - (right.startsAt ?? 0));
   const incoming = activeRows.filter(
     (row) =>
       String(row.recipientPersonId) === String(person._id) &&
@@ -80,6 +91,7 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
   };
   const shiftFor = (shiftId: string) =>
     shifts?.find((row) => String(row._id) === shiftId) ??
+    swapShifts?.find((row) => String(row._id) === shiftId) ??
     relatedShifts?.find((row) => row._id === shiftId);
   const run = (key: string, work: () => Promise<unknown>) => {
     setFailure(null);
@@ -224,7 +236,7 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-lg font-semibold">
-                      {dateTime.format(shift.startsAt)}
+                      {dateTime.format(shift.startsAt ?? undefined)}
                     </p>
                     <p className="text-sm text-ink-2">
                       {shift.role || "Scheduled shift"}

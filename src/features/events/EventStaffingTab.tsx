@@ -14,19 +14,23 @@ import {
   useEventStaffNeedPlanTiming,
   useEventStaffNeedReleaseClaim,
   useGetEvent,
-  useListAvailabilityWindow,
-  useListEventAssignment,
-  useListEventStaffNeed,
   useListPerson,
-  useListShift,
   useListShiftType,
-  useListStaffNeedWaitlistEntry,
-  useListTimeOffRequest,
   useCreateStaffNeedWaitlistEntry,
   useStaffNeedWaitlistEntryLeave,
 } from "../../lib/manifest-convex-react";
-import { useEventTimelineActivities } from "../../lib/useEventRows";
+import {
+  useEventAssignments,
+  useEventShifts,
+  useEventStaffNeeds,
+  useEventTimelineActivities,
+} from "../../lib/useEventRows";
+import {
+  useEventWaitlistEntries,
+  useShiftsInWindow,
+} from "../../lib/useEventAreaRows";
 import { useAuthStatus } from "../../lib/useAuthStatus";
+import { useAwayForPeople } from "../../lib/eventHistoryQueries";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import {
@@ -67,14 +71,14 @@ export function EventStaffingTab({ eventId }: Props) {
   const auth = useAuthStatus();
   const event = useGetEvent(eventId);
   const canManage = event?.staffingCanManage === true;
-  const assignments = useListEventAssignment();
-  const needs = useListEventStaffNeed();
+  // This event's crew rows only; other events' shifts are read below for the
+  // times this event's crew works.
+  const assignments = useEventAssignments(eventId);
+  const needs = useEventStaffNeeds(eventId);
   const people = useListPerson();
-  const shifts = useListShift();
+  const eventShifts = useEventShifts(eventId);
   const shiftTypes = useListShiftType();
   const activities = useEventTimelineActivities(eventId);
-  const timeOff = useListTimeOffRequest();
-  const availability = useListAvailabilityWindow();
   const createAssignment = useCreateEventAssignment();
   const unassign = useEventAssignmentUnassign();
   const createNeed = useCreateEventStaffNeed();
@@ -88,7 +92,7 @@ export function EventStaffingTab({ eventId }: Props) {
   const chooseAssignmentLeg = useEventAssignmentChooseTravelLeg();
   const chooseNeedLeg = useEventStaffNeedChooseTravelLeg();
   const describeDemand = useEventStaffNeedDescribeDemand();
-  const waitlistEntries = useListStaffNeedWaitlistEntry();
+  const waitlistEntries = useEventWaitlistEntries(eventId);
   const joinWaitlist = useCreateStaffNeedWaitlistEntry();
   const leaveWaitlist = useStaffNeedWaitlistEntryLeave();
   const autoFill = useAutoFillEventStaffNeeds();
@@ -132,9 +136,9 @@ export function EventStaffingTab({ eventId }: Props) {
         assignments: eventAssignments,
         people: people ?? [],
         staffNeeds: eventNeeds,
-        shifts,
+        shifts: eventShifts,
       }),
-    [eventAssignments, eventId, eventNeeds, people, shifts],
+    [eventAssignments, eventId, eventNeeds, people, eventShifts],
   );
 
   const crewWindow = {
@@ -151,6 +155,45 @@ export function EventStaffingTab({ eventId }: Props) {
         row.timingMilestone === "staff_off",
     )?.startsAt,
   };
+
+  // Shifts on any event that overlap the times this event's crew works: the
+  // span of every window the conflict check below looks at.
+  const conflictWindow = useMemo(() => {
+    let from = Infinity;
+    let to = -Infinity;
+    for (const window of [
+      { startsAt: crewWindow.startsAt, endsAt: crewWindow.endsAt },
+      ...roster.flatMap((entry) =>
+        entry.shiftWindows?.length
+          ? entry.shiftWindows
+          : (entry.plannedWindows ?? [entry]),
+      ),
+    ]) {
+      if (window.startsAt == null || window.endsAt == null) continue;
+      from = Math.min(from, window.startsAt);
+      to = Math.max(to, window.endsAt);
+    }
+    return from < to ? { from, to } : ("skip" as const);
+  }, [crewWindow.startsAt, crewWindow.endsAt, roster]);
+  const shifts = useShiftsInWindow(conflictWindow);
+  // Approved time off and availability over those times and the open
+  // positions' times only, not every request ever made.
+  const awayWindow = useMemo(() => {
+    let from = conflictWindow === "skip" ? Infinity : conflictWindow.from;
+    let to = conflictWindow === "skip" ? -Infinity : conflictWindow.to;
+    for (const need of eventNeeds) {
+      if (need.startsAt == null || need.endsAt == null) continue;
+      from = Math.min(from, need.startsAt);
+      to = Math.max(to, need.endsAt);
+    }
+    return from < to ? { from, to } : ("skip" as const);
+  }, [conflictWindow, eventNeeds]);
+  const away = useAwayForPeople(
+    people?.map((person) => person._id),
+    awayWindow,
+  );
+  const timeOff = away?.timeOff;
+  const availability = away?.availability;
 
   const roleOptions = useMemo(
     () =>

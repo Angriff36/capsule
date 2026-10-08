@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from "react";
 import {
   useCreateRecurringAvailability,
-  useListRecurringAvailability,
   useRecurringAvailabilityWithdraw,
 } from "../../lib/manifest-convex-react";
+import { usePersonRecurringAvailability } from "../../lib/workforceScopedQueries";
 import {
   DAY_NAMES,
   bandLabel,
@@ -24,7 +24,7 @@ export function WeeklyAvailabilityCard({
   busy: string | null;
   run: (key: string, work: () => Promise<void>) => void;
 }) {
-  const rows = useListRecurringAvailability();
+  const rows = usePersonRecurringAvailability(personId);
   const declare = useCreateRecurringAvailability();
   const withdraw = useRecurringAvailabilityWithdraw();
   const [showAdd, setShowAdd] = useState(false);

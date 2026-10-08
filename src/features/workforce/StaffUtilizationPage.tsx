@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
+import { useListPerson } from "../../lib/manifest-convex-react";
 import {
-  useListPerson,
-  useListShift,
-  useListTimeRecord,
-} from "../../lib/manifest-convex-react";
+  useShiftsByIds,
+  useShiftsInWindow,
+  useTimeRecordsIn,
+} from "../../lib/workforceScopedQueries";
 import { TableSkeleton } from "../../ui/primitives";
 import { useEventsById } from "../facilities/useEventsById";
 import {
@@ -141,6 +142,7 @@ export function StaffUtilizationDashboard({
   events,
   loading = false,
   now = new Date(),
+  onRangeChange,
 }: {
   people: readonly StaffUtilizationPerson[];
   shifts: readonly StaffUtilizationShift[];
@@ -148,6 +150,8 @@ export function StaffUtilizationDashboard({
   events: readonly StaffUtilizationEvent[];
   loading?: boolean;
   now?: Date;
+  /** Told the chosen period, so the page can read only that period. */
+  onRangeChange?: (range: { startAt: number; endAt: number }) => void;
 }) {
   const initialRange = useMemo(() => presetRange("month", now), [now]);
   const [preset, setPreset] = useState<PeriodPreset>("month");
@@ -171,6 +175,9 @@ export function StaffUtilizationDashboard({
   const endAt = endOfLocalDateExclusive(endDate);
   const rangeIsValid =
     Number.isFinite(startAt) && Number.isFinite(endAt) && endAt > startAt;
+  useEffect(() => {
+    if (rangeIsValid) onRangeChange?.({ startAt, endAt });
+  }, [rangeIsValid, startAt, endAt, onRangeChange]);
   const report = useMemo(
     () =>
       buildStaffUtilizationReport({
@@ -523,14 +530,36 @@ export function StaffUtilizationDashboard({
 
 export function StaffUtilizationPage() {
   const people = useListPerson();
-  const shifts = useListShift();
-  const timeRecords = useListTimeRecord();
+  const now = useMemo(() => new Date(), []);
+  // Only the chosen period: shifts that overlap it, entries inside it, and
+  // the planned shifts those entries name.
+  const [range, setRange] = useState(() => {
+    const initial = presetRange("month", now);
+    return {
+      startAt: startOfLocalDay(initial.startDate),
+      endAt: endOfLocalDateExclusive(initial.endDate),
+    };
+  });
+  const period = { from: range.startAt, to: range.endAt };
+  const periodShifts = useShiftsInWindow(period);
+  const timeRecords = useTimeRecordsIn(period);
+  const entryShifts = useShiftsByIds(
+    timeRecords?.map((record) => record.shiftId),
+  );
+  const shifts =
+    periodShifts && entryShifts
+      ? [
+          ...periodShifts,
+          ...entryShifts.filter(
+            (row) => !periodShifts.some((shift) => shift._id === row._id),
+          ),
+        ]
+      : undefined;
   const eventIds = useMemo(
     () => (shifts === undefined ? undefined : shifts.map((s) => s.eventId)),
     [shifts],
   );
   const events = useEventsById(eventIds);
-  const now = useMemo(() => new Date(), []);
 
   return (
     <StaffUtilizationDashboard
@@ -545,6 +574,7 @@ export function StaffUtilizationPage() {
         events === undefined
       }
       now={now}
+      onRangeChange={setRange}
     />
   );
 }

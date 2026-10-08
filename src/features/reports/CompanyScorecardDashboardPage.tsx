@@ -1,8 +1,5 @@
 import { useMemo, useState } from "react";
 import {
-  useListEventCloseout,
-  useListLead,
-  useListProposal,
   useListPerson,
   useListScorecardTarget,
 } from "@/lib/manifest-convex-react";
@@ -15,6 +12,10 @@ import { EmptyState, PageHeader, StatusChip } from "@/ui/primitives";
 import { CHIP_TONE_CLASS } from "@/lib/statusLabels";
 import { formatMoney } from "@/lib/format";
 import { useEventsInRange } from "../facilities/useEventsById";
+import {
+  useCloseoutsInRange,
+  useLeadsInRange,
+} from "@/lib/financeScopedQueries";
 import { acceptedProposalIds, isBookedEvent } from "./dashboardRecordSets";
 import { MetricDefinitionList } from "./MetricDefinitionList";
 import {
@@ -61,9 +62,9 @@ export function CompanyScorecardDashboardPage() {
     [currentYear, currentMonth],
   );
   const events = useEventsInRange(eventWindow);
-  const closeouts = useListEventCloseout();
-  const leads = useListLead();
-  const proposals = useListProposal();
+  // Closeouts and leads of the same six months, and the leads' proposals.
+  const closeouts = useCloseoutsInRange(eventWindow);
+  const { leads, proposals } = useLeadsInRange(eventWindow);
   const targets = useListScorecardTarget();
   const people = useListPerson();
   const [editing, setEditing] = useState<string | null>(null);

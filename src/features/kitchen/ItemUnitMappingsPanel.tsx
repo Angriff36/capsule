@@ -2,8 +2,8 @@ import { useState, type FormEvent } from "react";
 import {
   useCreateItemUnitMapping,
   useItemUnitMappingRetire,
-  useListItemUnitMapping,
 } from "../../lib/manifest-convex-react";
+import { useIngredientUnitMappingRows } from "../../lib/recipeScopedQueries";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
 import { SELECTABLE_UNITS } from "./import/UnitOfMeasureMapper";
@@ -68,7 +68,7 @@ export function ItemUnitMappingsPanel({
   ingredientUnit: string;
   onFailure: (error: unknown) => void;
 }) {
-  const mappings = useListItemUnitMapping();
+  const mappings = useIngredientUnitMappingRows(ingredientId);
   const recordMapping = useCreateItemUnitMapping();
   const retireMapping = useItemUnitMappingRetire();
   const { prompt, host } = useActionPrompt();

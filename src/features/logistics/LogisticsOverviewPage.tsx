@@ -1,11 +1,12 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
+import { useListVehicle } from "../../lib/manifest-convex-react";
+import { useEventsById, useEventsInRange } from "../facilities/useEventsById";
 import {
-  useListDelivery,
-  useListPackList,
-  useListVehicle,
-} from "../../lib/manifest-convex-react";
-import { useEventsById } from "../facilities/useEventsById";
+  useDeliveriesByStatus,
+  useLogisticsForEvents,
+  usePackListsByStatus,
+} from "../facilities/useLogisticsWindow";
 import { formatDate, formatTime } from "../../lib/format";
 import {
   EmptyState,
@@ -16,6 +17,12 @@ import {
   TableSkeleton,
 } from "../../ui/primitives";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
+
+const DAY_MS = 86_400_000;
+/** Pack lists still to pack, load or send out. */
+const OPEN_PACK_STATUSES = ["draft", "packing", "packed", "loaded"] as const;
+const OVERVIEW_PARTS = ["deliveries"] as const;
+const ACTIVE_DELIVERY_STATUSES = ["scheduled", "in_transit"] as const;
 
 type AttentionRow = {
   key: string;
@@ -28,8 +35,35 @@ type AttentionRow = {
 };
 
 export function LogisticsOverviewPage() {
-  const deliveries = useListDelivery();
-  const packLists = useListPackList();
+  // What the cards count: runs still on the road, open pack lists, and the
+  // runs of today's events and of those lists' events. Not every row the
+  // company ever had.
+  const today = new Date().setHours(0, 0, 0, 0);
+  const openPacks = usePackListsByStatus(OPEN_PACK_STATUSES, false);
+  const packLists = openPacks?.packLists;
+  const todayEvents = useEventsInRange({ from: today, to: today + DAY_MS });
+  const forEvents = useLogisticsForEvents(
+    packLists === undefined || todayEvents === undefined
+      ? undefined
+      : [
+          ...packLists.map((row) => row.eventId),
+          ...todayEvents.map((event) => event._id),
+        ],
+    OVERVIEW_PARTS,
+  );
+  const activeDeliveries = useDeliveriesByStatus(ACTIVE_DELIVERY_STATUSES);
+  const deliveries = useMemo(
+    () =>
+      forEvents === undefined || activeDeliveries === undefined
+        ? undefined
+        : [
+            ...activeDeliveries,
+            ...forEvents.deliveries.filter(
+              (row) => !activeDeliveries.some((own) => own._id === row._id),
+            ),
+          ],
+    [forEvents, activeDeliveries],
+  );
   const vehicles = useListVehicle();
   const eventIds = useMemo(
     () =>

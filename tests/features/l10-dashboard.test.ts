@@ -31,6 +31,19 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
   };
 });
 
+// Seed keys by Convex table, for the scoped and paged reads.
+const SEED_KEY: Record<string, string> = {
+  eventCloseouts: "closeouts",
+  revenueAttributions: "attributions",
+  leadershipItems: "items",
+  scorecardTargets: "targets",
+};
+vi.mock("../../src/lib/financeScopedQueries", async () =>
+  (await import("../helpers/financeScopedQueriesMock")).financeScopedMock(
+    (table) => seed[SEED_KEY[table] ?? table] as never,
+  ),
+);
+
 vi.mock("../../src/features/facilities/useEventsById", () => ({
   useEventsInRange: () => seed.events ?? [],
 }));

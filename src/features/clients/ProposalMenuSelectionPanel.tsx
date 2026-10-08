@@ -1,20 +1,22 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api, type Id } from "../../lib/api";
-import {
-  useListMenu,
-  useListMenuDish,
-  useListProposalDishSelection,
-  useListProposalLineItem,
-} from "../../lib/manifest-convex-react";
+import { useListMenu, useListMenuDish } from "../../lib/manifest-convex-react";
 import { useWholeDishList } from "../../lib/useDishesByIds";
+import {
+  useProposalDishSelections,
+  useProposalLineItems,
+} from "../../lib/financeScopedQueries";
 import { TableSkeleton } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
 
 interface ProposalMenuSelectionPanelProps {
   proposalId: string;
   guestCount: number;
   /** Selections are editable while the proposal is draft/sent/viewed. */
   editable: boolean;
+  /** Price lines change only on a draft. */
+  draft: boolean;
   onFailure: (error: unknown) => void;
 }
 
@@ -30,13 +32,15 @@ export function ProposalMenuSelectionPanel({
   proposalId,
   guestCount,
   editable,
+  draft,
   onFailure,
 }: ProposalMenuSelectionPanelProps) {
   const menus = useListMenu();
   const menuDishes = useListMenuDish();
   const dishes = useWholeDishList();
-  const selections = useListProposalDishSelection();
-  const lineItems = useListProposalLineItem();
+  // Only this proposal's choices and price lines.
+  const selections = useProposalDishSelections(proposalId);
+  const lineItems = useProposalLineItems(proposalId);
   const pickDish = useMutation(api.lib.proposalDishPricing.pickProposalDish);
   const adjustServings = useMutation(
     api.lib.proposalDishPricing.adjustProposalDishServings,
@@ -44,7 +48,11 @@ export function ProposalMenuSelectionPanel({
   const removeSelection = useMutation(
     api.lib.proposalDishPricing.removeProposalDish,
   );
+  const removeLine = useMutation(
+    api.lib.proposalPricing.removeProposalLineAndRecompute,
+  );
   const [busy, setBusy] = useState<string | null>(null);
+  const { prompt, host } = useActionPrompt();
 
   const loading =
     menus === undefined ||
@@ -115,6 +123,20 @@ export function ProposalMenuSelectionPanel({
             !lineNames.has(dishName(row.dishId).trim().toLowerCase()),
         );
 
+  // A menu's per-guest or base price line, added by a dish pick, left behind
+  // after every dish of that menu was taken off: the client would pay for a
+  // menu with no food on it. Only lines linked to their menu count, so a
+  // typed line or a price built from the event's menu is never flagged.
+  const pickedMenuIds = new Set<string>(
+    activeSelections.map((row) => String(row.menuId)),
+  );
+  const leftoverMenuLines = draft
+    ? priceLines.filter(
+        (line) =>
+          line.menuId != null && !pickedMenuIds.has(String(line.menuId)),
+      )
+    : [];
+
   const publishedMenus = (menus ?? []).filter(
     (row) => row.deletedAt == null && String(row.status) === "published",
   );
@@ -169,6 +191,46 @@ export function ProposalMenuSelectionPanel({
           would get {unpriced.length === 1 ? "it" : "them"} free. Add a line
           under Pricing.
         </p>
+      ) : null}
+
+      {host}
+      {leftoverMenuLines.length > 0 ? (
+        <div role="status" className="mt-3 text-base text-warn">
+          <p>
+            Still in the price with no dishes picked:{" "}
+            {leftoverMenuLines.map((line) => line.description).join(", ")}. The
+            client would pay for a menu with no food on it.
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {leftoverMenuLines.map((line) => (
+              <button
+                key={line._id}
+                className="btn btn-ghost btn-sm"
+                type="button"
+                disabled={busy != null}
+                onClick={() =>
+                  void (async () => {
+                    const confirmed = await prompt.askConfirm({
+                      title: `Remove ${line.description}`,
+                      description: "The proposal total goes down by this line.",
+                      confirmLabel: "Remove price",
+                      tone: "danger",
+                    });
+                    if (!confirmed) return;
+                    await run(`line:${line._id}`, async () => {
+                      await removeLine({
+                        docId: line._id as Id<"proposalLineItems">,
+                        version: Number(line.version),
+                      });
+                    });
+                  })()
+                }
+              >
+                Remove {line.description}
+              </button>
+            ))}
+          </div>
+        </div>
       ) : null}
 
       {activeSelections.length === 0 ? (

@@ -5,10 +5,12 @@ import {
   useCreateCandidate,
   useCreateInterview,
   useInterviewRecordOutcome,
-  useListCandidate,
-  useListInterview,
   useListPerson,
 } from "../../lib/manifest-convex-react";
+import {
+  useCandidatePages,
+  useInterviewsFor,
+} from "../../lib/workforceHistoryQueries";
 import {
   useHireCandidateIntoTeam,
   useIngestKmCandidates,
@@ -77,8 +79,10 @@ function localDateEpoch(value: FormDataEntryValue | null): number | undefined {
 }
 
 export function CandidatesPage() {
-  const candidates = useListCandidate();
-  const interviews = useListInterview();
+  // The newest candidates, more on request, and only their interviews.
+  const candidatePages = useCandidatePages();
+  const candidates = candidatePages.rows;
+  const interviews = useInterviewsFor(candidates?.map((row) => row._id));
   const people = useListPerson();
   const authStatus = useAuthStatus();
   const viewerIsAdmin = ["admin", "owner", "system"].includes(
@@ -818,6 +822,17 @@ export function CandidatesPage() {
               </div>
             );
           })}
+          {candidatePages.canLoadMore ? (
+            <div className="mt-3 flex justify-center">
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={candidatePages.loadMore}
+              >
+                Load more
+              </button>
+            </div>
+          ) : null}
         </section>
       )}
     </div>

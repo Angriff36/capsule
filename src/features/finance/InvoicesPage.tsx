@@ -8,7 +8,6 @@ import {
   useInvoiceMarkVoided,
   useInvoiceSend,
   useInvoiceWriteOff,
-  useListInvoice,
   useListOrganization,
   useListTaxRate,
 } from "../../lib/manifest-convex-react";
@@ -29,6 +28,12 @@ import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { InvoiceIssueForm } from "./InvoiceIssueForm";
+import {
+  useClientInvoices,
+  useEventInvoices,
+  useInvoicesInStatuses,
+  usePagedRows,
+} from "../../lib/financeScopedQueries";
 import { formatInvoiceNumber } from "./invoiceNumberDisplay";
 import { useActionNotice } from "../../ui/action-result";
 import {
@@ -41,6 +46,14 @@ import { ListStateManager } from "../list-state/ListStateManager";
 import { useListViewState } from "../list-state/useListViewState";
 
 const policy = new CommercialLifecyclePolicy();
+const UNFINISHED_STATUSES = [
+  "draft",
+  "sent",
+  "viewed",
+  "overdue",
+  "partial",
+] as const;
+const CLOSED_STATUSES = ["paid", "voided", "written_off"];
 const invoicesState = new ListStateManager({
   closed: {
     key: "closed",
@@ -79,7 +92,6 @@ export function InvoicesPage() {
     searchParams.get("eventId")?.trim() ||
     "";
   const openFromLink = searchParams.get("issue") === "1";
-  const invoices = useListInvoice();
   const clients = useClientDirectory();
   const events = usePickerAndNamedEvents([
     prefillEventId,
@@ -100,6 +112,39 @@ export function InvoicesPage() {
   const [showIssue, setShowIssue] = useState(openFromLink);
   const [{ closed: showClosed }, setListState] =
     useListViewState(invoicesState);
+  // Only the invoices this view shows: one client's or one event's, else
+  // every unfinished one through the status index, plus (closed shown) the
+  // newest page with "Load more". The issue form's next number reads the
+  // newest page.
+  const scopeEventId =
+    prefillEventId || (!prefillClientId ? (eventScope.scopeId ?? "") : "");
+  const clientInvoices = useClientInvoices(prefillClientId || null);
+  const eventInvoices = useEventInvoices(
+    prefillClientId ? null : scopeEventId || null,
+  );
+  const scoped = Boolean(prefillClientId || scopeEventId);
+  const unfinishedInvoices = useInvoicesInStatuses(
+    scoped ? [] : UNFINISHED_STATUSES,
+  );
+  const pagedInvoices = usePagedRows(
+    "invoices",
+    (!scoped && showClosed) || showIssue,
+  );
+  const invoices = prefillClientId
+    ? clientInvoices
+    : scopeEventId
+      ? eventInvoices
+      : unfinishedInvoices === undefined ||
+          (showClosed && pagedInvoices.rows === undefined)
+        ? undefined
+        : [
+            ...new Map(
+              [
+                ...unfinishedInvoices,
+                ...(showClosed ? (pagedInvoices.rows ?? []) : []),
+              ].map((row) => [row._id, row]),
+            ).values(),
+          ];
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
@@ -127,10 +172,7 @@ export function InvoicesPage() {
         });
   const visibleRows = showClosed
     ? scopedRows
-    : scopedRows.filter(
-        (row) =>
-          !["paid", "voided", "written_off"].includes(String(row.status)),
-      );
+    : scopedRows.filter((row) => !CLOSED_STATUSES.includes(String(row.status)));
 
   const canSend = (row: { status: unknown; amountDue?: unknown }) =>
     policy
@@ -381,7 +423,11 @@ export function InvoicesPage() {
       ) : null}
       {host}
 
-      {showIssue ? (
+      {showIssue && pagedInvoices.rows === undefined ? (
+        // The next invoice number needs the newest invoices, closed ones too;
+        // the form waits for them so it never proposes a number in use.
+        <TableSkeleton rows={3} />
+      ) : showIssue ? (
         <InvoiceIssueForm
           clients={activeClients}
           events={events ?? []}
@@ -391,9 +437,10 @@ export function InvoicesPage() {
           defaultClientId={prefillClientId}
           defaultEventId={prefillEventId || eventScope.workingId || ""}
           functionalCurrencyCode={functionalCurrencyCode}
-          existingInvoiceNumbers={(invoices ?? []).map(
-            (row) => row.invoiceNumber,
-          )}
+          existingInvoiceNumbers={[
+            ...(invoices ?? []),
+            ...(pagedInvoices.rows ?? []),
+          ].map((row) => row.invoiceNumber)}
         />
       ) : null}
 
@@ -406,7 +453,11 @@ export function InvoicesPage() {
             <p className="eyebrow">Billing ledger</p>
             <h2>Invoices</h2>
           </div>
-          <span>{formatCountNoun(visibleRows.length, "invoice")}</span>
+          <span>
+            {showClosed && !scoped
+              ? `${visibleRows.filter((row) => !CLOSED_STATUSES.includes(String(row.status))).length} open · ${visibleRows.filter((row) => CLOSED_STATUSES.includes(String(row.status))).length} closed shown`
+              : formatCountNoun(visibleRows.length, "invoice")}
+          </span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />
@@ -528,6 +579,18 @@ export function InvoicesPage() {
             </table>
           </div>
         )}
+        {!loading && !scoped && showClosed && pagedInvoices.canLoadMore ? (
+          <div className="px-4 py-3">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={pagedInvoices.loadingMore}
+              onClick={pagedInvoices.loadMore}
+            >
+              {pagedInvoices.loadingMore ? "Loading…" : "Load older invoices"}
+            </button>
+          </div>
+        ) : null}
       </section>
 
       <BulkActionBar

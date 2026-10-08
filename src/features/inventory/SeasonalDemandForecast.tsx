@@ -1,15 +1,15 @@
 import { useMemo, useState } from "react";
 import {
   useListIngredient,
-  useListIngredientDemand,
+  type useListIngredientDemand,
 } from "../../lib/manifest-convex-react";
-import {
-  useAllEventReportRows,
-  type EventLookupRow,
-} from "../facilities/useEventsById";
+import type { EventLookupRow } from "../facilities/useEventsById";
+import { useDemandInWindows } from "../facilities/useInventoryWindow";
 import { TableSkeleton } from "../../ui/primitives";
 
 const TOP_N = 12;
+/** Past years of the target quarter the forecast reads. */
+export const FORECAST_YEARS = 3;
 const QUARTER_LABELS = [
   "Q1 (Jan–Mar)",
   "Q2 (Apr–Jun)",
@@ -117,11 +117,35 @@ function formatQuantity(value: number): string {
   return Number.isInteger(value) ? String(value) : value.toFixed(1);
 }
 
+/**
+ * The target quarter (the one after this one) in each of the last
+ * FORECAST_YEARS years: the only events the forecast averages.
+ */
+export function forecastWindows(now: number) {
+  const current = new Date(now);
+  const currentQuarter = Math.floor(current.getUTCMonth() / 3);
+  const targetQuarter = (currentQuarter + 1) % 4;
+  const targetYear =
+    currentQuarter === 3
+      ? current.getUTCFullYear() + 1
+      : current.getUTCFullYear();
+  return Array.from({ length: FORECAST_YEARS }, (_, n) => {
+    const year = targetYear - 1 - n;
+    return {
+      from: Date.UTC(year, targetQuarter * 3, 1),
+      to: Date.UTC(year, targetQuarter * 3 + 3, 1),
+    };
+  });
+}
+
 export function SeasonalDemandForecast() {
-  const demands = useListIngredientDemand();
-  const events = useAllEventReportRows();
-  const ingredients = useListIngredient();
   const [open, setOpen] = useState(false);
+  // Read only when opened, and only the quarters the forecast uses.
+  const windows = useMemo(() => forecastWindows(Date.now()), []);
+  const history = useDemandInWindows(open ? windows : "skip");
+  const demands = history?.demands;
+  const events = history?.events;
+  const ingredients = useListIngredient();
 
   const forecast = useMemo(
     () => computeSeasonalForecast(demands, events, ingredients, Date.now()),
@@ -153,8 +177,9 @@ export function SeasonalDemandForecast() {
         </button>
       </div>
       <p className="mt-1 max-w-160 text-ink-2">
-        Projected from historical demand in the same quarter of past years — use
-        it to pre-negotiate quantities with vendors before peak season.
+        Projected from demand in the same quarter of the last {FORECAST_YEARS}{" "}
+        years — use it to pre-negotiate quantities with vendors before peak
+        season.
       </p>
       {open ? (
         loading ? (

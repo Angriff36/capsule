@@ -1,11 +1,11 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import type { Id } from "../../lib/api";
+import { useEventEquipmentReservations } from "../../lib/useEventRows";
 import {
   useEquipmentReservationCancel,
   useEquipmentReservationCheckOut,
   useEquipmentReservationMarkReturned,
   useListEquipment,
-  useListEquipmentReservation,
 } from "../../lib/manifest-convex-react";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
@@ -50,7 +50,7 @@ export function EventEquipmentPanel({
   endsAt?: number | null;
 }) {
   const equipment = useListEquipment();
-  const reservations = useListEquipmentReservation();
+  const reservations = useEventEquipmentReservations(eventId);
   const reserveEquipment = useReserveEquipment();
   const checkOut = useEquipmentReservationCheckOut();
   const markReturned = useEquipmentReservationMarkReturned();

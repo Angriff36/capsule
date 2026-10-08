@@ -6,8 +6,6 @@ import {
 } from "../facilities/useLaborSummary";
 import {
   useCreatePayrollInput,
-  useListEvent,
-  useListPayrollInput,
   useListPerson,
   usePayrollInputFinalize,
   usePayrollInputMarkVoided,
@@ -24,6 +22,13 @@ import {
   dayStartOfTimestamp,
 } from "./payrollPeriod";
 import { PayrollWorksheet } from "./PayrollWorksheet";
+import { localDayEndExclusive, localDayStart } from "./payrollPeriod";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import {
+  usePagedRows,
+  useRowsInStatuses,
+  useWindowRows,
+} from "../../lib/financeScopedQueries";
 import { useActionNotice } from "../../ui/action-result";
 import {
   PayrollPrepareForm,
@@ -45,19 +50,44 @@ const initialPeriod = () => {
   return { start: dateInputValue(start), end: dateInputValue(today) };
 };
 
+/** The event picker is read only while the prepare form is open. */
+function PrepareFormWithEvents(
+  props: Omit<Parameters<typeof PayrollPrepareForm>[0], "events">,
+) {
+  const events = usePickerAndNamedEvents([]);
+  return <PayrollPrepareForm {...props} events={events ?? []} />;
+}
+
+// Not yet finalized for export or voided.
+const OPEN_STATUSES = ["draft", "prepared"];
+
 export function PayrollPage() {
-  const payrollInputs = useListPayrollInput();
+  // The worksheet shows every open input (through the status index), and
+  // closed ones a page at a time only once the user shows them; the export
+  // reads only inputs that start in the export period.
+  const [showTerminal, setShowTerminal] = useState(false);
+  const openInputs = useRowsInStatuses("payrollInputs", OPEN_STATUSES);
+  const inputPages = usePagedRows("payrollInputs", showTerminal);
+  const payrollInputs =
+    openInputs === undefined || (showTerminal && inputPages.rows === undefined)
+      ? undefined
+      : [
+          ...new Map(
+            [...openInputs, ...(inputPages.rows ?? [])].map((row) => [
+              row._id,
+              row,
+            ]),
+          ).values(),
+        ];
   // Authored seam: finance managers lack workforceAccess, so the generated
   // listTimeRecord returns [] for them — clocked hours come from laborSummary.
   const timeRecords = usePayrollTimeRecords();
   const payRates = usePayRates();
   const people = useListPerson();
-  const events = useListEvent();
   const createPayroll = useCreatePayrollInput();
   const finalize = usePayrollInputFinalize();
   const markVoided = usePayrollInputMarkVoided();
   const [showPrepare, setShowPrepare] = useState(false);
-  const [showTerminal, setShowTerminal] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
@@ -65,6 +95,19 @@ export function PayrollPage() {
   const [periodStart, setPeriodStart] = useState(period.start);
   const [periodEnd, setPeriodEnd] = useState(period.end);
   const [processor, setProcessor] = useState<PayrollProcessor>("gusto");
+  const exportStartAt = localDayStart(periodStart);
+  const exportEndAt = localDayEndExclusive(periodEnd);
+  const exportInputs = useWindowRows(
+    "payrollInputs",
+    Number.isFinite(exportStartAt) &&
+      Number.isFinite(exportEndAt) &&
+      exportStartAt < exportEndAt
+      ? {
+          fields: ["periodStart"],
+          ranges: [{ from: exportStartAt, to: exportEndAt }],
+        }
+      : null,
+  );
   const { prompt, host } = useActionPrompt(busy != null);
 
   const activeRows = (payrollInputs ?? []).filter(
@@ -180,10 +223,10 @@ export function PayrollPage() {
   const loading =
     payrollInputs === undefined ||
     timeRecords === undefined ||
-    people === undefined ||
-    events === undefined;
+    people === undefined;
 
   const payrollExport = useMemo(() => {
+    if (exportInputs === undefined) return { document: null, error: null };
     try {
       return {
         document: buildPayrollExport({
@@ -192,7 +235,7 @@ export function PayrollPage() {
           periodEnd,
           people: people ?? [],
           timeRecords: timeRecords ?? [],
-          payrollInputs: payrollInputs ?? [],
+          payrollInputs: exportInputs ?? [],
         }),
         error: null,
       };
@@ -202,7 +245,7 @@ export function PayrollPage() {
         error: error instanceof Error ? error.message : "Invalid pay period.",
       };
     }
-  }, [payrollInputs, people, periodEnd, periodStart, processor, timeRecords]);
+  }, [exportInputs, people, periodEnd, periodStart, processor, timeRecords]);
 
   return (
     <div className="operations-stage supply-stage">
@@ -242,7 +285,9 @@ export function PayrollPage() {
       {host}
 
       <PayrollExportPanel
-        loading={loading}
+        // The file waits for the period's payroll inputs too, so it never
+        // leaves out finalized adjustments that are still loading.
+        loading={loading || exportInputs === undefined}
         periodStart={periodStart}
         periodEnd={periodEnd}
         processor={processor}
@@ -257,9 +302,8 @@ export function PayrollPage() {
       />
 
       {showPrepare ? (
-        <PayrollPrepareForm
+        <PrepareFormWithEvents
           people={people ?? []}
-          events={events ?? []}
           busy={busy === "prepare-payroll"}
           onSubmit={submitPrepare}
         />
@@ -268,6 +312,11 @@ export function PayrollPage() {
       <PayrollWorksheet
         loading={loading}
         visibleRows={visibleRows}
+        countLabel={
+          showTerminal
+            ? `${visibleRows.filter((row) => OPEN_STATUSES.includes(String(row.status))).length} open · ${visibleRows.filter((row) => !OPEN_STATUSES.includes(String(row.status))).length} closed shown`
+            : undefined
+        }
         personName={personName}
         clockedMinutesForInput={clockedMinutesForInput}
         estimatedGross={estimatedGross}
@@ -275,6 +324,18 @@ export function PayrollPage() {
         onPrepare={() => setShowPrepare(true)}
         onInvoke={invoke}
       />
+      {!loading && showTerminal && inputPages.canLoadMore ? (
+        <div className="px-4 py-3">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            disabled={inputPages.loadingMore}
+            onClick={inputPages.loadMore}
+          >
+            {inputPages.loadingMore ? "Loading…" : "Load older inputs"}
+          </button>
+        </div>
+      ) : null}
 
       <p className="mt-4 text-sm text-ink-3">
         Saved report definitions live under{" "}

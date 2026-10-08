@@ -10,6 +10,7 @@ import { query, type QueryCtx } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import { canRead } from "./search";
 import { DISH_IDS_CAP } from "./dishLookup";
+import { latestPriceByIngredient } from "../src/features/kitchen/IngredientPriceHistory";
 
 export type MenuRecipeRows = {
   dishIngredients: Doc<"dishIngredients">[];
@@ -140,19 +141,23 @@ export const forDishes = query({
 
     const priceObservations: Doc<"ingredientPriceObservations">[] = [];
     const unitMappings: Doc<"itemUnitMappings">[] = [];
+    // Only the latest price of each ingredient, the one a cost uses; older
+    // prices stay on the server.
     if (priceRead)
-      for (const ingredientId of menuIngredientIds)
-        priceObservations.push(
-          ...live(
-            await ctx.db
-              .query("ingredientPriceObservations")
-              .withIndex("by_ingredientId", (q) =>
-                q.eq("ingredientId", ingredientId),
-              )
-              .collect(),
-            tenantId,
-          ),
+      for (const ingredientId of menuIngredientIds) {
+        const rows = live(
+          await ctx.db
+            .query("ingredientPriceObservations")
+            .withIndex("by_ingredientId", (q) =>
+              q.eq("ingredientId", ingredientId),
+            )
+            .collect(),
+          tenantId,
         );
+        const latest = latestPriceByIngredient(rows).get(ingredientId);
+        const row = latest && rows.find((entry) => entry._id === latest._id);
+        if (row) priceObservations.push(row);
+      }
     if (ingredientRead) {
       for (const ingredientId of menuIngredientIds)
         unitMappings.push(

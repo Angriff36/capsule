@@ -1,11 +1,9 @@
 import { useMemo, useState } from "react";
 import { formatCountNoun, formatMoney } from "../../lib/format";
-import {
-  useListIngredient,
-  useListWasteRecord,
-} from "../../lib/manifest-convex-react";
+import { useListIngredient } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { useEventsById } from "../facilities/useEventsById";
+import { useWasteForPeriod } from "../facilities/useInventoryWindow";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { WasteRecentEntries } from "./WasteRecentEntries";
 import { WASTE_REASON_LABELS, WasteRecordForm } from "./WasteRecordForm";
@@ -30,7 +28,11 @@ type Bucket = {
 };
 
 export function WasteCostReportPage() {
-  const wasteRecords = useListWasteRecord();
+  const [periodKey, setPeriodKey] =
+    useState<(typeof PERIODS)[number]["key"]>("30");
+  const period = PERIODS.find((option) => option.key === periodKey)!;
+  // Only the chosen period's records (all time only when picked).
+  const wasteRecords = useWasteForPeriod(period.days);
   const ingredients = useListIngredient();
   const eventIds = useMemo(
     () =>
@@ -40,11 +42,8 @@ export function WasteCostReportPage() {
     [wasteRecords],
   );
   const events = useEventsById(eventIds);
-  const [periodKey, setPeriodKey] =
-    useState<(typeof PERIODS)[number]["key"]>("30");
   const [recording, setRecording] = useState(false);
 
-  const period = PERIODS.find((option) => option.key === periodKey)!;
   const loading = wasteRecords === undefined || ingredients === undefined;
 
   const report = useMemo(() => {

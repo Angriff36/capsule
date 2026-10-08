@@ -5,10 +5,12 @@ import {
   useCreateDishIngredient,
   useCreateDishTask,
   useDishUseMainRecipe,
-  useListDishComponent,
-  useListDishIngredient,
-  useListDishTask,
 } from "../../lib/manifest-convex-react";
+import {
+  useDishComponentRows,
+  useDishIngredientRows,
+  useDishTaskRows,
+} from "../../lib/recipeScopedQueries";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { dishPath } from "./kitchenRoutes";
 
@@ -24,6 +26,10 @@ type Props = {
 
 const orUndefined = <T,>(value: T | null | undefined) => value ?? undefined;
 
+/** Rows of this version and of its main dish; undefined until both arrive. */
+const bothDishes = <T,>(own: T[] | undefined, main: T[] | undefined) =>
+  own && main ? [...own, ...main] : undefined;
+
 /**
  * On a version: "Use the main dish's recipe". On, the version cooks from the
  * main dish's ingredients, recipes and prep steps. Off, it keeps its own,
@@ -38,9 +44,18 @@ export function DishVersionRecipeSwitch({
   onFailure,
 }: Props) {
   const setRecipeSource = useDishUseMainRecipe();
-  const ingredientLines = useListDishIngredient();
-  const componentLines = useListDishComponent();
-  const prepSteps = useListDishTask();
+  const ingredientLines = bothDishes(
+    useDishIngredientRows(dishId),
+    useDishIngredientRows(mainDishId),
+  );
+  const componentLines = bothDishes(
+    useDishComponentRows(dishId),
+    useDishComponentRows(mainDishId),
+  );
+  const prepSteps = bothDishes(
+    useDishTaskRows(dishId),
+    useDishTaskRows(mainDishId),
+  );
   const addIngredient = useCreateDishIngredient();
   const addComponent = useCreateDishComponent();
   const addPrepStep = useCreateDishTask();

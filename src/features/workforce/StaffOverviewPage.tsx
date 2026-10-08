@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
-import { useMemo } from "react";
+import { useState } from "react";
+import { useListPerson } from "../../lib/manifest-convex-react";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
-  useListEventAssignment,
-  useListPerson,
-  useListShift,
-  useListShiftSwapRequest,
-  useListTimeOffRequest,
-} from "../../lib/manifest-convex-react";
+  useShiftsInWindow,
+  useStaffForEvents,
+  useSwapRequestsWithStatus,
+  useTimeOffRequestsWithStatus,
+} from "../../lib/workforceScopedQueries";
 import {
   EmptyState,
   PageHeader,
@@ -16,7 +17,7 @@ import {
   TableSkeleton,
 } from "../../ui/primitives";
 import { formatDate } from "../../lib/format";
-import { useEventsById } from "../facilities/useEventsById";
+import { useEventsInRange } from "../facilities/useEventsById";
 import { StaffPayRatesSection } from "./StaffPayRatesSection";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 
@@ -34,16 +35,23 @@ interface AttentionRow {
 
 export function StaffOverviewPage() {
   const people = useListPerson();
-  const shifts = useListShift();
-  const assignments = useListEventAssignment();
-  const swapRequests = useListShiftSwapRequest();
-  const timeOffRequests = useListTimeOffRequest();
-  const eventIds = useMemo(
-    () =>
-      assignments === undefined ? undefined : assignments.map((a) => a.eventId),
-    [assignments],
-  );
-  const events = useEventsById(eventIds);
+  const tenantId = useAuthStatus()?.tenantId;
+  // Only what the page counts: shifts in the coming week, requests waiting
+  // for a manager, and staff of events that are not over yet.
+  const [openedAt] = useState(() => Date.now());
+  const shifts = useShiftsInWindow({ from: openedAt, to: openedAt + WEEK_MS });
+  const swapRequests = useSwapRequestsWithStatus(tenantId, "awaiting_manager");
+  const timeOffRequests = useTimeOffRequestsWithStatus(tenantId, "pending");
+  // Events are read by start; one that began earlier today may still run.
+  const [todayStart] = useState(() => new Date().setHours(0, 0, 0, 0));
+  const events = useEventsInRange({
+    from: todayStart,
+    to: Number.MAX_SAFE_INTEGER,
+    withUndated: true,
+  });
+  const assignments = useStaffForEvents(
+    events?.map((event) => event._id),
+  )?.assignments;
 
   const loading =
     people === undefined ||

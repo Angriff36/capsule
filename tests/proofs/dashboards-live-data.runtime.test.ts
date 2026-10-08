@@ -48,6 +48,17 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
   };
 });
 
+// Seed keys by Convex table, for the scoped and paged reads.
+const SEED_KEY: Record<string, string> = {
+  eventCloseouts: "closeouts",
+  revenueAttributions: "attributions",
+};
+vi.mock("../../src/lib/financeScopedQueries", async () =>
+  (await import("../helpers/financeScopedQueriesMock")).financeScopedMock(
+    (table) => seed[SEED_KEY[table] ?? table],
+  ),
+);
+
 vi.mock("../../src/features/facilities/useEventsById", () => ({
   useEventsById: () => seed.events ?? [],
   useAllEventReportRows: () => seed.events ?? [],
@@ -264,6 +275,11 @@ describe("dashboards read live tenant rows", () => {
     act(() => {
       root.render(createElement(MemoryRouter, null, createElement(Page)));
     });
+    // All-time figures load only when asked for: ask, as a user would.
+    const ask = [...container.querySelectorAll("button")].find((button) =>
+      (button.textContent ?? "").startsWith("Show all-time"),
+    );
+    if (ask) act(() => ask.click());
   }
 
   function cardValue(title: string): string {

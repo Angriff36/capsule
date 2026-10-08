@@ -158,6 +158,11 @@
     },
     {
       "code": "DOMAIN_UNWIRED_FK",
+      "key": "ProposalLineItem.menuId",
+      "issue": "https://github.com/Angriff36/capsule/issues/402"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
       "key": "QuoteSubmission.menuId",
       "issue": "https://github.com/Angriff36/capsule/issues/402"
     },

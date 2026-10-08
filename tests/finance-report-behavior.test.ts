@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { createElement } from "react";
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
 import {
   backend,
   container,
@@ -8,6 +8,14 @@ import {
   button,
   click,
 } from "./support/mounted-app";
+// Scoped and paged reads answer from the rows the test gives each table's
+// generated list hook.
+vi.mock("../src/lib/financeScopedQueries", async () => {
+  const { financeScopedMock, fromListHooks } =
+    await import("./helpers/financeScopedQueriesMock");
+  const { backend } = await import("./support/mounted-app");
+  return financeScopedMock(fromListHooks(backend.values));
+});
 import { CloseoutPage } from "../src/features/finance/CloseoutPage";
 import { EventCostSummaryReport } from "../src/features/finance/EventCostSummaryReport";
 import { FoodCostPercentagePage } from "../src/features/finance/FoodCostPercentagePage";

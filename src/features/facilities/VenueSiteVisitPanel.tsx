@@ -5,7 +5,6 @@ import { formatDate } from "../../lib/format";
 import {
   useCreateAttachment,
   useCreateVenueNote,
-  useListVenueNote,
 } from "../../lib/manifest-convex-react";
 import { Section } from "../../ui/primitives";
 import {
@@ -13,7 +12,7 @@ import {
   type CommandFailure,
 } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
-import { useAllEventReportRows } from "./useEventsById";
+import { useVenueEvents } from "./useFacilitiesHistory";
 import {
   SITE_VISIT_AREAS,
   SITE_VISIT_SHOTS,
@@ -32,8 +31,12 @@ const text = (data: FormData, name: string) =>
  */
 export function VenueSiteVisitPanel({ venue }: { venue: Doc<"venues"> }) {
   const venueId = String(venue._id);
-  const notes = useListVenueNote();
-  const events = useAllEventReportRows();
+  // This venue's notes only, read by venue.
+  const notes = useQuery(api.queries.listVenueNoteByVenueId, {
+    venueId: venue._id,
+  });
+  // This venue's events only, read by venue.
+  const events = useVenueEvents(venueId);
   const files = useQuery(api.fileStorage.listForParent, {
     parentType: "venue",
     parentId: venueId,

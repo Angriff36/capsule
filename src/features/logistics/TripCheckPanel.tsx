@@ -3,8 +3,8 @@ import { formatDate, formatTime } from "../../lib/format";
 import {
   useCreateVehicleTripCheck,
   useListPerson,
-  useListVehicleTripCheck,
 } from "../../lib/manifest-convex-react";
+import { useTripChecksForRun } from "../facilities/useLogisticsWindow";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import {
   fuelLevelLabel,
@@ -85,7 +85,7 @@ function CheckLine({
  * crew.
  */
 export function TripCheckPanel({ runId }: { runId: string }) {
-  const checks = useListVehicleTripCheck() as TripCheckRow[] | undefined;
+  const checks = useTripChecksForRun(runId) as TripCheckRow[] | undefined;
   const people = useListPerson();
   const record = useCreateVehicleTripCheck();
   const [open, setOpen] = useState<TripCheckKind | null>(null);

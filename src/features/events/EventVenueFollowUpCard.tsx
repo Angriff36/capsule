@@ -5,9 +5,9 @@ import { formatDate, formatTime } from "../../lib/format";
 import {
   useCreateVenueNote,
   useListOrganization,
-  useListVenueNote,
 } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
+import { useEventVenueNotes } from "../../lib/useEventAreaRows";
 import { Section } from "../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
@@ -80,7 +80,7 @@ export function EventVenueFollowUpCard(props: {
   eventType?: string | null;
 }) {
   const { venue } = props;
-  const notes = useListVenueNote();
+  const notes = useEventVenueNotes(props.eventId);
   const postNote = useCreateVenueNote();
   const organizations = useListOrganization();
   const auth = useAuthStatus();

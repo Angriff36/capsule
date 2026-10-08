@@ -5,16 +5,9 @@ import {
   useCreateVendorContact,
   useCreateVendorOrder,
   useListIngredient,
-  useListIngredientDemand,
-  useListIngredientPriceObservation,
   useListItemUnitMapping,
-  useListInventoryItem,
-  useListPurchaseNeed,
   useListVendor,
   useListVendorContact,
-  useListVendorOrder,
-  useListVendorOrderLine,
-  useListVendorOrderLineDemand,
   useCreateWeeklyPurchasingConfig,
   useListWeeklyPurchasingConfig,
   useWeeklyPurchasingConfigConfigure,
@@ -23,6 +16,7 @@ import {
   usePurchaseNeedMarkOrdered,
   useWeeklyPurchasingConfigSetOrderApprovalThreshold,
 } from "../../lib/manifest-convex-react";
+import { useStockLines } from "../facilities/useInventoryHistory";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import {
   BulkActionBar,
@@ -50,37 +44,54 @@ import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
 import { vendorOrderTitle } from "./vendorOrderNumber";
-import { byVendorScore, computeVendorPerformance } from "./vendorPerformance";
+import {
+  byVendorScore,
+  computeVendorPerformance,
+  PERFORMANCE_WINDOW_MS,
+} from "./vendorPerformance";
 import { WorkingEventScopeNote } from "../events/WorkingEventScope";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import {
+  useLinesForDemands,
+  useNeedPages,
+  useOrderPages,
+  useSentOrderNeeds,
+  useVendorScoreInputs,
+} from "../facilities/useInventoryWindow";
+import {
+  useVendorOrderRows,
+  useVendorOrdersInStatuses,
+} from "../facilities/useLogisticsWindow";
 import { usePurchasingScopeViewModel } from "./PurchasingScopeViewModel";
 
 const policy = new SupplyLifecyclePolicy();
+const DRAFT_STATUS = ["draft"] as const;
 
 export function PurchasingPage() {
   const { eventScope, linkedEventId, scopedEventId, showAllEvents } =
     usePurchasingScopeViewModel();
   const listOrigin = useListOrigin();
-  const needs = useListPurchaseNeed();
+  // What the page shows, not every row the company ever had: the newest
+  // 50 needs (the followed event's when it follows one) and orders, with
+  // more on request; every weekly draft; the current draft's lines; the
+  // orders that fill the needs on screen; sent orders' needs; and the
+  // vendor-score window.
+  const needPages = useNeedPages(scopedEventId);
+  const needs = needPages.rows;
   const vendors = useListVendor();
-  const orders = useListVendorOrder();
-  const lines = useListVendorOrderLine();
-  const demandLinks = useListVendorOrderLineDemand();
+  const orderPages = useOrderPages();
+  const orders = orderPages.rows;
+  const drafts = useVendorOrdersInStatuses(DRAFT_STATUS);
   const ingredients = useListIngredient();
-  const inventoryItems = useListInventoryItem();
+  const inventoryItems = useStockLines("totals");
   const vendorContacts = useListVendorContact();
-  const priceObservations = useListIngredientPriceObservation();
-  const demands = useListIngredientDemand();
-  const events = usePickerAndNamedEvents(
-    needs && orders && demands
-      ? [
-          scopedEventId,
-          ...needs.map((row) => row.eventId),
-          ...orders.map((row) => row.eventId),
-          ...demands.map((row) => row.eventId),
-        ]
-      : undefined,
+  const scoreInputs = useVendorScoreInputs(PERFORMANCE_WINDOW_MS);
+  const sent = useSentOrderNeeds();
+  const filling = useLinesForDemands(
+    needs?.map((row) => row.ingredientDemandId),
   );
+  const demandLines = filling?.lines;
+  const demandLinks = filling?.links;
   const unitMappings = useListItemUnitMapping();
   const createVendor = useCreateVendor();
   const createOrder = useCreateVendorOrder();
@@ -104,10 +115,8 @@ export function PurchasingPage() {
     (item) => item.deletedAt == null,
   );
   const activeOrders = (orders ?? []).filter((item) => item.deletedAt == null);
-  const shownNeeds = activeNeeds.filter(
-    (item) => scopedEventId == null || String(item.eventId) === scopedEventId,
-  );
-  // Vendor scores use every order; operator-facing ledgers honor an explicit
+  const shownNeeds = activeNeeds;
+  // Vendor scores use their own window; operator-facing ledgers honor an explicit
   // cascade link before falling back to the working-event scope.
   // A weekly draft serves every event in its week, so it always shows.
   const sharedWeekly = (item: {
@@ -124,12 +133,12 @@ export function PurchasingPage() {
     () =>
       computeVendorPerformance(
         activeVendors.map((vendor) => vendor._id),
-        orders ?? [],
-        lines ?? [],
-        priceObservations ?? [],
+        scoreInputs?.orders ?? [],
+        scoreInputs?.lines ?? [],
+        scoreInputs?.observations ?? [],
         Date.now(),
       ),
-    [activeVendors, orders, lines, priceObservations],
+    [activeVendors, scoreInputs],
   );
   const rankedVendors = useMemo(
     () => [...activeVendors].sort(byVendorScore(vendorPerformance)),
@@ -137,11 +146,13 @@ export function PurchasingPage() {
   );
   const weeklyDrafts = useMemo(
     () =>
-      activeOrders.filter(
+      (drafts ?? []).filter(
         (order) =>
-          String(order.status) === "draft" && order.sourceRangeStart != null,
+          order.deletedAt == null &&
+          String(order.status) === "draft" &&
+          order.sourceRangeStart != null,
       ),
-    [activeOrders],
+    [drafts],
   );
   const shownWeeklyDrafts = weeklyDrafts.filter(
     (order) =>
@@ -151,21 +162,45 @@ export function PurchasingPage() {
   );
   // Purchasing opens on the week's automatic draft (BE-10.6).
   const currentDraft = currentWeeklyDraft(weeklyDrafts, Date.now());
+  const draftRows = useVendorOrderRows(currentDraft ? currentDraft._id : null);
   const currentDraftLines =
     currentDraft &&
-    lines !== undefined &&
-    demandLinks !== undefined &&
-    needs !== undefined &&
-    demands !== undefined
+    draftRows.lines !== undefined &&
+    draftRows.links !== undefined &&
+    draftRows.filled !== undefined
       ? weeklyDraftLines({
           order: currentDraft,
-          lines,
-          links: demandLinks,
-          needs,
-          demands,
+          lines: draftRows.lines,
+          links: draftRows.links,
+          needs: draftRows.filled.needs,
+          demands: draftRows.filled.demands,
           mappings: unitMappings ?? [],
         })
       : null;
+  // Order lines for the header totals: each listed order's and draft's own,
+  // once each (a draft among the newest orders is in both lists).
+  const lines = useMemo(
+    () => [
+      ...new Map(
+        [
+          ...(orders ?? []).flatMap((order) => order.lines),
+          ...(drafts ?? []).flatMap((order) => order.lines ?? []),
+        ].map((line) => [line._id, line]),
+      ).values(),
+    ],
+    [orders, drafts],
+  );
+  const events = usePickerAndNamedEvents(
+    needs && orders && sent && draftRows.filled
+      ? [
+          scopedEventId,
+          ...needs.map((row) => row.eventId),
+          ...orders.map((row) => row.eventId),
+          ...sent.needs.map((row) => row.eventId),
+          ...draftRows.filled.demands.map((row) => row.eventId),
+        ]
+      : undefined,
+  );
   const ingredientName = (id: string) =>
     ingredients?.find((item) => item._id === id)?.name ?? "Unknown ingredient";
   const eventName = (id: string) =>
@@ -173,7 +208,7 @@ export function PurchasingPage() {
   const vendorName = (id: string) =>
     vendors?.find((item) => item._id === id)?.name ?? "Unknown vendor";
   const linkedLines = (need: { ingredientDemandId: string }) =>
-    lines?.filter((line) => {
+    demandLines?.filter((line) => {
       if (line.deletedAt != null || line.status === "cancelled") return false;
       if (line.ingredientDemandId === need.ingredientDemandId) return true;
       return demandLinks?.some(
@@ -187,16 +222,16 @@ export function PurchasingPage() {
     linkedLines(need)?.[0];
   const linkedOrders = (need: { ingredientDemandId: string }) => {
     if (
-      lines === undefined ||
+      demandLines === undefined ||
       demandLinks === undefined ||
-      orders === undefined ||
+      filling === undefined ||
       vendors === undefined
     )
       return undefined;
     return [
       ...new Set(linkedLines(need)?.map((line) => line.vendorOrderId)),
     ].map((id) => {
-      const order = orders.find((item) => item._id === id);
+      const order = filling.orders.find((item) => item._id === id);
       return {
         id,
         label: order
@@ -546,7 +581,7 @@ export function PurchasingPage() {
           </div>
           <span>{shownWeeklyDrafts.length} drafts</span>
         </div>
-        {orders === undefined || vendors === undefined ? (
+        {drafts === undefined || vendors === undefined ? (
           <TableSkeleton rows={3} />
         ) : shownWeeklyDrafts.length === 0 ? (
           <div className="document-empty">
@@ -612,7 +647,10 @@ export function PurchasingPage() {
       </section>
 
       <SentOrderSurplusPanel
-        rows={sentOrderSurplus({ needs: needs ?? [], orders: orders ?? [] })}
+        rows={sentOrderSurplus({
+          needs: sent?.needs ?? [],
+          orders: sent?.orders ?? [],
+        })}
         eventName={eventName}
         ingredientName={ingredientName}
       />
@@ -622,7 +660,7 @@ export function PurchasingPage() {
           needs === undefined ||
           ingredients === undefined ||
           events === undefined ||
-          lines === undefined ||
+          demandLines === undefined ||
           demandLinks === undefined
         }
         activeNeeds={shownNeeds}
@@ -653,6 +691,18 @@ export function PurchasingPage() {
         }}
       />
 
+      {needPages.canLoadMore ? (
+        <div className="mt-3 flex justify-center">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={needPages.loadMore}
+          >
+            Load more needs
+          </button>
+        </div>
+      ) : null}
+
       {linkedEventId ? (
         <p className="mt-3 flex flex-wrap items-center gap-2 text-sm text-ink-2">
           <span>
@@ -670,7 +720,7 @@ export function PurchasingPage() {
         <div className="ledger-heading">
           <div>
             <p className="eyebrow">Order folios</p>
-            <h2>All vendor orders</h2>
+            <h2>Vendor orders</h2>
           </div>
           <span>{shownOrders.length} orders</span>
         </div>
@@ -742,6 +792,17 @@ export function PurchasingPage() {
             </table>
           </div>
         )}
+        {orderPages.canLoadMore ? (
+          <div className="mt-3 flex justify-center">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={orderPages.loadMore}
+            >
+              Load more orders
+            </button>
+          </div>
+        ) : null}
       </section>
 
       <SeasonalDemandForecast />

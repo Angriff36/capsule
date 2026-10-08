@@ -1,8 +1,8 @@
 import {
-  useListEventVehicleAssignment,
   useListTrailer,
   useListVehicle,
 } from "../../lib/manifest-convex-react";
+import { useActiveEventRigs } from "../facilities/useLogisticsWindow";
 import type { PackRig } from "./packViews";
 
 type Named = { _id: string; make: string; model: string; registration: string };
@@ -41,7 +41,7 @@ export function packRigs(
 }
 
 export function usePackRigs(eventId: string | null | undefined): PackRig[] {
-  const assignments = useListEventVehicleAssignment();
+  const assignments = useActiveEventRigs(eventId);
   const vehicles = useListVehicle();
   const trailers = useListTrailer();
   if (!eventId) return [];

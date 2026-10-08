@@ -16,6 +16,38 @@ vi.mock("../../../src/features/facilities/useEventsById", () => ({
   usePickerEvents: () => [],
 }));
 
+vi.mock("../../../src/lib/productionScopedQueries", () => ({
+  usePrepWork: () => ({
+    tasks: [],
+    dependencies: [],
+    checks: [],
+    comments: [],
+  }),
+  useOpenBatches: () => [
+    {
+      _id: "batch-1",
+      version: 4,
+      componentId: "component-1",
+      plannedYield: 12,
+      yieldUnit: "kg",
+      status: "in_progress",
+      deletedAt: null,
+    },
+  ],
+  useFinishedBatches: () => ({
+    batches: [],
+    canLoadMore: false,
+    loadingMore: false,
+    loadMore: () => {},
+  }),
+  useBatchShares: () => ({
+    shares: [],
+    canLoadMore: false,
+    loadingMore: false,
+    loadMore: () => {},
+  }),
+}));
+
 vi.mock("../../../src/lib/manifest-convex-react", () => ({
   useListProductionBatch: () => [
     {

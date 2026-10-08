@@ -5,10 +5,12 @@ import {
   useCreateVehicleMaintenanceSchedule,
   useCreateVehicleServiceEntry,
   useListVehicle,
-  useListVehicleFuelLog,
   useListVehicleMaintenanceSchedule,
-  useListVehicleServiceEntry,
 } from "../../lib/manifest-convex-react";
+import {
+  useVehicleLogPage,
+  useVehicleOdometers,
+} from "../facilities/useFacilitiesHistory";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
@@ -25,6 +27,8 @@ const costFmt = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 2,
 });
 const milesFmt = new Intl.NumberFormat("en-US");
+/** Fuel and service rows the history shows at first, and per "Show older". */
+const HISTORY_PAGE = 30;
 
 type IntervalType = "time" | "mileage";
 
@@ -87,8 +91,16 @@ export function VehicleMaintenancePage() {
   const vehicles = useListVehicle() as VehicleRow[] | undefined;
   const schedules = useListVehicleMaintenanceSchedule() as
     ScheduleRow[] | undefined;
-  const services = useListVehicleServiceEntry() as ServiceRow[] | undefined;
-  const fuelLogs = useListVehicleFuelLog() as FuelRow[] | undefined;
+  // The newest fuel and service entries only; older ones on "Show older".
+  const [historyLimit, setHistoryLimit] = useState(HISTORY_PAGE);
+  const log = useVehicleLogPage(historyLimit);
+  const services = log?.service as ServiceRow[] | undefined;
+  const fuelLogs = log?.fuel as FuelRow[] | undefined;
+  const odometers = useVehicleOdometers(
+    vehicles
+      ?.filter((vehicle) => vehicle.deletedAt == null)
+      .map((vehicle) => String(vehicle._id)),
+  );
   const createSchedule = useCreateVehicleMaintenanceSchedule();
   const createService = useCreateVehicleServiceEntry();
   const createFuel = useCreateVehicleFuelLog();
@@ -130,18 +142,11 @@ export function VehicleMaintenancePage() {
     );
 
   // Current odometer per vehicle = latest reading across fuel + service logs.
-  const odometerByVehicle = useMemo(() => {
-    const map = new Map<string, number>();
-    for (const row of serviceEntries) {
-      const id = String(row.vehicleId);
-      map.set(id, Math.max(map.get(id) ?? 0, row.odometer));
-    }
-    for (const row of fuelEntries) {
-      const id = String(row.vehicleId);
-      map.set(id, Math.max(map.get(id) ?? 0, row.odometer));
-    }
-    return map;
-  }, [serviceEntries, fuelEntries]);
+  const odometerByVehicle = useMemo(
+    () => new Map<string, number>(Object.entries(odometers ?? {})),
+    [odometers],
+  );
+  const counted = (count: number) => `${count}${log?.countsCapped ? "+" : ""}`;
 
   const dueState = (schedule: ScheduleRow): DueState => {
     if (schedule.intervalType === "mileage") {
@@ -290,8 +295,8 @@ export function VehicleMaintenancePage() {
   const loading =
     vehicles === undefined ||
     schedules === undefined ||
-    services === undefined ||
-    fuelLogs === undefined;
+    log === undefined ||
+    odometers === undefined;
 
   return (
     <div className="operations-stage supply-stage">
@@ -336,7 +341,7 @@ export function VehicleMaintenancePage() {
           <b>{dueSoonCount}</b> due soon
         </span>
         <span>
-          <b>{serviceEntries.length}</b> services logged
+          <b>{counted(log?.serviceCount ?? 0)}</b> services logged
         </span>
       </div>
 
@@ -758,7 +763,8 @@ export function VehicleMaintenancePage() {
             <h2>Recent fuel & service</h2>
           </div>
           <span>
-            {fuelEntries.length} fuel · {serviceEntries.length} service
+            {counted(log?.fuelCount ?? 0)} fuel ·{" "}
+            {counted(log?.serviceCount ?? 0)} service
           </span>
         </div>
         {loading ? (
@@ -784,31 +790,43 @@ export function VehicleMaintenancePage() {
                 </tr>
               </thead>
               <tbody>
-                {mergeHistory(fuelEntries, serviceEntries).map((row) => {
-                  const vehicle = vehicleById.get(String(row.vehicleId));
-                  return (
-                    <tr key={`${row.kind}:${row.id}`}>
-                      <td>{formatDate(row.at)}</td>
-                      <td data-label="Vehicle">
-                        {vehicle?.registration ?? "—"}
-                      </td>
-                      <td data-label="Type">
-                        <StatusChip
-                          status={row.kind === "fuel" ? "fuel" : "service"}
-                        />
-                      </td>
-                      <td data-label="Detail">{row.detail}</td>
-                      <td className="supply-number" data-label="Odometer">
-                        {milesFmt.format(row.odometer)} mi
-                      </td>
-                      <td className="supply-number" data-label="Cost">
-                        {costFmt.format(row.cost)}
-                      </td>
-                    </tr>
-                  );
-                })}
+                {mergeHistory(fuelEntries, serviceEntries, historyLimit).map(
+                  (row) => {
+                    const vehicle = vehicleById.get(String(row.vehicleId));
+                    return (
+                      <tr key={`${row.kind}:${row.id}`}>
+                        <td>{formatDate(row.at)}</td>
+                        <td data-label="Vehicle">
+                          {vehicle?.registration ?? "—"}
+                        </td>
+                        <td data-label="Type">
+                          <StatusChip
+                            status={row.kind === "fuel" ? "fuel" : "service"}
+                          />
+                        </td>
+                        <td data-label="Detail">{row.detail}</td>
+                        <td className="supply-number" data-label="Odometer">
+                          {milesFmt.format(row.odometer)} mi
+                        </td>
+                        <td className="supply-number" data-label="Cost">
+                          {costFmt.format(row.cost)}
+                        </td>
+                      </tr>
+                    );
+                  },
+                )}
               </tbody>
             </table>
+            {log?.hasOlder ||
+            fuelEntries.length + serviceEntries.length > historyLimit ? (
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm mt-2"
+                onClick={() => setHistoryLimit((limit) => limit + HISTORY_PAGE)}
+              >
+                Show older
+              </button>
+            ) : null}
           </div>
         )}
       </section>
@@ -816,7 +834,7 @@ export function VehicleMaintenancePage() {
   );
 }
 
-function mergeHistory(fuel: FuelRow[], service: ServiceRow[]) {
+function mergeHistory(fuel: FuelRow[], service: ServiceRow[], limit: number) {
   const rows = [
     ...fuel.map((row) => ({
       kind: "fuel" as const,
@@ -837,5 +855,5 @@ function mergeHistory(fuel: FuelRow[], service: ServiceRow[]) {
       detail: row.vendor,
     })),
   ];
-  return rows.sort((left, right) => right.at - left.at).slice(0, 30);
+  return rows.sort((left, right) => right.at - left.at).slice(0, limit);
 }

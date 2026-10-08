@@ -1208,6 +1208,12 @@
       "reason": "Batch 2026-09-29: new optional field from a plan capability (PL-*); existing rows stay valid."
     },
     {
+      "path": "ProposalLineItem.menuId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-08",
+      "reason": "Optional menu link on per-guest and base price lines a dish pick adds (convex/lib/proposalDishPricing.ts); existing rows stay valid with no link."
+    },
+    {
       "path": "ProposalTemplate.sectionOrder",
       "category": "property-added",
       "acknowledgedAt": "2026-09-29",

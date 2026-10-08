@@ -1,35 +1,30 @@
 import { useMemo } from "react";
+import { usePlanWindowRows } from "../../../lib/eventScopedQueries";
+import { useAwayForPeople } from "../../../lib/eventHistoryQueries";
 import {
-  useListAvailabilityWindow,
   useListEquipment,
-  useListEquipmentIssue,
   useListEquipmentPart,
-  useListEquipmentReservation,
-  useListEventAssignment,
-  useListEventPlanNeeds,
-  useListEventStaffNeed,
-  useListEventVehicleAssignment,
   useListOrganization,
-  useListPackList,
-  useListPackListItem,
   useListPerson,
   useListQualification,
-  useListTimeOffRequest,
   useListTrailer,
   useListVehicle,
 } from "../../../lib/manifest-convex-react";
 import {
+  eventWindow,
   parsePlanLevels,
   type PlanLevels,
   type PlanSnapshot,
 } from "../../../lib/planningChecks";
 import { useEventRecordsInRange } from "../../facilities/useEventsById";
-import { DAY_MS } from "../../home/homeCalendar";
+import { useOpenEquipmentIssues } from "../../facilities/useLogisticsWindow";
 
-const PLAN_WINDOW_DAYS = 90;
-
+// The month view shows at most 37 days before the chosen day to 42 after it;
+// 50 each side covers every view plus a week for multi-day jobs and clashes.
 export type PlanData = {
   loading: boolean;
+  /** More events on screen than the board reads at once. */
+  tooMany: boolean;
   snap: PlanSnapshot;
   levels: PlanLevels;
   organization:
@@ -41,34 +36,79 @@ export type PlanData = {
  * Everything the planning board reads, as one snapshot. A list this role may
  * not read comes back empty, so its checks simply find nothing.
  */
-export function usePlanSnapshot(anchor: number): PlanData {
-  // Events within 90 days either side of the day the board is showing: more
-  // than the 42-day month grid, so multi-day jobs and the events they could
-  // clash with are all here. The window moves with the board, not each render.
-  const eventWindow = useMemo(
+const NEIGHBOUR_MS = 86_400_000;
+
+export function usePlanSnapshot(shown: { from: number; to: number }): PlanData {
+  // Events on the days the board shows (those that start on them and those
+  // that started earlier and still run into them), plus one day either side:
+  // a neighbour's load, travel, setup and cleanup time can reach into the
+  // days shown, and the clash checks must see its crew, trucks and holds.
+  // The board draws only the days shown.
+  const shownWindow = useMemo(
     () => ({
-      from: anchor - PLAN_WINDOW_DAYS * DAY_MS,
-      to: anchor + PLAN_WINDOW_DAYS * DAY_MS,
+      from: shown.from - NEIGHBOUR_MS,
+      to: shown.to + NEIGHBOUR_MS,
+      runningIn: true,
     }),
-    [anchor],
+    [shown],
   );
-  const events = useEventRecordsInRange(eventWindow);
-  const assignments = useListEventAssignment();
-  const staffNeeds = useListEventStaffNeed();
-  const rigs = useListEventVehicleAssignment();
+  const events = useEventRecordsInRange(shownWindow);
+  // Staff, trucks, holds and pack lists of the events in the window only
+  // (convex/planWindow.ts), not every row the company ever had.
+  const eventIdsKey = (events ?? []).map((row) => row._id).join(",");
+  const eventIds = useMemo(
+    () => (eventIdsKey ? eventIdsKey.split(",") : []),
+    [eventIdsKey],
+  );
+  const forEvents = usePlanWindowRows(events === undefined ? "skip" : eventIds);
+  const assignments = forEvents?.assignments;
+  const staffNeeds = forEvents?.staffNeeds;
+  const rigs = forEvents?.rigs;
   const vehicles = useListVehicle();
   const trailers = useListTrailer();
   const people = useListPerson();
-  const timeOff = useListTimeOffRequest();
-  const availability = useListAvailabilityWindow();
+  // Time off and availability of every active person the board can put on
+  // an event (not only those already on one), over the times these events
+  // and their crews cover, not every row ever made.
+  const awayWindow = useMemo(() => {
+    if (events === undefined || assignments === undefined) return "skip";
+    let from = shown.from;
+    let to = shown.to;
+    for (const row of [
+      ...events.map((event) =>
+        eventWindow({ ...event, stage: String(event.stage) }),
+      ),
+      ...assignments.map((row) =>
+        row.startsAt != null && row.endsAt != null
+          ? { start: row.startsAt, end: row.endsAt }
+          : null,
+      ),
+    ]) {
+      if (!row) continue;
+      from = Math.min(from, row.start);
+      to = Math.max(to, row.end);
+    }
+    return { from, to };
+  }, [events, assignments, shown.from, shown.to]);
+  const away = useAwayForPeople(
+    people
+      ?.filter(
+        (row) => row.deletedAt == null && String(row.status) === "active",
+      )
+      .map((row) => row._id),
+    awayWindow,
+  );
+  const timeOff = away?.timeOff;
+  const availability = away?.availability;
   const qualifications = useListQualification();
   const equipment = useListEquipment();
-  const reservations = useListEquipmentReservation();
+  const reservations = forEvents?.reservations;
   const parts = useListEquipmentPart();
-  const equipmentIssues = useListEquipmentIssue();
-  const packLists = useListPackList();
-  const packLines = useListPackListItem();
-  const planNeeds = useListEventPlanNeeds();
+  // Only open issues take units out of use.
+  const equipmentIssues = useOpenEquipmentIssues();
+  const packLists = forEvents?.packLists;
+  const packLines = forEvents?.packLines;
+  const planNeeds = forEvents?.planNeeds;
   const organizations = useListOrganization();
 
   const lists = [
@@ -184,5 +224,11 @@ export function usePlanSnapshot(anchor: number): PlanData {
     [organization?.planningChecksJson],
   );
 
-  return { loading, snap, levels, organization };
+  return {
+    loading,
+    tooMany: forEvents?.capped === true,
+    snap,
+    levels,
+    organization,
+  };
 }

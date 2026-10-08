@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  useListInventoryItem,
   useListComponent,
   useListComponentIngredient,
 } from "../../lib/manifest-convex-react";
+import { useStockLines } from "../facilities/useInventoryHistory";
 import { Skeleton } from "../../ui/primitives";
 import { componentPath } from "../kitchen/kitchenRoutes";
 
@@ -25,7 +25,7 @@ type Suggestion = {
 export function computeSuggestions(
   components: ReturnType<typeof useListComponent>,
   lines: ReturnType<typeof useListComponentIngredient>,
-  inventory: ReturnType<typeof useListInventoryItem>,
+  inventory: ReturnType<typeof useStockLines>,
 ): Suggestion[] {
   if (!components || !lines || !inventory) return [];
 
@@ -85,7 +85,7 @@ export function computeSuggestions(
 export function ComponentStockSuggestions() {
   const components = useListComponent();
   const lines = useListComponentIngredient();
-  const inventory = useListInventoryItem();
+  const inventory = useStockLines("none");
   const [open, setOpen] = useState(false);
 
   const suggestions = useMemo(
