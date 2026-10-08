@@ -1,7 +1,4 @@
 import { useState } from "react";
-import { useMutation } from "convex/react";
-import { api, type Id } from "../../lib/api";
-import { effectiveSellingPrice } from "../../lib/catalogEligibility";
 import {
   useCreateProposalDishSelection,
   useListMenu,
@@ -19,8 +16,6 @@ interface ProposalMenuSelectionPanelProps {
   guestCount: number;
   /** Selections are editable while the proposal is draft/sent/viewed. */
   editable: boolean;
-  /** Price lines change only on a draft; then picks price themselves. */
-  pricesEditable?: boolean;
   onFailure: (error: unknown) => void;
 }
 
@@ -34,7 +29,6 @@ export function ProposalMenuSelectionPanel({
   proposalId,
   guestCount,
   editable,
-  pricesEditable = false,
   onFailure,
 }: ProposalMenuSelectionPanelProps) {
   const menus = useListMenu();
@@ -45,15 +39,6 @@ export function ProposalMenuSelectionPanel({
   const createSelection = useCreateProposalDishSelection();
   const adjustServings = useProposalDishSelectionAdjustServings();
   const removeSelection = useProposalDishSelectionRemove();
-  const addLine = useMutation(
-    api.lib.proposalPricing.addProposalLineAndRecompute,
-  );
-  const reviseLine = useMutation(
-    api.lib.proposalPricing.reviseProposalLineAndRecompute,
-  );
-  const removeLine = useMutation(
-    api.lib.proposalPricing.removeProposalLineAndRecompute,
-  );
   const [busy, setBusy] = useState<string | null>(null);
 
   const loading =
@@ -137,88 +122,21 @@ export function ProposalMenuSelectionPanel({
         "active",
   );
 
-  // The price line a dish pick added itself: linked to that catalog dish.
-  const pickedLine = (menuId: string, dishId: string) => {
-    const menuDish = (menuDishes ?? []).find(
-      (md) => md.menuId === menuId && md.dishId === dishId,
-    );
-    return menuDish
-      ? priceLines.find((line) => line.menuDishId === menuDish._id)
-      : undefined;
-  };
-
   const addSelection = (line: (typeof catalogLines)[number]) => {
-    const servings = guestCount > 0 ? guestCount : 1;
     void run(`add:${line._id}`, async () => {
       await createSelection({
         proposalId,
         menuId: line.menuId,
         dishId: line.dishId,
-        quantityServings: servings,
+        quantityServings: guestCount > 0 ? guestCount : 1,
         course: line.course ?? undefined,
         serviceStyle: line.serviceStyle ?? undefined,
       });
-      // Price the pick unless a line already covers it: the dish's own
-      // catalog price, or, once every dish of its menu is picked, the menu's
-      // per-guest price (the same rule the event build uses).
-      const name = dishName(line.dishId);
-      if (
-        !pricesEditable ||
-        coveredDishIds.has(String(line.dishId)) ||
-        lineNames.has(name.trim().toLowerCase())
-      )
-        return;
-      let sortOrder =
-        priceLines.reduce(
-          (max, row) => Math.max(max, Number(row.sortOrder) || 0),
-          -1,
-        ) + 1;
-      const price = effectiveSellingPrice(line, Date.now());
-      if (price != null && price > 0) {
-        await addLine({
-          proposalId: proposalId as Id<"proposals">,
-          description: name,
-          pricingBasis: "per_unit",
-          unitPrice: price,
-          quantity: servings,
-          unit: "servings",
-          sortOrder,
-          menuDishId: line._id as Id<"menuDishes">,
-        });
-        return;
-      }
-      const menu = (menus ?? []).find((m) => m._id === line.menuId);
-      const picked = new Set([...selectedDishIds, line.dishId].map(String));
-      const complete = catalogLines
-        .filter((row) => row.menuId === line.menuId)
-        .every((row) => picked.has(String(row.dishId)));
-      if (!menu || !complete || Number(menu.pricePerPerson) <= 0) return;
-      await addLine({
-        proposalId: proposalId as Id<"proposals">,
-        description: `${menu.name} (per guest)`,
-        pricingBasis: "per_person",
-        unitPrice: Number(menu.pricePerPerson),
-        sortOrder: sortOrder++,
-      });
-      if (Number(menu.basePrice) > 0)
-        await addLine({
-          proposalId: proposalId as Id<"proposals">,
-          description: `${menu.name} (base price)`,
-          pricingBasis: "flat",
-          unitPrice: Number(menu.basePrice),
-          sortOrder,
-        });
     });
   };
 
   const commitServings = (
-    row: {
-      _id: string;
-      version: number;
-      quantityServings: number;
-      menuId: string;
-      dishId: string;
-    },
+    row: { _id: string; version: number; quantityServings: number },
     raw: string,
   ) => {
     const next = Number(raw);
@@ -230,22 +148,6 @@ export function ProposalMenuSelectionPanel({
         version: row.version,
         quantityServings: next,
       });
-      const line = pricesEditable
-        ? pickedLine(row.menuId, row.dishId)
-        : undefined;
-      if (line && line.pricingBasis === "per_unit")
-        await reviseLine({
-          docId: line._id as Id<"proposalLineItems">,
-          version: Number(line.version),
-          description: line.description,
-          pricingBasis: "per_unit",
-          unitPrice: Number(line.unitPrice),
-          quantity: next,
-          unit: line.unit ?? undefined,
-          sortOrder: Number(line.sortOrder),
-          menuDishId: line.menuDishId as Id<"menuDishes">,
-          overrideReason: line.overrideReason ?? undefined,
-        });
     });
   };
 
@@ -302,8 +204,6 @@ export function ProposalMenuSelectionPanel({
                             _id: row._id,
                             version: row.version,
                             quantityServings: Number(row.quantityServings),
-                            menuId: row.menuId,
-                            dishId: row.dishId,
                           },
                           event.target.value,
                         )
@@ -325,29 +225,6 @@ export function ProposalMenuSelectionPanel({
                             docId: row._id,
                             version: row.version,
                           });
-                          if (!pricesEditable) return;
-                          // Its own price line, and the menu's per-guest
-                          // lines now that the menu is no longer whole.
-                          const menu = (menus ?? []).find(
-                            (m) => m._id === row.menuId,
-                          );
-                          const stale = [
-                            pickedLine(row.menuId, row.dishId),
-                            ...priceLines.filter(
-                              (line) =>
-                                menu != null &&
-                                (line.description ===
-                                  `${menu.name} (per guest)` ||
-                                  line.description ===
-                                    `${menu.name} (base price)`),
-                            ),
-                          ];
-                          for (const line of stale)
-                            if (line)
-                              await removeLine({
-                                docId: line._id as Id<"proposalLineItems">,
-                                version: Number(line.version),
-                              });
                         })
                       }
                     >
