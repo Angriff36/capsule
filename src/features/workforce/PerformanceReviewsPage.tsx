@@ -194,11 +194,20 @@ export function PerformanceReviewsPage() {
                 defaultValue={workingId ?? ""}
               >
                 <option value="">No specific event</option>
-                {/* Reviews follow work: the latest events first. */}
+                {/* Reviews follow work: events already held come first, the
+                    latest at the top, then upcoming ones; cancelled are left
+                    out. */}
                 {[...(events ?? [])]
-                  .sort(
-                    (a, b) => Number(b.startsAt ?? 0) - Number(a.startsAt ?? 0),
-                  )
+                  .filter((event) => event.stage !== "cancelled")
+                  .sort((a, b) => {
+                    const now = Date.now();
+                    const aStart = Number(a.startsAt ?? 0);
+                    const bStart = Number(b.startsAt ?? 0);
+                    const aPast = aStart <= now;
+                    const bPast = bStart <= now;
+                    if (aPast !== bPast) return aPast ? -1 : 1;
+                    return aPast ? bStart - aStart : aStart - bStart;
+                  })
                   .map((event) => (
                     <option key={event._id} value={event._id}>
                       {event.title} — {formatDate(event.startsAt ?? 0)}
