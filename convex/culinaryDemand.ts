@@ -122,6 +122,26 @@ async function byTenant<
   return live(rows as unknown as (Doc<T> & { deletedAt?: number | null })[]);
 }
 
+/**
+ * One event's rows of an event-scoped table, read through its by_eventId
+ * index (live rows of this company only). A whole-company read of these
+ * tables passed the 16 MB read limit on the live server (2026-10-08).
+ */
+async function byEvent<T extends "eventDishes" | "productionBatchAllocations">(
+  ctx: Ctx,
+  table: T,
+  tenantId: string,
+  eventId: Id<"events">,
+) {
+  const rows = await ctx.db
+    .query(table as "eventDishes")
+    .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+    .collect();
+  return live(
+    rows as unknown as (Doc<T> & { deletedAt?: number | null })[],
+  ).filter((row) => row.tenantId === tenantId);
+}
+
 interface Catalog {
   lookups: DemandLookups;
   dishes: Doc<"dishes">[];
@@ -402,11 +422,30 @@ async function loadEventDishes(
       ? ed.followsEventHeadcount
       : Number(ed.quantityServings ?? 0) === previousHeadcount &&
         (ed.headcountOverride == null || ed.headcountOverride === 0);
-  const [eventDishes, overrides, prepTasks] = await Promise.all([
-    byTenant(ctx, "eventDishes", tenantId),
-    byTenant(ctx, "eventDishLineOverrides", tenantId),
-    byTenant(ctx, "prepTasks", tenantId),
-  ]);
+  const eventDishes = await byEvent(ctx, "eventDishes", tenantId, eventId);
+  // Changes and prep tasks are matched to their event dish below, so read
+  // them by event dish: exactly the rows that match, nothing else.
+  const perDish = await Promise.all(
+    eventDishes.map(async (ed) => {
+      const [dishOverrides, dishTasks] = await Promise.all([
+        ctx.db
+          .query("eventDishLineOverrides")
+          .withIndex("by_eventDishId", (q) => q.eq("eventDishId", ed._id))
+          .collect(),
+        ctx.db
+          .query("prepTasks")
+          .withIndex("by_eventDishId", (q) => q.eq("eventDishId", ed._id))
+          .collect(),
+      ]);
+      return { dishOverrides, dishTasks };
+    }),
+  );
+  const overrides = live(perDish.flatMap((row) => row.dishOverrides)).filter(
+    (row) => row.tenantId === tenantId,
+  );
+  const prepTasks = live(perDish.flatMap((row) => row.dishTasks)).filter(
+    (row) => row.tenantId === tenantId,
+  );
   return eventDishes
     .filter(
       (ed) =>
@@ -540,7 +579,7 @@ async function reviewEvent(
     proposedHeadcount,
   );
   const allocations = (
-    await byTenant(ctx, "productionBatchAllocations", tenantId)
+    await byEvent(ctx, "productionBatchAllocations", tenantId, eventId)
   ).filter(
     (a) =>
       a.allocatedAt != null &&

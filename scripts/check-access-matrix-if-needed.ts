@@ -53,6 +53,11 @@ const MANIFEST_WORDS = [
   "checkRole",
   "private command",
   "user.role",
+  // Role grants and role sets (e.g. `allow financeAccess` in
+  // src/foundation/base.manifest) change who may read or write.
+  "allow ",
+  "Access",
+  "role",
 ];
 /** Rule c: text in a changed line of a convex .ts file (generated rules count). */
 const CONVEX_WORDS = [
@@ -64,7 +69,16 @@ const CONVEX_WORDS = [
   "tenantId ===",
   "assertOwnWorkspaceLinks",
   "assertServerOnlyStep",
+  // Tenant scoping (e.g. `.eq("tenantId", tenantId)`), role tables and role
+  // sets (ROLE_READS, ROLE_PERMISSIONS, EQUIPMENT_ROLES) and capability names.
+  "tenantId",
+  "ROLE",
+  'Access"',
+  "role",
 ];
+/** Rule c also: a changed line that names a role, as role sets list them. */
+const ROLE_NAME =
+  /"(owner|admin|system|manager|staff|driver|[a-z]+(_[a-z]+)*_(manager|staff|lead|chef|cook))"|^\s*(owner|admin|system|manager|staff|driver|[a-z]+_manager)\s*:/;
 
 /** Rule d: the matrix itself. */
 function isMatrixFile(path: string): boolean {
@@ -160,15 +174,29 @@ function decide(): { run: boolean; why: string[]; base: string } {
     )
     .map((l) => `${l.path}: ${l.text.trim().slice(0, 100)}`);
   if (b.length) why.push(`rule b (manifest access line changed): ${first(b)}`);
-  const c = lines
+  const c: string[] = lines
     .filter(
       (l) =>
         l.path.startsWith("convex/") &&
         !l.path.startsWith("convex/_generated/") &&
         l.path.endsWith(".ts") &&
-        CONVEX_WORDS.some((w) => l.text.includes(w)),
+        (CONVEX_WORDS.some((w) => l.text.includes(w)) ||
+          ROLE_NAME.test(l.text)),
     )
     .map((l) => `${l.path}: ${l.text.trim().slice(0, 100)}`);
+  // Role tables and role sets also live in src/ (generated ROLE_PERMISSIONS,
+  // screen role lists): a changed line there that names a role or a role
+  // table is an access change too.
+  c.push(
+    ...lines
+      .filter(
+        (l) =>
+          l.path.startsWith("src/") &&
+          /\.tsx?$/.test(l.path) &&
+          (/ROLE/.test(l.text) || ROLE_NAME.test(l.text)),
+      )
+      .map((l) => `${l.path}: ${l.text.trim().slice(0, 100)}`),
+  );
   if (c.length) why.push(`rule c (convex access line changed): ${first(c)}`);
   const d = files.filter(isMatrixFile);
   if (d.length) why.push(`rule d (matrix or its ledger changed): ${first(d)}`);
