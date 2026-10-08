@@ -1,8 +1,13 @@
 import { Link } from "react-router-dom";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatCountNoun, formatDate } from "../../lib/format";
+import {
+  formatCountNoun,
+  formatDate,
+  formatMoneyExact,
+} from "../../lib/format";
 import { PayrollLifecyclePolicy } from "./PayrollLifecyclePolicy";
 import { roundPayrollHours } from "./payrollPeriod";
+import { parseTipPayrollNote } from "./tipDistribution";
 
 const policy = new PayrollLifecyclePolicy();
 
@@ -16,6 +21,7 @@ export type PayrollWorksheetRow = {
   regularMinutes?: unknown;
   overtimeMinutes?: unknown;
   status: unknown;
+  notes?: unknown;
 };
 
 /**
@@ -135,6 +141,17 @@ export function PayrollWorksheet({
                       {gross == null ? null : (
                         <small>est. ${gross.toFixed(2)}</small>
                       )}
+                      {(() => {
+                        // A tip share sent from Tips carries its amount in the
+                        // note; the export pays it, so the check shows it.
+                        const tip = parseTipPayrollNote(row.notes);
+                        return tip ? (
+                          <small>
+                            {" "}
+                            tip {formatMoneyExact(tip.amountCents / 100)}
+                          </small>
+                        ) : null;
+                      })()}
                     </td>
                     <td>
                       <StatusChip status={String(row.status)} />

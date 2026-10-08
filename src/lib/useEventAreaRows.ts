@@ -90,11 +90,12 @@ export function useDishComponentLines(dishId: string) {
   });
 }
 
-/** One event's payroll inputs. */
+/** One event's payroll inputs; nothing is read without an event. */
 export function useEventPayrollInputs(eventId: string) {
-  return useQuery(api.queries.listPayrollInputByEventId, {
-    eventId: eventId as Id<"events">,
-  });
+  return useQuery(
+    api.queries.listPayrollInputByEventId,
+    eventId ? { eventId: eventId as Id<"events"> } : "skip",
+  );
 }
 
 /** One event's vendor orders. */

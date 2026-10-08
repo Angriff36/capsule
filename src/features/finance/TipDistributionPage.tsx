@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import {
   useCreatePayrollInput,
   useListPerson,
+  usePayrollInputMarkVoided,
 } from "../../lib/manifest-convex-react";
+import { useEventPayrollInputs } from "../../lib/useEventAreaRows";
 import {
   useEventAssignmentRows,
   useEventShiftRows,
@@ -24,6 +26,7 @@ import {
   distributeTipPool,
   formatTipPayrollNote,
   moneyToCents,
+  parseTipPayrollNote,
   tipPayrollIdempotencyKey,
   type TipParticipant,
   type TipPoolingMethod,
@@ -52,6 +55,7 @@ const durationHours = (start: unknown, end: unknown) => {
 export function TipDistributionPage() {
   const people = useListPerson();
   const createPayrollInput = useCreatePayrollInput();
+  const markVoided = usePayrollInputMarkVoided();
   const [eventId, setEventId] = useState(() => workingEventId() ?? "");
   // Only the picked event's staff and shifts.
   const eventScope = eventId ? (eventId as Id<"events">) : "skip";
@@ -60,6 +64,23 @@ export function TipDistributionPage() {
   const assignments = eventId ? eventAssignments : [];
   const shifts = eventId ? eventShifts : [];
   const events = usePickerAndNamedEvents([eventId]);
+  // Tip shares this event already sent to Payroll (not voided). A new split
+  // replaces the prepared ones, so the same tips are never paid twice.
+  const eventPayrollInputs = useEventPayrollInputs(eventId);
+  const sentTips = (eventPayrollInputs ?? []).filter(
+    (row) =>
+      String(row.status) !== "voided" && parseTipPayrollNote(row.notes) != null,
+  );
+  const allTipShares = (eventPayrollInputs ?? []).filter(
+    (row) => parseTipPayrollNote(row.notes) != null,
+  ).length;
+  const finalizedTips = sentTips.filter(
+    (row) => String(row.status) === "finalized",
+  );
+  const sentTipCents = sentTips.reduce(
+    (sum, row) => sum + (parseTipPayrollNote(row.notes)?.amountCents ?? 0),
+    0,
+  );
   const [total, setTotal] = useState("0.00");
   const [method, setMethod] = useState<TipPoolingMethod>("equal");
   const [excluded, setExcluded] = useState<Record<string, boolean>>({});
@@ -196,6 +217,14 @@ export function TipDistributionPage() {
     }
     setFailure(null);
     setNotice(null);
+    if (finalizedTips.length > 0) {
+      setFailure(
+        new Error(
+          "Tips for this event are already finalized in Payroll. Void them there first, then send the new split.",
+        ),
+      );
+      return;
+    }
     setBusy(true);
     const periodStart = Number(selectedEvent.startsAt ?? Date.now());
     const periodEnd = Math.max(
@@ -203,6 +232,16 @@ export function TipDistributionPage() {
       Number(selectedEvent.endsAt ?? selectedEvent.startsAt ?? Date.now()),
     );
     try {
+      // The earlier, still unfinalized split is replaced by this one.
+      // How many tip shares this event has ever had (voided too): a new
+      // send after any earlier one gets a new key.
+      const replacedKey = `:after:${allTipShares}`;
+      for (const row of sentTips)
+        await markVoided({
+          docId: row._id,
+          version: row.version,
+          reason: "Replaced by a new tip split",
+        });
       for (const share of calculation.shares) {
         const staffRow = staff.find((row) => row.person._id === share.personId);
         await createPayrollInput({
@@ -221,13 +260,16 @@ export function TipDistributionPage() {
             method,
             version: 1,
           }),
-          idempotencyKey: tipPayrollIdempotencyKey({
+          // A double-click of the same send is still saved once, but a new
+          // split after earlier shares is a new share, never an old voided
+          // one returned again.
+          idempotencyKey: `${tipPayrollIdempotencyKey({
             eventId: selectedEvent._id,
             method,
             personId: share.personId,
             shareCents: share.shareCents,
             totalCents: calculation.totalCents,
-          }),
+          })}${replacedKey}`,
         });
       }
       setNotice(
@@ -560,6 +602,16 @@ export function TipDistributionPage() {
               {busy ? "Preparing payroll…" : "Send amounts to payroll"}
             </button>
           </div>
+          {sentTips.length > 0 ? (
+            <p className="tip-bridge-note tip-no-print" role="status">
+              Already sent to Payroll for this event:{" "}
+              {formatCountNoun(sentTips.length, "share")} totaling{" "}
+              {formatMoneyExact(sentTipCents / 100)}.{" "}
+              {finalizedTips.length > 0
+                ? "Some are finalized: void them in Payroll before sending a new split."
+                : "Sending again replaces them."}
+            </p>
+          ) : null}
           <p className="tip-bridge-note tip-no-print">
             Each share goes to Payroll to be checked — no pay goes out until you
             finalize it there. The tip amount is written on the payroll line and
