@@ -68,7 +68,9 @@ export function contactTaskRowsFromGrid(
   grid: ReadonlyArray<ReadonlyArray<string>>,
 ): Record<string, string>[] {
   const rows: Record<string, string>[] = [];
-  const seen = new Set<string>();
+  // Each id's row contents: an exact repeat (a page break) is dropped, a
+  // different task on the same day with the same subject gets its own id.
+  const seen = new Map<string, string[]>();
   let contact = "";
   for (const [index, raw] of grid.entries()) {
     const cells = raw.map((cell) => (cell ?? "").trim());
@@ -85,9 +87,15 @@ export function contactTaskRowsFromGrid(
     const eventInfo = cells[10] ?? "";
     const eventId = EVENT_NUMBER.exec(eventInfo)?.[1] ?? "";
     const owner = eventId ? eventId : `client:${contact.toLowerCase()}`;
-    const historyId = `task:${owner}:${date}:${subject.toLowerCase()}`;
-    if (seen.has(historyId)) continue;
-    seen.add(historyId);
+    const baseId = `task:${owner}:${date}:${subject.toLowerCase()}`;
+    const content = JSON.stringify([cells[0], done, cells[4], cells[8]]);
+    const contents = seen.get(baseId) ?? [];
+    if (contents.includes(content)) continue;
+    contents.push(content);
+    seen.set(baseId, contents);
+    // The first keeps the plain id, so tasks brought in before stay matched.
+    const historyId =
+      contents.length === 1 ? baseId : `${baseId}:${contents.length}`;
     rows.push({
       HistoryID: historyId,
       ...(eventId ? { EventID: eventId } : {}),

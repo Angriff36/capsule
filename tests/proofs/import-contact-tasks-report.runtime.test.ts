@@ -215,4 +215,26 @@ describe("runtime proof: TPP Contact Tasks & Notes report import (AC-057)", () =
     expect(again.committed).toBe(0);
     expect(await table("clientCommunications")).toHaveLength(3);
   });
+
+  it("keeps two different tasks with one day and subject, drops an exact repeat", () => {
+    const reminder = (description: string) =>
+      task(
+        "45928",
+        "No",
+        "Payment reminder",
+        description,
+        "Chen Wedding - Sat (Event #: 5101)",
+      );
+    const rows = contactTaskRowsFromGrid([
+      blank({ 0: "Contact Tasks & Notes" }),
+      ...block("Maya Chen"),
+      reminder("Deposit"),
+      reminder("Balance"),
+      reminder("Deposit"),
+    ]);
+    expect(rows.map((row) => [row.HistoryID, row.Notes])).toEqual([
+      ["task:5101:2025-09-28:payment reminder", "Deposit"],
+      ["task:5101:2025-09-28:payment reminder:2", "Balance"],
+    ]);
+  });
 });
