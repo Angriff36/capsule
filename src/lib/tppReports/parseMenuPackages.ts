@@ -164,12 +164,15 @@ export function menuPackagesFromEntries(
 ): OldMenuPackage[] {
   const sheet = readXlsxWorkbookFromEntries(entries).sheets[0];
   const looks = readXlsxCellLooksFromEntries(entries)[0];
-  return menuPackagesFromLines(
-    (sheet?.cells ?? [])
-      .filter((cell) => /^A\d+$/.test(cell.ref))
-      .map((cell) => ({
-        text: XlsxReportGrid.cellText(cell),
-        look: looks?.get(cell.ref),
-      })),
-  );
+  const lines = (sheet?.cells ?? [])
+    .filter((cell) => /^A\d+$/.test(cell.ref))
+    .map((cell) => ({
+      text: XlsxReportGrid.cellText(cell),
+      look: looks?.get(cell.ref),
+    }));
+  // Only the Menu Item Packages report: another styled workbook would turn
+  // its bold cells into bogus menus.
+  if (!isMenuPackagesReport(lines.slice(0, 3).map((line) => [line.text])))
+    return [];
+  return menuPackagesFromLines(lines);
 }
