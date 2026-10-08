@@ -90,6 +90,16 @@ export function EquipmentRepairsPanel({
     const number = (key: string) =>
       text(key) === "" ? undefined : Number(text(key));
     const dueAt = text("dueAt");
+    // Say which field is missing, not the server's general "check the
+    // entered details".
+    if (!text("equipmentId")) {
+      setFailure(new Error("Pick the equipment that has the problem."));
+      return;
+    }
+    if (!text("description")) {
+      setFailure(new Error("Say what is wrong with it."));
+      return;
+    }
     run(async () => {
       await raise({
         kind: "repair",
