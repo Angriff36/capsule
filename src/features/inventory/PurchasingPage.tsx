@@ -177,11 +177,16 @@ export function PurchasingPage() {
           mappings: unitMappings ?? [],
         })
       : null;
-  // Order lines for the header totals: each listed order's and draft's own.
+  // Order lines for the header totals: each listed order's and draft's own,
+  // once each (a draft among the newest orders is in both lists).
   const lines = useMemo(
     () => [
-      ...(orders ?? []).flatMap((order) => order.lines),
-      ...(drafts ?? []).flatMap((order) => order.lines ?? []),
+      ...new Map(
+        [
+          ...(orders ?? []).flatMap((order) => order.lines),
+          ...(drafts ?? []).flatMap((order) => order.lines ?? []),
+        ].map((line) => [line._id, line]),
+      ).values(),
     ],
     [orders, drafts],
   );
