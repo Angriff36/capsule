@@ -11,4 +11,6 @@ git -C $root fetch origin dev main --quiet
 if ((git -C $root rev-list --count 'origin/main..origin/dev') -eq '0') { exit 0 }
 $branch = 'dev (not yet in production)'
 New-Item -ItemType File -Force $open | Out-Null
-"[$(Get-Date -Format s)] daily review opened for $branch" | Add-Content (Join-Path $root '.claude\loop-tick.log')
+# loop-tick.cmd already sends this script's output to loop-tick.log and holds it open,
+# so Add-Content to the log fails; write to output instead.
+"[$(Get-Date -Format s)] daily review opened for $branch"
