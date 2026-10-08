@@ -193,6 +193,8 @@ const UPCOMING_CAP = 500;
 const PAST_SHOWN = 8;
 const PAST_SCAN_CAP = 400;
 
+const UNDATED_CAP = 200;
+
 export const listEvents = query({
   args: {},
   handler: async (ctx) => {
@@ -226,7 +228,22 @@ export const listEvents = query({
         shown += 1;
       if (shown >= PAST_SHOWN) break;
     }
-    const rows = [...upcoming, ...past];
+    // Events with no date yet (new bookings) stay in the picker, as before.
+    const undated = [
+      ...(await ctx.db
+        .query("events")
+        .withIndex("by_tenantId_and_startsAt", (q: any) =>
+          q.eq("tenantId", auth.tenantId).eq("startsAt", null),
+        )
+        .take(UNDATED_CAP)),
+      ...(await ctx.db
+        .query("events")
+        .withIndex("by_tenantId_and_startsAt", (q: any) =>
+          q.eq("tenantId", auth.tenantId).eq("startsAt", undefined),
+        )
+        .take(UNDATED_CAP)),
+    ];
+    const rows = [...upcoming, ...past, ...undated];
     return rows.filter(live).map((row: any) => ({
       _id: row._id,
       title: row.title ?? null,
