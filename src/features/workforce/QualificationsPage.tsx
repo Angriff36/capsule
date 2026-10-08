@@ -86,10 +86,16 @@ export function QualificationsPage() {
     const form = event.currentTarget;
     const data = new FormData(form);
     const expiresRaw = String(data.get("expiresAt") || "");
+    // A blank name takes the chosen type's name ("Food handler card").
+    const typeValue = String(data.get("certificationType") ?? "").trim();
+    const name =
+      String(data.get("name") ?? "").trim() ||
+      (certificationTypes.find(([value]) => value === typeValue)?.[1] ?? "");
     void run("grant", async () => {
+      if (!name) throw new Error("Name the qualification or pick its type.");
       await grant({
         personId: String(data.get("personId")),
-        name: String(data.get("name")),
+        name,
         // Date-only inputs parse as local midnight ("T00:00:00"), not UTC,
         // so the selected calendar day survives west-of-UTC time zones.
         issuedAt: new Date(
@@ -113,7 +119,7 @@ export function QualificationsPage() {
       form.reset();
       setShowCreate(false);
       reportActionOk(
-        `${String(data.get("name"))} added for ${personName(String(data.get("personId")))}.`,
+        `${name} added for ${personName(String(data.get("personId")))}.`,
       );
     });
   };
@@ -177,8 +183,7 @@ export function QualificationsPage() {
               <input
                 name="name"
                 className="input"
-                placeholder="Food handler card"
-                required
+                placeholder="Blank uses the type below"
               />
             </label>
             <label className="field-label">
