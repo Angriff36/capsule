@@ -59,7 +59,7 @@ const EVENT_PAGE_PARTS: Array<{
     domain: "commercial",
     reads: [
       "clientDirectory.list",
-      "queries.listClientContact",
+      "queries.listClientContactByClientId",
       "queries.getProposal",
     ],
   },
@@ -71,15 +71,17 @@ const EVENT_PAGE_PARTS: Array<{
   {
     part: "demand, stock, shortages and purchasing",
     domain: "purchasing",
-    reads: ["queries.listIngredientDemand"],
+    reads: ["queries.listIngredientDemandByEventId"],
   },
   {
     part: "prep tasks, batches and quality",
     domain: "kitchen",
     reads: [
       "queries.listPrepTask",
-      "queries.listProductionBatch",
-      "queries.listQualityCheck",
+      // Open batches and the prep board's work (tasks, steps, quality
+      // checks) are read scoped, not as whole tables (2026-10-08).
+      "productionWindow.openBatches",
+      "productionWindow.prepWork",
     ],
   },
   {
@@ -95,11 +97,11 @@ const EVENT_PAGE_PARTS: Array<{
     part: "pack list, equipment, vehicle, delivery and return",
     domain: "packing",
     reads: [
-      "queries.listPackList",
-      "queries.listPackListItem",
-      "queries.listEquipmentReservation",
-      "queries.listEventVehicleAssignment",
-      "queries.listDelivery",
+      "queries.listPackListByEventId",
+      "queries.listPackListItemByPackListId",
+      "queries.listEquipmentReservationByEventId",
+      "queries.listEventVehicleAssignmentByActiveEventId",
+      "queries.listDeliveryByPackListId",
     ],
   },
   {
@@ -111,9 +113,9 @@ const EVENT_PAGE_PARTS: Array<{
     part: "invoice, payment and closeout",
     domain: "closeout",
     reads: [
-      "queries.listInvoice",
-      "queries.listPayment",
-      "queries.listEventCloseout",
+      "queries.listInvoiceByEventId",
+      "queries.listPaymentByInvoiceId",
+      "queries.listEventCloseoutByEventId",
       "closeoutSources.eventCloseoutSources",
     ],
   },
