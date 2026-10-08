@@ -24,26 +24,55 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 ### Generated reads
 
 - `queries.getClient` - live read
+- `queries.getClientContact` - live read
 - `queries.getContract` - live read
 - `queries.getEvent` - live read
+- `queries.getInvoice` - live read
+- `queries.getLead` - live read
+- `queries.getProposal` - live read
 - `queries.getVenue` - live read
-- `queries.listClientCommunication` - live read
-- `queries.listClientContact` - live read
-- `queries.listClientOutreachTask` - live read
-- `queries.listContract` - live read
+- `queries.listClientCommunicationByClientContactId` - live read
+- `queries.listClientCommunicationByClientId` - live read
+- `queries.listClientCommunicationByEventId` - live read
+- `queries.listClientContactByClientId` - live read
+- `queries.listContractByClientId` - live read
+- `queries.listCreditMemoByClientId` - live read
+- `queries.listCreditMemoBySourceInvoiceId` - live read
+- `queries.listDateHoldByHoldDate` - live read
+- `queries.listDateWaitlistEntryByHoldDate` - live read
 - `queries.listEvent` - live read
-- `queries.listInvoice` - live read
-- `queries.listLead` - live read
-- `queries.listMessage` - live read
-- `queries.listMessageThread` - live read
+- `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventCloseoutByEventId` - live read
+- `queries.listEventCloseoutByTenantIdAndStatus` - live read
+- `queries.listEventNumberAssignmentByEventId` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listInvoiceByClientId` - live read
+- `queries.listInvoiceByEventId` - live read
+- `queries.listInvoiceByTenantIdAndStatus` - live read
+- `queries.listLeadByClientId` - live read
+- `queries.listLeftoverDispositionByEventId` - live read
+- `queries.listMessageByThreadId` - live read
 - `queries.listOccasion` - live read
 - `queries.listOrganization` - live read
+- `queries.listPackListByEventId` - live read
+- `queries.listPaymentByInvoiceId` - live read
+- `queries.listPayrollExportRecordByPersonId` - live read
+- `queries.listPayrollInputByEventId` - live read
 - `queries.listPerson` - live read
-- `queries.listProposal` - live read
-- `queries.listQuoteSubmission` - live read
+- `queries.listProposalByClientId` - live read
+- `queries.listProposalByEventId` - live read
+- `queries.listProposalDishSelectionByProposalId` - live read
+- `queries.listProposalEnhancementByProposalId` - live read
+- `queries.listProposalLineItemByProposalId` - live read
+- `queries.listProposalRevisionByProposalId` - live read
+- `queries.listQuoteSubmissionByTenantIdAndStatus` - live read
 - `queries.listReferralSource` - live read
+- `queries.listRevenueAttributionByEventId` - live read
+- `queries.listSavedReportSnapshotBySavedReportDefinitionId` - live read
 - `queries.listServiceStyle` - live read
-- `queries.listSyncError` - live read
+- `queries.listShareLinkByProposalId` - live read
+- `queries.listSignatureRequestByProposalRevisionId` - live read
+- `queries.listTastingDishByTastingId` - live read
 
 ### Generated actions
 
@@ -350,6 +379,11 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 - `eventLookup.reportPage` - query; live read, updates by itself
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `fileStorage.urlsForStorageIds` - query; live read, updates by itself
+- `financeWindow.canReadTable` - query; live read, updates by itself
+- `financeWindow.datesFrom` - query; live read, updates by itself
+- `financeWindow.leftoversInYear` - query; live read, updates by itself
+- `financeWindow.page` - query; live read, updates by itself
+- `financeWindow.threadLastMessageAt` - query; live read, updates by itself
 - `lib.clientOutreach.ensureOpen` - mutation; authored step; live reads update by themselves
 - `lib.proposalRevision.sendProposalWithRevisionCapture` - mutation; authored step; live reads update by themselves
 - `messageInbox.ingestInboundMessage` - action; one-time call (not live); the live reads it changes update by themselves
@@ -368,21 +402,53 @@ Screens (35): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 ### Generated reads
 
 - `queries.getClient` - live read
+- `queries.getClientContact` - live read
 - `queries.getEvent` - live read
+- `queries.getInvoice` - live read
+- `queries.getLead` - live read
+- `queries.getProposal` - live read
+- `queries.listClientCommunicationByClientContactId` - live read
+- `queries.listClientCommunicationByClientId` - live read
+- `queries.listClientCommunicationByEventId` - live read
+- `queries.listClientContactByClientId` - live read
+- `queries.listContractByClientId` - live read
+- `queries.listCreditMemoByClientId` - live read
+- `queries.listCreditMemoBySourceInvoiceId` - live read
+- `queries.listDateHoldByHoldDate` - live read
+- `queries.listDateWaitlistEntryByHoldDate` - live read
 - `queries.listEvent` - live read
-- `queries.listEventTimelineActivity` - live read
+- `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventCloseoutByEventId` - live read
+- `queries.listEventCloseoutByTenantIdAndStatus` - live read
+- `queries.listEventNumberAssignmentByEventId` - live read
+- `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listInvoiceByClientId` - live read
+- `queries.listInvoiceByEventId` - live read
+- `queries.listInvoiceByTenantIdAndStatus` - live read
+- `queries.listLeadByClientId` - live read
+- `queries.listLeftoverDispositionByEventId` - live read
 - `queries.listMenu` - live read
 - `queries.listMenuDish` - live read
+- `queries.listMessageByThreadId` - live read
 - `queries.listOrganization` - live read
-- `queries.listProposal` - live read
-- `queries.listProposalDishSelection` - live read
-- `queries.listProposalEnhancement` - live read
-- `queries.listProposalLineItem` - live read
-- `queries.listProposalRevision` - live read
+- `queries.listPackListByEventId` - live read
+- `queries.listPaymentByInvoiceId` - live read
+- `queries.listPayrollExportRecordByPersonId` - live read
+- `queries.listPayrollInputByEventId` - live read
+- `queries.listProposalByClientId` - live read
+- `queries.listProposalByEventId` - live read
+- `queries.listProposalDishSelectionByProposalId` - live read
+- `queries.listProposalEnhancementByProposalId` - live read
+- `queries.listProposalLineItemByProposalId` - live read
+- `queries.listProposalRevisionByProposalId` - live read
 - `queries.listProposalTemplate` - live read
+- `queries.listQuoteSubmissionByTenantIdAndStatus` - live read
+- `queries.listRevenueAttributionByEventId` - live read
+- `queries.listSavedReportSnapshotBySavedReportDefinitionId` - live read
 - `queries.listServiceStyle` - live read
-- `queries.listShareLink` - live read
-- `queries.listSignatureRequest` - live read
+- `queries.listShareLinkByProposalId` - live read
+- `queries.listSignatureRequestByProposalRevisionId` - live read
+- `queries.listTastingDishByTastingId` - live read
 - `queries.listVenue` - live read
 
 ### Generated actions
@@ -532,6 +598,11 @@ Screens (35): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `eventLookup.reportPage` - query; live read, updates by itself
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `fileStorage.urlsForStorageIds` - query; live read, updates by itself
+- `financeWindow.canReadTable` - query; live read, updates by itself
+- `financeWindow.datesFrom` - query; live read, updates by itself
+- `financeWindow.leftoversInYear` - query; live read, updates by itself
+- `financeWindow.page` - query; live read, updates by itself
+- `financeWindow.threadLastMessageAt` - query; live read, updates by itself
 - `lib.proposalChangeDraft.startProposalChange` - mutation; authored step; live reads update by themselves
 - `lib.proposalDishPricing.adjustProposalDishServings` - mutation; authored step; live reads update by themselves
 - `lib.proposalDishPricing.pickProposalDish` - mutation; authored step; live reads update by themselves
@@ -574,60 +645,66 @@ Screens (66): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `queries.getEventTemplate` - live read
 - `queries.getLead` - live read
 - `queries.getProposal` - live read
-- `queries.listAvailabilityWindow` - live read
-- `queries.listClientContact` - live read
-- `queries.listCorrectiveAction` - live read
-- `queries.listDelivery` - live read
+- `queries.listClientContactByClientId` - live read
+- `queries.listCorrectiveActionByEventId` - live read
+- `queries.listDeliveryByPackListId` - live read
 - `queries.listDish` - live read
+- `queries.listDishComponentByDishId` - live read
+- `queries.listDishIngredientByDishId` - live read
 - `queries.listEquipment` - live read
-- `queries.listEquipmentIssue` - live read
 - `queries.listEquipmentPart` - live read
-- `queries.listEquipmentReservation` - live read
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
-- `queries.listEventAssignment` - live read
 - `queries.listEventAssignmentByEventId` - live read
 - `queries.listEventChecklist` - live read
 - `queries.listEventDishByEventId` - live read
+- `queries.listEventDishLineOverrideByEventDishId` - live read
 - `queries.listEventGuestByEventId` - live read
-- `queries.listEventNumberAssignment` - live read
-- `queries.listEventPlanNeeds` - live read
-- `queries.listEventStaffNeed` - live read
+- `queries.listEventLayoutSectionByEventId` - live read
 - `queries.listEventStaffNeedByEventId` - live read
-- `queries.listEventTask` - live read
 - `queries.listEventTaskByEventId` - live read
 - `queries.listEventTimelineActivityByEventId` - live read
 - `queries.listEventTimelineCommentByEventId` - live read
-- `queries.listEventVehicleAssignment` - live read
-- `queries.listIncident` - live read
+- `queries.listEventVehicleAssignmentByActiveEventId` - live read
+- `queries.listIncidentByEventId` - live read
 - `queries.listIngredient` - live read
 - `queries.listIngredientDemandByEventId` - live read
-- `queries.listInvoice` - live read
+- `queries.listInventoryLotByVendorOrderId` - live read
+- `queries.listInvoiceByEventId` - live read
+- `queries.listInvoiceByTenantIdAndInvoiceNumber` - live read
 - `queries.listMenu` - live read
 - `queries.listMenuDish` - live read
 - `queries.listOccasion` - live read
 - `queries.listOrganization` - live read
-- `queries.listPackList` - live read
 - `queries.listPackListByEventId` - live read
-- `queries.listPackListItem` - live read
+- `queries.listPackListItemByPackListId` - live read
+- `queries.listPackSectionClaimByPackListId` - live read
+- `queries.listPayrollInputByEventId` - live read
 - `queries.listPerson` - live read
-- `queries.listPlanningOverride` - live read
-- `queries.listPlanningReceipt` - live read
+- `queries.listPlanningOverrideByEventId` - live read
+- `queries.listPlanningReceiptByEventId` - live read
 - `queries.listPlanningRule` - live read
 - `queries.listPrepTaskByEventId` - live read
 - `queries.listProposalByEventId` - live read
-- `queries.listProposalDishSelection` - live read
-- `queries.listProposalEnhancement` - live read
+- `queries.listProposalDishSelectionByProposalId` - live read
+- `queries.listProposalEnhancementByProposalId` - live read
 - `queries.listQualification` - live read
+- `queries.listReceiptCorrectionByVendorOrderLineId` - live read
 - `queries.listReferralSource` - live read
 - `queries.listRentalOrderLineByEventId` - live read
 - `queries.listReviewFlagByEventId` - live read
 - `queries.listServiceStyle` - live read
 - `queries.listShiftByEventId` - live read
-- `queries.listTimeOffRequest` - live read
 - `queries.listTrailer` - live read
 - `queries.listVehicle` - live read
+- `queries.listVehicleTripCheckByEventVehicleAssignmentId` - live read
+- `queries.listVendorBillMatchByVendorOrderLineId` - live read
+- `queries.listVendorOrderByEventId` - live read
+- `queries.listVendorOrderByTenantIdAndStatus` - live read
+- `queries.listVendorOrderLineByVendorOrderId` - live read
+- `queries.listVendorOrderLineDemandByVendorOrderId` - live read
 - `queries.listVenue` - live read
+- `queries.listVenueNoteByEventId` - live read
 
 ### Generated actions
 
@@ -1283,9 +1360,22 @@ Screens (66): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `eventLookup.reportPage` - query; live read, updates by itself
 - `eventMonthRows.forEvents` - query; live read, updates by itself
 - `eventReadiness.getEventReadiness` - query; live read, updates by itself
+- `eventsAreaWindow.guestsForEvents` - query; live read, updates by itself
+- `eventsAreaWindow.importDirectoryRows` - query; live read, updates by itself
+- `eventsAreaWindow.invoicesForEvents` - query; live read, updates by itself
+- `eventsAreaWindow.packItemsForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.purchasingForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.shiftsInWindow` - query; live read, updates by itself
+- `eventsAreaWindow.stockForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.trackerRows` - query; live read, updates by itself
+- `eventsAreaWindow.waitlistForEvent` - query; live read, updates by itself
 - `fileStorage.discardOrphanUploads` - mutation; authored step; live reads update by themselves
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `fileStorage.urlsForStorageIds` - query; live read, updates by itself
+- `historyWindow.awayForPeople` - query; live read, updates by itself
+- `historyWindow.dishTasksByIds` - query; live read, updates by itself
+- `historyWindow.eventsByNumber` - query; live read, updates by itself
+- `historyWindow.importNumberRecords` - query; live read, updates by itself
 - `lib.eventDuplicate.duplicateEvent` - mutation; authored step; live reads update by themselves
 - `lib.eventPacket.commands.canManagePacket` - query; live read, updates by itself
 - `lib.eventPacket.commands.generatePacketUploadUrl` - mutation; authored step; live reads update by themselves
@@ -1299,6 +1389,15 @@ Screens (66): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `lib.eventPacket.commands.revisionUrl` - query; live read, updates by itself
 - `lib.eventPacket.commands.sourceUrl` - query; live read, updates by itself
 - `lib.proposalEventCreation.createEventFromAcceptedProposal` - mutation; authored step; live reads update by themselves
+- `logisticsWindow.deliveriesByStatus` - query; live read, updates by itself
+- `logisticsWindow.forEvents` - query; live read, updates by itself
+- `logisticsWindow.holdsForEquipment` - query; live read, updates by itself
+- `logisticsWindow.openEquipmentIssues` - query; live read, updates by itself
+- `logisticsWindow.packListPage` - query; live read, updates by itself
+- `logisticsWindow.packListsByStatus` - query; live read, updates by itself
+- `logisticsWindow.vendorOrderNeeds` - query; live read, updates by itself
+- `logisticsWindow.venueEventsSince` - query; live read, updates by itself
+- `planWindow.forEvents` - query; live read, updates by itself
 - `reasonedChanges.acceptSuggestion` - mutation; authored step; live reads update by themselves
 - `reasonedChanges.assignPersonWithReason` - mutation; authored step; live reads update by themselves
 - `reasonedChanges.assignRigWithReason` - mutation; authored step; live reads update by themselves
@@ -1329,65 +1428,77 @@ Screens (174): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `queries.getIngredient` - live read
 - `queries.getMenu` - live read
 - `queries.getPrepTask` - live read
+- `queries.listClientContactByClientId` - live read
 - `queries.listComponent` - live read
-- `queries.listComponentComponent` - live read
-- `queries.listComponentEquipment` - live read
-- `queries.listComponentImport` - live read
-- `queries.listComponentImportLine` - live read
+- `queries.listComponentComponentByComponentId` - live read
+- `queries.listComponentEquipmentByComponentId` - live read
+- `queries.listComponentImportByResultingComponentId` - live read
+- `queries.listComponentImportLineByImportId` - live read
 - `queries.listComponentIngredient` - live read
+- `queries.listComponentIngredientByComponentId` - live read
+- `queries.listComponentIngredientByIngredientId` - live read
 - `queries.listComponentPortionSpec` - live read
-- `queries.listComponentSnapshot` - live read
-- `queries.listComponentStep` - live read
+- `queries.listComponentPortionSpecByComponentId` - live read
+- `queries.listComponentSnapshotByComponentId` - live read
+- `queries.listComponentStepByComponentId` - live read
+- `queries.listCorrectiveActionByEventId` - live read
 - `queries.listDish` - live read
 - `queries.listDishComponent` - live read
+- `queries.listDishComponentByComponentId` - live read
+- `queries.listDishComponentByDishId` - live read
 - `queries.listDishContainer` - live read
+- `queries.listDishContainerByDishId` - live read
 - `queries.listDishIngredient` - live read
-- `queries.listDishTask` - live read
-- `queries.listDishTaskMaterial` - live read
+- `queries.listDishIngredientByDishId` - live read
+- `queries.listDishTaskByDishId` - live read
 - `queries.listEquipment` - live read
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
 - `queries.listEventDish` - live read
 - `queries.listEventDishByEventId` - live read
-- `queries.listEventDishLineOverride` - live read
+- `queries.listEventDishLineOverrideByEventDishId` - live read
 - `queries.listEventGuestByEventId` - live read
+- `queries.listEventLayoutSectionByEventId` - live read
 - `queries.listEventStaffNeedByEventId` - live read
 - `queries.listEventTimelineActivityByEventId` - live read
 - `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIncidentByEventId` - live read
 - `queries.listIngredient` - live read
-- `queries.listIngredientDemand` - live read
 - `queries.listIngredientDemandByEventId` - live read
-- `queries.listIngredientPriceObservation` - live read
+- `queries.listIngredientPriceObservationByIngredientId` - live read
 - `queries.listInventoryItem` - live read
-- `queries.listInventoryLot` - live read
-- `queries.listInventoryReservation` - live read
-- `queries.listInvoice` - live read
+- `queries.listInvoiceByEventId` - live read
+- `queries.listInvoiceByTenantIdAndInvoiceNumber` - live read
 - `queries.listItemUnitMapping` - live read
+- `queries.listItemUnitMappingByIngredientId` - live read
 - `queries.listMenu` - live read
 - `queries.listMenuDish` - live read
+- `queries.listMenuDishByMenuId` - live read
 - `queries.listOrganization` - live read
 - `queries.listPackListByEventId` - live read
+- `queries.listPayrollInputByEventId` - live read
 - `queries.listPerson` - live read
 - `queries.listPrepTask` - live read
 - `queries.listPrepTaskByEventId` - live read
-- `queries.listPrepTaskComment` - live read
-- `queries.listPrepTaskDependency` - live read
-- `queries.listProductionBatch` - live read
-- `queries.listProductionBatchAllocation` - live read
+- `queries.listPrepTaskCommentByPrepTaskId` - live read
 - `queries.listProposalByEventId` - live read
-- `queries.listQualityCheck` - live read
+- `queries.listProposalDishSelectionByProposalId` - live read
+- `queries.listProposalEnhancementByProposalId` - live read
 - `queries.listRentalOrderLineByEventId` - live read
 - `queries.listReviewFlagByEventId` - live read
 - `queries.listServiceStyle` - live read
 - `queries.listShiftByEventId` - live read
 - `queries.listStation` - live read
 - `queries.listStylePackaging` - live read
+- `queries.listStylePackagingByComponentId` - live read
+- `queries.listStylePackagingByDishId` - live read
 - `queries.listVendor` - live read
-- `queries.listVendorItem` - live read
-- `queries.listVendorOrder` - live read
-- `queries.listVendorOrderLine` - live read
+- `queries.listVendorItemByIngredientId` - live read
+- `queries.listVendorOrderByEventId` - live read
+- `queries.listVendorOrderLineByVendorOrderId` - live read
 - `queries.listVenue` - live read
+- `queries.listVenueNoteByEventId` - live read
 - `queries.listWeeklyPurchasingConfig` - live read
 
 ### Generated actions
@@ -2422,8 +2533,21 @@ Screens (174): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `eventLookup.reportPage` - query; live read, updates by itself
 - `eventMenuLookup.forDish` - query; live read, updates by itself
 - `eventMenuLookup.forEvents` - query; live read, updates by itself
+- `eventsAreaWindow.guestsForEvents` - query; live read, updates by itself
+- `eventsAreaWindow.importDirectoryRows` - query; live read, updates by itself
+- `eventsAreaWindow.invoicesForEvents` - query; live read, updates by itself
+- `eventsAreaWindow.packItemsForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.purchasingForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.shiftsInWindow` - query; live read, updates by itself
+- `eventsAreaWindow.stockForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.trackerRows` - query; live read, updates by itself
+- `eventsAreaWindow.waitlistForEvent` - query; live read, updates by itself
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `fileStorage.urlsForStorageIds` - query; live read, updates by itself
+- `historyWindow.awayForPeople` - query; live read, updates by itself
+- `historyWindow.dishTasksByIds` - query; live read, updates by itself
+- `historyWindow.eventsByNumber` - query; live read, updates by itself
+- `historyWindow.importNumberRecords` - query; live read, updates by itself
 - `ingredientLookup.applyCostToIngredient` - action; one-time call (not live); the live reads it changes update by themselves
 - `ingredientLookup.applyImageToIngredient` - action; one-time call (not live); the live reads it changes update by themselves
 - `ingredientLookup.applyToIngredient` - action; one-time call (not live); the live reads it changes update by themselves
@@ -2431,6 +2555,7 @@ Screens (174): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `ingredientLookup.resolveCreateLookupCost` - action; one-time call (not live); the live reads it changes update by themselves
 - `ingredientLookup.resolveLookupCost` - action; one-time call (not live); the live reads it changes update by themselves
 - `ingredientLookup.searchFoods` - action; one-time call (not live); the live reads it changes update by themselves
+- `inventoryHistoryWindow.stockLines` - query; live read, updates by itself
 - `lib.culinaryOperations.cloneMenu` - mutation; authored step; live reads update by themselves
 - `lib.culinaryOperations.createComponentImportReview` - mutation; authored step; live reads update by themselves
 - `lib.culinaryOperations.eventPrepWorkReview` - query; live read, updates by itself
@@ -2449,6 +2574,16 @@ Screens (174): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `lib.safeMaterialization.draftPurchaseOrder` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.refreshPackRules` - mutation; authored step; live reads update by themselves
 - `menuRecipeLookup.forDishes` - query; live read, updates by itself
+- `productionWindow.batchesSince` - query; live read, updates by itself
+- `productionWindow.finishedBatchesPage` - query; live read, updates by itself
+- `productionWindow.openBatches` - query; live read, updates by itself
+- `productionWindow.planWork` - query; live read, updates by itself
+- `productionWindow.prepWork` - query; live read, updates by itself
+- `productionWindow.sharesPage` - query; live read, updates by itself
+- `recipeWindow.dishTaskMaterials` - query; live read, updates by itself
+- `recipeWindow.latestPriceObservations` - query; live read, updates by itself
+- `recipeWindow.openComponentImports` - query; live read, updates by itself
+- `recipeWindow.prepBoard` - query; live read, updates by itself
 - `vendorPriceList.importVendorPriceRows` - mutation; authored step; live reads update by themselves
 - `vendorPriceList.priceHistory` - query; live read, updates by itself
 
@@ -2459,23 +2594,37 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 ### Generated reads
 
 - `queries.getEvent` - live read
+- `queries.listClientContactByClientId` - live read
+- `queries.listCorrectiveActionByEventId` - live read
+- `queries.listDishComponentByDishId` - live read
+- `queries.listDishIngredientByDishId` - live read
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventDishLineOverrideByEventDishId` - live read
 - `queries.listEventGuestByEventId` - live read
+- `queries.listEventLayoutSectionByEventId` - live read
 - `queries.listEventStaffNeedByEventId` - live read
 - `queries.listEventTimelineActivityByEventId` - live read
 - `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIncidentByEventId` - live read
 - `queries.listIngredientDemandByEventId` - live read
+- `queries.listInvoiceByEventId` - live read
+- `queries.listInvoiceByTenantIdAndInvoiceNumber` - live read
 - `queries.listOperatingLocation` - live read
 - `queries.listPackListByEventId` - live read
+- `queries.listPayrollInputByEventId` - live read
 - `queries.listPerson` - live read
 - `queries.listPrepTaskByEventId` - live read
 - `queries.listProposalByEventId` - live read
+- `queries.listProposalDishSelectionByProposalId` - live read
+- `queries.listProposalEnhancementByProposalId` - live read
 - `queries.listRentalOrderLineByEventId` - live read
 - `queries.listReviewFlagByEventId` - live read
-- `queries.listShift` - live read
 - `queries.listShiftByEventId` - live read
+- `queries.listVendorOrderByEventId` - live read
+- `queries.listVendorOrderLineByVendorOrderId` - live read
+- `queries.listVenueNoteByEventId` - live read
 
 ### Generated actions
 
@@ -2621,6 +2770,15 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 - `eventRoutes.getEventRoute` - query; live read, updates by itself
 - `eventRoutes.refreshEventRoute` - action; one-time call (not live); the live reads it changes update by themselves
 - `eventTimingRules.getEventTimingRules` - query; live read, updates by itself
+- `eventsAreaWindow.guestsForEvents` - query; live read, updates by itself
+- `eventsAreaWindow.importDirectoryRows` - query; live read, updates by itself
+- `eventsAreaWindow.invoicesForEvents` - query; live read, updates by itself
+- `eventsAreaWindow.packItemsForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.purchasingForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.shiftsInWindow` - query; live read, updates by itself
+- `eventsAreaWindow.stockForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.trackerRows` - query; live read, updates by itself
+- `eventsAreaWindow.waitlistForEvent` - query; live read, updates by itself
 - `fileStorage.discardOrphanUploads` - mutation; authored step; live reads update by themselves
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `lib.operationalTransactions.applyCateringPackage` - mutation; authored step; live reads update by themselves
@@ -2646,51 +2804,53 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 ### Generated reads
 
 - `queries.getEvent` - live read
-- `queries.listAvailabilityWindow` - live read
-- `queries.listCandidate` - live read
-- `queries.listDelivery` - live read
+- `queries.listClientContactByClientId` - live read
+- `queries.listCorrectiveActionByEventId` - live read
+- `queries.listDishComponentByDishId` - live read
+- `queries.listDishIngredientByDishId` - live read
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
-- `queries.listEventAssignment` - live read
 - `queries.listEventAssignmentByEventId` - live read
-- `queries.listEventCloseout` - live read
+- `queries.listEventDishLineOverrideByEventDishId` - live read
 - `queries.listEventGuestByEventId` - live read
+- `queries.listEventLayoutSectionByEventId` - live read
 - `queries.listEventStaffNeed` - live read
 - `queries.listEventStaffNeedByEventId` - live read
 - `queries.listEventTimelineActivityByEventId` - live read
 - `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIncidentByEventId` - live read
 - `queries.listIngredientDemandByEventId` - live read
-- `queries.listInterview` - live read
-- `queries.listOneOnOne` - live read
-- `queries.listOneOnOneAction` - live read
-- `queries.listPackList` - live read
+- `queries.listInvoiceByEventId` - live read
+- `queries.listInvoiceByTenantIdAndInvoiceNumber` - live read
 - `queries.listPackListByEventId` - live read
-- `queries.listPackListItem` - live read
-- `queries.listPerformanceReview` - live read
+- `queries.listPayrollInputByEventId` - live read
 - `queries.listPerson` - live read
-- `queries.listPrepTask` - live read
 - `queries.listPrepTaskByEventId` - live read
-- `queries.listPrepTaskDependency` - live read
 - `queries.listProposalByEventId` - live read
+- `queries.listProposalDishSelectionByProposalId` - live read
+- `queries.listProposalEnhancementByProposalId` - live read
 - `queries.listQualification` - live read
 - `queries.listRecurringAvailability` - live read
+- `queries.listRecurringAvailabilityByPersonId` - live read
 - `queries.listRentalOrderLineByEventId` - live read
 - `queries.listReviewFlagByEventId` - live read
 - `queries.listRoleScorecard` - live read
 - `queries.listServiceStyle` - live read
-- `queries.listShift` - live read
 - `queries.listShiftByEventId` - live read
-- `queries.listShiftSwapRequest` - live read
+- `queries.listShiftSwapRequestByRecipientPersonIdAndStatus` - live read
+- `queries.listShiftSwapRequestByRequesterPersonId` - live read
+- `queries.listShiftSwapRequestByTenantIdAndStatus` - live read
 - `queries.listShiftType` - live read
 - `queries.listSkillLevel` - live read
-- `queries.listStaffNeedWaitlistEntry` - live read
 - `queries.listStaffingTemplate` - live read
-- `queries.listTimeOffRequest` - live read
-- `queries.listTimeRecord` - live read
-- `queries.listTrainingCompletion` - live read
+- `queries.listTimeOffRequestByPersonId` - live read
+- `queries.listTimeOffRequestByTenantIdAndStatus` - live read
+- `queries.listTimeRecordByPersonId` - live read
+- `queries.listTrainingCompletionByPersonId` - live read
 - `queries.listTrainingModule` - live read
-- `queries.listTrainingSignOff` - live read
-- `queries.listWeeklyScheduleNotice` - live read
+- `queries.listVendorOrderByEventId` - live read
+- `queries.listVendorOrderLineByVendorOrderId` - live read
+- `queries.listVenueNoteByEventId` - live read
 
 ### Generated actions
 
@@ -3388,9 +3548,22 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `eventMenuLookup.forEvents` - query; live read, updates by itself
 - `eventRouteLegs.getEventRouteLegs` - query; live read, updates by itself
 - `eventRouteLegs.getEventTransport` - query; live read, updates by itself
+- `eventsAreaWindow.guestsForEvents` - query; live read, updates by itself
+- `eventsAreaWindow.importDirectoryRows` - query; live read, updates by itself
+- `eventsAreaWindow.invoicesForEvents` - query; live read, updates by itself
+- `eventsAreaWindow.packItemsForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.purchasingForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.shiftsInWindow` - query; live read, updates by itself
+- `eventsAreaWindow.stockForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.trackerRows` - query; live read, updates by itself
+- `eventsAreaWindow.waitlistForEvent` - query; live read, updates by itself
 - `fileStorage.discardOrphanUploads` - mutation; authored step; live reads update by themselves
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `hiringPipeline.ingestKmCandidates` - mutation; authored step; live reads update by themselves
+- `historyWindow.awayForPeople` - query; live read, updates by itself
+- `historyWindow.dishTasksByIds` - query; live read, updates by itself
+- `historyWindow.eventsByNumber` - query; live read, updates by itself
+- `historyWindow.importNumberRecords` - query; live read, updates by itself
 - `laborSummary.attendanceAlerts` - query; live read, updates by itself
 - `laborSummary.eventLaborSummary` - query; live read, updates by itself
 - `laborSummary.listPayRates` - query; live read, updates by itself
@@ -3410,9 +3583,41 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `teamChatCursor.markChannelRead` - mutation; authored step; live reads update by themselves
 - `teamChatSend.sendWithFiles` - mutation; authored step; live reads update by themselves
 - `vendorNames.active` - query; live read, updates by itself
+- `workforceHistoryWindow.activeAnnouncements` - query; live read, updates by itself
+- `workforceHistoryWindow.announcementPage` - query; live read, updates by itself
+- `workforceHistoryWindow.candidatePage` - query; live read, updates by itself
+- `workforceHistoryWindow.interviewsFor` - query; live read, updates by itself
+- `workforceHistoryWindow.oneOnOneActionsFor` - query; live read, updates by itself
+- `workforceHistoryWindow.oneOnOnePage` - query; live read, updates by itself
+- `workforceHistoryWindow.pendingImportConflicts` - query; live read, updates by itself
+- `workforceHistoryWindow.performanceReviewPage` - query; live read, updates by itself
+- `workforceHistoryWindow.trainingCompletionCounts` - query; live read, updates by itself
+- `workforceHistoryWindow.trainingCompletionPage` - query; live read, updates by itself
+- `workforceHistoryWindow.trainingSignOffPage` - query; live read, updates by itself
 - `workforceScheduling.autoFillEventStaffNeeds` - mutation; authored step; live reads update by themselves
 - `workforceScheduling.scheduleShift` - mutation; authored step; live reads update by themselves
 - `workforceScheduling.suggestStaffForNeed` - query; live read, updates by itself
+- `workforceWindow.approvedTimeOff` - query; live read, updates by itself
+- `workforceWindow.availabilityWindowPage` - query; live read, updates by itself
+- `workforceWindow.availabilityWindows` - query; live read, updates by itself
+- `workforceWindow.driverDeliveries` - query; live read, updates by itself
+- `workforceWindow.fieldCloseouts` - query; live read, updates by itself
+- `workforceWindow.forEvents` - query; live read, updates by itself
+- `workforceWindow.myDayPrep` - query; live read, updates by itself
+- `workforceWindow.packForEvents` - query; live read, updates by itself
+- `workforceWindow.personActiveWindows` - query; live read, updates by itself
+- `workforceWindow.personOpenShifts` - query; live read, updates by itself
+- `workforceWindow.personScheduleNotices` - query; live read, updates by itself
+- `workforceWindow.personTimeRecordsSince` - query; live read, updates by itself
+- `workforceWindow.reviewedTimeOff` - query; live read, updates by itself
+- `workforceWindow.shifts` - query; live read, updates by itself
+- `workforceWindow.shiftsAround` - query; live read, updates by itself
+- `workforceWindow.shiftsByIds` - query; live read, updates by itself
+- `workforceWindow.swapRequestPage` - query; live read, updates by itself
+- `workforceWindow.timeRecordPage` - query; live read, updates by itself
+- `workforceWindow.timeRecordsIn` - query; live read, updates by itself
+- `workforceWindow.trainingCompletionsFor` - query; live read, updates by itself
+- `workforceWindow.weekNotices` - query; live read, updates by itself
 
 ## 7. Pack list and warehouse
 
@@ -3422,32 +3627,38 @@ Screens (30): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 
 - `queries.getPackList` - live read
 - `queries.listComponent` - live read
-- `queries.listDelivery` - live read
-- `queries.listDepartureOverride` - live read
+- `queries.listDeliveryByPackListId` - live read
 - `queries.listDishComponent` - live read
 - `queries.listEquipment` - live read
-- `queries.listEquipmentReservation` - live read
 - `queries.listEvent` - live read
-- `queries.listEventAssignment` - live read
+- `queries.listEventAssignmentByEventId` - live read
 - `queries.listEventDishByEventId` - live read
-- `queries.listEventStaffNeed` - live read
-- `queries.listEventVehicleAssignment` - live read
+- `queries.listEventStaffNeedByEventId` - live read
+- `queries.listEventTaskByEventId` - live read
+- `queries.listEventVehicleAssignmentByActiveEventId` - live read
+- `queries.listInventoryLotByVendorOrderId` - live read
 - `queries.listOccasion` - live read
-- `queries.listPackList` - live read
-- `queries.listPackListItem` - live read
+- `queries.listPackListByEventId` - live read
+- `queries.listPackListItemByPackListId` - live read
 - `queries.listPackListTemplate` - live read
 - `queries.listPackRule` - live read
-- `queries.listPackSectionClaim` - live read
+- `queries.listPackSectionClaimByPackListId` - live read
 - `queries.listPerson` - live read
+- `queries.listPlanningOverrideByEventId` - live read
+- `queries.listPlanningReceiptByEventId` - live read
+- `queries.listReceiptCorrectionByVendorOrderLineId` - live read
 - `queries.listServiceStyle` - live read
 - `queries.listServiceStyleKitItem` - live read
+- `queries.listShiftByEventId` - live read
 - `queries.listStylePackaging` - live read
 - `queries.listTrailer` - live read
 - `queries.listVehicle` - live read
-- `queries.listVehicleFuelLog` - live read
 - `queries.listVehicleMaintenanceSchedule` - live read
-- `queries.listVehicleServiceEntry` - live read
-- `queries.listVehicleTripCheck` - live read
+- `queries.listVehicleTripCheckByEventVehicleAssignmentId` - live read
+- `queries.listVendorBillMatchByVendorOrderLineId` - live read
+- `queries.listVendorOrderByTenantIdAndStatus` - live read
+- `queries.listVendorOrderLineByVendorOrderId` - live read
+- `queries.listVendorOrderLineDemandByVendorOrderId` - live read
 - `queries.listVenue` - live read
 
 ### Generated actions
@@ -3904,6 +4115,14 @@ Screens (30): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 - `eventLookup.reportPage` - query; live read, updates by itself
 - `eventRouteLegs.getEventRouteLegs` - query; live read, updates by itself
 - `eventRouteLegs.getEventTransport` - query; live read, updates by itself
+- `facilitiesHistoryWindow.equipmentServiceSummary` - query; live read, updates by itself
+- `facilitiesHistoryWindow.leadsForSources` - query; live read, updates by itself
+- `facilitiesHistoryWindow.maintenanceDueBefore` - query; live read, updates by itself
+- `facilitiesHistoryWindow.notesForVenues` - query; live read, updates by itself
+- `facilitiesHistoryWindow.rentalMonth` - query; live read, updates by itself
+- `facilitiesHistoryWindow.vehicleLogPage` - query; live read, updates by itself
+- `facilitiesHistoryWindow.vehicleOdometers` - query; live read, updates by itself
+- `facilitiesHistoryWindow.venueEvents` - query; live read, updates by itself
 - `lib.operationalTransactions.applyCateringPackage` - mutation; authored step; live reads update by themselves
 - `lib.operationalTransactions.eventTimingPlan` - query; live read, updates by itself
 - `lib.operationalTransactions.issueEventStock` - mutation; authored step; live reads update by themselves
@@ -3914,9 +4133,18 @@ Screens (30): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
 - `lib.safeMaterialization.applyPackTemplate` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.draftPurchaseOrder` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.refreshPackRules` - mutation; authored step; live reads update by themselves
+- `logisticsWindow.deliveriesByStatus` - query; live read, updates by itself
+- `logisticsWindow.forEvents` - query; live read, updates by itself
+- `logisticsWindow.holdsForEquipment` - query; live read, updates by itself
+- `logisticsWindow.openEquipmentIssues` - query; live read, updates by itself
+- `logisticsWindow.packListPage` - query; live read, updates by itself
+- `logisticsWindow.packListsByStatus` - query; live read, updates by itself
+- `logisticsWindow.vendorOrderNeeds` - query; live read, updates by itself
+- `logisticsWindow.venueEventsSince` - query; live read, updates by itself
 - `packScans.count` - mutation; authored step; live reads update by themselves
 - `packScans.listForPackList` - query; live read, updates by itself
 - `packSections.take` - mutation; authored step; live reads update by themselves
+- `planWindow.forEvents` - query; live read, updates by itself
 - `reasonedChanges.acceptSuggestion` - mutation; authored step; live reads update by themselves
 - `reasonedChanges.assignPersonWithReason` - mutation; authored step; live reads update by themselves
 - `reasonedChanges.assignRigWithReason` - mutation; authored step; live reads update by themselves
@@ -3936,33 +4164,52 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
 
 - `queries.getEvent` - live read
 - `queries.getVenue` - live read
+- `queries.listClientContactByClientId` - live read
+- `queries.listCorrectiveActionByEventId` - live read
+- `queries.listDeliveryByPackListId` - live read
+- `queries.listDishComponentByDishId` - live read
+- `queries.listDishIngredientByDishId` - live read
 - `queries.listEquipment` - live read
-- `queries.listEquipmentIssue` - live read
 - `queries.listEquipmentMaintenanceTask` - live read
-- `queries.listEquipmentPart` - live read
-- `queries.listEquipmentReservation` - live read
+- `queries.listEquipmentPartByEquipmentId` - live read
 - `queries.listEquipmentReservationByEventId` - live read
-- `queries.listEquipmentServiceEntry` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventDishLineOverrideByEventDishId` - live read
 - `queries.listEventGuestByEventId` - live read
-- `queries.listEventLayoutSection` - live read
+- `queries.listEventLayoutSectionByEventId` - live read
 - `queries.listEventStaffNeedByEventId` - live read
 - `queries.listEventTimelineActivityByEventId` - live read
 - `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listEventVehicleAssignmentByActiveEventId` - live read
+- `queries.listIncidentByEventId` - live read
 - `queries.listIngredientDemandByEventId` - live read
+- `queries.listInventoryLotByVendorOrderId` - live read
+- `queries.listInvoiceByEventId` - live read
+- `queries.listInvoiceByTenantIdAndInvoiceNumber` - live read
 - `queries.listOrganization` - live read
-- `queries.listPackList` - live read
 - `queries.listPackListByEventId` - live read
-- `queries.listPackListItem` - live read
+- `queries.listPackListItemByPackListId` - live read
+- `queries.listPackSectionClaimByPackListId` - live read
+- `queries.listPayrollInputByEventId` - live read
 - `queries.listPerson` - live read
 - `queries.listPrepTaskByEventId` - live read
 - `queries.listProposalByEventId` - live read
+- `queries.listProposalDishSelectionByProposalId` - live read
+- `queries.listProposalEnhancementByProposalId` - live read
+- `queries.listReceiptCorrectionByVendorOrderLineId` - live read
 - `queries.listRentalOrderLineByEventId` - live read
 - `queries.listReviewFlagByEventId` - live read
 - `queries.listShiftByEventId` - live read
 - `queries.listStorageLocation` - live read
+- `queries.listVehicleTripCheckByEventVehicleAssignmentId` - live read
+- `queries.listVendorBillMatchByVendorOrderLineId` - live read
+- `queries.listVendorOrderByEventId` - live read
+- `queries.listVendorOrderByTenantIdAndStatus` - live read
+- `queries.listVendorOrderLineByVendorOrderId` - live read
+- `queries.listVendorOrderLineDemandByVendorOrderId` - live read
 - `queries.listVenueLayoutTemplate` - live read
+- `queries.listVenueNoteByEventId` - live read
 
 ### Generated actions
 
@@ -4191,11 +4438,36 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
+- `eventsAreaWindow.guestsForEvents` - query; live read, updates by itself
+- `eventsAreaWindow.importDirectoryRows` - query; live read, updates by itself
+- `eventsAreaWindow.invoicesForEvents` - query; live read, updates by itself
+- `eventsAreaWindow.packItemsForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.purchasingForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.shiftsInWindow` - query; live read, updates by itself
+- `eventsAreaWindow.stockForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.trackerRows` - query; live read, updates by itself
+- `eventsAreaWindow.waitlistForEvent` - query; live read, updates by itself
+- `facilitiesHistoryWindow.equipmentServiceSummary` - query; live read, updates by itself
+- `facilitiesHistoryWindow.leadsForSources` - query; live read, updates by itself
+- `facilitiesHistoryWindow.maintenanceDueBefore` - query; live read, updates by itself
+- `facilitiesHistoryWindow.notesForVenues` - query; live read, updates by itself
+- `facilitiesHistoryWindow.rentalMonth` - query; live read, updates by itself
+- `facilitiesHistoryWindow.vehicleLogPage` - query; live read, updates by itself
+- `facilitiesHistoryWindow.vehicleOdometers` - query; live read, updates by itself
+- `facilitiesHistoryWindow.venueEvents` - query; live read, updates by itself
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.applyLayoutTemplate` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.applyPackTemplate` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.draftPurchaseOrder` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.refreshPackRules` - mutation; authored step; live reads update by themselves
+- `logisticsWindow.deliveriesByStatus` - query; live read, updates by itself
+- `logisticsWindow.forEvents` - query; live read, updates by itself
+- `logisticsWindow.holdsForEquipment` - query; live read, updates by itself
+- `logisticsWindow.openEquipmentIssues` - query; live read, updates by itself
+- `logisticsWindow.packListPage` - query; live read, updates by itself
+- `logisticsWindow.packListsByStatus` - query; live read, updates by itself
+- `logisticsWindow.vendorOrderNeeds` - query; live read, updates by itself
+- `logisticsWindow.venueEventsSince` - query; live read, updates by itself
 - `venueVendorPolicy.forEvent` - query; live read, updates by itself
 
 ## 9. Final Lock and event packet
@@ -4314,54 +4586,104 @@ Screens (70): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 ### Generated reads
 
 - `queries.getClient` - live read
+- `queries.getClientContact` - live read
 - `queries.getEvent` - live read
 - `queries.getInvoice` - live read
+- `queries.getLead` - live read
+- `queries.getProposal` - live read
 - `queries.getRevenueAttribution` - live read
+- `queries.listClientCommunicationByClientContactId` - live read
+- `queries.listClientCommunicationByClientId` - live read
+- `queries.listClientCommunicationByEventId` - live read
+- `queries.listClientContactByClientId` - live read
 - `queries.listComponent` - live read
+- `queries.listComponentComponentByComponentId` - live read
+- `queries.listComponentEquipmentByComponentId` - live read
+- `queries.listComponentImportByResultingComponentId` - live read
+- `queries.listComponentImportLineByImportId` - live read
 - `queries.listComponentIngredient` - live read
-- `queries.listCreditMemo` - live read
+- `queries.listComponentIngredientByComponentId` - live read
+- `queries.listComponentIngredientByIngredientId` - live read
+- `queries.listComponentPortionSpecByComponentId` - live read
+- `queries.listComponentSnapshotByComponentId` - live read
+- `queries.listComponentStepByComponentId` - live read
+- `queries.listContractByClientId` - live read
+- `queries.listCorrectiveActionByEventId` - live read
+- `queries.listCreditMemoByClientId` - live read
+- `queries.listCreditMemoBySourceInvoiceId` - live read
+- `queries.listDateHoldByHoldDate` - live read
+- `queries.listDateWaitlistEntryByHoldDate` - live read
 - `queries.listDishComponent` - live read
+- `queries.listDishComponentByComponentId` - live read
+- `queries.listDishComponentByDishId` - live read
+- `queries.listDishContainerByDishId` - live read
 - `queries.listDishIngredient` - live read
+- `queries.listDishIngredientByDishId` - live read
+- `queries.listDishTaskByDishId` - live read
 - `queries.listEquipment` - live read
-- `queries.listEquipmentReservation` - live read
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
-- `queries.listEventAssignment` - live read
 - `queries.listEventAssignmentByEventId` - live read
-- `queries.listEventCloseout` - live read
+- `queries.listEventCloseoutByEventId` - live read
+- `queries.listEventCloseoutByTenantIdAndStatus` - live read
 - `queries.listEventDishByEventId` - live read
+- `queries.listEventDishLineOverrideByEventDishId` - live read
 - `queries.listEventGuestByEventId` - live read
+- `queries.listEventLayoutSectionByEventId` - live read
+- `queries.listEventNumberAssignmentByEventId` - live read
 - `queries.listEventStaffNeedByEventId` - live read
+- `queries.listEventTaskByEventId` - live read
 - `queries.listEventTimelineActivityByEventId` - live read
 - `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIncidentByEventId` - live read
 - `queries.listIngredient` - live read
-- `queries.listIngredientDemand` - live read
 - `queries.listIngredientDemandByEventId` - live read
-- `queries.listIngredientPriceObservation` - live read
-- `queries.listInvoice` - live read
+- `queries.listIngredientPriceObservationByIngredientId` - live read
+- `queries.listInvoiceByClientId` - live read
+- `queries.listInvoiceByEventId` - live read
+- `queries.listInvoiceByTenantIdAndInvoiceNumber` - live read
+- `queries.listInvoiceByTenantIdAndStatus` - live read
 - `queries.listItemUnitMapping` - live read
-- `queries.listLeftoverDisposition` - live read
+- `queries.listItemUnitMappingByIngredientId` - live read
+- `queries.listLeadByClientId` - live read
+- `queries.listLeftoverDispositionByEventId` - live read
+- `queries.listMenuDishByMenuId` - live read
+- `queries.listMessageByThreadId` - live read
 - `queries.listOrganization` - live read
 - `queries.listPackListByEventId` - live read
-- `queries.listPayment` - live read
+- `queries.listPaymentByInvoiceId` - live read
 - `queries.listPaymentMethod` - live read
-- `queries.listPayrollExportRecord` - live read
-- `queries.listPayrollInput` - live read
+- `queries.listPayrollExportRecordByPersonId` - live read
+- `queries.listPayrollInputByEventId` - live read
 - `queries.listPerson` - live read
+- `queries.listPlanningOverrideByEventId` - live read
+- `queries.listPlanningReceiptByEventId` - live read
 - `queries.listPrepTaskByEventId` - live read
+- `queries.listProposalByClientId` - live read
 - `queries.listProposalByEventId` - live read
+- `queries.listProposalDishSelectionByProposalId` - live read
+- `queries.listProposalEnhancementByProposalId` - live read
+- `queries.listProposalLineItemByProposalId` - live read
+- `queries.listProposalRevisionByProposalId` - live read
+- `queries.listQuoteSubmissionByTenantIdAndStatus` - live read
 - `queries.listReferralSource` - live read
 - `queries.listRentalOrderLineByEventId` - live read
-- `queries.listRevenueAttribution` - live read
+- `queries.listRevenueAttributionByEventId` - live read
 - `queries.listReviewFlagByEventId` - live read
-- `queries.listShift` - live read
+- `queries.listSavedReportSnapshotBySavedReportDefinitionId` - live read
+- `queries.listShareLinkByProposalId` - live read
 - `queries.listShiftByEventId` - live read
+- `queries.listSignatureRequestByProposalRevisionId` - live read
+- `queries.listStylePackagingByComponentId` - live read
+- `queries.listStylePackagingByDishId` - live read
+- `queries.listTastingDishByTastingId` - live read
 - `queries.listTaxRate` - live read
-- `queries.listVendorOrder` - live read
-- `queries.listVendorOrderLine` - live read
-- `queries.listVendorOrderLineDemand` - live read
+- `queries.listVendorItemByIngredientId` - live read
+- `queries.listVendorOrderByEventId` - live read
+- `queries.listVendorOrderLineByVendorOrderId` - live read
 - `queries.listVenue` - live read
 - `queries.listVenueCommissionTerm` - live read
+- `queries.listVenueNoteByEventId` - live read
 
 ### Generated actions
 
@@ -4751,10 +5073,24 @@ Screens (70): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `eventLookup.range` - query; live read, updates by itself
 - `eventLookup.rangeDocs` - query; live read, updates by itself
 - `eventLookup.reportPage` - query; live read, updates by itself
+- `eventsAreaWindow.guestsForEvents` - query; live read, updates by itself
+- `eventsAreaWindow.importDirectoryRows` - query; live read, updates by itself
+- `eventsAreaWindow.invoicesForEvents` - query; live read, updates by itself
+- `eventsAreaWindow.packItemsForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.purchasingForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.shiftsInWindow` - query; live read, updates by itself
+- `eventsAreaWindow.stockForEvent` - query; live read, updates by itself
+- `eventsAreaWindow.trackerRows` - query; live read, updates by itself
+- `eventsAreaWindow.waitlistForEvent` - query; live read, updates by itself
 - `externalRecordLinkLists.listFor` - query; live read, updates by itself
 - `externalRecordLinkLists.menuLinkStats` - query; live read, updates by itself
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `fileStorage.urlsForStorageIds` - query; live read, updates by itself
+- `financeWindow.canReadTable` - query; live read, updates by itself
+- `financeWindow.datesFrom` - query; live read, updates by itself
+- `financeWindow.leftoversInYear` - query; live read, updates by itself
+- `financeWindow.page` - query; live read, updates by itself
+- `financeWindow.threadLastMessageAt` - query; live read, updates by itself
 - `invoiceEmail.send` - action; one-time call (not live); the live reads it changes update by themselves
 - `invoicePayments.createPaymentLink` - action; one-time call (not live); the live reads it changes update by themselves
 - `invoicePayments.getPaymentLink` - action; one-time call (not live); the live reads it changes update by themselves
@@ -4768,6 +5104,11 @@ Screens (70): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `laborSummary.listPayRates` - query; live read, updates by itself
 - `laborSummary.payrollTimeRecords` - query; live read, updates by itself
 - `laborSummary.personPeriodLaborSummary` - query; live read, updates by itself
+- `planWindow.forEvents` - query; live read, updates by itself
+- `recipeWindow.dishTaskMaterials` - query; live read, updates by itself
+- `recipeWindow.latestPriceObservations` - query; live read, updates by itself
+- `recipeWindow.openComponentImports` - query; live read, updates by itself
+- `recipeWindow.prepBoard` - query; live read, updates by itself
 - `travelFees.applyProposalTravelFee` - mutation; authored step; live reads update by themselves
 - `travelFees.getEventTravelFee` - query; live read, updates by itself
 - `travelFees.getProposalTravelFee` - query; live read, updates by itself

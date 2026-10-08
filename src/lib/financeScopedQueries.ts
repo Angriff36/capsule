@@ -143,7 +143,7 @@ function useDocsByIds<Row>(
     for (const id of key ? key.split(",") : [])
       next[id] = { query, args: { id } };
     return next;
-    // `api.queries.x` is a new object on every read, so the name stands in
+    // A function reference from `api` is a new object on every read, so its name stands in
     // for it; the object itself would rebuild the reads on every draw.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, getFunctionName(query)]);
