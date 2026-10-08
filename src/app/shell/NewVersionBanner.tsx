@@ -16,6 +16,13 @@ const CHECK_EVERY_MS = 10 * 60_000;
  * both version numbers. Reloading writes every unsaved form draft first, so
  * nothing typed is lost. It never calls this page current: with no answer
  * from the site it says nothing.
+ *
+ * A tab nobody is looking at reloads by itself once a newer version is out
+ * (drafts kept): an old tab left open keeps running the old version's
+ * server reads, and on 2026-10-08 forgotten tabs still asked for whole
+ * tables after the release that removed those reads, holding the live
+ * server up for everyone. A tab in view keeps the banner and reloads the
+ * next time it goes to the background.
  */
 export function NewVersionBanner({
   running = RUNNING_BUILD,
@@ -29,13 +36,21 @@ export function NewVersionBanner({
   useEffect(() => {
     if (!running) return; // a local build has no version to compare
     let stopped = false;
+    let found: string | null = null;
+    const reloadIfAway = () => {
+      if (found && document.visibilityState === "hidden") reloadKeepingDrafts();
+    };
     const check = () => {
       void checkLive().then((live) => {
-        if (!stopped) setNewer(newerBuild(running, live));
+        if (stopped) return;
+        found = newerBuild(running, live);
+        setNewer(found);
+        reloadIfAway();
       });
     };
     const onVisible = () => {
       if (document.visibilityState === "visible") check();
+      else reloadIfAway();
     };
     check();
     const timer = window.setInterval(check, CHECK_EVERY_MS);
