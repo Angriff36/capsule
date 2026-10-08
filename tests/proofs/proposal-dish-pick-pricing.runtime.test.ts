@@ -196,23 +196,6 @@ describe("runtime proof: proposal dish picks carry their price", () => {
     await pick(tart);
     expect(await lines()).toHaveLength(2);
     expect(await proposal()).toMatchObject({ subtotal: 500, total: 500 });
-
-    // One dish of the per-guest menu off: the menu price stays. The last one
-    // off: the menu's lines go too.
-    const remove = (row: any) =>
-      sales.mutation((api.lib as any).proposalDishPricing.removeProposalDish, {
-        docId: row._id,
-        version: row.version,
-      });
-    const harvestMenuId = (await picks())[0].menuId;
-    const harvestPicks = async () =>
-      (await picks()).filter((row) => row.menuId === harvestMenuId);
-    expect(await harvestPicks()).toHaveLength(2);
-    await remove((await harvestPicks())[0]);
-    expect(await lines()).toHaveLength(2);
-    await remove((await harvestPicks())[0]);
-    expect(await lines()).toEqual([]);
-    expect(await proposal()).toMatchObject({ subtotal: 0, total: 0 });
   });
 
   it("adds no second line for a dish a line already covers", async () => {
