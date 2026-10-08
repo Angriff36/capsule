@@ -182,6 +182,7 @@ export const pickProposalDish = mutation({
       pricingBasis: "per_person",
       unitPrice: Number(menu.pricePerPerson),
       sortOrder: sortOrder++,
+      menuId: menu._id,
     });
     if (Number(menu.basePrice) > 0)
       await ctx.runMutation(
@@ -192,6 +193,7 @@ export const pickProposalDish = mutation({
           pricingBasis: "flat",
           unitPrice: Number(menu.basePrice),
           sortOrder,
+          menuId: menu._id,
         },
       );
   },

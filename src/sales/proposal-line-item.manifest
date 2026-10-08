@@ -73,6 +73,10 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
   // The event's travel & delivery fee line (convex/travelFees.ts keeps one
   // per proposal and reprices it from the event's distance).
   property travelFee: boolean?
+  // The menu whose per-guest or base price this line is, when a dish pick
+  // added it (convex/lib/proposalDishPricing.ts). The proposal menu panel
+  // flags it once every dish of that menu is taken off.
+  property menuId: uuid?
   property addedAt: datetime?
   property removedAt: datetime?
 
@@ -101,7 +105,8 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     optional menuDishId: uuid,
     optional overrideReason: string,
     optional equipmentId: uuid,
-    optional travelFee: boolean
+    optional travelFee: boolean,
+    optional menuId: uuid
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
@@ -123,6 +128,7 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     mutate overrideReason = overrideReason
     mutate equipmentId = equipmentId
     mutate travelFee = travelFee
+    mutate menuId = menuId
     mutate addedAt = now()
     emit ProposalLineItemAdded {
       lineItemId: self.id

@@ -1211,6 +1211,7 @@ export function ProposalsPage() {
                             editable={MENU_EDITABLE_STATUSES.includes(
                               String(row.status),
                             )}
+                            draft={String(row.status) === "draft"}
                             onFailure={setFailure}
                           />
                         </td>
