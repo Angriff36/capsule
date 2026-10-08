@@ -12,8 +12,11 @@ import type { Doc, Id } from "./_generated/dataModel";
 import { query } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import { canRead } from "./search";
+import { RANGE_CAP } from "./eventLookup";
 
-export const PLAN_EVENT_CAP = 1000;
+// As many events as the board's own event window can hold, so no event it
+// shows comes back with its staff, trucks or pack lists missing.
+export const PLAN_EVENT_CAP = RANGE_CAP;
 
 type Live<T> = T & { deletedAt?: number | null };
 const live = <T extends { deletedAt?: unknown }>(rows: T[]) =>
