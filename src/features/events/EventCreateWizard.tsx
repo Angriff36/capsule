@@ -602,12 +602,19 @@ function ClientHeadcountStep({
   // A client who is new is made right here, not on another page.
   const canCreateClient = useCanCreateInlineReference("client");
   const [newClientName, setNewClientName] = useState<string | null>(null);
-  // The contact this step filled in from a client; a new client replaces it,
-  // but a name the user typed stays.
-  const autoContact = useRef<string | null>(null);
+  // The contact follows the client: a new client replaces the contact while
+  // it is still the previous client's own name, but a name the user typed
+  // stays. Read from the draft, so it holds across Back and Next.
+  const contactOf = (id: string | undefined) => {
+    const client = clients.find((row) => row._id === id);
+    return client
+      ? [client.givenName, client.familyName].filter(Boolean).join(" ") ||
+          clientName(client)
+      : null;
+  };
   const contactFollowsClient = () =>
     !draft.primaryContactName ||
-    draft.primaryContactName === autoContact.current;
+    draft.primaryContactName === contactOf(draft.clientId);
   const [madeClient, setMadeClient] = useState<{
     id: string;
     label: string;
@@ -657,7 +664,6 @@ function ClientHeadcountStep({
                   .join(" ") || clientName(client)
               : null;
             const follow = contactFollowsClient() && contact != null;
-            if (follow) autoContact.current = contact;
             update({
               clientId: id,
               ...(follow ? { primaryContactName: contact } : {}),
@@ -684,7 +690,6 @@ function ClientHeadcountStep({
           onCreated={(record) => {
             setMadeClient(record);
             const follow = contactFollowsClient();
-            if (follow) autoContact.current = record.label;
             update({
               clientId: record.id,
               ...(follow ? { primaryContactName: record.label } : {}),
