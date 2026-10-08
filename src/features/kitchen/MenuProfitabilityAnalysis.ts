@@ -27,6 +27,8 @@ export interface MenuDishProfitabilityInput extends Deletable {
 export interface DishProfitabilityInput extends Deletable {
   id: string;
   name: string;
+  /** The dish's own course, shown when the menu line names none. */
+  course?: string | null;
 }
 
 export interface DishComponentProfitabilityInput extends Deletable {
@@ -97,6 +99,8 @@ export interface MenuProfitabilityAnalysis {
   rankedDishCount: number;
   lowMarginCount: number;
   unrankedDishCount: number;
+  /** Sold per guest: the dishes need no prices of their own. */
+  perGuestMenu: boolean;
 }
 
 export interface BuildMenuProfitabilityInput {
@@ -292,7 +296,7 @@ export function buildMenuProfitability({
       menuDishVersion: line.version,
       dishId: line.dishId,
       dishName: dish?.name.trim() || "Unavailable dish",
-      course: line.course?.trim() || undefined,
+      course: line.course?.trim() || dish?.course?.trim() || undefined,
       sortOrder: line.sortOrder,
       sellingPrice: price,
       componentCost,
@@ -360,5 +364,6 @@ export function buildMenuProfitability({
     rankedDishCount,
     lowMarginCount: rows.filter((row) => row.status === "low_margin").length,
     unrankedDishCount: rows.length - rankedDishCount,
+    perGuestMenu,
   };
 }
