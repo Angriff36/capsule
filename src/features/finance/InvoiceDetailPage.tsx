@@ -22,7 +22,7 @@ import {
   useInvoiceSendBalanceReminder,
   useInvoiceSetDeposit,
   useInvoiceWriteOff,
-  useListClient,
+  useGetClient,
   useListCreditMemo,
   useListInvoice,
   useListOrganization,
@@ -87,7 +87,10 @@ export function InvoiceDetailPage() {
     "Invoice",
     invoice ? formatInvoiceNumber(invoice.invoiceNumber, invoice._id) : null,
   );
-  const clients = useListClient();
+  // Only this invoice's client: its name and address go on the PDF.
+  const client = useGetClient(
+    invoice?.clientId ? String(invoice.clientId) : "skip",
+  );
   const creditMemos = useListCreditMemo();
   const events = useEventsById(
     invoice === undefined ? undefined : [invoice?.eventId],
@@ -136,9 +139,14 @@ export function InvoiceDetailPage() {
   const [paymentLinkLoading, setPaymentLinkLoading] = useState(true);
   const { prompt, host } = useActionPrompt(busy != null);
   const { loadingTooLong } = useSlowQuery(
-    [invoice, clients, creditMemos, events, invoices, payments].includes(
-      undefined,
-    ) || brandingLoading
+    [
+      invoice,
+      invoice?.clientId ? client : null,
+      creditMemos,
+      events,
+      invoices,
+      payments,
+    ].includes(undefined) || brandingLoading
       ? undefined
       : invoice,
   );
@@ -196,7 +204,7 @@ export function InvoiceDetailPage() {
 
   if (
     invoice === undefined ||
-    clients === undefined ||
+    (invoice?.clientId && client === undefined) ||
     creditMemos === undefined ||
     events === undefined ||
     invoices === undefined ||
@@ -228,8 +236,11 @@ export function InvoiceDetailPage() {
     );
   }
 
-  const clientName = clientDisplayName(String(invoice.clientId), clients);
-  const clientRecord = clients.find((row) => row._id === invoice.clientId);
+  const clientRecord = client ?? undefined;
+  const clientName = clientDisplayName(
+    String(invoice.clientId),
+    clientRecord ? [clientRecord] : [],
+  );
   const linkedEvent =
     invoice.eventId != null
       ? events.find((row) => row._id === invoice.eventId)

@@ -367,8 +367,8 @@ Screens (35): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 
 ### Generated reads
 
+- `queries.getClient` - live read
 - `queries.getEvent` - live read
-- `queries.listClient` - live read
 - `queries.listEvent` - live read
 - `queries.listEventTimelineActivity` - live read
 - `queries.listMenu` - live read
@@ -518,6 +518,7 @@ Screens (35): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `clientDirectory.list` - query; live read, updates by itself
 - `dishLookup.byIds` - query; live read, updates by itself
 - `dishLookup.exclusiveToVenue` - query; live read, updates by itself
 - `dishLookup.page` - query; live read, updates by itself
@@ -4315,7 +4316,6 @@ Screens (70): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `queries.getEvent` - live read
 - `queries.getInvoice` - live read
 - `queries.getRevenueAttribution` - live read
-- `queries.listClient` - live read
 - `queries.listComponent` - live read
 - `queries.listComponentIngredient` - live read
 - `queries.listCreditMemo` - live read
