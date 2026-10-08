@@ -97,4 +97,20 @@ describe("guest paste with headings", () => {
       },
     ]);
   });
+  it("reads a full five-column row by position, keeping the allergy", () => {
+    expect(
+      readGuestPaste(
+        "Alex Park,alex@example.test,5551234567,no dairy,peanuts",
+        [],
+      ),
+    ).toEqual([
+      {
+        name: "Alex Park",
+        email: "alex@example.test",
+        phone: "5551234567",
+        dietaryRestrictions: ["no dairy"],
+        allergenRestrictions: ["peanuts"],
+      },
+    ]);
+  });
 });
