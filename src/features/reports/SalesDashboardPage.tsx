@@ -1,8 +1,8 @@
 import { useMemo } from "react";
+import { useClientDirectory } from "../../lib/useClientDirectory";
 import {
   useListLead,
   useListProposal,
-  useListClient,
   useListPerson,
 } from "@/lib/manifest-convex-react";
 import { useAllEventReportRows } from "../facilities/useEventsById";
@@ -58,7 +58,7 @@ export function SalesDashboardPage() {
   const events = useAllEventReportRows();
   const leads = useListLead();
   const proposals = useListProposal();
-  const clients = useListClient();
+  const clients = useClientDirectory();
   const people = useListPerson();
 
   // Process pipeline data

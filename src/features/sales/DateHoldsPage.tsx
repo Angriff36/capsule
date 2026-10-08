@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useClientDirectory } from "../../lib/useClientDirectory";
 import { Link } from "react-router-dom";
 import type { Doc } from "../../lib/api";
 import {
@@ -10,7 +11,6 @@ import {
   useDateWaitlistEntryOffer,
   useDateWaitlistEntryPromote,
   useDateWaitlistEntryWithdraw,
-  useListClient,
   useListDateHold,
   useListDateWaitlistEntry,
   useListLead,
@@ -50,7 +50,7 @@ const DAY_MS = 86_400_000;
 export function DateHoldsPage() {
   const holds = useListDateHold();
   const waitlist = useListDateWaitlistEntry();
-  const clients = useListClient();
+  const clients = useClientDirectory();
   const leads = useListLead();
   // The client's open lead, so booking carries its type and guest count.
   // One for the held day wins over another open one.

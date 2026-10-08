@@ -4,6 +4,7 @@ import {
   useSearchParams,
   Link,
 } from "react-router-dom";
+import { useClientDirectory } from "../../lib/useClientDirectory";
 import { useState, useEffect, useRef, type FormEvent } from "react";
 import {
   useGetRevenueAttribution,
@@ -12,7 +13,6 @@ import {
   useListVenueCommissionTerm,
   useListPerson,
   useListReferralSource,
-  useListClient,
   useRevenueAttributionCreate,
   useRevenueAttributionApply,
   useRevenueAttributionUpdate,
@@ -72,7 +72,7 @@ export function RevenueAttributionDetailPage() {
   const commissionTerms = useListVenueCommissionTerm();
   const people = useListPerson();
   const referralSources = useListReferralSource();
-  const clients = useListClient();
+  const clients = useClientDirectory();
   const event = useGetEvent(
     isNew || !attribution?.eventId ? "skip" : attribution.eventId,
   );

@@ -1,8 +1,6 @@
 import { useMemo, useState } from "react";
-import {
-  useListClient,
-  useListEventCloseout,
-} from "../../lib/manifest-convex-react";
+import { useClientDirectory } from "../../lib/useClientDirectory";
+import { useListEventCloseout } from "../../lib/manifest-convex-react";
 import { useEventsById } from "../facilities/useEventsById";
 import { TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate, formatMoney } from "../../lib/format";
@@ -525,7 +523,7 @@ export function ProfitMarginReportsPage() {
     [closeouts],
   );
   const events = useEventsById(eventIds);
-  const clients = useListClient();
+  const clients = useClientDirectory();
   const now = useMemo(() => new Date(), []);
 
   return (

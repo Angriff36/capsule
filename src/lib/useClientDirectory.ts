@@ -8,6 +8,11 @@ import type { Doc } from "./api";
  * client with useGetClient for its contact details. The full list opens ten
  * locked fields per client and is too slow for a big client book.
  */
-export function useClientDirectory(): Doc<"clients">[] | undefined {
-  return useQuery(api.clientDirectory.list) as Doc<"clients">[] | undefined;
+type DirectoryClient = Doc<"clients"> & {
+  displayName: string;
+  isArchived: boolean;
+};
+
+export function useClientDirectory(): DirectoryClient[] | undefined {
+  return useQuery(api.clientDirectory.list) as DirectoryClient[] | undefined;
 }

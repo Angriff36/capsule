@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
+import { useClientDirectory } from "../../lib/useClientDirectory";
 import {
-  useListClient,
   useListInvoice,
   useListOrganization,
   useListPayment,
@@ -55,7 +55,7 @@ const clientLabel = (row: {
 export function FinanceOverviewPage() {
   const invoices = useListInvoice();
   const payments = useListPayment();
-  const clients = useListClient();
+  const clients = useClientDirectory();
   const organizations = useListOrganization();
   const loading =
     invoices === undefined || payments === undefined || clients === undefined;

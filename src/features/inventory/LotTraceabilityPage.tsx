@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
+import { useClientDirectory } from "../../lib/useClientDirectory";
 import { Link } from "react-router-dom";
 import {
-  useListClient,
   useListIngredient,
   useListInventoryItem,
   useListInventoryLot,
@@ -36,7 +36,7 @@ export function LotTraceabilityPage() {
     [reservations],
   );
   const events = useEventsById(eventIds);
-  const clients = useListClient();
+  const clients = useClientDirectory();
   const ingredients = useListIngredient();
   const vendors = useListVendor();
   const locations = useListStorageLocation();
