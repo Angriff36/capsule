@@ -112,7 +112,7 @@ it("creates a missing client in the sheet and returns its id for picker selectio
   });
 });
 
-it("keeps a two-word company whole when its guessed person type is switched back", async () => {
+it("keeps a two-word company whole when switched to person and back", async () => {
   const createClient = command("useCreateClient", { docId: "client-new" });
   await mount(
     createElement(InlineReferenceCreateSheet, {
@@ -126,8 +126,10 @@ it("keeps a two-word company whole when its guessed person type is switched back
     }),
   );
   const sheet = document.body;
-  // Guessed a person and split; switching to company puts it back together.
-  expect(field("clientType", sheet).value).toBe("person");
+  // A name starts as a company; turned into a person it splits, and turned
+  // back into a company it is whole again.
+  expect(field("clientType", sheet).value).toBe("company");
+  change(field("clientType", sheet), "person");
   change(field("clientType", sheet), "company");
   await submit(sheet.querySelector("form")!);
   expect(createClient).toHaveBeenCalledWith(

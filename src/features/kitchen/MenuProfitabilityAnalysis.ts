@@ -350,10 +350,17 @@ export function buildMenuProfitability({
   const perGuest = Number(menuPricePerPerson ?? 0);
   const perGuestMenu =
     totalSellingPrice === 0 && perGuest > 0 && rows.length > 0;
+  // A dish with no or partial recipe cost would count as free and overstate
+  // the margin, so the per-guest margin waits for every dish's cost.
+  const perGuestCostComplete = rows.every((row) => row.costComplete);
   const portfolioMarginAmount = perGuestMenu
     ? perGuest - rows.reduce((total, row) => total + row.componentCost, 0)
     : totalSellingPrice - totalComponentCost;
-  const marginBase = perGuestMenu ? perGuest : totalSellingPrice;
+  const marginBase = perGuestMenu
+    ? perGuestCostComplete
+      ? perGuest
+      : 0
+    : totalSellingPrice;
 
   return {
     rows,
