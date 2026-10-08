@@ -1,16 +1,19 @@
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useMemo, useState } from "react";
+import { useCreateTasting } from "../../lib/manifest-convex-react";
 import {
-  useCreateTasting,
-  useListLead,
-  useListProposal,
-  useListTasting,
-} from "../../lib/manifest-convex-react";
+  useLeadsByIds,
+  usePagedRows,
+  useProposalsByIds,
+  useRowsWithEmpty,
+} from "../../lib/financeScopedQueries";
 import { formatDate, formatTime } from "../../lib/format";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { TastingDetail } from "./TastingDetail";
+
+const OPEN_LEAD = ["closedAt"];
 
 const STATUS_LABEL: Record<string, string> = {
   scheduled: "Scheduled",
@@ -34,9 +37,37 @@ export function leadLabel(lead: {
  * dish, then put the approved dishes on the proposal menu.
  */
 export function TastingsPage() {
-  const tastings = useListTasting();
-  const leads = useListLead();
-  const proposals = useListProposal();
+  // The newest tastings a page at a time; open leads for the booking form;
+  // and only the proposals and leads those name.
+  const tastingPages = usePagedRows("tastings");
+  const tastings = tastingPages.rows;
+  const openLeads = useRowsWithEmpty("leads", OPEN_LEAD);
+  const tastingLeads = useLeadsByIds(
+    tastings?.map((row) => (row.leadId ? String(row.leadId) : null)),
+  );
+  const leads = useMemo(
+    () =>
+      openLeads === undefined || tastingLeads === undefined
+        ? undefined
+        : [
+            ...new Map(
+              [...openLeads, ...tastingLeads].map((lead) => [lead._id, lead]),
+            ).values(),
+          ],
+    [openLeads, tastingLeads],
+  );
+  const proposals = useProposalsByIds(
+    leads === undefined || tastings === undefined
+      ? undefined
+      : [
+          ...leads.map((lead) =>
+            lead.proposalId ? String(lead.proposalId) : null,
+          ),
+          ...tastings.map((row) =>
+            row.proposalId ? String(row.proposalId) : null,
+          ),
+        ],
+  );
   const createTasting = useCreateTasting();
   const [failure, setFailure] = useState<unknown>(null);
   const [saving, setSaving] = useState(false);
@@ -240,6 +271,16 @@ export function TastingsPage() {
           </tbody>
         </table>
       )}
+      {tastings !== undefined && tastingPages.canLoadMore ? (
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm mt-2"
+          disabled={tastingPages.loadingMore}
+          onClick={tastingPages.loadMore}
+        >
+          {tastingPages.loadingMore ? "Loading…" : "Load older tastings"}
+        </button>
+      ) : null}
 
       {openId && rows.some((row) => row._id === openId) ? (
         <TastingDetail

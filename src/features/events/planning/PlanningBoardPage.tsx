@@ -6,6 +6,12 @@ import {
   type DragEvent,
   type FormEvent,
 } from "react";
+import type { Id } from "../../../lib/api";
+import {
+  useEventTaskRows,
+  usePlanningOverrideRows,
+  usePlanningReceiptRows,
+} from "../../../lib/eventScopedQueries";
 import { Link } from "react-router-dom";
 import { formatCountNoun, formatTime } from "../../../lib/format";
 import {
@@ -18,9 +24,6 @@ import {
   useEventAssignmentUnassign,
   useEventPlanNeedsRevise,
   useEventVehicleAssignmentRelease,
-  useListEventTask,
-  useListPlanningOverride,
-  useListPlanningReceipt,
   useListPlanningRule,
   usePlanningReceiptAnswerAgain,
 } from "../../../lib/manifest-convex-react";
@@ -145,11 +148,30 @@ function candidateOf(draft: Draft): PlanCandidate {
 export function PlanningBoardPage() {
   const authStatus = useAuthStatus();
   const [anchor, setAnchor] = useState(() => startOfDay(Date.now()));
-  const { loading, snap, levels } = usePlanSnapshot(anchor);
+  const [view, setView] = useState<View>("month");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const days = useMemo(() => {
+    const start = new Date(anchor);
+    if (view === "month") start.setDate(1);
+    if (view === "month" || view === "week")
+      start.setDate(start.getDate() - start.getDay());
+    const first = startOfDay(start.getTime());
+    const count =
+      view === "month" ? 42 : view === "week" ? 7 : view === "day" ? 1 : 14;
+    return Array.from({ length: count }, (_, index) => addDays(first, index));
+  }, [anchor, view]);
+  // Only the days on screen; moving the board loads the next ones.
+  const shown = useMemo(
+    () => ({ from: days[0], to: addDays(days[days.length - 1], 1) }),
+    [days],
+  );
+  const { loading, tooMany, snap, levels } = usePlanSnapshot(shown);
   const rules = useListPlanningRule();
-  const receipts = useListPlanningReceipt();
-  const overrides = useListPlanningOverride();
-  const tasks = useListEventTask();
+  // Tasks, receipts and overrides of the picked event only.
+  const pickedEvent = selectedId ? (selectedId as Id<"events">) : "skip";
+  const receipts = usePlanningReceiptRows(pickedEvent);
+  const overrides = usePlanningOverrideRows(pickedEvent);
+  const tasks = useEventTaskRows(pickedEvent);
 
   const assignPerson = useCreateEventAssignment();
   const unassign = useEventAssignmentUnassign();
@@ -168,8 +190,6 @@ export function PlanningBoardPage() {
   const recordReceipt = useCreatePlanningReceipt();
   const answerAgain = usePlanningReceiptAnswerAgain();
 
-  const [view, setView] = useState<View>("month");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [eventSearch, setEventSearch] = useState("");
   const [poolTab, setPoolTab] = useState<PoolTab>("people");
   const [poolSearch, setPoolSearch] = useState("");
@@ -197,16 +217,6 @@ export function PlanningBoardPage() {
   }, [draftSubject]);
 
   const today = startOfDay(Date.now());
-  const days = useMemo(() => {
-    const start = new Date(anchor);
-    if (view === "month") start.setDate(1);
-    if (view === "month" || view === "week")
-      start.setDate(start.getDate() - start.getDay());
-    const first = startOfDay(start.getTime());
-    const count =
-      view === "month" ? 42 : view === "week" ? 7 : view === "day" ? 1 : 14;
-    return Array.from({ length: count }, (_, index) => addDays(first, index));
-  }, [anchor, view]);
 
   const liveEvents = useMemo(
     () => snap.events.filter(isLiveEvent),
@@ -789,6 +799,12 @@ export function PlanningBoardPage() {
       </div>
       {savedToast}
       {host}
+      {tooMany ? (
+        <p role="status" className="mt-4 text-base text-warn">
+          Too many events on these days to check staff, trucks and pack lists at
+          once. Switch to the week or day view to see them.
+        </p>
+      ) : null}
       {failure ? (
         <div className="mt-4">
           <FailureBanner failure={failure} onDismiss={() => setFailure(null)} />

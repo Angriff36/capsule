@@ -3,6 +3,10 @@ import { Link, useParams } from "react-router-dom";
 import { ReturnToListLink } from "../list-state/listOrigin";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import { useEventsById } from "../facilities/useEventsById";
+import {
+  usePurchaseNeedsWhen,
+  useVendorOrderRows,
+} from "../facilities/useLogisticsWindow";
 import { formatQuantity, formatMoneyExact } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
@@ -10,18 +14,13 @@ import {
   useCreateVendorOrderLine,
   useGetVendorOrder,
   useListIngredient,
-  useListIngredientDemand,
-  useListInventoryLot,
   useListItemUnitMapping,
-  useListPurchaseNeed,
   useListInventoryItem,
   useListStorageLocation,
   useListVendor,
   useListVendorContact,
   useListVendorContract,
   useListVendorContractPriceTier,
-  useListVendorOrderLine,
-  useListVendorOrderLineDemand,
   useVendorOrderApprove,
   useVendorOrderCancel,
   useVendorOrderConfirm,
@@ -72,10 +71,28 @@ export function VendorOrderPage() {
   const vendorContacts = useListVendorContact();
   const contracts = useListVendorContract();
   const contractTiers = useListVendorContractPriceTier();
-  const lines = useListVendorOrderLine();
-  const demandLinks = useListVendorOrderLineDemand();
-  const needs = useListPurchaseNeed();
-  const demands = useListIngredientDemand();
+  const [showLineForm, setShowLineForm] = useState(false);
+  // This order's lines, links, lots, needs and demands only; every purchase
+  // need only while the add-line form (which offers them) is open.
+  const orderRows = useVendorOrderRows(order ? order._id : null);
+  const lines = orderRows.lines;
+  const demandLinks = orderRows.links;
+  const pickerNeeds = usePurchaseNeedsWhen(showLineForm);
+  const needs = useMemo(
+    () =>
+      orderRows.filled === undefined ||
+      (showLineForm && pickerNeeds === undefined)
+        ? undefined
+        : [
+            ...orderRows.filled.needs,
+            ...(showLineForm ? (pickerNeeds ?? []) : []).filter(
+              (row) =>
+                !orderRows.filled!.needs.some((own) => own._id === row._id),
+            ),
+          ],
+    [orderRows.filled, pickerNeeds, showLineForm],
+  );
+  const demands = orderRows.filled?.demands;
   const eventIds = useMemo(
     () =>
       needs === undefined || demands === undefined
@@ -85,7 +102,7 @@ export function VendorOrderPage() {
   );
   const events = useEventsById(eventIds);
   const ingredients = useListIngredient();
-  const inventoryLots = useListInventoryLot();
+  const inventoryLots = orderRows.lots;
   const unitMappings = useListItemUnitMapping();
   const locations = useListStorageLocation();
   const stockLines = useListInventoryItem();
@@ -104,7 +121,6 @@ export function VendorOrderPage() {
   const cancelLine = useVendorOrderLineCancelLine();
   const reconcileLine = useVendorOrderLineReconcileDraftRequirement();
   const reviseLine = useVendorOrderLineReviseQuantity();
-  const [showLineForm, setShowLineForm] = useState(false);
   const [lineNeedId, setLineNeedId] = useState("");
   const [receivingLineId, setReceivingLineId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);

@@ -2,9 +2,6 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useListPerson,
-  useListPrepTask,
-  useListPrepTaskDependency,
-  useListProductionBatch,
   useListComponent,
   usePrepTaskClaim,
   usePrepTaskComplete,
@@ -13,6 +10,7 @@ import {
   useProductionBatchComplete,
   useProductionBatchStart,
 } from "../../lib/manifest-convex-react";
+import { useOpenBatches, usePrepWork } from "../../lib/productionScopedQueries";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useOptimisticStatus } from "../../ui/useOptimisticStatus";
 import { TableSkeleton } from "../../ui/primitives";
@@ -95,13 +93,39 @@ function dueLabel(dueAt: number | null, now: number): string {
 }
 
 export function KitchenDisplayPage() {
-  const tasks = useListPrepTask();
-  const dependencies = useListPrepTaskDependency();
-  const batches = useListProductionBatch();
+  // Open prep tasks with their events' other tasks and links; never every
+  // prep task the company ever had.
+  const work = usePrepWork({});
+  const tasks = work?.tasks;
+  const dependencies = work?.dependencies;
   // The filter offers the picker's events (next 400, last 90 days, undated);
   // the names on cards come from the events the board's own
   // tasks and batches name, wherever they fall.
   const events = usePickerEvents();
+  const [eventFilter, setEventFilter] = useState<string>("all");
+  // Batches still to cook for the house and for the events this screen
+  // shows: not finished and not two days gone, or the one picked above.
+  const [shownSince] = useState(() => Date.now() - 2 * 86_400_000);
+  const batchEventIds = useMemo(
+    () =>
+      events === undefined
+        ? undefined
+        : [
+            ...events
+              .filter(
+                (event) =>
+                  !["cancelled", "completed", "closed_out"].includes(
+                    String(event.stage),
+                  ) && !(event.startsAt != null && event.startsAt < shownSince),
+              )
+              .map((event) => event._id as string),
+            ...(eventFilter === "all" || eventFilter === "house"
+              ? []
+              : [eventFilter]),
+          ],
+    [events, eventFilter, shownSince],
+  );
+  const batches = useOpenBatches(batchEventIds);
   const boardEventIds = useMemo(
     () =>
       tasks && batches
@@ -121,7 +145,6 @@ export function KitchenDisplayPage() {
   const batchStart = useProductionBatchStart();
   const batchComplete = useProductionBatchComplete();
   const batchCancel = useProductionBatchCancel();
-  const [eventFilter, setEventFilter] = useState<string>("all");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   // The card the failure came from, so the cook sees it where they tapped.

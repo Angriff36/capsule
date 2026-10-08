@@ -8,7 +8,6 @@ import {
   useContractSend,
   useContractSign,
   useCreateContract,
-  useListContract,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -21,12 +20,15 @@ import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
 import { useActionNotice } from "../../ui/action-result";
 import { useWorkingEventId } from "../events/workingEvent";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import { usePagedRows } from "../../lib/financeScopedQueries";
 
 const policy = new CrmLifecyclePolicy();
 
 export function ContractsPage() {
   const workingId = useWorkingEventId();
-  const contracts = useListContract();
+  // The newest contracts, a page at a time ("Load more" reads older ones).
+  const contractPages = usePagedRows("contracts");
+  const contracts = contractPages.rows;
   const clients = useClientDirectory();
   const events = usePickerAndNamedEvents([workingId]);
   const createContract = useCreateContract();
@@ -350,6 +352,18 @@ export function ContractsPage() {
             </tbody>
           </table>
         )}
+        {contracts !== undefined && contractPages.canLoadMore ? (
+          <div className="px-4 py-3">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={contractPages.loadingMore}
+              onClick={contractPages.loadMore}
+            >
+              {contractPages.loadingMore ? "Loading…" : "Load older contracts"}
+            </button>
+          </div>
+        ) : null}
       </section>
     </div>
   );

@@ -47,6 +47,39 @@ vi.mock("../../../src/lib/messageReplyActions", () => ({
   useSendEmailReply: () => harness.sendReply,
 }));
 
+// The inbox reads threads a page at a time and the open thread's messages.
+vi.mock("../../../src/lib/financeScopedQueries", async () =>
+  (await import("../../helpers/financeScopedQueriesMock")).financeScopedMock(
+    (table) =>
+      table === "messageThreads"
+        ? [
+            {
+              _id: "thread-1",
+              provider: harness.provider,
+              subject: "Client question",
+              status: "open",
+              version: 1,
+              deletedAt: null,
+            },
+            ...harness.extraThreads,
+          ]
+        : table === "messages"
+          ? [
+              {
+                _id: "message-old",
+                threadId: "thread-1",
+                direction: "outbound",
+                status: "queued",
+                bodyText: "Legacy draft",
+                createdAt: 1,
+                deletedAt: null,
+              },
+              ...harness.extraMessages,
+            ]
+          : [],
+  ),
+);
+
 vi.mock("../../../src/lib/manifest-convex-react", () => {
   const commandHook = () => vi.fn(async () => ({}));
   return new Proxy(

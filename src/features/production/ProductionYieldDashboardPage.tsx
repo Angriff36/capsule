@@ -1,9 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  useListProductionBatch,
-  useListComponent,
-} from "../../lib/manifest-convex-react";
+import { useListComponent } from "../../lib/manifest-convex-react";
+import { useBatchesSince } from "../../lib/productionScopedQueries";
 import { TableSkeleton } from "../../ui/primitives";
 import { FieldHelp } from "../../ui/FieldHelp";
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
@@ -101,13 +99,20 @@ export function ProductionYieldDashboard({
   components,
   loading = false,
   now,
+  windowDays: chosenWindow,
+  onWindowDaysChange,
 }: {
   batches: readonly ProductionYieldBatch[];
   components: readonly ProductionYieldComponent[];
   loading?: boolean;
   now: Date;
+  /** The page that reads the batches owns the period; else this does. */
+  windowDays?: ProductionYieldWindow;
+  onWindowDaysChange?: (days: ProductionYieldWindow) => void;
 }) {
-  const [windowDays, setWindowDays] = useState<ProductionYieldWindow>(30);
+  const [ownWindow, setOwnWindow] = useState<ProductionYieldWindow>(30);
+  const windowDays = chosenWindow ?? ownWindow;
+  const setWindowDays = onWindowDaysChange ?? setOwnWindow;
   const report = useMemo(
     () => buildProductionYieldReport({ batches, components, windowDays, now }),
     [batches, components, windowDays, now],
@@ -345,8 +350,22 @@ export function ProductionYieldDashboard({
   );
 }
 
+/**
+ * A batch is created when it is planned, before it is made. There is no
+ * index on the finish time, so the read starts this long before the chosen
+ * period: a batch planned more ahead than this and finished inside the
+ * period would be missed.
+ */
+const PLAN_LEAD_DAYS = 30;
+const DAY_MS = 86_400_000;
+
 export function ProductionYieldDashboardPage() {
-  const batches = useListProductionBatch();
+  const [now] = useState(() => new Date());
+  const [windowDays, setWindowDays] = useState<ProductionYieldWindow>(30);
+  // Only batches of the chosen period, never the whole history.
+  const batches = useBatchesSince(
+    now.getTime() - (windowDays + PLAN_LEAD_DAYS) * DAY_MS,
+  );
   const components = useListComponent();
   const loading = batches === undefined || components === undefined;
 
@@ -355,7 +374,9 @@ export function ProductionYieldDashboardPage() {
       batches={(batches ?? []) as ProductionYieldBatch[]}
       components={(components ?? []) as ProductionYieldComponent[]}
       loading={loading}
-      now={new Date()}
+      now={now}
+      windowDays={windowDays}
+      onWindowDaysChange={setWindowDays}
     />
   );
 }

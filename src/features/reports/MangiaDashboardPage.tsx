@@ -1,5 +1,8 @@
 import { useMemo } from "react";
-import { useListPrepTask, useListPackList } from "@/lib/manifest-convex-react";
+import {
+  usePackListsForEvents,
+  useWindowRows,
+} from "@/lib/financeScopedQueries";
 import { useEventsInRange } from "../facilities/useEventsById";
 import {
   DashboardGrid,
@@ -28,14 +31,21 @@ import { MetricDefinitionList } from "./MetricDefinitionList";
  */
 
 export function MangiaDashboardPage() {
-  const prepTasks = useListPrepTask();
-  const packLists = useListPackList();
-
   const today = useMemo(() => {
     const date = new Date();
     date.setHours(0, 0, 0, 0);
     return date;
   }, []);
+  // Only today's prep tasks (by due day).
+  const prepWindow = useMemo(() => {
+    const dayEnd = new Date(today);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+    return {
+      fields: ["dueAt"],
+      ranges: [{ from: today.getTime(), to: dayEnd.getTime() }],
+    };
+  }, [today]);
+  const prepTasks = useWindowRows("prepTasks", prepWindow);
 
   // The board shows the last seven days and the current Sunday-to-Sunday week.
   const [eventWindow, weekRange] = useMemo(() => {
@@ -91,6 +101,18 @@ export function MangiaDashboardPage() {
             ),
           ],
     [windowEvents, upcomingEvents],
+  );
+
+  // Only today's events' pack lists.
+  const packLists = usePackListsForEvents(
+    events
+      ?.filter((e) => {
+        if (!e.startsAt) return false;
+        const eventDate = new Date(e.startsAt);
+        eventDate.setHours(0, 0, 0, 0);
+        return eventDate.getTime() === today.getTime();
+      })
+      .map((e) => String(e._id)),
   );
 
   // Today's operations snapshot
@@ -166,7 +188,9 @@ export function MangiaDashboardPage() {
       (p) => p.deletedAt == null && todayEventIds.has(String(p.eventId)),
     );
 
-    const opened = todayPacks.filter((p) => p.status === "opened").length;
+    const opened = todayPacks.filter(
+      (p) => String(p.status) === "opened",
+    ).length;
     const packing = todayPacks.filter((p) => p.status === "packing").length;
     const packed = todayPacks.filter((p) => p.status === "packed").length;
     const dispatched = todayPacks.filter(

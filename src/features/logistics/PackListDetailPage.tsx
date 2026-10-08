@@ -7,7 +7,6 @@ import {
   useCreatePackListItem,
   useGetPackList,
   useListPerson,
-  useListPackListItem,
   useListPackListTemplate,
   usePackListCancel,
   usePackListDispatch,
@@ -28,7 +27,6 @@ import {
   usePackListItemMarkMissing,
   usePackListItemMarkPacked,
   usePackListItemRecordChecked,
-  useListPackSectionClaim,
   usePackSectionClaimRelease,
   usePackListItemRecordLoaded,
   usePackListItemRecordPackedCount,
@@ -52,6 +50,10 @@ import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip } from "../../ui/primitives";
 import { classifyCommandFailure } from "../events/CommandFailure";
 import { useEventsById } from "../facilities/useEventsById";
+import {
+  usePackListItemsFor,
+  usePackSectionClaimsFor,
+} from "../facilities/useLogisticsWindow";
 import { useDishesByIds, useWholeDishList } from "../../lib/useDishesByIds";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
@@ -107,7 +109,8 @@ type TemplateSummary = {
 export function PackListDetailPage() {
   const { id } = useParams();
   const packList = useRouteRecord(useGetPackList, id);
-  const items = useListPackListItem();
+  // This list's lines only, read by list.
+  const items = usePackListItemsFor(packList ? packList._id : null);
   const events = useEventsById(
     packList === undefined ? undefined : [packList?.eventId],
   );
@@ -142,7 +145,7 @@ export function PackListDetailPage() {
   const recordPackedCount = usePackListItemRecordPackedCount();
   const recordSentInstead = usePackListItemRecordSentInstead();
   const recordChecked = usePackListItemRecordChecked();
-  const sectionClaims = useListPackSectionClaim();
+  const sectionClaims = usePackSectionClaimsFor(packList ? packList._id : null);
   const authStatus = useAuthStatus();
   const takeSection = usePackSectionTake();
   const giveBackSection = usePackSectionClaimRelease();

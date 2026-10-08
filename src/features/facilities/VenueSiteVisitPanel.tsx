@@ -5,7 +5,6 @@ import { formatDate } from "../../lib/format";
 import {
   useCreateAttachment,
   useCreateVenueNote,
-  useListVenueNote,
 } from "../../lib/manifest-convex-react";
 import { Section } from "../../ui/primitives";
 import {
@@ -32,7 +31,10 @@ const text = (data: FormData, name: string) =>
  */
 export function VenueSiteVisitPanel({ venue }: { venue: Doc<"venues"> }) {
   const venueId = String(venue._id);
-  const notes = useListVenueNote();
+  // This venue's notes only, read by venue.
+  const notes = useQuery(api.queries.listVenueNoteByVenueId, {
+    venueId: venue._id,
+  });
   const events = useAllEventReportRows();
   const files = useQuery(api.fileStorage.listForParent, {
     parentType: "venue",

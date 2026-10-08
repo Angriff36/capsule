@@ -5,16 +5,9 @@ import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useSendOutWithReason } from "../../lib/useReasonedChanges";
 import {
-  useListDepartureOverride,
-  useListEventAssignment,
-  useListEventStaffNeed,
-  useListEventVehicleAssignment,
-  useListPackList,
-  useListPackListItem,
   useListPerson,
   useListTrailer,
   useListVehicle,
-  useListVehicleTripCheck,
   usePackListDispatch,
   usePackListMarkLoaded,
 } from "../../lib/manifest-convex-react";
@@ -24,6 +17,7 @@ import { EmptyState, PageHeader, TableSkeleton } from "../../ui/primitives";
 import { resolveManifestPolicies } from "../admin/rolePermissionAudit";
 import { eventDetailPath } from "../events/eventRoutes";
 import { useEventsInRange } from "../facilities/useEventsById";
+import { useLogisticsForEvents } from "../facilities/useLogisticsWindow";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { readyToLeave, type LeaveSummary } from "./readyToLeave";
@@ -40,6 +34,16 @@ const RANGES = [
   { key: "past", label: "Last 7 days", from: -7, to: 0 },
 ] as const;
 type RangeKey = (typeof RANGES)[number]["key"];
+
+const DISPATCH_PARTS = [
+  "packLists",
+  "packLines",
+  "rigs",
+  "tripChecks",
+  "assignments",
+  "staffNeeds",
+  "departureOverrides",
+] as const;
 
 /** Stages where an event still has a truck to send. */
 const LIVE_STAGES = new Set([
@@ -65,16 +69,9 @@ function personName(
  */
 export function DispatchBoardPage() {
   const authStatus = useAuthStatus();
-  const packLists = useListPackList();
-  const packLines = useListPackListItem();
-  const rigs = useListEventVehicleAssignment();
   const vehicles = useListVehicle();
   const trailers = useListTrailer();
   const people = useListPerson();
-  const tripChecks = useListVehicleTripCheck() as TripCheckRow[] | undefined;
-  const assignments = useListEventAssignment();
-  const staffNeeds = useListEventStaffNeed();
-  const overrides = useListDepartureOverride();
   const markLoaded = usePackListMarkLoaded();
   const dispatch = usePackListDispatch();
   const sendOutWithReason = useSendOutWithReason();
@@ -88,6 +85,19 @@ export function DispatchBoardPage() {
   const to = dayStart + range.to * DAY_MS;
   // Only the events starting in the chosen days are read.
   const events = useEventsInRange({ from, to });
+  // Pack lists, trucks, checks, staff and send-out reasons of those events
+  // only, not every row the company ever had.
+  const forEvents = useLogisticsForEvents(
+    events?.map((event) => event._id),
+    DISPATCH_PARTS,
+  );
+  const packLists = forEvents?.packLists;
+  const packLines = forEvents?.packLines;
+  const rigs = forEvents?.rigs;
+  const tripChecks = forEvents?.tripChecks as TripCheckRow[] | undefined;
+  const assignments = forEvents?.assignments;
+  const staffNeeds = forEvents?.staffNeeds;
+  const overrides = forEvents?.departureOverrides;
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();

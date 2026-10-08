@@ -1,10 +1,8 @@
 import { useMemo, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
-import {
-  useGetClient,
-  useListClientContact,
-} from "../../lib/manifest-convex-react";
+import { useGetClient } from "../../lib/manifest-convex-react";
+import { useClientContacts } from "../../lib/useEventAreaRows";
 import { useClientEvents } from "../facilities/useEventsById";
 import { formatDate } from "../../lib/format";
 import { StatusChip } from "../../ui/primitives";
@@ -56,7 +54,7 @@ export function EventClientTab({
 }: Props) {
   // Only this event's client: the full list is too slow for a big client book.
   const client = useGetClient(clientId ?? "skip") ?? undefined;
-  const clientContacts = useListClientContact();
+  const clientContacts = useClientContacts(clientId);
   const events = useClientEvents(clientId);
   const name = clientDisplayName(clientId, client ? [client] : undefined);
 

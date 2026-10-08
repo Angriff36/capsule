@@ -5,14 +5,16 @@ import {
   useCreateDishTask,
   useDishTaskRetire,
   useDishTaskRevise,
-  useListDishComponent,
-  useListDishIngredient,
-  useListDishTask,
-  useListDishTaskMaterial,
   useListComponent,
   useListIngredient,
   useListStation,
 } from "../../lib/manifest-convex-react";
+import {
+  useDishComponentRows,
+  useDishIngredientRows,
+  useDishTaskMaterialRows,
+  useDishTaskRows,
+} from "../../lib/recipeScopedQueries";
 import {
   activeKitchenStations,
   kitchenStationName,
@@ -81,12 +83,13 @@ const QUANTITY_MODES: { value: PrepQuantityEntryMode; label: string }[] = [
 
 /** Dish-level prep task templates with component hyperlinks when linked. */
 export function DishPrepTasksPanel({ dishId }: Props) {
-  const tasks = useListDishTask();
+  // This dish's steps, lines and step materials only.
+  const tasks = useDishTaskRows(dishId);
   const components = useListComponent();
   const ingredients = useListIngredient();
-  const dishIngredients = useListDishIngredient();
-  const dishComponents = useListDishComponent();
-  const taskMaterials = useListDishTaskMaterial();
+  const dishIngredients = useDishIngredientRows(dishId);
+  const dishComponents = useDishComponentRows(dishId);
+  const taskMaterials = useDishTaskMaterialRows(dishId);
   const addTask = useCreateDishTask();
   const retireTask = useDishTaskRetire();
   const reviseTask = useDishTaskRevise();

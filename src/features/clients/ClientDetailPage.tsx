@@ -9,11 +9,13 @@ import {
   useClientSetBirthday,
   useCreateClientContact,
   useGetClient,
-  useListClientContact,
-  useListContract,
-  useListInvoice,
-  useListProposal,
 } from "../../lib/manifest-convex-react";
+import {
+  useClientContactRows,
+  useClientContracts,
+  useClientInvoices,
+  useClientProposals,
+} from "../../lib/financeScopedQueries";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
@@ -57,10 +59,12 @@ export function ClientDetailPage() {
     "Client",
     client ? clientDisplayName(client._id, [client]) : undefined,
   );
-  const contacts = useListClientContact();
-  const proposals = useListProposal();
-  const contracts = useListContract();
-  const invoices = useListInvoice();
+  // One client's rows only; skipped until the client doc resolves.
+  const clientId = client ? client._id : null;
+  const contacts = useClientContactRows(clientId);
+  const proposals = useClientProposals(clientId);
+  const contracts = useClientContracts(clientId);
+  const invoices = useClientInvoices(clientId);
   const createContact = useCreateClientContact();
   const setPrimary = useClientContactSetPrimary();
   const removeContact = useClientContactRemove();
@@ -74,7 +78,9 @@ export function ClientDetailPage() {
   const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
   const { loadingTooLong } = useSlowQuery(
-    [client, contacts, proposals, contracts, invoices].includes(undefined)
+    client === undefined ||
+      (client !== null &&
+        [contacts, proposals, contracts, invoices].includes(undefined))
       ? undefined
       : client,
   );
@@ -90,10 +96,11 @@ export function ClientDetailPage() {
 
   if (
     client === undefined ||
-    contacts === undefined ||
-    proposals === undefined ||
-    contracts === undefined ||
-    invoices === undefined
+    (client !== null &&
+      (contacts === undefined ||
+        proposals === undefined ||
+        contracts === undefined ||
+        invoices === undefined))
   ) {
     return (
       <div className="space-y-4">
@@ -120,19 +127,19 @@ export function ClientDetailPage() {
     );
   }
 
-  const clientContacts = contacts.filter(
+  const clientContacts = (contacts ?? []).filter(
     (row) => row.deletedAt == null && row.clientId === client._id,
   );
   const activeContacts = clientContacts.filter(
     (row) => row.deletedAt == null && String(row.status) === "active",
   );
-  const clientProposals = proposals.filter(
+  const clientProposals = (proposals ?? []).filter(
     (row) => row.deletedAt == null && row.clientId === client._id,
   );
-  const clientContracts = contracts.filter(
+  const clientContracts = (contracts ?? []).filter(
     (row) => row.deletedAt == null && row.clientId === client._id,
   );
-  const clientInvoices = invoices.filter(
+  const clientInvoices = (invoices ?? []).filter(
     (row) => row.deletedAt == null && String(row.clientId) === client._id,
   );
   const actions = policy.clientActions(String(client.status));

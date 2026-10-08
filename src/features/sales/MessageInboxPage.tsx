@@ -6,10 +6,6 @@ import { useSendEmailReply } from "../../lib/messageReplyActions";
 import {
   useCreateLead,
   useCreateMessage,
-  useListClientContact,
-  useListLead,
-  useListMessage,
-  useListMessageThread,
   useMessageThreadCreate,
   useMessageThreadLinkLead,
   useMessageThreadSetStatus,
@@ -26,6 +22,16 @@ import type { Doc } from "../../lib/api";
 import { useActionNotice } from "../../ui/action-result";
 import { deliveryStatusLabel, replyDisposition } from "./deliveryHonesty";
 import { messageTime } from "./messageOrder";
+import {
+  useClientContactsByIds,
+  useLeadsByIds,
+  useMessagesForThreads,
+  usePagedRows,
+  useRowsWithEmpty,
+  useThreadLastMessageAt,
+} from "../../lib/financeScopedQueries";
+
+const OPEN_LEAD = ["closedAt"];
 import { MessageMedia } from "./MessageMedia";
 import { ThreadLinksBar } from "./ThreadLinksBar";
 
@@ -63,10 +69,30 @@ function threadTitle(t: Thread): string {
  * action — replaying the same provider message id creates no duplicate.
  */
 export function MessageInboxPage() {
-  const threads = useListMessageThread();
-  const messages = useListMessage();
-  const leads = useListLead();
-  const contacts = useListClientContact();
+  // The newest threads a page at a time; the open thread's messages; when
+  // each listed thread last had a message; the leads and contacts they name,
+  // and open leads for the link picker.
+  const threadPages = usePagedRows("messageThreads");
+  const threads = threadPages.rows;
+  const lastMessageAt = useThreadLastMessageAt(
+    threads?.filter((t) => t.deletedAt == null).map((t) => t._id),
+  );
+  const openLeads = useRowsWithEmpty("leads", OPEN_LEAD);
+  const namedLeads = useLeadsByIds(threads?.map((t) => t.leadId ?? null));
+  const leads = useMemo(
+    () =>
+      openLeads === undefined || namedLeads === undefined
+        ? undefined
+        : [
+            ...new Map(
+              [...openLeads, ...namedLeads].map((lead) => [lead._id, lead]),
+            ).values(),
+          ],
+    [openLeads, namedLeads],
+  );
+  const contacts = useClientContactsByIds(
+    threads?.map((t) => t.contactId ?? null),
+  );
   const ingest = useAction(api.messageInbox.ingestInboundMessage);
   const ingestEnvelope = useAction(api.messageInbox.ingestProviderEnvelope);
   const createThread = useMessageThreadCreate();
@@ -109,6 +135,15 @@ export function MessageInboxPage() {
     [threads],
   );
   const selected = visibleThreads.find((t) => t._id === selectedId) ?? null;
+  const shownThreadIds = useMemo(() => {
+    if (!selected) return [];
+    const shown = new Set<string>([selected._id]);
+    for (const t of visibleThreads) {
+      if (t.mergedIntoThreadId === selected._id) shown.add(t._id);
+    }
+    return [...shown];
+  }, [selected, visibleThreads]);
+  const messages = useMessagesForThreads(shownThreadIds);
 
   // A thread shows its own messages plus those of threads merged into it
   // (AC-248: merging never moves or deletes source history).
@@ -464,7 +499,7 @@ export function MessageInboxPage() {
         />
       ) : null}
 
-      {threads === undefined || messages === undefined ? (
+      {threads === undefined || lastMessageAt === undefined ? (
         <TableSkeleton rows={5} />
       ) : visibleThreads.length === 0 ? (
         <div className="empty-state">
@@ -478,9 +513,7 @@ export function MessageInboxPage() {
         >
           <ul className="max-h-140 overflow-y-auto border-line-2 max-md:border-b md:border-r">
             {visibleThreads.map((t) => {
-              const lastAt = (messages ?? [])
-                .filter((m) => m.threadId === t._id)
-                .reduce((max, m) => Math.max(max, messageTime(m)), 0);
+              const lastAt = lastMessageAt?.[t._id] ?? 0;
               return (
                 <li key={t._id}>
                   <button
@@ -531,6 +564,18 @@ export function MessageInboxPage() {
                 </li>
               );
             })}
+            {threadPages.canLoadMore ? (
+              <li className="px-3 py-2">
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  disabled={threadPages.loadingMore}
+                  onClick={threadPages.loadMore}
+                >
+                  {threadPages.loadingMore ? "Loading…" : "Load older threads"}
+                </button>
+              </li>
+            ) : null}
           </ul>
 
           <div className="flex min-h-100 flex-col">

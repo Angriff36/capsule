@@ -3,14 +3,6 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   useGetMenu,
-  useListDishComponent,
-  useListDishIngredient,
-  useListIngredient,
-  useListIngredientPriceObservation,
-  useListItemUnitMapping,
-  useListMenuDish,
-  useListComponent,
-  useListComponentIngredient,
   useMenuArchive,
   useMenuDishUpdateSellingPrice,
   useMenuMarkPublished,
@@ -18,6 +10,8 @@ import {
   useMenuUnpublish,
 } from "../../lib/manifest-convex-react";
 import { useWholeDishList } from "../../lib/useDishesByIds";
+import { useMenuDishRows } from "../../lib/recipeScopedQueries";
+import { useSharedRecipeRows } from "../../lib/useMenuRecipeRows";
 import { formatMoneyExact } from "../../lib/format";
 import { useTrackRecent } from "../../lib/recents";
 import { useRouteRecord } from "../../lib/routeRecord";
@@ -29,7 +23,7 @@ import { KitchenBookNav } from "./KitchenBookNav";
 import { ReturnToListLink } from "../list-state/listOrigin";
 import { MenuDetailsEditor } from "./MenuDetailsEditor";
 import { MenuDishManager } from "./MenuDishManager";
-import { dishRecipeLinks, shareRecipeLines } from "./dishVersions";
+import { dishRecipeLinks } from "./dishVersions";
 import { buildMenuProfitability } from "./MenuProfitabilityAnalysis";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import { MenuProfitabilityPanel } from "./MenuProfitabilityPanel";
@@ -66,29 +60,31 @@ export function MenuDetailPage() {
   const menu = useRouteRecord(useGetMenu, id);
   useTrackRecent("Menu", menu?.name);
   const dishes = useWholeDishList();
-  const menuDishes = useListMenuDish();
-  // A version that shares its main dish's recipe shows those lines as its own.
-  const rawDishComponents = useListDishComponent();
-  const rawDishIngredients = useListDishIngredient();
-  const dishComponents = useMemo(
-    () =>
-      rawDishComponents && dishes
-        ? shareRecipeLines(rawDishComponents, dishRecipeLinks(dishes))
-        : undefined,
-    [dishes, rawDishComponents],
-  );
-  const dishIngredients = useMemo(
-    () =>
-      rawDishIngredients && dishes
-        ? shareRecipeLines(rawDishIngredients, dishRecipeLinks(dishes))
-        : undefined,
-    [dishes, rawDishIngredients],
-  );
-  const components = useListComponent();
-  const componentIngredients = useListComponentIngredient();
-  const ingredients = useListIngredient();
-  const priceObservations = useListIngredientPriceObservation();
-  const itemUnitMappings = useListItemUnitMapping();
+  const menuDishes = useMenuDishRows(menu?._id);
+  // The recipe, price and unit rows of this menu's dishes only, never the
+  // whole lists. A version that shares its main dish's recipe shows those
+  // lines as its own.
+  const recipeLinks = useMemo(() => {
+    if (!menuDishes || !dishes) return undefined;
+    const links = dishRecipeLinks(dishes);
+    const linkOf = new Map(links.map((link) => [String(link.dishId), link]));
+    return menuDishes
+      .filter((selection) => selection.deletedAt == null)
+      .map(
+        (selection) =>
+          linkOf.get(String(selection.dishId)) ?? {
+            dishId: String(selection.dishId),
+          },
+      );
+  }, [dishes, menuDishes]);
+  const recipeRows = useSharedRecipeRows(recipeLinks);
+  const dishComponents = recipeRows?.dishComponents;
+  const dishIngredients = recipeRows?.dishIngredients;
+  const components = recipeRows?.components;
+  const componentIngredients = recipeRows?.componentIngredients;
+  const ingredients = recipeRows?.ingredients;
+  const priceObservations = recipeRows?.priceObservations;
+  const itemUnitMappings = recipeRows?.unitMappings;
   const { branding } = useTenantBranding();
   const publish = useMenuMarkPublished();
   const unpublish = useMenuUnpublish();

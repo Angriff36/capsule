@@ -3,6 +3,7 @@ import { useShiftMarkNoShow } from "../../lib/manifest-convex-react";
 import { formatDate } from "../../lib/format";
 import { useAttendanceAlerts } from "../facilities/useLaborSummary";
 import { attendanceAlertText } from "./timePay";
+import { useShiftsByIds } from "../../lib/workforceScopedQueries";
 
 type ShiftVersion = { _id: string; version?: number | null };
 
@@ -27,6 +28,10 @@ export function TimeAttentionPanel({
   }, []);
   const view = useAttendanceAlerts(now);
   const markNoShow = useShiftMarkNoShow();
+  // The shifts the alerts name, when the page has not loaded them.
+  const alertShifts = useShiftsByIds(
+    view?.alerts.map((alert) => alert.shiftId),
+  );
   const [busy, setBusy] = useState<string | null>(null);
 
   if (!view) return null;
@@ -34,7 +39,9 @@ export function TimeAttentionPanel({
   if (alerts.length === 0 && overtime.length === 0) return null;
 
   const record = (shiftId: string) => {
-    const shift = shifts?.find((row) => row._id === shiftId);
+    const shift =
+      shifts?.find((row) => row._id === shiftId) ??
+      alertShifts?.find((row) => row._id === shiftId);
     if (!shift) return;
     setBusy(shiftId);
     Promise.resolve(markNoShow({ docId: shift._id, version: shift.version }))

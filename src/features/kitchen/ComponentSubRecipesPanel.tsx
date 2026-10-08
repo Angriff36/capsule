@@ -8,9 +8,9 @@ import {
   useComponentComponentAdjustQuantity,
   useComponentComponentRemove,
   useListComponent,
-  useListComponentComponent,
   useListItemUnitMapping,
 } from "../../lib/manifest-convex-react";
+import { useComponentSubRecipeRows } from "../../lib/recipeScopedQueries";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
@@ -34,7 +34,7 @@ export function ComponentSubRecipesPanel({
 }: {
   componentId: string;
 }) {
-  const lines = useListComponentComponent();
+  const lines = useComponentSubRecipeRows(componentId);
   const recipes = useListComponent();
   const itemUnitMappings = useListItemUnitMapping();
   const addLine = useAddNestedRecipeLine();

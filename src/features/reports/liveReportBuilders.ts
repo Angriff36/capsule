@@ -522,6 +522,19 @@ interface ReportPeriod {
   to: number | null;
 }
 
+/**
+ * The [from, to) a report counts (null = open), for loading only that
+ * period's rows; the same bounds the builders filter by.
+ */
+export function liveReportBounds(
+  window: ReportDateWindow,
+  range: { from: number | null; to: number | null },
+  now: number,
+): { from: number | null; to: number | null } {
+  const { from, to } = periodBounds({ window, ...range }, now);
+  return { from, to };
+}
+
 /** [from, to) plus the last instant the trend draws a month for. */
 function periodBounds(period: ReportPeriod, now: number) {
   if (period.from != null || period.to != null) {

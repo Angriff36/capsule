@@ -6,7 +6,6 @@ import { Fragment, useMemo, useState } from "react";
 import {
   useListComponent,
   useListIngredient,
-  useListOpeningStockRecord,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
 import {
@@ -24,6 +23,10 @@ import {
   useReviewOpeningStock,
   useSetAsideOpeningStock,
 } from "../facilities/openingStock";
+import {
+  useOpeningStockCounts,
+  useOpeningStockPages,
+} from "../facilities/useInventoryWindow";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { OpeningStockImport } from "./OpeningStockImport";
@@ -61,7 +64,6 @@ const day = (at: number | null | undefined) =>
       }).format(at);
 
 export function OpeningStockPage() {
-  const records = useListOpeningStockRecord();
   const ingredients = useListIngredient();
   const components = useListComponent();
   const locations = useListStorageLocation();
@@ -69,6 +71,10 @@ export function OpeningStockPage() {
   const setAside = useSetAsideOpeningStock();
   const apply = useApplyOpeningStock();
   const [tab, setTab] = useState<Tab>("needs_review");
+  // The open tab's rows, 50 at a time, and how many each tab holds.
+  const tabPages = useOpeningStockPages(tab);
+  const records = tabPages.rows;
+  const tabCounts = useOpeningStockCounts();
   const [editing, setEditing] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -90,25 +96,13 @@ export function OpeningStockPage() {
   );
 
   const all = records ?? [];
-  const counts = {
-    needs_review: all.filter((row) => row.status === "needs_review").length,
-    ready: all.filter((row) => row.status === "ready").length,
-    done: all.filter(
-      (row) => row.status === "applied" || row.status === "set_aside",
-    ).length,
-  };
-  const shown = all
-    .filter((row) =>
-      tab === "done"
-        ? row.status === "applied" || row.status === "set_aside"
-        : row.status === tab,
-    )
-    .sort(
-      (a, b) =>
-        KIND_ORDER.indexOf(a.kind as OpeningStockKind) -
-          KIND_ORDER.indexOf(b.kind as OpeningStockKind) ||
-        String(a.itemName).localeCompare(String(b.itemName)),
-    );
+  const counts = tabCounts ?? { needs_review: 0, ready: 0, done: 0 };
+  const shown = [...all].sort(
+    (a, b) =>
+      KIND_ORDER.indexOf(a.kind as OpeningStockKind) -
+        KIND_ORDER.indexOf(b.kind as OpeningStockKind) ||
+      String(a.itemName).localeCompare(String(b.itemName)),
+  );
 
   const run = async (key: string, work: () => Promise<string | void>) => {
     setFailure(null);
@@ -196,7 +190,9 @@ export function OpeningStockPage() {
             >
               {busy === "apply-all"
                 ? "Working…"
-                : `Use all ${readyFood.length} as opening stock`}
+                : tabPages.canLoadMore
+                  ? `Use the ${readyFood.length} shown as opening stock`
+                  : `Use all ${readyFood.length} as opening stock`}
             </button>
           ) : null}
           <div className="flex flex-wrap gap-2" role="tablist">
@@ -218,7 +214,7 @@ export function OpeningStockPage() {
         ) : shown.length === 0 ? (
           <div className="document-empty">
             <p>
-              {all.length === 0
+              {counts.needs_review + counts.ready + counts.done === 0
                 ? "No count sheet has been brought in."
                 : "Nothing here."}
             </p>
@@ -363,8 +359,23 @@ export function OpeningStockPage() {
             </table>
           </div>
         )}
+        {tabPages.canLoadMore ? (
+          <div className="mt-3 flex justify-center">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={tabPages.loadMore}
+            >
+              Load more
+            </button>
+          </div>
+        ) : null}
         <p className="px-4 pb-3 text-xs text-ink-3">
-          {formatCountNoun(all.length, "row")} in all.
+          {formatCountNoun(
+            counts.needs_review + counts.ready + counts.done,
+            "row",
+          )}{" "}
+          in all.
         </p>
       </section>
     </div>

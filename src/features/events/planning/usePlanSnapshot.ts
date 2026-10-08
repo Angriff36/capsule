@@ -1,6 +1,5 @@
 import { useMemo } from "react";
-import { useQuery } from "convex/react";
-import { api } from "../../../lib/api";
+import { usePlanWindowRows } from "../../../lib/eventScopedQueries";
 import {
   useListAvailabilityWindow,
   useListEquipment,
@@ -19,14 +18,13 @@ import {
   type PlanSnapshot,
 } from "../../../lib/planningChecks";
 import { useEventRecordsInRange } from "../../facilities/useEventsById";
-import { DAY_MS } from "../../home/homeCalendar";
 
 // The month view shows at most 37 days before the chosen day to 42 after it;
 // 50 each side covers every view plus a week for multi-day jobs and clashes.
-const PLAN_WINDOW_DAYS = 50;
-
 export type PlanData = {
   loading: boolean;
+  /** More events on screen than the board reads at once. */
+  tooMany: boolean;
   snap: PlanSnapshot;
   levels: PlanLevels;
   organization:
@@ -38,17 +36,9 @@ export type PlanData = {
  * Everything the planning board reads, as one snapshot. A list this role may
  * not read comes back empty, so its checks simply find nothing.
  */
-export function usePlanSnapshot(anchor: number): PlanData {
-  // Events within 50 days either side of the day the board is showing. The
-  // window moves with the board, not each render.
-  const eventWindow = useMemo(
-    () => ({
-      from: anchor - PLAN_WINDOW_DAYS * DAY_MS,
-      to: anchor + PLAN_WINDOW_DAYS * DAY_MS,
-    }),
-    [anchor],
-  );
-  const events = useEventRecordsInRange(eventWindow);
+export function usePlanSnapshot(shown: { from: number; to: number }): PlanData {
+  // Events that start on the days the board shows, nothing more.
+  const events = useEventRecordsInRange(shown);
   // Staff, trucks, holds and pack lists of the events in the window only
   // (convex/planWindow.ts), not every row the company ever had.
   const eventIdsKey = (events ?? []).map((row) => row._id).join(",");
@@ -56,10 +46,7 @@ export function usePlanSnapshot(anchor: number): PlanData {
     () => (eventIdsKey ? eventIdsKey.split(",") : []),
     [eventIdsKey],
   );
-  const forEvents = useQuery(
-    api.planWindow.forEvents,
-    events === undefined ? "skip" : { eventIds },
-  );
+  const forEvents = usePlanWindowRows(events === undefined ? "skip" : eventIds);
   const assignments = forEvents?.assignments;
   const staffNeeds = forEvents?.staffNeeds;
   const rigs = forEvents?.rigs;
@@ -191,5 +178,11 @@ export function usePlanSnapshot(anchor: number): PlanData {
     [organization?.planningChecksJson],
   );
 
-  return { loading, snap, levels, organization };
+  return {
+    loading,
+    tooMany: forEvents?.capped === true,
+    snap,
+    levels,
+    organization,
+  };
 }

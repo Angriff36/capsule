@@ -10,7 +10,7 @@ import {
 import { formatDate } from "../../lib/format";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 import { venueDetailPath } from "./facilitiesRoutes";
-import { useAllEventReportRows } from "./useEventsById";
+import { useVenueScorecardEvents } from "./useLogisticsWindow";
 import { handoffStatus, ownerProblem } from "./venueHandoff";
 import { problemStatus } from "./venueEscalation";
 import { onboardingStatus } from "./venueOnboarding";
@@ -39,7 +39,15 @@ export function VenuePartnersPage() {
   const notes = useListVenueNote();
   const sources = useListReferralSource();
   const leads = useListLead();
-  const events = useAllEventReportRows();
+  // The partner venues' events of the last two years only.
+  const partnerIds = useMemo(
+    () =>
+      venues
+        ?.filter((venue) => venue.deletedAt == null && venue.partnerTier)
+        .map((venue) => String(venue._id)),
+    [venues],
+  );
+  const events = useVenueScorecardEvents(partnerIds);
 
   const rows = useMemo(() => {
     const now = Date.now();

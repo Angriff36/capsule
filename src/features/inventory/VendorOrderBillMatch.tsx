@@ -1,11 +1,11 @@
 import { formatMoneyExact } from "../../lib/format";
 import { useState, type FormEvent } from "react";
 import {
-  useListVendorBillMatch,
   useVendorOrderLineCorrectBillMatch,
   useVendorOrderLineMatchBill,
   useVendorOrderLineReviewBillDifference,
 } from "../../lib/manifest-convex-react";
+import { useBillMatchesForLine } from "../facilities/useLogisticsWindow";
 
 type BillLine = {
   _id: string;
@@ -133,7 +133,7 @@ export function VendorOrderBillMatch({ line, busy, run }: BillMatchProps) {
   const matchBill = useVendorOrderLineMatchBill();
   const correctBill = useVendorOrderLineCorrectBillMatch();
   const reviewBill = useVendorOrderLineReviewBillDifference();
-  const listed = useListVendorBillMatch() as ListedMatch[] | undefined;
+  const listed = useBillMatchesForLine(line._id) as ListedMatch[] | undefined;
   const [mode, setMode] = useState<"closed" | "match" | "fix">("closed");
   const received = Number(line.receivedQuantity);
   const canMatch =

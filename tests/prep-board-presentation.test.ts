@@ -17,6 +17,20 @@ const manifest = vi.hoisted(() => ({
   command: vi.fn(async () => undefined),
 }));
 
+vi.mock("../src/lib/productionScopedQueries", () => ({
+  usePrepWork: () =>
+    manifest.tasks === undefined ||
+    manifest.dependencies === undefined ||
+    manifest.checks === undefined
+      ? undefined
+      : {
+          tasks: manifest.tasks,
+          dependencies: manifest.dependencies,
+          checks: manifest.checks,
+          comments: manifest.comments ?? [],
+        },
+}));
+
 vi.mock("../src/lib/manifest-convex-react", () => ({
   useListPrepTask: () => manifest.tasks,
   useListPrepTaskDependency: () => manifest.dependencies,

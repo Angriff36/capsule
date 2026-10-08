@@ -1,10 +1,17 @@
 import { useState } from "react";
 import {
   useListPerson,
-  useListTimeOffRequest,
   useTimeOffRequestApprove,
   useTimeOffRequestDecline,
 } from "../../lib/manifest-convex-react";
+import { useAuthStatus } from "../../lib/useAuthStatus";
+import {
+  useReviewedTimeOff,
+  useTimeOffRequestsWithStatus,
+} from "../../lib/workforceScopedQueries";
+
+/** How many reviewed requests the page lists. */
+const REVIEWED_SHOWN = 30;
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
@@ -25,7 +32,14 @@ const formatRange = (startsAt?: number | null, endsAt?: number | null) => {
 };
 
 export function TimeOffRequestsPage() {
-  const requests = useListTimeOffRequest();
+  // Every request still waiting, and only the reviewed ones listed.
+  const waiting = useTimeOffRequestsWithStatus(
+    useAuthStatus()?.tenantId,
+    "pending",
+  );
+  const recentlyReviewed = useReviewedTimeOff(REVIEWED_SHOWN);
+  const requests =
+    waiting && recentlyReviewed ? [...waiting, ...recentlyReviewed] : undefined;
   const people = useListPerson();
   const approve = useTimeOffRequestApprove();
   const decline = useTimeOffRequestDecline();
@@ -194,7 +208,7 @@ export function TimeOffRequestsPage() {
                 </tr>
               </thead>
               <tbody>
-                {reviewed.slice(0, 30).map((request) => (
+                {reviewed.slice(0, REVIEWED_SHOWN).map((request) => (
                   <tr key={request._id}>
                     <td>{personName(String(request.personId))}</td>
                     <td>{formatRange(request.startsAt, request.endsAt)}</td>

@@ -3,12 +3,9 @@ import { Link } from "react-router-dom";
 import {
   useListComponent,
   useListDishTask,
-  useListPrepTask,
-  useListPrepTaskDependency,
-  useListProductionBatch,
-  useListProductionBatchAllocation,
   useListStation,
 } from "../../lib/manifest-convex-react";
+import { usePlanWork } from "../../lib/productionScopedQueries";
 import { TableSkeleton } from "../../ui/primitives";
 import { useEventsById } from "../facilities/useEventsById";
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
@@ -218,10 +215,13 @@ export function ProductionPlanView({
 }
 
 export function ProductionPlanPage() {
-  const prepTasks = useListPrepTask();
+  // Prep tasks, links, batches and shares of unfinished events only (the
+  // plan leaves finished and cancelled events out), never the whole lists.
+  const work = usePlanWork();
+  const prepTasks = work?.tasks;
   const dishTasks = useListDishTask();
-  const batches = useListProductionBatch();
-  const allocations = useListProductionBatchAllocation();
+  const batches = work?.batches;
+  const allocations = work?.allocations;
   // The plan only reads the events its own prep tasks and batches name.
   const eventIds = useMemo(
     () =>
@@ -235,7 +235,7 @@ export function ProductionPlanPage() {
     [prepTasks, batches, allocations],
   );
   const events = useEventsById(eventIds);
-  const dependencies = useListPrepTaskDependency();
+  const dependencies = work?.dependencies;
   const stations = useListStation();
   const components = useListComponent();
   const loading =

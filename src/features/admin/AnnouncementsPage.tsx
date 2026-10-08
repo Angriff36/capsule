@@ -4,12 +4,11 @@ import {
   announcementStaffActions,
   staffActionNeedsConfirm,
 } from "../../agent/CapsuleStaffActionOffer";
-import { api } from "../../lib/api";
+import { api, type Id } from "../../lib/api";
 import {
   useAnnouncementRemove,
   useCreateAnnouncement,
   useListAnnouncement,
-  useListAnnouncementDismissal,
 } from "../../lib/manifest-convex-react";
 import {
   ErrorState,
@@ -53,6 +52,25 @@ const canManageAnnouncements = (role: string | undefined) =>
   role === "system" ||
   Boolean(role?.endsWith("_manager"));
 
+/**
+ * Who closed this one banner, read through its own index (never every
+ * dismissal of the company). Each person who closed it read it: one count
+ * per person. Nothing shows while it loads.
+ */
+function AnnouncementReadCount({
+  announcementId,
+}: {
+  announcementId: Id<"announcements">;
+}) {
+  const dismissals = useQuery(
+    api.queries.listAnnouncementDismissalByAnnouncementId,
+    { announcementId },
+  );
+  if (dismissals === undefined) return null;
+  const people = new Set(dismissals.map((row) => row.authSubjectId));
+  return <>{` · ${readCountLabel(people.size)}`}</>;
+}
+
 /** How many people read and closed the banner. */
 function readCountLabel(count: number): string {
   if (count === 0) return "Nobody has closed it yet";
@@ -70,7 +88,6 @@ const dateFormat = new Intl.DateTimeFormat(undefined, {
 export function AnnouncementsPage() {
   const authStatus = useQuery(api.authStatus.getAuthStatus, {});
   const announcements = useListAnnouncement();
-  const dismissals = useListAnnouncementDismissal();
   const createAnnouncement = useCreateAnnouncement();
   const removeAnnouncement = useAnnouncementRemove();
 
@@ -93,17 +110,6 @@ export function AnnouncementsPage() {
         .sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0)),
     [announcements],
   );
-  // Each person who closed the banner read it: one count per person.
-  const readBy = useMemo(() => {
-    const people = new Map<string, Set<string>>();
-    for (const row of dismissals ?? []) {
-      const key = String(row.announcementId);
-      const set = people.get(key) ?? new Set<string>();
-      set.add(row.authSubjectId);
-      people.set(key, set);
-    }
-    return people;
-  }, [dismissals]);
   const now = Date.now();
   const activeCount = rows.filter(
     (r) => r.deletedAt == null && r.expiresAt != null && r.expiresAt > now,
@@ -326,9 +332,9 @@ export function AnnouncementsPage() {
                     </p>
                     <p className="mt-1 text-2xs text-ink-3">
                       Expires {dateFormat.format(row.expiresAt as number)}
-                      {dismissals !== undefined
-                        ? ` · ${readCountLabel(readBy.get(String(row._id))?.size ?? 0)}`
-                        : ""}
+                      <AnnouncementReadCount
+                        announcementId={row._id as Id<"announcements">}
+                      />
                     </p>
                   </div>
                   {canManage && removeOffer && !removed ? (

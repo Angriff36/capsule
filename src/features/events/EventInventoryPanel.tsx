@@ -4,12 +4,10 @@ import { useIssueEventStock } from "../../lib/operational-transactions";
 import {
   useCreateInventoryReservation,
   useListIngredient,
-  useListInventoryItem,
-  useListInventoryLot,
-  useListInventoryReservation,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
 import { useEventIngredientDemands } from "../../lib/useEventRows";
+import { useEventStock } from "../../lib/useEventAreaRows";
 import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventInventorySummaryAside } from "./EventInventorySummaryAside";
 import {
@@ -44,9 +42,12 @@ export function EventInventoryPanel({
   onError,
 }: Props) {
   const demands = useEventIngredientDemands(eventId);
-  const items = useListInventoryItem();
-  const inventoryLots = useListInventoryLot();
-  const reservations = useListInventoryReservation();
+  // Stock items, lots and holds for this event's ingredients only (free stock
+  // still counts other events' holds on those items).
+  const stock = useEventStock(eventId);
+  const items = stock?.items;
+  const inventoryLots = stock?.lots;
+  const reservations = stock?.reservations;
   const ingredients = useListIngredient();
   const locations = useListStorageLocation();
   const createReservation = useCreateInventoryReservation();

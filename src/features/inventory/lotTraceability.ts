@@ -130,22 +130,6 @@ export function buildLotTraceabilityRows(
   );
 }
 
-export function countUnattributedConsumptions(
-  reservations: readonly any[],
-): number {
-  return reservations.filter((reservation) => {
-    if (
-      reservation.deletedAt != null ||
-      reservation.status !== "consumed" ||
-      reservation.consumedAt == null ||
-      reservation.inventoryLotId
-    ) {
-      return false;
-    }
-    return true;
-  }).length;
-}
-
 function formatClientName(client: any): string {
   if (!client) return "Unknown client";
   const personName = [client.givenName, client.familyName]

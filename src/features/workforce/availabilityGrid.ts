@@ -19,7 +19,7 @@ export interface WindowRow {
   personId: string;
   startsAt?: number | null;
   endsAt?: number | null;
-  kind?: string;
+  kind?: string | null;
   status: string;
   deletedAt?: number | null;
 }

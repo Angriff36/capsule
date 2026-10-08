@@ -2,8 +2,8 @@ import type { Id } from "../../lib/api";
 import {
   useListEquipment,
   useListIngredient,
-  useListPackListItem,
 } from "../../lib/manifest-convex-react";
+import { useEventPackItems } from "../../lib/useEventAreaRows";
 import {
   useEventEquipmentReservations,
   useEventIngredientDemands,
@@ -39,7 +39,7 @@ export function EventRequirementsPanel({ eventId }: { eventId: Id<"events"> }) {
   const equipment = useListEquipment() ?? [];
   const rentals = useEventRentalOrderLines(eventId) ?? [];
   const packLists = useEventPackLists(eventId) ?? [];
-  const packItems = useListPackListItem() ?? [];
+  const packItems = useEventPackItems(eventId) ?? [];
   const vendors = useRentalVendorChoices() ?? [];
 
   const vendorName = new Map(vendors.map((v) => [String(v.vendorId), v.name]));

@@ -6,8 +6,6 @@ import {
 } from "../facilities/useLaborSummary";
 import {
   useCreatePayrollInput,
-  useListEvent,
-  useListPayrollInput,
   useListPerson,
   usePayrollInputFinalize,
   usePayrollInputMarkVoided,
@@ -24,6 +22,9 @@ import {
   dayStartOfTimestamp,
 } from "./payrollPeriod";
 import { PayrollWorksheet } from "./PayrollWorksheet";
+import { localDayEndExclusive, localDayStart } from "./payrollPeriod";
+import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import { usePagedRows, useWindowRows } from "../../lib/financeScopedQueries";
 import { useActionNotice } from "../../ui/action-result";
 import {
   PayrollPrepareForm,
@@ -45,14 +46,24 @@ const initialPeriod = () => {
   return { start: dateInputValue(start), end: dateInputValue(today) };
 };
 
+/** The event picker is read only while the prepare form is open. */
+function PrepareFormWithEvents(
+  props: Omit<Parameters<typeof PayrollPrepareForm>[0], "events">,
+) {
+  const events = usePickerAndNamedEvents([]);
+  return <PayrollPrepareForm {...props} events={events ?? []} />;
+}
+
 export function PayrollPage() {
-  const payrollInputs = useListPayrollInput();
+  // The worksheet shows the newest inputs a page at a time; the export reads
+  // only inputs that start in the export period.
+  const inputPages = usePagedRows("payrollInputs");
+  const payrollInputs = inputPages.rows;
   // Authored seam: finance managers lack workforceAccess, so the generated
   // listTimeRecord returns [] for them — clocked hours come from laborSummary.
   const timeRecords = usePayrollTimeRecords();
   const payRates = usePayRates();
   const people = useListPerson();
-  const events = useListEvent();
   const createPayroll = useCreatePayrollInput();
   const finalize = usePayrollInputFinalize();
   const markVoided = usePayrollInputMarkVoided();
@@ -65,6 +76,19 @@ export function PayrollPage() {
   const [periodStart, setPeriodStart] = useState(period.start);
   const [periodEnd, setPeriodEnd] = useState(period.end);
   const [processor, setProcessor] = useState<PayrollProcessor>("gusto");
+  const exportStartAt = localDayStart(periodStart);
+  const exportEndAt = localDayEndExclusive(periodEnd);
+  const exportInputs = useWindowRows(
+    "payrollInputs",
+    Number.isFinite(exportStartAt) &&
+      Number.isFinite(exportEndAt) &&
+      exportStartAt < exportEndAt
+      ? {
+          fields: ["periodStart"],
+          ranges: [{ from: exportStartAt, to: exportEndAt }],
+        }
+      : null,
+  );
   const { prompt, host } = useActionPrompt(busy != null);
 
   const activeRows = (payrollInputs ?? []).filter(
@@ -180,8 +204,7 @@ export function PayrollPage() {
   const loading =
     payrollInputs === undefined ||
     timeRecords === undefined ||
-    people === undefined ||
-    events === undefined;
+    people === undefined;
 
   const payrollExport = useMemo(() => {
     try {
@@ -192,7 +215,7 @@ export function PayrollPage() {
           periodEnd,
           people: people ?? [],
           timeRecords: timeRecords ?? [],
-          payrollInputs: payrollInputs ?? [],
+          payrollInputs: exportInputs ?? [],
         }),
         error: null,
       };
@@ -202,7 +225,7 @@ export function PayrollPage() {
         error: error instanceof Error ? error.message : "Invalid pay period.",
       };
     }
-  }, [payrollInputs, people, periodEnd, periodStart, processor, timeRecords]);
+  }, [exportInputs, people, periodEnd, periodStart, processor, timeRecords]);
 
   return (
     <div className="operations-stage supply-stage">
@@ -257,9 +280,8 @@ export function PayrollPage() {
       />
 
       {showPrepare ? (
-        <PayrollPrepareForm
+        <PrepareFormWithEvents
           people={people ?? []}
-          events={events ?? []}
           busy={busy === "prepare-payroll"}
           onSubmit={submitPrepare}
         />
@@ -275,6 +297,18 @@ export function PayrollPage() {
         onPrepare={() => setShowPrepare(true)}
         onInvoke={invoke}
       />
+      {!loading && inputPages.canLoadMore ? (
+        <div className="px-4 py-3">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            disabled={inputPages.loadingMore}
+            onClick={inputPages.loadMore}
+          >
+            {inputPages.loadingMore ? "Loading…" : "Load older inputs"}
+          </button>
+        </div>
+      ) : null}
 
       <p className="mt-4 text-sm text-ink-3">
         Saved report definitions live under{" "}

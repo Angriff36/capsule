@@ -3,14 +3,20 @@ import { formatCountNoun } from "../../lib/format";
 import {
   useListPerson,
   useListQualification,
-  useListShift,
-  useListShiftSwapRequest,
   useListShiftType,
-  useListTimeOffRequest,
-  useListTrainingCompletion,
   useShiftSwapRequestApprove,
   useShiftSwapRequestReject,
 } from "../../lib/manifest-convex-react";
+import { useAuthStatus } from "../../lib/useAuthStatus";
+import {
+  HISTORY_PAGE,
+  useApprovedTimeOff,
+  useShiftsAround,
+  useShiftsByIds,
+  useSwapRequestPages,
+  useSwapRequestsWithStatus,
+  useTrainingCompletionsFor,
+} from "../../lib/workforceScopedQueries";
 import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
@@ -26,13 +32,49 @@ const dateTime = new Intl.DateTimeFormat([], {
 });
 
 export function ShiftSwapRequestsPage() {
-  const requests = useListShiftSwapRequest();
-  const shifts = useListShift();
+  // The queue in full; history a page at a time. Shifts, training and
+  // time off only for the swaps shown.
+  const waiting = useSwapRequestsWithStatus(
+    useAuthStatus()?.tenantId,
+    "awaiting_manager",
+  );
+  const historyPages = useSwapRequestPages();
+  const requests =
+    waiting && historyPages.status !== "LoadingFirstPage"
+      ? [
+          ...waiting,
+          ...historyPages.results.filter(
+            (row) => row.status !== "awaiting_manager",
+          ),
+        ]
+      : undefined;
+  const queueShifts = useShiftsAround(waiting?.map((row) => row.shiftId));
+  const historyShifts = useShiftsByIds(
+    historyPages.results.map((row) => row.shiftId),
+  );
+  const shifts =
+    queueShifts && historyShifts
+      ? [...queueShifts, ...historyShifts]
+      : undefined;
   const people = useListPerson();
   const qualifications = useListQualification();
-  const trainingCompletions = useListTrainingCompletion();
+  const trainingCompletions = useTrainingCompletionsFor(
+    waiting?.map((row) => row.recipientPersonId),
+  );
   const shiftTypes = useListShiftType();
-  const timeOffRequests = useListTimeOffRequest();
+  const queueSpan = (queueShifts ?? []).filter(
+    (row) => row.startsAt != null && row.endsAt != null,
+  );
+  const timeOffRequests = useApprovedTimeOff(
+    queueShifts === undefined
+      ? "skip"
+      : queueSpan.length === 0
+        ? { from: 0, to: 0 }
+        : {
+            from: Math.min(...queueSpan.map((row) => row.startsAt!)),
+            to: Math.max(...queueSpan.map((row) => row.endsAt!)),
+          },
+  );
   const approve = useShiftSwapRequestApprove();
   const reject = useShiftSwapRequestReject();
   const [busy, setBusy] = useState<string | null>(null);
@@ -249,6 +291,15 @@ export function ShiftSwapRequestsPage() {
               </tbody>
             </table>
           </div>
+          {historyPages.status === "CanLoadMore" ? (
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm mt-3"
+              onClick={() => historyPages.loadMore(HISTORY_PAGE)}
+            >
+              Load more
+            </button>
+          ) : null}
         </section>
       ) : null}
     </div>

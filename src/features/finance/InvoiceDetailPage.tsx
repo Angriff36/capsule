@@ -2,6 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { classifyCommandFailure } from "../events/CommandFailure";
 import type { FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
+import {
+  useClientCreditMemos,
+  useClientInvoices,
+  useInvoicePayments,
+  useInvoiceSourceCreditMemos,
+} from "../../lib/financeScopedQueries";
 import { ReturnToListLink } from "../list-state/listOrigin";
 import {
   formatDate,
@@ -23,10 +29,7 @@ import {
   useInvoiceSetDeposit,
   useInvoiceWriteOff,
   useGetClient,
-  useListCreditMemo,
-  useListInvoice,
   useListOrganization,
-  useListPayment,
 } from "../../lib/manifest-convex-react";
 import { useInvoiceReminderActions } from "../../lib/invoiceReminderActions";
 import {
@@ -91,12 +94,33 @@ export function InvoiceDetailPage() {
   const client = useGetClient(
     invoice?.clientId ? String(invoice.clientId) : "skip",
   );
-  const creditMemos = useListCreditMemo();
+  // Only this invoice's rows and its client's: memos it issued, the client's
+  // credit and open invoices, and its payments.
+  const clientId = invoice?.clientId ? String(invoice.clientId) : null;
+  const sourceMemos = useInvoiceSourceCreditMemos(invoice?._id);
+  const clientMemos = useClientCreditMemos(clientId);
+  const creditMemos =
+    invoice === null
+      ? []
+      : sourceMemos === undefined ||
+          (invoice?.clientId && clientMemos === undefined)
+        ? undefined
+        : [
+            ...new Map(
+              [...sourceMemos, ...(clientMemos ?? [])].map((row) => [
+                row._id,
+                row,
+              ]),
+            ).values(),
+          ];
   const events = useEventsById(
     invoice === undefined ? undefined : [invoice?.eventId],
   );
-  const invoices = useListInvoice();
-  const payments = useListPayment();
+  const clientInvoices = useClientInvoices(clientId);
+  const invoices =
+    invoice === null || (invoice && !invoice.clientId) ? [] : clientInvoices;
+  const invoicePayments = useInvoicePayments(invoice?._id);
+  const payments = invoice === null ? [] : invoicePayments;
   const organizations = useListOrganization();
   const functionalCurrencyCode = normalizeCurrencyCode(
     organizations?.find((row) => row.deletedAt == null)?.defaultCurrencyCode,

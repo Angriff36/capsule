@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import {
   useListServiceStyle,
   useListOccasion,
@@ -48,7 +48,35 @@ const NOT_ENOUGH_HISTORY = "Not enough history";
  * - Top growing segments
  */
 
+const TITLE = "Average Event Value Growth";
+const LEAD =
+  "Event value trend analysis with breakdowns by service style, occasion, venue, salesperson, and event size. Track growth MoM and YoY.";
+
+/**
+ * Every figure here is all-time (every event the company has), so no event
+ * is read until the user asks for the dashboard.
+ */
 export function AvgEventValueGrowthDashboardPage() {
+  const [requested, setRequested] = useState(false);
+  if (requested) return <AvgEventValueGrowthBody />;
+  return (
+    <div className="operations-stage supply-stage">
+      <PageHeader title={TITLE} lead={LEAD} />
+      <p className="mt-3 max-w-160 text-ink-2">
+        These figures add up every event on file.
+      </p>
+      <button
+        type="button"
+        className="btn btn-primary mt-4"
+        onClick={() => setRequested(true)}
+      >
+        Show all-time event values
+      </button>
+    </div>
+  );
+}
+
+function AvgEventValueGrowthBody() {
   const events = useAllEventReportRows();
   const serviceStyles = useListServiceStyle();
   const occasions = useListOccasion();
@@ -523,10 +551,7 @@ export function AvgEventValueGrowthDashboardPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        title="Average Event Value Growth"
-        lead="Event value trend analysis with breakdowns by service style, occasion, venue, salesperson, and event size. Track growth MoM and YoY."
-      />
+      <PageHeader title={TITLE} lead={LEAD} />
 
       {events?.length === 0 ? (
         <div data-testid="dashboard-empty">

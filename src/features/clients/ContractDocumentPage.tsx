@@ -1,11 +1,11 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useEventProposals } from "../../lib/financeScopedQueries";
 import {
   useGetClient,
   useGetContract,
   useGetEvent,
   useGetVenue,
-  useListProposal,
 } from "../../lib/manifest-convex-react";
 import { formatDate, formatMoney, formatTime } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
@@ -95,7 +95,8 @@ export function ContractDocumentPage() {
   const venue = useGetVenue(event?.venueId ? String(event.venueId) : "skip");
   // The client already agreed to these in the proposal; the contract repeats
   // them rather than printing different money terms.
-  const proposals = useListProposal();
+  // Only this contract's event's proposals.
+  const proposals = useEventProposals(event ? String(event._id) : null);
   const acceptedTerms = (proposals ?? [])
     .filter(
       (row) =>

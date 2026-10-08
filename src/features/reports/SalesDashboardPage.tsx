@@ -1,10 +1,10 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useClientDirectory } from "../../lib/useClientDirectory";
+import { useListPerson } from "@/lib/manifest-convex-react";
 import {
-  useListLead,
-  useListProposal,
-  useListPerson,
-} from "@/lib/manifest-convex-react";
+  useAllRowsOnRequest,
+  useProposalsByIds,
+} from "@/lib/financeScopedQueries";
 import { useAllEventReportRows } from "../facilities/useEventsById";
 import {
   DashboardGrid,
@@ -54,10 +54,41 @@ const STAGE_ORDER: Record<LeadStage, number> = {
   lost: 99,
 };
 
+const TITLE = "Sales Dashboard";
+const LEAD =
+  "Pipeline visibility, conversion tracking, and sales performance metrics";
+
+/**
+ * Every figure here is all-time (every event and lead the company has), so
+ * nothing is read until the user asks for the dashboard.
+ */
 export function SalesDashboardPage() {
+  const [requested, setRequested] = useState(false);
+  if (requested) return <SalesDashboardBody />;
+  return (
+    <div className="operations-stage supply-stage">
+      <PageHeader title={TITLE} lead={LEAD} />
+      <p className="mt-3 max-w-160 text-ink-2">
+        These figures add up every event and lead on file.
+      </p>
+      <button
+        type="button"
+        className="btn btn-primary mt-4"
+        onClick={() => setRequested(true)}
+      >
+        Show all-time sales figures
+      </button>
+    </div>
+  );
+}
+
+function SalesDashboardBody() {
   const events = useAllEventReportRows();
-  const leads = useListLead();
-  const proposals = useListProposal();
+  const leads = useAllRowsOnRequest("leads", true);
+  // Only the proposals the leads point at decide conversion.
+  const proposals = useProposalsByIds(
+    leads?.map((lead) => (lead.proposalId ? String(lead.proposalId) : null)),
+  );
   const clients = useClientDirectory();
   const people = useListPerson();
 
@@ -367,10 +398,7 @@ export function SalesDashboardPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        title="Sales Dashboard"
-        lead="Pipeline visibility, conversion tracking, and sales performance metrics"
-      />
+      <PageHeader title={TITLE} lead={LEAD} />
 
       {events?.length === 0 && leads?.length === 0 ? (
         <div data-testid="dashboard-empty">

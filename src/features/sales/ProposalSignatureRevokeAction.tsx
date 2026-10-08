@@ -1,7 +1,5 @@
-import {
-  useListSignatureRequest,
-  useSignatureRequestRevoke,
-} from "../../lib/manifest-convex-react";
+import { useSignatureRequestRevoke } from "../../lib/manifest-convex-react";
+import { useProposalSignatureRequests } from "../../lib/financeScopedQueries";
 import type { ActionPromptSession } from "../../ui/action-prompt";
 
 /**
@@ -21,7 +19,8 @@ export function ProposalSignatureRevokeAction({
   busy: string | null;
   run: (key: string, work: () => Promise<void>) => Promise<void>;
 }>) {
-  const signatureRequests = useListSignatureRequest();
+  // Only this proposal's requests.
+  const signatureRequests = useProposalSignatureRequests(proposalId);
   const revoke = useSignatureRequestRevoke();
   const pending = (signatureRequests ?? []).find(
     (row) =>

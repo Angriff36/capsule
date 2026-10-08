@@ -3,8 +3,8 @@ import { useState, type FormEvent } from "react";
 import {
   useCreateEquipmentIssue,
   useEquipmentIssueSettle,
-  useListEquipmentIssue,
 } from "../../lib/manifest-convex-react";
+import { useOpenEquipmentIssues } from "./useLogisticsWindow";
 import { formatMoneyExact } from "../../lib/format";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { useActionNotice } from "../../ui/action-result";
@@ -50,7 +50,8 @@ export function EquipmentRepairsPanel({
 }: {
   equipment: readonly EquipmentRow[];
 }) {
-  const issues = useListEquipmentIssue();
+  // Only the open problems this panel lists.
+  const issues = useOpenEquipmentIssues();
   const vendors = useRentalVendorChoices();
   const raise = useCreateEquipmentIssue();
   const settle = useEquipmentIssueSettle();

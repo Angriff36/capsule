@@ -3,6 +3,27 @@ import type { ReportSubjectArea } from "./ReportCreateForm";
 type SourceRow = Record<string, unknown>;
 
 /**
+ * The fields, in order, whose first set value dates a row for a report (the
+ * screen loads only rows dated in the report's period by these).
+ */
+export const REPORT_DATE_FIELDS: Record<ReportSubjectArea, readonly string[]> =
+  {
+    events: ["startsAt", "createdAt", "_creationTime"],
+    sales: ["eventDate", "sentAt", "createdAt", "_creationTime"],
+    inventory: [
+      "purchasingWeekStart",
+      "confirmedAt",
+      "calculatedAt",
+      "createdAt",
+      "_creationTime",
+    ],
+    production: ["dueAt", "completedAt", "createdAt", "_creationTime"],
+    workforce: ["startsAt", "createdAt", "_creationTime"],
+    logistics: ["windowStartsAt", "scheduledAt", "createdAt", "_creationTime"],
+    finance: ["issuedAt", "dueDate", "createdAt", "_creationTime"],
+  };
+
+/**
  * The date that puts a row in a report period, per subject. The builders,
  * the left-out counts and metricDefinitions' dateBasis words all follow it.
  */
@@ -10,31 +31,13 @@ export const REPORT_DATE_OF: Record<
   ReportSubjectArea,
   (row: SourceRow) => number | null
 > = {
-  events: (row) => firstDate(row, "startsAt", "createdAt", "_creationTime"),
-  sales: (row) =>
-    firstDate(row, "eventDate", "sentAt", "createdAt", "_creationTime"),
-  inventory: (row) =>
-    firstDate(
-      row,
-      "purchasingWeekStart",
-      "confirmedAt",
-      "calculatedAt",
-      "createdAt",
-      "_creationTime",
-    ),
-  production: (row) =>
-    firstDate(row, "dueAt", "completedAt", "createdAt", "_creationTime"),
-  workforce: (row) => firstDate(row, "startsAt", "createdAt", "_creationTime"),
-  logistics: (row) =>
-    firstDate(
-      row,
-      "windowStartsAt",
-      "scheduledAt",
-      "createdAt",
-      "_creationTime",
-    ),
-  finance: (row) =>
-    firstDate(row, "issuedAt", "dueDate", "createdAt", "_creationTime"),
+  events: (row) => firstDate(row, ...REPORT_DATE_FIELDS.events),
+  sales: (row) => firstDate(row, ...REPORT_DATE_FIELDS.sales),
+  inventory: (row) => firstDate(row, ...REPORT_DATE_FIELDS.inventory),
+  production: (row) => firstDate(row, ...REPORT_DATE_FIELDS.production),
+  workforce: (row) => firstDate(row, ...REPORT_DATE_FIELDS.workforce),
+  logistics: (row) => firstDate(row, ...REPORT_DATE_FIELDS.logistics),
+  finance: (row) => firstDate(row, ...REPORT_DATE_FIELDS.finance),
 };
 
 export function firstDate(row: SourceRow, ...keys: string[]): number | null {

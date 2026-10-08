@@ -4,8 +4,8 @@ import {
   useDishComponentSetPortionSpec,
   useListComponent,
   useListComponentPortionSpec,
-  useListDishComponent,
 } from "../../lib/manifest-convex-react";
+import { useDishComponentRows } from "../../lib/recipeScopedQueries";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
 import { componentPath } from "./kitchenRoutes";
@@ -45,7 +45,7 @@ type LineRow = {
 };
 
 export function DishComponentPortionSpecPanel({ dishId }: Props) {
-  const dishComponents = useListDishComponent();
+  const dishComponents = useDishComponentRows(dishId);
   const components = useListComponent();
   const portionSpecs = useListComponentPortionSpec();
   const setPortionSpec = useDishComponentSetPortionSpec();

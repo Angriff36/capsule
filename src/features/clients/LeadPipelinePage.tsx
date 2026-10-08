@@ -12,8 +12,6 @@ import {
   useLeadStageConversion,
   useLeadStageProposal,
   useLeadUpdatePipeline,
-  useListLead,
-  useListProposal,
   useListReferralSource,
 } from "../../lib/manifest-convex-react";
 import { type Id } from "../../lib/api";
@@ -25,6 +23,12 @@ import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { LeadDetailsForm } from "./LeadDetailsForm";
 import { LeadSourceReport } from "./LeadSourceReport";
+import {
+  useAllRowsOnRequest,
+  usePagedRows,
+  useProposalsByIds,
+  useRowsWithEmpty,
+} from "../../lib/financeScopedQueries";
 import { useSendProposalWithRevisionCapture } from "./useSendProposalWithRevisionCapture";
 import "./LeadPipelinePage.css";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
@@ -104,8 +108,30 @@ function dateValue(value: FormDataEntryValue | null): number | undefined {
   return Number.isNaN(parsed) ? undefined : parsed;
 }
 
+const OPEN_LEAD = ["closedAt"];
+
 export function LeadPipelinePage() {
-  const leads = useListLead();
+  const [showClosed, setShowClosed] = useState(false);
+  const [showSources, setShowSources] = useState(false);
+  // The board reads only open leads; closed ones load a page at a time when
+  // the user opens them, and the all-time source report when asked for.
+  const openLeads = useRowsWithEmpty("leads", OPEN_LEAD);
+  const closedPages = usePagedRows("leads", showClosed);
+  const allLeads = useAllRowsOnRequest("leads", showSources);
+  const leads = useMemo(
+    () =>
+      openLeads === undefined
+        ? undefined
+        : [
+            ...new Map(
+              [...openLeads, ...(closedPages.rows ?? [])].map((lead) => [
+                lead._id,
+                lead,
+              ]),
+            ).values(),
+          ],
+    [openLeads, closedPages.rows],
+  );
   const referralSources = useListReferralSource();
   const createLead = useCreateLead();
   const updatePipeline = useLeadUpdatePipeline();
@@ -121,8 +147,10 @@ export function LeadPipelinePage() {
   const confirmProposalSent = useLeadConfirmProposalSent();
   const closeLead = useLeadClose();
   const reopenLead = useLeadReopen();
-  const proposals = useListProposal();
-  const [showClosed, setShowClosed] = useState(false);
+  // Only the proposals the loaded leads point at (accepted = booked).
+  const proposals = useProposalsByIds(
+    leads?.map((lead) => (lead.proposalId ? String(lead.proposalId) : null)),
+  );
 
   const [showCapture, setShowCapture] = useState(false);
   const [leadType, setLeadType] = useState<"company" | "person">("company");
@@ -899,7 +927,7 @@ export function LeadPipelinePage() {
           );
         })}
       </section>
-      {closedCount > 0 ? (
+      {closedCount > 0 || !showClosed ? (
         <section className="lead-pipeline-closed-note">
           <button
             type="button"
@@ -908,7 +936,7 @@ export function LeadPipelinePage() {
           >
             {showClosed
               ? "Hide closed and booked leads"
-              : `Show closed and booked leads (${closedCount})`}
+              : "Show closed and booked leads"}
           </button>
           {showClosed ? (
             <ul className="mt-2 space-y-1">
@@ -945,11 +973,39 @@ export function LeadPipelinePage() {
               ))}
             </ul>
           ) : null}
+          {showClosed && closedPages.canLoadMore ? (
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm mt-2"
+              disabled={closedPages.loadingMore}
+              onClick={closedPages.loadMore}
+            >
+              {closedPages.loadingMore ? "Loading…" : "Load older leads"}
+            </button>
+          ) : null}
         </section>
       ) : null}
       {promptHost}
 
-      <LeadSourceReport leads={capturedLeads} />
+      {showSources ? (
+        allLeads === undefined ? (
+          <TableSkeleton rows={3} />
+        ) : (
+          <LeadSourceReport
+            leads={(allLeads as LeadRow[]).filter(
+              (lead) => lead.deletedAt == null && lead.capturedAt != null,
+            )}
+          />
+        )
+      ) : (
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm mt-4"
+          onClick={() => setShowSources(true)}
+        >
+          Show lead sources (all time)
+        </button>
+      )}
     </div>
   );
 }

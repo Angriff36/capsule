@@ -1,9 +1,10 @@
+import { useQuery } from "convex/react";
 import { useState } from "react";
+import { api, type Id } from "../../lib/api";
 import { formatDate } from "../../lib/format";
 import {
   useDeckShareLinkCreate,
   useDeckShareLinkRevoke,
-  useListDeckShareLink,
 } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { resolveManifestPolicies } from "../admin/rolePermissionAudit";
@@ -16,7 +17,10 @@ import { resolveManifestPolicies } from "../admin/rolePermissionAudit";
  */
 export function DeckShareActions({ attachmentId }: { attachmentId: string }) {
   const authStatus = useAuthStatus();
-  const links = useListDeckShareLink();
+  // This file's links only, never every shared link of the company.
+  const links = useQuery(api.queries.listDeckShareLinkByAttachmentId, {
+    attachmentId: attachmentId as Id<"attachments">,
+  });
   const createLink = useDeckShareLinkCreate();
   const revokeLink = useDeckShareLinkRevoke();
   const [busy, setBusy] = useState(false);

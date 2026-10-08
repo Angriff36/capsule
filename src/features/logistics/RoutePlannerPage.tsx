@@ -1,11 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { formatDate } from "../../lib/format";
 import { Link } from "react-router-dom";
-import {
-  useListDelivery,
-  useListVehicle,
-} from "../../lib/manifest-convex-react";
+import { useListVehicle } from "../../lib/manifest-convex-react";
 import { useEventsById } from "../facilities/useEventsById";
+import { useDeliveriesByStatus } from "../facilities/useLogisticsWindow";
 import { TableSkeleton } from "../../ui/primitives";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import {
@@ -54,6 +52,8 @@ type DeliveryRow = {
   deletedAt?: number | null;
 };
 
+const ACTIVE_RUN_STATUSES = ["scheduled", "in_transit"] as const;
+
 type VehicleRow = {
   _id: string;
   registration: string;
@@ -64,7 +64,9 @@ type VehicleRow = {
 
 export function RoutePlannerPage() {
   const vehicles = useListVehicle() as VehicleRow[] | undefined;
-  const deliveries = useListDelivery() as DeliveryRow[] | undefined;
+  // Only runs still to drive are planned here: read by status.
+  const deliveries = useDeliveriesByStatus(ACTIVE_RUN_STATUSES) as
+    DeliveryRow[] | undefined;
   const eventIds = useMemo(
     () =>
       deliveries === undefined

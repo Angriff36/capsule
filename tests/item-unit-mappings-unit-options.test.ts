@@ -9,6 +9,10 @@ vi.mock("../src/lib/manifest-convex-react", () => ({
   useItemUnitMappingRetire: () => vi.fn(),
 }));
 
+vi.mock("../src/lib/recipeScopedQueries", () => ({
+  useIngredientUnitMappingRows: () => [],
+}));
+
 vi.mock("../src/ui/action-prompt", () => ({
   useActionPrompt: () => ({ prompt: vi.fn(), host: null }),
 }));

@@ -1,7 +1,5 @@
-import {
-  useListAvailabilityWindow,
-  useListRecurringAvailability,
-} from "../../lib/manifest-convex-react";
+import { useListRecurringAvailability } from "../../lib/manifest-convex-react";
+import { useAvailabilityWindowsInWindow } from "../../lib/workforceScopedQueries";
 import { TableSkeleton } from "../../ui/primitives";
 import { availabilityForDay, upcomingDays } from "./availabilityGrid";
 
@@ -18,8 +16,14 @@ interface PersonRow {
  */
 export function AvailabilityGridSection({ people }: { people: PersonRow[] }) {
   const recurring = useListRecurringAvailability();
-  const windows = useListAvailabilityWindow();
   const days = upcomingDays(7);
+  // Only the date-range exceptions that touch the seven days shown.
+  const lastDay = new Date(days[6]!);
+  lastDay.setDate(lastDay.getDate() + 1);
+  const windows = useAvailabilityWindowsInWindow({
+    from: days[0]!.getTime(),
+    to: lastDay.getTime(),
+  });
 
   return (
     <section className="working-ledger">

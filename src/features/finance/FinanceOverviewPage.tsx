@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import { useClientDirectory } from "../../lib/useClientDirectory";
+import { useListOrganization } from "../../lib/manifest-convex-react";
 import {
-  useListInvoice,
-  useListOrganization,
-  useListPayment,
-} from "../../lib/manifest-convex-react";
+  useCanReadTable,
+  useInvoicesByIds,
+  useInvoicesInStatuses,
+  useWindowRows,
+} from "../../lib/financeScopedQueries";
 import {
   EmptyState,
   PageHeader,
@@ -26,6 +28,8 @@ import { OPEN_INVOICE_STATUSES } from "./invoiceBilling";
 
 /** Invoice statuses with money still owed — the "needs attention" pool. */
 const OPEN_STATUSES: readonly string[] = OPEN_INVOICE_STATUSES;
+/** The page shows open invoices and counts drafts; nothing else is read. */
+const SHOWN_STATUSES = [...OPEN_INVOICE_STATUSES, "draft"] as const;
 
 const ATTENTION_LIMIT = 8;
 
@@ -53,12 +57,31 @@ const clientLabel = (row: {
 };
 
 export function FinanceOverviewPage() {
-  const invoices = useListInvoice();
-  const payments = useListPayment();
+  const invoices = useInvoicesInStatuses(SHOWN_STATUSES);
+  const now = new Date();
+  const monthStartMs = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  const monthEndMs = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    1,
+  ).getTime();
+  // Only this month's settled payments, and the invoices they paid.
+  const payments = useWindowRows("payments", {
+    fields: ["settledAt"],
+    ranges: [{ from: monthStartMs, to: monthEndMs }],
+  });
+  const paidInvoices = useInvoicesByIds(
+    (payments ?? []).map((row) => String(row.invoiceId)),
+  );
+  const paymentsReadable = useCanReadTable("payments");
   const clients = useClientDirectory();
   const organizations = useListOrganization();
   const loading =
-    invoices === undefined || payments === undefined || clients === undefined;
+    invoices === undefined ||
+    payments === undefined ||
+    paidInvoices === undefined ||
+    paymentsReadable === undefined ||
+    clients === undefined;
 
   const functionalCurrencyCode = normalizeCurrencyCode(
     organizations?.find((row) => row.deletedAt == null)?.defaultCurrencyCode,
@@ -77,14 +100,9 @@ export function FinanceOverviewPage() {
   const overdueCount = openRows.filter(
     (row) => String(row.status) === "overdue",
   ).length;
-  const now = new Date();
-  const monthStartMs = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-  const monthEndMs = new Date(
-    now.getFullYear(),
-    now.getMonth() + 1,
-    1,
-  ).getTime();
-  const invoicesById = new Map(activeRows.map((row) => [String(row._id), row]));
+  const invoicesById = new Map(
+    (paidInvoices ?? []).map((row) => [String(row._id), row]),
+  );
   const paidThisMonth = (payments ?? [])
     .filter(
       (row) =>
@@ -103,12 +121,9 @@ export function FinanceOverviewPage() {
     (row) => String(row.status) === "draft",
   ).length;
   // paymentRead requires financeAccess while invoices are readable via
-  // manageAccess, and denied generated reads come back as [] — so an empty
-  // payments list alongside invoices that have settled is access-denial, not
-  // "no receipts". Show that honestly instead of $0 (sol review 2026-07-28).
-  const paymentsUnreadable =
-    (payments ?? []).length === 0 &&
-    activeRows.some((row) => row.paidAt != null);
+  // manageAccess, and denied reads come back empty — so a role that cannot
+  // read payments sees that honestly instead of $0 (sol review 2026-07-28).
+  const paymentsUnreadable = paymentsReadable === false;
 
   const attentionRows = [...openRows]
     .sort((a, b) => {

@@ -1,4 +1,12 @@
-import { useEventRentalOrderLines } from "../../lib/useEventRows";
+import {
+  useEventEquipmentReservations,
+  useEventRentalOrderLines,
+} from "../../lib/useEventRows";
+import {
+  useEventInvoices,
+  useEventPayrollInputs,
+  useEventPurchasing,
+} from "../../lib/useEventAreaRows";
 import { useMemo } from "react";
 import { formatMoney } from "../../lib/format";
 import { useEventLaborSummary } from "../facilities/useLaborSummary";
@@ -9,16 +17,9 @@ import {
   useListDishComponent,
   useListDishIngredient,
   useListEquipment,
-  useListEquipmentReservation,
   useListIngredient,
-  useListIngredientDemand,
   useListIngredientPriceObservation,
   useListItemUnitMapping,
-  useListInvoice,
-  useListPayrollInput,
-  useListVendorOrder,
-  useListVendorOrderLine,
-  useListVendorOrderLineDemand,
 } from "../../lib/manifest-convex-react";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
 import { buildEventMenuCost } from "./eventMenuCost";
@@ -56,14 +57,16 @@ export function EventMarginTab({ eventId }: Props) {
   const ingredients = useListIngredient();
   const priceObservations = useListIngredientPriceObservation();
   const itemUnitMappings = useListItemUnitMapping();
-  const invoices = useListInvoice();
-  const demands = useListIngredientDemand();
-  const orders = useListVendorOrder();
-  const lines = useListVendorOrderLine();
-  const lineDemands = useListVendorOrderLineDemand();
-  const payroll = useListPayrollInput();
+  // This event's invoices, purchasing, payroll and holds only.
+  const invoices = useEventInvoices(eventId);
+  const purchasing = useEventPurchasing(eventId);
+  const demands = purchasing?.demands;
+  const orders = purchasing?.orders;
+  const lines = purchasing?.lines;
+  const lineDemands = purchasing?.lineDemands;
+  const payroll = useEventPayrollInputs(eventId);
   const equipment = useListEquipment();
-  const equipmentReservations = useListEquipmentReservation();
+  const equipmentReservations = useEventEquipmentReservations(eventId);
   // Live labor from clocked time × pay rates (laborSummary seam). Payroll
   // inputs are only the fallback — their rate fields are encrypted-stripped.
   const clockedLabor = useEventLaborSummary(eventId);

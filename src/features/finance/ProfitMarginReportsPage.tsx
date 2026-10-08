@@ -1,7 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useClientDirectory } from "../../lib/useClientDirectory";
-import { useListEventCloseout } from "../../lib/manifest-convex-react";
-import { useEventsById } from "../facilities/useEventsById";
+import { useCloseoutsForEventDays } from "../../lib/financeScopedQueries";
 import { TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate, formatMoney } from "../../lib/format";
 import { ReportsWorkspaceNav } from "../reports/ReportsWorkspaceNav";
@@ -157,12 +156,15 @@ export function ProfitMarginDashboard({
   clients,
   loading = false,
   now,
+  onRangeChange,
 }: {
   closeouts: readonly ProfitMarginCloseout[];
   events: readonly ProfitMarginEvent[];
   clients: readonly ProfitMarginClient[];
   loading?: boolean;
   now: Date;
+  /** The page reads only the closeouts of the days picked here. */
+  onRangeChange?: (rangeStart: string, rangeEnd: string) => void;
 }) {
   const [granularity, setGranularity] =
     useState<ProfitMarginGranularity>("month");
@@ -171,6 +173,9 @@ export function ProfitMarginDashboard({
     dateInputValue(defaultStart(now)),
   );
   const [rangeEnd, setRangeEnd] = useState(() => dateInputValue(now));
+  useEffect(() => {
+    onRangeChange?.(rangeStart, rangeEnd);
+  }, [onRangeChange, rangeStart, rangeEnd]);
   const validRange = Boolean(rangeStart && rangeEnd && rangeStart <= rangeEnd);
   const report = useMemo(
     () =>
@@ -516,15 +521,17 @@ export function ProfitMarginDashboard({
 }
 
 export function ProfitMarginReportsPage() {
-  const closeouts = useListEventCloseout();
-  const eventIds = useMemo(
-    () =>
-      closeouts === undefined ? undefined : closeouts.map((c) => c.eventId),
-    [closeouts],
-  );
-  const events = useEventsById(eventIds);
-  const clients = useClientDirectory();
   const now = useMemo(() => new Date(), []);
+  // Only the events in the picked days and their closeouts.
+  const [range, setRange] = useState(() => ({
+    start: dateInputValue(defaultStart(now)),
+    end: dateInputValue(now),
+  }));
+  const { events, closeouts } = useCloseoutsForEventDays(
+    range.start,
+    range.end,
+  );
+  const clients = useClientDirectory();
 
   return (
     <ProfitMarginDashboard
@@ -535,6 +542,13 @@ export function ProfitMarginReportsPage() {
         closeouts === undefined || events === undefined || clients === undefined
       }
       now={now}
+      onRangeChange={(start, end) =>
+        setRange((current) =>
+          current.start === start && current.end === end
+            ? current
+            : { start, end },
+        )
+      }
     />
   );
 }

@@ -64,6 +64,44 @@ vi.mock("convex/react", async (importOriginal) => {
       );
     return backend.calls.get(key);
   };
+  // One page of a supply ledger (convex/inventoryWindow.ts): the test's
+  // generated-list rows, narrowed as the server would.
+  const supplyPage = (name: string, args: unknown) => {
+    const live = (hook: string) =>
+      (
+        (backend.values.get(hook) ?? []) as (Record<string, unknown> & {
+          deletedAt?: number | null;
+        })[]
+      ).filter((row) => row.deletedAt == null);
+    const a = (args ?? {}) as { eventId?: string; tab?: string };
+    if (name === "inventoryWindow:needPage")
+      return live("useListPurchaseNeed").filter(
+        (row) => !a.eventId || row.eventId === a.eventId,
+      );
+    if (name === "inventoryWindow:orderPage") {
+      const lines = live("useListVendorOrderLine");
+      return live("useListVendorOrder").map((row) => ({
+        ...row,
+        lines: lines.filter((line) => line.vendorOrderId === row._id),
+      }));
+    }
+    if (name === "inventoryWindow:openingStockPage") {
+      const tab =
+        a.tab === "done" ? ["applied", "set_aside"] : [String(a.tab ?? "")];
+      return live("useListOpeningStockRecord").filter((row) =>
+        tab.includes(String(row.status)),
+      );
+    }
+    const hook = (
+      {
+        "inventoryWindow:reservationPage": "useListInventoryReservation",
+        "inventoryWindow:transferPage": "useListStockTransfer",
+        "inventoryWindow:countSessionPage": "useListStockCountSession",
+        "inventoryWindow:wastePage": "useListWasteRecord",
+      } as Record<string, string>
+    )[name];
+    return hook ? live(hook) : backend.values.get(name);
+  };
   return {
     ...original,
     useQuery: (
@@ -212,6 +250,169 @@ vi.mock("convex/react", async (importOriginal) => {
           numberAssignments: rows("useListEventNumberAssignment"),
         };
       }
+      // Event screens' scoped reads (src/lib/useEventAreaRows.ts,
+      // convex/eventsAreaWindow.ts): the test's generated-list rows for that
+      // record or those events.
+      if (!backend.values.has(name)) {
+        const live = (hook: string) =>
+          (
+            (backend.values.get(hook) ?? []) as (Record<string, unknown> & {
+              deletedAt?: number | null;
+            })[]
+          ).filter((row) => row.deletedAt == null);
+        const scoped: Record<string, string> = {
+          "queries:listInvoiceByEventId": "useListInvoice",
+          "queries:listIncidentByEventId": "useListIncident",
+          "queries:listCorrectiveActionByEventId": "useListCorrectiveAction",
+          "queries:listEventLayoutSectionByEventId":
+            "useListEventLayoutSection",
+          "queries:listClientContactByClientId": "useListClientContact",
+          "queries:listProposalDishSelectionByProposalId":
+            "useListProposalDishSelection",
+          "queries:listProposalEnhancementByProposalId":
+            "useListProposalEnhancement",
+          "queries:listVenueNoteByEventId": "useListVenueNote",
+          "queries:listEventDishLineOverrideByEventDishId":
+            "useListEventDishLineOverride",
+          "queries:listPayrollInputByEventId": "useListPayrollInput",
+          "queries:listVendorOrderByEventId": "useListVendorOrder",
+        };
+        if (scoped[name]) {
+          const [field, value] = Object.entries(
+            args as Record<string, unknown>,
+          )[0]!;
+          return live(scoped[name]).filter((row) => row[field] === value);
+        }
+        if (name === "queries:listInvoiceByTenantIdAndInvoiceNumber") {
+          const { invoiceNumber } = args as { invoiceNumber: string };
+          return live("useListInvoice").filter(
+            (row) => row.invoiceNumber === invoiceNumber,
+          );
+        }
+        if (name.startsWith("eventsAreaWindow:")) {
+          const a = args as {
+            eventId?: string;
+            eventIds?: string[];
+            from?: number;
+            to?: number;
+            personIds?: string[];
+            invoiceNumber?: string;
+            proposalIds?: string[];
+            vendorOrderIds?: string[];
+          };
+          const ids = new Set(a.eventIds ?? (a.eventId ? [a.eventId] : []));
+          const ofEvents = (hook: string) =>
+            live(hook).filter((row) => ids.has(String(row.eventId)));
+          if (name === "eventsAreaWindow:guestsForEvents")
+            return ofEvents("useListEventGuest");
+          if (name === "eventsAreaWindow:invoicesForEvents")
+            return ofEvents("useListInvoice");
+          if (name === "eventsAreaWindow:trackerRows")
+            return {
+              deliveries: ofEvents("useListDelivery"),
+              invoices: ofEvents("useListInvoice"),
+              vehicleAssignments: ofEvents("useListEventVehicleAssignment"),
+              numberAssignments: ofEvents("useListEventNumberAssignment"),
+            };
+          if (name === "eventsAreaWindow:shiftsInWindow")
+            return live("useListShift").filter(
+              (row) =>
+                (!a.personIds || a.personIds.includes(String(row.personId))) &&
+                row.startsAt != null &&
+                Number(row.startsAt) < a.to! &&
+                (row.endsAt != null
+                  ? Number(row.endsAt) > a.from!
+                  : Number(row.startsAt) >= a.from!),
+            );
+          if (name === "eventsAreaWindow:waitlistForEvent") {
+            const needs = new Set(
+              ofEvents("useListEventStaffNeed").map((row) => row._id),
+            );
+            return live("useListStaffNeedWaitlistEntry").filter((row) =>
+              needs.has(row.staffNeedId),
+            );
+          }
+          if (name === "eventsAreaWindow:packItemsForEvent") {
+            const lists = new Set(
+              ofEvents("useListPackList").map((row) => row._id),
+            );
+            return live("useListPackListItem").filter((row) =>
+              lists.has(row.packListId),
+            );
+          }
+          if (name === "eventsAreaWindow:purchasingForEvent") {
+            const demands = ofEvents("useListIngredientDemand");
+            const demandIds = new Set(demands.map((row) => row._id));
+            const lineDemands = live("useListVendorOrderLineDemand").filter(
+              (row) => demandIds.has(row.ingredientDemandId),
+            );
+            const linkedLines = new Set(
+              lineDemands.map((row) => row.vendorOrderLineId),
+            );
+            const lines = live("useListVendorOrderLine").filter(
+              (row) =>
+                demandIds.has(row.ingredientDemandId) ||
+                linkedLines.has(row._id),
+            );
+            const orderIds = new Set([
+              ...lines.map((row) => row.vendorOrderId),
+              ...lineDemands.map((row) => row.vendorOrderId),
+            ]);
+            return {
+              demands,
+              orders: live("useListVendorOrder").filter((row) =>
+                orderIds.has(row._id),
+              ),
+              lines,
+              lineDemands,
+            };
+          }
+          if (name === "eventsAreaWindow:stockForEvent") {
+            const demands = ofEvents("useListIngredientDemand");
+            const holds = live("useListInventoryReservation");
+            const ingredients = new Set([
+              ...demands.map((row) => row.ingredientId),
+              ...holds
+                .filter((row) => ids.has(String(row.eventId)))
+                .map((row) => row.ingredientId),
+            ]);
+            const items = live("useListInventoryItem").filter((row) =>
+              ingredients.has(row.ingredientId),
+            );
+            const itemIds = new Set(items.map((row) => row._id));
+            return {
+              demands,
+              items,
+              lots: live("useListInventoryLot").filter((row) =>
+                ingredients.has(row.ingredientId),
+              ),
+              reservations: holds.filter(
+                (row) =>
+                  ids.has(String(row.eventId)) ||
+                  itemIds.has(row.inventoryItemId),
+              ),
+            };
+          }
+          if (name === "eventsAreaWindow:importDirectoryRows") {
+            const invoices = live("useListInvoice").filter(
+              (row) => row.invoiceNumber === a.invoiceNumber,
+            );
+            const invoiceIds = new Set(invoices.map((row) => row._id));
+            return {
+              invoices,
+              payments: live("useListPayment").filter((row) =>
+                invoiceIds.has(row.invoiceId),
+              ),
+              proposalLines: live("useListProposalLineItem").filter((row) =>
+                (a.proposalIds ?? []).includes(String(row.proposalId)),
+              ),
+              vendorOrderLines: live("useListVendorOrderLine").filter((row) =>
+                (a.vendorOrderIds ?? []).includes(String(row.vendorOrderId)),
+              ),
+            };
+          }
+        }
+      }
       // A menu's recipe, price and stock rows: the test's lists, as given.
       if (name === "menuRecipeLookup:forDishes" && !backend.values.has(name)) {
         const list = (hook: string) =>
@@ -263,8 +464,593 @@ vi.mock("convex/react", async (importOriginal) => {
           capped: false,
         };
       }
+      // Staff screens' scoped reads (convex/workforceWindow.ts and the
+      // generated per-person and per-state lists): the test's generated-list
+      // rows, narrowed as the server would.
+      if (
+        (name.startsWith("workforceWindow:") ||
+          /^queries:list(Shift|TimeRecord|WeeklyScheduleNotice|AvailabilityWindow|RecurringAvailability|TimeOffRequest|ShiftSwapRequest|TrainingCompletion|EventAssignment|Delivery|PrepTask)By/.test(
+            name,
+          )) &&
+        !backend.values.has(name)
+      ) {
+        const live = (hook: string) =>
+          (
+            (backend.values.get(hook) ?? []) as (Record<string, unknown> & {
+              deletedAt?: number | null;
+            })[]
+          ).filter((row) => row.deletedAt == null);
+        const a = (args ?? {}) as Record<string, unknown>;
+        const num = (value: unknown) =>
+          typeof value === "number" ? value : null;
+        const overlaps = (row: Record<string, unknown>) => {
+          const start = num(row.startsAt);
+          const end = num(row.endsAt);
+          return (
+            end != null &&
+            end > (a.from as number) &&
+            (a.to == null || (start != null && start < (a.to as number)))
+          );
+        };
+        const ids = new Set((a.ids as string[] | undefined) ?? []);
+        const people = new Set((a.personIds as string[] | undefined) ?? []);
+        switch (name) {
+          case "workforceWindow:shifts":
+            return live("useListShift").filter(overlaps);
+          case "workforceWindow:shiftsByIds":
+          case "workforceWindow:shiftsAround":
+            return live("useListShift").filter((row) =>
+              ids.has(String(row._id)),
+            );
+          case "workforceWindow:personOpenShifts":
+            return live("useListShift").filter(
+              (row) =>
+                row.personId === a.personId &&
+                (row.status === "started" ||
+                  (row.status === "scheduled" &&
+                    (num(row.endsAt) == null ||
+                      num(row.endsAt)! >= (a.from as number)))),
+            );
+          case "workforceWindow:timeRecordsIn":
+            return live("useListTimeRecord").filter(
+              (row) =>
+                num(row.clockInAt) != null &&
+                num(row.clockOutAt) != null &&
+                num(row.clockInAt)! >= (a.from as number) &&
+                num(row.clockOutAt)! <= (a.to as number),
+            );
+          case "workforceWindow:personTimeRecordsSince":
+            return live("useListTimeRecord").filter(
+              (row) => row.personId === a.personId,
+            );
+          case "workforceWindow:personScheduleNotices":
+            return live("useListWeeklyScheduleNotice").filter(
+              (row) =>
+                row.personId === a.personId &&
+                (row.weekEndsAt as number) >= (a.from as number),
+            );
+          case "workforceWindow:weekNotices":
+            return live("useListWeeklyScheduleNotice").filter(
+              (row) =>
+                people.has(String(row.personId)) &&
+                row.weekStartsAt === a.weekStartsAt,
+            );
+          case "workforceWindow:personActiveWindows":
+            return live("useListAvailabilityWindow").filter(
+              (row) => row.personId === a.personId && row.status === "active",
+            );
+          case "workforceWindow:availabilityWindows":
+            return live("useListAvailabilityWindow").filter(overlaps);
+          case "workforceWindow:approvedTimeOff":
+            return live("useListTimeOffRequest").filter(
+              (row) => row.status === "approved" && overlaps(row),
+            );
+          case "workforceWindow:reviewedTimeOff":
+            return live("useListTimeOffRequest").filter(
+              (row) => row.status !== "pending",
+            );
+          case "workforceWindow:trainingCompletionsFor":
+            return live("useListTrainingCompletion").filter((row) =>
+              people.has(String(row.personId)),
+            );
+          case "workforceWindow:forEvents": {
+            const events = new Set(a.eventIds as string[]);
+            return {
+              assignments: live("useListEventAssignment").filter(
+                (row) =>
+                  events.has(String(row.eventId)) &&
+                  (a.personId == null || row.personId === a.personId),
+              ),
+              staffNeeds: live("useListEventStaffNeed").filter((row) =>
+                events.has(String(row.eventId)),
+              ),
+            };
+          }
+          case "workforceWindow:packForEvents": {
+            const events = new Set(a.eventIds as string[]);
+            const packLists = live("useListPackList").filter((row) =>
+              events.has(String(row.eventId)),
+            );
+            const listIds = new Set(packLists.map((row) => String(row._id)));
+            return {
+              packLists,
+              packLines: live("useListPackListItem").filter((row) =>
+                listIds.has(String(row.packListId)),
+              ),
+            };
+          }
+          case "workforceWindow:myDayPrep":
+            return {
+              tasks: live("useListPrepTask"),
+              links: live("useListPrepTaskDependency"),
+            };
+          case "workforceWindow:fieldCloseouts":
+            return live("useListEventCloseout");
+          case "workforceWindow:driverDeliveries":
+            return live("useListDelivery").filter(
+              (row) => row.driverId === a.driverId,
+            );
+        }
+        const match = /^queries:list(\w+?)By(\w+)$/.exec(name);
+        if (match) {
+          const rows = live(`useList${match[1]}`);
+          return rows.filter((row) =>
+            Object.entries(a).every(
+              ([field, value]) => field === "tenantId" || row[field] === value,
+            ),
+          );
+        }
+      }
+      // Kitchen screens' scoped reads (convex/productionWindow.ts): the
+      // test's generated-list rows, as given.
+      if (
+        (name === "productionWindow:prepWork" ||
+          name === "productionWindow:planWork") &&
+        !backend.values.has(name)
+      ) {
+        const list = (hook: string) =>
+          (
+            (backend.values.get(hook) ?? []) as { deletedAt?: number | null }[]
+          ).filter((row) => row.deletedAt == null);
+        return {
+          eventIds: [],
+          tasks: list("useListPrepTask"),
+          dependencies: list("useListPrepTaskDependency"),
+          checks: list("useListQualityCheck"),
+          comments: list("useListPrepTaskComment"),
+          batches: list("useListProductionBatch"),
+          allocations: list("useListProductionBatchAllocation"),
+        };
+      }
+      if (
+        (name === "productionWindow:batchesSince" ||
+          name === "productionWindow:openBatches") &&
+        !backend.values.has(name)
+      )
+        return (
+          (backend.values.get("useListProductionBatch") ?? []) as {
+            deletedAt?: number | null;
+          }[]
+        ).filter((row) => row.deletedAt == null);
+      // One recipe's, dish's, menu's, ingredient's or import's rows
+      // (src/lib/recipeScopedQueries.ts): the test's generated-list rows for
+      // that record.
+      for (const [query, hook] of [
+        ["queries:listComponentStepByComponentId", "useListComponentStep"],
+        [
+          "queries:listComponentPortionSpecByComponentId",
+          "useListComponentPortionSpec",
+        ],
+        [
+          "queries:listComponentComponentByComponentId",
+          "useListComponentComponent",
+        ],
+        [
+          "queries:listComponentEquipmentByComponentId",
+          "useListComponentEquipment",
+        ],
+        [
+          "queries:listComponentSnapshotByComponentId",
+          "useListComponentSnapshot",
+        ],
+        [
+          "queries:listComponentIngredientByComponentId",
+          "useListComponentIngredient",
+        ],
+        [
+          "queries:listComponentIngredientByIngredientId",
+          "useListComponentIngredient",
+        ],
+        ["queries:listDishComponentByComponentId", "useListDishComponent"],
+        ["queries:listDishComponentByDishId", "useListDishComponent"],
+        ["queries:listDishIngredientByDishId", "useListDishIngredient"],
+        ["queries:listDishContainerByDishId", "useListDishContainer"],
+        ["queries:listDishTaskByDishId", "useListDishTask"],
+        [
+          "queries:listIngredientPriceObservationByIngredientId",
+          "useListIngredientPriceObservation",
+        ],
+        [
+          "queries:listComponentImportLineByImportId",
+          "useListComponentImportLine",
+        ],
+        [
+          "queries:listComponentImportByResultingComponentId",
+          "useListComponentImport",
+        ],
+        ["queries:listMenuDishByMenuId", "useListMenuDish"],
+        ["queries:listItemUnitMappingByIngredientId", "useListItemUnitMapping"],
+        ["queries:listVendorItemByIngredientId", "useListVendorItem"],
+        ["queries:listStylePackagingByComponentId", "useListStylePackaging"],
+        ["queries:listStylePackagingByDishId", "useListStylePackaging"],
+      ] as const)
+        if (name === query && !backend.values.has(name)) {
+          const [field, value] = Object.entries(
+            args as Record<string, unknown>,
+          )[0]!;
+          return (
+            (backend.values.get(hook) ?? []) as Record<string, unknown>[]
+          ).filter((row) => row[field] === value && row.deletedAt == null);
+        }
+      // Kitchen windows (convex/recipeWindow.ts): the test's generated rows.
+      if (name.startsWith("recipeWindow:") && !backend.values.has(name)) {
+        const list = (hook: string) =>
+          (backend.values.get(hook) ?? []) as (Record<string, unknown> & {
+            deletedAt?: number | null;
+          })[];
+        const live = (hook: string) =>
+          list(hook).filter((row) => row.deletedAt == null);
+        const a = args as { dishId: string; ingredientIds: string[] } & {
+          eventIds: string[];
+        };
+        if (name === "recipeWindow:dishTaskMaterials") {
+          const tasks = new Set(
+            live("useListDishTask")
+              .filter((task) => task.dishId === a.dishId)
+              .map((task) => task._id),
+          );
+          return live("useListDishTaskMaterial").filter((row) =>
+            tasks.has(row.dishTaskId),
+          );
+        }
+        if (name === "recipeWindow:latestPriceObservations")
+          return live("useListIngredientPriceObservation").filter((row) =>
+            a.ingredientIds.includes(String(row.ingredientId)),
+          );
+        if (name === "recipeWindow:openComponentImports")
+          return live("useListComponentImport").filter((row) =>
+            [
+              "uploaded",
+              "parsed",
+              "reviewing",
+              "ready",
+              "finalizing",
+              "failed",
+            ].includes(String(row.status)),
+          );
+        if (name === "recipeWindow:prepBoard") {
+          const tasks = live("useListPrepTask").filter((task) =>
+            a.eventIds.includes(String(task.eventId)),
+          );
+          const taskIds = new Set(tasks.map((task) => task._id));
+          return {
+            tasks,
+            dependencies: list("useListPrepTaskDependency").filter((row) =>
+              taskIds.has(row.dependentTaskId),
+            ),
+            qualityChecks: live("useListQualityCheck").filter((row) =>
+              taskIds.has(row.prepTaskId),
+            ),
+            invoices: live("useListInvoice").filter((row) =>
+              a.eventIds.includes(String(row.eventId)),
+            ),
+          };
+        }
+      }
+      // Logistics, facilities and supply scoped reads
+      // (convex/logisticsWindow.ts, src/features/facilities/useLogisticsWindow.ts):
+      // the test's generated-list rows for that record or those events.
+      if (!backend.values.has(name)) {
+        const live = (hook: string) =>
+          (
+            (backend.values.get(hook) ?? []) as (Record<string, unknown> & {
+              deletedAt?: number | null;
+            })[]
+          ).filter((row) => row.deletedAt == null);
+        const byField: Record<string, string> = {
+          "queries:listPackListItemByPackListId": "useListPackListItem",
+          "queries:listPackSectionClaimByPackListId": "useListPackSectionClaim",
+          "queries:listEventVehicleAssignmentByActiveEventId":
+            "useListEventVehicleAssignment",
+          "queries:listVehicleTripCheckByEventVehicleAssignmentId":
+            "useListVehicleTripCheck",
+          "queries:listDeliveryByPackListId": "useListDelivery",
+          "queries:listEquipmentPartByEquipmentId": "useListEquipmentPart",
+          "queries:listVenueNoteByVenueId": "useListVenueNote",
+          "queries:listVenueRoomByVenueId": "useListVenueRoom",
+          "queries:listVendorOrderLineByVendorOrderId":
+            "useListVendorOrderLine",
+          "queries:listVendorOrderLineDemandByVendorOrderId":
+            "useListVendorOrderLineDemand",
+          "queries:listInventoryLotByVendorOrderId": "useListInventoryLot",
+          "queries:listVendorBillMatchByVendorOrderLineId":
+            "useListVendorBillMatch",
+          "queries:listReceiptCorrectionByVendorOrderLineId":
+            "useListReceiptCorrection",
+          "queries:listPackListByEventId": "useListPackList",
+          "queries:listInventoryLotByIngredientId": "useListInventoryLot",
+          "queries:listStockCountLineByStockCountSessionId":
+            "useListStockCountLine",
+        };
+        if (byField[name]) {
+          const [field, value] = Object.entries(
+            args as Record<string, unknown>,
+          )[0]!;
+          return live(byField[name]).filter((row) => row[field] === value);
+        }
+        if (name === "queries:listPurchaseNeed")
+          return backend.values.get("useListPurchaseNeed") ?? [];
+        if (name === "queries:listVendorOrderByTenantIdAndStatus") {
+          const { status } = args as { status: string };
+          const lines = live("useListVendorOrderLine");
+          return live("useListVendorOrder")
+            .filter((row) => row.status === status)
+            .map((row) => ({
+              ...row,
+              lines: lines.filter((line) => line.vendorOrderId === row._id),
+            }));
+        }
+        if (name.startsWith("logisticsWindow:")) {
+          const a = args as {
+            eventIds?: string[];
+            statuses?: string[];
+            withLines?: boolean;
+            equipmentIds?: string[];
+            venueIds?: string[];
+            vendorOrderId?: string;
+          };
+          if (name === "logisticsWindow:forEvents") {
+            const ids = new Set(a.eventIds ?? []);
+            const ofEvents = (hook: string) =>
+              live(hook).filter((row) => ids.has(String(row.eventId)));
+            const packLists = ofEvents("useListPackList");
+            const listIds = new Set(packLists.map((row) => row._id));
+            const rigs = ofEvents("useListEventVehicleAssignment");
+            const rigIds = new Set(rigs.map((row) => row._id));
+            return {
+              packLists,
+              packLines: live("useListPackListItem").filter((row) =>
+                listIds.has(row.packListId),
+              ),
+              rigs,
+              tripChecks: live("useListVehicleTripCheck").filter((row) =>
+                rigIds.has(row.eventVehicleAssignmentId),
+              ),
+              reservations: ofEvents("useListEquipmentReservation"),
+              deliveries: ofEvents("useListDelivery"),
+              departureOverrides: ofEvents("useListDepartureOverride"),
+              assignments: ofEvents("useListEventAssignment"),
+              staffNeeds: ofEvents("useListEventStaffNeed"),
+              issues: ofEvents("useListEquipmentIssue"),
+            };
+          }
+          if (name === "logisticsWindow:packListsByStatus") {
+            const packLists = live("useListPackList").filter((row) =>
+              (a.statuses ?? []).includes(String(row.status)),
+            );
+            const listIds = new Set(packLists.map((row) => row._id));
+            return {
+              packLists,
+              packLines: a.withLines
+                ? live("useListPackListItem").filter((row) =>
+                    listIds.has(row.packListId),
+                  )
+                : [],
+            };
+          }
+          if (name === "logisticsWindow:deliveriesByStatus")
+            return live("useListDelivery").filter((row) =>
+              (a.statuses ?? []).includes(String(row.status)),
+            );
+          if (name === "logisticsWindow:openEquipmentIssues")
+            return live("useListEquipmentIssue").filter(
+              (row) => row.status === "open",
+            );
+          if (name === "logisticsWindow:holdsForEquipment")
+            return live("useListEquipmentReservation").filter((row) =>
+              (a.equipmentIds ?? []).includes(String(row.equipmentId)),
+            );
+          if (name === "logisticsWindow:venueEventsSince")
+            return live("useListEvent").filter((row) =>
+              (a.venueIds ?? []).includes(String(row.venueId)),
+            );
+          if (name === "logisticsWindow:vendorOrderNeeds") {
+            const lineIds = new Set(
+              live("useListVendorOrderLine")
+                .filter((row) => row.vendorOrderId === a.vendorOrderId)
+                .map((row) => row._id),
+            );
+            const demandIds = new Set(
+              live("useListVendorOrderLineDemand")
+                .filter((row) => row.vendorOrderId === a.vendorOrderId)
+                .map((row) => row.ingredientDemandId),
+            );
+            return {
+              needs: live("useListPurchaseNeed").filter(
+                (row) =>
+                  lineIds.has(row.vendorOrderLineId) ||
+                  demandIds.has(row.ingredientDemandId),
+              ),
+              demands: live("useListIngredientDemand").filter((row) =>
+                demandIds.has(row._id),
+              ),
+            };
+          }
+        }
+        // Supply reads (convex/inventoryWindow.ts): the same narrowing.
+        if (name.startsWith("inventoryWindow:")) {
+          const a = (args ?? {}) as {
+            eventIds?: string[];
+            dishIds?: string[];
+            demandIds?: string[];
+            sessionIds?: string[];
+            windows?: { from: number; to: number }[];
+            from?: number;
+            lotNumber?: string;
+            receivedFrom?: number | null;
+            receivedTo?: number | null;
+          };
+          const inList = (values: string[] | undefined, value: unknown) =>
+            (values ?? []).includes(String(value));
+          if (name === "inventoryWindow:demandsForEvents")
+            return {
+              demands: live("useListIngredientDemand").filter((row) =>
+                inList(a.eventIds, row.eventId),
+              ),
+              needs: live("useListPurchaseNeed").filter((row) =>
+                inList(a.eventIds, row.eventId),
+              ),
+            };
+          if (name === "inventoryWindow:demandHistory") {
+            const demands = live("useListIngredientDemand").filter(
+              (row) =>
+                inList(a.dishIds, row.dishId) &&
+                (row.status === "confirmed" || row.status === "fulfilled"),
+            );
+            return {
+              demands,
+              events: live("useListEvent").filter((row) =>
+                demands.some((demand) => demand.eventId === row._id),
+              ),
+            };
+          }
+          if (name === "inventoryWindow:demandInWindows") {
+            const events = live("useListEvent").filter((row) =>
+              (a.windows ?? []).some(
+                (w) =>
+                  typeof row.startsAt === "number" &&
+                  row.startsAt >= w.from &&
+                  row.startsAt < w.to,
+              ),
+            );
+            return {
+              events,
+              demands: live("useListIngredientDemand").filter((row) =>
+                events.some((event) => event._id === row.eventId),
+              ),
+            };
+          }
+          if (name === "inventoryWindow:linesForDemands") {
+            const links = live("useListVendorOrderLineDemand").filter((row) =>
+              inList(a.demandIds, row.ingredientDemandId),
+            );
+            const lines = live("useListVendorOrderLine").filter(
+              (row) =>
+                inList(a.demandIds, row.ingredientDemandId) ||
+                links.some((link) => link.vendorOrderLineId === row._id),
+            );
+            return {
+              lines,
+              links,
+              orders: live("useListVendorOrder").filter((row) =>
+                lines.some((line) => line.vendorOrderId === row._id),
+              ),
+            };
+          }
+          if (name === "inventoryWindow:sentOrderNeeds") {
+            const orders = live("useListVendorOrder").filter((row) =>
+              ["submitted", "confirmed", "partially_received"].includes(
+                String(row.status),
+              ),
+            );
+            return {
+              orders,
+              needs: live("useListPurchaseNeed").filter((row) =>
+                orders.some((order) => order._id === row.vendorOrderId),
+              ),
+            };
+          }
+          if (name === "inventoryWindow:vendorScoreInputs") {
+            const orders = live("useListVendorOrder").filter(
+              (row) =>
+                row.status === "received" &&
+                typeof row.receivedAt === "number" &&
+                row.receivedAt >= (a.from ?? 0),
+            );
+            return {
+              orders,
+              lines: live("useListVendorOrderLine").filter((row) =>
+                orders.some((order) => order._id === row.vendorOrderId),
+              ),
+              observations: live("useListIngredientPriceObservation"),
+            };
+          }
+          if (name === "inventoryWindow:traceLots") {
+            const typed = (a.lotNumber ?? "").trim();
+            const lots = live("useListInventoryLot").filter((lot) => {
+              const number = String(lot.supplierLotNumber ?? "");
+              const at = lot.receivedAt as number | null | undefined;
+              return (
+                (!typed ||
+                  number.startsWith(typed) ||
+                  number.startsWith(typed.toUpperCase())) &&
+                (a.receivedFrom == null ||
+                  (at != null && at >= a.receivedFrom)) &&
+                (a.receivedTo == null || (at != null && at <= a.receivedTo))
+              );
+            });
+            const holds = live("useListInventoryReservation");
+            return {
+              lots,
+              reservations: holds.filter((row) =>
+                lots.some((lot) => lot._id === row.inventoryLotId),
+              ),
+              unattributed: typed
+                ? 0
+                : holds.filter(
+                    (row) =>
+                      !row.inventoryLotId &&
+                      row.status === "consumed" &&
+                      row.consumedAt != null,
+                  ).length,
+            };
+          }
+          if (name === "inventoryWindow:countSessionProgress")
+            return Object.fromEntries(
+              (a.sessionIds ?? []).map((id) => [
+                id,
+                live("useListStockCountLine").filter(
+                  (line) =>
+                    line.stockCountSessionId === id &&
+                    line.status === "reconciled",
+                ).length,
+              ]),
+            );
+          if (name === "inventoryWindow:openingStockCounts") {
+            const rows = live("useListOpeningStockRecord");
+            return {
+              needs_review: rows.filter((row) => row.status === "needs_review")
+                .length,
+              ready: rows.filter((row) => row.status === "ready").length,
+              done: rows.filter(
+                (row) => row.status === "applied" || row.status === "set_aside",
+              ).length,
+            };
+          }
+          if (name === "inventoryWindow:wasteSince")
+            return live("useListWasteRecord");
+        }
+      }
       return backend.values.get(name);
     },
+    // A one-off read answers as the live read would.
+    useConvex: () => ({
+      query: async (reference: unknown, args?: unknown) =>
+        (await import("convex/react")).useQuery(
+          reference as Parameters<typeof getFunctionName>[0],
+          args as never,
+        ),
+    }),
     // All-time event pages (eventLookup:reportPage) and dish pages
     // (dishLookup:page) answer in one page from the generated list's rows,
     // unless the test sets its own.
@@ -281,7 +1067,25 @@ vi.mock("convex/react", async (importOriginal) => {
           ? backend.values.get("useListEvent")
           : name === "dishLookup:page" && !backend.values.has(name)
             ? backend.values.get("useListDish")
-            : backend.values.get(name);
+            : name === "logisticsWindow:packListPage" &&
+                !backend.values.has(name)
+              ? (backend.values.get("useListPackList") ?? [])
+              : name.startsWith("inventoryWindow:") && !backend.values.has(name)
+                ? supplyPage(name, args)
+                : name.startsWith("workforceWindow:") &&
+                    !backend.values.has(name)
+                  ? (
+                      (backend.values.get(
+                        {
+                          "workforceWindow:timeRecordPage": "useListTimeRecord",
+                          "workforceWindow:availabilityWindowPage":
+                            "useListAvailabilityWindow",
+                          "workforceWindow:swapRequestPage":
+                            "useListShiftSwapRequest",
+                        }[name] ?? name,
+                      ) ?? []) as { deletedAt?: number | null }[]
+                    ).filter((row) => row.deletedAt == null)
+                  : backend.values.get(name);
       return rows === undefined
         ? { results: [], status: "LoadingFirstPage", loadMore: () => {} }
         : { results: rows, status: "Exhausted", loadMore: () => {} };

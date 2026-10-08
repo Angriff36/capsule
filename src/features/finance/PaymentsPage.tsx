@@ -2,8 +2,6 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreatePayment,
-  useListInvoice,
-  useListPayment,
   useListPaymentMethod,
   usePaymentBeginProcessing,
   usePaymentFail,
@@ -11,6 +9,11 @@ import {
   usePaymentReverse,
   usePaymentSettle,
 } from "../../lib/manifest-convex-react";
+import {
+  useInvoicesByIds,
+  useInvoicesInStatuses,
+  usePagedRows,
+} from "../../lib/financeScopedQueries";
 import { paymentBreakdown } from "./paymentBreakdown";
 import { formatMoneyExact } from "../../lib/format";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
@@ -25,6 +28,7 @@ import { useActionNotice } from "../../ui/action-result";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const policy = new CommercialLifecyclePolicy();
+const PAYABLE_STATUSES = ["sent", "viewed", "overdue", "partial"] as const;
 const ledger = new PaymentsLedgerPresenter();
 
 const money = (value: FormDataEntryValue | null) => {
@@ -33,8 +37,23 @@ const money = (value: FormDataEntryValue | null) => {
 };
 
 export function PaymentsPage() {
-  const payments = useListPayment();
-  const invoices = useListInvoice();
+  // The newest payments, a page at a time ("Load more" reads older ones),
+  // the open invoices a payment can go against, and the invoices the shown
+  // payments name.
+  const paymentPages = usePagedRows("payments");
+  const payments = paymentPages.rows;
+  const openInvoices = useInvoicesInStatuses(PAYABLE_STATUSES);
+  const namedInvoices = useInvoicesByIds(
+    (payments ?? []).map((row) => String(row.invoiceId)),
+  );
+  const invoices =
+    openInvoices === undefined || namedInvoices === undefined
+      ? undefined
+      : [
+          ...new Map(
+            [...openInvoices, ...namedInvoices].map((row) => [row._id, row]),
+          ).values(),
+        ];
   const paymentMethods = useListPaymentMethod();
   const createPayment = useCreatePayment();
   const beginProcessing = usePaymentBeginProcessing();
@@ -558,6 +577,18 @@ export function PaymentsPage() {
             </table>
           </div>
         )}
+        {!loading && paymentPages.canLoadMore ? (
+          <div className="px-4 py-3">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={paymentPages.loadingMore}
+              onClick={paymentPages.loadMore}
+            >
+              {paymentPages.loadingMore ? "Loading…" : "Load older payments"}
+            </button>
+          </div>
+        ) : null}
       </section>
     </div>
   );

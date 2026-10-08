@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { Id } from "../../lib/api";
-import { useListShift } from "../../lib/manifest-convex-react";
+import { useShiftsInWindow } from "../../lib/useEventAreaRows";
 import { useEventsById } from "../facilities/useEventsById";
 import {
   useApplyShiftTimingChange,
@@ -8,6 +8,7 @@ import {
   useKeepShiftTime,
 } from "../../lib/useEventTimingRules";
 import {
+  addScheduleWeeks,
   buildStaffShiftSummary,
   shiftsInScheduleWeek,
   startOfScheduleWeek,
@@ -32,7 +33,26 @@ const shiftTimeLabel = (times: {
  */
 export function EventShiftChangesPanel({ eventId }: { eventId: string }) {
   const changes = useEventShiftChanges(eventId as Id<"events">);
-  const shifts = useListShift();
+  // Only the shifts of the people whose times move, in the weeks shown below.
+  // The week is anchored at render time, as summaryFor does.
+  const shiftWindow = useMemo(() => {
+    if (!changes || changes.length === 0) return "skip" as const;
+    let from = Infinity;
+    let to = -Infinity;
+    for (const change of changes) {
+      const week = startOfScheduleWeek(
+        change.to.startsAt ?? change.from.startsAt ?? Date.now(),
+      );
+      from = Math.min(from, week);
+      to = Math.max(to, addScheduleWeeks(week, 1));
+    }
+    return {
+      from,
+      to,
+      personIds: [...new Set(changes.map((change) => String(change.personId)))],
+    };
+  }, [changes]);
+  const shifts = useShiftsInWindow(shiftWindow);
   const eventIds = useMemo(
     () =>
       shifts === undefined

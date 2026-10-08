@@ -2,8 +2,6 @@ import { useMemo, useState } from "react";
 import { useQuery } from "convex/react";
 import { api, type Id } from "../../../lib/api";
 import {
-  useListInvoice,
-  useListPayment,
   useExternalRecordLinkResolveConflict,
   useExternalRecordLinkVerifyLink,
 } from "../../../lib/manifest-convex-react";
@@ -102,8 +100,20 @@ export function ExternalRecordsReconcilePage() {
     pending: true,
     recordTypes: ["payment"],
   });
-  const payments = useListPayment();
-  const invoices = useListInvoice();
+  // Capsule payments and invoices feed only the payment match picker, so they
+  // are read only while an imported payment waits for a match.
+  const needsPayments = (allRecords ?? []).some(
+    (r) =>
+      r.conflictStatus === "pending_conflict" && r.capsuleEntity === "payment",
+  );
+  const payments = useQuery(
+    api.queries.listPayment,
+    needsPayments ? {} : "skip",
+  );
+  const invoices = useQuery(
+    api.queries.listInvoice,
+    needsPayments ? {} : "skip",
+  );
 
   // Commands for resolving records.
   const verifyLink = useExternalRecordLinkVerifyLink();
@@ -419,7 +429,8 @@ export function ExternalRecordsReconcilePage() {
               </tr>
             </thead>
             <tbody>
-              {allRecords === undefined || payments === undefined ? (
+              {allRecords === undefined ||
+              (needsPayments && payments === undefined) ? (
                 <tr>
                   <td colSpan={9} className="py-4">
                     <TableSkeleton rows={4} />

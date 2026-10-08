@@ -19,10 +19,8 @@ import { runPlannedSteps } from "../../../agent/CapsuleEventBundleStepRunner";
 import type { Id } from "../../../lib/api";
 import { useAttachPacketSources } from "../../../lib/eventPacket/useEventPacket";
 import type { EventBundle } from "../../../lib/tppReports/eventBundle";
-import {
-  useListInvoice,
-  useListServiceStyle,
-} from "../../../lib/manifest-convex-react";
+import { useListServiceStyle } from "../../../lib/manifest-convex-react";
+import { useInvoicesByNumber } from "../../../lib/useEventAreaRows";
 import { useAllEventReportRows } from "../../facilities/useEventsById";
 import { useAuthStatus } from "../../../lib/useAuthStatus";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
@@ -53,6 +51,8 @@ export interface EventImportResult {
   executedSteps: number;
 }
 
+const NO_INVOICES: never[] = [];
+
 export function useEventImportRunner(input: {
   bundle: EventBundle | null;
   catalog: CapsuleEventBundleCatalogMatch;
@@ -67,7 +67,10 @@ export function useEventImportRunner(input: {
   // Light rows of every live event, read in pages (PL-SCALE): the match
   // below needs only number, client, title, date and stage.
   const eventRows = useAllEventReportRows();
-  const invoiceRows = useListInvoice();
+  // Only invoices carrying this BEO's number; none to read without one.
+  const headerNumber = input.bundle?.header.invoiceNumber?.trim() || undefined;
+  const numberInvoices = useInvoicesByNumber(tenantId, headerNumber);
+  const invoiceRows = headerNumber === undefined ? NO_INVOICES : numberInvoices;
   const attachPacketSources = useAttachPacketSources();
   const loadExistingRows = useLoadExistingEventRows();
   const serviceStyles = useMemo(

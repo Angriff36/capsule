@@ -1,10 +1,10 @@
 import { useState } from "react";
 import {
   useCreatePayrollExportRecord,
-  useListPayrollExportRecord,
   usePayrollExportRecordAcknowledge,
   usePayrollExportRecordReject,
 } from "../../lib/manifest-convex-react";
+import { usePayrollReceiptsForPeople } from "../../lib/financeScopedQueries";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip } from "../../ui/primitives";
 import type { PayrollExportDocument } from "./payrollExport";
@@ -39,7 +39,10 @@ const signed = (minutes: number) =>
  * for each send (accepted or turned down by the payroll provider).
  */
 export function usePayrollReceipts(document: PayrollExportDocument | null) {
-  const listed = useListPayrollExportRecord() as ReceiptRow[] | undefined;
+  // Only the receipts of the people in this export.
+  const listed = usePayrollReceiptsForPeople(
+    document ? document.rows.map((row) => row.personId) : [],
+  ) as ReceiptRow[] | undefined;
   const record = useCreatePayrollExportRecord();
   const receipts = (listed ?? []).filter((row) => row.deletedAt == null);
   const plans: PayrollRevisionPlan[] = document

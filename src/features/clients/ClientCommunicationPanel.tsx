@@ -1,10 +1,8 @@
 import { useUser } from "@clerk/react";
 import { useMemo, useState, type FormEvent } from "react";
 import type { Doc, Id } from "../../lib/api";
-import {
-  useCreateClientCommunication,
-  useListClientCommunication,
-} from "../../lib/manifest-convex-react";
+import { useCommunicationsFor } from "../../lib/financeScopedQueries";
+import { useCreateClientCommunication } from "../../lib/manifest-convex-react";
 import { formatDate, formatTime } from "../../lib/format";
 import { EmptyState, Section, Skeleton } from "../../ui/primitives";
 import { CrmFailureBanner } from "./CrmFailureBanner";
@@ -81,7 +79,7 @@ export function ClientCommunicationPanel({
   target: ClientCommunicationTarget;
 }) {
   const { isLoaded, user } = useUser();
-  const rows = useListClientCommunication();
+  const rows = useTargetCommunications(target);
   const createCommunication = useCreateClientCommunication();
   const authorName =
     user?.fullName?.trim() ||
@@ -97,6 +95,24 @@ export function ClientCommunicationPanel({
       authorName={authorName}
       onCreate={(draft) => createCommunication(draft)}
     />
+  );
+}
+
+/**
+ * Only the target's history: the event's rows, or each contact's rows plus
+ * the old-system rows filed on the client itself.
+ */
+function useTargetCommunications(
+  target: ClientCommunicationTarget,
+): Array<Doc<"clientCommunications">> | undefined {
+  return useCommunicationsFor(
+    target.kind === "event"
+      ? { kind: "event", eventId: target.eventId }
+      : {
+          kind: "contacts",
+          contactIds: target.contacts.map((contact) => contact._id),
+          clientId: target.clientId ?? null,
+        },
   );
 }
 

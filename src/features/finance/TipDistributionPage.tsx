@@ -2,10 +2,13 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreatePayrollInput,
-  useListEventAssignment,
   useListPerson,
-  useListShift,
 } from "../../lib/manifest-convex-react";
+import {
+  useEventAssignmentRows,
+  useEventShiftRows,
+} from "../../lib/eventScopedQueries";
+import type { Id } from "../../lib/api";
 import {
   formatCountNoun,
   formatDate,
@@ -47,11 +50,15 @@ const durationHours = (start: unknown, end: unknown) => {
 };
 
 export function TipDistributionPage() {
-  const assignments = useListEventAssignment();
   const people = useListPerson();
-  const shifts = useListShift();
   const createPayrollInput = useCreatePayrollInput();
   const [eventId, setEventId] = useState(() => workingEventId() ?? "");
+  // Only the picked event's staff and shifts.
+  const eventScope = eventId ? (eventId as Id<"events">) : "skip";
+  const eventAssignments = useEventAssignmentRows(eventScope);
+  const eventShifts = useEventShiftRows(eventScope);
+  const assignments = eventId ? eventAssignments : [];
+  const shifts = eventId ? eventShifts : [];
   const events = usePickerAndNamedEvents([eventId]);
   const [total, setTotal] = useState("0.00");
   const [method, setMethod] = useState<TipPoolingMethod>("equal");

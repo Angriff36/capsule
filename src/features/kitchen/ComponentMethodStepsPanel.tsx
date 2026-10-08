@@ -3,8 +3,8 @@ import {
   useComponentStepRemove,
   useComponentStepRevise,
   useCreateComponentStep,
-  useListComponentStep,
 } from "../../lib/manifest-convex-react";
+import { useComponentStepRows } from "../../lib/recipeScopedQueries";
 import { useActionPrompt } from "../../ui/action-prompt";
 
 function positiveWholeNumber(raw: string | undefined): number | undefined {
@@ -29,7 +29,7 @@ export function ComponentMethodStepsPanel({
   componentId: string;
   instructions?: string | null;
 }) {
-  const steps = useListComponentStep();
+  const steps = useComponentStepRows(componentId);
   const addStep = useCreateComponentStep();
   const reviseStep = useComponentStepRevise();
   const removeStep = useComponentStepRemove();

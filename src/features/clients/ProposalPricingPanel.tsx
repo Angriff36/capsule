@@ -1,8 +1,8 @@
 import { formatMoneyExact } from "../../lib/format";
 import { useState } from "react";
 import { useMutation, useQuery } from "convex/react";
-import { useListProposalLineItem } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
+import { useProposalLineItems } from "../../lib/financeScopedQueries";
 import { api, type Id } from "../../lib/api";
 import {
   byLineDisplayOrder,
@@ -73,7 +73,8 @@ export function ProposalPricingPanel({
   editable = false,
   onFailure,
 }: ProposalPricingPanelProps) {
-  const lineItems = useListProposalLineItem();
+  // Only this proposal's price lines.
+  const lineItems = useProposalLineItems(proposalId);
   // Published-catalog dishes a line can be priced from (spec §5.4 L276).
   const catalog = useCatalogDishes();
   // AC-547: rental/decor items a line can price.

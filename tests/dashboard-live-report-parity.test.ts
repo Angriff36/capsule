@@ -19,6 +19,11 @@ vi.mock("../src/lib/manifest-convex-react", () => ({
   useListVenue: () => [],
   useListServiceStyle: () => [],
 }));
+vi.mock("../src/lib/financeScopedQueries", async () =>
+  (await import("./helpers/financeScopedQueriesMock")).financeScopedMock(
+    (table) => (table === "events" ? seed.events : []),
+  ),
+);
 vi.mock("../src/features/facilities/useEventsById", () => ({
   useAllEventReportRows: () => seed.events,
 }));
@@ -97,6 +102,11 @@ describe("dashboard figures match the live report", () => {
     act(() => {
       root.render(createElement(MemoryRouter, null, createElement(Page)));
     });
+    // All-time figures load only when asked for: ask, as a user would.
+    const ask = [...container.querySelectorAll("button")].find((button) =>
+      (button.textContent ?? "").startsWith("Show all-time"),
+    );
+    if (ask) act(() => ask.click());
     const heading = [...container.querySelectorAll("h3")].find(
       (h3) => (h3.textContent ?? "").trim() === title,
     );

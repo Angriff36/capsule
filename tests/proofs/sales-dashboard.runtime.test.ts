@@ -19,6 +19,19 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
     useListPerson: list("people"),
   };
 });
+// Seed keys by Convex table, for the scoped and paged reads.
+const SEED_KEY: Record<string, string> = {
+  eventCloseouts: "closeouts",
+  revenueAttributions: "attributions",
+  leadershipItems: "items",
+  scorecardTargets: "targets",
+};
+vi.mock("../../src/lib/financeScopedQueries", async () =>
+  (await import("../helpers/financeScopedQueriesMock")).financeScopedMock(
+    (table) => seed[SEED_KEY[table] ?? table] as never,
+  ),
+);
+
 vi.mock("../../src/features/facilities/useEventsById", () => ({
   useAllEventReportRows: () => seed.events ?? [],
 }));
@@ -111,6 +124,11 @@ describe("sales dashboard", () => {
         createElement(MemoryRouter, null, createElement(SalesDashboardPage)),
       );
     });
+    // All-time figures load only when asked for: ask, as a user would.
+    const ask = [...container.querySelectorAll("button")].find((button) =>
+      (button.textContent ?? "").startsWith("Show all-time"),
+    );
+    if (ask) act(() => ask.click());
 
     // Booked = approved or later with a price: $4,000 + $2,000.
     expect(card("Booked Revenue")).toContain("$6,000");

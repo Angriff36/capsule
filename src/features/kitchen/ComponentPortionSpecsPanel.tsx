@@ -4,8 +4,8 @@ import {
   useComponentPortionSpecRetire,
   useComponentPortionSpecRevise,
   useCreateComponentPortionSpec,
-  useListComponentPortionSpec,
 } from "../../lib/manifest-convex-react";
+import { useComponentPortionSpecRows } from "../../lib/recipeScopedQueries";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
 import { readableRecipeAmount } from "./RecipeNotes";
@@ -17,7 +17,7 @@ export function ComponentPortionSpecsPanel({
 }: {
   componentId: string;
 }) {
-  const specs = useListComponentPortionSpec();
+  const specs = useComponentPortionSpecRows(componentId);
   const defineSpec = useCreateComponentPortionSpec();
   const reviseSpec = useComponentPortionSpecRevise();
   const retireSpec = useComponentPortionSpecRetire();

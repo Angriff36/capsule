@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   useCreateInventoryItem,
   useCreateInventoryReservation,
@@ -15,12 +15,8 @@ import {
   useInventoryReservationReturnUnused,
   useInventorySettingsSetStockTracking,
   useListIngredient,
-  useListIngredientDemand,
   useListInventoryItem,
-  useListInventoryLot,
-  useListInventoryReservation,
   useListInventorySettings,
-  useListStockTransfer,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
 import { formatQuantity, formatCountNoun, formatDate } from "../../lib/format";
@@ -37,6 +33,13 @@ import { IngredientCatalogImageProvider } from "../../lib/IngredientCatalogImage
 import { useWorkingEventId } from "../events/workingEvent";
 import { FieldHelp } from "../../ui/FieldHelp";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import { useEventsInRange } from "../facilities/useEventsById";
+import {
+  useDemandsForEvents,
+  useLotsForIngredient,
+  useReservationPages,
+  useTransferPages,
+} from "../facilities/useInventoryWindow";
 import {
   reservedOn,
   stockBalance,
@@ -95,14 +98,44 @@ const parseExpiryInput = (raw: string) => {
   return Number.isFinite(time) ? time : undefined; // undefined = invalid
 };
 
+/** Days of coming events whose demand the receipt scanner offers. */
+const SCAN_DEMAND_DAYS = 14;
+
+type StockBookHold = {
+  inventoryItemId?: string | null;
+  inventoryLotId?: string | null;
+  status?: string | null;
+  quantity?: number | string | null;
+  deletedAt?: number | null;
+};
+
 export function StockBookPage() {
   const items = useListInventoryItem();
-  const inventoryLots = useListInventoryLot();
-  const reservations = useListInventoryReservation();
-  const transfers = useListStockTransfer();
+  // Each stock line carries its own holds (the generated stock list reads
+  // them), so on hand, held and free stock need no separate whole read.
+  const itemHolds = useMemo(
+    () =>
+      (items ?? []).flatMap(
+        (item) => (item.reservations ?? []) as StockBookHold[],
+      ),
+    [items],
+  );
+  // The reservation and transfer tables show the newest 50, more on request.
+  const reservationPages = useReservationPages();
+  const reservations = reservationPages.rows;
+  const transferPages = useTransferPages();
+  const transfers = transferPages.rows;
   const locations = useListStorageLocation();
   const ingredients = useListIngredient();
-  const demands = useListIngredientDemand();
+  // The receipt scanner offers the demand of the next two weeks' events.
+  const scanDay = new Date().setHours(0, 0, 0, 0);
+  const scanEvents = useEventsInRange({
+    from: scanDay,
+    to: scanDay + SCAN_DEMAND_DAYS * 86_400_000,
+  });
+  const demands = useDemandsForEvents(
+    scanEvents?.map((event) => event._id),
+  )?.demands;
   const workingId = useWorkingEventId();
   const events = usePickerAndNamedEvents(
     reservations
@@ -133,6 +166,16 @@ export function StockBookPage() {
       : null,
   );
   const [transferSource, setTransferSource] = useState<any>(null);
+  // Supplier lots only of the stock line picked in the reserve form.
+  const [reserveItemId, setReserveItemId] = useState("");
+  useEffect(() => setReserveItemId(""), [form]);
+  const reserveItem = (items ?? []).find((item) => item._id === reserveItemId);
+  const reserveLots = useLotsForIngredient(
+    form === "reserve" ? reserveItem?.ingredientId : null,
+  );
+  const inventoryLots = reserveLots?.filter(
+    (lot) => lot.locationId === reserveItem?.locationId,
+  );
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [horizonDays, setHorizonDays] = useState(7);
@@ -157,6 +200,7 @@ export function StockBookPage() {
   const activeReservations = (reservations ?? []).filter(
     (item) => item.deletedAt == null,
   );
+  const liveHolds = itemHolds.filter((hold) => hold.deletedAt == null);
   const ingredientName = (id: string) =>
     ingredients?.find((item) => item._id === id)?.name ?? "Unknown ingredient";
   const unitFor = (item: {
@@ -167,11 +211,10 @@ export function StockBookPage() {
     locations?.find((item) => item._id === id)?.name ?? "Unknown location";
   const eventName = (id: string) =>
     events?.find((item) => item._id === id)?.title ?? "Unknown event";
-  const reservedFor = (itemId: string) =>
-    reservedOn(itemId, activeReservations);
+  const reservedFor = (itemId: string) => reservedOn(itemId, liveHolds);
   // The generated remove guard rejects while any hold is still active.
   const activeHoldCount = (itemId: string) =>
-    activeReservations.filter(
+    liveHolds.filter(
       (reservation) =>
         reservation.inventoryItemId === itemId &&
         reservation.status === "active",
@@ -179,7 +222,7 @@ export function StockBookPage() {
 
   const qty4 = stockQuantity;
   const availableFor = (item: any) =>
-    stockBalance(item._id, item.quantityOnHand, activeReservations).available;
+    stockBalance(item._id, item.quantityOnHand, liveHolds).available;
   const belowPar = (item: any) =>
     item.parLevel > 0 && availableFor(item) < item.parLevel;
   const suggestedPurchase = (item: any) =>
@@ -280,7 +323,7 @@ export function StockBookPage() {
               "Select a supplier lot for the same ingredient and location.",
             );
           }
-          const alreadyAllocated = (reservations ?? [])
+          const alreadyAllocated = itemHolds
             .filter(
               (reservation) =>
                 reservation.inventoryLotId === inventoryLotId &&
@@ -715,6 +758,7 @@ export function StockBookPage() {
             inventoryLots={(inventoryLots ?? []).filter(
               (lot) => lot.deletedAt == null,
             )}
+            onReserveItem={setReserveItemId}
             transferSource={transferSource}
             busy={busy != null}
             onSubmit={submit}
@@ -937,6 +981,17 @@ export function StockBookPage() {
               </table>
             </div>
           )}
+          {reservationPages.canLoadMore ? (
+            <div className="mt-3 flex justify-center">
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={reservationPages.loadMore}
+              >
+                Load more
+              </button>
+            </div>
+          ) : null}
         </section>
 
         <section className="working-ledger mt-10">
@@ -1109,6 +1164,17 @@ export function StockBookPage() {
               </table>
             </div>
           )}
+          {transferPages.canLoadMore ? (
+            <div className="mt-3 flex justify-center">
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={transferPages.loadMore}
+              >
+                Load more
+              </button>
+            </div>
+          ) : null}
         </section>
       </div>
     </IngredientCatalogImageProvider>
@@ -1122,6 +1188,7 @@ function SupplyStockForm({
   locations,
   events,
   inventoryLots,
+  onReserveItem,
   transferSource,
   busy,
   onSubmit,
@@ -1377,7 +1444,12 @@ function SupplyStockForm({
           <>
             <label className="field-label">
               Stock line
-              <select name="inventoryItemId" className="input" required>
+              <select
+                name="inventoryItemId"
+                className="input"
+                required
+                onChange={(event) => onReserveItem(event.target.value)}
+              >
                 <option value="">Select stock</option>
                 {items.map((item: any) => (
                   <option key={item._id} value={item._id}>

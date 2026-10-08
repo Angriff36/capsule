@@ -1,5 +1,9 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { type Doc, type Id } from "../../lib/api";
+import {
+  useEventCorrectiveActions,
+  useEventIncidents,
+} from "../../lib/useEventAreaRows";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   useCorrectiveActionClose,
@@ -8,8 +12,6 @@ import {
   useIncidentBeginInvestigation,
   useIncidentDismiss,
   useIncidentMarkResolved,
-  useListCorrectiveAction,
-  useListIncident,
 } from "../../lib/manifest-convex-react";
 import { EmptyState, Skeleton } from "../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
@@ -52,12 +54,12 @@ type IncidentAction = {
  * unlocks the incident server-side via the CorrectiveActionClosed reaction.
  */
 export function EventIncidentPanel({ eventId }: { eventId: Id<"events"> }) {
-  const allIncidents = useListIncident();
+  const allIncidents = useEventIncidents(eventId);
   const incidentRows = useMemo(
     () => allIncidents?.filter((r) => r.eventId === eventId),
     [allIncidents, eventId],
   );
-  const allCorrective = useListCorrectiveAction();
+  const allCorrective = useEventCorrectiveActions(eventId);
   const correctiveRows = useMemo(
     () => allCorrective?.filter((r) => r.eventId === eventId),
     [allCorrective, eventId],

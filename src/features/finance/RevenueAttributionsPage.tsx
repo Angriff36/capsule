@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  useListRevenueAttribution,
   useRevenueAttributionApprove,
   useRevenueAttributionReject,
   useRevenueAttributionRequestApproval,
   useRevenueAttributionUpdate,
 } from "../../lib/manifest-convex-react";
-import { useAllEventReportRows } from "../facilities/useEventsById";
+import { useEventsById, useEventsInRange } from "../facilities/useEventsById";
+import {
+  useAttributionsForEvents,
+  usePagedRows,
+} from "../../lib/financeScopedQueries";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import {
@@ -16,7 +19,11 @@ import {
 } from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
-import { RevenueSplitSummary } from "./RevenueSplitSummary";
+import {
+  monthRange,
+  monthValue,
+  RevenueSplitSummary,
+} from "./RevenueSplitSummary";
 // This page renders tax-workspace surfaces (tax-period-stamp). Routes are lazy
 // chunks, so landing directly on this page without this import gets no styles
 // and the header stat runs together ("Pending approval00 total").
@@ -42,8 +49,21 @@ const attributionTypeLabel = (type: string) => {
 };
 
 export function RevenueAttributionsPage() {
-  const attributions = useListRevenueAttribution();
-  const events = useAllEventReportRows();
+  // The table shows the newest splits a page at a time; the summary reads
+  // only the picked month's events and their splits.
+  const attributionPages = usePagedRows("revenueAttributions");
+  const attributions = attributionPages.rows;
+  const events = useEventsById(
+    attributions === undefined
+      ? undefined
+      : attributions.map((attr) => String(attr.eventId)),
+  );
+  const [month, setMonth] = useState(() => monthValue(new Date()));
+  const [monthFrom, monthTo] = monthRange(month);
+  const monthEvents = useEventsInRange({ from: monthFrom, to: monthTo });
+  const monthSplits = useAttributionsForEvents(
+    monthEvents?.map((event) => event._id),
+  );
   const approve = useRevenueAttributionApprove();
   const reject = useRevenueAttributionReject();
   const requestApproval = useRevenueAttributionRequestApproval();
@@ -186,7 +206,7 @@ export function RevenueAttributionsPage() {
               ).length
             }
           </strong>
-          <small>{configuredAttributions.length} total</small>
+          <small>{configuredAttributions.length} shown</small>
         </div>
       </header>
       <FinanceWorkspaceNav />
@@ -199,11 +219,17 @@ export function RevenueAttributionsPage() {
       {host}
 
       <RevenueSplitSummary
-        events={events.map((event) => ({ ...event, _id: String(event._id) }))}
-        splits={configuredAttributions.map((attr) => ({
-          ...attr,
-          eventId: String(attr.eventId),
+        events={(monthEvents ?? []).map((event) => ({
+          ...event,
+          _id: String(event._id),
         }))}
+        splits={(monthSplits ?? [])
+          .filter((attr) => attr.deletedAt == null)
+          .map((attr) => ({
+            ...attr,
+            eventId: String(attr.eventId),
+          }))}
+        onMonthChange={setMonth}
       />
 
       {configuredAttributions.length === 0 ? (
@@ -324,6 +350,18 @@ export function RevenueAttributionsPage() {
           </table>
         </div>
       )}
+      {attributionPages.canLoadMore ? (
+        <div className="px-4 py-3">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            disabled={attributionPages.loadingMore}
+            onClick={attributionPages.loadMore}
+          >
+            {attributionPages.loadingMore ? "Loading…" : "Load older splits"}
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

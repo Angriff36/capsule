@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { useAction } from "convex/react";
 import { api } from "../../lib/api";
-import {
-  useListSyncError,
-  useSyncErrorMarkResolved,
-} from "../../lib/manifest-convex-react";
+import { useSyncErrorMarkResolved } from "../../lib/manifest-convex-react";
+import { useRowsWhere } from "../../lib/financeScopedQueries";
 import { classifyCommandFailure } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
 import { formatTime } from "../../lib/format";
@@ -37,8 +35,11 @@ const RETRYABLE_KINDS = new Set(["parse_failed", "unknown"]);
  * ingest input, so re-running `ingestInboundMessage` with it is the retry. If
  * that action's arg shape changes, the retry parse must change with it.
  */
+const PENDING = [{ field: "status", value: "pending" }];
+
 export function SyncErrorsPanel() {
-  const errors = useListSyncError();
+  // Only pending errors; resolved ones are never shown.
+  const errors = useRowsWhere("syncErrors", PENDING);
   const markResolved = useSyncErrorMarkResolved();
   const ingest = useAction(api.messageInbox.ingestInboundMessage);
   const [failure, setFailure] = useState<Failure | null>(null);

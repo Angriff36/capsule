@@ -4,17 +4,17 @@ import { formatCountNoun, formatDate } from "../../lib/format";
 import {
   useCreateEquipmentIssue,
   useListEquipment,
-  useListEquipmentIssue,
-  useListEquipmentReservation,
-  useListPackList,
-  useListPackListItem,
   useListPerson,
 } from "../../lib/manifest-convex-react";
 import { EmptyState, PageHeader, TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useActionFailure } from "../../ui/action-result/useActionNotice";
 import { eventDetailPath } from "../events/eventRoutes";
-import { useEventsById } from "../facilities/useEventsById";
+import { useEventsById, useEventsInRange } from "../facilities/useEventsById";
+import {
+  useLogisticsForEvents,
+  useOpenEquipmentIssues,
+} from "../facilities/useLogisticsWindow";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { packReturnSummary, packReturnTotals, packWentOut } from "./packReturn";
 import { comesBack } from "./packViews";
@@ -36,22 +36,57 @@ const ISSUE_KIND_LABEL: Record<string, string> = {
   vendor_return: "Short vendor return",
 };
 
+const DAY_MS = 86_400_000;
+/** Events shown per step: those of the last two weeks and today. */
+const RETURNS_PAGE_DAYS = 14;
+const RETURNS_PARTS = [
+  "packLists",
+  "packLines",
+  "reservations",
+  "issues",
+] as const;
+
 const show = (value: number) =>
   Number.isInteger(value) ? String(value) : String(Number(value.toFixed(2)));
 
 /**
- * Returns: every event whose load went out, with what still has to be
+ * Returns: every event of the last two weeks (older on request) whose load
+ * went out, with what still has to be
  * counted back in, what was lost or broken, and the events already counted.
  * Pack lines are counted on the load sheet's "Coming back" view; equipment
  * holds are returned on the event's equipment page. This page only adds
  * them up across events.
  */
 export function ReturnsPage() {
-  const packLists = useListPackList();
-  const packLines = useListPackListItem();
-  const reservations = useListEquipmentReservation();
+  // Loads, holds and issues of the events of the days shown (and every open
+  // issue), older days only when asked; not every row the company ever had.
+  const [days, setDays] = useState(RETURNS_PAGE_DAYS);
+  const dayStart = new Date().setHours(0, 0, 0, 0);
+  const recent = useEventsInRange({
+    from: dayStart - days * DAY_MS,
+    to: dayStart + DAY_MS,
+  });
+  const forEvents = useLogisticsForEvents(
+    recent?.map((event) => event._id),
+    RETURNS_PARTS,
+  );
+  const openIssueRows = useOpenEquipmentIssues();
+  const packLists = forEvents?.packLists;
+  const packLines = forEvents?.packLines;
+  const reservations = forEvents?.reservations;
+  const issues = useMemo(
+    () =>
+      forEvents === undefined || openIssueRows === undefined
+        ? undefined
+        : [
+            ...forEvents.issues,
+            ...openIssueRows.filter(
+              (row) => !forEvents.issues.some((own) => own._id === row._id),
+            ),
+          ],
+    [forEvents, openIssueRows],
+  );
   const equipment = useListEquipment();
-  const issues = useListEquipmentIssue();
   const raise = useCreateEquipmentIssue();
   const { prompt, host } = useActionPrompt();
   const { error, setError } = useActionFailure();
@@ -236,7 +271,7 @@ export function ReturnsPage() {
       <PageHeader
         eyebrow="Logistics · Returns"
         title="Returns"
-        lead="What went out, what still has to be counted back in, and what was lost or broken."
+        lead="What went out in the days shown, what still has to be counted back in, and what was lost or broken."
         facts={[
           { label: "Coming back", value: loading ? "…" : open.length },
           { label: "Lost or broken", value: loading ? "…" : problemCount },
@@ -492,6 +527,17 @@ export function ReturnsPage() {
             ),
           )}
         </ul>
+      )}
+      {loading ? null : (
+        <div className="mt-3 flex justify-center">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => setDays((value) => value + RETURNS_PAGE_DAYS)}
+          >
+            Show older events
+          </button>
+        </div>
       )}
       {error ? (
         <p className="text-sm text-danger" role="alert">

@@ -1,17 +1,16 @@
 import { useMemo } from "react";
 import { useEventLaborSummary } from "../facilities/useLaborSummary";
+import { useListEquipment } from "../../lib/manifest-convex-react";
 import {
-  useListEquipment,
-  useListEquipmentReservation,
-  useListIngredientDemand,
-  useListInvoice,
-  useListPayrollInput,
-  useListVendorOrder,
-  useListVendorOrderLine,
-  useListVendorOrderLineDemand,
-} from "../../lib/manifest-convex-react";
+  useEventInvoices,
+  useEventPayrollInputs,
+  useEventPurchasing,
+} from "../../lib/useEventAreaRows";
 import { formatMoney } from "../../lib/format";
-import { useEventRentalOrderLines } from "../../lib/useEventRows";
+import {
+  useEventEquipmentReservations,
+  useEventRentalOrderLines,
+} from "../../lib/useEventRows";
 import { buildLiveEventProfitability } from "./liveEventProfitability";
 import "./LiveEventProfitabilityWidget.css";
 
@@ -34,14 +33,16 @@ export function LiveEventProfitabilityWidget({
   /** Why the recipe estimate is $0 (unit mismatch, no priced lines). */
   recipeUnpricedReason?: string | null;
 }) {
-  const invoices = useListInvoice();
-  const demands = useListIngredientDemand();
-  const orders = useListVendorOrder();
-  const lines = useListVendorOrderLine();
-  const lineDemands = useListVendorOrderLineDemand();
-  const payrollInputs = useListPayrollInput();
+  // This event's invoices, purchasing, payroll and holds only.
+  const invoices = useEventInvoices(eventId);
+  const purchasing = useEventPurchasing(eventId);
+  const demands = purchasing?.demands;
+  const orders = purchasing?.orders;
+  const lines = purchasing?.lines;
+  const lineDemands = purchasing?.lineDemands;
+  const payrollInputs = useEventPayrollInputs(eventId);
   const equipment = useListEquipment();
-  const equipmentReservations = useListEquipmentReservation();
+  const equipmentReservations = useEventEquipmentReservations(eventId);
   const rentalLines = useEventRentalOrderLines(eventId);
   // Live labor from clocked time × pay rates (laborSummary seam).
   const clockedLabor = useEventLaborSummary(eventId);

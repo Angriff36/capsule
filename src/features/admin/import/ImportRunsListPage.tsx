@@ -1,8 +1,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { useMutation } from "convex/react";
+import { useMutation, usePaginatedQuery } from "convex/react";
 import {
-  useListImportRun,
   useImportRunMarkFailed,
   useImportRunRevert,
 } from "../../../lib/manifest-convex-react";
@@ -83,9 +82,21 @@ const importRunsState = new ListStateManager({
   },
 });
 
+const RUNS_PAGE = 100;
+
 export function ImportRunsListPage() {
   const listOrigin = useListOrigin();
-  const allRuns = useListImportRun();
+  // Newest runs a page at a time, never the whole import history at once.
+  const {
+    results: pagedRuns,
+    status: runsStatus,
+    loadMore: loadMoreRuns,
+  } = usePaginatedQuery(
+    api.adminWindow.importRunsPage,
+    {},
+    { initialNumItems: RUNS_PAGE },
+  );
+  const allRuns = runsStatus === "LoadingFirstPage" ? undefined : pagedRuns;
   // Allocation goes through the authored importCoordinator seam: the generated
   // ImportRun_start is a transition command on an EXISTING run (requires docId),
   // so the "Start Import" form could never allocate a row with it.
@@ -529,6 +540,18 @@ export function ImportRunsListPage() {
             </tbody>
           </table>
         </div>
+        {runsStatus === "CanLoadMore" || runsStatus === "LoadingMore" ? (
+          <div className="px-4 py-3">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={runsStatus === "LoadingMore"}
+              onClick={() => loadMoreRuns(RUNS_PAGE)}
+            >
+              {runsStatus === "LoadingMore" ? "Loading…" : "Load more"}
+            </button>
+          </div>
+        ) : null}
       </div>
 
       {/* Help text */}

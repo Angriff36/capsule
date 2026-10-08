@@ -1,10 +1,8 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatCount, formatCountNoun, formatTime } from "../../lib/format";
-import {
-  useListEventGuest,
-  useListVenue,
-} from "../../lib/manifest-convex-react";
+import { useListVenue } from "../../lib/manifest-convex-react";
+import { useGuestsForEvents } from "../../lib/useEventAreaRows";
 import { useEventRecordsInRange } from "../facilities/useEventsById";
 import { ArrowLeftIcon } from "../../ui/icons";
 import { TableSkeleton } from "../../ui/primitives";
@@ -19,7 +17,9 @@ import {
 import "./EventCapacityPlannerPage.css";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
-const CAPACITY_LOOKBACK_DAYS = 7;
+// Two days back keeps a job that started just before the range and still
+// runs into it; nothing earlier is loaded.
+const CAPACITY_LOOKBACK_DAYS = 2;
 
 const weekday = new Intl.DateTimeFormat("en-US", { weekday: "short" });
 const monthDay = new Intl.DateTimeFormat("en-US", {
@@ -122,7 +122,10 @@ export function EventCapacityPlannerPage() {
       : ("skip" as const);
   }, [endDate, startDate]);
   const events = useEventRecordsInRange(eventWindow);
-  const guests = useListEventGuest();
+  // Guests of the events in the range only.
+  const guests = useGuestsForEvents(
+    eventWindow === "skip" ? [] : events?.map((event) => event._id),
+  );
   const venues = useListVenue();
   const loading =
     (events === undefined && eventWindow !== "skip") ||

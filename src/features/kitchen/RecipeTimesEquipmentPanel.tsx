@@ -4,9 +4,9 @@ import {
   useComponentEquipmentRemove,
   useComponentSetTimes,
   useCreateComponentEquipment,
-  useListComponentEquipment,
   useListEquipment,
 } from "../../lib/manifest-convex-react";
+import { useComponentEquipmentRows } from "../../lib/recipeScopedQueries";
 import {
   activeRecipeEquipment,
   type RecipeEquipmentOption,
@@ -70,7 +70,7 @@ export function RecipeTimesEquipmentPanel({
   const setTimes = useComponentSetTimes();
   const addEquipment = useCreateComponentEquipment();
   const removeEquipment = useComponentEquipmentRemove();
-  const rows = useListComponentEquipment() as
+  const rows = useComponentEquipmentRows(component._id) as
     ComponentEquipmentRow[] | undefined;
   const companyEquipment = useListEquipment() as
     RecipeEquipmentOption[] | undefined;

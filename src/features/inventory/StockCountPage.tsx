@@ -6,8 +6,6 @@ import {
   useCreateStockCountSession,
   useListIngredient,
   useListInventoryItem,
-  useListStockCountLine,
-  useListStockCountSession,
   useListStorageLocation,
   useStockCountLineConfirmLedgerMatch,
   useStockCountLineReconcileVariance,
@@ -16,6 +14,11 @@ import {
   useStockCountSessionClose,
 } from "../../lib/manifest-convex-react";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import {
+  useCountLinesFor,
+  useCountSessionPages,
+  useCountSessionProgress,
+} from "../facilities/useInventoryWindow";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import "./StockCountPage.css";
@@ -37,8 +40,10 @@ const formatTimestamp = (value: number | null | undefined) =>
       }).format(value);
 
 export function StockCountPage() {
-  const sessions = useListStockCountSession();
-  const lines = useListStockCountLine();
+  // The newest 50 count sheets (more on request), the open sheet's lines,
+  // and how far along each listed sheet is.
+  const sessionPages = useCountSessionPages();
+  const sessions = sessionPages.rows;
   const items = useListInventoryItem();
   const locations = useListStorageLocation();
   const ingredients = useListIngredient();
@@ -98,6 +103,14 @@ export function StockCountPage() {
     }
     setSelectedSessionId(orderedSessions[0]?._id ?? "");
   }, [orderedSessions, selectedSessionId]);
+
+  const sheetLines = useCountLinesFor(selectedSessionId || null);
+  const lines = selectedSessionId ? sheetLines : [];
+  const progress = useCountSessionProgress(
+    sessions === undefined
+      ? undefined
+      : orderedSessions.map((session) => session._id),
+  );
 
   const selectedSession = orderedSessions.find(
     (session) => session._id === selectedSessionId,
@@ -546,14 +559,7 @@ export function StockCountPage() {
               <strong>{orderedSessions.length}</strong>
             </div>
             {orderedSessions.map((session) => {
-              const rows = (lines ?? []).filter(
-                (line) =>
-                  line.deletedAt == null &&
-                  line.stockCountSessionId === session._id,
-              );
-              const done = rows.filter(
-                (line) => String(line.status) === "reconciled",
-              ).length;
+              const done = progress?.[session._id] ?? 0;
               return (
                 <button
                   type="button"
@@ -586,6 +592,11 @@ export function StockCountPage() {
                 </button>
               );
             })}
+            {sessionPages.canLoadMore ? (
+              <button type="button" onClick={sessionPages.loadMore}>
+                <small>Show older count sheets</small>
+              </button>
+            ) : null}
           </aside>
 
           {selectedSession ? (

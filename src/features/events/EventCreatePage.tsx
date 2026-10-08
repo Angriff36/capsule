@@ -19,12 +19,14 @@ import {
   useListMenu,
   useListOccasion,
   useListPerson,
-  useListProposalDishSelection,
-  useListProposalEnhancement,
   useListReferralSource,
   useListServiceStyle,
   useListVenue,
 } from "../../lib/manifest-convex-react";
+import {
+  useProposalDishSelections,
+  useProposalEnhancements,
+} from "../../lib/useEventAreaRows";
 import { ArrowLeftIcon, ChevronRightIcon } from "../../ui/icons";
 import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { FieldError, useFieldValidation } from "../../ui/formValidation";
@@ -199,8 +201,8 @@ export function EventCreatePage() {
     holdDate,
   });
   const proposal = useGetProposal(proposalId || "skip");
-  const proposalDishSelections = useListProposalDishSelection();
-  const proposalEnhancements = useListProposalEnhancement();
+  const proposalDishSelections = useProposalDishSelections(proposalId);
+  const proposalEnhancements = useProposalEnhancements(proposalId);
   const createEventFromProposal = useCreateEventFromProposal();
   const template = useRouteRecord(useGetEventTemplate, templateId || undefined);
   const menus = useListMenu();

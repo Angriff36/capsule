@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import {
   useCreateDishComponent,
   useDishComponentDetach,
-  useListDishComponent,
   useListComponent,
 } from "../../lib/manifest-convex-react";
+import { useDishComponentRows } from "../../lib/recipeScopedQueries";
 import { componentPath } from "./kitchenRoutes";
 import { TableSkeleton } from "../../ui/primitives";
 import { FieldHelp } from "../../ui/FieldHelp";
@@ -19,7 +19,7 @@ type Props = {
 };
 
 export function DishComponentsPanel({ dishId }: Props) {
-  const dishComponents = useListDishComponent();
+  const dishComponents = useDishComponentRows(dishId);
   const components = useListComponent();
   const attachComponent = useCreateDishComponent();
   const detachComponent = useDishComponentDetach();

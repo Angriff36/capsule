@@ -1,9 +1,6 @@
 import { useMemo } from "react";
-import {
-  useGetClient,
-  useGetEvent,
-  useListEventNumberAssignment,
-} from "../../lib/manifest-convex-react";
+import { useEventNumberAssignments } from "../../lib/financeScopedQueries";
+import { useGetClient, useGetEvent } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { clientDisplayName } from "../events/clientName";
 import {
@@ -22,7 +19,10 @@ export function WorkingEventReports() {
   const id = useWorkingEventId();
   const event = useGetEvent(id ?? "skip");
   const client = useGetClient(event?.clientId ?? "skip");
-  const numberAssignments = useListEventNumberAssignment();
+  // Only the working event's number.
+  const numberAssignments = useEventNumberAssignments(
+    event ? String(event._id) : null,
+  );
   const authStatus = useAuthStatus();
   const { ids, chosen, toggle } = useEventReportList(
     authStatus?.personId ?? "anonymous",

@@ -1,11 +1,5 @@
-import { useMemo } from "react";
-import {
-  useListEventCloseout,
-  useListLead,
-  useListProposal,
-  useListServiceStyle,
-  useListVenue,
-} from "@/lib/manifest-convex-react";
+import { useMemo, useState } from "react";
+import { useListServiceStyle, useListVenue } from "@/lib/manifest-convex-react";
 import { useAllEventReportRows } from "../facilities/useEventsById";
 import {
   eventServiceStyleKey,
@@ -33,6 +27,10 @@ import {
   percentText,
 } from "./dashboardRecordSets";
 import { MetricDefinitionList } from "./MetricDefinitionList";
+import {
+  useAllRowsOnRequest,
+  useProposalsByIds,
+} from "@/lib/financeScopedQueries";
 import { KpiRecordList } from "./KpiRecordList";
 
 /**
@@ -52,11 +50,42 @@ import { KpiRecordList } from "./KpiRecordList";
  * - Time-series trends for key metrics
  */
 
+const TITLE = "Tim's KPIs Dashboard";
+const LEAD =
+  "The numbers that run the business, live from your events, closeouts, and leads — with the detail behind each one a click away.";
+
+/**
+ * Every figure here is all-time (every event, closeout and lead the company
+ * has), so nothing is read until the user asks for the dashboard.
+ */
 export function TimsKPIsDashboardPage() {
+  const [requested, setRequested] = useState(false);
+  if (requested) return <TimsKPIsDashboardBody />;
+  return (
+    <div className="operations-stage supply-stage">
+      <PageHeader title={TITLE} lead={LEAD} />
+      <p className="mt-3 max-w-160 text-ink-2">
+        These figures add up every event, closeout and lead on file.
+      </p>
+      <button
+        type="button"
+        className="btn btn-primary mt-4"
+        onClick={() => setRequested(true)}
+      >
+        Show all-time KPIs
+      </button>
+    </div>
+  );
+}
+
+function TimsKPIsDashboardBody() {
   const events = useAllEventReportRows();
-  const closeouts = useListEventCloseout();
-  const leads = useListLead();
-  const proposals = useListProposal();
+  const closeouts = useAllRowsOnRequest("eventCloseouts", true);
+  const leads = useAllRowsOnRequest("leads", true);
+  // Only the proposals the leads point at decide conversion.
+  const proposals = useProposalsByIds(
+    leads?.map((lead) => (lead.proposalId ? String(lead.proposalId) : null)),
+  );
   const venues = useListVenue();
   const serviceStyles = useListServiceStyle();
 
@@ -479,10 +508,7 @@ export function TimsKPIsDashboardPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        title="Tim's KPIs Dashboard"
-        lead="The numbers that run the business, live from your events, closeouts, and leads — with the detail behind each one a click away."
-      />
+      <PageHeader title={TITLE} lead={LEAD} />
 
       {events?.length === 0 ? (
         <div data-testid="dashboard-empty">

@@ -1,12 +1,12 @@
 import { useMemo, useState } from "react";
 import type { Id } from "../../lib/api";
+import { useEventLayoutSections } from "../../lib/useEventAreaRows";
 import {
   useCreateEventLayoutSection,
   useEventLayoutSectionRemove,
   useEventLayoutSectionUpdate,
   useGetEvent,
   useGetVenue,
-  useListEventLayoutSection,
   useListVenueLayoutTemplate,
 } from "../../lib/manifest-convex-react";
 import { PlusIcon } from "../../ui/icons";
@@ -38,7 +38,7 @@ type Props = {
 
 /** Layout & setup sections with type dropdown + editable instructions. */
 export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
-  const sections = useListEventLayoutSection();
+  const sections = useEventLayoutSections(eventId);
   const addSection = useCreateEventLayoutSection();
   const applyLayoutTemplate = useApplyLayoutTemplate();
   const updateSection = useEventLayoutSectionUpdate();

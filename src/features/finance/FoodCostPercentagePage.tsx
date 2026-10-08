@@ -1,10 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  useListEventCloseout,
-  useListVenue,
-} from "../../lib/manifest-convex-react";
+import { useListVenue } from "../../lib/manifest-convex-react";
+import { useCloseoutsForEventWindow } from "../../lib/financeScopedQueries";
 import { TableSkeleton } from "../../ui/primitives";
-import { useEventsById } from "../facilities/useEventsById";
 import { formatCountNoun, formatDate, formatMoney } from "../../lib/format";
 import { ReportsWorkspaceNav } from "../reports/ReportsWorkspaceNav";
 import { useFinanceReportFilters } from "./useFinanceReportFilters";
@@ -17,6 +14,7 @@ import {
   type FoodCostGranularity,
   type FoodCostPeriod,
   type FoodCostReport,
+  foodCostWindow,
 } from "./foodCostPercentage";
 import "./FoodCostPercentagePage.css";
 
@@ -158,6 +156,7 @@ export function FoodCostPercentageDashboard({
   now,
   venuePremiseFilter = "all",
   onVenuePremiseChange,
+  onGranularityChange,
 }: {
   closeouts: readonly FoodCostCloseout[];
   events: readonly FoodCostEvent[];
@@ -166,8 +165,13 @@ export function FoodCostPercentageDashboard({
   now: Date;
   venuePremiseFilter?: "on" | "off" | "all";
   onVenuePremiseChange?: (value: "on" | "off" | "all") => void;
+  /** The page reads only the closeouts of the periods shown. */
+  onGranularityChange?: (granularity: FoodCostGranularity) => void;
 }) {
   const [granularity, setGranularity] = useState<FoodCostGranularity>("month");
+  useEffect(() => {
+    onGranularityChange?.(granularity);
+  }, [onGranularityChange, granularity]);
   const [target, setTarget] = useState(initialTarget);
 
   // Filter events by venue premise
@@ -498,15 +502,15 @@ function FoodCostReportBody({
 }
 
 export function FoodCostPercentagePage() {
-  const closeouts = useListEventCloseout();
-  const eventIds = useMemo(
-    () =>
-      closeouts === undefined ? undefined : closeouts.map((c) => c.eventId),
-    [closeouts],
-  );
-  const events = useEventsById(eventIds);
-  const venues = useListVenue();
   const now = useMemo(() => new Date(), []);
+  // Only the events in the periods shown and their closeouts.
+  const [granularity, setGranularity] = useState<FoodCostGranularity>("month");
+  const eventWindow = useMemo(
+    () => foodCostWindow(now, granularity),
+    [now, granularity],
+  );
+  const { events, closeouts } = useCloseoutsForEventWindow(eventWindow);
+  const venues = useListVenue();
 
   // Build venue lookup map for onPremise filtering
   const venueMap = useMemo(() => {
@@ -526,6 +530,7 @@ export function FoodCostPercentagePage() {
       venueMap={venueMap}
       loading={closeouts === undefined || events === undefined}
       now={now}
+      onGranularityChange={setGranularity}
     />
   );
 }
@@ -536,12 +541,14 @@ function FoodCostPercentagePageWithFilters({
   venueMap,
   loading,
   now,
+  onGranularityChange,
 }: {
   closeouts: readonly FoodCostCloseout[];
   events: readonly FoodCostEvent[];
   venueMap: Map<string, boolean | null | undefined>;
   loading: boolean;
   now: Date;
+  onGranularityChange: (granularity: FoodCostGranularity) => void;
 }) {
   // Venue premise lives in the URL so a filtered view can be shared.
   const { filters, setFilter } = useFinanceReportFilters();
@@ -555,6 +562,7 @@ function FoodCostPercentagePageWithFilters({
       now={now}
       venuePremiseFilter={filters.venuePremise}
       onVenuePremiseChange={(value) => setFilter("venuePremise", value)}
+      onGranularityChange={onGranularityChange}
     />
   );
 }

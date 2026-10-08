@@ -5,11 +5,13 @@ import {
   useCorrectCloseoutFromSources,
   useEventCloseoutSources,
 } from "../facilities/useCloseoutSources";
+import { useEventCloseoutFinalize } from "../../lib/manifest-convex-react";
 import {
-  useEventCloseoutFinalize,
-  useListEventCloseout,
-  useListInvoice,
-} from "../../lib/manifest-convex-react";
+  useCloseoutsForEvents,
+  useCloseoutsInStatus,
+  useInvoicesForEvents,
+  usePagedRows,
+} from "../../lib/financeScopedQueries";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import {
   formatCountNoun,
@@ -58,19 +60,34 @@ const note = (data: FormData, name: string) =>
 export function CloseoutPage() {
   const eventScope = useWorkingEventScope("closeout");
   const authStatus = useAuthStatus();
-  const closeouts = useListEventCloseout();
+  const [showFinalized, setShowFinalized] = useState(false);
+  // Only the closeouts shown: the working event's, else the unfinished ones,
+  // else (finalized shown) the newest page with "Load more".
+  const eventCloseouts = useCloseoutsForEvents(
+    eventScope.scopeId ? [eventScope.scopeId] : undefined,
+  );
+  const draftCloseouts = useCloseoutsInStatus(
+    eventScope.scopeId || showFinalized ? null : "draft",
+  );
+  const pagedCloseouts = usePagedRows(
+    "eventCloseouts",
+    !eventScope.scopeId && showFinalized,
+  );
+  const closeouts = eventScope.scopeId
+    ? eventCloseouts
+    : showFinalized
+      ? pagedCloseouts.rows
+      : draftCloseouts;
   const events = usePickerAndNamedEvents(
     closeouts
       ? [eventScope.workingId, ...closeouts.map((row) => row.eventId)]
       : undefined,
   );
-  const invoices = useListInvoice();
   const captureCloseout = useCaptureCloseoutFromSources();
   const correctCloseout = useCorrectCloseoutFromSources();
   const finalize = useEventCloseoutFinalize();
   const [correctingId, setCorrectingId] = useState<string | null>(null);
   const [showCapture, setShowCapture] = useState(false);
-  const [showFinalized, setShowFinalized] = useState(false);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [draft, setDraft] = useState<CloseoutDraft | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -102,14 +119,25 @@ export function CloseoutPage() {
       events?.find((event) => event._id === String(row.eventId))?.startsAt ?? 0,
     );
   visibleRows.sort((a, b) => startsAt(b) - startsAt(a));
-  const closedOutEventIds = new Set(
-    activeCloseouts.map((row) => String(row.eventId)),
+  // Closed-out events offered for capture, less those with a closeout of any
+  // state (read for these events only).
+  const candidateEvents = (events ?? []).filter(
+    (event) => event.deletedAt == null && String(event.stage) === "closed_out",
   );
-  const capturableEvents = (events ?? []).filter(
-    (event) =>
-      event.deletedAt == null &&
-      String(event.stage) === "closed_out" &&
-      !closedOutEventIds.has(event._id),
+  const candidateCloseouts = useCloseoutsForEvents(
+    events === undefined ? undefined : candidateEvents.map((row) => row._id),
+  );
+  const closedOutEventIds = new Set(
+    [...activeCloseouts, ...(candidateCloseouts ?? [])]
+      .filter((row) => row.deletedAt == null)
+      .map((row) => String(row.eventId)),
+  );
+  const capturableEvents = candidateEvents.filter(
+    (event) => !closedOutEventIds.has(event._id),
+  );
+  // Billing for the closeouts shown only.
+  const invoices = useInvoicesForEvents(
+    visibleRows.map((row) => String(row.eventId)),
   );
 
   const eventFor = (id: string) => events?.find((event) => event._id === id);
@@ -563,6 +591,18 @@ export function CloseoutPage() {
             </table>
           </div>
         )}
+        {!eventScope.scopeId && showFinalized && pagedCloseouts.canLoadMore ? (
+          <div className="px-4 py-3">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              disabled={pagedCloseouts.loadingMore}
+              onClick={pagedCloseouts.loadMore}
+            >
+              {pagedCloseouts.loadingMore ? "Loading…" : "Load older closeouts"}
+            </button>
+          </div>
+        ) : null}
       </section>
 
       <p className="mt-4 text-sm text-ink-3">

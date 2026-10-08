@@ -1,13 +1,13 @@
 import { useState } from "react";
 import {
   useCreateProposalEnhancement,
-  useListProposalEnhancement,
   useProposalEnhancementRevise,
   useProposalEnhancementWithdraw,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { formatMoneyExact } from "../../lib/format";
 import type { Id } from "../../lib/api";
+import { useProposalEnhancements } from "../../lib/financeScopedQueries";
 
 interface ProposalEnhancementsPanelProps {
   proposalId: string;
@@ -38,7 +38,8 @@ export function ProposalEnhancementsPanel({
   editable = false,
   onFailure,
 }: ProposalEnhancementsPanelProps) {
-  const enhancements = useListProposalEnhancement();
+  // Only this proposal's enhancements.
+  const enhancements = useProposalEnhancements(proposalId);
   const createEnhancement = useCreateProposalEnhancement();
   const reviseEnhancement = useProposalEnhancementRevise();
   const withdrawEnhancement = useProposalEnhancementWithdraw();

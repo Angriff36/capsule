@@ -4,20 +4,16 @@ import { Link } from "react-router-dom";
 import {
   useListIngredient,
   useListInventoryItem,
-  useListInventoryLot,
-  useListInventoryReservation,
   useListStorageLocation,
   useListVendor,
 } from "../../lib/manifest-convex-react";
 import { formatDate, formatTime } from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
 import { useEventsById } from "../facilities/useEventsById";
+import { useLotTrace } from "../facilities/useInventoryWindow";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { endOfDay, startOfDay } from "./PurchasingFormHelpers";
-import {
-  buildLotTraceabilityRows,
-  countUnattributedConsumptions,
-} from "./lotTraceability";
+import { buildLotTraceabilityRows } from "./lotTraceability";
 import "./LotTraceabilityPage.css";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
@@ -26,16 +22,6 @@ const quantity = new Intl.NumberFormat(undefined, {
 });
 
 export function LotTraceabilityPage() {
-  const lots = useListInventoryLot();
-  const reservations = useListInventoryReservation();
-  const eventIds = useMemo(
-    () =>
-      reservations === undefined
-        ? undefined
-        : reservations.map((row) => row.eventId),
-    [reservations],
-  );
-  const events = useEventsById(eventIds);
   const clients = useClientDirectory();
   const ingredients = useListIngredient();
   const vendors = useListVendor();
@@ -45,16 +31,6 @@ export function LotTraceabilityPage() {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
 
-  const loading = [
-    lots,
-    reservations,
-    events,
-    clients,
-    ingredients,
-    vendors,
-    locations,
-    items,
-  ].some((catalog) => catalog === undefined);
   const receivedFrom = startOfDay(fromDate);
   const receivedTo = endOfDay(toDate);
   const hasFilter =
@@ -63,6 +39,35 @@ export function LotTraceabilityPage() {
     toDate.length > 0;
   const invalidRange =
     receivedFrom != null && receivedTo != null && receivedFrom > receivedTo;
+  // Only the lots this trace asks for, and what was used from them.
+  const trace = useLotTrace(
+    hasFilter && !invalidRange
+      ? {
+          lotNumber: supplierLotNumber,
+          receivedFrom: receivedFrom ?? null,
+          receivedTo: receivedTo ?? null,
+        }
+      : "skip",
+  );
+  const lots = trace?.lots;
+  const reservations = trace?.reservations;
+  const eventIds = useMemo(
+    () =>
+      reservations === undefined
+        ? undefined
+        : reservations.map((row) => row.eventId),
+    [reservations],
+  );
+  const events = useEventsById(eventIds);
+
+  const loading = [
+    clients,
+    ingredients,
+    vendors,
+    locations,
+    items,
+    ...(hasFilter && !invalidRange ? [lots, reservations, events] : []),
+  ].some((catalog) => catalog === undefined);
 
   const rows = useMemo(
     () =>
@@ -99,7 +104,7 @@ export function LotTraceabilityPage() {
   );
   const unattributed =
     hasFilter && !supplierLotNumber.trim() && !invalidRange
-      ? countUnattributedConsumptions(reservations ?? [])
+      ? (trace?.unattributed ?? 0)
       : 0;
   const affectedEvents = new Set(rows.map((row) => row.eventId)).size;
   const affectedClients = new Set(
@@ -164,7 +169,9 @@ export function LotTraceabilityPage() {
               setSupplierLotNumber(event.currentTarget.value)
             }
           />
-          <span className="field-hint">Partial, case-insensitive match</span>
+          <span className="field-hint">
+            The start of the lot number, as typed or in capitals
+          </span>
         </label>
         <label className="field-label" htmlFor="trace-from-date">
           Lots received from

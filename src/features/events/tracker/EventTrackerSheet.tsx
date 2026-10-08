@@ -4,13 +4,13 @@ import { useSearchParams } from "react-router-dom";
 import { useAuthStatus } from "../../../lib/useAuthStatus";
 import { resolveManifestPolicies } from "../../admin/rolePermissionAudit";
 import {
-  useListInvoice,
   useListPerson,
   useListServiceStyle,
   useListTrailer,
   useListVehicle,
 } from "../../../lib/manifest-convex-react";
 import { useEventMonthRows } from "../../../lib/useEventMonthRows";
+import { useInvoicesForEvents } from "../../../lib/useEventAreaRows";
 import { useEventRecordsInRange } from "../../facilities/useEventsById";
 import { QueryLoadState } from "../../../ui/QueryLoadState";
 import { useSlowQuery } from "../../../ui/useSlowQuery";
@@ -57,7 +57,8 @@ export function EventTrackerSheet() {
   );
   const events = useEventRecordsInRange(monthWindow);
   const clients = useClientDirectory();
-  const invoices = useListInvoice();
+  // Invoices of the shown month's events only.
+  const invoices = useInvoicesForEvents(events?.map((event) => event._id));
   // Pack lists, questions, trucks and numbers of the shown month's events.
   const monthRows = useEventMonthRows(events?.map((event) => event._id));
   const packLists = monthRows?.packLists;

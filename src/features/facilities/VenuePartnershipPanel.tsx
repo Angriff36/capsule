@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from "react";
-import type { Doc } from "../../lib/api";
+import { useQuery } from "convex/react";
+import { api, type Doc } from "../../lib/api";
 import { formatDate } from "../../lib/format";
 import {
   useCreateReferralSource,
@@ -8,7 +9,6 @@ import {
   useListPerson,
   useListReferralSource,
   useListVenue,
-  useListVenueNote,
   useReferralSourceLinkVenue,
   useVenueSetPartnership,
 } from "../../lib/manifest-convex-react";
@@ -19,7 +19,7 @@ import {
   type CommandFailure,
 } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
-import { useAllEventReportRows } from "./useEventsById";
+import { useVenueScorecardEvents } from "./useLogisticsWindow";
 import { VenueBrandForm } from "./VenueBrandForm";
 import { VenueHandoffPanel } from "./VenueHandoffPanel";
 import { VenueOnboardingPanel } from "./VenueOnboardingPanel";
@@ -72,11 +72,14 @@ export function VenuePartnershipPanel({ venue }: { venue: Doc<"venues"> }) {
   const createSource = useCreateReferralSource();
   const linkVenue = useReferralSourceLinkVenue();
   const people = useListPerson();
-  const notes = useListVenueNote();
+  // This venue's notes and its events of the last two years only.
+  const notes = useQuery(api.queries.listVenueNoteByVenueId, {
+    venueId: venue._id,
+  });
   const sources = useListReferralSource();
   const leads = useListLead();
   const venues = useListVenue();
-  const events = useAllEventReportRows();
+  const events = useVenueScorecardEvents([String(venue._id)]);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   const [checkIn, setCheckIn] = useState("");

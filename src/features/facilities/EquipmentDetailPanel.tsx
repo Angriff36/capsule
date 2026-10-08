@@ -1,6 +1,6 @@
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useRef, useState, type FormEvent } from "react";
-import { api } from "../../lib/api";
+import { api, type Id } from "../../lib/api";
 import { formatMoney } from "../../lib/format";
 import {
   useCreateAttachment,
@@ -9,7 +9,6 @@ import {
   useEquipmentPartDetach,
   useEquipmentSetCustomFields,
   useEquipmentSetPrimaryImage,
-  useListEquipmentPart,
   useListOrganization,
 } from "../../lib/manifest-convex-react";
 import {
@@ -69,7 +68,10 @@ export function EquipmentDetailPanel({
   onClose: () => void;
   onError: (error: unknown) => void;
 }) {
-  const parts = (useListEquipmentPart() ?? []) as PartRow[];
+  // This item's parts only, read by item.
+  const parts = (useQuery(api.queries.listEquipmentPartByEquipmentId, {
+    equipmentId: item._id as Id<"equipments">,
+  }) ?? []) as PartRow[];
   const attachPart = useCreateEquipmentPart();
   const detachPart = useEquipmentPartDetach();
   const generateUploadUrl = useMutation(api.fileStorage.generateUploadUrl);

@@ -1,10 +1,10 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { type Id } from "../../lib/api";
+import { useQuery } from "convex/react";
+import { api, type Id } from "../../lib/api";
 import {
   useCreateVenueRoom,
   useVenueRoomRevise,
   useVenueRoomRemove,
-  useListVenueRoom,
 } from "../../lib/manifest-convex-react";
 import {
   classifyCommandFailure,
@@ -56,7 +56,8 @@ type Props = {
 
 /** Venue rooms/spaces panel (spec §8.1 "room/space details"). */
 export function VenueRoomsPanel({ venueId }: Props) {
-  const rooms = useListVenueRoom();
+  // This venue's rooms only, read by venue.
+  const rooms = useQuery(api.queries.listVenueRoomByVenueId, { venueId });
   const addRoom = useCreateVenueRoom();
   const reviseRoom = useVenueRoomRevise();
   const removeRoom = useVenueRoomRemove();

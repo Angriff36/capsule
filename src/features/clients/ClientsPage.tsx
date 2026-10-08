@@ -4,10 +4,11 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   useCreateClient,
   useCreateClientMerge,
-  useListClientCommunication,
-  useListClientContact,
 } from "../../lib/manifest-convex-react";
-import { useAllEventReportRows } from "../facilities/useEventsById";
+import {
+  useAllEventRowsOnRequest,
+  useClientPairHistory,
+} from "../../lib/financeScopedQueries";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { formatDate, formatMoney } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
@@ -61,9 +62,10 @@ export function ClientsPage() {
   const navigate = useNavigate();
   const listOrigin = useListOrigin();
   const clients = useClientContacts();
-  const contacts = useListClientContact();
-  const events = useAllEventReportRows();
-  const communications = useListClientCommunication();
+  // Bookings and lifetime value add up every event on file, so events are
+  // read only when the user asks for those columns.
+  const [showBookings, setShowBookings] = useState(false);
+  const events = useAllEventRowsOnRequest(showBookings);
   const createClient = useCreateClient();
   const createClientMerge = useCreateClientMerge();
   const [showRegister, setShowRegister] = useState(false);
@@ -111,6 +113,20 @@ export function ClientsPage() {
   const duplicateCandidates = useMemo(
     () => findProbableClientDuplicates(clients ?? []),
     [clients],
+  );
+  // Transfer counts are shown only for the pair under review, so only that
+  // pair's contacts and history are read.
+  const reviewing = duplicateCandidates.find(
+    (item) => item.id === selectedCandidateId,
+  );
+  const {
+    contacts,
+    events: pairEvents,
+    communications,
+  } = useClientPairHistory(
+    reviewing
+      ? [String(reviewing.first._id), String(reviewing.second._id)]
+      : [],
   );
 
   const statsByClient = useMemo(() => {
@@ -166,10 +182,16 @@ export function ClientsPage() {
   };
 
   const countsFor = (clientId: string) => {
-    const allClientContacts = (contacts ?? []).filter(
+    if (
+      contacts === undefined ||
+      pairEvents === undefined ||
+      communications === undefined
+    )
+      return null;
+    const allClientContacts = contacts.filter(
       (contact) => String(contact.clientId) === clientId,
     );
-    const allClientEvents = (events ?? []).filter(
+    const allClientEvents = pairEvents.filter(
       (clientEvent) => String(clientEvent.clientId) === clientId,
     );
     const clientContacts = allClientContacts.filter(
@@ -182,7 +204,7 @@ export function ClientsPage() {
     const eventIds = new Set(
       allClientEvents.map((clientEvent) => clientEvent._id),
     );
-    const communicationCount = (communications ?? []).filter(
+    const communicationCount = communications.filter(
       (communication) =>
         String(communication.clientId) === clientId ||
         (communication.clientContactId != null &&
@@ -280,11 +302,7 @@ export function ClientsPage() {
     })();
   };
 
-  const dataLoaded =
-    clients !== undefined &&
-    contacts !== undefined &&
-    events !== undefined &&
-    communications !== undefined;
+  const dataLoaded = clients !== undefined;
 
   return (
     <div className="space-y-4">
@@ -462,6 +480,15 @@ export function ClientsPage() {
           onChange={(event) => setFind(event.target.value)}
         />
       ) : null}
+      {registered.length > 0 && !showBookings ? (
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={() => setShowBookings(true)}
+        >
+          Show upcoming, last event and lifetime value
+        </button>
+      ) : null}
       <div className="card overflow-x-auto">
         {clients === undefined ? (
           <TableSkeleton rows={5} />
@@ -487,9 +514,13 @@ export function ClientsPage() {
               <tr>
                 <th className="th w-full">Client</th>
                 <th className="th hidden sm:table-cell">Contact</th>
-                <th className="th text-right">Upcoming</th>
-                <th className="th">Last event</th>
-                <th className="th text-right">Lifetime value</th>
+                {showBookings ? (
+                  <>
+                    <th className="th text-right">Upcoming</th>
+                    <th className="th">Last event</th>
+                    <th className="th text-right">Lifetime value</th>
+                  </>
+                ) : null}
                 <th className="th">Status</th>
                 <th className="th">Terms</th>
               </tr>
@@ -526,19 +557,31 @@ export function ClientsPage() {
                     <td className="td hidden max-w-[16rem] truncate text-sm text-ink-3 sm:table-cell">
                       {contactLine || "—"}
                     </td>
-                    <td className="td text-right font-mono">
-                      {stats.upcoming > 0 ? stats.upcoming : "—"}
-                    </td>
-                    <td className="td font-mono text-sm">
-                      {stats.lastPastAt > 0
-                        ? formatDate(stats.lastPastAt)
-                        : "—"}
-                    </td>
-                    <td className="td text-right font-mono">
-                      {stats.lifetimeValue > 0
-                        ? formatMoney(stats.lifetimeValue)
-                        : "—"}
-                    </td>
+                    {showBookings ? (
+                      <>
+                        <td className="td text-right font-mono">
+                          {events === undefined
+                            ? "…"
+                            : stats.upcoming > 0
+                              ? stats.upcoming
+                              : "—"}
+                        </td>
+                        <td className="td font-mono text-sm">
+                          {events === undefined
+                            ? "…"
+                            : stats.lastPastAt > 0
+                              ? formatDate(stats.lastPastAt)
+                              : "—"}
+                        </td>
+                        <td className="td text-right font-mono">
+                          {events === undefined
+                            ? "…"
+                            : stats.lifetimeValue > 0
+                              ? formatMoney(stats.lifetimeValue)
+                              : "—"}
+                        </td>
+                      </>
+                    ) : null}
                     <td className="td">
                       <StatusChip status={String(row.status)} />
                     </td>

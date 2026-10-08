@@ -139,6 +139,22 @@ function periodLabel(date: Date, granularity: FoodCostGranularity): string {
   return `Q${Math.floor(date.getMonth() / 3) + 1} ’${String(date.getFullYear()).slice(-2)}`;
 }
 
+/** The dates the report shows for this granularity: [from, to). */
+export function foodCostWindow(
+  now: Date,
+  granularity: FoodCostGranularity,
+): { from: number; to: number } {
+  const finalStart = startOfPeriod(now, granularity);
+  return {
+    from: shiftPeriod(
+      finalStart,
+      -(PERIOD_COUNT[granularity] - 1),
+      granularity,
+    ).getTime(),
+    to: shiftPeriod(finalStart, 1, granularity).getTime(),
+  };
+}
+
 export function buildFoodCostReport({
   closeouts,
   events,

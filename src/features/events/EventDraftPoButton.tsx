@@ -4,12 +4,14 @@ import {
   useCreateVendorOrder,
   useCreateVendorOrderLine,
   useListIngredient,
-  useListIngredientDemand,
   useListVendor,
-  useListVendorOrder,
-  useListVendorOrderLine,
   useListWeeklyPurchasingConfig,
 } from "../../lib/manifest-convex-react";
+import { useEventIngredientDemands } from "../../lib/useEventRows";
+import {
+  useEventVendorOrders,
+  useVendorOrderLines,
+} from "../../lib/useEventAreaRows";
 import { EventDraftPoCoordinator } from "./EventDraftPoCoordinator";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
 import { useDraftPurchaseOrder } from "../../lib/safeMaterialization";
@@ -24,9 +26,16 @@ type Props = {
 };
 
 export function EventDraftPoButton({ eventId, eventStage }: Props) {
-  const demands = useListIngredientDemand();
-  const orders = useListVendorOrder();
-  const lines = useListVendorOrderLine();
+  // This event's needs and orders, and the lines of its open draft order.
+  const demands = useEventIngredientDemands(eventId);
+  const orders = useEventVendorOrders(eventId);
+  const draftOrderId = orders?.find(
+    (row) =>
+      row.deletedAt == null &&
+      row.eventId === eventId &&
+      String(row.status) === "draft",
+  )?._id;
+  const lines = useVendorOrderLines(draftOrderId);
   const ingredients = useListIngredient();
   const vendors = useListVendor();
   const configs = useListWeeklyPurchasingConfig();

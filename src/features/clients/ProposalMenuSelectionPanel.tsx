@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api, type Id } from "../../lib/api";
-import {
-  useListMenu,
-  useListMenuDish,
-  useListProposalDishSelection,
-  useListProposalLineItem,
-} from "../../lib/manifest-convex-react";
+import { useListMenu, useListMenuDish } from "../../lib/manifest-convex-react";
 import { useWholeDishList } from "../../lib/useDishesByIds";
+import {
+  useProposalDishSelections,
+  useProposalLineItems,
+} from "../../lib/financeScopedQueries";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 
@@ -39,8 +38,9 @@ export function ProposalMenuSelectionPanel({
   const menus = useListMenu();
   const menuDishes = useListMenuDish();
   const dishes = useWholeDishList();
-  const selections = useListProposalDishSelection();
-  const lineItems = useListProposalLineItem();
+  // Only this proposal's choices and price lines.
+  const selections = useProposalDishSelections(proposalId);
+  const lineItems = useProposalLineItems(proposalId);
   const pickDish = useMutation(api.lib.proposalDishPricing.pickProposalDish);
   const adjustServings = useMutation(
     api.lib.proposalDishPricing.adjustProposalDishServings,

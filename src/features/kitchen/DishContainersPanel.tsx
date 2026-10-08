@@ -7,8 +7,8 @@ import {
   useCreateDishContainer,
   useDishContainerReinstate,
   useDishContainerRetire,
-  useListDishContainer,
 } from "../../lib/manifest-convex-react";
+import { useDishContainerRows } from "../../lib/recipeScopedQueries";
 import {
   DishContainerEditForm,
   SERVICE_LABEL,
@@ -26,7 +26,7 @@ type Props = {
 };
 
 export function DishContainersPanel({ dishId }: Props) {
-  const containers = useListDishContainer();
+  const containers = useDishContainerRows(dishId);
   const defineContainer = useCreateDishContainer();
   const retireContainer = useDishContainerRetire();
   const reinstateContainer = useDishContainerReinstate();

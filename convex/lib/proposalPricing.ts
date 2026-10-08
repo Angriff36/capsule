@@ -272,7 +272,7 @@ export const addProposalLineAndRecompute = mutation({
     // The event's travel & delivery fee line (convex/travelFees.ts).
     travelFee: v.optional(v.boolean()),
     // The menu a per-guest or base price line belongs to (proposalDishPricing).
-    menuId: v.optional(v.id("menus")),
+    menuId: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const auth = await getAuthContext(ctx);

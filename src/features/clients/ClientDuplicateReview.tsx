@@ -14,7 +14,8 @@ interface ClientDuplicateReviewProps {
   selectedCandidateId: string | null;
   primaryClientId: string | null;
   busy: boolean;
-  countsFor: (clientId: string) => TransferCounts;
+  /** null while the pair's contacts and history are still loading. */
+  countsFor: (clientId: string) => TransferCounts | null;
   onReview: (candidate: ClientDuplicateCandidate) => void;
   onChoosePrimary: (clientId: string) => void;
   onCancel: () => void;
@@ -29,7 +30,7 @@ function AccountChoice({
 }: {
   client: Doc<"clients">;
   selected: boolean;
-  counts: TransferCounts;
+  counts: TransferCounts | null;
   onChoose: () => void;
 }) {
   return (
@@ -53,9 +54,15 @@ function AccountChoice({
             {client.email || "No email"}
           </span>
           <span className="mt-3 block text-sm text-ink-2">
-            {formatCountNoun(counts.events, "event")} ·{" "}
-            {formatCountNoun(counts.contacts, "contact")} ·{" "}
-            {formatCountNoun(counts.communications, "communication")}
+            {counts ? (
+              <>
+                {formatCountNoun(counts.events, "event")} ·{" "}
+                {formatCountNoun(counts.contacts, "contact")} ·{" "}
+                {formatCountNoun(counts.communications, "communication")}
+              </>
+            ) : (
+              "Counting…"
+            )}
           </span>
         </span>
       </span>
