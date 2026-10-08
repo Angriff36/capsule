@@ -217,8 +217,17 @@ export function MessageInboxPage() {
       setReply("");
       setNotice(`Reply emailed to ${result.to} just now.`);
     } catch (e) {
-      // The typed reply stays; Send again reuses the same id.
-      fail(e);
+      // The typed reply stays; Send again reuses the same id. Nothing was
+      // being saved, so the title says the email was not sent.
+      const failure = classifyCommandFailure(e);
+      setFailure({
+        ...failure,
+        title: "Couldn't send this email",
+        detail: failure.detail.replace(
+          " Nothing was saved. Fix that, then try again.",
+          " Your reply is kept here; copy the draft to send it another way.",
+        ),
+      });
     } finally {
       setSending(false);
     }

@@ -96,10 +96,17 @@ export function PayrollWorksheet({
                 const clocked = clockedMinutesForInput(row);
                 const clockedHours =
                   clocked == null ? null : roundPayrollHours(clocked);
+                // Prepared minutes are what this input pays; clocked time
+                // only fills in when none were entered.
+                const prepared =
+                  Number(row.regularMinutes ?? 0) +
+                  Number(row.overtimeMinutes ?? 0);
+                const payHours =
+                  prepared > 0 ? roundPayrollHours(prepared) : clockedHours;
                 const gross =
-                  clockedHours == null
+                  payHours == null
                     ? null
-                    : estimatedGross(String(row.personId), clockedHours);
+                    : estimatedGross(String(row.personId), payHours);
                 return (
                   <tr key={row._id}>
                     <td>
@@ -115,9 +122,9 @@ export function PayrollWorksheet({
                       </small>
                     </td>
                     <td>
-                      {clockedHours == null
+                      {payHours == null
                         ? String(row.totalMinutes ?? 0)
-                        : `${clockedHours.toFixed(2)} h`}{" "}
+                        : `${payHours.toFixed(2)} h`}{" "}
                       <small>
                         ({String(row.regularMinutes ?? 0)} prepared reg /{" "}
                         {String(row.overtimeMinutes ?? 0)} prepared OT)
