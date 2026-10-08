@@ -115,6 +115,16 @@ export function DeliveriesPage() {
   const venues = useListVenue();
   const assignments = useListEventAssignment();
   const [pickedPackId, setPickedPackId] = useState("");
+  // Opened while the page shows one event: start on that event's pack list.
+  const openCreate = () => {
+    const own = schedulablePacks.filter(
+      (pack) =>
+        eventScope.scopeId != null &&
+        String(pack.eventId ?? "") === eventScope.scopeId,
+    );
+    if (!pickedPackId && own.length === 1) setPickedPackId(own[0]._id);
+    setShowCreate(true);
+  };
   const [destination, setDestination] = useState("");
   const [windowStart, setWindowStart] = useState("");
   const [windowEnd, setWindowEnd] = useState("");
@@ -353,7 +363,7 @@ export function DeliveriesPage() {
           <button
             className="btn btn-primary"
             type="button"
-            onClick={() => setShowCreate((value) => !value)}
+            onClick={() => (showCreate ? setShowCreate(false) : openCreate())}
           >
             {showCreate ? "Close form" : "Schedule delivery"}
           </button>
@@ -490,7 +500,7 @@ export function DeliveriesPage() {
                 <button
                   type="button"
                   className="btn btn-primary btn-sm"
-                  onClick={() => setShowCreate(true)}
+                  onClick={openCreate}
                 >
                   Schedule delivery
                 </button>
