@@ -410,10 +410,10 @@ describe("AC-152 public pages reveal nothing private", () => {
         expect(["_id", "name", "sortOrder"]).toContain(key);
       }
     }
-    // The caterer's public name and address only (#125), nothing else of
-    // the organization record.
+    // The caterer's public name, address, phone and website only (#125),
+    // nothing else of the organization record.
     for (const key of Object.keys(options.company ?? {})) {
-      expect(["name", "address"]).toContain(key);
+      expect(["name", "address", "phone", "website"]).toContain(key);
     }
     expectNothingPrivate(options);
     expect(JSON.stringify(options)).not.toContain("Porter dinner");
