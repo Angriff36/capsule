@@ -255,7 +255,7 @@ async function exportStaffPerson(
       .collect(),
     ctx.db
       .query("savedReportDefinitions")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .withIndex("by_ownerId", (q) => q.eq("ownerId", personId))
       .collect(),
     ctx.db
       .query("shifts")
@@ -314,7 +314,9 @@ async function exportStaffPerson(
         recurringAvailabilities,
         tenantId,
       ),
-      savedReports: savedReports.filter((row) => matchesActor(row.ownerId)),
+      savedReports: belongsToTenant(savedReports, tenantId).filter((row) =>
+        matchesActor(row.ownerId),
+      ),
       shifts: belongsToTenant(shifts, tenantId),
       timeRecords: belongsToTenant(timeRecords, tenantId),
       authoredClientCommunications: clientCommunications.filter((row) =>

@@ -50,10 +50,24 @@ export function ServiceStyleMatch({
         disabled={disabled || busy || !styleId}
         onClick={() => {
           setBusy(true);
-          void resolve({
-            linkId: linkId as Id<"externalRecordLinks">,
-            serviceStyleId: styleId as Id<"serviceStyles">,
-          })
+          // Each call works one page of imported events; keep going until
+          // the answer has no cursor.
+          const run = async () => {
+            let step = await resolve({
+              linkId: linkId as Id<"externalRecordLinks">,
+              serviceStyleId: styleId as Id<"serviceStyles">,
+            });
+            while (step.cursor) {
+              step = await resolve({
+                linkId: linkId as Id<"externalRecordLinks">,
+                serviceStyleId: styleId as Id<"serviceStyles">,
+                cursor: step.cursor,
+                appliedBefore: step.applied,
+              });
+            }
+            return step;
+          };
+          void run()
             .then(({ applied }) =>
               onDone(
                 `Service style matched; ${applied} imported event(s) updated.`,

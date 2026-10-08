@@ -18,6 +18,15 @@ import {
 } from "./lib/eventTimingPolicy";
 
 const FINISHED_STAGES = new Set(["completed", "closed_out", "cancelled"]);
+const OPEN_STAGES = [
+  "quote",
+  "planning",
+  "pending_approval",
+  "approved",
+  "sales_lock",
+  "executing",
+  "final",
+] as const;
 const DAY_MS = 24 * 3_600_000;
 
 export const recalculate = internalMutation({
@@ -32,10 +41,20 @@ export const recalculateCompany = internalMutation({
   args: { tenantId: v.string() },
   handler: async (ctx, { tenantId }) => {
     const now = Date.now();
-    const events = await ctx.db
-      .query("events")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .collect();
+    // Open stages only, through the stage index — never the finished
+    // event history.
+    const events = (
+      await Promise.all(
+        OPEN_STAGES.map((stage) =>
+          ctx.db
+            .query("events")
+            .withIndex("by_tenantId_and_stage_and_startsAt", (q) =>
+              q.eq("tenantId", tenantId).eq("stage", stage),
+            )
+            .collect(),
+        ),
+      )
+    ).flat();
     let queued = 0;
     for (const event of events) {
       if (event.deletedAt != null || FINISHED_STAGES.has(String(event.stage)))

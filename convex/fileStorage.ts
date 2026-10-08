@@ -69,12 +69,14 @@ export const listForParent = query({
   handler: async (ctx, args) => {
     const auth = await getAuthContext(ctx);
     if (!auth.tenantId) return [];
+    // This record's files only, never the workspace's whole upload history.
     const rows = await ctx.db
       .query("attachments")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", auth.tenantId))
+      .withIndex("by_parentId", (q) => q.eq("parentId", args.parentId))
       .collect();
     const live = rows.filter(
       (r) =>
+        r.tenantId === auth.tenantId &&
         r.parentType === args.parentType &&
         r.parentId === args.parentId &&
         r.deletedAt == null,

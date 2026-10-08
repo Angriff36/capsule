@@ -8,6 +8,7 @@
 // tell = no email. The same summary never goes twice on one day.
 import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
+import type { Doc } from "./_generated/dataModel";
 import {
   internalAction,
   internalMutation,
@@ -45,7 +46,10 @@ import {
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const DUE_SOON_MS = 3 * DAY_MS;
-const OPEN_INVOICE = new Set(["sent", "viewed", "overdue", "partial"]);
+const OPEN_INVOICE_STATES = ["sent", "viewed", "overdue", "partial"] as const;
+const OPEN_INVOICE = new Set<string>(OPEN_INVOICE_STATES);
+const EVENT_CANDIDATE_CAP = 1000;
+const NEWEST_EVENT_CAP = 300;
 
 const EVENT = {
   booked: "StaffSummariesBooked",
@@ -67,15 +71,78 @@ async function kitchenTimeZone(ctx: QueryCtx, tenantId: string) {
 }
 
 async function newestBooking(ctx: QueryCtx, tenantId: string) {
+  // One booking row a day: read newest first and stop at the first booking,
+  // never the whole booking history.
   const rows = await ctx.db
     .query("manifestEvents")
     .withIndex("by_entityId", (q) => q.eq("entityId", `summaries:${tenantId}`))
-    .collect();
+    .order("desc")
+    .take(50);
   return (
     rows
       .filter((row) => row.type === EVENT.booked)
       .sort((left, right) => right.createdAt - left.createdAt)[0] ?? null
   );
+}
+
+/**
+ * Events that can have changed in the last day, without reading the whole
+ * event history (there is no updatedAt index): events from a week ago on,
+ * the newest-created ones, and any whose stage moved inside the window.
+ * The caller still keeps only rows with updatedAt inside the window.
+ */
+async function recentlyChangedEventCandidates(
+  ctx: QueryCtx,
+  tenantId: string,
+  now: number,
+  since: number,
+) {
+  const lists = await Promise.all([
+    ctx.db
+      .query("events")
+      .withIndex("by_tenantId_and_startsAt", (q) =>
+        q.eq("tenantId", tenantId).gte("startsAt", now - 7 * DAY_MS),
+      )
+      .take(EVENT_CANDIDATE_CAP),
+    ctx.db
+      .query("events")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .order("desc")
+      .take(NEWEST_EVENT_CAP),
+    ctx.db
+      .query("events")
+      .withIndex("by_tenantId_and_approvedAt", (q) =>
+        q.eq("tenantId", tenantId).gte("approvedAt", since),
+      )
+      .take(EVENT_CANDIDATE_CAP),
+    ctx.db
+      .query("events")
+      .withIndex("by_tenantId_and_executionStartedAt", (q) =>
+        q.eq("tenantId", tenantId).gte("executionStartedAt", since),
+      )
+      .take(EVENT_CANDIDATE_CAP),
+    ctx.db
+      .query("events")
+      .withIndex("by_tenantId_and_completedAt", (q) =>
+        q.eq("tenantId", tenantId).gte("completedAt", since),
+      )
+      .take(EVENT_CANDIDATE_CAP),
+    ctx.db
+      .query("events")
+      .withIndex("by_tenantId_and_cancelledAt", (q) =>
+        q.eq("tenantId", tenantId).gte("cancelledAt", since),
+      )
+      .take(EVENT_CANDIDATE_CAP),
+    ctx.db
+      .query("events")
+      .withIndex("by_tenantId_and_closedOutAt", (q) =>
+        q.eq("tenantId", tenantId).gte("closedOutAt", since),
+      )
+      .take(EVENT_CANDIDATE_CAP),
+  ]);
+  const byId = new Map<string, Doc<"events">>();
+  for (const row of lists.flat()) byId.set(String(row._id), row);
+  return [...byId.values()];
 }
 
 function sendKey(personId: string, category: string, now: number): string {
@@ -157,17 +224,25 @@ export const plan = internalQuery({
           .query("emailNotificationSubscriptions")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
           .collect(),
-        ctx.db
-          .query("events")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .collect(),
-        ctx.db
-          .query("invoices")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .collect(),
+        recentlyChangedEventCandidates(ctx, tenantId, now, since),
+        // Only open invoices can need follow-up: read those states, not the
+        // whole invoice history.
+        Promise.all(
+          OPEN_INVOICE_STATES.map((status) =>
+            ctx.db
+              .query("invoices")
+              .withIndex("by_tenantId_and_status", (q) =>
+                q.eq("tenantId", tenantId).eq("status", status),
+              )
+              .collect(),
+          ),
+        ).then((lists) => lists.flat()),
+        // Only tracked lines (a reorder point above zero) can be low.
         ctx.db
           .query("inventoryItems")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+          .withIndex("by_tenantId_and_reorderThreshold", (q) =>
+            q.eq("tenantId", tenantId).gt("reorderThreshold", 0),
+          )
           .collect(),
         ctx.db
           .query("organizations")

@@ -188,15 +188,62 @@ async function hydrateLine(ctx: { db: any }, tenantId: string, line: any) {
   };
 }
 
+const DAY_MS = 86_400_000;
+const UPCOMING_CAP = 500;
+const PAST_SHOWN = 8;
+const PAST_SCAN_CAP = 400;
+
+const UNDATED_CAP = 200;
+
 export const listEvents = query({
   args: {},
   handler: async (ctx) => {
     const auth = await briefingAuth(ctx);
     if (!auth) return null;
-    const rows = await ctx.db
+    // Not the whole history: the picker shows every upcoming event and the
+    // newest eight past ones that are not cancelled or closed out. Upcoming
+    // starts two days back so "today" holds in every time zone.
+    const split = Date.now() - 2 * DAY_MS;
+    const upcoming = await ctx.db
       .query("events")
-      .withIndex("by_tenantId", (q: any) => q.eq("tenantId", auth.tenantId))
-      .collect();
+      .withIndex("by_tenantId_and_startsAt", (q: any) =>
+        q.eq("tenantId", auth.tenantId).gte("startsAt", split),
+      )
+      .take(UPCOMING_CAP);
+    const past: any[] = [];
+    let visited = 0;
+    let shown = 0;
+    for await (const row of ctx.db
+      .query("events")
+      .withIndex("by_tenantId_and_startsAt", (q: any) =>
+        q
+          .eq("tenantId", auth.tenantId)
+          .gte("startsAt", 0)
+          .lt("startsAt", split),
+      )
+      .order("desc")) {
+      if (++visited > PAST_SCAN_CAP) break;
+      past.push(row);
+      if (live(row) && !["cancelled", "closed_out"].includes(String(row.stage)))
+        shown += 1;
+      if (shown >= PAST_SHOWN) break;
+    }
+    // Events with no date yet (new bookings) stay in the picker, as before.
+    const undated = [
+      ...(await ctx.db
+        .query("events")
+        .withIndex("by_tenantId_and_startsAt", (q: any) =>
+          q.eq("tenantId", auth.tenantId).eq("startsAt", null),
+        )
+        .take(UNDATED_CAP)),
+      ...(await ctx.db
+        .query("events")
+        .withIndex("by_tenantId_and_startsAt", (q: any) =>
+          q.eq("tenantId", auth.tenantId).eq("startsAt", undefined),
+        )
+        .take(UNDATED_CAP)),
+    ];
+    const rows = [...upcoming, ...past, ...undated];
     return rows.filter(live).map((row: any) => ({
       _id: row._id,
       title: row.title ?? null,

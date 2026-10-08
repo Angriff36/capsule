@@ -40,7 +40,7 @@ type Preview = {
   }[];
 };
 const preview = (actor: Actor) =>
-  act(actor).query(api.ledgerReconstruction.preview, {}) as Promise<Preview>;
+  act(actor).action(api.ledgerReconstruction.preview, {}) as Promise<Preview>;
 
 const scheduled = (ctx: unknown) =>
   (
@@ -217,10 +217,10 @@ describe("old invoice rebuild preview (AC-086)", () => {
     expect(gala.missing.join(" | ")).not.toContain("tax");
 
     // Saving a checked preview keeps who checked it; saving again replaces it.
-    await act(owner).mutation(api.ledgerReconstruction.saveChecked, {
+    await act(owner).action(api.ledgerReconstruction.saveChecked, {
       key: "OLD-77",
     });
-    await act(owner).mutation(api.ledgerReconstruction.saveChecked, {
+    await act(owner).action(api.ledgerReconstruction.saveChecked, {
       key: "OLD-77",
     });
     const { reviews } = await preview(owner);
@@ -249,7 +249,7 @@ describe("old invoice rebuild preview (AC-086)", () => {
     });
     expect(await preview(cook)).toBeNull();
     await expect(
-      act(cook).mutation(api.ledgerReconstruction.saveChecked, {
+      act(cook).action(api.ledgerReconstruction.saveChecked, {
         key: "OLD-90",
       }),
     ).rejects.toThrow(/finance staff and managers/);

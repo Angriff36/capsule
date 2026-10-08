@@ -71,24 +71,30 @@ export async function phoneAlertHealthFor(
   ctx: QueryCtx,
   tenantId: string,
 ): Promise<PhoneAlertHealth> {
-  const [devices, failureRows] = await Promise.all([
-    ctx.db
-      .query("pushSubscriptions")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .collect(),
-    ctx.db
-      .query("manifestEvents")
-      .withIndex("by_entity", (q) => q.eq("entity", PUSH_DEVICE_ENTITY))
-      .collect(),
-  ]);
+  const devices = await ctx.db
+    .query("pushSubscriptions")
+    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .collect();
+  // Failure rows per live device (one row per failure spell), never every
+  // workspace's PushDevice history.
   const failuresByDevice = new Map<string, Doc<"manifestEvents">[]>();
-  for (const row of failureRows) {
-    const payload = row.payload as { tenantId?: unknown } | null;
-    if (payload?.tenantId !== tenantId) continue;
-    const list = failuresByDevice.get(row.entityId) ?? [];
-    list.push(row);
-    failuresByDevice.set(row.entityId, list);
-  }
+  await Promise.all(
+    devices.filter(live).map(async (device) => {
+      const rows = await ctx.db
+        .query("manifestEvents")
+        .withIndex("by_entityId", (q) => q.eq("entityId", String(device._id)))
+        .collect();
+      failuresByDevice.set(
+        String(device._id),
+        rows.filter((row) => {
+          const payload = row.payload as { tenantId?: unknown } | null;
+          return (
+            row.entity === PUSH_DEVICE_ENTITY && payload?.tenantId === tenantId
+          );
+        }),
+      );
+    }),
+  );
 
   const health: PhoneAlertHealth = {
     reached: 0,

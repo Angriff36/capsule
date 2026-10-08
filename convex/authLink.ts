@@ -51,13 +51,10 @@ async function isImportedPerson(ctx: MutationCtx, person: Doc<"people">) {
   return Boolean(
     await ctx.db
       .query("externalRecordLinks")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", person.tenantId))
-      .filter((q) =>
-        q.and(
-          q.eq(q.field("capsuleEntity"), "person"),
-          q.eq(q.field("capsuleId"), String(person._id)),
-        ),
+      .withIndex("by_tenantId_and_capsuleId", (q) =>
+        q.eq("tenantId", person.tenantId).eq("capsuleId", String(person._id)),
       )
+      .filter((q) => q.eq(q.field("capsuleEntity"), "person"))
       .first(),
   );
 }

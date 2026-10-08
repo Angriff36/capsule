@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useCallback, useEffect, useState } from "react";
+import { useAction } from "convex/react";
 import { api } from "../../../lib/api";
 import { formatDate, formatMoney } from "../../../lib/format";
 import type {
@@ -19,9 +19,32 @@ export function OldInvoiceRebuild({
   onDone: (message: string) => void;
   onError: (message: string) => void;
 }>) {
-  const data = useQuery(api.ledgerReconstruction.preview, {});
-  const saveChecked = useMutation(api.ledgerReconstruction.saveChecked);
+  // The preview reads every kept record page by page, so it is fetched
+  // once on open and again after each save, not kept live.
+  const loadPreview = useAction(api.ledgerReconstruction.preview);
+  const saveChecked = useAction(api.ledgerReconstruction.saveChecked);
+  const [data, setData] = useState<Awaited<
+    ReturnType<typeof loadPreview>
+  > | null>(null);
   const [busyKey, setBusyKey] = useState<string | null>(null);
+  const reload = useCallback(
+    () =>
+      loadPreview({})
+        .then(setData)
+        .catch((cause: unknown) =>
+          onError(
+            cause instanceof Error
+              ? cause.message
+              : "Couldn't rebuild the old invoices.",
+          ),
+        ),
+    [loadPreview, onError],
+  );
+  useEffect(() => {
+    void reload();
+    // Load once on open; saves reload on their own.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadPreview]);
   if (!data || data.invoices.length === 0) return null;
   const reviews = new Map(data.reviews.map((review) => [review.key, review]));
 
@@ -84,7 +107,10 @@ export function OldInvoiceRebuild({
                   onClick={() => {
                     setBusyKey(invoice.key);
                     void saveChecked({ key: invoice.key })
-                      .then(() => onDone("Old invoice saved as checked."))
+                      .then(() => {
+                        onDone("Old invoice saved as checked.");
+                        return reload();
+                      })
                       .catch((cause: unknown) =>
                         onError(
                           cause instanceof Error

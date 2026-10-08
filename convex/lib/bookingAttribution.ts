@@ -46,12 +46,13 @@ export async function captureVenueTermAtBooking(
   const tenantId = event.tenantId;
   const splits = await ctx.db
     .query("revenueAttributions")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
     .collect();
   // Approved again after a change: the first capture stays.
   if (
     splits.some(
       (row) =>
+        row.tenantId === tenantId &&
         row.deletedAt == null &&
         String(row.eventId) === String(eventId) &&
         row.attributionType === "venue_commission",
@@ -59,10 +60,13 @@ export async function captureVenueTermAtBooking(
   ) {
     return;
   }
-  const terms = await ctx.db
-    .query("venueCommissionTerms")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-    .collect();
+  const venueId = event.venueId;
+  const terms = (
+    await ctx.db
+      .query("venueCommissionTerms")
+      .withIndex("by_venueId", (q) => q.eq("venueId", venueId))
+      .collect()
+  ).filter((term) => term.tenantId === tenantId);
   const term = termInForce(terms, String(event.venueId), Date.now());
   if (!term || Number(term.commissionPercent) <= 0) return;
   // Finance-only records: written as the company's system role, as part of
@@ -90,11 +94,12 @@ export async function assertSplitsWithinRevenue(
   if (!applied || applied.overRevenueReason) return;
   const splits = await ctx.db
     .query("revenueAttributions")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", applied.tenantId))
+    .withIndex("by_eventId", (q) => q.eq("eventId", applied.eventId))
     .collect();
   const total = splits
     .filter(
       (row) =>
+        row.tenantId === applied.tenantId &&
         row.deletedAt == null &&
         row.status === "applied" &&
         String(row.eventId) === String(applied.eventId),

@@ -58,17 +58,17 @@ export const scheduleShift = mutation({
     // the same event returns the shift that already exists instead of adding
     // a second one to schedules, publication counts and utilization.
     if (args.onePerEvent && args.eventId) {
+      const eventId = args.eventId;
+      // This event's shifts, not the person's whole shift history.
       const existing = (
         await ctx.db
           .query("shifts")
-          .withIndex("by_personId", (query) =>
-            query.eq("personId", args.personId),
-          )
+          .withIndex("by_eventId", (query) => query.eq("eventId", eventId))
           .collect()
       ).find(
         (shift) =>
           shift.tenantId === tenantId &&
-          shift.eventId === args.eventId &&
+          shift.personId === args.personId &&
           shift.deletedAt == null &&
           // completed and no_show are attendance history, not a gap
           shift.status !== "cancelled",

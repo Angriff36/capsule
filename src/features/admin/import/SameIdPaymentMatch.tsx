@@ -17,6 +17,8 @@ export function SameIdPaymentMatch({
 }>) {
   const matchAll = useMutation(api.importPaymentMatch.matchSameIdPayments);
   const [busy, setBusy] = useState(false);
+  // Where the last press stopped; the next press carries on from there.
+  const [cursor, setCursor] = useState<string | null>(null);
   return (
     <button
       type="button"
@@ -24,14 +26,15 @@ export function SameIdPaymentMatch({
       disabled={disabled || busy}
       onClick={() => {
         setBusy(true);
-        void matchAll({})
-          .then(({ matched, more }) =>
+        void matchAll({ cursor })
+          .then(({ matched, more, cursor: next }) => {
+            setCursor(next);
             onDone(
-              matched === 0
+              matched === 0 && !more
                 ? "No waiting payment has the same id as a Capsule payment."
                 : `Matched ${matched} payment(s) with the same id.${more ? " Press again for more." : ""}`,
-            ),
-          )
+            );
+          })
           .catch((cause: unknown) =>
             onError(
               cause instanceof Error
