@@ -235,7 +235,9 @@ export function ClientPortalView({
             <strong>
               {new Intl.NumberFormat().format(portal.event.expectedHeadcount)}
             </strong>
-            <span>guests</span>
+            <span>
+              {portal.event.expectedHeadcount === 1 ? "guest" : "guests"}
+            </span>
           </div>
         </section>
 
