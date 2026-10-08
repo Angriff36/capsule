@@ -304,9 +304,17 @@ describe("approved time to payroll (AC-383)", () => {
     expect(prepared.totalMinutes).toBe(270);
 
     // The export reads the same approved hours.
+    // The pay period the export below covers (the screen asks for it).
     const timeRecords = (await s.workforce.query(
       api.laborSummary.payrollTimeRecords,
-      {},
+      {
+        ranges: [
+          {
+            from: S.startsAt - 2 * 24 * 60 * MIN,
+            to: S.startsAt + 2 * 24 * 60 * MIN,
+          },
+        ],
+      },
     )) as Array<Record<string, unknown>> | null;
     const people = await s.all<Doc<"people">>("people");
     const day = new Date(S.startsAt);

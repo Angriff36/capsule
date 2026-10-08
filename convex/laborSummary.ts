@@ -35,7 +35,9 @@ import {
   type OvertimeWarning,
 } from "../src/features/workforce/timePay";
 
-const PAYROLL_PREVIEW_CAP = 5000;
+// Pay periods one payroll screen asks for at once (the export period and
+// the periods of the inputs it lists).
+const PAYROLL_RANGE_CAP = 60;
 
 /** Mirrors financeManageAccess | workforceManageAccess (+ admin tier). */
 export function canReadRates(role: string): boolean {
@@ -457,9 +459,15 @@ export const listPayRates = query({
  * for them and the export's "Recorded" column silently read 0.
  */
 export const payrollTimeRecords = query({
-  args: {},
+  args: {
+    // [from, to) clock-in windows: the export period and each listed input's
+    // period. Every record that clocked in inside one is returned, however
+    // old, and nothing else.
+    ranges: v.array(v.object({ from: v.number(), to: v.number() })),
+  },
   handler: async (
     ctx,
+    { ranges },
   ): Promise<Array<{
     personId: string;
     clockInAt: number;
@@ -470,16 +478,24 @@ export const payrollTimeRecords = query({
   }> | null> => {
     const auth = await getAuthContext(ctx);
     if (!canReadRates(auth.role)) return null;
-    // The newest clocked time (by clock-in), not the whole clock history.
-    const records = (
-      (await ctx.db
+    // Only the clock-ins inside the asked pay periods, read by clock-in time.
+    const byId = new Map<string, Doc<"timeRecords">>();
+    for (const { from, to } of ranges.slice(0, PAYROLL_RANGE_CAP)) {
+      if (!(to > from)) continue;
+      for (const row of (await ctx.db
         .query("timeRecords")
         .withIndex("by_tenantId_and_clockInAt", (q: any) =>
-          q.eq("tenantId", auth.tenantId),
+          q
+            .eq("tenantId", auth.tenantId)
+            .gte("clockInAt", from)
+            .lt("clockInAt", to),
         )
-        .order("desc")
-        .take(PAYROLL_PREVIEW_CAP)) as Doc<"timeRecords">[]
-    ).reverse();
+        .collect()) as Doc<"timeRecords">[])
+        byId.set(String(row._id), row);
+    }
+    const records = [...byId.values()].sort(
+      (a, b) => Number(a.clockInAt) - Number(b.clockInAt),
+    );
     return records
       .filter(
         (record) =>

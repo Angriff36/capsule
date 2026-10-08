@@ -79,9 +79,6 @@ export function PayrollPage() {
             ]),
           ).values(),
         ];
-  // Authored seam: finance managers lack workforceAccess, so the generated
-  // listTimeRecord returns [] for them — clocked hours come from laborSummary.
-  const timeRecords = usePayrollTimeRecords();
   const payRates = usePayRates();
   const people = useListPerson();
   const createPayroll = useCreatePayrollInput();
@@ -97,6 +94,26 @@ export function PayrollPage() {
   const [processor, setProcessor] = useState<PayrollProcessor>("gusto");
   const exportStartAt = localDayStart(periodStart);
   const exportEndAt = localDayEndExclusive(periodEnd);
+  // Authored seam: finance managers lack workforceAccess, so the generated
+  // listTimeRecord returns [] for them — clocked hours come from laborSummary.
+  // Only the clock-ins of the export period and of each listed input's
+  // period, however old (never the newest N, which would drop hours).
+  const timeRanges = useMemo(() => {
+    if (payrollInputs === undefined) return "skip" as const;
+    const ranges = new Map<string, { from: number; to: number }>();
+    const add = (from: number, to: number) => {
+      if (Number.isFinite(from) && Number.isFinite(to) && to > from)
+        ranges.set(`${from}:${to}`, { from, to });
+    };
+    add(exportStartAt, exportEndAt);
+    for (const row of payrollInputs)
+      add(
+        dayStartOfTimestamp(Number(row.periodStart)),
+        dayEndExclusiveOfTimestamp(Number(row.periodEnd)),
+      );
+    return [...ranges.values()];
+  }, [payrollInputs, exportStartAt, exportEndAt]);
+  const timeRecords = usePayrollTimeRecords(timeRanges);
   const exportInputs = useWindowRows(
     "payrollInputs",
     Number.isFinite(exportStartAt) &&
