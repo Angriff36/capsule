@@ -430,8 +430,14 @@ export const getQuoteFormOptions = query({
     serviceStyles: { _id: Id<"serviceStyles">; name: string }[];
     occasions: { _id: Id<"occasions">; name: string }[];
     referralSources: { _id: Id<"referralSources">; name: string }[];
-    /** The caterer's public name and address from Admin → Branding (#125). */
-    company: { name: string; address: string | null } | null;
+    /** The caterer's public name, address, phone and website from Admin →
+     * Branding (#125), so a visitor can reach the caterer directly. */
+    company: {
+      name: string;
+      address: string | null;
+      phone: string | null;
+      website: string | null;
+    } | null;
   }> => {
     const org = await ctx.db
       .query("organizations")
@@ -478,6 +484,8 @@ export const getQuoteFormOptions = query({
       company: {
         name: org.brandDisplayName?.trim() || org.name,
         address: org.brandAddress?.trim() || null,
+        phone: org.brandPhone?.trim() || null,
+        website: org.brandWebsite?.trim() || null,
       },
     };
   },
