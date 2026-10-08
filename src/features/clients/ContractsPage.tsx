@@ -1,3 +1,4 @@
+import { useClientDirectory } from "../../lib/useClientDirectory";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -7,7 +8,6 @@ import {
   useContractSend,
   useContractSign,
   useCreateContract,
-  useListClient,
   useListContract,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
@@ -27,7 +27,7 @@ const policy = new CrmLifecyclePolicy();
 export function ContractsPage() {
   const workingId = useWorkingEventId();
   const contracts = useListContract();
-  const clients = useListClient();
+  const clients = useClientDirectory();
   const events = usePickerAndNamedEvents([workingId]);
   const createContract = useCreateContract();
   const send = useContractSend();
