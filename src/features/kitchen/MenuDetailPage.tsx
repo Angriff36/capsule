@@ -167,6 +167,7 @@ export function MenuDetailPage() {
         dishes: (dishes ?? []).map((dish) => ({
           id: dish._id,
           name: dish.name,
+          course: dish.course,
           deletedAt: dish.deletedAt,
         })),
         dishComponents: (dishComponents ?? []).map((attachment) => ({
