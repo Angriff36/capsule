@@ -30,9 +30,6 @@ let cachedMaterials: Uint8Array[] | null = null;
 // key for every field ran it past its time limit.
 let cachedKeys: CryptoKey[] | null = null;
 let workingKey = 0;
-// Opened fields by ciphertext, so a list read again does not decrypt again.
-const opened = new Map<string, string>();
-const OPENED_LIMIT = 50_000;
 
 export async function encrypt(
   plaintext: string,
@@ -66,8 +63,6 @@ export async function decrypt(
   if (keyId !== DEFAULT_KEY_ID) {
     throw new Error(`Unknown Manifest encryption key id: ${keyId}`);
   }
-  const known = opened.get(ciphertext);
-  if (known !== undefined) return known;
   const packed = base64ToBytes(ciphertext);
   if (packed.length < 13) throw new Error("Invalid Manifest ciphertext");
   const iv = packed.slice(0, 12);
@@ -84,10 +79,7 @@ export async function decrypt(
         toBufferSource(data),
       );
       workingKey = index;
-      const plaintext = new TextDecoder().decode(plainBuf);
-      if (opened.size >= OPENED_LIMIT) opened.clear();
-      opened.set(ciphertext, plaintext);
-      return plaintext;
+      return new TextDecoder().decode(plainBuf);
     } catch (error) {
       lastError = error;
     }
