@@ -1,4 +1,5 @@
 import { useClientDirectory } from "../../lib/useClientDirectory";
+import { SearchSelect } from "../../ui/SearchSelect";
 import {
   useMemo,
   useState,
@@ -151,6 +152,8 @@ type StageMove = {
  * the card. Every write is the same command the event page uses, so the
  * guards are the same too — a locked event simply is not draggable.
  */
+
+const NO_VENUE = "no-venue";
 export function EventTrackerPage() {
   const authStatus = useAuthStatus();
   const today = startOfDay(Date.now());
@@ -737,31 +740,47 @@ export function EventTrackerPage() {
                         </label>
                         <label className="tracker-field-wide">
                           <span>Venue</span>
-                          <select
-                            className="input"
-                            value={event.venueId ?? ""}
+                          {/* A thousand venues: search, not scroll. */}
+                          <SearchSelect
+                            value={event.venueId ?? NO_VENUE}
                             disabled={!canReschedule(event) || busy}
-                            onChange={(domEvent) =>
-                              commitVenue(event, domEvent.currentTarget.value)
+                            aria-label={`Venue for ${event.title}`}
+                            placeholder="Search venues…"
+                            recentsKey="venues"
+                            onChange={(picked) =>
+                              commitVenue(
+                                event,
+                                picked === NO_VENUE ? "" : picked,
+                              )
                             }
-                          >
-                            <option value="">
-                              {event.venueId ? "No venue" : event.venue}
-                            </option>
-                            {event.venueId &&
-                            !activeVenues.some(
-                              (venue) => venue._id === event.venueId,
-                            ) ? (
-                              <option value={event.venueId} disabled>
-                                {event.venue} (inactive)
-                              </option>
-                            ) : null}
-                            {activeVenues.map((venue) => (
-                              <option key={venue._id} value={venue._id}>
-                                {venue.name}
-                              </option>
-                            ))}
-                          </select>
+                            options={[
+                              {
+                                id: NO_VENUE,
+                                label: event.venueId
+                                  ? "No venue"
+                                  : event.venue || "No venue",
+                              },
+                              ...(event.venueId &&
+                              !activeVenues.some(
+                                (venue) => venue._id === event.venueId,
+                              )
+                                ? [
+                                    {
+                                      id: event.venueId,
+                                      label: `${event.venue} (inactive)`,
+                                    },
+                                  ]
+                                : []),
+                              ...activeVenues.map((venue) => ({
+                                id: venue._id,
+                                label: String(venue.name),
+                                hint:
+                                  [venue.addressLine1, venue.city]
+                                    .filter((part) => part?.trim())
+                                    .join(", ") || null,
+                              })),
+                            ]}
+                          />
                         </label>
                         <label className="tracker-field-wide">
                           <span>Owner</span>

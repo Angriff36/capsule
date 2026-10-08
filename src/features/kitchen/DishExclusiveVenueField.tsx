@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SearchSelect } from "../../ui/SearchSelect";
 import { Link } from "react-router-dom";
 import {
   useDishSetExclusiveVenue,
@@ -10,6 +11,8 @@ import { venueDetailPath } from "../facilities/facilitiesRoutes";
  * Venue-exclusive menu item (Venue Partner Playbook section 07): a dish can be
  * offered only at one venue. "Any venue" offers it everywhere.
  */
+const ANY_VENUE = "any-venue";
+
 export function DishExclusiveVenueField({
   dish,
   onFailure,
@@ -29,12 +32,22 @@ export function DishExclusiveVenueField({
   return (
     <label className="mt-2 flex flex-wrap items-center gap-2 text-sm text-ink-2">
       Offered at
-      <select
-        className="input w-auto"
-        value={current}
+      <SearchSelect
+        value={current || ANY_VENUE}
         disabled={busy || venues === undefined}
-        onChange={(event) => {
-          const venueId = event.target.value;
+        aria-label="Offered at"
+        placeholder="Search venues…"
+        recentsKey="venues"
+        options={[
+          { id: ANY_VENUE, label: "Any venue" },
+          ...options.map((venue) => ({
+            id: String(venue._id),
+            label: `Only at ${venue.name}`,
+          })),
+        ]}
+        onChange={(picked) => {
+          const venueId = picked === ANY_VENUE ? "" : picked;
+          if (venueId === current) return;
           setBusy(true);
           void setExclusiveVenue({
             docId: dish._id,
@@ -44,14 +57,7 @@ export function DishExclusiveVenueField({
             .catch(onFailure)
             .finally(() => setBusy(false));
         }}
-      >
-        <option value="">Any venue</option>
-        {options.map((venue) => (
-          <option key={venue._id} value={venue._id}>
-            Only at {venue.name}
-          </option>
-        ))}
-      </select>
+      />
       {chosen ? (
         <Link className="link" to={venueDetailPath(String(chosen._id))}>
           Open venue
