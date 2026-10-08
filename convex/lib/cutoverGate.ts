@@ -230,9 +230,11 @@ async function openItemsCheck(
   const conflicts = (
     await db
       .query("importConflicts")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .withIndex("by_tenantId_and_status", (q) =>
+        q.eq("tenantId", tenantId).eq("status", "pending"),
+      )
       .collect()
-  ).filter((row) => row.deletedAt == null && row.status === "pending");
+  ).filter((row) => row.deletedAt == null);
   // A difference the daily TPP comparison found is settled when a person
   // says one system was fixed or the difference is fine (AC-286, AC-632).
   const differences = (
@@ -319,9 +321,11 @@ async function openingStockCheck(
   const waiting = (
     await db
       .query("openingStockRecords")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .withIndex("by_tenantId_and_status", (q) =>
+        q.eq("tenantId", tenantId).eq("status", "needs_review"),
+      )
       .collect()
-  ).filter((row) => row.deletedAt == null && row.status === "needs_review");
+  ).filter((row) => row.deletedAt == null);
   if (waiting.length > 0) {
     warnings.push(
       `${waiting.length} opening stock line(s) still wait for review; they are not in the confirmed count.`,

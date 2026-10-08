@@ -35,6 +35,8 @@ import {
   type OvertimeWarning,
 } from "../src/features/workforce/timePay";
 
+const PAYROLL_PREVIEW_CAP = 5000;
+
 /** Mirrors financeManageAccess | workforceManageAccess (+ admin tier). */
 export function canReadRates(role: string): boolean {
   return (
@@ -156,14 +158,37 @@ async function tenantPeople(
   return new Map(rows.map((row) => [String(row._id), row]));
 }
 
-async function tenantTimeRecords(
+/**
+ * Time records clocked in at or after `from` (and at or before `to`), through
+ * the (tenant, clockInAt) index — never the whole clock history.
+ */
+async function tenantTimeRecordsClockedIn(
   ctx: { db: any },
   tenantId: string,
+  from: number,
+  to?: number,
 ): Promise<Doc<"timeRecords">[]> {
   return await ctx.db
     .query("timeRecords")
-    .withIndex("by_tenantId", (q: any) => q.eq("tenantId", tenantId))
+    .withIndex("by_tenantId_and_clockInAt", (q: any) => {
+      const range = q.eq("tenantId", tenantId).gte("clockInAt", from);
+      return to === undefined ? range : range.lte("clockInAt", to);
+    })
     .collect();
+}
+
+/** Rows of one event through its index, kept to this workspace. */
+async function eventRows<T extends "shifts" | "timeRecords">(
+  ctx: { db: any },
+  table: T,
+  tenantId: string,
+  eventId: string,
+): Promise<Doc<T>[]> {
+  const rows: Doc<T>[] = await ctx.db
+    .query(table)
+    .withIndex("by_eventId", (q: any) => q.eq("eventId", eventId))
+    .collect();
+  return rows.filter((row) => row.tenantId === tenantId);
 }
 
 /**
@@ -182,12 +207,23 @@ export const attendanceAlerts = query({
   } | null> => {
     const auth = await getAuthContext(ctx);
     if (!canReadLaborAggregates(auth.role)) return null;
+    // Alerts cover shifts that started in the last week and time clocked in
+    // the last 21 days, so only those windows are read.
     const [people, records, shifts] = await Promise.all([
       tenantPeople(ctx, auth.tenantId),
-      tenantTimeRecords(ctx, auth.tenantId),
+      tenantTimeRecordsClockedIn(
+        ctx,
+        auth.tenantId,
+        args.now - 21 * 24 * 60 * 60_000,
+      ),
       ctx.db
         .query("shifts")
-        .withIndex("by_tenantId", (q: any) => q.eq("tenantId", auth.tenantId))
+        .withIndex("by_tenantId_and_endsAt", (q: any) =>
+          q
+            .eq("tenantId", auth.tenantId)
+            .gte("endsAt", args.now - 7 * 24 * 60 * 60_000)
+            .lte("endsAt", args.now + 7 * 24 * 60 * 60_000),
+        )
         .collect() as Promise<Doc<"shifts">[]>,
     ]);
     const nameOf = (personId: string) => {
@@ -241,14 +277,34 @@ export async function loadEventLabor(
   tenantId: string,
   eventId: string,
 ): Promise<EventLaborSummary & { records: Doc<"timeRecords">[] }> {
-  const [people, records, shifts] = await Promise.all([
+  // Only this event's shifts and time: records on the event directly, and
+  // records on one of its shifts that name no event.
+  const [people, directRecords, shifts] = await Promise.all([
     tenantPeople(ctx, tenantId),
-    tenantTimeRecords(ctx, tenantId),
-    ctx.db
-      .query("shifts")
-      .withIndex("by_tenantId", (q: any) => q.eq("tenantId", tenantId))
-      .collect() as Promise<Doc<"shifts">[]>,
+    eventRows(ctx, "timeRecords", tenantId, eventId),
+    eventRows(ctx, "shifts", tenantId, eventId),
   ]);
+  const viaShiftRecords = (
+    await Promise.all(
+      shifts.map(
+        (shift) =>
+          ctx.db
+            .query("timeRecords")
+            .withIndex("by_shiftId", (q: any) => q.eq("shiftId", shift._id))
+            .collect() as Promise<Doc<"timeRecords">[]>,
+      ),
+    )
+  )
+    .flat()
+    .filter((record) => record.tenantId === tenantId);
+  const records = [
+    ...new Map(
+      [...directRecords, ...viaShiftRecords].map((record) => [
+        String(record._id),
+        record,
+      ]),
+    ).values(),
+  ].sort((a, b) => a._creationTime - b._creationTime);
   const shiftEventById = new Map(
     shifts.map((shift) => [String(shift._id), String(shift.eventId ?? "")]),
   );
@@ -317,13 +373,23 @@ export const personPeriodLaborSummary = query({
     const auth = await getAuthContext(ctx);
     if (!canReadRates(auth.role)) return null;
     const personId = String(args.personId);
+    // The period's time, from eight days before it (the weekly overtime
+    // count reaches back to the start of its first week), and this person's
+    // payroll inputs only.
     const [people, records, inputs] = await Promise.all([
       tenantPeople(ctx, auth.tenantId),
-      tenantTimeRecords(ctx, auth.tenantId),
-      ctx.db
-        .query("payrollInputs")
-        .withIndex("by_tenantId", (q: any) => q.eq("tenantId", auth.tenantId))
-        .collect() as Promise<Doc<"payrollInputs">[]>,
+      tenantTimeRecordsClockedIn(
+        ctx,
+        auth.tenantId,
+        args.periodStart - 8 * 24 * 60 * 60_000,
+        args.periodEnd,
+      ),
+      (
+        ctx.db
+          .query("payrollInputs")
+          .withIndex("by_personId", (q: any) => q.eq("personId", args.personId))
+          .collect() as Promise<Doc<"payrollInputs">[]>
+      ).then((rows) => rows.filter((row) => row.tenantId === auth.tenantId)),
     ]);
     const matching = records.filter(
       (record) =>
@@ -404,7 +470,16 @@ export const payrollTimeRecords = query({
   }> | null> => {
     const auth = await getAuthContext(ctx);
     if (!canReadRates(auth.role)) return null;
-    const records = await tenantTimeRecords(ctx, auth.tenantId);
+    // The newest clocked time (by clock-in), not the whole clock history.
+    const records = (
+      (await ctx.db
+        .query("timeRecords")
+        .withIndex("by_tenantId_and_clockInAt", (q: any) =>
+          q.eq("tenantId", auth.tenantId),
+        )
+        .order("desc")
+        .take(PAYROLL_PREVIEW_CAP)) as Doc<"timeRecords">[]
+    ).reverse();
     return records
       .filter(
         (record) =>

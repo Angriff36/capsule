@@ -367,9 +367,11 @@ export const saveCutoverFacts = mutation({
       const applied = (
         await ctx.db
           .query("openingStockRecords")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+          .withIndex("by_tenantId_and_status", (q) =>
+            q.eq("tenantId", tenantId).eq("status", "applied"),
+          )
           .collect()
-      ).filter((row) => row.deletedAt == null && row.status === "applied");
+      ).filter((row) => row.deletedAt == null);
       patch.openingStockAsOf = args.openingStockAsOf;
       patch.openingStockCount = applied.length;
       patch.openingStockConfirmedById = auth.id;

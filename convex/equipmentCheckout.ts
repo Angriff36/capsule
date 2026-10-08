@@ -123,9 +123,12 @@ export const equipmentAvailability = query({
         .query("equipmentReservations")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
         .collect(),
+      // Only open problems hold units out of use.
       ctx.db
         .query("equipmentIssues")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .withIndex("by_tenantId_and_status", (q) =>
+          q.eq("tenantId", tenantId).eq("status", "open"),
+        )
         .collect(),
     ]);
     const window = {

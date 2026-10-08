@@ -17,6 +17,7 @@
  */
 import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
+import type { Doc } from "./_generated/dataModel";
 import {
   action,
   internalAction,
@@ -374,18 +375,34 @@ export const loadScanContext = internalQuery({
           .query("people")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
           .collect(),
+        // Only what can trigger a text, never whole histories: events that
+        // start inside the lead window, deliveries in transit, and open or
+        // investigating incidents.
         ctx.db
           .query("events")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
+          .withIndex("by_tenantId_and_startsAt", (q) =>
+            q
+              .eq("tenantId", args.tenantId)
+              .gt("startsAt", now)
+              .lte("startsAt", now + EVENT_LEAD_MS),
+          )
           .collect(),
         ctx.db
           .query("deliveries")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
+          .withIndex("by_tenantId_and_status", (q) =>
+            q.eq("tenantId", args.tenantId).eq("status", "in_transit"),
+          )
           .collect(),
-        ctx.db
-          .query("incidents")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
-          .collect(),
+        Promise.all(
+          (["open", "investigating"] as const).map((status) =>
+            ctx.db
+              .query("incidents")
+              .withIndex("by_tenantId_and_status", (q) =>
+                q.eq("tenantId", args.tenantId).eq("status", status),
+              )
+              .collect(),
+          ),
+        ).then((lists) => lists.flat()),
         ctx.db
           .query("operatingLocations")
           .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
@@ -425,9 +442,14 @@ export const loadScanContext = internalQuery({
       });
     }
 
-    const eventTitle = new Map(
-      events.map((event) => [String(event._id), event.title] as const),
-    );
+    // Titles of the events the incidents name, read by id.
+    const eventTitle = new Map<string, string>();
+    for (const incident of incidents) {
+      if (incident.eventId == null) continue;
+      const event = await ctx.db.get(incident.eventId);
+      if (event && event.tenantId === args.tenantId)
+        eventTitle.set(String(event._id), event.title);
+    }
     const triggers: Trigger[] = [];
 
     for (const event of events) {
@@ -487,9 +509,15 @@ export const loadScanContext = internalQuery({
     const recipientById = new Map(
       recipients.map((recipient) => [recipient.personId, recipient] as const),
     );
-    for (const event of events) {
+    const alertedEvents: Doc<"events">[] = [];
+    for (const id of new Set(triggers.map((trigger) => trigger.eventId))) {
+      const eventId = id ? ctx.db.normalizeId("events", id) : null;
+      const event = eventId ? await ctx.db.get(eventId) : null;
+      if (event && event.tenantId === args.tenantId) alertedEvents.push(event);
+    }
+    alertedEvents.sort((a, b) => a._creationTime - b._creationTime);
+    for (const event of alertedEvents) {
       const eventId = String(event._id);
-      if (!triggers.some((trigger) => trigger.eventId === eventId)) continue;
       const shifts = await ctx.db
         .query("shifts")
         .withIndex("by_eventId", (q) => q.eq("eventId", event._id))

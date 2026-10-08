@@ -10,6 +10,7 @@
 // Tenant scoping comes from the authenticated identity — no client-supplied
 // tenantId is trusted.
 import { query, type QueryCtx } from "./_generated/server";
+import type { Doc } from "./_generated/dataModel";
 import { v } from "convex/values";
 import {
   getAuthContext,
@@ -404,17 +405,25 @@ export const searchAll = query({
 
     // Structured event date intent — when the caller asked for a date window
     // (e.g. "events next week") but there is no text term, a pure search-index
-    // query is not possible (search requires a non-empty query). Fall back to
-    // the tenant index and filter by startsAt.
+    // query is not possible (search requires a non-empty query). Read the
+    // date window straight from the (tenant, startsAt) index.
     if (
       parsed.kinds.has("event") &&
       canRead(auth, ["staffAccess"]) &&
       !wantsText &&
       (parsed.startAfter !== null || parsed.startBefore !== null)
     ) {
+      const startAfter = parsed.startAfter;
+      const startBefore = parsed.startBefore;
       const events = await ctx.db
         .query("events")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .withIndex("by_tenantId_and_startsAt", (q) => {
+          const t = q.eq("tenantId", tenantId);
+          if (startAfter !== null && startBefore !== null)
+            return t.gte("startsAt", startAfter).lt("startsAt", startBefore);
+          if (startAfter !== null) return t.gte("startsAt", startAfter);
+          return t.gte("startsAt", 0).lt("startsAt", startBefore as number);
+        })
         .filter((q) => q.eq(q.field("deletedAt"), null))
         .take(60);
       for (const ev of events) {
@@ -463,10 +472,26 @@ async function queryInvoices(
   const MAX_HITS = 15;
   const out: SearchHit[] = [];
   let scanned = 0;
-  const invoices = ctx.db
-    .query("invoices")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId));
-  for await (const inv of invoices) {
+  // With status words (or the unpaid default), walk only those statuses
+  // through the status index instead of the whole invoice history.
+  async function* invoiceRows() {
+    if (statuses == null) {
+      yield* ctx.db
+        .query("invoices")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId));
+      return;
+    }
+    for (const status of statuses) {
+      yield* ctx.db
+        .query("invoices")
+        .withIndex("by_tenantId_and_status", (q) =>
+          q
+            .eq("tenantId", tenantId)
+            .eq("status", status as Doc<"invoices">["status"]),
+        );
+    }
+  }
+  for await (const inv of invoiceRows()) {
     scanned += 1;
     const anchor = inv.dueDate ?? inv.issuedAt;
     const matchesAge =

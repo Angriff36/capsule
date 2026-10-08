@@ -69,12 +69,24 @@ async function capsuleSide(
   };
 }
 
-async function runComparison(
-  ctx: MutationCtx,
-  tenantId: string,
-  now: number,
-  window: { from: number; to: number | null },
-): Promise<{
+/** Rows read in one batch, and how many rows one run works before it books its next part. */
+const BATCH_ROWS = 100;
+const RUN_ROWS = 400;
+
+type ComparisonWindow = { from: number; to: number | null };
+
+/** The last row a batch worked: its _creationTime and every id worked at that time. */
+type RowCursor = { time: number; ids: string[] } | null;
+
+/**
+ * Where a comparison is. One run cannot read every TPP event, every Capsule
+ * event and every difference of a company (the per-call read limit), so the
+ * work goes in batches by creation time and a run that runs out of room
+ * books its next part with this state.
+ */
+interface ComparisonProgress {
+  stage: "links" | "events" | "open" | "done";
+  after: RowCursor;
   summary: ComparisonSummary;
   comparedCount: number;
   openCount: number;
@@ -82,18 +94,80 @@ async function runComparison(
   clearedCount: number;
   /** Differences still open for events inside the window. */
   openInWindow: number;
-}> {
-  // Only venue, event and person links take part; reading every link of
-  // the company is too much once the archive imports land.
+}
+
+const modeValidator = v.union(
+  v.object({ kind: v.literal("daily"), book: v.boolean() }),
+  v.object({ kind: v.literal("period"), from: v.number(), to: v.number() }),
+);
+type ComparisonMode =
+  | { kind: "daily"; book: boolean }
+  | { kind: "period"; from: number; to: number };
+
+function windowOf(mode: ComparisonMode, now: number): ComparisonWindow {
+  return mode.kind === "period"
+    ? { from: mode.from, to: mode.to }
+    : { from: now - WINDOW_MS, to: null };
+}
+
+function startProgress(window: ComparisonWindow): ComparisonProgress {
+  return {
+    stage: "links",
+    after: null,
+    summary: newSummary(window.from, window.to),
+    comparedCount: 0,
+    openCount: 0,
+    newCount: 0,
+    clearedCount: 0,
+    openInWindow: 0,
+  };
+}
+
+/** The rows of a batch not worked yet, and the cursor after the batch. */
+function pastCursor<T extends { _id: string; _creationTime: number }>(
+  rows: T[],
+  after: RowCursor,
+): { fresh: T[]; next: RowCursor } {
+  const worked = new Set(after?.ids ?? []);
+  const fresh = rows.filter(
+    (row) =>
+      !(
+        after &&
+        row._creationTime === after.time &&
+        worked.has(String(row._id))
+      ),
+  );
+  const last = rows[rows.length - 1];
+  if (!last) return { fresh, next: after };
+  return {
+    fresh,
+    next: {
+      time: last._creationTime,
+      ids: rows
+        .filter((row) => row._creationTime === last._creationTime)
+        .map((row) => String(row._id)),
+    },
+  };
+}
+
+const isLiveTppLink = (link: Doc<"externalRecordLinks">) =>
+  link.sourceSystem === "tpp_legacy" &&
+  link.deletedAt == null &&
+  link.conflictStatus !== "superseded";
+
+/** TPP ids an earlier import matched to Capsule venues and people. */
+async function identityLookups(
+  ctx: MutationCtx,
+  tenantId: string,
+): Promise<IdentityLookups> {
+  // Venues and people are small lists; they are read whole each run.
   const read = await Promise.all([
-    ...["venue", "event"].map((recordType) =>
-      ctx.db
-        .query("externalRecordLinks")
-        .withIndex("by_tenantId_and_recordType", (q) =>
-          q.eq("tenantId", tenantId).eq("recordType", recordType),
-        )
-        .collect(),
-    ),
+    ctx.db
+      .query("externalRecordLinks")
+      .withIndex("by_tenantId_and_recordType", (q) =>
+        q.eq("tenantId", tenantId).eq("recordType", "venue"),
+      )
+      .collect(),
     ctx.db
       .query("externalRecordLinks")
       .withIndex("by_tenantId_and_capsuleEntity", (q) =>
@@ -103,14 +177,7 @@ async function runComparison(
   ]);
   const links = [
     ...new Map(read.flat().map((link) => [String(link._id), link])).values(),
-  ].filter(
-    (link) =>
-      link.sourceSystem === "tpp_legacy" &&
-      link.deletedAt == null &&
-      link.conflictStatus !== "superseded",
-  );
-
-  // TPP ids an earlier import matched to Capsule records.
+  ].filter(isLiveTppLink);
   const venueByTpp = new Map<string, string>();
   const personByTpp = new Map<string, { id: string; name: string }>();
   for (const link of links) {
@@ -125,78 +192,59 @@ async function runComparison(
       if (name) personByTpp.set(link.externalId, { id: link.capsuleId, name });
     }
   }
-  const lookups: IdentityLookups = {
+  return {
     salesperson: (tppId) => personByTpp.get(tppId),
     venue: (tppId) => venueByTpp.get(tppId),
   };
+}
 
-  const inWindow = (at: number) =>
-    at >= window.from && (window.to == null || at <= window.to);
-  const summary = newSummary(window.from, window.to);
-  const found = new Map<
-    string,
-    {
-      link: Doc<"externalRecordLinks">;
-      field: string;
-      source: string;
-      mine: string;
-    }
-  >();
-  const comparedLinks = new Set<string>();
-  const linkedEventIds = new Set<string>();
-  for (const link of links) {
-    if (link.recordType !== "event") continue;
-    if (link.capsuleId) linkedEventIds.add(link.capsuleId);
-    const tpp = tppEventFromRaw(link.rawSourceData);
-    if (!tpp || tpp.startsAt == null || !inWindow(tpp.startsAt)) continue;
-    addTppEvent(summary.tpp, tpp, lookups);
-    if (!link.capsuleId) {
-      // Still on the match-up page; nothing to compare yet.
-      summary.onlyInTpp += 1;
-      continue;
-    }
-    const eventId = ctx.db.normalizeId("events", link.capsuleId);
-    const event = eventId ? await ctx.db.get(eventId) : null;
-    const capsule = event ? await capsuleSide(ctx, tenantId, event) : null;
-    comparedLinks.add(String(link._id));
-    for (const difference of compareEventPair(tpp, capsule, lookups)) {
-      found.set(`${link._id}|${difference.field}`, {
-        link,
-        field: difference.field,
-        source: difference.sourceValue,
-        mine: difference.capsuleValue,
-      });
-    }
+/** Compare one TPP event link and settle its saved differences. */
+async function compareLink(
+  ctx: MutationCtx,
+  tenantId: string,
+  now: number,
+  window: ComparisonWindow,
+  lookups: IdentityLookups,
+  link: Doc<"externalRecordLinks">,
+  progress: ComparisonProgress,
+): Promise<void> {
+  const tpp = tppEventFromRaw(link.rawSourceData);
+  if (!tpp || tpp.startsAt == null) return;
+  if (!(
+    tpp.startsAt >= window.from &&
+    (window.to == null || tpp.startsAt <= window.to)
+  ))
+    return;
+  addTppEvent(progress.summary.tpp, tpp, lookups);
+  if (!link.capsuleId) {
+    // Still on the match-up page; nothing to compare yet.
+    progress.summary.onlyInTpp += 1;
+    return;
   }
-
-  const events = await ctx.db
-    .query("events")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-    .collect();
-  for (const event of events) {
-    if (event.deletedAt != null) continue;
-    if (event.startsAt == null || !inWindow(event.startsAt)) continue;
-    addCapsuleEvent(summary.capsule, await capsuleSide(ctx, tenantId, event));
-    if (!linkedEventIds.has(String(event._id))) summary.onlyInCapsule += 1;
+  const eventId = ctx.db.normalizeId("events", link.capsuleId);
+  const event = eventId ? await ctx.db.get(eventId) : null;
+  const capsule = event ? await capsuleSide(ctx, tenantId, event) : null;
+  progress.comparedCount += 1;
+  const found = new Map<string, { source: string; mine: string }>();
+  for (const difference of compareEventPair(tpp, capsule, lookups)) {
+    found.set(difference.field, {
+      source: difference.sourceValue,
+      mine: difference.capsuleValue,
+    });
   }
 
   const saved = (
     await ctx.db
       .query("parallelRunDifferences")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .withIndex("by_externalRecordLinkId", (q) =>
+        q.eq("externalRecordLinkId", link._id),
+      )
       .collect()
-  ).filter((row) => row.deletedAt == null);
-  let newCount = 0;
-  let clearedCount = 0;
-  let openInWindow = 0;
+  ).filter((row) => row.tenantId === tenantId && row.deletedAt == null);
   const seen = new Set<string>();
   for (const row of saved) {
-    const key = `${row.externalRecordLinkId}|${row.field}`;
-    seen.add(key);
-    const today = found.get(key);
-    // A link not compared today (its event left the window) keeps its row.
-    if (!today && !comparedLinks.has(String(row.externalRecordLinkId)))
-      continue;
+    seen.add(row.field);
+    const today = found.get(row.field);
     const status = nextDifferenceStatus(
       row.status,
       today != null &&
@@ -204,9 +252,9 @@ async function runComparison(
         today.mine === row.capsuleValue,
       today != null,
     );
-    if (today && status === "open") openInWindow += 1;
+    if (today && status === "open") progress.openInWindow += 1;
     if (status === "cleared" && row.status === "cleared") continue;
-    if (status === "cleared") clearedCount += 1;
+    if (status === "cleared") progress.clearedCount += 1;
     const reopened = status === "open" && row.status !== "open";
     await ctx.db.patch(row._id, {
       status,
@@ -214,7 +262,7 @@ async function runComparison(
         ? {
             sourceValue: today.source,
             capsuleValue: today.mine,
-            capsuleId: today.link.capsuleId,
+            capsuleId: link.capsuleId,
             lastSeenAt: now,
           }
         : {}),
@@ -223,16 +271,16 @@ async function runComparison(
       version: row.version + 1,
     });
   }
-  for (const [key, today] of found) {
-    if (seen.has(key)) continue;
+  for (const [field, today] of found) {
+    if (seen.has(field)) continue;
     await ctx.db.insert("parallelRunDifferences", {
       tenantId,
       deletedAt: null,
-      externalRecordLinkId: today.link._id,
-      externalId: today.link.externalId,
-      capsuleEntity: today.link.capsuleEntity,
-      capsuleId: today.link.capsuleId,
-      field: today.field,
+      externalRecordLinkId: link._id,
+      externalId: link.externalId,
+      capsuleEntity: link.capsuleEntity,
+      capsuleId: link.capsuleId,
+      field,
       sourceValue: today.source,
       capsuleValue: today.mine,
       status: "open",
@@ -242,23 +290,112 @@ async function runComparison(
       updatedAt: now,
       version: 0,
     });
-    newCount += 1;
-    openInWindow += 1;
+    progress.newCount += 1;
+    progress.openInWindow += 1;
   }
-  const openCount = (
-    await ctx.db
-      .query("parallelRunDifferences")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .collect()
-  ).filter((row) => row.deletedAt == null && row.status === "open").length;
-  return {
-    summary,
-    comparedCount: comparedLinks.size,
-    openCount,
-    newCount,
-    clearedCount,
-    openInWindow,
-  };
+}
+
+/** True when a live TPP event link names this Capsule event. */
+async function hasTppLink(
+  ctx: MutationCtx,
+  tenantId: string,
+  eventId: string,
+): Promise<boolean> {
+  for await (const link of ctx.db
+    .query("externalRecordLinks")
+    .withIndex("by_tenantId_and_capsuleId", (q) =>
+      q.eq("tenantId", tenantId).eq("capsuleId", eventId),
+    )) {
+    if (link.recordType === "event" && isLiveTppLink(link)) return true;
+  }
+  return false;
+}
+
+/**
+ * Work the comparison as far as one run may: TPP event links first, then the
+ * Capsule events in the window, then the count of open differences.
+ */
+async function workComparison(
+  ctx: MutationCtx,
+  tenantId: string,
+  now: number,
+  window: ComparisonWindow,
+  progress: ComparisonProgress,
+): Promise<ComparisonProgress> {
+  const inWindow = (at: number) =>
+    at >= window.from && (window.to == null || at <= window.to);
+  let lookups: IdentityLookups | null = null;
+  let room = RUN_ROWS;
+  while (progress.stage !== "done" && room > 0) {
+    const after = progress.after;
+    const want = BATCH_ROWS + (after?.ids.length ?? 0);
+    const since = after?.time ?? 0;
+    if (progress.stage === "links") {
+      const rows = await ctx.db
+        .query("externalRecordLinks")
+        .withIndex("by_tenantId_and_recordType", (q) =>
+          q
+            .eq("tenantId", tenantId)
+            .eq("recordType", "event")
+            .gte("_creationTime", since),
+        )
+        .take(want);
+      const { fresh, next } = pastCursor(rows, after);
+      lookups ??= await identityLookups(ctx, tenantId);
+      for (const link of fresh) {
+        if (!isLiveTppLink(link)) continue;
+        await compareLink(ctx, tenantId, now, window, lookups, link, progress);
+      }
+      room -= fresh.length;
+      progress.after = next;
+      if (rows.length < want) {
+        progress.stage = "events";
+        progress.after = null;
+      }
+    } else if (progress.stage === "events") {
+      const rows = await ctx.db
+        .query("events")
+        .withIndex("by_tenantId", (q) =>
+          q.eq("tenantId", tenantId).gte("_creationTime", since),
+        )
+        .take(want);
+      const { fresh, next } = pastCursor(rows, after);
+      for (const event of fresh) {
+        if (event.deletedAt != null) continue;
+        if (event.startsAt == null || !inWindow(event.startsAt)) continue;
+        addCapsuleEvent(
+          progress.summary.capsule,
+          await capsuleSide(ctx, tenantId, event),
+        );
+        if (!(await hasTppLink(ctx, tenantId, String(event._id))))
+          progress.summary.onlyInCapsule += 1;
+      }
+      room -= fresh.length;
+      progress.after = next;
+      if (rows.length < want) {
+        progress.stage = "open";
+        progress.after = null;
+      }
+    } else {
+      const rows = await ctx.db
+        .query("parallelRunDifferences")
+        .withIndex("by_tenantId", (q) =>
+          q.eq("tenantId", tenantId).gte("_creationTime", since),
+        )
+        .take(want * 5);
+      const { fresh, next } = pastCursor(rows, after);
+      progress.openCount += fresh.filter(
+        (row) => row.deletedAt == null && row.status === "open",
+      ).length;
+      room -= Math.ceil(fresh.length / 5);
+      progress.after = next;
+      if (rows.length < want * 5) {
+        progress.stage = "done";
+        progress.after = null;
+      }
+    }
+  }
+  return progress;
 }
 
 function isPeriodCheck(row: Doc<"parallelRunComparisons">): boolean {
@@ -285,53 +422,185 @@ async function newestComparison(ctx: QueryCtx, tenantId: string) {
  * One comparison. With `book`, the next one is booked a day later, unless the
  * company already switched from TPP (go): then the daily run stops.
  */
+type ComparisonResult = Omit<ComparisonProgress, "stage" | "after">;
+
+function resultOf(progress: ComparisonProgress): ComparisonResult {
+  const { stage: _stage, after: _after, ...result } = progress;
+  return result;
+}
+
+/**
+ * Work as far as this run may. When the work is not done, the next part is
+ * booked at once with the state so far.
+ */
+async function workOrBook(
+  ctx: MutationCtx,
+  tenantId: string,
+  now: number,
+  mode: ComparisonMode,
+  start: ComparisonProgress,
+): Promise<ComparisonProgress> {
+  const progress = await workComparison(
+    ctx,
+    tenantId,
+    now,
+    windowOf(mode, now),
+    start,
+  );
+  if (progress.stage !== "done") {
+    await ctx.scheduler.runAfter(0, internal.parallelRun.continueComparison, {
+      tenantId,
+      now,
+      mode,
+      progress: JSON.stringify(progress),
+    });
+  }
+  return progress;
+}
+
+/** Keep a finished daily comparison and book the next day's run. */
+async function finishDaily(
+  ctx: MutationCtx,
+  tenantId: string,
+  now: number,
+  book: boolean,
+  progress: ComparisonProgress,
+) {
+  const result = resultOf(progress);
+  const decision = await cutoverDecisionOf(ctx.db, tenantId);
+  const switched = decision?.status === "go";
+  let nextRunAt: number | null = null;
+  if (book && !switched) {
+    nextRunAt = now + DAY_MS;
+    await ctx.scheduler.runAt(nextRunAt, internal.parallelRun.compareTenant, {
+      tenantId,
+      book: true,
+    });
+  } else if (!book) {
+    // A "Compare now" keeps the booked daily run's time.
+    nextRunAt = (await newestComparison(ctx, tenantId))?.nextRunAt ?? null;
+  }
+  const id = await ctx.db.insert("parallelRunComparisons", {
+    tenantId,
+    comparedAt: now,
+    comparedCount: result.comparedCount,
+    openCount: result.openCount,
+    newCount: result.newCount,
+    clearedCount: result.clearedCount,
+    summary: JSON.stringify(result.summary),
+    nextRunAt,
+    createdAt: now,
+    updatedAt: now,
+    version: 0,
+  });
+  await insertStepEvent(ctx, {
+    type: "parallel_run.compared",
+    entity: "ParallelRunComparison",
+    entityId: String(id),
+    payload: {
+      parallelRunComparisonId: String(id),
+      tenantId,
+      newCount: result.newCount,
+      clearedCount: result.clearedCount,
+    },
+    createdAt: now,
+  });
+  return { comparisonId: id, continuing: false as const, ...result, nextRunAt };
+}
+
+/** Keep a finished period check with its verdict. */
+async function finishPeriod(
+  ctx: MutationCtx,
+  tenantId: string,
+  now: number,
+  period: { from: number; to: number },
+  progress: ComparisonProgress,
+) {
+  const result = resultOf(progress);
+  const verdict = reconcileVerdict(result.summary, result.openInWindow);
+  const summary: ComparisonSummary = {
+    ...result.summary,
+    period: { from: period.from, to: period.to, verdict },
+  };
+  const id = await ctx.db.insert("parallelRunComparisons", {
+    tenantId,
+    comparedAt: now,
+    comparedCount: result.comparedCount,
+    openCount: result.openCount,
+    newCount: result.newCount,
+    clearedCount: result.clearedCount,
+    summary: JSON.stringify(summary),
+    nextRunAt: null,
+    createdAt: now,
+    updatedAt: now,
+    version: 0,
+  });
+  await insertStepEvent(ctx, {
+    type: "parallel_run.period_checked",
+    entity: "ParallelRunComparison",
+    entityId: String(id),
+    payload: {
+      parallelRunComparisonId: String(id),
+      tenantId,
+      from: period.from,
+      to: period.to,
+      passed: verdict.passed,
+    },
+    createdAt: now,
+  });
+  return { comparisonId: id, continuing: false as const, verdict, summary };
+}
+
+/**
+ * One comparison. With `book`, the next one is booked a day later, unless the
+ * company already switched from TPP (go): then the daily run stops. A big
+ * company's comparison goes on in booked parts; the comparison row is kept
+ * when the last part is done.
+ */
 export const compareTenant = internalMutation({
   args: { tenantId: v.string(), book: v.boolean() },
   handler: async (ctx, { tenantId, book }) => {
     const now = Date.now();
-    const decision = await cutoverDecisionOf(ctx.db, tenantId);
-    const switched = decision?.status === "go";
-    const result = await runComparison(ctx, tenantId, now, {
-      from: now - WINDOW_MS,
-      to: null,
-    });
-    let nextRunAt: number | null = null;
-    if (book && !switched) {
-      nextRunAt = now + DAY_MS;
-      await ctx.scheduler.runAt(nextRunAt, internal.parallelRun.compareTenant, {
-        tenantId,
-        book: true,
-      });
-    } else if (!book) {
-      // A "Compare now" keeps the booked daily run's time.
-      nextRunAt = (await newestComparison(ctx, tenantId))?.nextRunAt ?? null;
-    }
-    const id = await ctx.db.insert("parallelRunComparisons", {
+    const mode: ComparisonMode = { kind: "daily", book };
+    const progress = await workOrBook(
+      ctx,
       tenantId,
-      comparedAt: now,
-      comparedCount: result.comparedCount,
-      openCount: result.openCount,
-      newCount: result.newCount,
-      clearedCount: result.clearedCount,
-      summary: JSON.stringify(result.summary),
-      nextRunAt,
-      createdAt: now,
-      updatedAt: now,
-      version: 0,
-    });
-    await insertStepEvent(ctx, {
-      type: "parallel_run.compared",
-      entity: "ParallelRunComparison",
-      entityId: String(id),
-      payload: {
-        parallelRunComparisonId: String(id),
-        tenantId,
-        newCount: result.newCount,
-        clearedCount: result.clearedCount,
-      },
-      createdAt: now,
-    });
-    return { comparisonId: id, ...result, nextRunAt };
+      now,
+      mode,
+      startProgress(windowOf(mode, now)),
+    );
+    if (progress.stage === "done")
+      return await finishDaily(ctx, tenantId, now, book, progress);
+    return {
+      comparisonId: null,
+      continuing: true as const,
+      ...resultOf(progress),
+      nextRunAt: null,
+    };
+  },
+});
+
+/** The next part of a comparison a run could not finish. */
+export const continueComparison = internalMutation({
+  args: {
+    tenantId: v.string(),
+    now: v.number(),
+    mode: modeValidator,
+    progress: v.string(),
+  },
+  handler: async (ctx, { tenantId, now, mode, progress }) => {
+    const next = await workOrBook(
+      ctx,
+      tenantId,
+      now,
+      mode,
+      JSON.parse(progress) as ComparisonProgress,
+    );
+    if (next.stage !== "done") return null;
+    if (mode.kind === "daily")
+      await finishDaily(ctx, tenantId, now, mode.book, next);
+    else await finishPeriod(ctx, tenantId, now, mode, next);
+    return null;
   },
 });
 
@@ -457,39 +726,29 @@ export const reconcilePeriod = mutation({
       throw new ConvexError("The last day must come after the first day.");
     }
     const now = Date.now();
-    const result = await runComparison(ctx, tenantId, now, { from, to });
-    const verdict = reconcileVerdict(result.summary, result.openInWindow);
-    const summary: ComparisonSummary = {
-      ...result.summary,
-      period: { from, to, verdict },
-    };
-    const id = await ctx.db.insert("parallelRunComparisons", {
+    const mode: ComparisonMode = { kind: "period", from, to };
+    const progress = await workOrBook(
+      ctx,
       tenantId,
-      comparedAt: now,
-      comparedCount: result.comparedCount,
-      openCount: result.openCount,
-      newCount: result.newCount,
-      clearedCount: result.clearedCount,
-      summary: JSON.stringify(summary),
-      nextRunAt: null,
-      createdAt: now,
-      updatedAt: now,
-      version: 0,
-    });
-    await insertStepEvent(ctx, {
-      type: "parallel_run.period_checked",
-      entity: "ParallelRunComparison",
-      entityId: String(id),
-      payload: {
-        parallelRunComparisonId: String(id),
-        tenantId,
-        from,
-        to,
-        passed: verdict.passed,
+      now,
+      mode,
+      startProgress(windowOf(mode, now)),
+    );
+    if (progress.stage === "done")
+      return await finishPeriod(ctx, tenantId, now, { from, to }, progress);
+    // A long history goes on in booked parts; the result shows on the page
+    // when the last part is done.
+    return {
+      comparisonId: null,
+      continuing: true as const,
+      verdict: {
+        passed: false,
+        reasons: [
+          "The check is still running. The result shows here when it is done.",
+        ],
       },
-      createdAt: now,
-    });
-    return { comparisonId: id, verdict, summary };
+      summary: progress.summary,
+    };
   },
 });
 

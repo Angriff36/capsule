@@ -63,13 +63,28 @@ export const getEventBookingDetails = query({
     // Completed signature evidence for this proposal, earliest completion
     // first (deterministic tiebreak by id). Scoped to the tenant like the
     // generated reads.
+    // Read through this proposal's revisions, never the workspace's whole
+    // signature history (evidence must sit on one of these revisions anyway).
+    const revisions = await ctx.db
+      .query("proposalRevisions")
+      .withIndex("by_proposalId", (q) => q.eq("proposalId", proposal._id))
+      .collect();
     const completions = (
-      await ctx.db
-        .query("signatureRequests")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", event.tenantId))
-        .filter((q) => q.eq(q.field("proposalId"), proposal._id))
-        .collect()
+      await Promise.all(
+        revisions.map((revision) =>
+          ctx.db
+            .query("signatureRequests")
+            .withIndex("by_proposalRevisionId", (q) =>
+              q.eq("proposalRevisionId", revision._id),
+            )
+            .collect(),
+        ),
+      )
     )
+      .flat()
+      .filter(
+        (s) => s.tenantId === event.tenantId && s.proposalId === proposal._id,
+      )
       .filter((s) => s.status === "completed" && s.deletedAt == null)
       .sort(
         (a, b) =>
@@ -192,6 +207,8 @@ function isValidTimestamp(ms: number): boolean {
 // Submission volume is capped by the generated QuoteSubmission.create
 // rateLimit (src/sales/quote-submission.manifest).
 const MAX_SHORT = 200;
+const SAME_VISIT_WINDOW_MS = 24 * 60 * 60 * 1000;
+const SAME_VISIT_SCAN_CAP = 1000;
 const MAX_LONG = 4000;
 function bounded(value: string | undefined, max = MAX_SHORT): string {
   return (value ?? "").trim().slice(0, max);
@@ -328,13 +345,20 @@ export const ingressQuoteSubmission = internalMutation({
     // A repeat of the same form visit (double tap, lost response) carries the
     // same submission key, even if a field was changed in between.
     const submissionKey = args.submissionKey.trim();
-    const sameVisit = submissionKey
-      ? await ctx.db
-          .query("quoteSubmissions")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .filter((q) => q.eq(q.field("submissionKey"), submissionKey))
-          .collect()
-      : [];
+    // A repeat of the same visit comes within moments, so only the newest
+    // day of submissions is walked, never the whole submission history.
+    const sameVisit: Doc<"quoteSubmissions">[] = [];
+    if (submissionKey) {
+      const since = Date.now() - SAME_VISIT_WINDOW_MS;
+      let visited = 0;
+      for await (const sub of ctx.db
+        .query("quoteSubmissions")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .order("desc")) {
+        if (++visited > SAME_VISIT_SCAN_CAP || sub._creationTime < since) break;
+        if (sub.submissionKey === submissionKey) sameVisit.unshift(sub);
+      }
+    }
     const existing = [...sameVisit, ...candidates].find(
       (sub) =>
         sub.deletedAt == null &&

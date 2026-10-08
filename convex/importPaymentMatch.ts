@@ -145,22 +145,32 @@ async function isPaymentTaken(
  * Capsule payment. Look-alikes are left for a person.
  */
 export const matchSameIdPayments = mutation({
-  args: {},
+  // One press works one page of the imported payment rows; `cursor` (from
+  // the last press) carries on where it stopped. Reading every import row
+  // of the company at once went past the per-call read limit.
+  args: { cursor: v.optional(v.union(v.string(), v.null())) },
   handler: async (
     ctx,
-  ): Promise<{ matched: number; left: number; more: boolean }> => {
+    { cursor },
+  ): Promise<{
+    matched: number;
+    left: number;
+    more: boolean;
+    cursor: string | null;
+  }> => {
     const auth = await getAuthContext(ctx);
     const tenantId = auth.tenantId;
     if (!tenantId) throw new Error("Sign in to a workspace first.");
-    const rows = (
-      await ctx.db
-        .query("externalRecordLinks")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .collect()
-    ).filter(isOpenPaymentRow);
+    const page = await ctx.db
+      .query("externalRecordLinks")
+      .withIndex("by_tenantId_and_capsuleEntity", (q) =>
+        q.eq("tenantId", tenantId).eq("capsuleEntity", "payment"),
+      )
+      .paginate({ numItems: MAX_ROWS_PER_RUN, cursor: cursor ?? null });
+    const rows = page.page.filter(isOpenPaymentRow);
 
     let matched = 0;
-    for (const link of rows.slice(0, MAX_ROWS_PER_RUN)) {
+    for (const link of rows) {
       const facts = readImportedPayment(link);
       const found = new Map<string, Doc<"payments">>();
       for (const id of [facts.externalId, facts.providerTransactionId]) {
@@ -192,7 +202,8 @@ export const matchSameIdPayments = mutation({
     return {
       matched,
       left: rows.length - matched,
-      more: rows.length > MAX_ROWS_PER_RUN,
+      more: !page.isDone,
+      cursor: page.isDone ? null : page.continueCursor,
     };
   },
 });

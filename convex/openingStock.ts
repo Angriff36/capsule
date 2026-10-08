@@ -112,16 +112,22 @@ async function openRecords(
   ctx: Reader,
   tenantId: string,
 ): Promise<Doc<"openingStockRecords">[]> {
+  // Open states only, through the status index, oldest first as before.
   return (
-    await ctx.db
-      .query("openingStockRecords")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .collect()
-  ).filter(
-    (row) =>
-      row.deletedAt == null &&
-      (row.status === "needs_review" || row.status === "ready"),
-  );
+    await Promise.all(
+      (["needs_review", "ready"] as const).map((status) =>
+        ctx.db
+          .query("openingStockRecords")
+          .withIndex("by_tenantId_and_status", (q) =>
+            q.eq("tenantId", tenantId).eq("status", status),
+          )
+          .collect(),
+      ),
+    )
+  )
+    .flat()
+    .filter((row) => row.deletedAt == null)
+    .sort((a, b) => a._creationTime - b._creationTime);
 }
 
 const forClash = (doc: Doc<"openingStockRecords">): OpenRecordForClash => ({

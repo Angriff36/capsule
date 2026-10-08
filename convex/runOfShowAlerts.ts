@@ -225,9 +225,16 @@ function dueWindows(
 export const collectDueAlerts = internalQuery({
   args: { tenantId: v.string(), now: v.number() },
   handler: async (ctx, args): Promise<RunAlertJob[]> => {
+    // Only events starting inside the alert window, through the startsAt
+    // index — never the whole event history.
     const events = await ctx.db
       .query("events")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", args.tenantId))
+      .withIndex("by_tenantId_and_startsAt", (q) =>
+        q
+          .eq("tenantId", args.tenantId)
+          .gte("startsAt", args.now - EVENT_WINDOW_MS)
+          .lte("startsAt", args.now + EVENT_WINDOW_MS),
+      )
       .collect();
     const inWindow = events.filter(
       (event) =>

@@ -76,15 +76,23 @@ export const matchServiceStyle = internalQuery({
  * have none. Runs as the signed-in person: each event change goes through
  * Event.changeServiceStyle and its own permission check.
  */
+const EVENT_LINKS_PER_CALL = 300;
+
 export const resolveImportedServiceStyle = mutation({
+  // The imported events are worked one page per call: `cursor` and
+  // `appliedBefore` come from the last call's answer, until it returns no
+  // cursor. Only then is the import item marked matched. Reading every
+  // imported event at once went past the per-call read limit.
   args: {
     linkId: v.id("externalRecordLinks"),
     serviceStyleId: v.id("serviceStyles"),
+    cursor: v.optional(v.string()),
+    appliedBefore: v.optional(v.number()),
   },
   handler: async (
     ctx,
-    { linkId, serviceStyleId },
-  ): Promise<{ applied: number }> => {
+    { linkId, serviceStyleId, cursor, appliedBefore },
+  ): Promise<{ applied: number; cursor?: string }> => {
     const auth = await getAuthContext(ctx);
     const link = await ctx.db.get(linkId);
     if (
@@ -106,15 +114,14 @@ export const resolveImportedServiceStyle = mutation({
       throw new Error("Pick one of your active service styles.");
     }
 
-    let applied = 0;
-    const eventLinks = (
-      await ctx.db
-        .query("externalRecordLinks")
-        .withIndex("by_tenantId_and_recordType", (q) =>
-          q.eq("tenantId", auth.tenantId).eq("recordType", "event"),
-        )
-        .collect()
-    ).filter(
+    let applied = appliedBefore ?? 0;
+    const page = await ctx.db
+      .query("externalRecordLinks")
+      .withIndex("by_tenantId_and_recordType", (q) =>
+        q.eq("tenantId", auth.tenantId).eq("recordType", "event"),
+      )
+      .paginate({ numItems: EVENT_LINKS_PER_CALL, cursor: cursor ?? null });
+    const eventLinks = page.page.filter(
       (row) =>
         row.deletedAt == null &&
         row.sourceSystem === link.sourceSystem &&
@@ -146,6 +153,7 @@ export const resolveImportedServiceStyle = mutation({
       });
       applied += 1;
     }
+    if (!page.isDone) return { applied, cursor: page.continueCursor };
 
     await ctx.runMutation(api.mutations.ExternalRecordLink_updateCapsuleId, {
       docId: linkId,

@@ -42,12 +42,16 @@ export async function venueVendorRules(
   venueId: string,
   at: number | null,
 ): Promise<Map<string, VenueVendorStatus>> {
+  const rules = new Map<string, VenueVendorStatus>();
+  const id = ctx.db.normalizeId("venues", venueId);
+  if (!id) return rules;
+  // This venue's rows only, never the workspace's whole vendor list.
   const rows = await ctx.db
     .query("venueVendorRelationships")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+    .withIndex("by_venueId", (q) => q.eq("venueId", id))
     .collect();
-  const rules = new Map<string, VenueVendorStatus>();
   for (const row of rows) {
+    if (row.tenantId !== tenantId) continue;
     if (String(row.venueId) !== venueId || !inForce(row, at)) continue;
     const status = row.status as VenueVendorStatus;
     const current = rules.get(String(row.vendorId));

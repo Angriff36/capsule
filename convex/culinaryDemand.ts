@@ -91,27 +91,16 @@ async function byTenant<
     | "componentComponents"
     | "componentPortionSpecs"
     | "componentSteps"
-    | "componentSnapshots"
     | "dishIngredients"
     | "dishComponents"
     | "dishTasks"
     | "dishTaskMaterials"
     | "ingredients"
     | "itemUnitMappings"
-    | "ingredientPriceObservations"
-    | "wasteRecords"
-    | "eventCloseouts"
-    | "invoices"
-    | "eventDishLineOverrides"
-    | "prepTasks"
-    | "eventDishes"
-    | "eventIngredientContributions"
-    | "productionBatchAllocations"
-    | "productionBatches"
-    | "events"
-    | "ingredientDemands"
-    | "purchaseNeeds",
+    | "ingredientPriceObservations",
 >(ctx: Ctx, table: T, tenantId: string): Promise<Doc<T>[]> {
+  // Catalog tables only. Tables that grow with events (event dishes and
+  // their children, invoices, batches, demand) are read by event: see byEvent.
   // Every table here carries the TenantScoped mixin and its by_tenantId index;
   // typing the builder against one concrete table keeps the index call typed
   // while the runtime uses the real table name.
@@ -127,12 +116,17 @@ async function byTenant<
  * index (live rows of this company only). A whole-company read of these
  * tables passed the 16 MB read limit on the live server (2026-10-08).
  */
-async function byEvent<T extends "eventDishes" | "productionBatchAllocations">(
-  ctx: Ctx,
-  table: T,
-  tenantId: string,
-  eventId: Id<"events">,
-) {
+async function byEvent<
+  T extends
+    | "eventDishes"
+    | "productionBatchAllocations"
+    | "eventIngredientContributions"
+    | "ingredientDemands"
+    | "purchaseNeeds"
+    | "wasteRecords"
+    | "invoices"
+    | "eventCloseouts",
+>(ctx: Ctx, table: T, tenantId: string, eventId: Id<"events">) {
   const rows = await ctx.db
     .query(table as "eventDishes")
     .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
@@ -150,8 +144,70 @@ interface Catalog {
   dishTasks: Doc<"dishTasks">[];
 }
 
-/** Load the tenant's catalog once, shaped for the pure engine. */
-async function loadCatalog(ctx: Ctx, tenantId: string): Promise<Catalog> {
+const toObservation = (o: Doc<"ingredientPriceObservations">) => ({
+  id: String(o._id),
+  ingredientId: String(o.ingredientId),
+  vendorId: o.vendorId ? String(o.vendorId) : null,
+  vendorOrderId: o.vendorOrderId ? String(o.vendorOrderId) : null,
+  unit: unitOf(o.unit),
+  unitPrice: Number(o.unitPrice),
+  observedAt: typeof o.observedAt === "number" ? o.observedAt : null,
+});
+
+/**
+ * Price observations grow with every vendor order, so callers that cost only
+ * some ingredients read just those ingredients' rows (by_ingredientId).
+ */
+async function priceRowsFor(
+  ctx: Ctx,
+  tenantId: string,
+  ingredientIds: Iterable<string>,
+) {
+  const rows = await Promise.all(
+    [...new Set(ingredientIds)].map((id) => {
+      const ingredientId = ctx.db.normalizeId("ingredients", id);
+      return ingredientId
+        ? ctx.db
+            .query("ingredientPriceObservations")
+            .withIndex("by_ingredientId", (q) =>
+              q.eq("ingredientId", ingredientId),
+            )
+            .collect()
+        : [];
+    }),
+  );
+  return live(rows.flat()).filter((row) => row.tenantId === tenantId);
+}
+
+/** A copy of the ingredient lookup with prices for `ingredientIds` filled in. */
+async function withPrices(
+  ctx: Ctx,
+  tenantId: string,
+  ingredients: ReadonlyMap<string, IngredientLike>,
+  ingredientIds: Iterable<string>,
+): Promise<Map<string, IngredientLike>> {
+  const prices = observationsByIngredient(
+    (await priceRowsFor(ctx, tenantId, ingredientIds)).map(toObservation),
+  );
+  return new Map(
+    [...ingredients].map(([id, ingredient]) => [
+      id,
+      { ...ingredient, observations: prices.get(id) ?? [] },
+    ]),
+  );
+}
+
+/**
+ * Load the tenant's catalog once, shaped for the pure engine. Price
+ * observations are read whole only when `priceIngredientIds` is omitted
+ * (whole-catalog cost reports); demand callers pass [] because the demand
+ * engine never reads prices.
+ */
+async function loadCatalog(
+  ctx: Ctx,
+  tenantId: string,
+  priceIngredientIds?: Iterable<string>,
+): Promise<Catalog> {
   const [
     dishes,
     components,
@@ -177,18 +233,12 @@ async function loadCatalog(ctx: Ctx, tenantId: string): Promise<Catalog> {
     byTenant(ctx, "dishTaskMaterials", tenantId),
     byTenant(ctx, "ingredients", tenantId),
     byTenant(ctx, "itemUnitMappings", tenantId),
-    byTenant(ctx, "ingredientPriceObservations", tenantId),
+    priceIngredientIds === undefined
+      ? byTenant(ctx, "ingredientPriceObservations", tenantId)
+      : priceRowsFor(ctx, tenantId, priceIngredientIds),
   ]);
   const pricesByIngredient = observationsByIngredient(
-    priceRows.map((o) => ({
-      id: String(o._id),
-      ingredientId: String(o.ingredientId),
-      vendorId: o.vendorId ? String(o.vendorId) : null,
-      vendorOrderId: o.vendorOrderId ? String(o.vendorOrderId) : null,
-      unit: unitOf(o.unit),
-      unitPrice: Number(o.unitPrice),
-      observedAt: typeof o.observedAt === "number" ? o.observedAt : null,
-    })),
+    priceRows.map(toObservation),
   );
   const stepCounts = new Map<string, number>();
   const steps = await byTenant(ctx, "componentSteps", tenantId);
@@ -200,9 +250,22 @@ async function loadCatalog(ctx: Ctx, tenantId: string): Promise<Catalog> {
     );
   }
   // A recipe taken back to draft keeps feeding events its last published
-  // edition until the draft is published (recipeEdition.ts).
+  // edition until the draft is published (recipeEdition.ts). Only draft
+  // recipes use saved editions, so only their snapshots are read.
   const savedByRecipe = new Map<string, Doc<"componentSnapshots">[]>();
-  for (const row of await byTenant(ctx, "componentSnapshots", tenantId)) {
+  const draftSnapshots = await Promise.all(
+    components
+      .filter((c) => String(c.status) === "draft")
+      .map((c) =>
+        ctx.db
+          .query("componentSnapshots")
+          .withIndex("by_componentId", (q) => q.eq("componentId", c._id))
+          .collect(),
+      ),
+  );
+  for (const row of live(draftSnapshots.flat()).filter(
+    (s) => s.tenantId === tenantId,
+  )) {
     const list = savedByRecipe.get(String(row.componentId)) ?? [];
     list.push(row);
     savedByRecipe.set(String(row.componentId), list);
@@ -569,9 +632,10 @@ async function reviewEvent(
   tenantId: string,
   eventId: Id<"events">,
   proposedHeadcount?: number,
+  loadedCatalog?: Catalog,
 ): Promise<EventDemandReview> {
   await requireEvent(ctx, tenantId, eventId);
-  const catalog = await loadCatalog(ctx, tenantId);
+  const catalog = loadedCatalog ?? (await loadCatalog(ctx, tenantId, []));
   const eventDishes = await loadEventDishes(
     ctx,
     tenantId,
@@ -586,13 +650,52 @@ async function reviewEvent(
       String(a.eventId ?? "") === String(eventId) &&
       a.status !== "released",
   );
-  const batches = await byTenant(ctx, "productionBatches", tenantId);
-  const batchById = new Map(batches.map((b) => [String(b._id), b]));
   // Every live allocation of a live batch keeps its rows, including the
   // surplus allocation, which belongs to no event but is purchased on one.
-  const activeAllocationIds = (
-    await byTenant(ctx, "productionBatchAllocations", tenantId)
-  )
+  // Only this event's allocations and the allocations its demand rows point
+  // at matter (writeReconciledEventDemand checks this event's rows only).
+  const referencedAllocations = await Promise.all(
+    [
+      ...new Set(
+        (await byEvent(ctx, "eventIngredientContributions", tenantId, eventId))
+          .map((row) => row.productionBatchAllocationId)
+          .filter((id): id is string => !!id),
+      ),
+    ].map((id) => {
+      const allocationId = ctx.db.normalizeId("productionBatchAllocations", id);
+      return allocationId ? ctx.db.get(allocationId) : null;
+    }),
+  );
+  const candidateAllocations = live(
+    [
+      ...(await byEvent(ctx, "productionBatchAllocations", tenantId, eventId)),
+      ...referencedAllocations.filter(
+        (a): a is Doc<"productionBatchAllocations"> =>
+          !!a && a.tenantId === tenantId,
+      ),
+    ].filter(
+      (a, index, rows) =>
+        rows.findIndex((b) => String(b._id) === String(a._id)) === index,
+    ),
+  );
+  const batches = live(
+    (
+      await Promise.all(
+        [
+          ...new Set(
+            candidateAllocations.map((a) => String(a.productionBatchId)),
+          ),
+        ].map((id) => {
+          const batchId = ctx.db.normalizeId("productionBatches", id);
+          return batchId ? ctx.db.get(batchId) : null;
+        }),
+      )
+    ).filter(
+      (b): b is Doc<"productionBatches"> => !!b && b.tenantId === tenantId,
+    ),
+  );
+  const batchById = new Map(batches.map((b) => [String(b._id), b]));
+  const activeAllocationIds = candidateAllocations
     .filter((a) => {
       const batch = batchById.get(String(a.productionBatchId));
       return (
@@ -718,10 +821,30 @@ export const componentContentReport = query({
   args: { componentId: v.id("components") },
   handler: async (ctx, args): Promise<ComponentContentReport | null> => {
     const tenantId = requireCulinaryReader(await getAuthContext(ctx));
-    const catalog = await loadCatalog(ctx, tenantId);
+    const catalog = await loadCatalog(ctx, tenantId, []);
     const component = catalog.lookups.components.get(String(args.componentId));
     if (!component) return null;
-    const cost = componentBatchCost(component.id, catalog.lookups);
+    // Price only the ingredients inside this recipe and its sub-recipes.
+    const usedIngredients = new Set<string>();
+    const seen = new Set<string>();
+    const queue = [component.id];
+    while (queue.length) {
+      const current = catalog.lookups.components.get(queue.shift() as string);
+      if (!current || seen.has(current.id)) continue;
+      seen.add(current.id);
+      for (const l of current.ingredientLines)
+        usedIngredients.add(l.ingredientId);
+      for (const l of current.componentLines) queue.push(l.childComponentId);
+    }
+    const cost = componentBatchCost(component.id, {
+      ...catalog.lookups,
+      ingredients: await withPrices(
+        ctx,
+        tenantId,
+        catalog.lookups.ingredients,
+        usedIngredients,
+      ),
+    });
     const usedBy = [...catalog.lookups.components.values()]
       .filter((c) =>
         c.componentLines.some((l) => l.childComponentId === component.id),
@@ -762,7 +885,7 @@ export interface UnresolvedWorkReport {
   }[];
 }
 
-const OPEN_STAGES = new Set([
+const OPEN_STAGES = new Set<Doc<"events">["stage"]>([
   "planning",
   "pending_approval",
   "approved",
@@ -778,7 +901,21 @@ export const kitchenUnresolvedReport = query({
     // An event that is already over (but never closed out) needs nothing
     // ordered or cooked any more, so its gaps are not kitchen work.
     const now = Date.now();
-    const events = (await byTenant(ctx, "events", tenantId))
+    // Only open-stage events count, so read each open stage through its
+    // index instead of every event the company ever had.
+    const openStageEvents = await Promise.all(
+      [...OPEN_STAGES].map((stage) =>
+        ctx.db
+          .query("events")
+          .withIndex("by_tenantId_and_stage_and_startsAt", (q) =>
+            q.eq("tenantId", tenantId).eq("stage", stage),
+          )
+          .collect(),
+      ),
+    );
+    const events = live(openStageEvents.flat())
+      // Same tie order as a whole-company read (creation order).
+      .sort((a, b) => a._creationTime - b._creationTime)
       .filter(
         (e) =>
           OPEN_STAGES.has(e.stage) &&
@@ -866,12 +1003,19 @@ export const eventFoodCostReport = query({
         "Kitchen, finance and managers may read an event's food cost",
       );
     const event = await requireEvent(ctx, tenantId, args.eventId);
-    const catalog = await loadCatalog(ctx, tenantId);
+    const catalog = await loadCatalog(ctx, tenantId, []);
     const eventDishes = await loadEventDishes(ctx, tenantId, args.eventId);
     // Every menu amount counts, including parts a shared batch makes: the
     // event eats that food whichever batch cooks it.
     const demands = eventDishes.map((ed) =>
       expandEventDish(ed, catalog.lookups),
+    );
+    // Only the ingredients this event uses are priced.
+    const pricedIngredients = await withPrices(
+      ctx,
+      tenantId,
+      catalog.lookups.ingredients,
+      demands.flatMap((d) => d.contributions.map((c) => c.ingredientId)),
     );
     const asOf = typeof event.startsAt === "number" ? event.startsAt : null;
     const expectedHeadcount = Number(event.expectedHeadcount ?? 0);
@@ -879,9 +1023,9 @@ export const eventFoodCostReport = query({
     let actual: EventFoodCostInput["actual"] = null;
     let recordedWasteCost = 0;
     if (canReadEventMoney(auth.role)) {
-      const closeout = (await byTenant(ctx, "eventCloseouts", tenantId)).find(
-        (c) => String(c.eventId) === String(args.eventId),
-      );
+      const closeout = (
+        await byEvent(ctx, "eventCloseouts", tenantId, args.eventId)
+      ).find((c) => String(c.eventId) === String(args.eventId));
       const finalized = closeout?.status === "finalized";
       const ingredientCost = Number(closeout?.actualIngredientCost ?? 0);
       // A draft seeded with $0 is not an actual yet.
@@ -895,7 +1039,7 @@ export const eventFoodCostReport = query({
       // reaches it only through an audited closeout correction.
       recordedWasteCost = finalized
         ? Number(closeout?.actualWasteCost ?? 0)
-        : (await byTenant(ctx, "wasteRecords", tenantId))
+        : (await byEvent(ctx, "wasteRecords", tenantId, args.eventId))
             .filter(
               (w) =>
                 String(w.eventId ?? "") === String(args.eventId) &&
@@ -905,7 +1049,7 @@ export const eventFoodCostReport = query({
               (sum, w) => sum + Number(w.quantity) * Number(w.unitCost),
               0,
             );
-      const billed = (await byTenant(ctx, "invoices", tenantId))
+      const billed = (await byEvent(ctx, "invoices", tenantId, args.eventId))
         .filter(
           (i) =>
             String(i.eventId ?? "") === String(args.eventId) &&
@@ -924,7 +1068,7 @@ export const eventFoodCostReport = query({
     return eventFoodCost({
       contributions: demands.flatMap((d) => d.contributions),
       unresolvedItems: demands.reduce((n, d) => n + d.unresolved.length, 0),
-      ingredients: catalog.lookups.ingredients,
+      ingredients: pricedIngredients,
       mappings: catalog.lookups.mappings,
       asOf,
       expectedHeadcount,
@@ -1005,7 +1149,7 @@ export async function writeReconciledEventDemand(
     };
   const review = await reviewEvent(ctx, tenantId, eventId);
   const existingRows = (
-    await byTenant(ctx, "eventIngredientContributions", tenantId)
+    await byEvent(ctx, "eventIngredientContributions", tenantId, eventId)
   ).filter((r) => String(r.eventId) === String(eventId));
   const existing: ExistingContributionRow[] = existingRows.map((r) => ({
     id: String(r._id),
@@ -1137,14 +1281,16 @@ async function buildDemandChangePreview(
 ): Promise<DemandChangePreview> {
   const event = await requireEvent(ctx, tenantId, input.eventId);
   const contributionRows = (
-    await byTenant(ctx, "eventIngredientContributions", tenantId)
+    await byEvent(ctx, "eventIngredientContributions", tenantId, input.eventId)
   ).filter((row) => String(row.eventId) === String(input.eventId));
   const demandRows = (
-    await byTenant(ctx, "ingredientDemands", tenantId)
+    await byEvent(ctx, "ingredientDemands", tenantId, input.eventId)
   ).filter((row) => String(row.eventId) === String(input.eventId));
-  const purchaseNeeds = (await byTenant(ctx, "purchaseNeeds", tenantId)).filter(
-    (row) => String(row.eventId) === String(input.eventId),
-  );
+  const purchaseNeeds = (
+    await byEvent(ctx, "purchaseNeeds", tenantId, input.eventId)
+  ).filter((row) => String(row.eventId) === String(input.eventId));
+  // The preview needs ingredient names only; prices are never read.
+  const catalog = await loadCatalog(ctx, tenantId, []);
 
   const sourceParts = [
     `${input.kind}:${input.eventId}:${input.newHeadcount ?? ""}:${input.demandId ?? ""}`,
@@ -1178,9 +1324,9 @@ async function buildDemandChangePreview(
         nextQuantity: 0,
         isCommitted: need.status === "ordered" || need.status === "fulfilled",
       }));
-    const ingredient = (
-      await loadCatalog(ctx, tenantId)
-    ).lookups.ingredients.get(String(demand.ingredientId));
+    const ingredient = catalog.lookups.ingredients.get(
+      String(demand.ingredientId),
+    );
     const line: DemandChangeLine = {
       key: String(demand._id),
       ingredientId: String(demand.ingredientId),
@@ -1203,6 +1349,7 @@ async function buildDemandChangePreview(
     tenantId,
     input.eventId,
     input.kind === "headcount" ? input.newHeadcount : undefined,
+    catalog,
   );
   const existing = contributionRows.map((row) => ({
     id: String(row._id),
@@ -1216,7 +1363,6 @@ async function buildDemandChangePreview(
   }));
   const current = new Map<string, PreviewContribution>();
   const next = new Map<string, PreviewContribution>();
-  const catalog = await loadCatalog(ctx, tenantId);
   const put = (
     target: Map<string, PreviewContribution>,
     key: string,
@@ -1472,7 +1618,7 @@ export const planSharedRecipeBatch = mutation({
   },
   handler: async (ctx, args): Promise<SharedBatchResult> => {
     const tenantId = requireTenant(await getAuthContext(ctx));
-    const catalog = await loadCatalog(ctx, tenantId);
+    const catalog = await loadCatalog(ctx, tenantId, []);
     const component = catalog.lookups.components.get(String(args.componentId));
     const componentDoc = catalog.components.find(
       (c) => String(c._id) === String(args.componentId),
@@ -1571,14 +1717,26 @@ export const planSharedRecipeBatch = mutation({
     }
     // Per-event-dish recipe contributions for this recipe are now satisfied
     // by the batch: supersede them so demand is not counted twice.
-    const existing = (
-      await byTenant(ctx, "eventIngredientContributions", tenantId)
-    ).filter(
-      (r) =>
-        r.ownership !== "batch_allocation" && r.ownership !== "batch_surplus",
+    // Only the allocated event dishes' rows can match, so read just those.
+    const existingByDish = await Promise.all(
+      args.allocations.map(async (a) =>
+        live(
+          await ctx.db
+            .query("eventIngredientContributions")
+            .withIndex("by_eventDishId", (q) =>
+              q.eq("eventDishId", a.eventDishId),
+            )
+            .collect(),
+        ).filter(
+          (r) =>
+            r.tenantId === tenantId &&
+            r.ownership !== "batch_allocation" &&
+            r.ownership !== "batch_surplus",
+        ),
+      ),
     );
-    for (const a of args.allocations) {
-      for (const row of existing) {
+    for (const [index, a] of args.allocations.entries()) {
+      for (const row of existingByDish[index]) {
         if (String(row.eventDishId) !== String(a.eventDishId)) continue;
         const path = row.componentPath ?? [];
         if (!path.length || path[0] !== component.id) continue;
@@ -1598,11 +1756,46 @@ export const planSharedRecipeBatch = mutation({
       eventId: String(firstEvent.eventId),
       eventDishId: String(firstEvent.eventDishId),
     };
-    const eventDishDocs = await byTenant(ctx, "eventDishes", tenantId);
+    // Shares land only on the allocated event dishes and their events.
+    const eventDishDocs = live(
+      (
+        await Promise.all(
+          [
+            ...new Set([
+              ...args.allocations.map((a) => String(a.eventDishId)),
+              ...plan.contributions.map(
+                (s) => s.eventDishId ?? surplusHome.eventDishId,
+              ),
+            ]),
+          ].map((id) => {
+            const eventDishId = ctx.db.normalizeId("eventDishes", id);
+            return eventDishId ? ctx.db.get(eventDishId) : null;
+          }),
+        )
+      ).filter(
+        (ed): ed is Doc<"eventDishes"> => !!ed && ed.tenantId === tenantId,
+      ),
+    );
     const dishOf = new Map(
       eventDishDocs.map((ed) => [String(ed._id), String(ed.dishId)]),
     );
-    const eventDocs = await byTenant(ctx, "events", tenantId);
+    const eventDocs = live(
+      (
+        await Promise.all(
+          [
+            ...new Set([
+              ...args.allocations.map((a) => String(a.eventId)),
+              ...plan.contributions.map(
+                (s) => s.eventId ?? surplusHome.eventId,
+              ),
+            ]),
+          ].map((id) => {
+            const eventId = ctx.db.normalizeId("events", id);
+            return eventId ? ctx.db.get(eventId) : null;
+          }),
+        )
+      ).filter((e): e is Doc<"events"> => !!e && e.tenantId === tenantId),
+    );
     const weekOf = new Map(
       eventDocs.map((e) => [
         String(e._id),
