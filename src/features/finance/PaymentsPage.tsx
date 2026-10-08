@@ -13,6 +13,7 @@ import {
   useInvoicesByIds,
   useInvoicesInStatuses,
   usePagedRows,
+  useRowsWithEmpty,
 } from "../../lib/financeScopedQueries";
 import { paymentBreakdown } from "./paymentBreakdown";
 import { formatMoneyExact } from "../../lib/format";
@@ -30,6 +31,8 @@ import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 const policy = new CommercialLifecyclePolicy();
 const PAYABLE_STATUSES = ["sent", "viewed", "overdue", "partial"] as const;
 const ledger = new PaymentsLedgerPresenter();
+// An open payment has no settled date yet; settled ones always have one.
+const NO_SETTLED_DATE = ["settledAt"];
 
 const money = (value: FormDataEntryValue | null) => {
   const amount = Number(String(value ?? "").trim());
@@ -37,11 +40,23 @@ const money = (value: FormDataEntryValue | null) => {
 };
 
 export function PaymentsPage() {
-  // The newest payments, a page at a time ("Load more" reads older ones),
-  // the open invoices a payment can go against, and the invoices the shown
-  // payments name.
-  const paymentPages = usePagedRows("payments");
-  const payments = paymentPages.rows;
+  // Every open payment (few, read through the settled-date index), settled
+  // ones a page at a time only once the user shows them, the open invoices a
+  // payment can go against, and the invoices the shown payments name.
+  const [showTerminal, setShowTerminal] = useState(false);
+  const unsettled = useRowsWithEmpty("payments", NO_SETTLED_DATE);
+  const paymentPages = usePagedRows("payments", showTerminal);
+  const payments =
+    unsettled === undefined || (showTerminal && paymentPages.rows === undefined)
+      ? undefined
+      : [
+          ...new Map(
+            [...unsettled, ...(paymentPages.rows ?? [])].map((row) => [
+              row._id,
+              row,
+            ]),
+          ).values(),
+        ];
   const openInvoices = useInvoicesInStatuses(PAYABLE_STATUSES);
   const namedInvoices = useInvoicesByIds(
     (payments ?? []).map((row) => String(row.invoiceId)),
@@ -66,7 +81,6 @@ export function PaymentsPage() {
   const invoiceFromLink =
     new URLSearchParams(window.location.search).get("invoice") ?? "";
   const [showRecord, setShowRecord] = useState(invoiceFromLink !== "");
-  const [showTerminal, setShowTerminal] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState(invoiceFromLink);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -80,11 +94,8 @@ export function PaymentsPage() {
       Number(row.amountDue ?? 0) > 0,
   );
   const activeRows = (payments ?? []).filter((row) => row.deletedAt == null);
-  const visibleRows = showTerminal ? activeRows : ledger.openRows(activeRows);
-  const settledSummary = ledger.settledSummary(activeRows);
-  const hiddenSettledNotice = showTerminal
-    ? null
-    : ledger.hiddenSettledNotice(settledSummary);
+  const openRows = ledger.openRows(activeRows);
+  const visibleRows = showTerminal ? activeRows : openRows;
 
   const invoiceLabel = (id: string) => {
     const invoice = invoices?.find((row) => row._id === id);
@@ -298,7 +309,7 @@ export function PaymentsPage() {
             type="button"
             onClick={() => setShowTerminal((value) => !value)}
           >
-            {ledger.mastheadSettledLabel(settledSummary, showTerminal)}
+            {showTerminal ? "Hide settled" : "Show settled"}
           </button>
           <button
             className="btn btn-primary"
@@ -475,26 +486,25 @@ export function PaymentsPage() {
             <p className="eyebrow">Collections</p>
             <h2>Payments</h2>
           </div>
-          <span>{ledger.headingCount(activeRows, showTerminal)}</span>
+          <span>
+            {showTerminal
+              ? `${openRows.length} open · ${activeRows.length - openRows.length} settled shown`
+              : `${openRows.length} open`}
+          </span>
         </div>
-        {hiddenSettledNotice ? (
-          <p className="mt-3 text-base text-ink-2" role="status">
-            {hiddenSettledNotice}
-          </p>
-        ) : null}
         {loading ? (
           <TableSkeleton rows={5} />
         ) : visibleRows.length === 0 ? (
           <div className="document-empty">
-            <p>No open payments.</p>
-            {hiddenSettledNotice ? (
+            <p>{showTerminal ? "No payments yet." : "No open payments."}</p>
+            {!showTerminal ? (
               <div className="mt-3 flex justify-center gap-2">
                 <button
                   type="button"
                   className="btn btn-primary btn-sm"
                   onClick={() => setShowTerminal(true)}
                 >
-                  {ledger.showSettledLabel(settledSummary)}
+                  Show settled payments
                 </button>
                 {showRecord ? null : (
                   <button
@@ -577,7 +587,7 @@ export function PaymentsPage() {
             </table>
           </div>
         )}
-        {!loading && paymentPages.canLoadMore ? (
+        {!loading && showTerminal && paymentPages.canLoadMore ? (
           <div className="px-4 py-3">
             <button
               type="button"

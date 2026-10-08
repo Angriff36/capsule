@@ -130,7 +130,7 @@ it("updates invoice-detail send eligibility with the live balance and links to t
   });
 });
 
-it("shows the hidden settled total and reveals the actual payments in one click", async () => {
+it("opens on open payments only and reveals the settled ones in one click", async () => {
   backend.values.set("useListPayment", [
     {
       _id: "payment-a",
@@ -151,17 +151,18 @@ it("shows the hidden settled total and reveals the actual payments in one click"
     { _id: invoiceId, invoiceNumber: "INV-204" },
   ]);
   await mount(createElement(PaymentsPage));
-  expect(container.textContent).toContain("0 open · 2 settled");
-  expect(container.textContent).toContain("2 completed payments");
-  expect(container.textContent).toContain("$15,300.00");
+  // Settled payments are history: nothing about them is read until the
+  // user asks, so no settled count or total shows on opening.
+  expect(container.textContent).toContain("0 open");
+  expect(container.textContent).not.toContain("$15,300.00");
   expect(container.querySelectorAll("tbody tr")).toHaveLength(0);
   await click(
     button(
-      "Show 2 settled payments",
+      "Show settled payments",
       container.querySelector(".document-empty")!,
     ),
   );
-  expect(container.textContent).toContain("2 payments");
+  expect(container.textContent).toContain("0 open · 2 settled shown");
   const rows = [...container.querySelectorAll("tbody tr")];
   expect(rows).toHaveLength(2);
   expect(rows[0].textContent).toContain("INV-204");
