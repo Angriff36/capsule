@@ -407,7 +407,15 @@ export const page = query({
       fieldEquals,
     });
     const result = indexed
-      ? { page: indexed, isDone: true, continueCursor: "" }
+      ? {
+          page: indexed,
+          isDone: true,
+          // The rows come whole from the index, as one finished page. The
+          // browser's paging pins a page by repeating the cursor it got back,
+          // so send back the one it pinned with; a new cursor each time makes
+          // it reset and ask again, over and over.
+          continueCursor: paginationOpts.endCursor ?? "indexed",
+        }
       : await ctx.db
           .query(table)
           .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))

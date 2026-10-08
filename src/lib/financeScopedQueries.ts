@@ -6,6 +6,7 @@ import {
   useQuery,
   type RequestForQueries,
 } from "convex/react";
+import { getFunctionName } from "convex/server";
 import { api, type Doc, type Id } from "./api";
 import type { PagedTable } from "../../convex/financeWindow";
 import type { EventLookupRow } from "../../convex/eventLookup";
@@ -142,7 +143,10 @@ function useDocsByIds<Row>(
     for (const id of key ? key.split(",") : [])
       next[id] = { query, args: { id } };
     return next;
-  }, [key, query]);
+    // `api.queries.x` is a new object on every read, so the name stands in
+    // for it; the object itself would rebuild the reads on every draw.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, getFunctionName(query)]);
   const results = useQueries(requests);
   return useMemo(() => {
     if (key === null) return undefined;
@@ -288,7 +292,9 @@ export function useRowsForEachId<Row extends { _id: string }>(
     for (const id of key ? key.split(",") : [])
       next[id] = { query, args: { [argName]: id } };
     return next;
-  }, [key, query, argName]);
+    // See useDocsByIds: the name, not the new-every-read object.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key, getFunctionName(query), argName]);
   const results = useQueries(requests);
   return useMemo(() => {
     if (key === null) return undefined;
