@@ -15,7 +15,8 @@
 //     per-guest line (and base price line) once every dish of it is picked;
 //   - servings follow onto the dish's own line; removing a pick removes only
 //     the dish's own line. A per-guest menu line stays: it is the menu's price,
-//     and one dish less does not make the rest free.
+//     and one dish less does not make the rest free. When the last dish of the
+//     menu is taken off, the menu's per-guest and base lines go too.
 
 import { mutation } from "../_generated/server";
 import { api } from "../_generated/api";
@@ -253,16 +254,48 @@ export const removeProposalDish = mutation({
     });
     const proposal = await ctx.db.get(selection.proposalId);
     if (!proposal || proposal.status !== "draft") return;
+    const lines = await activeLines(ctx, selection.proposalId);
     const line = await ownLine(
       ctx,
-      await activeLines(ctx, selection.proposalId),
+      lines,
       String(selection.menuId),
       String(selection.dishId),
     );
-    if (!line) return;
-    await ctx.runMutation(
-      api.lib.proposalPricing.removeProposalLineAndRecompute,
-      { docId: line._id, version: Number(line.version) },
+    if (line)
+      await ctx.runMutation(
+        api.lib.proposalPricing.removeProposalLineAndRecompute,
+        { docId: line._id, version: Number(line.version) },
+      );
+
+    // The last dish of a per-guest menu taken off: the menu's own lines go
+    // too, so the client is not charged for a menu with no food on it.
+    const menuStillPicked = (
+      await ctx.db
+        .query("proposalDishSelections")
+        .withIndex("by_proposalId", (q) =>
+          q.eq("proposalId", selection.proposalId),
+        )
+        .collect()
+    ).some(
+      (row) =>
+        row.deletedAt == null &&
+        row.selectedAt != null &&
+        String(row.menuId) === String(selection.menuId),
     );
+    if (menuStillPicked) return;
+    const menu = await ctx.db.get(selection.menuId);
+    if (!menu) return;
+    for (const menuLine of lines) {
+      if (
+        (String(menuLine.pricingBasis) === "per_person" &&
+          menuLine.description === `${menu.name} (per guest)`) ||
+        (String(menuLine.pricingBasis) === "flat" &&
+          menuLine.description === `${menu.name} (base price)`)
+      )
+        await ctx.runMutation(
+          api.lib.proposalPricing.removeProposalLineAndRecompute,
+          { docId: menuLine._id, version: Number(menuLine.version) },
+        );
+    }
   },
 });
