@@ -31,24 +31,9 @@ export function useBatchesSince(since: number | "skip") {
   );
 }
 
-/** Planned and in-progress batches of these events and of the house. */
-export function useOpenBatches(
-  eventIds: ReadonlyArray<string | null | undefined> | undefined,
-) {
-  const key =
-    eventIds === undefined
-      ? undefined
-      : [...new Set(eventIds.filter((id): id is string => !!id))]
-          .sort()
-          .join(",");
-  const ids = useMemo(
-    () => (key === undefined ? undefined : key ? key.split(",") : []),
-    [key],
-  );
-  return useQuery(
-    api.productionWindow.openBatches,
-    ids === undefined ? "skip" : { eventIds: ids },
-  );
+/** Every planned and in-progress batch, house or event. */
+export function useOpenBatches() {
+  return useQuery(api.productionWindow.openBatches, {});
 }
 
 const PAGE = 50;

@@ -36,10 +36,22 @@ export type PlanData = {
  * Everything the planning board reads, as one snapshot. A list this role may
  * not read comes back empty, so its checks simply find nothing.
  */
+const NEIGHBOUR_MS = 86_400_000;
+
 export function usePlanSnapshot(shown: { from: number; to: number }): PlanData {
-  // Events on the days the board shows: those that start on them and those
-  // that started earlier and still run into them. Nothing more.
-  const shownWindow = useMemo(() => ({ ...shown, runningIn: true }), [shown]);
+  // Events on the days the board shows (those that start on them and those
+  // that started earlier and still run into them), plus one day either side:
+  // a neighbour's load, travel, setup and cleanup time can reach into the
+  // days shown, and the clash checks must see its crew, trucks and holds.
+  // The board draws only the days shown.
+  const shownWindow = useMemo(
+    () => ({
+      from: shown.from - NEIGHBOUR_MS,
+      to: shown.to + NEIGHBOUR_MS,
+      runningIn: true,
+    }),
+    [shown],
+  );
   const events = useEventRecordsInRange(shownWindow);
   // Staff, trucks, holds and pack lists of the events in the window only
   // (convex/planWindow.ts), not every row the company ever had.
@@ -55,8 +67,9 @@ export function usePlanSnapshot(shown: { from: number; to: number }): PlanData {
   const vehicles = useListVehicle();
   const trailers = useListTrailer();
   const people = useListPerson();
-  // Time off and availability of the people on these events, over the
-  // times those events and their crews cover, not every row ever made.
+  // Time off and availability of every active person the board can put on
+  // an event (not only those already on one), over the times these events
+  // and their crews cover, not every row ever made.
   const awayWindow = useMemo(() => {
     if (events === undefined || assignments === undefined) return "skip";
     let from = shown.from;
@@ -78,7 +91,11 @@ export function usePlanSnapshot(shown: { from: number; to: number }): PlanData {
     return { from, to };
   }, [events, assignments, shown.from, shown.to]);
   const away = useAwayForPeople(
-    assignments?.map((row) => row.personId),
+    people
+      ?.filter(
+        (row) => row.deletedAt == null && String(row.status) === "active",
+      )
+      .map((row) => row._id),
     awayWindow,
   );
   const timeOff = away?.timeOff;

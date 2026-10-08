@@ -81,6 +81,21 @@ export async function resolveCatalogPrice(
   return price;
 }
 
+// A line's menu link (a per-guest or base price from a dish pick) must name
+// a live menu of the same company; anything else is refused.
+async function assertOwnMenuLink(
+  ctx: { db: any },
+  menuId: string | undefined,
+  tenantId: string,
+): Promise<void> {
+  if (menuId == null) return;
+  const id = ctx.db.normalizeId("menus", menuId);
+  const menu = id ? await ctx.db.get(id) : null;
+  if (!menu || menu.tenantId !== tenantId || menu.deletedAt != null) {
+    throw new Error("That menu is not in your menu catalog.");
+  }
+}
+
 // Enforce a valid catalog link at write (throws on invalid). Thin throwing
 // wrapper over resolveCatalogPrice; no-op for free-form lines (no menuDishId).
 export async function assertValidCatalogLink(
@@ -284,6 +299,7 @@ export const addProposalLineAndRecompute = mutation({
     }
     await assertValidCatalogLink(ctx, args.menuDishId, proposal.tenantId);
     await assertValidRentalLink(ctx, args.equipmentId, proposal.tenantId);
+    await assertOwnMenuLink(ctx, args.menuId, proposal.tenantId);
     const amount = await authoritativeAmountForTarget(
       ctx,
       args.proposalId,

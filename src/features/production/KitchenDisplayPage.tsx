@@ -103,29 +103,8 @@ export function KitchenDisplayPage() {
   // tasks and batches name, wherever they fall.
   const events = usePickerEvents();
   const [eventFilter, setEventFilter] = useState<string>("all");
-  // Batches still to cook for the house and for the events this screen
-  // shows: not finished and not two days gone, or the one picked above.
-  const [shownSince] = useState(() => Date.now() - 2 * 86_400_000);
-  const batchEventIds = useMemo(
-    () =>
-      events === undefined
-        ? undefined
-        : [
-            ...events
-              .filter(
-                (event) =>
-                  !["cancelled", "completed", "closed_out"].includes(
-                    String(event.stage),
-                  ) && !(event.startsAt != null && event.startsAt < shownSince),
-              )
-              .map((event) => event._id as string),
-            ...(eventFilter === "all" || eventFilter === "house"
-              ? []
-              : [eventFilter]),
-          ],
-    [events, eventFilter, shownSince],
-  );
-  const batches = useOpenBatches(batchEventIds);
+  // Every batch still to cook, house or event, however old its event.
+  const batches = useOpenBatches();
   const boardEventIds = useMemo(
     () =>
       tasks && batches

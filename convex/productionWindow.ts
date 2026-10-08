@@ -294,35 +294,28 @@ export const batchesSince = query({
   },
 });
 
-const OPEN_BATCH = new Set(["planned", "in_progress"]);
+const OPEN_BATCH = new Set(["planned", "in_progress"] as const);
 
 /**
- * Batches still to cook (planned or in progress) for these events and for
- * the house (no event): what the kitchen display shows.
+ * Every batch still to cook (planned or in progress), house or event, read
+ * through the status index: what the kitchen display shows. An open batch
+ * of an event that started days ago still shows, so it can be finished.
  */
 export const openBatches = query({
-  args: { eventIds: v.array(v.string()) },
-  handler: async (ctx, { eventIds }): Promise<Batch[]> => {
+  args: {},
+  handler: async (ctx): Promise<Batch[]> => {
     const auth = await getAuthContext(ctx);
     if (!auth.tenantId || !rules(auth).kitchen) return [];
     const tenantId = auth.tenantId;
-    const keys: Array<Id<"events"> | null | undefined> = [null, undefined];
-    for (const raw of [...new Set(eventIds)].slice(0, EVENT_CAP)) {
-      const id = ctx.db.normalizeId("events", raw);
-      if (id) keys.push(id);
-    }
     const out: Batch[] = [];
-    for (const eventId of keys)
+    for (const status of OPEN_BATCH)
       for (const row of await ctx.db
         .query("productionBatches")
-        .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
-        .collect())
-        if (
-          row.tenantId === tenantId &&
-          row.deletedAt == null &&
-          OPEN_BATCH.has(row.status)
+        .withIndex("by_tenantId_and_status_and_completedAt", (q) =>
+          q.eq("tenantId", tenantId).eq("status", status),
         )
-          out.push(withVariance(row));
+        .collect())
+        if (row.deletedAt == null) out.push(withVariance(row));
     return out;
   },
 });
