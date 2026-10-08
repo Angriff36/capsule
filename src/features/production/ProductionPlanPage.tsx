@@ -2,10 +2,10 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useListComponent,
-  useListDishTask,
   useListStation,
 } from "../../lib/manifest-convex-react";
 import { usePlanWork } from "../../lib/productionScopedQueries";
+import { useDishTasksByIds } from "../../lib/eventHistoryQueries";
 import { TableSkeleton } from "../../ui/primitives";
 import { useEventsById } from "../facilities/useEventsById";
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
@@ -219,7 +219,10 @@ export function ProductionPlanPage() {
   // plan leaves finished and cancelled events out), never the whole lists.
   const work = usePlanWork();
   const prepTasks = work?.tasks;
-  const dishTasks = useListDishTask();
+  // Only the prep steps the plan's tasks follow.
+  const dishTasks = useDishTasksByIds(
+    useMemo(() => prepTasks?.map((task) => task.dishTaskId), [prepTasks]),
+  );
   const batches = work?.batches;
   const allocations = work?.allocations;
   // The plan only reads the events its own prep tasks and batches name.

@@ -1,9 +1,6 @@
 import { useMemo } from "react";
-import {
-  useListVehicleFuelLog,
-  useListVehicleMaintenanceSchedule,
-  useListVehicleServiceEntry,
-} from "../../lib/manifest-convex-react";
+import { useListVehicleMaintenanceSchedule } from "../../lib/manifest-convex-react";
+import { useVehicleOdometers } from "../facilities/useFacilitiesHistory";
 
 /**
  * Service each truck is past due for, by date or by miles, named for a
@@ -11,15 +8,19 @@ import {
  */
 export function useOverdueVehicleService(): ReadonlyMap<string, string[]> {
   const schedules = useListVehicleMaintenanceSchedule();
-  const fuel = useListVehicleFuelLog();
-  const service = useListVehicleServiceEntry();
+  // Latest odometer reading of the trucks with a mileage schedule only.
+  const mileageVehicleIds = useMemo(
+    () =>
+      schedules
+        ?.filter(
+          (row) => row.deletedAt == null && row.intervalType === "mileage",
+        )
+        .map((row) => String(row.vehicleId)),
+    [schedules],
+  );
+  const odometers = useVehicleOdometers(mileageVehicleIds);
   return useMemo(() => {
-    const odometer = new Map<string, number>();
-    for (const row of [...(fuel ?? []), ...(service ?? [])]) {
-      if (row.deletedAt != null) continue;
-      const id = String(row.vehicleId);
-      odometer.set(id, Math.max(odometer.get(id) ?? 0, Number(row.odometer)));
-    }
+    const odometer = new Map<string, number>(Object.entries(odometers ?? {}));
     const now = Date.now();
     const out = new Map<string, string[]>();
     for (const row of schedules ?? []) {
@@ -33,5 +34,5 @@ export function useOverdueVehicleService(): ReadonlyMap<string, string[]> {
       if (overdue) out.set(id, [...(out.get(id) ?? []), row.taskName]);
     }
     return out;
-  }, [schedules, fuel, service]);
+  }, [schedules, odometers]);
 }

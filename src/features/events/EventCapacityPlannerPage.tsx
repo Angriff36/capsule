@@ -17,10 +17,6 @@ import {
 import "./EventCapacityPlannerPage.css";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
-// Two days back keeps a job that started just before the range and still
-// runs into it; nothing earlier is loaded.
-const CAPACITY_LOOKBACK_DAYS = 2;
-
 const weekday = new Intl.DateTimeFormat("en-US", { weekday: "short" });
 const monthDay = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -116,8 +112,10 @@ export function EventCapacityPlannerPage() {
     const through = parseLocalDate(endDate);
     return Number.isFinite(from) && Number.isFinite(through) && from <= through
       ? {
-          from: addLocalDays(from, -CAPACITY_LOOKBACK_DAYS),
+          from,
           to: addLocalDays(through, 1),
+          // Bookings that started before the range and still run into it.
+          runningIn: true,
         }
       : ("skip" as const);
   }, [endDate, startDate]);

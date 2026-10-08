@@ -111,6 +111,226 @@ vi.mock("convex/react", async (importOriginal) => {
       const name = getFunctionName(reference);
       backend.reads(name, args);
       if (args === "skip") return undefined;
+      // Facilities and fleet scoped reads (convex/facilitiesHistoryWindow.ts):
+      // the test's generated-list rows, narrowed as the server would.
+      if (
+        name.startsWith("facilitiesHistoryWindow:") &&
+        !backend.values.has(name)
+      ) {
+        const live = (hook: string) =>
+          (
+            (backend.values.get(hook) ?? []) as (Record<string, unknown> & {
+              deletedAt?: number | null;
+            })[]
+          ).filter((row) => row.deletedAt == null);
+        const a = (args ?? {}) as Record<string, unknown>;
+        const num = (value: unknown) => Number(value ?? 0);
+        const logged = (hook: string) =>
+          live(hook).filter((row) => row.loggedAt != null);
+        switch (name) {
+          case "facilitiesHistoryWindow:equipmentServiceSummary": {
+            const entries = logged("useListEquipmentServiceEntry");
+            return {
+              tasks: ((a.taskIds as string[]) ?? []).map((taskId) => {
+                const mine = entries
+                  .filter((row) => String(row.maintenanceTaskId) === taskId)
+                  .sort((x, y) => num(y.completedAt) - num(x.completedAt));
+                return {
+                  taskId,
+                  latest: mine[0] ?? null,
+                  count: mine.length,
+                  capped: false,
+                };
+              }),
+              total: entries.length,
+              totalCapped: false,
+            };
+          }
+          case "facilitiesHistoryWindow:maintenanceDueBefore":
+            return live("useListEquipmentMaintenanceTask").filter(
+              (row) =>
+                row.nextDueAt != null && num(row.nextDueAt) <= num(a.before),
+            );
+          case "facilitiesHistoryWindow:vehicleOdometers": {
+            const ids = new Set((a.vehicleIds as string[]) ?? []);
+            const out: Record<string, number> = {};
+            for (const row of [
+              ...live("useListVehicleFuelLog"),
+              ...live("useListVehicleServiceEntry"),
+            ]) {
+              const id = String(row.vehicleId);
+              if (ids.has(id))
+                out[id] = Math.max(out[id] ?? 0, num(row.odometer));
+            }
+            return out;
+          }
+          case "facilitiesHistoryWindow:vehicleLogPage": {
+            const fuel = logged("useListVehicleFuelLog");
+            const service = logged("useListVehicleServiceEntry");
+            const limit = num(a.limit);
+            return {
+              fuel: fuel.slice(0, limit),
+              service: service.slice(0, limit),
+              fuelCount: fuel.length,
+              serviceCount: service.length,
+              countsCapped: false,
+              hasOlder: fuel.length > limit || service.length > limit,
+            };
+          }
+          case "facilitiesHistoryWindow:rentalMonth": {
+            const from = num(a.from);
+            const to = num(a.to);
+            const events = live("useListEvent");
+            const inMonth = new Set(
+              events
+                .filter(
+                  (row) =>
+                    row.startsAt != null &&
+                    num(row.startsAt) >= from &&
+                    num(row.startsAt) < to,
+                )
+                .map((row) => String(row._id)),
+            );
+            return {
+              holds: live("useListEquipmentReservation").filter(
+                (row) =>
+                  inMonth.has(String(row.eventId)) ||
+                  (row.startsAt != null &&
+                    row.endsAt != null &&
+                    num(row.startsAt) < to &&
+                    num(row.endsAt) > from),
+              ),
+              lines: live("useListRentalOrderLine").filter((row) =>
+                inMonth.has(String(row.eventId)),
+              ),
+              issues: live("useListEquipmentIssue").filter(
+                (row) =>
+                  row.raisedAt != null &&
+                  num(row.raisedAt) >= from &&
+                  num(row.raisedAt) < to,
+              ),
+            };
+          }
+          case "facilitiesHistoryWindow:leadsForSources": {
+            const ids = new Set((a.sourceIds as string[]) ?? []);
+            return live("useListLead").filter((row) =>
+              ids.has(String(row.referralSourceId)),
+            );
+          }
+          case "facilitiesHistoryWindow:notesForVenues": {
+            const ids = new Set((a.venueIds as string[]) ?? []);
+            return live("useListVenueNote").filter((row) =>
+              ids.has(String(row.venueId)),
+            );
+          }
+          case "facilitiesHistoryWindow:venueEvents":
+            return live("useListEvent").filter(
+              (row) => String(row.venueId ?? "") === a.venueId,
+            );
+        }
+      }
+      // Event, planning and kitchen history reads (convex/historyWindow.ts):
+      // the test's generated-list rows, narrowed as the server would.
+      if (name.startsWith("historyWindow:") && !backend.values.has(name)) {
+        const live = (hook: string) =>
+          (
+            (backend.values.get(hook) ?? []) as (Record<string, unknown> & {
+              deletedAt?: number | null;
+            })[]
+          ).filter((row) => row.deletedAt == null);
+        const a = (args ?? {}) as Record<string, unknown>;
+        if (name === "historyWindow:awayForPeople") {
+          const people = new Set((a.personIds as string[]) ?? []);
+          const overlaps = (row: Record<string, unknown>) =>
+            people.has(String(row.personId)) &&
+            typeof row.startsAt === "number" &&
+            typeof row.endsAt === "number" &&
+            row.startsAt < (a.to as number) &&
+            row.endsAt > (a.from as number);
+          return {
+            timeOff: live("useListTimeOffRequest").filter(
+              (row) => row.status === "approved" && overlaps(row),
+            ),
+            availability: live("useListAvailabilityWindow").filter(overlaps),
+          };
+        }
+        if (name === "historyWindow:eventsByNumber")
+          return live("useListEvent").filter(
+            (row) => row.eventNumber === a.eventNumber,
+          );
+        if (name === "historyWindow:importNumberRecords")
+          return {
+            proposals: live("useListProposal").filter(
+              (row) => row.proposalNumber === a.number,
+            ),
+            vendorOrders: live("useListVendorOrder").filter((row) =>
+              String(row.orderNumber ?? "").startsWith(`TPP-${a.number}-`),
+            ),
+          };
+        if (name === "historyWindow:dishTasksByIds") {
+          const ids = new Set((a.ids as string[]) ?? []);
+          const rows = live("useListDishTask");
+          for (const row of rows)
+            if (ids.has(String(row._id)) && row.sequenceAfterDishTaskId)
+              ids.add(String(row.sequenceAfterDishTaskId));
+          return rows.filter((row) => ids.has(String(row._id)));
+        }
+      }
+      // Stock lines with only the holds a screen uses
+      // (convex/inventoryHistoryWindow.ts): the test's generated stock rows,
+      // whose `reservations` stand for every hold on the line.
+      if (
+        name === "inventoryHistoryWindow:stockLines" &&
+        !backend.values.has(name)
+      ) {
+        const { holds } = args as { holds: "none" | "totals" | "active" };
+        const items = backend.values.get("useListInventoryItem") as
+          | (Record<string, unknown> & {
+              deletedAt?: number | null;
+              reservations?: Record<string, unknown>[];
+            })[]
+          | undefined;
+        if (items === undefined) return undefined;
+        return items
+          .filter((row) => row.deletedAt == null)
+          .map((row) => {
+            const { reservations, totalReserved, availableQuantity, ...rest } =
+              row;
+            if (holds === "none") return rest;
+            const all = reservations ?? [];
+            const active = all.filter((hold) => hold.status === "active");
+            const reserved =
+              reservations === undefined
+                ? totalReserved
+                : active.reduce((sum, hold) => sum + Number(hold.quantity), 0);
+            const totals = {
+              ...rest,
+              totalReserved: reserved,
+              availableQuantity:
+                reservations === undefined
+                  ? availableQuantity
+                  : Number(row.quantityOnHand) - Number(reserved),
+            };
+            if (holds === "totals") return totals;
+            const byLot = new Map<string, number>();
+            for (const hold of all) {
+              if (hold.deletedAt != null || hold.inventoryLotId == null)
+                continue;
+              if (hold.status !== "active" && hold.status !== "consumed")
+                continue;
+              const lot = String(hold.inventoryLotId);
+              byLot.set(lot, (byLot.get(lot) ?? 0) + Number(hold.quantity));
+            }
+            return {
+              ...totals,
+              reservations: active,
+              lotAllocations: [...byLot].map(([inventoryLotId, quantity]) => ({
+                inventoryLotId,
+                quantity,
+              })),
+            };
+          });
+      }
       // The light client list (convex/clientDirectory.ts) answers from the
       // same client rows a test gives the generated list, unless the test
       // sets its own.
@@ -464,6 +684,65 @@ vi.mock("convex/react", async (importOriginal) => {
           capped: false,
         };
       }
+      // Staff and admin history reads (convex/workforceHistoryWindow.ts):
+      // the test's generated-list rows, narrowed as the server would.
+      if (
+        name.startsWith("workforceHistoryWindow:") &&
+        !backend.values.has(name)
+      ) {
+        const live = (hook: string) =>
+          (
+            (backend.values.get(hook) ?? []) as (Record<string, unknown> & {
+              deletedAt?: number | null;
+            })[]
+          ).filter((row) => row.deletedAt == null);
+        const a = (args ?? {}) as Record<string, unknown>;
+        switch (name) {
+          case "workforceHistoryWindow:interviewsFor": {
+            const ids = new Set((a.candidateIds as string[]) ?? []);
+            return live("useListInterview").filter((row) =>
+              ids.has(String(row.candidateId)),
+            );
+          }
+          case "workforceHistoryWindow:oneOnOneActionsFor": {
+            const ids = new Set((a.oneOnOneIds as string[]) ?? []);
+            const actions = live("useListOneOnOneAction");
+            const staffMeetings = a.staffMemberId
+              ? live("useListOneOnOne").filter(
+                  (row) =>
+                    row.staffMemberId === a.staffMemberId && row.heldAt != null,
+                )
+              : [];
+            const staffIds = new Set(staffMeetings.map((row) => row._id));
+            return {
+              actions: actions.filter((row) => ids.has(String(row.oneOnOneId))),
+              staffMeetings,
+              staffActions: actions.filter((row) =>
+                staffIds.has(row.oneOnOneId),
+              ),
+            };
+          }
+          case "workforceHistoryWindow:trainingCompletionCounts": {
+            const byModule: Record<string, number> = {};
+            let total = 0;
+            for (const row of live("useListTrainingCompletion")) {
+              if (row.recordedAt == null) continue;
+              const key = String(row.trainingModuleId);
+              byModule[key] = (byModule[key] ?? 0) + 1;
+              total += 1;
+            }
+            return { total, byModule };
+          }
+          case "workforceHistoryWindow:activeAnnouncements":
+            return live("useListAnnouncement").filter(
+              (row) => Number(row.expiresAt) > Number(a.now),
+            );
+          case "workforceHistoryWindow:pendingImportConflicts":
+            return live("useListImportConflict").filter(
+              (row) => row.status === "pending",
+            );
+        }
+      }
       // Staff screens' scoped reads (convex/workforceWindow.ts and the
       // generated per-person and per-state lists): the test's generated-list
       // rows, narrowed as the server would.
@@ -788,8 +1067,6 @@ vi.mock("convex/react", async (importOriginal) => {
           )[0]!;
           return live(byField[name]).filter((row) => row[field] === value);
         }
-        if (name === "queries:listPurchaseNeed")
-          return backend.values.get("useListPurchaseNeed") ?? [];
         if (name === "queries:listVendorOrderByTenantIdAndStatus") {
           const { status } = args as { status: string };
           const lines = live("useListVendorOrderLine");
@@ -1072,20 +1349,41 @@ vi.mock("convex/react", async (importOriginal) => {
               ? (backend.values.get("useListPackList") ?? [])
               : name.startsWith("inventoryWindow:") && !backend.values.has(name)
                 ? supplyPage(name, args)
-                : name.startsWith("workforceWindow:") &&
+                : name.startsWith("workforceHistoryWindow:") &&
                     !backend.values.has(name)
                   ? (
                       (backend.values.get(
                         {
-                          "workforceWindow:timeRecordPage": "useListTimeRecord",
-                          "workforceWindow:availabilityWindowPage":
-                            "useListAvailabilityWindow",
-                          "workforceWindow:swapRequestPage":
-                            "useListShiftSwapRequest",
+                          "workforceHistoryWindow:candidatePage":
+                            "useListCandidate",
+                          "workforceHistoryWindow:oneOnOnePage":
+                            "useListOneOnOne",
+                          "workforceHistoryWindow:performanceReviewPage":
+                            "useListPerformanceReview",
+                          "workforceHistoryWindow:trainingCompletionPage":
+                            "useListTrainingCompletion",
+                          "workforceHistoryWindow:trainingSignOffPage":
+                            "useListTrainingSignOff",
+                          "workforceHistoryWindow:announcementPage":
+                            "useListAnnouncement",
                         }[name] ?? name,
                       ) ?? []) as { deletedAt?: number | null }[]
                     ).filter((row) => row.deletedAt == null)
-                  : backend.values.get(name);
+                  : name.startsWith("workforceWindow:") &&
+                      !backend.values.has(name)
+                    ? (
+                        (backend.values.get(
+                          {
+                            "workforceWindow:timeRecordPage":
+                              "useListTimeRecord",
+                            "workforceWindow:availabilityWindowPage":
+                              "useListAvailabilityWindow",
+                            "workforceWindow:swapRequestPage":
+                              "useListShiftSwapRequest",
+                          }[name] ?? name,
+                        ) ?? []) as { deletedAt?: number | null }[]
+                      ).filter((row) => row.deletedAt == null)
+                    : backend.values.get(name);
       return rows === undefined
         ? { results: [], status: "LoadingFirstPage", loadMore: () => {} }
         : { results: rows, status: "Exhausted", loadMore: () => {} };

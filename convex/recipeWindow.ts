@@ -100,20 +100,19 @@ export type OpenComponentImport = Pick<
   "_id" | "parsedName" | "sourceFilename" | "status" | "updatedAt"
 >;
 
-const RESUMABLE = new Set([
+const RESUMABLE = [
   "uploaded",
   "parsed",
   "reviewing",
   "ready",
   "finalizing",
   "failed",
-]);
+] as const;
 
 /**
  * The recipe imports still in progress, most recently changed first, at most
- * eight, without their source text (listComponentImport). componentImports
- * has no status index, so the company's imports are read here and only the
- * few short rows the import page lists go to the browser.
+ * eight, without their source text (listComponentImport). Only imports in
+ * those states are read, through the status index.
  */
 export const openComponentImports = query({
   args: {},
@@ -121,12 +120,19 @@ export const openComponentImports = query({
     const auth = await getAuthContext(ctx);
     if (!auth.tenantId || !canRead(auth, ["kitchenAccess"])) return [];
     const tenantId = auth.tenantId;
-    const rows = await ctx.db
-      .query("componentImports")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .collect();
+    const rows: Doc<"componentImports">[] = [];
+    for (const status of RESUMABLE)
+      rows.push(
+        ...(await ctx.db
+          .query("componentImports")
+          .withIndex("by_tenantId_and_status", (q) =>
+            q.eq("tenantId", tenantId).eq("status", status),
+          )
+          .collect()),
+      );
     return rows
-      .filter((row) => row.deletedAt == null && RESUMABLE.has(row.status))
+      .filter((row) => row.deletedAt == null)
+      .sort((a, b) => a._creationTime - b._creationTime)
       .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0))
       .slice(0, OPEN_IMPORTS_SHOWN)
       .map((row) => ({

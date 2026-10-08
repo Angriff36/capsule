@@ -2,9 +2,9 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   useListIngredient,
-  useListInventoryItem,
   useListVendor,
 } from "../../lib/manifest-convex-react";
+import { useStockLines } from "../facilities/useInventoryHistory";
 import { formatCount, formatDate, formatMoneyExact } from "../../lib/format";
 import { PageHeader, Skeleton, StatusChip } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
@@ -53,7 +53,7 @@ const URGENCY_CHIP: Record<Urgency, string> = {
 };
 
 export function InventoryOverviewPage() {
-  const items = useListInventoryItem();
+  const items = useStockLines("none");
   // Only the orders still open (all this page counts), with their lines.
   const orders = useVendorOrdersInStatuses(OPEN_ORDER_STATUSES);
   const lines = useMemo(

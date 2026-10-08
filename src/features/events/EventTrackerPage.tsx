@@ -49,8 +49,6 @@ import { DemandChangePreviewDialog } from "../inventory/DemandChangePreviewDialo
 import { CascadePreviewDialog } from "./CascadePreviewDialog";
 
 const LANE_DAYS = 14;
-// Two days back keeps a job that started yesterday and still runs on Today.
-const TRACKER_DAYS_BACK = 2;
 // "Later" loads this many more days each time it is asked.
 const LATER_STEP_DAYS = 30;
 // Mirrors the Event command guards in src/operations/event.manifest so a card
@@ -156,14 +154,16 @@ const NO_VENUE = "no-venue";
 export function EventTrackerPage() {
   const authStatus = useAuthStatus();
   const today = startOfDay(Date.now());
-  // Only the lanes on screen: the next two weeks, plus undated events.
-  // "Later" loads more days only when asked.
+  // Only the lanes on screen: the next two weeks, jobs that started earlier
+  // and still run today, and undated events. "Later" loads more days only
+  // when asked.
   const [laterDays, setLaterDays] = useState(0);
   const eventWindow = useMemo(
     () => ({
-      from: addDays(today, -TRACKER_DAYS_BACK),
+      from: today,
       to: addDays(today, LANE_DAYS + laterDays),
       withUndated: true,
+      runningIn: true,
     }),
     [today, laterDays],
   );

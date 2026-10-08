@@ -89,7 +89,9 @@ export function useEventsInRange(
  * `rangeDocs`, at most 3000). Same loading/empty rules as useEventsInRange.
  */
 export function useEventRecordsInRange(
-  window: { from: number; to: number; withUndated?: boolean } | "skip",
+  window:
+    | { from: number; to: number; withUndated?: boolean; runningIn?: boolean }
+    | "skip",
 ): Doc<"events">[] | undefined {
   const result = useQuery(api.eventLookup.rangeDocs, window);
   if (result === undefined) return undefined;

@@ -6,7 +6,6 @@ import {
   useCreateVendorOrder,
   useListIngredient,
   useListItemUnitMapping,
-  useListInventoryItem,
   useListVendor,
   useListVendorContact,
   useCreateWeeklyPurchasingConfig,
@@ -17,6 +16,7 @@ import {
   usePurchaseNeedMarkOrdered,
   useWeeklyPurchasingConfigSetOrderApprovalThreshold,
 } from "../../lib/manifest-convex-react";
+import { useStockLines } from "../facilities/useInventoryHistory";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import {
   BulkActionBar,
@@ -83,7 +83,7 @@ export function PurchasingPage() {
   const orders = orderPages.rows;
   const drafts = useVendorOrdersInStatuses(DRAFT_STATUS);
   const ingredients = useListIngredient();
-  const inventoryItems = useListInventoryItem();
+  const inventoryItems = useStockLines("totals");
   const vendorContacts = useListVendorContact();
   const scoreInputs = useVendorScoreInputs(PERFORMANCE_WINDOW_MS);
   const sent = useSentOrderNeeds();

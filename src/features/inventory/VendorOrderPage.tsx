@@ -2,11 +2,9 @@ import { useMemo, useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ReturnToListLink } from "../list-state/listOrigin";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
-import { useEventsById } from "../facilities/useEventsById";
-import {
-  usePurchaseNeedsWhen,
-  useVendorOrderRows,
-} from "../facilities/useLogisticsWindow";
+import { useEventsById, useEventsInRange } from "../facilities/useEventsById";
+import { useVendorOrderRows } from "../facilities/useLogisticsWindow";
+import { useDemandsForEvents } from "../facilities/useInventoryWindow";
 import { formatQuantity, formatMoneyExact } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
@@ -15,7 +13,6 @@ import {
   useGetVendorOrder,
   useListIngredient,
   useListItemUnitMapping,
-  useListInventoryItem,
   useListStorageLocation,
   useListVendor,
   useListVendorContact,
@@ -35,6 +32,7 @@ import {
   useVendorOrderSubmitForApproval,
   useVendorOrderUpdateTotals,
 } from "../../lib/manifest-convex-react";
+import { useStockLines } from "../facilities/useInventoryHistory";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
@@ -63,6 +61,9 @@ import { contractPrice } from "./contractPrice";
 import { VendorOrderLinePacks } from "./VendorOrderLinePacks";
 
 const policy = new SupplyLifecyclePolicy();
+const PICKER_DAY_MS = 86_400_000;
+/** Days of coming events an order with no week or event offers needs from. */
+const PICKER_DAYS = 14;
 
 export function VendorOrderPage() {
   const { id } = useParams();
@@ -77,7 +78,23 @@ export function VendorOrderPage() {
   const orderRows = useVendorOrderRows(order ? order._id : null);
   const lines = orderRows.lines;
   const demandLinks = orderRows.links;
-  const pickerNeeds = usePurchaseNeedsWhen(showLineForm);
+  // The add-line form offers the needs of this order's own event and of the
+  // events in its purchasing week (the next two weeks for an order with
+  // neither), read only while the form is open.
+  const pickDay = new Date().setHours(0, 0, 0, 0);
+  const pickFrom = order?.sourceRangeStart ?? pickDay;
+  const pickTo =
+    order?.sourceRangeEnd != null
+      ? order.sourceRangeEnd + PICKER_DAY_MS
+      : pickFrom + PICKER_DAYS * PICKER_DAY_MS;
+  const pickerEvents = useEventsInRange(
+    showLineForm && order ? { from: pickFrom, to: pickTo } : "skip",
+  );
+  const pickerNeeds = useDemandsForEvents(
+    showLineForm && order && pickerEvents
+      ? [order.eventId, ...pickerEvents.map((event) => event._id)]
+      : undefined,
+  )?.needs;
   const needs = useMemo(
     () =>
       orderRows.filled === undefined ||
@@ -105,7 +122,7 @@ export function VendorOrderPage() {
   const inventoryLots = orderRows.lots;
   const unitMappings = useListItemUnitMapping();
   const locations = useListStorageLocation();
-  const stockLines = useListInventoryItem();
+  const stockLines = useStockLines("none");
   const createLocation = useCreateStorageLocation();
   const createLine = useCreateVendorOrderLine();
   const submitOrder = useVendorOrderSubmit();

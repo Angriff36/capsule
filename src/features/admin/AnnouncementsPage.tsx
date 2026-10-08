@@ -8,8 +8,11 @@ import { api, type Id } from "../../lib/api";
 import {
   useAnnouncementRemove,
   useCreateAnnouncement,
-  useListAnnouncement,
 } from "../../lib/manifest-convex-react";
+import {
+  useActiveAnnouncements,
+  useAnnouncementPages,
+} from "../../lib/workforceHistoryQueries";
 import {
   ErrorState,
   PageHeader,
@@ -87,7 +90,11 @@ const dateFormat = new Intl.DateTimeFormat(undefined, {
 
 export function AnnouncementsPage() {
   const authStatus = useQuery(api.authStatus.getAuthStatus, {});
-  const announcements = useListAnnouncement();
+  // The newest announcements, more on request; the active count is the
+  // server's live set, not the loaded page.
+  const pages = useAnnouncementPages();
+  const announcements = pages.rows;
+  const active = useActiveAnnouncements();
   const createAnnouncement = useCreateAnnouncement();
   const removeAnnouncement = useAnnouncementRemove();
 
@@ -111,7 +118,7 @@ export function AnnouncementsPage() {
     [announcements],
   );
   const now = Date.now();
-  const activeCount = rows.filter(
+  const activeCount = (active ?? []).filter(
     (r) => r.deletedAt == null && r.expiresAt != null && r.expiresAt > now,
   ).length;
 
@@ -356,6 +363,17 @@ export function AnnouncementsPage() {
             })}
           </ul>
         )}
+        {pages.canLoadMore ? (
+          <div className="mt-3 flex justify-center">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={pages.loadMore}
+            >
+              Load more
+            </button>
+          </div>
+        ) : null}
       </Section>
     </div>
   );

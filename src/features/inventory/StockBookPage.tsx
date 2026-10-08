@@ -15,10 +15,10 @@ import {
   useInventoryReservationReturnUnused,
   useInventorySettingsSetStockTracking,
   useListIngredient,
-  useListInventoryItem,
   useListInventorySettings,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
+import { useStockLines } from "../facilities/useInventoryHistory";
 import { formatQuantity, formatCountNoun, formatDate } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -110,9 +110,9 @@ type StockBookHold = {
 };
 
 export function StockBookPage() {
-  const items = useListInventoryItem();
-  // Each stock line carries its own holds (the generated stock list reads
-  // them), so on hand, held and free stock need no separate whole read.
+  const items = useStockLines("active");
+  // Each stock line carries its active holds, so on hand, held and free
+  // stock need no separate whole read.
   const itemHolds = useMemo(
     () =>
       (items ?? []).flatMap(
@@ -323,18 +323,11 @@ export function StockBookPage() {
               "Select a supplier lot for the same ingredient and location.",
             );
           }
-          const alreadyAllocated = itemHolds
-            .filter(
-              (reservation) =>
-                reservation.inventoryLotId === inventoryLotId &&
-                reservation.deletedAt == null &&
-                (reservation.status === "active" ||
-                  reservation.status === "consumed"),
-            )
-            .reduce(
-              (sum, reservation) => sum + Number(reservation.quantity),
-              0,
-            );
+          // Active and consumed holds on the lot, summed by the server.
+          const alreadyAllocated = (items ?? [])
+            .flatMap((line) => line.lotAllocations ?? [])
+            .filter((row) => row.inventoryLotId === inventoryLotId)
+            .reduce((sum, row) => sum + row.quantity, 0);
           if (
             Number(data.get("quantity")) >
             Number(lot.receiptQuantity) - alreadyAllocated

@@ -12,7 +12,7 @@ import {
   type CommandFailure,
 } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
-import { useAllEventReportRows } from "./useEventsById";
+import { useVenueEvents } from "./useFacilitiesHistory";
 import {
   SITE_VISIT_AREAS,
   SITE_VISIT_SHOTS,
@@ -35,7 +35,8 @@ export function VenueSiteVisitPanel({ venue }: { venue: Doc<"venues"> }) {
   const notes = useQuery(api.queries.listVenueNoteByVenueId, {
     venueId: venue._id,
   });
-  const events = useAllEventReportRows();
+  // This venue's events only, read by venue.
+  const events = useVenueEvents(venueId);
   const files = useQuery(api.fileStorage.listForParent, {
     parentType: "venue",
     parentId: venueId,

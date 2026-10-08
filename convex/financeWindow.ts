@@ -194,6 +194,119 @@ const tableValidator = v.union(
   ...(Object.keys(RULES) as PagedTable[]).map((table) => v.literal(table)),
 );
 
+/**
+ * Indexes on [tenantId, ...fields] (manifest.config.yaml), by table and by
+ * the comma-joined fields a page filters on: a date window over those
+ * fields, those fields empty, or those fields holding given texts. A filter
+ * with one of these reads only its rows; any other filter reads page by page.
+ */
+const FIELD_INDEXES: { [T in PagedTable]?: Record<string, string> } = {
+  payments: { settledAt: "by_tenantId_and_settledAt" },
+  invoices: { "issuedAt,createdAt": "by_tenantId_and_issuedAt_and_createdAt" },
+  eventCloseouts: {
+    "finalizedAt,capturedAt,createdAt":
+      "by_tenantId_and_finalizedAt_and_capturedAt_and_createdAt",
+  },
+  leads: {
+    createdAt: "by_tenantId_and_createdAt",
+    closedAt: "by_tenantId_and_closedAt",
+  },
+  payrollInputs: { periodStart: "by_tenantId_and_periodStart" },
+  revenueAttributions: { appliedAt: "by_tenantId_and_appliedAt" },
+  prepTasks: { dueAt: "by_tenantId_and_dueAt" },
+  clientOutreachTasks: { resolvedAt: "by_tenantId_and_resolvedAt" },
+  syncErrors: { status: "by_tenantId_and_status" },
+};
+
+/** An index range over field names known only at run time. */
+interface FieldRange {
+  eq(field: string, value: unknown): FieldRange;
+  gte(field: string, value: number): FieldRange;
+  lt(field: string, value: number): FieldRange;
+}
+interface FieldIndexed {
+  withIndex(
+    index: string,
+    range: (q: FieldRange) => FieldRange,
+  ): { collect(): Promise<Row[]> };
+}
+
+/** An empty field is stored as undefined or null; each is its own range. */
+const EMPTY = [undefined, null] as const;
+
+/** Every way `count` fields can each be empty (undefined or null). */
+function emptyCombos(count: number): Array<Array<null | undefined>> {
+  let combos: Array<Array<null | undefined>> = [[]];
+  for (let i = 0; i < count; i += 1)
+    combos = combos.flatMap((combo) => EMPTY.map((empty) => [...combo, empty]));
+  return combos;
+}
+
+type PageFilters = {
+  window?: { fields: string[]; ranges: { from: number; to: number }[] };
+  emptyFields?: string[];
+  fieldEquals?: { field: string; value: string }[];
+};
+
+/**
+ * The rows a filter can keep, read through the table's index on its fields,
+ * newest first (as the tenant index pages them); null when no index fits.
+ * A window over fields [a, b, c] (the date is the first one set) reads a in
+ * range, then a empty and b in range, then a and b empty and c in range.
+ */
+async function indexedRows(
+  ctx: QueryCtx,
+  table: PagedTable,
+  tenantId: string,
+  { window, emptyFields, fieldEquals }: PageFilters,
+): Promise<Row[] | null> {
+  const indexes = FIELD_INDEXES[table];
+  if (!indexes) return null;
+  const db = ctx.db.query(table) as unknown as FieldIndexed;
+  const ranges: Array<(q: FieldRange) => FieldRange> = [];
+  const tenant = (q: FieldRange) => q.eq("tenantId", tenantId);
+  const windowIndex = window && indexes[window.fields.join(",")];
+  const emptyIndex = emptyFields && indexes[emptyFields.join(",")];
+  const equalsIndex =
+    fieldEquals && indexes[fieldEquals.map(({ field }) => field).join(",")];
+  let index: string;
+  if (window && windowIndex) {
+    index = windowIndex;
+    window.fields.forEach((field, at) => {
+      const before = window.fields.slice(0, at);
+      for (const combo of emptyCombos(at))
+        for (const { from, to } of window.ranges)
+          ranges.push((q) =>
+            before
+              .reduce((r, name, i) => r.eq(name, combo[i]), tenant(q))
+              .gte(field, from)
+              .lt(field, to),
+          );
+    });
+  } else if (emptyFields && emptyIndex) {
+    index = emptyIndex;
+    for (const combo of emptyCombos(emptyFields.length))
+      ranges.push((q) =>
+        emptyFields.reduce((r, name, i) => r.eq(name, combo[i]), tenant(q)),
+      );
+  } else if (fieldEquals && equalsIndex) {
+    index = equalsIndex;
+    ranges.push((q) =>
+      fieldEquals.reduce(
+        (r, { field, value }) => r.eq(field, value),
+        tenant(q),
+      ),
+    );
+  } else return null;
+  const byId = new Map<unknown, Row>();
+  for (const range of ranges)
+    for (const row of await db.withIndex(index, range).collect())
+      byId.set(row._id, row);
+  return [...byId.values()].sort(
+    (a, b) => (b._creationTime as number) - (a._creationTime as number),
+  );
+}
+
 /** A number date, or a date string (yyyy-mm-dd...) parsed; else null. */
 function dateValue(value: unknown): number | null {
   if (typeof value === "number" && Number.isFinite(value)) return value;
@@ -251,9 +364,9 @@ export const page = query({
     paginationOpts: paginationOptsValidator,
     /**
      * Keep only rows whose date (the first of `fields` that is set) falls in
-     * one of the [from, to) ranges. These tables have no index on those
-     * dates, so the page is still read whole; only the window's rows are
-     * sent.
+     * one of the [from, to) ranges. With an index on those fields
+     * (FIELD_INDEXES) only the window's rows are read, in one finished page;
+     * otherwise each page is read whole and only the window's rows are sent.
      */
     window: v.optional(
       v.object({
@@ -263,10 +376,13 @@ export const page = query({
     ),
     /**
      * Keep only rows where every one of these fields is empty (e.g. open
-     * leads: closedAt). Same page-by-page read; only those rows are sent.
+     * leads: closedAt). Read as `window` is.
      */
     emptyFields: v.optional(v.array(v.string())),
-    /** Keep only rows whose field holds this text (e.g. status "pending"). */
+    /**
+     * Keep only rows whose field holds this text (e.g. status "pending").
+     * Read as `window` is.
+     */
     fieldEquals: v.optional(
       v.array(v.object({ field: v.string(), value: v.string() })),
     ),
@@ -285,11 +401,18 @@ export const page = query({
       };
     }
     const tenantId = auth.tenantId;
-    const result = await ctx.db
-      .query(table)
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .order("desc")
-      .paginate(paginationOpts);
+    const indexed = await indexedRows(ctx, table, tenantId, {
+      window,
+      emptyFields,
+      fieldEquals,
+    });
+    const result = indexed
+      ? { page: indexed, isDone: true, continueCursor: "" }
+      : await ctx.db
+          .query(table)
+          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+          .order("desc")
+          .paginate(paginationOpts);
     let rows = result.page as unknown as Row[];
     if (rule.live) rows = rows.filter((row) => row.deletedAt == null);
     if (window)

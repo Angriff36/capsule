@@ -92,6 +92,11 @@ const readsSwap = (auth: AppAuthContext, row: Doc<"shiftSwapRequests">) =>
       row.recipientPersonId === auth.personId));
 
 const EMPTY_PAGE = { page: [], isDone: true, continueCursor: "" };
+/** Oldest saved first, the order the tenant index reads. */
+const byCreation = (
+  a: { _creationTime: number },
+  b: { _creationTime: number },
+) => a._creationTime - b._creationTime;
 
 /**
  * Shifts that overlap [from, to) (no `to`: everything from `from` on): one
@@ -202,9 +207,8 @@ export const trainingCompletionsFor = query({
 });
 
 /**
- * Time entries wholly inside [from, to), found among the ones made since
- * the period began (see CLOCK_IN_SLACK_MS). Callers keep their own period
- * rule, so totals match the whole list's.
+ * Time entries wholly inside [from, to), read through the clock-in index.
+ * Callers keep their own period rule, so totals match the whole list's.
  */
 export const timeRecordsIn = query({
   args: { from: v.number(), to: v.number() },
@@ -212,14 +216,17 @@ export const timeRecordsIn = query({
     const auth = await getAuthContext(ctx);
     if (!auth.tenantId) return [];
     const tenantId = auth.tenantId;
-    const rows = await ctx.db
-      .query("timeRecords")
-      .withIndex("by_tenantId", (q) =>
-        q
-          .eq("tenantId", tenantId)
-          .gte("_creationTime", from - CLOCK_IN_SLACK_MS),
-      )
-      .collect();
+    const rows = (
+      await ctx.db
+        .query("timeRecords")
+        .withIndex("by_tenantId_and_clockInAt", (q) =>
+          q
+            .eq("tenantId", tenantId)
+            .gte("clockInAt", from)
+            .lte("clockInAt", to),
+        )
+        .collect()
+    ).sort(byCreation);
     const out: Doc<"timeRecords">[] = [];
     for (const row of rows) {
       if (row.deletedAt != null) continue;
@@ -239,9 +246,9 @@ export const timeRecordsIn = query({
 });
 
 /**
- * Approved time off that overlaps [from, to). The table has no date index
- * yet, so approved rows are read by state, but only overlapping ones are
- * opened and sent. Same rule as listTimeOffRequest.
+ * Approved time off that overlaps [from, to): approved rows that end after
+ * `from`, through the state and end-date index. Same rule as
+ * listTimeOffRequest.
  */
 export const approvedTimeOff = query({
   args: { from: v.number(), to: v.number() },
@@ -250,12 +257,17 @@ export const approvedTimeOff = query({
     if (!auth.tenantId) return [];
     const tenantId = auth.tenantId;
     const out: Doc<"timeOffRequests">[] = [];
-    for (const row of await ctx.db
-      .query("timeOffRequests")
-      .withIndex("by_tenantId_and_status", (q) =>
-        q.eq("tenantId", tenantId).eq("status", "approved"),
-      )
-      .collect()) {
+    for (const row of (
+      await ctx.db
+        .query("timeOffRequests")
+        .withIndex("by_tenantId_and_status_and_endsAt", (q) =>
+          q
+            .eq("tenantId", tenantId)
+            .eq("status", "approved")
+            .gt("endsAt", from),
+        )
+        .collect()
+    ).sort(byCreation)) {
       if (row.deletedAt != null) continue;
       if (row.startsAt == null || row.endsAt == null) continue;
       if (!(row.startsAt < to && row.endsAt > from)) continue;
@@ -696,9 +708,8 @@ export const availabilityWindowPage = query({
 });
 
 /**
- * Availability windows that overlap [from, to). The table has no date index
- * yet, so the rows are still read, but only the overlapping ones are opened
- * and sent.
+ * Availability windows that overlap [from, to): windows that end after
+ * `from`, through the end-date index.
  */
 export const availabilityWindows = query({
   args: { from: v.number(), to: v.number() },
@@ -706,10 +717,14 @@ export const availabilityWindows = query({
     const auth = await getAuthContext(ctx);
     if (!auth.tenantId) return [];
     const tenantId = auth.tenantId;
-    const rows = await ctx.db
-      .query("availabilityWindows")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .collect();
+    const rows = (
+      await ctx.db
+        .query("availabilityWindows")
+        .withIndex("by_tenantId_and_endsAt", (q) =>
+          q.eq("tenantId", tenantId).gt("endsAt", from),
+        )
+        .collect()
+    ).sort(byCreation);
     const out: Doc<"availabilityWindows">[] = [];
     for (const row of rows) {
       if (row.deletedAt != null) continue;

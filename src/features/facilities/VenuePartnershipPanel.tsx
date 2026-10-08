@@ -5,7 +5,6 @@ import { formatDate } from "../../lib/format";
 import {
   useCreateReferralSource,
   useCreateVenueNote,
-  useListLead,
   useListPerson,
   useListReferralSource,
   useListVenue,
@@ -20,6 +19,7 @@ import {
 } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
 import { useVenueScorecardEvents } from "./useLogisticsWindow";
+import { useVenueLeads } from "./useFacilitiesHistory";
 import { VenueBrandForm } from "./VenueBrandForm";
 import { VenueHandoffPanel } from "./VenueHandoffPanel";
 import { VenueOnboardingPanel } from "./VenueOnboardingPanel";
@@ -77,7 +77,8 @@ export function VenuePartnershipPanel({ venue }: { venue: Doc<"venues"> }) {
     venueId: venue._id,
   });
   const sources = useListReferralSource();
-  const leads = useListLead();
+  // Only the leads sent through venue-linked lead sources.
+  const leads = useVenueLeads(sources);
   const venues = useListVenue();
   const events = useVenueScorecardEvents([String(venue._id)]);
   const [busy, setBusy] = useState<string | null>(null);

@@ -2,7 +2,6 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreatePerformanceReview,
-  useListPerformanceReview,
   useListPerson,
   useListRoleScorecard,
 } from "../../lib/manifest-convex-react";
@@ -12,6 +11,7 @@ import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { useAuthStatus } from "../../lib/useAuthStatus";
+import { usePerformanceReviewPages } from "../../lib/workforceHistoryQueries";
 import { SearchSelect } from "../../ui/SearchSelect";
 import { useWorkingEventId } from "../events/workingEvent";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
@@ -31,7 +31,9 @@ function localDateEpoch(value: FormDataEntryValue | null) {
 
 export function PerformanceReviewsPage() {
   const workingId = useWorkingEventId();
-  const reviews = useListPerformanceReview();
+  // The newest reviews, more on request.
+  const reviewPages = usePerformanceReviewPages();
+  const reviews = reviewPages.rows;
   const people = useListPerson();
   const events = usePickerAndNamedEvents(
     reviews ? [workingId, ...reviews.map((row) => row.eventId)] : undefined,
@@ -368,6 +370,17 @@ export function PerformanceReviewsPage() {
             </table>
           </div>
         )}
+        {reviewPages.canLoadMore ? (
+          <div className="mt-3 flex justify-center">
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={reviewPages.loadMore}
+            >
+              Load more
+            </button>
+          </div>
+        ) : null}
       </section>
     </div>
   );

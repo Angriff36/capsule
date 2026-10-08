@@ -5,7 +5,6 @@ import {
   useCreateStockCountLine,
   useCreateStockCountSession,
   useListIngredient,
-  useListInventoryItem,
   useListStorageLocation,
   useStockCountLineConfirmLedgerMatch,
   useStockCountLineReconcileVariance,
@@ -13,6 +12,7 @@ import {
   useStockCountLineReviseCount,
   useStockCountSessionClose,
 } from "../../lib/manifest-convex-react";
+import { useStockLines } from "../facilities/useInventoryHistory";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import {
   useCountLinesFor,
@@ -44,7 +44,7 @@ export function StockCountPage() {
   // and how far along each listed sheet is.
   const sessionPages = useCountSessionPages();
   const sessions = sessionPages.rows;
-  const items = useListInventoryItem();
+  const items = useStockLines("none");
   const locations = useListStorageLocation();
   const ingredients = useListIngredient();
   const createSession = useCreateStockCountSession();

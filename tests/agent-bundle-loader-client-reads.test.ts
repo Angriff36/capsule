@@ -40,7 +40,7 @@ describe("assistant event loader client reads", () => {
 
   it("reads only the event's own client", async () => {
     const client = fakeClient({
-      "queries:listEvent": [{ _id: "e1", clientId: "c7", status: "draft" }],
+      "queries:getEvent": { _id: "e1", clientId: "c7", status: "draft" },
       "queries:getClient": {
         _id: "c7",
         email: "host@example.test",
@@ -55,8 +55,55 @@ describe("assistant event loader client reads", () => {
     });
     const names = client.calls.map((c) => c.name);
     expect(names).not.toContain("queries:listClient");
+    // Only this event's rows, not the company's whole history.
+    for (const whole of [
+      "queries:listEvent",
+      "queries:listClientContact",
+      "queries:listEventDish",
+      "queries:listEventTimelineActivity",
+      "queries:listPrepTask",
+      "queries:listPackList",
+      "queries:listPackListItem",
+      "queries:listEventAssignment",
+    ])
+      expect(names).not.toContain(whole);
+    expect(
+      client.calls.find((c) => c.name === "queries:listClientContactByClientId")
+        ?.args,
+    ).toEqual({ clientId: "c7" });
     expect(
       client.calls.find((c) => c.name === "queries:getClient")?.args,
     ).toEqual({ id: "c7" });
+  });
+
+  it("reads the bundle's own invoice, proposal and orders, not every one", async () => {
+    const client = fakeClient({
+      "agentHistoryWindow:bundleDirectory": {
+        invoices: [{ _id: "i1", invoiceNumber: "1234", status: "draft" }],
+        payments: [],
+        proposals: [{ _id: "p1", proposalNumber: "1234", status: "draft" }],
+        vendorOrders: [],
+        proposalLines: [{ _id: "l1", proposalId: "p1", description: "Tacos" }],
+        vendorOrderLines: [],
+      },
+    });
+    const loader = new CapsuleEventBundleStateLoader(client);
+    const directory = await loader.loadDirectory("1234", "e1");
+    expect(directory.invoices.map((row) => row.id)).toEqual(["i1"]);
+    expect(directory.proposals[0]?.lineDescriptions).toEqual(["Tacos"]);
+    const names = client.calls.map((c) => c.name);
+    for (const whole of [
+      "queries:listInvoice",
+      "queries:listPayment",
+      "queries:listProposal",
+      "queries:listVendorOrder",
+      "queries:listProposalLineItem",
+      "queries:listVendorOrderLine",
+    ])
+      expect(names).not.toContain(whole);
+    expect(
+      client.calls.find((c) => c.name === "agentHistoryWindow:bundleDirectory")
+        ?.args,
+    ).toEqual({ identity: "1234", eventId: "e1" });
   });
 });

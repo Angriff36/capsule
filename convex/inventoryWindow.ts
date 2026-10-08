@@ -13,13 +13,19 @@ import { query } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import { canRead } from "./search";
 
-const DAY = 86_400_000;
 const ID_CAP = 1000;
 
 type Live = { deletedAt?: number | null; tenantId: string };
 const mineLive = <T extends Live>(rows: T[], tenantId: string) =>
   rows.filter((row) => row.deletedAt == null && row.tenantId === tenantId);
 const empty = { page: [], isDone: true, continueCursor: "" };
+/** An empty optional date is stored as undefined or null. */
+const EMPTY = [undefined, null] as const;
+/** Oldest saved first, the order the tenant index reads. */
+const byCreation = (
+  a: { _creationTime: number },
+  b: { _creationTime: number },
+) => a._creationTime - b._creationTime;
 
 const READS = {
   demand: ["inventoryAccess", "manageAccess"],
@@ -363,10 +369,8 @@ export const sentOrderNeeds = query({
 
 /**
  * What vendor scores count over their rolling window: orders received since
- * `from`, their lines, and price observations taken since `from`.
- * Observations are read newest first back to `from - 30 days` (an
- * observation is saved when it is taken; a bulk import may save older ones
- * a little late).
+ * `from`, their lines, and price observations taken since `from` (when
+ * observed, else when made), each read through its date index.
  */
 export const vendorScoreInputs = query({
   args: { from: v.number() },
@@ -383,12 +387,15 @@ export const vendorScoreInputs = query({
       for (const order of mineLive(
         await ctx.db
           .query("vendorOrders")
-          .withIndex("by_tenantId_and_status", (q) =>
-            q.eq("tenantId", tenantId).eq("status", "received"),
+          .withIndex("by_tenantId_and_status_and_receivedAt", (q) =>
+            q
+              .eq("tenantId", tenantId)
+              .eq("status", "received")
+              .gte("receivedAt", from),
           )
           .collect(),
         tenantId,
-      )) {
+      ).sort(byCreation)) {
         if (order.receivedAt == null || order.receivedAt < from) continue;
         out.orders.push(order);
         out.lines.push(
@@ -400,16 +407,30 @@ export const vendorScoreInputs = query({
             .collect()),
         );
       }
-    if (canRead(auth, READS.priceObservation))
-      out.observations = mineLive(
-        await ctx.db
-          .query("ingredientPriceObservations")
-          .withIndex("by_tenantId", (q) =>
-            q.eq("tenantId", tenantId).gte("_creationTime", from - 30 * DAY),
-          )
-          .collect(),
-        tenantId,
-      ).filter((row) => (row.observedAt ?? row.createdAt ?? 0) >= from);
+    if (canRead(auth, READS.priceObservation)) {
+      const index = "by_tenantId_and_observedAt_and_createdAt" as const;
+      const rows = await ctx.db
+        .query("ingredientPriceObservations")
+        .withIndex(index, (q) =>
+          q.eq("tenantId", tenantId).gte("observedAt", from),
+        )
+        .collect();
+      for (const empty of EMPTY)
+        rows.push(
+          ...(await ctx.db
+            .query("ingredientPriceObservations")
+            .withIndex(index, (q) =>
+              q
+                .eq("tenantId", tenantId)
+                .eq("observedAt", empty)
+                .gte("createdAt", from),
+            )
+            .collect()),
+        );
+      out.observations = mineLive(rows, tenantId)
+        .filter((row) => (row.observedAt ?? row.createdAt ?? 0) >= from)
+        .sort(byCreation);
+    }
     return out;
   },
 });
@@ -449,10 +470,17 @@ export const transferPage = query({
 /**
  * Lots for a recall trace: lot numbers that start with `lotNumber` (as
  * typed and in capitals), and/or lots received in [receivedFrom,
- * receivedTo]. A date-only search reads lots saved from 30 days before the
- * range to 30 days after it. Returns the matching lots, every consumption
+ * receivedTo]. A date-only search reads the lots received in the range
+ * through the received-date index. Returns the matching lots, every consumption
  * from them, and the count of consumptions with no lot.
  */
+// The first string after every string that starts with `prefix`: the
+// prefix with its last character moved up by one ("AB" -> "AC").
+function prefixEnd(prefix: string): string {
+  const last = prefix.charCodeAt(prefix.length - 1);
+  return prefix.slice(0, -1) + String.fromCharCode(last + 1);
+}
+
 export const traceLots = query({
   args: {
     lotNumber: v.string(),
@@ -478,7 +506,7 @@ export const traceLots = query({
           .withIndex("by_supplierLotNumber", (q) =>
             q
               .gte("supplierLotNumber", prefix)
-              .lt("supplierLotNumber", `${prefix}￿`),
+              .lt("supplierLotNumber", prefixEnd(prefix)),
           )
           .take(500))
           if (!seen.has(lot._id)) {
@@ -488,15 +516,14 @@ export const traceLots = query({
     } else if (receivedFrom != null || receivedTo != null) {
       lots = await ctx.db
         .query("inventoryLots")
-        .withIndex("by_tenantId", (q) => {
-          const tenant = q.eq("tenantId", tenantId);
-          const lower =
-            receivedFrom == null
-              ? tenant
-              : tenant.gte("_creationTime", receivedFrom - 30 * DAY);
+        .withIndex("by_tenantId_and_receivedAt", (q) => {
+          // No lower bound still leaves out lots with no received date.
+          const lower = q
+            .eq("tenantId", tenantId)
+            .gte("receivedAt", receivedFrom ?? -Infinity);
           return receivedTo == null
             ? lower
-            : lower.lte("_creationTime", receivedTo + 30 * DAY);
+            : lower.lte("receivedAt", receivedTo);
         })
         .take(5000);
     }
@@ -597,13 +624,25 @@ export const openingStockPage = query({
     if (!auth.tenantId || !canRead(auth, READS.openingStock)) return empty;
     const tenantId = auth.tenantId;
     const statuses: readonly string[] = OPENING_TABS[tab];
-    const result = await ctx.db
-      .query("openingStockRecords")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .filter((q) =>
-        q.or(...statuses.map((status) => q.eq(q.field("status"), status))),
-      )
-      .paginate(paginationOpts);
+    // A one-state tab pages its state's index; "done" (two states) filters
+    // the tenant's records page by page.
+    const result =
+      tab === "needs_review" || tab === "ready"
+        ? await ctx.db
+            .query("openingStockRecords")
+            .withIndex("by_tenantId_and_status", (q) =>
+              q.eq("tenantId", tenantId).eq("status", tab),
+            )
+            .paginate(paginationOpts)
+        : await ctx.db
+            .query("openingStockRecords")
+            .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+            .filter((q) =>
+              q.or(
+                ...statuses.map((status) => q.eq(q.field("status"), status)),
+              ),
+            )
+            .paginate(paginationOpts);
     return {
       ...result,
       page: mineLive(result.page, tenantId).map((row) => ({
@@ -644,9 +683,8 @@ const withCost = (row: Doc<"wasteRecords">) => ({
 });
 
 /**
- * Waste recorded since `from`. Records are read newest first back to
- * `from - 7 days` (a record is saved when it is logged, and may be dated a
- * few days back).
+ * Waste recorded since `from`, dated as the waste screens date it: when
+ * recorded, else when made, else when saved. Read through the date index.
  */
 export const wasteSince = query({
   args: { from: v.number() },
@@ -654,15 +692,37 @@ export const wasteSince = query({
     const auth = await getAuthContext(ctx);
     if (!auth.tenantId || !canRead(auth, READS.waste)) return [];
     const tenantId = auth.tenantId;
-    return mineLive(
-      await ctx.db
-        .query("wasteRecords")
-        .withIndex("by_tenantId", (q) =>
-          q.eq("tenantId", tenantId).gte("_creationTime", from - 7 * DAY),
-        )
-        .collect(),
-      tenantId,
-    ).map(withCost);
+    const index = "by_tenantId_and_recordedAt_and_createdAt" as const;
+    const rows = await ctx.db
+      .query("wasteRecords")
+      .withIndex(index, (q) =>
+        q.eq("tenantId", tenantId).gte("recordedAt", from),
+      )
+      .collect();
+    for (const empty of EMPTY) {
+      rows.push(
+        ...(await ctx.db
+          .query("wasteRecords")
+          .withIndex(index, (q) =>
+            q
+              .eq("tenantId", tenantId)
+              .eq("recordedAt", empty)
+              .gte("createdAt", from),
+          )
+          .collect()),
+        ...(await ctx.db
+          .query("wasteRecords")
+          .withIndex(index, (q) =>
+            q
+              .eq("tenantId", tenantId)
+              .eq("recordedAt", empty)
+              .eq("createdAt", undefined)
+              .gte("_creationTime", from),
+          )
+          .collect()),
+      );
+    }
+    return mineLive(rows, tenantId).sort(byCreation).map(withCost);
   },
 });
 

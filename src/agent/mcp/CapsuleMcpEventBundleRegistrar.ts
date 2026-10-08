@@ -4,6 +4,7 @@ import { join, resolve } from "node:path";
 import { z } from "zod";
 import { suggestCatalogMatches } from "../CapsuleEventBundleCatalogMatch";
 import { CapsuleEventBundleCoordinator } from "../CapsuleEventBundleCoordinator";
+import { bundleIdentity } from "../CapsuleEventBundlePlan";
 import type { CapsuleEventBundleContext } from "../CapsuleEventBundleExistingState";
 import { CapsuleEventBundleStateLoader } from "../CapsuleEventBundleStateLoader";
 import type { CapsuleCommandExecutor } from "../CapsuleCommandExecutor";
@@ -59,7 +60,10 @@ export class CapsuleMcpEventBundleRegistrar {
   ): Promise<CapsuleEventBundleContext> {
     const context: CapsuleEventBundleContext = {};
     if (!readTenant && eventId === undefined) return context;
-    context.directory = await this.stateLoader.loadDirectory();
+    context.directory = await this.stateLoader.loadDirectory(
+      bundleIdentity(bundle.header),
+      eventId,
+    );
     if (eventId !== undefined) {
       context.existing = await this.stateLoader.loadExisting(eventId);
     } else {

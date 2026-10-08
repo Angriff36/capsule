@@ -91,7 +91,8 @@ export default defineSchema({
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
-    .index("by_personId", ["personId"]),
+    .index("by_personId", ["personId"])
+    .index("by_tenantId_and_endsAt", ["tenantId", "endsAt"]),
   candidates: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -253,7 +254,8 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_clientId", ["clientId"])
     .index("by_clientMergeAuthorizationId", ["clientMergeAuthorizationId"])
-    .index("by_mergeTargetClientId", ["mergeTargetClientId"]),
+    .index("by_mergeTargetClientId", ["mergeTargetClientId"])
+    .index("by_tenantId_and_resolvedAt", ["tenantId", "resolvedAt"]),
   clientPortalLinks: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -404,7 +406,8 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_resultingComponentId", ["resultingComponentId"])
-    .index("by_duplicateOfComponentId", ["duplicateOfComponentId"]),
+    .index("by_duplicateOfComponentId", ["duplicateOfComponentId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   componentImportLines: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -1191,6 +1194,7 @@ export default defineSchema({
     .index("by_referralSourceId", ["referralSourceId"])
     .index("by_recurrenceTemplateEventId", ["recurrenceTemplateEventId"])
     .index("by_tenantId_and_startsAt", ["tenantId", "startsAt"])
+    .index("by_tenantId_and_endsAt", ["tenantId", "endsAt"])
     .index("by_tenantId_and_stage_and_startsAt", ["tenantId", "stage", "startsAt"])
     .index("by_tenantId_and_approvedAt", ["tenantId", "approvedAt"])
     .index("by_tenantId_and_executionStartedAt", ["tenantId", "executionStartedAt"])
@@ -1296,7 +1300,8 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_eventId", ["eventId"])
-    .index("by_tenantId_and_status", ["tenantId", "status"]),
+    .index("by_tenantId_and_status", ["tenantId", "status"])
+    .index("by_tenantId_and_finalizedAt_and_capturedAt_and_createdAt", ["tenantId", "finalizedAt", "capturedAt", "createdAt"]),
   eventDishes: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -1848,7 +1853,8 @@ export default defineSchema({
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
-    .index("by_externalRecordLinkId", ["externalRecordLinkId"]),
+    .index("by_externalRecordLinkId", ["externalRecordLinkId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   importDatasets: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2008,7 +2014,8 @@ export default defineSchema({
     .index("by_purchaseEligibleEventId", ["purchaseEligibleEventId"])
     .index("by_eventId", ["eventId"])
     .index("by_ingredientId", ["ingredientId"])
-    .index("by_dishId", ["dishId"]),
+    .index("by_dishId", ["dishId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   ingredientPriceObservations: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2029,7 +2036,8 @@ export default defineSchema({
     .index("by_ingredientId", ["ingredientId"])
     .index("by_vendorId", ["vendorId"])
     .index("by_vendorOrderLineId", ["vendorOrderLineId"])
-    .index("by_vendorOrderId", ["vendorOrderId"]),
+    .index("by_vendorOrderId", ["vendorOrderId"])
+    .index("by_tenantId_and_observedAt_and_createdAt", ["tenantId", "observedAt", "createdAt"]),
   integrationConnections: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2121,7 +2129,8 @@ export default defineSchema({
     .index("by_locationId", ["locationId"])
     .index("by_vendorOrderId", ["vendorOrderId"])
     .index("by_ingredientDemandId", ["ingredientDemandId"])
-    .index("by_eventId", ["eventId"]),
+    .index("by_eventId", ["eventId"])
+    .index("by_tenantId_and_receivedAt", ["tenantId", "receivedAt"]),
   inventoryReservations: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2148,7 +2157,8 @@ export default defineSchema({
     .index("by_inventoryItemId", ["inventoryItemId"])
     .index("by_eventId", ["eventId"])
     .index("by_ingredientId", ["ingredientId"])
-    .index("by_inventorySettingsId", ["inventorySettingsId"]),
+    .index("by_inventorySettingsId", ["inventorySettingsId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   inventorySettings: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2208,7 +2218,8 @@ export default defineSchema({
     .index("by_mergeTargetClientId", ["mergeTargetClientId"])
     .index("by_eventId", ["eventId"])
     .index("by_tenantId_and_invoiceNumber", ["tenantId", "invoiceNumber"])
-    .index("by_tenantId_and_status", ["tenantId", "status"]),
+    .index("by_tenantId_and_status", ["tenantId", "status"])
+    .index("by_tenantId_and_issuedAt_and_createdAt", ["tenantId", "issuedAt", "createdAt"]),
   invoiceNumberSequences: defineTable({
     tenantId: v.string(),
     lastNumber: v.number(),
@@ -2276,6 +2287,8 @@ export default defineSchema({
     .index("by_clientContactId", ["clientContactId"])
     .index("by_proposalId", ["proposalId"])
     .index("by_referralSourceId", ["referralSourceId"])
+    .index("by_tenantId_and_createdAt", ["tenantId", "createdAt"])
+    .index("by_tenantId_and_closedAt", ["tenantId", "closedAt"])
     .searchIndex("search_companyName", { searchField: "companyName", filterFields: ["tenantId"] })
     .searchIndex("search_givenName", { searchField: "givenName", filterFields: ["tenantId"] })
     .searchIndex("search_familyName", { searchField: "familyName", filterFields: ["tenantId"] })
@@ -2300,7 +2313,8 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_ownerPersonId", ["ownerPersonId"])
     .index("by_openedByPersonId", ["openedByPersonId"])
-    .index("by_closedByPersonId", ["closedByPersonId"]),
+    .index("by_closedByPersonId", ["closedByPersonId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   leftoverDispositions: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2523,6 +2537,7 @@ export default defineSchema({
     .index("by_importRunId", ["importRunId"])
     .index("by_ingredientId", ["ingredientId"])
     .index("by_locationId", ["locationId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"])
     .searchIndex("search_itemName", { searchField: "itemName", filterFields: ["tenantId"] }),
   operatingLocations: defineTable({
     tenantId: v.string(),
@@ -2881,7 +2896,8 @@ export default defineSchema({
     .index("by_eventId", ["eventId"])
     .index("by_paymentMethodId", ["paymentMethodId"])
     .index("by_tenantId_and_externalPaymentId", ["tenantId", "externalPaymentId"])
-    .index("by_tenantId_and_matchedExternalId", ["tenantId", "matchedExternalId"]),
+    .index("by_tenantId_and_matchedExternalId", ["tenantId", "matchedExternalId"])
+    .index("by_tenantId_and_settledAt", ["tenantId", "settledAt"]),
   paymentMethods: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2961,7 +2977,8 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_personId", ["personId"])
     .index("by_eventId", ["eventId"])
-    .index("by_shiftId", ["shiftId"]),
+    .index("by_shiftId", ["shiftId"])
+    .index("by_tenantId_and_periodStart", ["tenantId", "periodStart"]),
   performanceReviews: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -3126,6 +3143,7 @@ export default defineSchema({
     .index("by_componentId", ["componentId"])
     .index("by_assignedToId", ["assignedToId"])
     .index("by_tenantId_and_status", ["tenantId", "status"])
+    .index("by_tenantId_and_dueAt", ["tenantId", "dueAt"])
     .searchIndex("search_name", { searchField: "name", filterFields: ["tenantId"] }),
   prepTaskComments: defineTable({
     tenantId: v.string(),
@@ -3221,7 +3239,9 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_componentId", ["componentId"])
-    .index("by_eventId", ["eventId"]),
+    .index("by_eventId", ["eventId"])
+    .index("by_tenantId_and_status_and_completedAt", ["tenantId", "status", "completedAt"])
+    .index("by_tenant_status_shortfall", ["tenantId", "status", "shortfallResolvedAt", "shortfallQuantity"]),
   productionBatchAllocations: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -3244,7 +3264,8 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_productionBatchId", ["productionBatchId"])
     .index("by_eventId", ["eventId"])
-    .index("by_eventDishId", ["eventDishId"]),
+    .index("by_eventDishId", ["eventDishId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   proposals: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -3438,7 +3459,8 @@ export default defineSchema({
     .index("by_ingredientId", ["ingredientId"])
     .index("by_preferredVendorId", ["preferredVendorId"])
     .index("by_vendorOrderId", ["vendorOrderId"])
-    .index("by_vendorOrderLineId", ["vendorOrderLineId"]),
+    .index("by_vendorOrderLineId", ["vendorOrderLineId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   pushSubscriptions: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -3702,7 +3724,8 @@ export default defineSchema({
     .index("by_approvedById", ["approvedById"])
     .index("by_venueCommissionTermId", ["venueCommissionTermId"])
     .index("by_overriddenById", ["overriddenById"])
-    .index("by_overRevenueAllowedById", ["overRevenueAllowedById"]),
+    .index("by_overRevenueAllowedById", ["overRevenueAllowedById"])
+    .index("by_tenantId_and_appliedAt", ["tenantId", "appliedAt"]),
   reviewFlags: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -4200,7 +4223,8 @@ export default defineSchema({
     updatedAt: v.optional(v.number()),
     version: v.number(),
   })
-    .index("by_tenantId", ["tenantId"]),
+    .index("by_tenantId", ["tenantId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   tastings: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -4287,7 +4311,8 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_personId", ["personId"])
     .index("by_tenantId_and_status", ["tenantId", "status"])
-    .index("by_staff_status_end", ["tenantId", "personId", "status", "endsAt"]),
+    .index("by_staff_status_end", ["tenantId", "personId", "status", "endsAt"])
+    .index("by_tenantId_and_status_and_endsAt", ["tenantId", "status", "endsAt"]),
   timeRecords: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -4319,7 +4344,8 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_personId", ["personId"])
     .index("by_shiftId", ["shiftId"])
-    .index("by_eventId", ["eventId"]),
+    .index("by_eventId", ["eventId"])
+    .index("by_tenantId_and_clockInAt", ["tenantId", "clockInAt"]),
   tppReportFavorites: defineTable({
     tenantId: v.string(),
     personId: v.optional(v.union(v.string(), v.null())),
@@ -4732,7 +4758,8 @@ export default defineSchema({
     .index("by_vendorId", ["vendorId"])
     .index("by_eventId", ["eventId"])
     .index("by_purchasingConfigId", ["purchasingConfigId"])
-    .index("by_tenantId_and_status", ["tenantId", "status"]),
+    .index("by_tenantId_and_status", ["tenantId", "status"])
+    .index("by_tenantId_and_status_and_receivedAt", ["tenantId", "status", "receivedAt"]),
   vendorOrderLines: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -5001,7 +5028,8 @@ export default defineSchema({
     .index("by_ingredientId", ["ingredientId"])
     .index("by_locationId", ["locationId"])
     .index("by_eventId", ["eventId"])
-    .index("by_inventoryItemId", ["inventoryItemId"]),
+    .index("by_inventoryItemId", ["inventoryItemId"])
+    .index("by_tenantId_and_recordedAt_and_createdAt", ["tenantId", "recordedAt", "createdAt"]),
   weeklyPurchasingConfigs: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

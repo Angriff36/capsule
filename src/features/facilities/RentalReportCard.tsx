@@ -1,13 +1,9 @@
 import { useQuery } from "convex/react";
 import { useMemo, useState } from "react";
 import { api } from "../../lib/api";
-import {
-  useListEquipment,
-  useListEquipmentIssue,
-  useListEquipmentReservation,
-  useListRentalOrderLine,
-} from "../../lib/manifest-convex-react";
+import { useListEquipment } from "../../lib/manifest-convex-react";
 import { useEventsById, useEventsInRange } from "./useEventsById";
+import { useRentalMonth } from "./useFacilitiesHistory";
 import { formatMoneyExact } from "../../lib/format";
 import { rentalReport, type RentalReport } from "../logistics/rentalReporting";
 
@@ -151,11 +147,13 @@ function downloadRentalReport(report: RentalReport, month: string) {
 /** Rental revenue, vendor cost, loss and damage, and equipment use by month. */
 export function RentalReportCard() {
   const equipment = useListEquipment();
-  const holds = useListEquipmentReservation();
-  const lines = useListRentalOrderLine();
-  const issues = useListEquipmentIssue();
   const [month, setMonth] = useState(() => monthValue(new Date()));
   const [periodStart, periodEnd] = monthRange(month);
+  // The chosen month's holds, vendor lines and problems only.
+  const rental = useRentalMonth(periodStart, periodEnd);
+  const holds = rental?.holds;
+  const lines = rental?.lines;
+  const issues = rental?.issues;
   // Events that start in the month, plus the events of holds that overlap the
   // month (a hold can reach into the month from an event that started before).
   const monthEvents = useEventsInRange({ from: periodStart, to: periodEnd });

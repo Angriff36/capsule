@@ -92,8 +92,9 @@ export type DateWindow = {
 /**
  * The rows of one table whose date is in one of the window's [from, to)
  * ranges, newest first.
- * The table has no index on that date, so the server reads it page by page
- * and sends only the window's rows. `undefined` until every page is read.
+ * With an index on those dates the server reads only the window's rows;
+ * otherwise it reads page by page and sends only the window's rows.
+ * `undefined` until every page is read.
  */
 export function useWindowRows<T extends PagedTable>(
   table: T,

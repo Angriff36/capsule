@@ -3,10 +3,10 @@ import { useClientDirectory } from "../../lib/useClientDirectory";
 import { Link } from "react-router-dom";
 import {
   useListIngredient,
-  useListInventoryItem,
   useListStorageLocation,
   useListVendor,
 } from "../../lib/manifest-convex-react";
+import { useStockLines } from "../facilities/useInventoryHistory";
 import { formatDate, formatTime } from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
 import { useEventsById } from "../facilities/useEventsById";
@@ -26,7 +26,7 @@ export function LotTraceabilityPage() {
   const ingredients = useListIngredient();
   const vendors = useListVendor();
   const locations = useListStorageLocation();
-  const items = useListInventoryItem();
+  const items = useStockLines("none");
   const [supplierLotNumber, setSupplierLotNumber] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");

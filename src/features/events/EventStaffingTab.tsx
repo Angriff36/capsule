@@ -14,10 +14,8 @@ import {
   useEventStaffNeedPlanTiming,
   useEventStaffNeedReleaseClaim,
   useGetEvent,
-  useListAvailabilityWindow,
   useListPerson,
   useListShiftType,
-  useListTimeOffRequest,
   useCreateStaffNeedWaitlistEntry,
   useStaffNeedWaitlistEntryLeave,
 } from "../../lib/manifest-convex-react";
@@ -32,6 +30,7 @@ import {
   useShiftsInWindow,
 } from "../../lib/useEventAreaRows";
 import { useAuthStatus } from "../../lib/useAuthStatus";
+import { useAwayForPeople } from "../../lib/eventHistoryQueries";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import {
@@ -80,8 +79,6 @@ export function EventStaffingTab({ eventId }: Props) {
   const eventShifts = useEventShifts(eventId);
   const shiftTypes = useListShiftType();
   const activities = useEventTimelineActivities(eventId);
-  const timeOff = useListTimeOffRequest();
-  const availability = useListAvailabilityWindow();
   const createAssignment = useCreateEventAssignment();
   const unassign = useEventAssignmentUnassign();
   const createNeed = useCreateEventStaffNeed();
@@ -179,6 +176,24 @@ export function EventStaffingTab({ eventId }: Props) {
     return from < to ? { from, to } : ("skip" as const);
   }, [crewWindow.startsAt, crewWindow.endsAt, roster]);
   const shifts = useShiftsInWindow(conflictWindow);
+  // Approved time off and availability over those times and the open
+  // positions' times only, not every request ever made.
+  const awayWindow = useMemo(() => {
+    let from = conflictWindow === "skip" ? Infinity : conflictWindow.from;
+    let to = conflictWindow === "skip" ? -Infinity : conflictWindow.to;
+    for (const need of eventNeeds) {
+      if (need.startsAt == null || need.endsAt == null) continue;
+      from = Math.min(from, need.startsAt);
+      to = Math.max(to, need.endsAt);
+    }
+    return from < to ? { from, to } : ("skip" as const);
+  }, [conflictWindow, eventNeeds]);
+  const away = useAwayForPeople(
+    people?.map((person) => person._id),
+    awayWindow,
+  );
+  const timeOff = away?.timeOff;
+  const availability = away?.availability;
 
   const roleOptions = useMemo(
     () =>

@@ -2,8 +2,6 @@ import { useState, type FormEvent } from "react";
 import {
   useCreateOneOnOne,
   useCreateOneOnOneAction,
-  useListOneOnOne,
-  useListOneOnOneAction,
   useListPerson,
   useListRoleScorecard,
   useOneOnOneActionClose,
@@ -16,6 +14,10 @@ import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { SearchSelect } from "../../ui/SearchSelect";
 import { useAuthStatus } from "../../lib/useAuthStatus";
+import {
+  useOneOnOneActionsFor,
+  useOneOnOnePages,
+} from "../../lib/workforceHistoryQueries";
 import { openActionsForNextMeeting } from "./oneOnOneCarryOver";
 import { effectiveScorecard } from "./scorecardVersions";
 
@@ -42,9 +44,10 @@ function localDateEpoch(value: FormDataEntryValue | null): number | undefined {
 }
 
 export function OneOnOnesPage() {
-  const meetings = useListOneOnOne();
+  // The newest meetings, more on request, and only their actions.
+  const meetingPages = useOneOnOnePages();
+  const meetings = meetingPages.rows;
   const authStatus = useAuthStatus();
-  const actions = useListOneOnOneAction();
   const people = useListPerson();
   const scorecards = useListRoleScorecard();
   const holdMeeting = useCreateOneOnOne();
@@ -58,6 +61,10 @@ export function OneOnOnesPage() {
   const [decisions, setDecisions] = useState<string[]>([""]);
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
+  const actionRows = useOneOnOneActionsFor(
+    meetings?.map((row) => row._id),
+    staffDraft,
+  );
 
   const activePeople = (people ?? []).filter(
     (row) => row.deletedAt == null && row.status === "active",
@@ -73,11 +80,15 @@ export function OneOnOnesPage() {
   const heldMeetings = (meetings ?? [])
     .filter((row) => row.deletedAt == null && row.heldAt != null)
     .sort((a, b) => (b.meetingDate ?? 0) - (a.meetingDate ?? 0));
-  const liveActions = (actions ?? []).filter((row) => row.deletedAt == null);
+  const liveActions = (actionRows?.actions ?? []).filter(
+    (row) => row.deletedAt == null,
+  );
 
+  // The staff member's own held meetings and their actions, read for them,
+  // so carry-over does not depend on which meetings are loaded.
   const priorOpenActions = openActionsForNextMeeting(
-    heldMeetings,
-    liveActions,
+    actionRows?.staffMeetings,
+    actionRows?.staffActions,
     staffDraft,
   );
 
@@ -590,6 +601,17 @@ export function OneOnOnesPage() {
               </div>
             );
           })}
+          {meetingPages.canLoadMore ? (
+            <div className="mt-3 flex justify-center">
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={meetingPages.loadMore}
+              >
+                Load more
+              </button>
+            </div>
+          ) : null}
         </section>
       )}
     </div>

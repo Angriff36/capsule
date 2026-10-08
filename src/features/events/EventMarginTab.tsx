@@ -8,6 +8,7 @@ import {
   useEventPurchasing,
 } from "../../lib/useEventAreaRows";
 import { useMemo } from "react";
+import { useLatestIngredientPriceRows } from "../../lib/recipeScopedQueries";
 import { formatMoney } from "../../lib/format";
 import { useEventLaborSummary } from "../facilities/useLaborSummary";
 import {
@@ -18,7 +19,6 @@ import {
   useListDishIngredient,
   useListEquipment,
   useListIngredient,
-  useListIngredientPriceObservation,
   useListItemUnitMapping,
 } from "../../lib/manifest-convex-react";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
@@ -55,7 +55,42 @@ export function EventMarginTab({ eventId }: Props) {
   const components = useListComponent();
   const componentIngredients = useListComponentIngredient();
   const ingredients = useListIngredient();
-  const priceObservations = useListIngredientPriceObservation();
+  // The latest price of this event's menu ingredients only.
+  const menuIngredientIds = useMemo(() => {
+    if (
+      eventDishes === undefined ||
+      dishIngredients === undefined ||
+      dishComponents === undefined ||
+      componentIngredients === undefined
+    )
+      return undefined;
+    const dishIds = new Set<string>();
+    for (const row of eventDishes) {
+      if (row.deletedAt != null || row.eventId !== eventId) continue;
+      dishIds.add(String(row.dishId));
+      if (row.recipeDishId) dishIds.add(String(row.recipeDishId));
+    }
+    const componentIds = new Set(
+      dishComponents
+        .filter((row) => dishIds.has(String(row.dishId)))
+        .map((row) => String(row.componentId)),
+    );
+    return [
+      ...dishIngredients
+        .filter((row) => dishIds.has(String(row.dishId)))
+        .map((row) => String(row.ingredientId)),
+      ...componentIngredients
+        .filter((row) => componentIds.has(String(row.componentId)))
+        .map((row) => String(row.ingredientId)),
+    ];
+  }, [
+    eventDishes,
+    dishIngredients,
+    dishComponents,
+    componentIngredients,
+    eventId,
+  ]);
+  const priceObservations = useLatestIngredientPriceRows(menuIngredientIds);
   const itemUnitMappings = useListItemUnitMapping();
   // This event's invoices, purchasing, payroll and holds only.
   const invoices = useEventInvoices(eventId);

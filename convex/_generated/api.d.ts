@@ -9,6 +9,7 @@
  */
 
 import type * as adminWindow from "../adminWindow.js";
+import type * as agentHistoryWindow from "../agentHistoryWindow.js";
 import type * as apiKeys from "../apiKeys.js";
 import type * as archiveDisposition from "../archiveDisposition.js";
 import type * as archiveInventory from "../archiveInventory.js";
@@ -60,6 +61,7 @@ import type * as eventRoutes from "../eventRoutes.js";
 import type * as eventTimingRules from "../eventTimingRules.js";
 import type * as eventsAreaWindow from "../eventsAreaWindow.js";
 import type * as externalRecordLinkLists from "../externalRecordLinkLists.js";
+import type * as facilitiesHistoryWindow from "../facilitiesHistoryWindow.js";
 import type * as fileStorage from "../fileStorage.js";
 import type * as financeWindow from "../financeWindow.js";
 import type * as geocode from "../geocode.js";
@@ -67,6 +69,7 @@ import type * as goodshuffleItems from "../goodshuffleItems.js";
 import type * as googleCalendar from "../googleCalendar.js";
 import type * as googleCalendarHealth from "../googleCalendarHealth.js";
 import type * as hiringPipeline from "../hiringPipeline.js";
+import type * as historyWindow from "../historyWindow.js";
 import type * as http from "../http.js";
 import type * as importCancel from "../importCancel.js";
 import type * as importClientByName from "../importClientByName.js";
@@ -81,6 +84,7 @@ import type * as importServiceStyle from "../importServiceStyle.js";
 import type * as importSourceDelta from "../importSourceDelta.js";
 import type * as ingredientLookup from "../ingredientLookup.js";
 import type * as inventoryAudit from "../inventoryAudit.js";
+import type * as inventoryHistoryWindow from "../inventoryHistoryWindow.js";
 import type * as inventoryWindow from "../inventoryWindow.js";
 import type * as invoiceEmail from "../invoiceEmail.js";
 import type * as invoicePayments from "../invoicePayments.js";
@@ -353,6 +357,7 @@ import type * as venueGallery from "../venueGallery.js";
 import type * as venueVendorPolicy from "../venueVendorPolicy.js";
 import type * as webhookDeliveries from "../webhookDeliveries.js";
 import type * as webhookIntegrations from "../webhookIntegrations.js";
+import type * as workforceHistoryWindow from "../workforceHistoryWindow.js";
 import type * as workforceScheduling from "../workforceScheduling.js";
 import type * as workforceWindow from "../workforceWindow.js";
 
@@ -364,6 +369,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   adminWindow: typeof adminWindow;
+  agentHistoryWindow: typeof agentHistoryWindow;
   apiKeys: typeof apiKeys;
   archiveDisposition: typeof archiveDisposition;
   archiveInventory: typeof archiveInventory;
@@ -415,6 +421,7 @@ declare const fullApi: ApiFromModules<{
   eventTimingRules: typeof eventTimingRules;
   eventsAreaWindow: typeof eventsAreaWindow;
   externalRecordLinkLists: typeof externalRecordLinkLists;
+  facilitiesHistoryWindow: typeof facilitiesHistoryWindow;
   fileStorage: typeof fileStorage;
   financeWindow: typeof financeWindow;
   geocode: typeof geocode;
@@ -422,6 +429,7 @@ declare const fullApi: ApiFromModules<{
   googleCalendar: typeof googleCalendar;
   googleCalendarHealth: typeof googleCalendarHealth;
   hiringPipeline: typeof hiringPipeline;
+  historyWindow: typeof historyWindow;
   http: typeof http;
   importCancel: typeof importCancel;
   importClientByName: typeof importClientByName;
@@ -436,6 +444,7 @@ declare const fullApi: ApiFromModules<{
   importSourceDelta: typeof importSourceDelta;
   ingredientLookup: typeof ingredientLookup;
   inventoryAudit: typeof inventoryAudit;
+  inventoryHistoryWindow: typeof inventoryHistoryWindow;
   inventoryWindow: typeof inventoryWindow;
   invoiceEmail: typeof invoiceEmail;
   invoicePayments: typeof invoicePayments;
@@ -708,6 +717,7 @@ declare const fullApi: ApiFromModules<{
   venueVendorPolicy: typeof venueVendorPolicy;
   webhookDeliveries: typeof webhookDeliveries;
   webhookIntegrations: typeof webhookIntegrations;
+  workforceHistoryWindow: typeof workforceHistoryWindow;
   workforceScheduling: typeof workforceScheduling;
   workforceWindow: typeof workforceWindow;
 }>;

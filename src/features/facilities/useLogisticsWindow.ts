@@ -221,11 +221,6 @@ export function useVendorOrderRows(vendorOrderId: string | null | undefined) {
   };
 }
 
-/** Every purchase need, only while `enabled` (a picker that offers them). */
-export function usePurchaseNeedsWhen(enabled: boolean) {
-  return useQuery(api.queries.listPurchaseNeed, enabled ? {} : "skip");
-}
-
 /** Bill matches of one order line. */
 export function useBillMatchesForLine(lineId: string) {
   return useQuery(api.queries.listVendorBillMatchByVendorOrderLineId, {

@@ -5,10 +5,9 @@ import {
   useListIngredient,
   useListOrganization,
   useListPerson,
-  useListProposal,
   useListVendor,
-  useListVendorOrder,
 } from "../../../lib/manifest-convex-react";
+import { useImportNumberRecords } from "../../../lib/eventHistoryQueries";
 import { useImportDirectoryRows } from "../../../lib/useEventAreaRows";
 
 /**
@@ -30,9 +29,11 @@ export function useEventImportDirectory(
   const people = useListPerson();
   const vendors = useListVendor();
   const ingredients = useListIngredient();
-  // No index by proposal or order number yet: these two stay whole lists.
-  const proposals = useListProposal();
-  const vendorOrders = useListVendorOrder();
+  // Only the proposals and orders carrying this bundle's number
+  // (convex/historyWindow.ts importNumberRecords), not every one.
+  const numbered = useImportNumberRecords(identity);
+  const proposals = numbered?.proposals;
+  const vendorOrders = numbered?.vendorOrders;
   const proposalIds = useMemo(
     () =>
       identity === null || proposals === undefined

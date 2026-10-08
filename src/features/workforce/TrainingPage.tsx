@@ -5,7 +5,6 @@ import {
   useCreateTrainingModule,
   useListPerson,
   useListShiftType,
-  useListTrainingCompletion,
   useListTrainingModule,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
@@ -23,6 +22,10 @@ import { TrainingSignOffPanel } from "./TrainingSignOffPanel";
 import { starterModules } from "./trainingStarters";
 import "./TrainingPage.css";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import {
+  useTrainingCompletionCounts,
+  useTrainingCompletionPages,
+} from "../../lib/workforceHistoryQueries";
 
 const categoryLabels: Record<string, string> = {
   food_safety: "Food safety",
@@ -39,7 +42,11 @@ function localDateEpoch(value: FormDataEntryValue | null) {
 
 export function TrainingPage() {
   const modules = useListTrainingModule();
-  const completions = useListTrainingCompletion();
+  // The newest completions, more on request; the counts come from the
+  // server, over every completion.
+  const completionPages = useTrainingCompletionPages();
+  const completions = completionPages.rows;
+  const completionCounts = useTrainingCompletionCounts();
   const shiftTypes = useListShiftType();
   const people = useListPerson();
   const createModule = useCreateTrainingModule();
@@ -157,6 +164,7 @@ export function TrainingPage() {
   const loading =
     modules === undefined ||
     completions === undefined ||
+    completionCounts === undefined ||
     shiftTypes === undefined ||
     people === undefined;
 
@@ -209,7 +217,7 @@ export function TrainingPage() {
         </div>
         <div>
           <span>Passed completions</span>
-          <strong>{activeCompletions.length}</strong>
+          <strong>{completionCounts?.total ?? 0}</strong>
           <small>Dated, scored proof attached to staff.</small>
         </div>
         <div>
@@ -492,9 +500,8 @@ export function TrainingPage() {
         ) : (
           <div className="training-module-grid">
             {listedModules.map((module, index) => {
-              const completionCount = activeCompletions.filter(
-                (row) => row.trainingModuleId === module._id,
-              ).length;
+              const completionCount =
+                completionCounts?.byModule[module._id] ?? 0;
               return (
                 <article
                   key={module._id}
@@ -557,7 +564,7 @@ export function TrainingPage() {
               <h2>Passed assessments</h2>
             </div>
             <span>
-              {formatCountNoun(activeCompletions.length, "completion")}
+              {formatCountNoun(completionCounts?.total ?? 0, "completion")}
             </span>
           </div>
           {loading ? (
@@ -601,6 +608,17 @@ export function TrainingPage() {
               </table>
             </div>
           )}
+          {completionPages.canLoadMore ? (
+            <div className="mt-3 flex justify-center">
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={completionPages.loadMore}
+              >
+                Load more
+              </button>
+            </div>
+          ) : null}
         </section>
 
         <section className="working-ledger">

@@ -3,7 +3,6 @@ import {
   useCreateSkillLevel,
   useCreateTrainingSignOff,
   useListSkillLevel,
-  useListTrainingSignOff,
   useSkillLevelChangeLevel,
   useTrainingSignOffFinishTraining,
   useTrainingSignOffInitialTrainingSteps,
@@ -12,6 +11,7 @@ import {
 import { formatDate } from "../../lib/format";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { TableSkeleton } from "../../ui/primitives";
+import { useTrainingSignOffPages } from "../../lib/workforceHistoryQueries";
 import { findSkillLevel, trainersFor, type SkillLevelRow } from "./skillLevels";
 import {
   initialledCount,
@@ -81,7 +81,9 @@ export function TrainingSignOffPanel({
   busy,
   run,
 }: TrainingSignOffPanelProps) {
-  const listed = useListTrainingSignOff() as SignOffRow[] | undefined;
+  // The newest sign-offs, more on request.
+  const signOffPages = useTrainingSignOffPages();
+  const listed = signOffPages.rows as SignOffRow[] | undefined;
   const levels = (useListSkillLevel() as SkillLevelRow[] | undefined) ?? [];
   const create = useCreateTrainingSignOff();
   const initial = useTrainingSignOffInitialTrainingSteps();
@@ -440,6 +442,17 @@ export function TrainingSignOffPanel({
           })}
         </ul>
       )}
+      {signOffPages.canLoadMore ? (
+        <div className="mt-3 flex justify-center">
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={signOffPages.loadMore}
+          >
+            Load more
+          </button>
+        </div>
+      ) : null}
     </section>
   );
 }

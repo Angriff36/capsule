@@ -1,23 +1,23 @@
 import { useMemo } from "react";
 import { usePlanWindowRows } from "../../../lib/eventScopedQueries";
+import { useAwayForPeople } from "../../../lib/eventHistoryQueries";
 import {
-  useListAvailabilityWindow,
   useListEquipment,
-  useListEquipmentIssue,
   useListEquipmentPart,
   useListOrganization,
   useListPerson,
   useListQualification,
-  useListTimeOffRequest,
   useListTrailer,
   useListVehicle,
 } from "../../../lib/manifest-convex-react";
 import {
+  eventWindow,
   parsePlanLevels,
   type PlanLevels,
   type PlanSnapshot,
 } from "../../../lib/planningChecks";
 import { useEventRecordsInRange } from "../../facilities/useEventsById";
+import { useOpenEquipmentIssues } from "../../facilities/useLogisticsWindow";
 
 // The month view shows at most 37 days before the chosen day to 42 after it;
 // 50 each side covers every view plus a week for multi-day jobs and clashes.
@@ -37,8 +37,10 @@ export type PlanData = {
  * not read comes back empty, so its checks simply find nothing.
  */
 export function usePlanSnapshot(shown: { from: number; to: number }): PlanData {
-  // Events that start on the days the board shows, nothing more.
-  const events = useEventRecordsInRange(shown);
+  // Events on the days the board shows: those that start on them and those
+  // that started earlier and still run into them. Nothing more.
+  const shownWindow = useMemo(() => ({ ...shown, runningIn: true }), [shown]);
+  const events = useEventRecordsInRange(shownWindow);
   // Staff, trucks, holds and pack lists of the events in the window only
   // (convex/planWindow.ts), not every row the company ever had.
   const eventIdsKey = (events ?? []).map((row) => row._id).join(",");
@@ -53,13 +55,40 @@ export function usePlanSnapshot(shown: { from: number; to: number }): PlanData {
   const vehicles = useListVehicle();
   const trailers = useListTrailer();
   const people = useListPerson();
-  const timeOff = useListTimeOffRequest();
-  const availability = useListAvailabilityWindow();
+  // Time off and availability of the people on these events, over the
+  // times those events and their crews cover, not every row ever made.
+  const awayWindow = useMemo(() => {
+    if (events === undefined || assignments === undefined) return "skip";
+    let from = shown.from;
+    let to = shown.to;
+    for (const row of [
+      ...events.map((event) =>
+        eventWindow({ ...event, stage: String(event.stage) }),
+      ),
+      ...assignments.map((row) =>
+        row.startsAt != null && row.endsAt != null
+          ? { start: row.startsAt, end: row.endsAt }
+          : null,
+      ),
+    ]) {
+      if (!row) continue;
+      from = Math.min(from, row.start);
+      to = Math.max(to, row.end);
+    }
+    return { from, to };
+  }, [events, assignments, shown.from, shown.to]);
+  const away = useAwayForPeople(
+    assignments?.map((row) => row.personId),
+    awayWindow,
+  );
+  const timeOff = away?.timeOff;
+  const availability = away?.availability;
   const qualifications = useListQualification();
   const equipment = useListEquipment();
   const reservations = forEvents?.reservations;
   const parts = useListEquipmentPart();
-  const equipmentIssues = useListEquipmentIssue();
+  // Only open issues take units out of use.
+  const equipmentIssues = useOpenEquipmentIssues();
   const packLists = forEvents?.packLists;
   const packLines = forEvents?.packLines;
   const planNeeds = forEvents?.planNeeds;

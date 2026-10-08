@@ -327,73 +327,86 @@ export const openBatches = query({
   },
 });
 
+/** Newest saved first, the order the tenant index pages. */
+const newestFirst = (
+  a: { _creationTime: number },
+  b: { _creationTime: number },
+) => b._creationTime - a._creationTime;
+
 /**
- * Finished batches a page at a time, newest first: completed ones that
- * still owe a shortfall or were finished in the last day (the floor's
- * "finished batches" card). Older pages load when the cook asks.
+ * Finished batches newest first: completed ones that still owe a shortfall
+ * or were finished in the last day (the floor's "finished batches" card).
+ * Both kinds are read through their indexes and sent in one finished page.
  */
 export const finishedBatchesPage = query({
   args: { now: v.number(), paginationOpts: paginationOptsValidator },
-  handler: async (ctx, { now, paginationOpts }) => {
+  handler: async (ctx, { now }) => {
     const auth = await getAuthContext(ctx);
     if (!auth.tenantId || !rules(auth).kitchen)
       return { page: [] as Batch[], isDone: true, continueCursor: "" };
     const tenantId = auth.tenantId;
-    // The filter runs on the server, so a page holds only rows the card
-    // shows: a short batch from long ago still comes in the first page.
-    const result = await ctx.db
+    const rows = await ctx.db
       .query("productionBatches")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .order("desc")
-      .filter((q) => {
-        const none = (field: "deletedAt" | "shortfallResolvedAt") =>
-          q.or(q.eq(q.field(field), null), q.eq(q.field(field), undefined));
-        return q.and(
-          none("deletedAt"),
-          q.eq(q.field("status"), "completed"),
-          q.or(
-            q.and(
-              q.gt(q.field("shortfallQuantity"), 0),
-              none("shortfallResolvedAt"),
-            ),
-            q.gt(q.field("completedAt"), now - DAY),
-          ),
-        );
-      })
-      .paginate(paginationOpts);
-    return { ...result, page: result.page.map(withVariance) };
+      .withIndex("by_tenantId_and_status_and_completedAt", (q) =>
+        q
+          .eq("tenantId", tenantId)
+          .eq("status", "completed")
+          .gt("completedAt", now - DAY),
+      )
+      .collect();
+    for (const unresolved of [undefined, null])
+      rows.push(
+        ...(await ctx.db
+          .query("productionBatches")
+          .withIndex("by_tenant_status_shortfall", (q) =>
+            q
+              .eq("tenantId", tenantId)
+              .eq("status", "completed")
+              .eq("shortfallResolvedAt", unresolved)
+              .gt("shortfallQuantity", 0),
+          )
+          .collect()),
+      );
+    const byId = new Map(
+      rows.filter((row) => row.deletedAt == null).map((row) => [row._id, row]),
+    );
+    return {
+      page: [...byId.values()].sort(newestFirst).map(withVariance),
+      isDone: true,
+      continueCursor: "",
+    };
   },
 });
 
+/** Share states before release. */
+const UNRELEASED = ["planned", "produced", "portioned"] as const;
+
 /**
- * Batch shares a page at a time, newest first, each with its batch: shares
- * not released, on batches not cancelled (the floor's "batch shares" card).
+ * Batch shares newest first, each with its batch: shares not released, on
+ * batches not cancelled (the floor's "batch shares" card). Read by state
+ * and sent in one finished page.
  */
 export const sharesPage = query({
   args: { paginationOpts: paginationOptsValidator },
-  handler: async (ctx, { paginationOpts }) => {
+  handler: async (ctx) => {
     const auth = await getAuthContext(ctx);
     const empty: Array<Doc<"productionBatchAllocations"> & { batch: Batch }> =
       [];
     if (!auth.tenantId || !rules(auth).kitchen)
       return { page: empty, isDone: true, continueCursor: "" };
     const tenantId = auth.tenantId;
-    const result = await ctx.db
-      .query("productionBatchAllocations")
-      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .order("desc")
-      .filter((q) =>
-        q.and(
-          q.or(
-            q.eq(q.field("deletedAt"), null),
-            q.eq(q.field("deletedAt"), undefined),
-          ),
-          q.neq(q.field("status"), "released"),
-        ),
-      )
-      .paginate(paginationOpts);
+    const rows: Doc<"productionBatchAllocations">[] = [];
+    for (const status of UNRELEASED)
+      rows.push(
+        ...(await ctx.db
+          .query("productionBatchAllocations")
+          .withIndex("by_tenantId_and_status", (q) =>
+            q.eq("tenantId", tenantId).eq("status", status),
+          )
+          .collect()),
+      );
     const page = empty;
-    for (const row of result.page) {
+    for (const row of rows.sort(newestFirst)) {
       if (row.deletedAt != null || row.status === "released") continue;
       const batch = await ctx.db.get(row.productionBatchId);
       if (
@@ -405,6 +418,6 @@ export const sharesPage = query({
         continue;
       page.push({ ...row, batch: withVariance(batch) });
     }
-    return { ...result, page };
+    return { page, isDone: true, continueCursor: "" };
   },
 });
