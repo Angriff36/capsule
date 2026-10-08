@@ -166,7 +166,7 @@ function parseSheet(xml: string, sharedStrings: string[]): string[][] {
 }
 
 /** Sheet name → relationship target, in workbook order. */
-function readSheetTargets(
+export function readSheetTargets(
   workbookXml: string,
   relsXml: string,
 ): Array<{ name: string; target: string }> {
@@ -204,7 +204,9 @@ export function readXlsxSheetsFromEntries(entries: ZipEntryMap): XlsxSheet[] {
   });
 }
 
-function entryText(entries: ZipEntryMap): (name: string) => string | undefined {
+export function entryText(
+  entries: ZipEntryMap,
+): (name: string) => string | undefined {
   return (name) => {
     const entry = entries.get(name);
     return entry === undefined

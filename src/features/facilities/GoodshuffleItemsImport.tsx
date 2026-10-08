@@ -1,16 +1,22 @@
-// Bring in the Goodshuffle item list (its inventory export, .xlsx or .csv).
-// Each item becomes an equipment item with its price, place, details and
-// picture; reading the file again updates the same items and adds nothing
-// twice.
+// Bring in the Goodshuffle item list (its inventory export, .xlsx or .csv)
+// or the old system's Inventory In-Stock report. Each item becomes an
+// equipment item with its price, place, details and picture; reading the
+// file again updates the same items and adds nothing twice.
 import { useState, type ChangeEvent } from "react";
 import { formatCountNoun } from "../../lib/format";
 import { goodshuffleSheetRows } from "../../lib/goodshuffleItems";
+import {
+  isTppInventoryReport,
+  readTppInventoryList,
+  type TppInventoryLeftOut,
+} from "../../lib/tppInventoryList";
 import { parseCsv } from "../../lib/tppMenuCsv";
 import { readXlsxSheetsFromEntries } from "../../lib/tppReports/xlsxWorkbookParser";
 import { readZipEntriesInBrowser } from "../../lib/tppReports/zipReaderBrowser";
 import {
   useBringInGoodshufflePicture,
   useImportGoodshuffleItems,
+  useImportTppEquipmentItems,
 } from "./goodshuffleItems";
 
 // Each new item is several saves; 100 rows in one call ran past the server's
@@ -32,11 +38,13 @@ async function fileGrid(file: File): Promise<string[][]> {
 export function GoodshuffleItemsImport({ onClose }: { onClose: () => void }) {
   const importItems = useImportGoodshuffleItems();
   const bringInPicture = useBringInGoodshufflePicture();
+  const importTppItems = useImportTppEquipmentItems();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [problems, setProblems] = useState<Problem[]>([]);
   const [sameName, setSameName] = useState<string[]>([]);
   const [countDiffers, setCountDiffers] = useState<CountDiff[]>([]);
+  const [leftOut, setLeftOut] = useState<TppInventoryLeftOut[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const handleFile = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -48,6 +56,7 @@ export function GoodshuffleItemsImport({ onClose }: { onClose: () => void }) {
     setProblems([]);
     setSameName([]);
     setCountDiffers([]);
+    setLeftOut([]);
     setBusy(true);
     const total = { added: 0, updated: 0, unchanged: 0, pictures: 0 };
     const found: Problem[] = [];
@@ -62,6 +71,28 @@ export function GoodshuffleItemsImport({ onClose }: { onClose: () => void }) {
         throw new Error(
           `${file.name} could not be read. Use the Goodshuffle inventory export (.xlsx) or the same sheet saved as .csv.`,
         );
+      }
+      if (isTppInventoryReport(grid)) {
+        const list = readTppInventoryList(grid);
+        for (let i = 0; i < list.rows.length; i += CHUNK_SIZE) {
+          const part = list.rows.slice(i, i + CHUNK_SIZE);
+          setMessage(
+            `Reading ${Math.min(i + part.length, list.rows.length)} of ${list.rows.length} items…`,
+          );
+          const result = await importTppItems({ rows: part });
+          total.added += result.added;
+          total.updated += result.updated;
+          total.unchanged += result.unchanged;
+          named.push(...result.sameName);
+          counts.push(...result.countDiffers);
+        }
+        setSameName(named);
+        setCountDiffers(counts);
+        setLeftOut(list.leftOut);
+        setMessage(
+          `${formatCountNoun(total.added, "item")} added, ${total.updated} updated, ${total.unchanged} already up to date.`,
+        );
+        return;
       }
       const { rows, firstRowNumber } = goodshuffleSheetRows(grid);
       if (rows.length === 0) {
@@ -134,7 +165,7 @@ export function GoodshuffleItemsImport({ onClose }: { onClose: () => void }) {
       <div className="supply-form-heading">
         <div>
           <p className="eyebrow">Equipment</p>
-          <h2>Bring in Goodshuffle items</h2>
+          <h2>Bring in Goodshuffle or old-system items</h2>
         </div>
         <button type="button" className="btn btn-ghost" onClick={onClose}>
           Close
@@ -148,8 +179,13 @@ export function GoodshuffleItemsImport({ onClose }: { onClose: () => void }) {
         again updates the same items and adds nothing twice; counts you changed
         here are kept.
       </p>
+      <p className="text-sm text-ink-2">
+        The old system&apos;s Inventory In-Stock report (.xlsx) works here too.
+        Its kitchen tools and trailer items come in with their count and storage
+        place. Food, disposables and prep steps are left out.
+      </p>
       <label className="field-label max-w-full min-w-0">
-        Goodshuffle file
+        Item list file
         <input
           type="file"
           accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -176,16 +212,29 @@ export function GoodshuffleItemsImport({ onClose }: { onClose: () => void }) {
       ) : null}
       {countDiffers.length > 0 ? (
         <div className="text-sm text-ink-2">
-          <p>Counts that differ from Goodshuffle (recount these):</p>
+          <p>Counts that differ from the file (recount these):</p>
           <ul>
             {countDiffers.slice(0, SHOWN).map((row) => (
               <li key={row.name}>
-                {row.name}: {row.inCapsule} here, {row.inFile} in Goodshuffle
+                {row.name}: {row.inCapsule} here, {row.inFile} in the file
               </li>
             ))}
             {countDiffers.length > SHOWN ? (
               <li>And {countDiffers.length - SHOWN} more.</li>
             ) : null}
+          </ul>
+        </div>
+      ) : null}
+      {leftOut.length > 0 ? (
+        <div className="text-sm text-ink-2" data-testid="old-system-left-out">
+          <p>Left out of the old-system list:</p>
+          <ul>
+            {leftOut.map((entry) => (
+              <li key={`${entry.group}-${entry.reason}`}>
+                {entry.group}: {formatCountNoun(entry.count, "line")}.{" "}
+                {entry.reason}
+              </li>
+            ))}
           </ul>
         </div>
       ) : null}

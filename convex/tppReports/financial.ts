@@ -20,6 +20,7 @@ import {
   requireReportTenant,
   resolveReportEventVenue,
 } from "./shared";
+import { menuItemCostingReport } from "./menuItemCosting";
 
 const REPORT_IDS = new Set(TPP_FINANCIAL_REPORTS.map((report) => report.id));
 const BILLED_STATUSES = new Set([
@@ -66,6 +67,7 @@ function reportRead(reportId: string): string[] {
   if (reportId === "outstanding-proposals") return PROPOSAL_READ;
   if (reportId === "inventory-cost-changes") return PRICE_OBSERVATION_READ;
   if (reportId === "staff-earnings") return PAYROLL_READ;
+  if (reportId === "menu-item-costing") return INGREDIENT_READ;
   if (reportId === "lost-revenue-by-cancellation-reason") return EVENT_READ;
   return INVOICE_READ;
 }
@@ -188,6 +190,13 @@ export const run = query({
     const seeVenues = canRead(auth, VENUE_READ);
     const seeClients = canRead(auth, CLIENT_READ);
     const parameters = (args.parameters ?? {}) as Parameters;
+    if (args.reportId === "menu-item-costing")
+      return menuItemCostingReport(
+        ctx,
+        tenantId,
+        reportTitle(args.reportId),
+        typeof parameters.category === "string" ? parameters.category : "",
+      );
     // Events in the chosen dates, plus the events and clients the invoices
     // name, read one by one. Reading every client or event first stopped at
     // the read limit, so newer ones showed as "Unknown contact".
@@ -748,7 +757,6 @@ export const run = query({
       "event-other-fees",
       "ledger-food-beverage-sales",
       "menu-item-cost-per-event",
-      "menu-item-costing",
       "menu-item-itemized-sales",
       "menu-item-sales-by-category",
       "miscellaneous-totals",

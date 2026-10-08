@@ -13,6 +13,7 @@ import {
   useListClient,
   useListDateHold,
   useListDateWaitlistEntry,
+  useListLead,
 } from "../../lib/manifest-convex-react";
 import { formatDate } from "../../lib/format";
 import {
@@ -50,6 +51,24 @@ export function DateHoldsPage() {
   const holds = useListDateHold();
   const waitlist = useListDateWaitlistEntry();
   const clients = useListClient();
+  const leads = useListLead();
+  // The client's open lead, so booking carries its type and guest count.
+  // One for the held day wins over another open one.
+  const openLeadId = (hold: { clientId?: string | null; holdDate: string }) => {
+    const open = (leads ?? []).filter(
+      (lead) =>
+        hold.clientId != null &&
+        lead.clientId === hold.clientId &&
+        lead.deletedAt == null &&
+        lead.closedAt == null,
+    );
+    const sameDay = open.find(
+      (lead) =>
+        lead.eventDate != null &&
+        new Date(lead.eventDate).toLocaleDateString("en-CA") === hold.holdDate,
+    );
+    return (sameDay ?? open[0])?._id;
+  };
   const createHold = useCreateDateHold();
   const joinWaitlist = useCreateDateWaitlistEntry();
   const extendHold = useDateHoldExtend();
@@ -272,6 +291,9 @@ export function DateHoldsPage() {
                                   holdId: hold._id,
                                   ...(hold.clientId
                                     ? { clientId: hold.clientId }
+                                    : {}),
+                                  ...(openLeadId(hold)
+                                    ? { leadId: String(openLeadId(hold)) }
                                     : {}),
                                 })}`}
                                 className="btn btn-ghost btn-sm"

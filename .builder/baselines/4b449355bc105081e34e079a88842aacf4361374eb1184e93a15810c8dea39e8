@@ -25,14 +25,18 @@ export interface EncryptionMetadata {
 const DEFAULT_KEY_ID = "local-v1";
 
 let cachedMaterials: Uint8Array[] | null = null;
+// Keys are imported once per isolate, and the one that opened the last field
+// is tried first: a list page opens thousands of fields, and importing every
+// key for every field ran it past its time limit.
+let cachedKeys: CryptoKey[] | null = null;
+let workingKey = 0;
 
 export async function encrypt(
   plaintext: string,
   _metadata: EncryptionMetadata,
 ): Promise<{ ciphertext: string; keyId: string }> {
   try {
-    const materials = await keyMaterials();
-    const key = await importAesKey(materials[0]!);
+    const key = (await aesKeys())[0]!;
     const iv = crypto.getRandomValues(new Uint8Array(12));
     const encoded = new TextEncoder().encode(plaintext);
     const cipherBuf = await crypto.subtle.encrypt(
@@ -64,15 +68,17 @@ export async function decrypt(
   const iv = packed.slice(0, 12);
   const data = packed.slice(12);
 
+  const keys = await aesKeys();
   let lastError: unknown;
-  for (const material of await keyMaterials()) {
+  for (let step = 0; step < keys.length; step++) {
+    const index = (workingKey + step) % keys.length;
     try {
-      const key = await importAesKey(material);
       const plainBuf = await crypto.subtle.decrypt(
         { name: "AES-GCM", iv: toBufferSource(iv) },
-        key,
+        keys[index]!,
         toBufferSource(data),
       );
+      workingKey = index;
       return new TextDecoder().decode(plainBuf);
     } catch (error) {
       lastError = error;
@@ -137,6 +143,12 @@ async function keyMaterials(): Promise<Uint8Array[]> {
   }
   cachedMaterials = materials;
   return materials;
+}
+
+async function aesKeys(): Promise<CryptoKey[]> {
+  if (cachedKeys) return cachedKeys;
+  cachedKeys = await Promise.all((await keyMaterials()).map(importAesKey));
+  return cachedKeys;
 }
 
 async function importAesKey(material: Uint8Array): Promise<CryptoKey> {

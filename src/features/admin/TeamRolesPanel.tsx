@@ -13,6 +13,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { ErrorState, Section } from "../../ui/primitives";
 import { PersonRoleDirectory } from "./PersonRoleDirectory";
+import { StaffListImport } from "./StaffListImport";
 import { TeamRolesTable } from "./TeamRolesTable";
 import type { TeamPerson } from "./TeamPerson";
 import { useActionNotice, useActionFailure } from "../../ui/action-result";
@@ -323,6 +324,9 @@ export function TeamRolesPanel({
             </button>
           </div>
         </form>
+      ) : null}
+      {canEdit ? (
+        <StaffListImport people={activePeople} onSaved={setNotice} />
       ) : null}
 
       <TeamRolesTable

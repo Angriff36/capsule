@@ -38,8 +38,8 @@ export const TPP_MENU_COLUMNS: Readonly<
     note: "A dish counts in portions; the old unit (Serving, Pizza) stays on the import with the portion size words.",
   },
   "Portion Price": {
-    goesTo: "kept",
-    note: "A dish has no price; the price stays on the import as price_per_person and menu prices are set on the proposal.",
+    goesTo: "dish",
+    note: 'the dish\'s price on the draft "Old system prices - <category>" menu (blank or 0 = no price); also kept on the import as price_per_person',
   },
   Tags: { goesTo: "dish", note: "dietary tags (words only)" },
   Stations: {

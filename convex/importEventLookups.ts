@@ -11,6 +11,7 @@
 
 import { v } from "convex/values";
 import { api } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
 import { internalQuery, type ActionCtx } from "./_generated/server";
 import { plainName } from "./importClientByName";
 import { type InquiryVenueRow } from "./lib/quoteInquiryVenue";
@@ -177,4 +178,147 @@ async function findOrAdd(
     lookups.refused.add(`${list}:${key}`);
     return null;
   }
+}
+
+// AC-277: the old system's menu export prices about a third of its items
+// (Portion Price). An imported dish with a price goes on the company's draft
+// price list for its old category ("Old system prices - Air Catering") at
+// that price, so the price is a real menu price a manager can check and
+// publish. A draft is never on the public menu or the proposal picker, so an
+// old price is not quoted to a client until someone publishes the list. A row
+// with no price (blank or 0) adds nothing; the price stays on the import.
+// A dish imported before (a later file, or dishes brought in before prices
+// were read) is added once. A later file with a new price changes the price on
+// the draft list; a dish moved to another category leaves its old draft list.
+
+type OldPriceLine = { lineId: string; price: number };
+type OldPriceMenu = {
+  id: string;
+  status: string;
+  lines: Map<string, OldPriceLine>;
+};
+
+/** Menus by plain name; null = the name could not be made (not allowed). */
+export type OldPriceMenus = Map<string, OldPriceMenu | null>;
+
+const OLD_PRICE_LIST = "Old system prices - ";
+
+export const oldPriceMenuName = (category: string | undefined) =>
+  `${OLD_PRICE_LIST}${category?.trim() || "No category"}`;
+
+/** The company's live old-system price lists and the dishes on each. */
+export const oldPriceMenus = internalQuery({
+  args: { tenantId: v.string() },
+  handler: async (ctx, { tenantId }) => {
+    const prefix = plainName(OLD_PRICE_LIST);
+    const menus = (
+      await ctx.db
+        .query("menus")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .collect()
+    ).filter(
+      (menu) =>
+        menu.deletedAt == null && plainName(menu.name).startsWith(prefix),
+    );
+    return await Promise.all(
+      menus.map(async (menu) => ({
+        key: plainName(menu.name),
+        id: String(menu._id),
+        status: String(menu.status),
+        lines: (
+          await ctx.db
+            .query("menuDishes")
+            .withIndex("by_menuId", (q) => q.eq("menuId", menu._id))
+            .collect()
+        )
+          .filter((line) => line.deletedAt == null && line.removedAt == null)
+          .map((line) => ({
+            dishId: String(line.dishId),
+            lineId: String(line._id),
+            price: Number(line.sellingPrice ?? 0),
+          })),
+      })),
+    );
+  },
+});
+
+/** Put one imported dish on its old-category price list; false = not added. */
+export async function addOldMenuPrice(
+  ctx: ActionCtx,
+  menus: OldPriceMenus,
+  args: {
+    category: string | undefined;
+    dishId: string;
+    price: number;
+    idempotencyKey: string;
+  },
+): Promise<boolean> {
+  const name = oldPriceMenuName(args.category);
+  const key = plainName(name);
+  let menu = menus.get(key);
+  if (menu === undefined) {
+    try {
+      const created = (await ctx.runMutation(
+        api.mutations.Menu_createViaDraft,
+        {
+          name,
+          category: args.category?.trim() || undefined,
+          description:
+            "Prices from the old system's menu export. Check them, then publish this menu to quote from it.",
+          idempotencyKey: `${args.idempotencyKey}:price-list`,
+        },
+      )) as { docId: string };
+      menu = { id: created.docId, status: "draft", lines: new Map() };
+    } catch {
+      // Not allowed to make menus: the price stays on the import only.
+      menu = null;
+    }
+    menus.set(key, menu);
+  }
+  // A list someone already published or archived is left as it is.
+  if (!menu || menu.status !== "draft") return false;
+  const cents = (value: number) => Math.round(value * 100);
+  const current = menu.lines.get(args.dishId);
+  try {
+    if (current) {
+      // A later file with a new price: the draft list follows it.
+      if (cents(current.price) === cents(args.price)) return false;
+      await ctx.runMutation(api.mutations.MenuDish_updateSellingPrice, {
+        docId: current.lineId as Id<"menuDishes">,
+        sellingPrice: args.price,
+        idempotencyKey: `${args.idempotencyKey}:price:${cents(args.price)}`,
+      });
+      current.price = args.price;
+      return true;
+    }
+    const created = (await ctx.runMutation(
+      api.mutations.MenuDish_createViaAdd,
+      {
+        menuId: menu.id,
+        dishId: args.dishId,
+        sellingPrice: args.price,
+        idempotencyKey: `${args.idempotencyKey}:price`,
+      },
+    )) as { docId: string };
+    menu.lines.set(args.dishId, { lineId: created.docId, price: args.price });
+  } catch {
+    return false;
+  }
+  // The dish moved category: it leaves its other old draft lists.
+  for (const [otherKey, other] of menus) {
+    const line = other?.lines.get(args.dishId);
+    if (!other || otherKey === key || other.status !== "draft" || !line)
+      continue;
+    try {
+      await ctx.runMutation(api.mutations.MenuDish_remove, {
+        docId: line.lineId as Id<"menuDishes">,
+        reason: `Moved to ${name} in the old system's menu export`,
+        idempotencyKey: `${args.idempotencyKey}:moved:${other.id}`,
+      });
+      other.lines.delete(args.dishId);
+    } catch {
+      // Left on the old list; a manager can remove it there.
+    }
+  }
+  return true;
 }

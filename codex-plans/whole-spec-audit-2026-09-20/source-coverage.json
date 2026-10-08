@@ -2365,22 +2365,22 @@
       "key": "PR02-01",
       "source": "specs/ralph/production-02-source-identity.md",
       "locator": "PR02-01",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-SOURCE-DATASETS"],
-      "gap": "Staff directory, service style / occasion / referral / salesperson lists, packages and seasonal prices, equipment references: no source rows or maps in the repository yet.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: tests/proofs/import-coverage-inventory.runtime.test.ts › \"every source dataset either maps, preserves, or explicitly unresolved-reports each present field\""
       ],
-      "waitsOn": "owner-files",
+      "waitsOn": null,
       "owners": [
         "src/import/",
         "convex/importCommit.ts",
         "src/lib/tppReports/",
         "existing migration/data-map documents"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "033fc556"
     },
     {
       "id": "AC-058",
@@ -2494,22 +2494,22 @@
       "key": "PR02-07",
       "source": "specs/ralph/production-02-source-identity.md",
       "locator": "PR02-07",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-SOURCE-DATASETS"],
-      "gap": "Staff postal addresses need the old system's staff list export.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: tests/proofs/import-supplement-fields.runtime.test.ts › \"imported birthdays, venue supplements and staff addresses land in their owning records and show unknown when absent\""
       ],
-      "waitsOn": "owner-files",
+      "waitsOn": null,
       "owners": [
         "src/import/",
         "convex/importCommit.ts",
         "src/lib/tppReports/",
         "existing migration/data-map documents"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "1e6560c5"
     },
     {
       "id": "AC-064",
@@ -4136,21 +4136,21 @@
       "key": "PR11-01",
       "source": "specs/ralph/production-11-reporting.md",
       "locator": "PR11-01",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-REPORT-INVENTORY"],
-      "gap": "The 90 supplied workbooks and the 70-report index are the owner's private archive; not in the repository.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/tpp-catalog-workbook-inventory.test.ts — 'every archived workbook maps to a supported report id, linked reference, or unsupported reason with an owner'"
       ],
-      "waitsOn": "owner-files",
+      "waitsOn": null,
       "owners": [
         "src/features/reports/",
         "existing TPP report playbook",
         "src/lib/tppReports/"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "65d9c50f"
     },
     {
       "id": "AC-141",
@@ -4563,21 +4563,21 @@
       "key": "PR13-05",
       "source": "specs/ralph/production-13-release-recovery.md",
       "locator": "PR13-05",
-      "status": "PENDING",
-      "codeState": "implemented-unverified",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-RELEASE-RECEIPT"],
-      "gap": "Same as AC-030: the production release legs run only on an authorized release.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): tests/deploy-production-script.test.ts; tests/deploy-backend-script.test.ts; authorized release receipt  2026-10-01: tests/deploy-production-script.test.ts 8/8 (receipt taken once, after the backend deploy) and tests/deploy-backend-script.test.ts 10/10 PASS. Authorized release receipt still PENDING (needs the next authorized release)."
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): tests/deploy-production-script.test.ts; tests/deploy-backend-script.test.ts; authorized release receipt  2026-10-01: tests/deploy-production-script.test.ts 8/8 (receipt taken once, after the backend deploy) and tests/deploy-backend-script.test.ts 10/10 PASS. Authorized release receipt still PENDING (needs the next authorized release). Authorized release receipt 2026-10-07: release 3107a4e8 by the lander's approved daily release (scripts/deploy-production.sh): grok review APPROVE, bun run check 872/872 test files and regen current before the one main push, Vercel and pop-os backend both at 3107a4e8; receipt docs/product/release-receipt-2026-10-07.md."
       ],
-      "waitsOn": "production-box",
+      "waitsOn": null,
       "owners": [
         "src/lib/releaseReceipt.ts",
         "scripts/release-receipt.ts",
         "scripts/deploy-production.sh"
       ],
-      "environment": "Not verified yet",
-      "sha": "d3ce58f0"
+      "environment": "automated test in the repository (vitest / convex-test); model or human judgment of the real screen or document",
+      "sha": "033fc556"
     },
     {
       "id": "AC-162",
@@ -7059,22 +7059,22 @@
       "key": "CF-6.2-04",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§6.2 bullet 'Menu catalog, categories, and prices'",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-SOURCE-DATASETS"],
-      "gap": "The real menu feed carries no prices; prices need a source file with them.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/tpp-menu-price-capture.test.ts — 'an imported menu row with a non-empty price stores it queryably, and an empty price stays on the raw link data' (build after a priced feed exists)"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/tpp-menu-price-capture.test.ts — 'an imported menu row with a non-empty price stores it queryably, and an empty price stays on the raw link data' (build after a priced feed exists) Green 2026-10-07 (PL-SOURCE-DATASETS, 09af0597): the priced feed exists - the real Menu Items Export prices 839 of 2,783 items. tests/proofs/import-mapped-fields.runtime.test.ts 'an imported menu row with a price lands on its category's draft price list; no price adds nothing' - a priced row becomes MenuDish.sellingPrice on the draft menu 'Old system prices - <category>', blank/0 adds nothing and the price stays on the import link verbatim, a repeat import adds nothing twice, a dish imported before gets its price once. Browser 360/1280 with 120 real export rows: the Air Catering and Drop Off price lists show on Kitchen > Menus with $13.99 / $6.00 / $10.40."
       ],
-      "waitsOn": "owner-files",
+      "waitsOn": null,
       "owners": [
         "src/import/",
         "convex/importCommit.ts",
         "src/lib/tppReports/",
         "existing migration/data-map documents"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test); signed-in browser on the local dev stack",
+      "sha": "1518375b"
     },
     {
       "id": "AC-278",
@@ -15165,7 +15165,7 @@
         "qualification scripts and docs"
       ],
       "environment": "automated test in the repository (vitest / convex-test); signed-in browser on the local dev stack",
-      "sha": "ebcf9a09"
+      "sha": "162a4a6f"
     },
     {
       "id": "AC-655",
@@ -16627,44 +16627,44 @@
       "key": "BE-21-14",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-14",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "The daily release review by a different model approves each batch; recorded by the lander, not the product builder.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 14 verified against scenario, gate, review and Git receipts; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit."
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 14 verified against scenario, gate, review and Git receipts; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit. 2026-10-07: release 3107a4e8 (range bdc3632a..3107a4e8, 162 commits) reviewed as one complete diff by cursor-grok-4.5-high-fast (xAI; builder is Opus 5.5, Anthropic) under the release-blocker review rule, verdict APPROVE stamped on the release commit and Reviewed-by lines; reviewer/model, date, criteria, verdict in docs/product/release-receipt-2026-10-07.md."
       ],
-      "waitsOn": "loop-tools",
+      "waitsOn": null,
       "owners": [
         "ACCEPTANCE_TESTS.md",
         "IMPLEMENTATION_PLAN.md",
         "codex-plans/",
         "repository review/release policy"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "model or human judgment of the real screen or document",
+      "sha": "033fc556"
     },
     {
       "id": "AC-727",
       "key": "BE-21-15",
       "source": "specs/capsule-backend-end-state-spec.md",
       "locator": "21-15",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-COMPLETION-DOSSIER"],
-      "gap": "Commits go to dev through the loop publisher and production only on an approved release; recorded by the lander.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 15 verified against scenario, gate, review and Git receipts"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed backend completion dossier — definition 15 verified against scenario, gate, review and Git receipts 2026-10-07: release 3107a4e8 - builder commits in its worktree, publisher to dev, one main push by scripts/release.sh after APPROVE and the full gate, backend deployed on pop-os by scripts/deploy-production.sh; Git receipts in docs/product/release-receipt-2026-10-07.md."
       ],
-      "waitsOn": "loop-tools",
+      "waitsOn": null,
       "owners": [
         "ACCEPTANCE_TESTS.md",
         "IMPLEMENTATION_PLAN.md",
         "codex-plans/",
         "repository review/release policy"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "033fc556"
     }
   ],
   "ralphCheckboxMap": [

@@ -22,6 +22,11 @@ import {
   TPP_MENU_COLUMNS,
   tppMenuTableToRows,
 } from "../../src/lib/tppMenuCsv";
+import { TPP_INVENTORY_COLUMNS } from "../../src/lib/tppInventoryList";
+import { TPP_CONTACT_TASK_COLUMNS } from "../../src/lib/tppReports/parseContactTasks";
+import { TPP_MENU_PACKAGE_PARTS } from "../../src/lib/tppReports/parseMenuPackages";
+import { TPP_VENUE_LISTING_COLUMNS } from "../../src/lib/tppReports/parseVenueListing";
+import { TPP_STAFF_LIST_COLUMNS } from "../../src/lib/tppStaffList";
 import {
   ensureEncryptionKey,
   importRows,
@@ -141,5 +146,113 @@ describe("runtime proof: every source dataset maps, keeps or reports each presen
       );
     });
     expect(unnamed).toEqual([]);
+  });
+
+  it("the Staff Address & Phone List: every heading has a home on the person", () => {
+    const heading = [
+      "Staff Member",
+      "Home",
+      "Work",
+      "Mobile",
+      "Email",
+      "Address",
+    ];
+    const named = TPP_STAFF_LIST_COLUMNS.map((entry) => entry.column);
+    expect(heading.filter((column) => !named.includes(column))).toEqual([]);
+    for (const entry of TPP_STAFF_LIST_COLUMNS)
+      expect(entry.note.length, entry.column).toBeGreaterThan(2);
+  });
+
+  // The printed heading rows of the real old-system reports
+  // (.artifacts/tpp-migration-20260905/tpp_migration/reports/company_wide).
+  const named = (columns: ReadonlyArray<{ column: string; note: string }>) => {
+    for (const entry of columns)
+      expect(entry.note.length, entry.column).toBeGreaterThan(2);
+    return columns.flatMap((entry) => entry.column.split(" / "));
+  };
+
+  it("the Venue Listing report: every column has a home on the venue", () => {
+    const heading = [
+      "Location",
+      "Address",
+      "City",
+      "State",
+      "Zip Code",
+      "Phone Number",
+      "Area:",
+    ];
+    const columns = named(TPP_VENUE_LISTING_COLUMNS);
+    expect(heading.filter((column) => !columns.includes(column))).toEqual([]);
+    const venueFields = Object.keys(TPP_FIELD_DISPOSITIONS.TPP_VENUE_MAPPINGS!);
+    for (const entry of TPP_VENUE_LISTING_COLUMNS)
+      expect(venueFields, entry.column).toContain(entry.field);
+  });
+
+  it("the Inventory In-Stock report: every column goes to the item, its details, or is left out with a reason", () => {
+    const heading = [
+      "(group name above each heading row)",
+      "Inventory Item",
+      "Stock #",
+      "Vendor",
+      "In Stock*",
+      "Unit Value",
+      "Storage Location",
+      "Total Value",
+      "Last Updated",
+    ];
+    const columns = named(TPP_INVENTORY_COLUMNS);
+    expect(heading.filter((column) => !columns.includes(column))).toEqual([]);
+  });
+
+  it("the Contact Tasks & Notes report: every column fills a history field or is accounted for", () => {
+    const heading = [
+      "Name:",
+      "Business Name:",
+      "Work #:",
+      "Home #:",
+      "Mobile #:",
+      "Email:",
+      "Task Owner",
+      "Task Type",
+      "Task Date",
+      "Priority",
+      "Complete ?",
+      "Task Subject",
+      "Task Description",
+      "Event Information",
+    ];
+    const columns = named(TPP_CONTACT_TASK_COLUMNS);
+    expect(heading.filter((column) => !columns.includes(column))).toEqual([]);
+    const historyFields = Object.keys(
+      TPP_FIELD_DISPOSITIONS.TPP_HISTORY_MAPPINGS!,
+    );
+    const keptOnLink = ["", "ContactName", "Priority", "Completed"];
+    for (const entry of TPP_CONTACT_TASK_COLUMNS)
+      if (!keptOnLink.includes(entry.field))
+        expect(historyFields, entry.column).toContain(entry.field);
+  });
+
+  it("the Menu Item Packages report: every kind of line has a home, and the prices it does not print are stated", () => {
+    // The report has no heading row: the font marks each line (package,
+    // choice group, dish, description). It was printed with "Show Prices?"
+    // off, and no old-system file prints a seasonal or dated price, so
+    // package and seasonal prices are named as not in the file.
+    const parts = TPP_MENU_PACKAGE_PARTS.map((entry) => entry.part);
+    for (const part of [
+      "Package name",
+      "Package description",
+      "Choice group",
+      "Choice group note",
+      "Dish",
+      "Dish description",
+    ])
+      expect(parts).toContain(part);
+    for (const entry of TPP_MENU_PACKAGE_PARTS)
+      expect(entry.goesTo.length, entry.part).toBeGreaterThan(2);
+    expect(
+      TPP_MENU_PACKAGE_PARTS.find(
+        (entry) => entry.part === "Package and seasonal prices",
+      )?.goesTo,
+    ).toMatch(/not in the file/);
   });
 });

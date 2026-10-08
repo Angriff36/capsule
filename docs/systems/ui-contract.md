@@ -393,27 +393,6 @@ Screens (35): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
   - refusals (role, stage and rules): "Staff may see the company profile"; "Managers may update the company profile"; "Managers may change the company profile"; "Guard 0 failed"; "ConcurrencyConflict:"; "Organization not found"
   - effects: OrganizationBrandLogoSet
   - refresh: live reads update by themselves; reads affected: Organization.list, Organization.get
-- `mutations.ProposalDishSelection_adjustServings` (ProposalDishSelection.adjustServings)
-  - inputs from the screen: quantityServings; filled by the server: none
-  - version: required (`version`); retry key: accepted (same key = same result)
-  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Sales staff may see proposal dish selections"; "Sales staff may update proposal dish selections"; "Sales staff may change proposal dish selections"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
-  - effects: ProposalDishSelectionServingsAdjusted
-  - refresh: live reads update by themselves; reads affected: ProposalDishSelection.list, ProposalDishSelection.get, Dish.list, Dish.get, Menu.list, Menu.get, Proposal.list, Proposal.get
-- `mutations.ProposalDishSelection_createViaSelect` (ProposalDishSelection.select)
-  - inputs from the screen: proposalId, menuId, dishId, quantityServings, course, serviceStyle, specialInstructions; filled by the server: none
-  - version: not used; retry key: accepted (same key = same result)
-  - result: allocation `{ docId: string }`
-  - refusals (role, stage and rules): "Sales staff may see proposal dish selections"; "Sales staff may update proposal dish selections"; "Sales staff may change proposal dish selections"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
-  - effects: ProposalDishSelected
-  - refresh: live reads update by themselves; reads affected: ProposalDishSelection.list, ProposalDishSelection.get, Dish.list, Dish.get, Menu.list, Menu.get, Proposal.list, Proposal.get
-- `mutations.ProposalDishSelection_remove` (ProposalDishSelection.remove)
-  - inputs from the screen: none; filled by the server: none
-  - version: required (`version`); retry key: accepted (same key = same result)
-  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
-  - refusals (role, stage and rules): "Sales staff may see proposal dish selections"; "Sales staff may update proposal dish selections"; "Sales staff may change proposal dish selections"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
-  - effects: ProposalDishSelectionRemoved
-  - refresh: live reads update by themselves; reads affected: ProposalDishSelection.list, ProposalDishSelection.get, Dish.list, Dish.get, Menu.list, Menu.get, Proposal.list, Proposal.get
 - `mutations.ProposalEnhancement_createViaOffer` (ProposalEnhancement.offer)
   - inputs from the screen: proposalId, name, price, description, sortOrder; filled by the server: none
   - version: not used; retry key: accepted (same key = same result)
@@ -551,6 +530,9 @@ Screens (35): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
 - `fileStorage.urlsForStorageIds` - query; live read, updates by itself
 - `lib.proposalChangeDraft.startProposalChange` - mutation; authored step; live reads update by themselves
+- `lib.proposalDishPricing.adjustProposalDishServings` - mutation; authored step; live reads update by themselves
+- `lib.proposalDishPricing.pickProposalDish` - mutation; authored step; live reads update by themselves
+- `lib.proposalDishPricing.removeProposalDish` - mutation; authored step; live reads update by themselves
 - `lib.proposalDraft.draftProposalWithLines` - mutation; authored step; live reads update by themselves
 - `lib.proposalDraftReport.getProposalDraftReport` - query; live read, updates by itself
 - `lib.proposalEventCreation.createEventFromAcceptedProposal` - mutation; authored step; live reads update by themselves
@@ -586,6 +568,7 @@ Screens (66): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 
 - `queries.getEvent` - live read
 - `queries.getEventTemplate` - live read
+- `queries.getLead` - live read
 - `queries.getProposal` - live read
 - `queries.listAvailabilityWindow` - live read
 - `queries.listClient` - live read

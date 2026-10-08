@@ -80,6 +80,11 @@ function table(
   };
 }
 
+/** A blank source value prints as "Not recorded", never as a made-up one (AC-063). */
+function recorded(value: string | null | undefined): string {
+  return value?.trim() || "Not recorded";
+}
+
 function name(client: {
   companyName?: string | null;
   givenName?: string | null;
@@ -620,16 +625,18 @@ export const run = query({
             values: {
               staff: `${row.givenName} ${row.familyName}`,
               role: row.role,
-              address: [
-                row.addressLine1,
-                row.addressLine2,
-                [row.city, row.region, row.postalCode]
+              address: recorded(
+                [
+                  row.addressLine1,
+                  row.addressLine2,
+                  [row.city, row.region, row.postalCode]
+                    .filter(Boolean)
+                    .join(" "),
+                ]
                   .filter(Boolean)
-                  .join(" "),
-              ]
-                .filter(Boolean)
-                .join(", "),
-              phone: row.phone ?? "",
+                  .join(", "),
+              ),
+              phone: recorded(row.phone),
               email: row.email,
             },
           })),
@@ -725,25 +732,29 @@ export const run = query({
               rows: [
                 {
                   label: "Address",
-                  value: [
-                    venue.addressLine1,
-                    venue.addressLine2,
-                    venue.city,
-                    venue.region,
-                    venue.postalCode,
-                  ]
-                    .filter(Boolean)
-                    .join(", "),
+                  value: recorded(
+                    [
+                      venue.addressLine1,
+                      venue.addressLine2,
+                      venue.city,
+                      venue.region,
+                      venue.postalCode,
+                    ]
+                      .filter(Boolean)
+                      .join(", "),
+                  ),
                 },
-                { label: "Phone", value: venue.contactPhone ?? "" },
-                { label: "Contact", value: venue.contactName ?? "" },
+                { label: "Phone", value: recorded(venue.contactPhone) },
+                { label: "Contact", value: recorded(venue.contactName) },
                 {
                   label: "Directions / load-in",
-                  value: venue.loadInInstructions ?? "",
+                  value: recorded(venue.loadInInstructions),
                 },
+                { label: "Parking", value: recorded(venue.logisticsNotes) },
+                { label: "Access", value: recorded(venue.accessNotes) },
                 {
                   label: "Special notes",
-                  value: venue.cateringNotes ?? venue.accessNotes ?? "",
+                  value: recorded(venue.cateringNotes),
                 },
               ],
             },

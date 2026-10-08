@@ -23,7 +23,8 @@ import { ConvexError, v } from "convex/values";
 import { internalMutation, type ActionCtx } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
-import { writeLink } from "./importCommit";
+import { loadClientNames, writeLink } from "./importCommit";
+import { matchClientByName, type ClientName } from "./importClientByName";
 import { COMPANY_RECORD_TYPE } from "./lib/importCompanies";
 import { skippedByPerson } from "./lib/importResolution";
 import { parseTppHistory, type ParsedHistoryRow } from "./lib/tppHistoryRows";
@@ -101,7 +102,8 @@ export const insertAndLink = internalMutation({
     const now = Date.now();
     const id = await ctx.db.insert("clientCommunications", {
       tenantId: args.tenantId,
-      clientId: ownClient ?? undefined,
+      // A row placed by its event alone sits under that event's client too.
+      clientId: ownClient ?? event?.clientId ?? undefined,
       eventId: ownEvent ?? undefined,
       occurredAt: args.occurredAt,
       medium: args.medium,
@@ -143,7 +145,13 @@ async function findLink(
 /** The Capsule client and event an old history row belongs to. */
 async function resolveHome(
   ctx: ActionCtx,
-  args: { tenantId: string; sourceSystem: string; row: ParsedHistoryRow },
+  args: {
+    tenantId: string;
+    sourceSystem: string;
+    row: ParsedHistoryRow;
+    /** The company's clients by name, read once per run when needed. */
+    clientNames: () => Promise<ClientName[]>;
+  },
 ): Promise<{ clientId?: string; eventId?: string }> {
   const { tenantId, sourceSystem, row } = args;
   const lookup = async (recordType: string, externalId?: string) => {
@@ -166,7 +174,16 @@ async function resolveHome(
       })) as string)
     : undefined;
   const eventId = await lookup("event", row.eventId);
-  return { clientId, eventId };
+  if (clientId || eventId || !row.contactName) return { clientId, eventId };
+  // Named only: one exact match among the company's clients, never a guess
+  // between two (the event import's rule, convex/importClientByName.ts).
+  const [givenName, ...rest] = row.contactName.split(/\s+/);
+  const match = matchClientByName(await args.clientNames(), {
+    companyName: row.contactName,
+    givenName,
+    familyName: rest.join(" "),
+  });
+  return match.status === "found" ? { clientId: match.clientId } : {};
 }
 
 export async function commitHistoryRows(
@@ -189,6 +206,8 @@ export async function commitHistoryRows(
   let skipped = 0;
   let pending = 0;
   const { tenantId, sourceSystem } = args;
+  let names: Promise<ClientName[]> | null = null;
+  const clientNames = () => (names ??= loadClientNames(ctx, tenantId));
 
   for (const [index, row] of parsed.records.entries()) {
     const remaining = parsed.records.length - index;
@@ -230,7 +249,12 @@ export async function commitHistoryRows(
       continue;
     }
 
-    const home = await resolveHome(ctx, { tenantId, sourceSystem, row });
+    const home = await resolveHome(ctx, {
+      tenantId,
+      sourceSystem,
+      row,
+      clientNames,
+    });
     if (!home.clientId && !home.eventId) {
       await ctx.runMutation(internal.importCommit.upsertLink, {
         ...linkBase,

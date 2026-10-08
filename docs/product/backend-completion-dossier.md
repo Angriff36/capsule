@@ -9,7 +9,7 @@ This page does not claim Capsule is production ready. It claims only what each l
 - Gate: the full repository gate (`bun run check`) and `bun run manifest:regen:check`, run on this batch; result and commit in definition 13.
 - Model judgments of this page (definitions 01, 08) and of the real Final Lock and explanation screens (definitions 10, 11): `docs/quality/llm-review/ac-713-720-722-723-completion-dossier-2026-10-04.json`, all PASS.
 - Review: every batch goes through the daily release review by a different model provider (Codex gpt-5.6-sol, fallback grok via Cursor CLI), run by the lander, never by the builder. Model judgments of real screens and documents are kept under `docs/quality/llm-review/`.
-- Git: work is committed in the batch worktree, published to `dev` after each round, and reaches production only through an approved daily release (`scripts/deploy-production.sh`). Last production release: 85ded95e, 2026-10-03 (frontend and backend).
+- Git: work is committed in the batch worktree, published to `dev` after each round, and reaches production only through an approved daily release (`scripts/deploy-production.sh`). Last production release: 3107a4e8, 2026-10-07 (frontend and backend; `docs/product/release-receipt-2026-10-07.md`).
 
 ## 01 · AC-713 · A normal user can progress from lead through closed-out Event without re-entering authoritative facts in another Capsule subsystem.
 
@@ -95,12 +95,12 @@ This page does not claim Capsule is production ready. It claims only what each l
 
 ## 14 · AC-726 · An eligible different model reviews and approves the complete diff under the repository's review rule.
 
-- Verdict: OPEN (waits on loop-tools)
+- Verdict: PASS
 - Rows: AC-726
-- Scenario: the lander runs the daily release review by a different provider and stamps each landed commit `Reviewed-by: <model> APPROVE`; the builder never runs or reads its own review.
+- Scenario: the lander runs the daily release review by a different provider and stamps each landed commit `Reviewed-by: <model> APPROVE`; the builder never runs or reads its own review. Receipt: release 3107a4e8 (2026-10-07), the complete diff since the previous release reviewed by grok (xAI) while the builder is Opus (Anthropic), verdict APPROVE on the release commit (`docs/product/release-receipt-2026-10-07.md`).
 
 ## 15 · AC-727 · Changes are committed and pushed according to repository policy; production release occurs only when authorized.
 
-- Verdict: OPEN (waits on loop-tools)
+- Verdict: PASS
 - Rows: AC-727
-- Scenario: the builder commits only in its batch worktree and never pushes (the pre-push hook refuses its pushes); the publisher puts each round on `dev`; production changes only through the approved daily release.
+- Scenario: the builder commits only in its batch worktree and never pushes (the pre-push hook refuses its pushes); the publisher puts each round on `dev`; production changes only through the approved daily release. Receipt: release 3107a4e8 (2026-10-07) - full gate before the one `main` push by `scripts/release.sh`, frontend and backend at the same commit through `scripts/deploy-production.sh` (`docs/product/release-receipt-2026-10-07.md`).

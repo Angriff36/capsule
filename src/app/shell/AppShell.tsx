@@ -91,12 +91,13 @@ export function AppShell() {
             </div>
           )}
           <NewVersionBanner />
-          <AnnouncementBanner />
           <ActionResultHost />
           <main
             ref={mainScrollRef}
             className="app-canvas min-h-0 flex-1 overflow-y-auto"
           >
+            {/* Inside the scroll area, so notices scroll away with the page. */}
+            <AnnouncementBanner />
             <ListNavigationManager />
             <ListScrollCoordinator
               scrollRef={mainScrollRef}

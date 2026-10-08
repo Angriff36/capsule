@@ -127,9 +127,7 @@ const LEAD: DatasetDispositions = {
   EstimatedValue: rec("Lead", "estimatedValue"),
   EventDate: rec("Lead", "eventDate"),
   Source: rec("Lead", "source"),
-  ReferralSource: link(
-    "Old referral names are not matched to Capsule referral sources yet; the name stays on the import.",
-  ),
+  ReferralSource: rec("Lead", "referralSourceId"),
   SalespersonID: link(
     "Old salesperson ids are not Capsule people; the id stays on the import until the staff list is matched.",
   ),
