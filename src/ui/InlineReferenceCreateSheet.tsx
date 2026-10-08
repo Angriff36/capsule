@@ -342,6 +342,13 @@ export function InlineReferenceCreateSheet({
               onName={setName}
               onClientType={(next) => {
                 setClientType(next);
+                // Back to a company: put a split name back together, so
+                // "Blue Apron" does not save as "Blue".
+                if (next === "company" && familyName.trim()) {
+                  setName([name.trim(), familyName.trim()].join(" "));
+                  setFamilyName("");
+                  return;
+                }
                 // "Emma Whitlock" typed as a company splits into first and
                 // last name when it turns out to be a person.
                 const words = name.trim().split(/\s+/);

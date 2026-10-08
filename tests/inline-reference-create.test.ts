@@ -112,6 +112,32 @@ it("creates a missing client in the sheet and returns its id for picker selectio
   });
 });
 
+it("keeps a two-word company whole when its guessed person type is switched back", async () => {
+  const createClient = command("useCreateClient", { docId: "client-new" });
+  await mount(
+    createElement(InlineReferenceCreateSheet, {
+      kind: "client",
+      open: true,
+      initialName: "Blue Apron",
+      existingOptions: [],
+      onClose: vi.fn(),
+      onUseExisting: vi.fn(),
+      onCreated: vi.fn(),
+    }),
+  );
+  const sheet = document.body;
+  // Guessed a person and split; switching to company puts it back together.
+  expect(field("clientType", sheet).value).toBe("person");
+  change(field("clientType", sheet), "company");
+  await submit(sheet.querySelector("form")!);
+  expect(createClient).toHaveBeenCalledWith(
+    expect.objectContaining({
+      clientType: "company",
+      companyName: "Blue Apron",
+    }),
+  );
+});
+
 it("requires a fresh duplicate confirmation after the identity changes", async () => {
   const createClient = command("useCreateClient", { docId: "client-new" });
   await mount(
