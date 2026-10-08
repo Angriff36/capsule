@@ -4,6 +4,7 @@ import {
   useLeadsByIds,
   usePagedRows,
   useProposalsByIds,
+  useRowsInStatuses,
   useRowsWithEmpty,
 } from "../../lib/financeScopedQueries";
 import { formatDate, formatTime } from "../../lib/format";
@@ -14,6 +15,8 @@ import { CrmFailureBanner } from "./CrmFailureBanner";
 import { TastingDetail } from "./TastingDetail";
 
 const OPEN_LEAD = ["closedAt"];
+// Booked and not yet on a proposal: still to taste or to apply.
+const OPEN_STATUSES = ["scheduled", "completed"];
 
 const STATUS_LABEL: Record<string, string> = {
   scheduled: "Scheduled",
@@ -37,10 +40,22 @@ export function leadLabel(lead: {
  * dish, then put the approved dishes on the proposal menu.
  */
 export function TastingsPage() {
-  // The newest tastings a page at a time; open leads for the booking form;
-  // and only the proposals and leads those name.
+  // Every open tasting (through the status index), the newest finished ones
+  // a page at a time; open leads for the booking form; and only the
+  // proposals and leads those name.
+  const openTastings = useRowsInStatuses("tastings", OPEN_STATUSES);
   const tastingPages = usePagedRows("tastings");
-  const tastings = tastingPages.rows;
+  const tastings =
+    openTastings === undefined || tastingPages.rows === undefined
+      ? undefined
+      : [
+          ...new Map(
+            [...openTastings, ...tastingPages.rows].map((row) => [
+              row._id,
+              row,
+            ]),
+          ).values(),
+        ];
   const openLeads = useRowsWithEmpty("leads", OPEN_LEAD);
   const tastingLeads = useLeadsByIds(
     tastings?.map((row) => (row.leadId ? String(row.leadId) : null)),

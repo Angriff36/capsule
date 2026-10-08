@@ -27,11 +27,14 @@ import {
   useLeadsByIds,
   useMessagesForThreads,
   usePagedRows,
+  useRowsInStatuses,
   useRowsWithEmpty,
   useThreadLastMessageAt,
 } from "../../lib/financeScopedQueries";
 
 const OPEN_LEAD = ["closedAt"];
+// Every conversation not archived may still need a reply.
+const OPEN_THREAD = ["active", "non_lead"];
 import { MessageMedia } from "./MessageMedia";
 import { ThreadLinksBar } from "./ThreadLinksBar";
 
@@ -69,11 +72,23 @@ function threadTitle(t: Thread): string {
  * action — replaying the same provider message id creates no duplicate.
  */
 export function MessageInboxPage() {
-  // The newest threads a page at a time; the open thread's messages; when
-  // each listed thread last had a message; the leads and contacts they name,
-  // and open leads for the link picker.
+  // Every thread not archived (through the status index), the newest
+  // archived ones a page at a time; the open thread's messages; when each
+  // listed thread last had a message; the leads and contacts they name, and
+  // open leads for the link picker.
+  const openThreads = useRowsInStatuses("messageThreads", OPEN_THREAD);
   const threadPages = usePagedRows("messageThreads");
-  const threads = threadPages.rows;
+  const threads = useMemo(
+    () =>
+      openThreads === undefined || threadPages.rows === undefined
+        ? undefined
+        : [
+            ...new Map(
+              [...openThreads, ...threadPages.rows].map((t) => [t._id, t]),
+            ).values(),
+          ],
+    [openThreads, threadPages.rows],
+  );
   const lastMessageAt = useThreadLastMessageAt(
     threads?.filter((t) => t.deletedAt == null).map((t) => t._id),
   );

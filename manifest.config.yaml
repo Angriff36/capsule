@@ -239,6 +239,23 @@ projections:
         PayrollInput:
           - fields: [tenantId, periodStart]
             name: by_tenantId_and_periodStart
+          # Every open row (draft, prepared, sent, viewed, scheduled, active)
+          # of these screens through a status index, so an older open one is
+          # never cut off by a page of newer finished ones.
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        Proposal:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        Contract:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        Tasting:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
+        MessageThread:
+          - fields: [tenantId, status]
+            name: by_tenantId_and_status
         RevenueAttribution:
           - fields: [tenantId, appliedAt]
             name: by_tenantId_and_appliedAt

@@ -21,13 +21,13 @@
       "sha256": "8f0c4e704527c5c62896e9dd116dcac5746c9816b85b385c26de129bb2257d1a"
     },
     "convex/queries.ts": {
-      "sha256": "1dd92652220ec4b2a1606674c289d234c1a3b7d0273b30dc5a0b509edf7a3813"
+      "sha256": "7dbeb066846691c3cd08ea6e47e2ea30b0c9ee90556265b84f88d51632531d68"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
     },
     "convex/schema.ts": {
-      "sha256": "0edac05b75e9244acc2fed8ac84ecd95ee6819d15849b80f86c3b98d03a6e767"
+      "sha256": "540386b138abb53484a7e0569643fb61408c266a1889cbc29e97ef475a2a1530"
     },
     "manifest-context-summary.json": {
       "sha256": "70d1418453a2d11193d0bebd5e394a3a91f87f41df9b7ce05138661e9b241b92"

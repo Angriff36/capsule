@@ -26,6 +26,7 @@ export type PayrollWorksheetRow = {
 export function PayrollWorksheet({
   loading,
   visibleRows,
+  countLabel,
   personName,
   clockedMinutesForInput,
   estimatedGross,
@@ -35,6 +36,8 @@ export function PayrollWorksheet({
 }: {
   loading: boolean;
   visibleRows: readonly PayrollWorksheetRow[];
+  /** Replaces the row count when only part of the history is loaded. */
+  countLabel?: string;
   personName: (id: string) => string;
   clockedMinutesForInput: (row: {
     personId: unknown;
@@ -56,7 +59,7 @@ export function PayrollWorksheet({
           <p className="eyebrow">Export worksheet</p>
           <h2>Payroll inputs</h2>
         </div>
-        <span>{formatCountNoun(visibleRows.length, "row")}</span>
+        <span>{countLabel ?? formatCountNoun(visibleRows.length, "row")}</span>
       </div>
       {loading ? (
         <TableSkeleton rows={5} />

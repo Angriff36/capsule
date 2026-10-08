@@ -20,15 +20,32 @@ import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
 import { useActionNotice } from "../../ui/action-result";
 import { useWorkingEventId } from "../events/workingEvent";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
-import { usePagedRows } from "../../lib/financeScopedQueries";
+import {
+  usePagedRows,
+  useRowsInStatuses,
+} from "../../lib/financeScopedQueries";
 
 const policy = new CrmLifecyclePolicy();
+// Not yet signed, expired or voided.
+const OPEN_STATUSES = ["draft", "sent", "viewed"];
 
 export function ContractsPage() {
   const workingId = useWorkingEventId();
-  // The newest contracts, a page at a time ("Load more" reads older ones).
+  // Every unsigned contract (through the status index), and the newest
+  // finished ones a page at a time ("Load more" reads older ones).
+  const openContracts = useRowsInStatuses("contracts", OPEN_STATUSES);
   const contractPages = usePagedRows("contracts");
-  const contracts = contractPages.rows;
+  const contracts =
+    openContracts === undefined || contractPages.rows === undefined
+      ? undefined
+      : [
+          ...new Map(
+            [...openContracts, ...contractPages.rows].map((row) => [
+              row._id,
+              row,
+            ]),
+          ).values(),
+        ];
   const clients = useClientDirectory();
   const events = usePickerAndNamedEvents([workingId]);
   const createContract = useCreateContract();
@@ -287,7 +304,9 @@ export function ContractsPage() {
             <p className="eyebrow">Agreements</p>
             <h2>Contracts</h2>
           </div>
-          <span>{visibleRows.length}</span>
+          <span>
+            {`${visibleRows.filter((row) => OPEN_STATUSES.includes(String(row.status))).length} open · ${visibleRows.filter((row) => !OPEN_STATUSES.includes(String(row.status))).length} closed shown`}
+          </span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />

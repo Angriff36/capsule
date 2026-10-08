@@ -10,6 +10,7 @@ import { useEventsById, useEventsInRange } from "../facilities/useEventsById";
 import {
   useAttributionsForEvents,
   usePagedRows,
+  useRowsWithEmpty,
 } from "../../lib/financeScopedQueries";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -31,6 +32,9 @@ import "./taxWorkspace.css";
 import { useActionNotice } from "../../ui/action-result";
 
 const usd = formatMoneyExact;
+// A split not yet applied (draft, pending, approved, rejected) has no applied
+// date; applied ones always have one.
+const NOT_APPLIED = ["appliedAt"];
 
 const formatDate = (date: string | number | null | undefined) => {
   if (!date) return "—";
@@ -49,10 +53,22 @@ const attributionTypeLabel = (type: string) => {
 };
 
 export function RevenueAttributionsPage() {
-  // The table shows the newest splits a page at a time; the summary reads
+  // The table shows every split not yet applied (through the applied-date
+  // index) and the newest applied ones a page at a time; the summary reads
   // only the picked month's events and their splits.
+  const openAttributions = useRowsWithEmpty("revenueAttributions", NOT_APPLIED);
   const attributionPages = usePagedRows("revenueAttributions");
-  const attributions = attributionPages.rows;
+  const attributions =
+    openAttributions === undefined || attributionPages.rows === undefined
+      ? undefined
+      : [
+          ...new Map(
+            [...openAttributions, ...attributionPages.rows].map((row) => [
+              row._id,
+              row,
+            ]),
+          ).values(),
+        ];
   const events = useEventsById(
     attributions === undefined
       ? undefined
@@ -206,7 +222,9 @@ export function RevenueAttributionsPage() {
               ).length
             }
           </strong>
-          <small>{configuredAttributions.length} shown</small>
+          <small>
+            {`${configuredAttributions.filter((a) => a.appliedAt == null).length} open · ${configuredAttributions.filter((a) => a.appliedAt != null).length} applied shown`}
+          </small>
         </div>
       </header>
       <FinanceWorkspaceNav />

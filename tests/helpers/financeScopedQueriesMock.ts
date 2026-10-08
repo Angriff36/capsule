@@ -120,6 +120,8 @@ export function financeScopedMock(tableRows: TableRows) {
             fieldEquals.every(({ field, value }) => row[field] === value),
           )
         : undefined,
+    useRowsInStatuses: (table: string, statuses: readonly string[]) =>
+      all(table).filter((row) => statuses.includes(String(row.status))),
     useCanReadTable: () => true,
     useInvoicesByIds: (list: readonly MaybeId[] | undefined) =>
       whereIn("invoices", "_id", list),

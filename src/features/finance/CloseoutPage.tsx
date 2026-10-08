@@ -61,13 +61,14 @@ export function CloseoutPage() {
   const eventScope = useWorkingEventScope("closeout");
   const authStatus = useAuthStatus();
   const [showFinalized, setShowFinalized] = useState(false);
-  // Only the closeouts shown: the working event's, else the unfinished ones,
-  // else (finalized shown) the newest page with "Load more".
+  // Only the closeouts shown: the working event's, else every unfinished
+  // one (through the status index), plus (finalized shown) the newest page
+  // with "Load more".
   const eventCloseouts = useCloseoutsForEvents(
     eventScope.scopeId ? [eventScope.scopeId] : undefined,
   );
   const draftCloseouts = useCloseoutsInStatus(
-    eventScope.scopeId || showFinalized ? null : "draft",
+    eventScope.scopeId ? null : "draft",
   );
   const pagedCloseouts = usePagedRows(
     "eventCloseouts",
@@ -75,9 +76,17 @@ export function CloseoutPage() {
   );
   const closeouts = eventScope.scopeId
     ? eventCloseouts
-    : showFinalized
-      ? pagedCloseouts.rows
-      : draftCloseouts;
+    : draftCloseouts === undefined ||
+        (showFinalized && pagedCloseouts.rows === undefined)
+      ? undefined
+      : [
+          ...new Map(
+            [...draftCloseouts, ...(pagedCloseouts.rows ?? [])].map((row) => [
+              row._id,
+              row,
+            ]),
+          ).values(),
+        ];
   const events = usePickerAndNamedEvents(
     closeouts
       ? [eventScope.workingId, ...closeouts.map((row) => row.eventId)]
@@ -351,7 +360,11 @@ export function CloseoutPage() {
             <p className="eyebrow">Reconciliation</p>
             <h2>Closeout folios</h2>
           </div>
-          <span>{formatCountNoun(visibleRows.length, "closeout")}</span>
+          <span>
+            {showFinalized && !eventScope.scopeId
+              ? `${visibleRows.filter((row) => String(row.status) !== "finalized").length} open · ${visibleRows.filter((row) => String(row.status) === "finalized").length} finalized shown`
+              : formatCountNoun(visibleRows.length, "closeout")}
+          </span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />

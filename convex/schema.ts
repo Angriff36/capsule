@@ -528,6 +528,7 @@ export default defineSchema({
     .index("by_clientId", ["clientId"])
     .index("by_clientMergeAuthorizationId", ["clientMergeAuthorizationId"])
     .index("by_mergeTargetClientId", ["mergeTargetClientId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"])
     .searchIndex("search_title", { searchField: "title", filterFields: ["tenantId"] }),
   correctiveActions: defineTable({
     tenantId: v.string(),
@@ -2441,7 +2442,8 @@ export default defineSchema({
     .index("by_providerThreadId", ["providerThreadId"])
     .index("by_contactId", ["contactId"])
     .index("by_leadId", ["leadId"])
-    .index("by_eventId", ["eventId"]),
+    .index("by_eventId", ["eventId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   occasions: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2978,7 +2980,8 @@ export default defineSchema({
     .index("by_personId", ["personId"])
     .index("by_eventId", ["eventId"])
     .index("by_shiftId", ["shiftId"])
-    .index("by_tenantId_and_periodStart", ["tenantId", "periodStart"]),
+    .index("by_tenantId_and_periodStart", ["tenantId", "periodStart"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   performanceReviews: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -3322,6 +3325,7 @@ export default defineSchema({
     .index("by_acceptedRevisionId", ["acceptedRevisionId"])
     .index("by_supersededById", ["supersededById"])
     .index("by_replacesProposalId", ["replacesProposalId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"])
     .searchIndex("search_title", { searchField: "title", filterFields: ["tenantId"] }),
   proposalDishSelections: defineTable({
     tenantId: v.string(),
@@ -4251,7 +4255,8 @@ export default defineSchema({
     .index("by_leadId", ["leadId"])
     .index("by_proposalId", ["proposalId"])
     .index("by_eventId", ["eventId"])
-    .index("by_createdByPersonId", ["createdByPersonId"]),
+    .index("by_createdByPersonId", ["createdByPersonId"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   tastingDishes: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

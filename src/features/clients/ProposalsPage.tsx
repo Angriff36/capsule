@@ -28,6 +28,7 @@ import {
   useProposalRevisions,
   useProposalShareLinks,
   useReadClientEvents,
+  useRowsInStatuses,
 } from "../../lib/financeScopedQueries";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { useActionPrompt } from "../../ui/action-prompt";
@@ -91,6 +92,8 @@ const LINKABLE_EVENT_STAGES = [
 
 // Proposal statuses where the client is still choosing dishes.
 const MENU_EDITABLE_STATUSES = ["draft", "sent", "viewed"];
+// Not yet accepted, declined, expired or superseded.
+const OPEN_STATUSES = ["draft", "sent", "viewed"];
 
 const policy = new CrmLifecyclePolicy();
 
@@ -100,9 +103,24 @@ const policy = new CrmLifecyclePolicy();
 export function ProposalsPage() {
   const { branding } = useTenantBranding();
   const withPictureUrls = useProposalPictureUrls();
-  // The newest proposals, a page at a time ("Load more" reads older ones).
+  // Every open proposal (through the status index), and the newest finished
+  // ones a page at a time ("Load more" reads older ones).
+  const openProposals = useRowsInStatuses("proposals", OPEN_STATUSES);
   const proposalPages = usePagedRows("proposals");
-  const proposals = proposalPages.rows;
+  const proposals = useMemo(
+    () =>
+      openProposals === undefined || proposalPages.rows === undefined
+        ? undefined
+        : [
+            ...new Map(
+              [...openProposals, ...proposalPages.rows].map((row) => [
+                row._id,
+                row,
+              ]),
+            ).values(),
+          ],
+    [openProposals, proposalPages.rows],
+  );
   // Names only; the signature request reads the one client's email.
   const clients = useClientDirectory();
   const readClient = useReadClient();
@@ -831,13 +849,15 @@ export function ProposalsPage() {
             <p className="eyebrow">Offers</p>
             <h2>Proposals</h2>
           </div>
-          <span>{visibleRows.length}</span>
+          <span>
+            {`${visibleRows.filter((row) => OPEN_STATUSES.includes(String(row.status))).length} open · ${visibleRows.filter((row) => !OPEN_STATUSES.includes(String(row.status))).length} closed shown`}
+          </span>
         </div>
         {openRows.length > 0 ? (
           <input
             type="search"
             className="input my-3 min-h-10 w-full max-w-sm"
-            placeholder="Find by title or client"
+            placeholder="Find loaded proposals by title or client"
             aria-label="Find a proposal"
             value={find}
             onChange={(event) => setFind(event.target.value)}

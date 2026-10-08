@@ -599,6 +599,43 @@ export function useRowsWhere<T extends PagedTable>(
   );
 }
 
+/**
+ * The rows of one table in any of the given statuses (e.g. a screen's open
+ * ones: draft, sent, viewed), newest first, each status one read through the
+ * table's [tenantId, status] index (FIELD_INDEXES in convex/financeWindow.ts
+ * must list it). `undefined` until all have loaded.
+ */
+export function useRowsInStatuses<T extends PagedTable>(
+  table: T,
+  statuses: readonly string[],
+): Doc<T>[] | undefined {
+  const key = statuses.join(",");
+  const requests = useMemo(() => {
+    const next: RequestForQueries = {};
+    for (const status of key ? key.split(",") : [])
+      next[status] = {
+        query: api.financeWindow.page,
+        args: {
+          table,
+          fieldEquals: [{ field: "status", value: status }],
+          paginationOpts: { numItems: ALL_PAGE, cursor: null },
+        },
+      };
+    return next;
+  }, [table, key]);
+  const results = useQueries(requests);
+  return useMemo(() => {
+    const byId = new Map<string, Doc<T>>();
+    for (const result of Object.values(results)) {
+      if (result === undefined) return undefined;
+      if (result instanceof Error) throw result;
+      for (const row of (result as { page: Doc<T>[] }).page)
+        byId.set(row._id, row);
+    }
+    return [...byId.values()].sort((a, b) => b._creationTime - a._creationTime);
+  }, [results]);
+}
+
 export type QuoteSubmissionStatus =
   "pending" | "processing" | "completed" | "failed" | "dismissed";
 

@@ -927,7 +927,7 @@ export function LeadPipelinePage() {
           );
         })}
       </section>
-      {closedCount > 0 || !showClosed ? (
+      {closedCount > 0 || !showClosed || closedPages.canLoadMore ? (
         <section className="lead-pipeline-closed-note">
           <button
             type="button"

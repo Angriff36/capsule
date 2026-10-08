@@ -53,6 +53,7 @@ const UNFINISHED_STATUSES = [
   "overdue",
   "partial",
 ] as const;
+const CLOSED_STATUSES = ["paid", "voided", "written_off"];
 const invoicesState = new ListStateManager({
   closed: {
     key: "closed",
@@ -111,9 +112,10 @@ export function InvoicesPage() {
   const [showIssue, setShowIssue] = useState(openFromLink);
   const [{ closed: showClosed }, setListState] =
     useListViewState(invoicesState);
-  // Only the invoices this view shows: one client's or one event's, else the
-  // unfinished ones through the status index, else (closed shown) the newest
-  // page with "Load more". The issue form's next number reads the newest page.
+  // Only the invoices this view shows: one client's or one event's, else
+  // every unfinished one through the status index, plus (closed shown) the
+  // newest page with "Load more". The issue form's next number reads the
+  // newest page.
   const scopeEventId =
     prefillEventId || (!prefillClientId ? (eventScope.scopeId ?? "") : "");
   const clientInvoices = useClientInvoices(prefillClientId || null);
@@ -122,7 +124,7 @@ export function InvoicesPage() {
   );
   const scoped = Boolean(prefillClientId || scopeEventId);
   const unfinishedInvoices = useInvoicesInStatuses(
-    scoped || showClosed ? [] : UNFINISHED_STATUSES,
+    scoped ? [] : UNFINISHED_STATUSES,
   );
   const pagedInvoices = usePagedRows(
     "invoices",
@@ -132,9 +134,17 @@ export function InvoicesPage() {
     ? clientInvoices
     : scopeEventId
       ? eventInvoices
-      : showClosed
-        ? pagedInvoices.rows
-        : unfinishedInvoices;
+      : unfinishedInvoices === undefined ||
+          (showClosed && pagedInvoices.rows === undefined)
+        ? undefined
+        : [
+            ...new Map(
+              [
+                ...unfinishedInvoices,
+                ...(showClosed ? (pagedInvoices.rows ?? []) : []),
+              ].map((row) => [row._id, row]),
+            ).values(),
+          ];
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
@@ -162,10 +172,7 @@ export function InvoicesPage() {
         });
   const visibleRows = showClosed
     ? scopedRows
-    : scopedRows.filter(
-        (row) =>
-          !["paid", "voided", "written_off"].includes(String(row.status)),
-      );
+    : scopedRows.filter((row) => !CLOSED_STATUSES.includes(String(row.status)));
 
   const canSend = (row: { status: unknown; amountDue?: unknown }) =>
     policy
@@ -442,7 +449,11 @@ export function InvoicesPage() {
             <p className="eyebrow">Billing ledger</p>
             <h2>Invoices</h2>
           </div>
-          <span>{formatCountNoun(visibleRows.length, "invoice")}</span>
+          <span>
+            {showClosed && !scoped
+              ? `${visibleRows.filter((row) => !CLOSED_STATUSES.includes(String(row.status))).length} open · ${visibleRows.filter((row) => CLOSED_STATUSES.includes(String(row.status))).length} closed shown`
+              : formatCountNoun(visibleRows.length, "invoice")}
+          </span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />
