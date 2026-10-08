@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import {
   useCreateVendorContract,
   useCreateVendorContractPriceTier,
+  useListIngredient,
   useListVendor,
   useListVendorContract,
   useListVendorContractPriceTier,
@@ -34,6 +35,15 @@ export function VendorContractsPage() {
   const contracts = useListVendorContract();
   const vendors = useListVendor();
   const tiers = useListVendorContractPriceTier();
+  const ingredients = useListIngredient();
+  const ingredientNames = [
+    ...new Set(
+      (ingredients ?? [])
+        .filter((row) => row.deletedAt == null)
+        .map((row) => String(row.name).trim())
+        .filter(Boolean),
+    ),
+  ].sort((a, b) => a.localeCompare(b));
   const createContract = useCreateVendorContract();
   const activateContract = useVendorContractActivate();
   const markExpired = useVendorContractMarkExpired();
@@ -450,7 +460,20 @@ export function VendorContractsPage() {
                     >
                       <label className="field-label">
                         Item
-                        <input name="itemName" className="input" required />
+                        {/* Orders find a contract price by the ingredient's
+                            exact name, so offer those names as you type. */}
+                        <input
+                          name="itemName"
+                          className="input"
+                          required
+                          list={`tier-items-${contract._id}`}
+                          autoComplete="off"
+                        />
+                        <datalist id={`tier-items-${contract._id}`}>
+                          {ingredientNames.map((name) => (
+                            <option key={name} value={name} />
+                          ))}
+                        </datalist>
                       </label>
                       <label className="field-label">
                         Unit price
