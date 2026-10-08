@@ -1,12 +1,11 @@
 import { useState } from "react";
+import { useMutation } from "convex/react";
+import { api, type Id } from "../../lib/api";
 import {
-  useCreateProposalDishSelection,
   useListMenu,
   useListMenuDish,
   useListProposalDishSelection,
   useListProposalLineItem,
-  useProposalDishSelectionAdjustServings,
-  useProposalDishSelectionRemove,
 } from "../../lib/manifest-convex-react";
 import { useWholeDishList } from "../../lib/useDishesByIds";
 import { TableSkeleton } from "../../ui/primitives";
@@ -24,6 +23,8 @@ interface ProposalMenuSelectionPanelProps {
  * published menu catalog and pick dishes. On acceptance with a linked Event
  * the selections cascade into EventDish records (Manifest reaction on
  * ProposalAccepted — see sales/proposal-dish-selection.manifest).
+ * On a draft, a pick, a servings change and a removal carry their price line
+ * in the same server step (convex/lib/proposalDishPricing.ts).
  */
 export function ProposalMenuSelectionPanel({
   proposalId,
@@ -36,9 +37,13 @@ export function ProposalMenuSelectionPanel({
   const dishes = useWholeDishList();
   const selections = useListProposalDishSelection();
   const lineItems = useListProposalLineItem();
-  const createSelection = useCreateProposalDishSelection();
-  const adjustServings = useProposalDishSelectionAdjustServings();
-  const removeSelection = useProposalDishSelectionRemove();
+  const pickDish = useMutation(api.lib.proposalDishPricing.pickProposalDish);
+  const adjustServings = useMutation(
+    api.lib.proposalDishPricing.adjustProposalDishServings,
+  );
+  const removeSelection = useMutation(
+    api.lib.proposalDishPricing.removeProposalDish,
+  );
   const [busy, setBusy] = useState<string | null>(null);
 
   const loading =
@@ -124,13 +129,10 @@ export function ProposalMenuSelectionPanel({
 
   const addSelection = (line: (typeof catalogLines)[number]) => {
     void run(`add:${line._id}`, async () => {
-      await createSelection({
-        proposalId,
-        menuId: line.menuId,
-        dishId: line.dishId,
+      await pickDish({
+        proposalId: proposalId as Id<"proposals">,
+        menuDishId: line._id as Id<"menuDishes">,
         quantityServings: guestCount > 0 ? guestCount : 1,
-        course: line.course ?? undefined,
-        serviceStyle: line.serviceStyle ?? undefined,
       });
     });
   };
@@ -144,7 +146,7 @@ export function ProposalMenuSelectionPanel({
     if (next === Number(row.quantityServings)) return;
     void run(`adjust:${row._id}`, async () => {
       await adjustServings({
-        docId: row._id,
+        docId: row._id as Id<"proposalDishSelections">,
         version: row.version,
         quantityServings: next,
       });
@@ -222,7 +224,7 @@ export function ProposalMenuSelectionPanel({
                       onClick={() =>
                         void run(`remove:${row._id}`, async () => {
                           await removeSelection({
-                            docId: row._id,
+                            docId: row._id as Id<"proposalDishSelections">,
                             version: row.version,
                           });
                         })

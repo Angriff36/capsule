@@ -214,6 +214,7 @@ import type * as lib_proposalAcceptanceRevision from "../lib/proposalAcceptanceR
 import type * as lib_proposalBookingVenue from "../lib/proposalBookingVenue.js";
 import type * as lib_proposalChangeDraft from "../lib/proposalChangeDraft.js";
 import type * as lib_proposalDepositSeed from "../lib/proposalDepositSeed.js";
+import type * as lib_proposalDishPricing from "../lib/proposalDishPricing.js";
 import type * as lib_proposalDraft from "../lib/proposalDraft.js";
 import type * as lib_proposalDraftReport from "../lib/proposalDraftReport.js";
 import type * as lib_proposalEventCreation from "../lib/proposalEventCreation.js";
@@ -560,6 +561,7 @@ declare const fullApi: ApiFromModules<{
   "lib/proposalBookingVenue": typeof lib_proposalBookingVenue;
   "lib/proposalChangeDraft": typeof lib_proposalChangeDraft;
   "lib/proposalDepositSeed": typeof lib_proposalDepositSeed;
+  "lib/proposalDishPricing": typeof lib_proposalDishPricing;
   "lib/proposalDraft": typeof lib_proposalDraft;
   "lib/proposalDraftReport": typeof lib_proposalDraftReport;
   "lib/proposalEventCreation": typeof lib_proposalEventCreation;
