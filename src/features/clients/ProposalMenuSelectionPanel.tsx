@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useMutation } from "convex/react";
 import { api, type Id } from "../../lib/api";
 import {
@@ -44,7 +44,12 @@ export function ProposalMenuSelectionPanel({
   const removeSelection = useMutation(
     api.lib.proposalDishPricing.removeProposalDish,
   );
+  const removeLine = useMutation(
+    api.lib.proposalPricing.removeProposalLineAndRecompute,
+  );
   const [busy, setBusy] = useState<string | null>(null);
+  // Menus that had dishes picked while this panel was open.
+  const menusPickedHere = useRef(new Set<string>());
 
   const loading =
     menus === undefined ||
@@ -115,6 +120,27 @@ export function ProposalMenuSelectionPanel({
             !lineNames.has(dishName(row.dishId).trim().toLowerCase()),
         );
 
+  // A menu's price line left behind after every dish of that menu was taken
+  // off here: the client would pay for a menu with no food on it. Only menus
+  // picked while this panel was open count, so a price built from the event's
+  // menu (no picks) is never flagged. The salesperson removes it in one click.
+  const menuNameOf = (menuId: string) =>
+    String((menus ?? []).find((m) => m._id === menuId)?.name ?? "");
+  const activeMenuNames = new Set(
+    activeSelections.map((row) => menuNameOf(row.menuId)),
+  );
+  for (const name of activeMenuNames) menusPickedHere.current.add(name);
+  const leftoverMenuLines = priceLines.filter((line) =>
+    [...menusPickedHere.current].some(
+      (name) =>
+        name !== "" &&
+        !activeMenuNames.has(name) &&
+        ((String(line.pricingBasis) === "per_person" &&
+          line.description.startsWith(`${name} (per `)) ||
+          line.description === `${name} (base price)`),
+    ),
+  );
+
   const publishedMenus = (menus ?? []).filter(
     (row) => row.deletedAt == null && String(row.status) === "published",
   );
@@ -169,6 +195,36 @@ export function ProposalMenuSelectionPanel({
           would get {unpriced.length === 1 ? "it" : "them"} free. Add a line
           under Pricing.
         </p>
+      ) : null}
+
+      {editable && leftoverMenuLines.length > 0 ? (
+        <div role="status" className="mt-3 text-base text-warn">
+          <p>
+            Still in the price with no dishes picked:{" "}
+            {leftoverMenuLines.map((line) => line.description).join(", ")}. The
+            client would pay for a menu with no food on it.
+          </p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {leftoverMenuLines.map((line) => (
+              <button
+                key={line._id}
+                className="btn btn-ghost btn-sm"
+                type="button"
+                disabled={busy != null}
+                onClick={() =>
+                  void run(`line:${line._id}`, async () => {
+                    await removeLine({
+                      docId: line._id as Id<"proposalLineItems">,
+                      version: Number(line.version),
+                    });
+                  })
+                }
+              >
+                Remove {line.description}
+              </button>
+            ))}
+          </div>
+        </div>
       ) : null}
 
       {activeSelections.length === 0 ? (
