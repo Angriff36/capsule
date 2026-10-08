@@ -64,13 +64,21 @@ function taskDate(value: string): string | undefined {
   return /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(text) ? text : undefined;
 }
 
+/** A short stable fingerprint of a text (FNV-1a). */
+function shortHash(text: string): string {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return (hash >>> 0).toString(36);
+}
+
 export function contactTaskRowsFromGrid(
   grid: ReadonlyArray<ReadonlyArray<string>>,
 ): Record<string, string>[] {
   const rows: Record<string, string>[] = [];
-  // Each id's row contents: an exact repeat (a page break) is dropped, a
-  // different task on the same day with the same subject gets its own id.
-  const seen = new Map<string, string[]>();
+  const seen = new Set<string>();
   let contact = "";
   for (const [index, raw] of grid.entries()) {
     const cells = raw.map((cell) => (cell ?? "").trim());
@@ -87,15 +95,14 @@ export function contactTaskRowsFromGrid(
     const eventInfo = cells[10] ?? "";
     const eventId = EVENT_NUMBER.exec(eventInfo)?.[1] ?? "";
     const owner = eventId ? eventId : `client:${contact.toLowerCase()}`;
-    const baseId = `task:${owner}:${date}:${subject.toLowerCase()}`;
-    const content = JSON.stringify([cells[0], done, cells[4], cells[8]]);
-    const contents = seen.get(baseId) ?? [];
-    if (contents.includes(content)) continue;
-    contents.push(content);
-    seen.set(baseId, contents);
-    // The first keeps the plain id, so tasks brought in before stay matched.
-    const historyId =
-      contents.length === 1 ? baseId : `${baseId}:${contents.length}`;
+    // Who wrote it and what it says are part of the id, so two different
+    // tasks on one day with one subject stay apart in any row order, and the
+    // same task printed again after a page break is read once.
+    const historyId = `task:${owner}:${date}:${subject.toLowerCase()}:${shortHash(
+      JSON.stringify([cells[0], cells[8] ?? ""]),
+    )}`;
+    if (seen.has(historyId)) continue;
+    seen.add(historyId);
     rows.push({
       HistoryID: historyId,
       ...(eventId ? { EventID: eventId } : {}),

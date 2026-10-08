@@ -1907,9 +1907,14 @@ export const commitImportRun = action({
             await ctx.runQuery(internal.importEventLookups.oldPriceMenus, {
               tenantId,
             })
-          ).map(({ key, dishIds, ...row }) => [
+          ).map(({ key, lines, ...row }) => [
             key,
-            { ...row, dishIds: new Set(dishIds) },
+            {
+              ...row,
+              lines: new Map(
+                lines.map(({ dishId, ...line }) => [dishId, line]),
+              ),
+            },
           ]),
         );
         await addOldMenuPrice(ctx, priceMenus, {

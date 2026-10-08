@@ -216,7 +216,7 @@ describe("runtime proof: TPP Contact Tasks & Notes report import (AC-057)", () =
     expect(await table("clientCommunications")).toHaveLength(3);
   });
 
-  it("keeps two different tasks with one day and subject, drops an exact repeat", () => {
+  it("keeps two different tasks with one day and subject in any order, drops an exact repeat", () => {
     const reminder = (description: string) =>
       task(
         "45928",
@@ -232,9 +232,17 @@ describe("runtime proof: TPP Contact Tasks & Notes report import (AC-057)", () =
       reminder("Balance"),
       reminder("Deposit"),
     ]);
-    expect(rows.map((row) => [row.HistoryID, row.Notes])).toEqual([
-      ["task:5101:2025-09-28:payment reminder", "Deposit"],
-      ["task:5101:2025-09-28:payment reminder:2", "Balance"],
+    expect(rows.map((row) => row.Notes)).toEqual(["Deposit", "Balance"]);
+    expect(rows[0]!.HistoryID).not.toBe(rows[1]!.HistoryID);
+    const reordered = contactTaskRowsFromGrid([
+      blank({ 0: "Contact Tasks & Notes" }),
+      ...block("Maya Chen"),
+      reminder("Balance"),
+      reminder("Deposit"),
+    ]);
+    expect(reordered.map((row) => [row.Notes, row.HistoryID])).toEqual([
+      ["Balance", rows[1]!.HistoryID],
+      ["Deposit", rows[0]!.HistoryID],
     ]);
   });
 });

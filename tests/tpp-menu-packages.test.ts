@@ -75,8 +75,9 @@ describe("old-system menu packages report", () => {
     const packages = menuPackagesFromLines(REPORT);
     expect(packages.map((p) => p.name)).toEqual([
       "Action Station - Asian",
-      "Traditional Option 3 - Glazed Ham",
-      "Traditional Option 3 - Glazed Ham (2)",
+      // Two packages of one name are told apart by their dishes, not order.
+      "Traditional Option 3 - Glazed Ham (Honey Glazed Ham, Mixed Green Salad with Ranch Dressing)",
+      "Traditional Option 3 - Glazed Ham (Honey Glazed Ham)",
     ]);
     const [asian, ham] = packages;
     expect(asian!.description).toBe(

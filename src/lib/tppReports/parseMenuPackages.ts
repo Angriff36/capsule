@@ -139,8 +139,17 @@ export function menuPackagesFromLines(
     }
     // A dish's own description is the dish's text in the Menu Items Export.
   }
-  // Two packages of one name (the old system lets that happen) stay apart.
-  const seen = new Map<string, number>();
+  // Two packages of one name (the old system lets that happen) stay apart by
+  // what is in them, not by their order in the file, so a later export finds
+  // the same menu for each. An exact copy is read once.
+  const named = new Map<string, number>();
+  for (const pack of packages)
+    named.set(
+      pack.name.toLowerCase(),
+      (named.get(pack.name.toLowerCase()) ?? 0) + 1,
+    );
+  const kept: OldMenuPackage[] = [];
+  const keptNames = new Set<string>();
   for (const pack of packages) {
     pack.groups = pack.groups.filter(
       (group) => group.label !== "" || group.dishes.length > 0,
@@ -150,12 +159,17 @@ export function menuPackagesFromLines(
       group.pickOne =
         group.label !== "" &&
         (isPickOneGroup(group.label) || isPickOneGroup(group.note));
-    const key = pack.name.toLowerCase();
-    const count = (seen.get(key) ?? 0) + 1;
-    seen.set(key, count);
-    if (count > 1) pack.name = `${pack.name} (${count})`;
+    if ((named.get(pack.name.toLowerCase()) ?? 0) > 1) {
+      const dishes = pack.groups.flatMap((group) => group.dishes);
+      const detail =
+        pack.description.trim() || dishes.slice(0, 2).join(", ") || "no dishes";
+      pack.name = `${pack.name} (${detail.length > 60 ? `${detail.slice(0, 57)}...` : detail})`;
+    }
+    if (keptNames.has(pack.name.toLowerCase())) continue;
+    keptNames.add(pack.name.toLowerCase());
+    kept.push(pack);
   }
-  return packages;
+  return kept;
 }
 
 /** Read the report straight from the unzipped .xlsx (the fonts are needed). */
