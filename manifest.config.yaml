@@ -303,6 +303,10 @@ projections:
         InventoryLot:
           - fields: [tenantId, receivedAt]
             name: by_tenantId_and_receivedAt
+          # Recall search by lot-number prefix within the company only
+          # (inventoryLots on production: 1 row, 2026-10-08).
+          - fields: [tenantId, supplierLotNumber]
+            name: by_tenantId_and_supplierLotNumber
         WasteRecord:
           - fields: [tenantId, recordedAt, createdAt]
             name: by_tenantId_and_recordedAt_and_createdAt

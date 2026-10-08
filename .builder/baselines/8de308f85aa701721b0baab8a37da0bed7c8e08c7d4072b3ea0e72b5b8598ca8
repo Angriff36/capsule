@@ -2131,7 +2131,8 @@ export default defineSchema({
     .index("by_vendorOrderId", ["vendorOrderId"])
     .index("by_ingredientDemandId", ["ingredientDemandId"])
     .index("by_eventId", ["eventId"])
-    .index("by_tenantId_and_receivedAt", ["tenantId", "receivedAt"]),
+    .index("by_tenantId_and_receivedAt", ["tenantId", "receivedAt"])
+    .index("by_tenantId_and_supplierLotNumber", ["tenantId", "supplierLotNumber"]),
   inventoryReservations: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

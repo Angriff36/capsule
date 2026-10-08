@@ -96,6 +96,12 @@ async function copyLivePricedLines(
     )
     .sort((left, right) => left.sortOrder - right.sortOrder);
   for (const line of live) {
+    // The menu link follows only while that menu is still live; a line of a
+    // retired menu is copied without it, so the change draft is never
+    // refused over a menu that is gone.
+    const menuId = presentText(line.menuId);
+    const menuDocId = menuId ? ctx.db.normalizeId("menus", menuId) : null;
+    const linkedMenu = menuDocId ? await ctx.db.get(menuDocId) : null;
     await ctx.runMutation(api.mutations.ProposalLineItem_createViaAddLine, {
       proposalId: targetId,
       description: line.description,
@@ -109,7 +115,8 @@ async function copyLivePricedLines(
       menuDishId: presentText(line.menuDishId),
       overrideReason: presentText(line.overrideReason),
       equipmentId: presentText(line.equipmentId),
-      menuId: presentText(line.menuId),
+      menuId:
+        linkedMenu && linkedMenu.deletedAt == null ? menuId : undefined,
     });
   }
 }

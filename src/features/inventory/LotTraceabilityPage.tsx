@@ -321,6 +321,12 @@ export function LotTraceabilityPage() {
           it. It never guesses a lot from the ingredient, location, or timing
           alone.
         </span>
+        {trace?.tooMany ? (
+          <span className="lot-trace-unattributed" role="status">
+            More than 500 lots start with this number. Type more of the lot
+            number so every matching lot is in the trace.
+          </span>
+        ) : null}
         {unattributed > 0 ? (
           <span className="lot-trace-unattributed">
             {unattributed} older used-up reservation

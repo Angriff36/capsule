@@ -350,22 +350,13 @@ export function ProductionYieldDashboard({
   );
 }
 
-/**
- * A batch is created when it is planned, before it is made. There is no
- * index on the finish time, so the read starts this long before the chosen
- * period: a batch planned more ahead than this and finished inside the
- * period would be missed.
- */
-const PLAN_LEAD_DAYS = 30;
 const DAY_MS = 86_400_000;
 
 export function ProductionYieldDashboardPage() {
   const [now] = useState(() => new Date());
   const [windowDays, setWindowDays] = useState<ProductionYieldWindow>(30);
-  // Only batches of the chosen period, never the whole history.
-  const batches = useBatchesSince(
-    now.getTime() - (windowDays + PLAN_LEAD_DAYS) * DAY_MS,
-  );
+  // Only batches finished in the chosen period, never the whole history.
+  const batches = useBatchesSince(now.getTime() - windowDays * DAY_MS);
   const components = useListComponent();
   const loading = batches === undefined || components === undefined;
 

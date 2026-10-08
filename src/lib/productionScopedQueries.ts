@@ -21,8 +21,8 @@ export function usePlanWork() {
 }
 
 /**
- * Batches created at or after `since` (the yield report's period start
- * less the planning lead). Pass "skip" while unknown.
+ * Completed batches finished at or after `since` (the yield report's
+ * period start). Pass "skip" while unknown.
  */
 export function useBatchesSince(since: number | "skip") {
   return useQuery(

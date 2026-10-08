@@ -481,6 +481,8 @@ function prefixEnd(prefix: string): string {
   return prefix.slice(0, -1) + String.fromCharCode(last + 1);
 }
 
+const LOT_TRACE_CAP = 500;
+
 export const traceLots = query({
   args: {
     lotNumber: v.string(),
@@ -493,6 +495,9 @@ export const traceLots = query({
       lots: [] as Doc<"inventoryLots">[],
       reservations: [] as Doc<"inventoryReservations">[],
       unattributed: 0,
+      // More lots match the typed prefix than one trace reads; the page says
+      // so and asks for more of the number.
+      tooMany: false,
     };
     if (!auth.tenantId || !canRead(auth, READS.lot)) return out;
     const tenantId = auth.tenantId;
@@ -503,16 +508,22 @@ export const traceLots = query({
       for (const prefix of [...new Set([typed, typed.toUpperCase()])])
         for (const lot of await ctx.db
           .query("inventoryLots")
-          .withIndex("by_supplierLotNumber", (q) =>
+          .withIndex("by_tenantId_and_supplierLotNumber", (q) =>
             q
+              .eq("tenantId", tenantId)
               .gte("supplierLotNumber", prefix)
               .lt("supplierLotNumber", prefixEnd(prefix)),
           )
-          .take(500))
+          .take(LOT_TRACE_CAP + 1)) {
+          if (seen.size >= LOT_TRACE_CAP) {
+            out.tooMany = true;
+            break;
+          }
           if (!seen.has(lot._id)) {
             seen.add(lot._id);
             lots.push(lot);
           }
+        }
     } else if (receivedFrom != null || receivedTo != null) {
       lots = await ctx.db
         .query("inventoryLots")

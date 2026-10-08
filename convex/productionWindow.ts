@@ -270,10 +270,8 @@ export const planWork = query({
 });
 
 /**
- * Batches created at or after `since`, for the yield report. The report
- * counts batches completed inside its chosen period; there is no index on
- * the completion time, so the caller passes the period start less the
- * longest a batch is planned ahead of being made.
+ * Completed batches finished at or after `since`, for the yield report,
+ * read through the status and finish-time index.
  */
 export const batchesSince = query({
   args: { since: v.number() },
@@ -282,15 +280,23 @@ export const batchesSince = query({
     if (!auth.tenantId || !rules(auth).kitchen) return [];
     const tenantId = auth.tenantId;
     return (
-      await ctx.db
-        .query("productionBatches")
-        .withIndex("by_tenantId", (q) =>
-          q.eq("tenantId", tenantId).gte("_creationTime", since),
-        )
-        .collect()
-    )
-      .filter((row) => row.deletedAt == null)
-      .map(withVariance);
+      // Finished batches by their finish time: the yield report counts
+      // completed batches finished in its period, however early they were
+      // planned.
+      (
+        await ctx.db
+          .query("productionBatches")
+          .withIndex("by_tenantId_and_status_and_completedAt", (q) =>
+            q
+              .eq("tenantId", tenantId)
+              .eq("status", "completed")
+              .gte("completedAt", since),
+          )
+          .collect()
+      )
+        .filter((row) => row.deletedAt == null)
+        .map(withVariance)
+    );
   },
 });
 
