@@ -110,14 +110,19 @@ export function ImportRunsListPage() {
   // Filter runs
   const filteredRuns = useMemo(() => {
     const runs = (allRuns ?? []).filter((r) => r.deletedAt == null);
-    return runs.filter((run) => {
-      if (sourceSystemFilter && run.sourceSystem !== sourceSystemFilter)
-        return false;
-      if (datasetTypeFilter && run.datasetType !== datasetTypeFilter)
-        return false;
-      if (statusFilter && run.status !== statusFilter) return false;
-      return true;
-    });
+    return (
+      runs
+        .filter((run) => {
+          if (sourceSystemFilter && run.sourceSystem !== sourceSystemFilter)
+            return false;
+          if (datasetTypeFilter && run.datasetType !== datasetTypeFilter)
+            return false;
+          if (statusFilter && run.status !== statusFilter) return false;
+          return true;
+        })
+        // Newest first, so the file just brought in is at the top.
+        .sort((a, b) => b._creationTime - a._creationTime)
+    );
   }, [allRuns, sourceSystemFilter, datasetTypeFilter, statusFilter]);
 
   const clearNotice = () => setNotice(null);
