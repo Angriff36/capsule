@@ -423,7 +423,11 @@ export function InvoicesPage() {
       ) : null}
       {host}
 
-      {showIssue ? (
+      {showIssue && pagedInvoices.rows === undefined ? (
+        // The next invoice number needs the newest invoices, closed ones too;
+        // the form waits for them so it never proposes a number in use.
+        <TableSkeleton rows={3} />
+      ) : showIssue ? (
         <InvoiceIssueForm
           clients={activeClients}
           events={events ?? []}
