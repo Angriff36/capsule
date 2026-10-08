@@ -392,8 +392,9 @@ without repeating the release gate. `--candidate <sha>` is supported by
 `--prepare` and retained for `--publish`, so later remote `dev` commits wait
 for the next release.
 
-It requires a clean tree, the branch pushed, and the reviewer that APPROVED
-the diff (merge gate above). It merges `--no-ff` into `main`, runs
+It requires a clean tree, the branch pushed, and either the reviewer that
+APPROVED the diff (merge gate above) or `--no-review` when the merge gate does
+not send the change to review. It merges `--no-ff` into `main`, runs
 `bun run check` on the merge (CI does not run on `main`; the pre-push hook
 refuses `main` without proof of that run), pushes `main`
 once with `CAPSULE_RELEASE=1` (the only Vercel production build and the only
@@ -402,13 +403,15 @@ whose subject starts with `[release]`, so a merge made on GitHub, PR button
 or auto-merge, lands but never deploys), then moves `dev` to the release
 commit and pushes it. `dev` is permanent and is never archived; keep working
 on it. (Any other branch name is still renamed to `archive/<branch>`.)
-After the main push it also produces the release receipt (PR13-06/AC-030):
+After the main push it also produces the release receipt (PR13-06/AC-030) when
+it runs alone — `scripts/deploy-production.sh` takes the receipt itself after
+the backend deploy:
 `bun scripts/release-receipt.ts` writes `.artifacts/release/receipt-<sha>.{json,md}`.
-Set `CAPSULE_RELEASE_URL` (canonical production URL) and optionally
-`VERCEL_TOKEN` / `CAPSULE_API_KEY` so its legs can verify; a leg without
-its input keeps the receipt PARTIAL by design.
+`CAPSULE_RELEASE_URL` (or `--url`) overrides the built-in canonical production
+URL; `VERCEL_TOKEN` / `CAPSULE_API_KEY` / `CAPSULE_RELEASE_WORKFLOW` let its
+legs verify; a leg without its input keeps the receipt PARTIAL by design.
 
-**The production Convex backend is a SELF-HOSTED instance on the owner's Linux box** (`pop-os`, public address `https://pop-os.tail78dd9e.ts.net`, cutover 2026-09-14). A Vercel production build is UI-ONLY in this mode, so a release that changes `.manifest`, `convex/`, or generated Convex files is not complete until that box has deployed the backend from the release commit. **ONE command does the whole production release from the work PC (owner rule, 2026-09-20): `bash scripts/deploy-production.sh --reviewer <model>`** — use it in place of a bare `scripts/release.sh`. It is only the orchestrator: it runs `scripts/release.sh`, waits until the production address serves the build OF the `[release]` commit (`scripts/verify-vercel-release.ts` reads `<site>/version.json`), decides if anything since the previous `[release]` commit changed the backend (`scripts/release-backend-scope.ts`), and if so runs `scripts/deploy-backend.sh --expect <sha> [--verify <new list queries>]` ON THE BOX over SSH (`oc@pop-os`, the user's own SSH key; the production checkout is found by its git origin). Last line: `RESULT: PASS - frontend and backend deployed at <sha>`, `RESULT: PASS - frontend deployed at <sha>; backend unchanged`, or `RESULT: FAIL - <reason>`; after a FAIL past the release, run the same command again on `main` and it continues. With no `--reviewer` it runs the primary Codex review itself and stops unless it reads `VERDICT: APPROVE`. Runbook: `docs/operations/production-backend-deploy.md`. **Never run `convex deploy` against production from Windows, never write your own deploy command block, and never hand the owner a copy/paste handoff.** `scripts/deploy-backend.sh` refuses any system that is not Linux; `--dry-run` does its local checks only. Read-only check from any machine: `POST <backend>/api/query` with `{"path":"queries:<name>","args":{},"format":"json"}` — `"status":"success"` means the function is deployed, `Server Error` means it is not. Convex Cloud `impartial-mule-193` is only the fallback.
+**The production Convex backend is a SELF-HOSTED instance on the owner's Linux box** (`pop-os`, public address `https://pop-os.tail78dd9e.ts.net`, cutover 2026-09-14). A Vercel production build is UI-ONLY in this mode, so a release that changes `.manifest`, `convex/`, or generated Convex files is not complete until that box has deployed the backend from the release commit. **ONE command does the whole production release from the work PC (owner rule, 2026-09-20): `bash scripts/deploy-production.sh --reviewer <model>`** — use it in place of a bare `scripts/release.sh`. It is only the orchestrator: it runs `scripts/release.sh`, waits until the production address serves the build OF the `[release]` commit (`scripts/verify-vercel-release.ts` reads `<site>/version.json`), decides if anything since the previous `[release]` commit changed the backend (`scripts/release-backend-scope.ts`), and if so runs `scripts/deploy-backend.sh --expect <sha> [--verify <new list queries>]` ON THE BOX over SSH (`oc@pop-os`, the user's own SSH key; the production checkout is found by its git origin). Last line: `RESULT: PASS - frontend and backend deployed at <sha>`, `RESULT: PASS - frontend deployed at <sha>; backend unchanged`, or `RESULT: FAIL - <reason>`; after a FAIL past the release, run the same command again on `main` and it continues. With neither `--reviewer` nor `--no-review` it runs the primary Codex review itself and stops unless it reads `VERDICT: APPROVE`. Runbook: `docs/operations/production-backend-deploy.md`. **Never run `convex deploy` against production from Windows, never write your own deploy command block, and never hand the owner a copy/paste handoff.** `scripts/deploy-backend.sh` refuses any system that is not Linux; `--dry-run` does its local checks only. Read-only check from any machine: `POST <backend>/api/query` with `{"path":"queries:<name>","args":{},"format":"json"}` — `"status":"success"` means the function is deployed, `Server Error` means it is not. Convex Cloud `impartial-mule-193` is only the fallback.
 
 **Manual deploy commands and settings changes are HUMAN-AUTHORIZED only.** No
 loop or agent runs `npx convex deploy`, `vercel deploy`, or edits Vercel/Clerk
