@@ -147,16 +147,14 @@ export function ComponentMethodStepsPanel({
 
   const onRemove = (step: (typeof rows)[number], position: number) => {
     void (async () => {
-      const reason = (
-        await prompt.askReason({
-          title: `Remove step ${position}`,
-          description: step.instruction,
-          label: "Removal reason",
-          confirmLabel: "Remove step",
-          tone: "danger",
-        })
-      )?.trim();
-      if (!reason) return;
+      const confirmed = await prompt.askConfirm({
+        title: `Remove step ${position}`,
+        description: step.instruction,
+        confirmLabel: "Remove step",
+        tone: "danger",
+      });
+      if (!confirmed) return;
+      const reason = "Removed in the recipe editor";
       await run(`remove:${step._id}`, () =>
         removeStep({ docId: step._id, version: step.version, reason }),
       );

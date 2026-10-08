@@ -160,16 +160,14 @@ export function ComponentSubRecipesPanel({
     version: number | undefined,
     name: string,
   ) {
-    const reason = (
-      await prompt.askReason({
-        title: "Remove sub-recipe",
-        description: `Remove ${name} from this recipe.`,
-        label: "Removal reason",
-        confirmLabel: "Remove sub-recipe",
-        tone: "danger",
-      })
-    )?.trim();
-    if (!reason) return;
+    const confirmed = await prompt.askConfirm({
+      title: "Remove sub-recipe",
+      description: `Remove ${name} from this recipe.`,
+      confirmLabel: "Remove sub-recipe",
+      tone: "danger",
+    });
+    if (!confirmed) return;
+    const reason = "Removed in the recipe editor";
     setBusy(id);
     setError(null);
     try {

@@ -1,7 +1,10 @@
 /**
  * A guest list pasted from a spreadsheet or typed one per line. With a header
  * row, columns are read by their headings (name, email, phone, dietary,
- * allergies, in any order); without one, in that order. Spreadsheet rows are
+ * allergies, in any order); without one, each cell by what it looks like (an
+ * @ is the email, seven digits a phone, a cell saying "allergy" an allergy;
+ * the rest dietary needs, then allergies, in their order), so "Laura Chen, laura@x.test, vegetarian" keeps its
+ * vegetarian even with no phone typed. Spreadsheet rows are
  * split on tabs; typed rows on commas. Blank lines are skipped, and so is a
  * name already on the list.
  */
@@ -34,6 +37,34 @@ function headingColumn(cell: string): Column | null {
   return null;
 }
 
+// Only a cell that says "allergy" is moved to allergies; other words keep
+// their place (dietary needs, then allergies), so "no dairy" stays a need.
+const ALLERGY = /allerg/i;
+
+/** A row with no heading: each cell placed by its shape, not its position. */
+function byShape(cells: string[]): Record<Column, string | undefined> {
+  const [name, ...rest] = cells;
+  const out: Record<Column, string | undefined> = {
+    name,
+    email: undefined,
+    phone: undefined,
+    dietary: undefined,
+    allergies: undefined,
+  };
+  const leftover: string[] = [];
+  for (const cell of rest) {
+    if (!cell) continue;
+    if (!out.email && cell.includes("@")) out.email = cell;
+    else if (!out.phone && (cell.match(/\d/g) ?? []).length >= 7)
+      out.phone = cell;
+    else if (!out.allergies && ALLERGY.test(cell)) out.allergies = cell;
+    else leftover.push(cell);
+  }
+  out.dietary = leftover.shift();
+  out.allergies ??= leftover.shift();
+  return out;
+}
+
 const items = (value: string | undefined) => {
   const list = (value ?? "")
     .split(/[;/]/)
@@ -64,7 +95,14 @@ export function readGuestPaste(
       columns = headings;
       continue;
     }
+    // A row with every column filled in is read by position, so an allergy
+    // never moves to dietary needs; a shorter row is read by shape.
+    const shaped =
+      columns === DEFAULT_COLUMNS && cells.length < DEFAULT_COLUMNS.length
+        ? byShape(cells)
+        : null;
     const cell = (column: Column) => {
+      if (shaped) return shaped[column] || undefined;
       const at = columns.indexOf(column);
       return at >= 0 ? cells[at] || undefined : undefined;
     };

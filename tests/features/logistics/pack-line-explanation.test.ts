@@ -103,7 +103,9 @@ describe("pack line explanation (AC-537)", () => {
       containerServings: 40,
     });
     expect(container.origin).toBe("From the dish's container");
-    expect(container.reasons).toEqual(["40 servings on the menu"]);
+    expect(container.reasons).toEqual([
+      "40 servings on the menu, about 10 servings a container",
+    ]);
     expect(
       explainPackLine({
         requiredQuantity: 4,

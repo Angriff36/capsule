@@ -16,14 +16,19 @@ function scoreWord(haystack: string, label: string, word: string): number {
   if (new RegExp(`(^|[^a-z0-9])${escapeRegExp(word)}`).test(label)) return 80;
   if (label.includes(word)) return 60;
   if (haystack.includes(word)) return 40;
-  // Typo-tolerant fallback: every letter appears in order ("chkn" → chicken).
-  let from = 0;
-  for (const char of word) {
-    const at = label.indexOf(char, from);
-    if (at === -1) return 0;
-    from = at + 1;
-  }
-  return 10;
+  // Typo-tolerant fallback: every letter appears in order within one word of
+  // the name ("chkn" → chicken). Across the whole name, "chafing" matched a
+  // "Cambro Hot water dispenser (filled) - Hand washing".
+  const inOrder = (text: string) => {
+    let from = 0;
+    for (const char of word) {
+      const at = text.indexOf(char, from);
+      if (at === -1) return false;
+      from = at + 1;
+    }
+    return true;
+  };
+  return label.split(/[^a-z0-9]+/).some(inOrder) ? 10 : 0;
 }
 
 function escapeRegExp(value: string): string {

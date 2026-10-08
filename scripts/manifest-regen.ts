@@ -38,7 +38,19 @@ export function regenerate(passthrough: string[] = []): number {
   if (status !== 0) return status;
   // The patches below read generated/ir/merged.ir.json, which is gitignored:
   // rebuild it so a new command from another checkout is never "missing".
-  const compiled = spawnSync(process.execPath, ["run", "manifest:compile"], {
+  // Run this checkout's pinned CLI directly: `bun run manifest:compile` can
+  // fall through to a global `manifest` shim that points at another checkout.
+  const cli = join(
+    CAPSULE_ROOT,
+    "node_modules",
+    "@angriff36",
+    "manifest",
+    "packages",
+    "cli",
+    "dist",
+    "index.js",
+  );
+  const compiled = spawnSync(process.execPath, [cli, "compile", "--merge"], {
     stdio: "inherit",
     cwd: CAPSULE_ROOT,
   });

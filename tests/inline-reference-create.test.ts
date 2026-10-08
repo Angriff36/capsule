@@ -112,6 +112,34 @@ it("creates a missing client in the sheet and returns its id for picker selectio
   });
 });
 
+it("keeps a two-word company whole when switched to person and back", async () => {
+  const createClient = command("useCreateClient", { docId: "client-new" });
+  await mount(
+    createElement(InlineReferenceCreateSheet, {
+      kind: "client",
+      open: true,
+      initialName: "Blue Apron",
+      existingOptions: [],
+      onClose: vi.fn(),
+      onUseExisting: vi.fn(),
+      onCreated: vi.fn(),
+    }),
+  );
+  const sheet = document.body;
+  // A name starts as a company; turned into a person it splits, and turned
+  // back into a company it is whole again.
+  expect(field("clientType", sheet).value).toBe("company");
+  change(field("clientType", sheet), "person");
+  change(field("clientType", sheet), "company");
+  await submit(sheet.querySelector("form")!);
+  expect(createClient).toHaveBeenCalledWith(
+    expect.objectContaining({
+      clientType: "company",
+      companyName: "Blue Apron",
+    }),
+  );
+});
+
 it("requires a fresh duplicate confirmation after the identity changes", async () => {
   const createClient = command("useCreateClient", { docId: "client-new" });
   await mount(

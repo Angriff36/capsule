@@ -21,7 +21,10 @@ function sheetRows(text: string): Record<string, string>[] {
 
 export function OpeningStockImport() {
   const importFile = useImportStockFile();
-  const [countDate, setCountDate] = useState("");
+  // Most sheets are brought in the day they were counted; change it if not.
+  const [countDate, setCountDate] = useState(() =>
+    new Date().toLocaleDateString("en-CA"),
+  );
   const [allCounted, setAllCounted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");

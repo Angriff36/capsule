@@ -602,6 +602,19 @@ function ClientHeadcountStep({
   // A client who is new is made right here, not on another page.
   const canCreateClient = useCanCreateInlineReference("client");
   const [newClientName, setNewClientName] = useState<string | null>(null);
+  // The contact follows the client: a new client replaces the contact while
+  // it is still the previous client's own name, but a name the user typed
+  // stays. Read from the draft, so it holds across Back and Next.
+  const contactOf = (id: string | undefined) => {
+    const client = clients.find((row) => row._id === id);
+    return client
+      ? [client.givenName, client.familyName].filter(Boolean).join(" ") ||
+          clientName(client)
+      : null;
+  };
+  const contactFollowsClient = () =>
+    !draft.primaryContactName ||
+    draft.primaryContactName === contactOf(draft.clientId);
   const [madeClient, setMadeClient] = useState<{
     id: string;
     label: string;
@@ -644,17 +657,16 @@ function ClientHeadcountStep({
           onChange={(id) => {
             const client = clients.find((row) => row._id === id);
             // Start the day-of contact as the client; edit it if it differs.
+            // The person at the client, else the company.
+            const contact = client
+              ? [client.givenName, client.familyName]
+                  .filter(Boolean)
+                  .join(" ") || clientName(client)
+              : null;
+            const follow = contactFollowsClient() && contact != null;
             update({
               clientId: id,
-              ...(!draft.primaryContactName && client
-                ? {
-                    // The person at the client, else the company.
-                    primaryContactName:
-                      [client.givenName, client.familyName]
-                        .filter(Boolean)
-                        .join(" ") || clientName(client),
-                  }
-                : {}),
+              ...(follow ? { primaryContactName: contact } : {}),
             });
           }}
           recentsKey="client"
@@ -677,11 +689,10 @@ function ClientHeadcountStep({
           }}
           onCreated={(record) => {
             setMadeClient(record);
+            const follow = contactFollowsClient();
             update({
               clientId: record.id,
-              ...(!draft.primaryContactName
-                ? { primaryContactName: record.label }
-                : {}),
+              ...(follow ? { primaryContactName: record.label } : {}),
             });
             setNewClientName(null);
           }}

@@ -27,6 +27,8 @@ export interface MenuDishProfitabilityInput extends Deletable {
 export interface DishProfitabilityInput extends Deletable {
   id: string;
   name: string;
+  /** The dish's own course, shown when the menu line names none. */
+  course?: string | null;
 }
 
 export interface DishComponentProfitabilityInput extends Deletable {
@@ -97,6 +99,8 @@ export interface MenuProfitabilityAnalysis {
   rankedDishCount: number;
   lowMarginCount: number;
   unrankedDishCount: number;
+  /** Sold per guest: the dishes need no prices of their own. */
+  perGuestMenu: boolean;
 }
 
 export interface BuildMenuProfitabilityInput {
@@ -292,7 +296,7 @@ export function buildMenuProfitability({
       menuDishVersion: line.version,
       dishId: line.dishId,
       dishName: dish?.name.trim() || "Unavailable dish",
-      course: line.course?.trim() || undefined,
+      course: line.course?.trim() || dish?.course?.trim() || undefined,
       sortOrder: line.sortOrder,
       sellingPrice: price,
       componentCost,
@@ -346,10 +350,17 @@ export function buildMenuProfitability({
   const perGuest = Number(menuPricePerPerson ?? 0);
   const perGuestMenu =
     totalSellingPrice === 0 && perGuest > 0 && rows.length > 0;
+  // A dish with no or partial recipe cost would count as free and overstate
+  // the margin, so the per-guest margin waits for every dish's cost.
+  const perGuestCostComplete = rows.every((row) => row.costComplete);
   const portfolioMarginAmount = perGuestMenu
     ? perGuest - rows.reduce((total, row) => total + row.componentCost, 0)
     : totalSellingPrice - totalComponentCost;
-  const marginBase = perGuestMenu ? perGuest : totalSellingPrice;
+  const marginBase = perGuestMenu
+    ? perGuestCostComplete
+      ? perGuest
+      : 0
+    : totalSellingPrice;
 
   return {
     rows,
@@ -360,5 +371,6 @@ export function buildMenuProfitability({
     rankedDishCount,
     lowMarginCount: rows.filter((row) => row.status === "low_margin").length,
     unrankedDishCount: rows.length - rankedDishCount,
+    perGuestMenu,
   };
 }

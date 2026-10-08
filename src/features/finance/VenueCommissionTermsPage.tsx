@@ -11,6 +11,7 @@ import { formatDate as formatDateShared } from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { SearchSelect } from "../../ui/SearchSelect";
 // This page renders tax-workspace surfaces (tax-period-stamp, tax-config-grid).
 // The stylesheet must be imported here too: routes are lazy chunks, so landing
 // directly on this page otherwise gets no styles and the header stat runs
@@ -213,23 +214,28 @@ export function VenueCommissionTermsPage() {
           </div>
           <label className="field-label">
             Venue
-            <select
-              className="input"
+            {/* A thousand venues: search them instead of scrolling a list. */}
+            <SearchSelect
+              key={editing ? String(editing._id) : "new"}
               name="venueId"
               required
               disabled={!!editing}
               defaultValue={editing ? String(editing.venueId) : ""}
-            >
-              <option value="">Select venue…</option>
-              {venues
+              recentsKey="venues"
+              placeholder="Search venues…"
+              aria-label="Venue"
+              options={venues
                 .filter((v) => v.deletedAt == null)
                 .sort((a, b) => String(a.name).localeCompare(String(b.name)))
-                .map((venue) => (
-                  <option key={venue._id} value={venue._id}>
-                    {venue.name}
-                  </option>
-                ))}
-            </select>
+                .map((venue) => ({
+                  id: venue._id,
+                  label: String(venue.name),
+                  hint:
+                    [venue.addressLine1, venue.city]
+                      .filter((part) => part?.trim())
+                      .join(", ") || null,
+                }))}
+            />
           </label>
           <label className="field-label">
             Commission percent

@@ -82,7 +82,13 @@ async function eventFacts(
     venueId: event.venueId,
     venueName: event.venueName,
     serviceStyleId: event.serviceStyleId,
-    serviceStyleName: event.serviceStyleName,
+    // The style's name decides if staff are needed; the event may hold only
+    // the style's id.
+    serviceStyleName:
+      event.serviceStyleName ??
+      (event.serviceStyleId
+        ? ((await ctx.db.get(event.serviceStyleId))?.name ?? null)
+        : null),
     staffOnAt: staffOnAt(event),
     staffOffAt: staffOffAt(event),
   };

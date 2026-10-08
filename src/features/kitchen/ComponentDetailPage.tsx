@@ -841,18 +841,18 @@ export function ComponentDetailPage() {
                       disabled={busy != null}
                       onClick={() => {
                         void (async () => {
-                          const reason = (
-                            await prompt.askReason({
-                              title: "Remove ingredient line",
-                              description: `Remove ${ingredientName(
-                                line.ingredientId,
-                              )} from this recipe.`,
-                              label: "Removal reason",
-                              confirmLabel: "Remove line",
-                              tone: "danger",
-                            })
-                          )?.trim();
-                          if (!reason) return;
+                          // A plain yes or no: a cook taking a line off a
+                          // recipe should not have to explain it.
+                          const confirmed = await prompt.askConfirm({
+                            title: "Remove ingredient line",
+                            description: `Remove ${ingredientName(
+                              line.ingredientId,
+                            )} from this recipe.`,
+                            confirmLabel: "Remove line",
+                            tone: "danger",
+                          });
+                          if (!confirmed) return;
+                          const reason = "Removed in the recipe editor";
                           await run(`remove:${line._id}`, async () => {
                             await captureBefore("Removed ingredient line");
                             await removeLine({

@@ -4,6 +4,7 @@ import {
   useSearchParams,
   Link,
 } from "react-router-dom";
+import { SearchSelect } from "../../ui/SearchSelect";
 import { useClientDirectory } from "../../lib/useClientDirectory";
 import { useState, useEffect, useRef, type FormEvent } from "react";
 import {
@@ -169,6 +170,18 @@ export function RevenueAttributionDetailPage() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    // An empty box saved a 0% split that hands out nothing.
+    const share = allocationMethod === "percent" ? percentBasis : fixedAmount;
+    if (!(share > 0) && (isNew || isEditMode)) {
+      setFailure(
+        new Error(
+          allocationMethod === "percent"
+            ? "Enter the percent for this split."
+            : "Enter the amount for this split.",
+        ),
+      );
+      return;
+    }
     if (isNew) {
       if (!eventId) {
         setFailure(new Error("Pick the event this split is for."));
@@ -491,7 +504,7 @@ export function RevenueAttributionDetailPage() {
                   value={percentBasis || ""}
                   onChange={(e) => setPercentBasis(Number(e.target.value))}
                   disabled={!canEdit}
-                  placeholder="15.00"
+                  placeholder="Percent"
                 />
                 <span>%</span>
               </div>
@@ -518,21 +531,24 @@ export function RevenueAttributionDetailPage() {
           {isVenueCommission && (
             <label className="field-label">
               Venue
-              <select
-                className="input"
+              <SearchSelect
                 value={venueId}
-                onChange={(e) => setVenueId(e.target.value)}
+                onChange={(id) => setVenueId(id)}
                 disabled={!canEdit}
-              >
-                <option value="">Select venue…</option>
-                {activeVenues
+                recentsKey="venues"
+                placeholder="Search venues…"
+                aria-label="Venue"
+                options={activeVenues
                   .sort((a, b) => String(a.name).localeCompare(String(b.name)))
-                  .map((venue) => (
-                    <option key={venue._id} value={venue._id}>
-                      {venue.name}
-                    </option>
-                  ))}
-              </select>
+                  .map((venue) => ({
+                    id: venue._id,
+                    label: String(venue.name),
+                    hint:
+                      [venue.addressLine1, venue.city]
+                        .filter((part) => part?.trim())
+                        .join(", ") || null,
+                  }))}
+              />
             </label>
           )}
 

@@ -99,7 +99,13 @@ export function explainPackLine(line: PackLineFacts): PackLineExplanation {
     line.dishContainerId &&
     line.containerServings != null
   )
-    reasons.push(`${line.containerServings} servings on the menu`);
+    reasons.push(
+      line.requiredQuantity > 0
+        ? `${line.containerServings} servings on the menu, about ${Math.round(
+            line.containerServings / line.requiredQuantity,
+          )} servings a ${line.unit === "each" ? "container" : line.unit}`
+        : `${line.containerServings} servings on the menu`,
+    );
   const details: string[] = [];
   if (line.category) details.push(packCategoryLabel(line.category));
   if (line.ownership)

@@ -392,20 +392,23 @@ export function VenueVendorRelationshipsPage() {
               <label className="block text-xs font-medium text-ink-2">
                 Venue *
               </label>
-              <select
+              <SearchSelect
                 name="venueId"
                 required
                 disabled={!!venueId}
                 defaultValue={venueId ?? ""}
-                className="input mt-1"
-              >
-                <option value="">Select venue...</option>
-                {filteredVenues.map((v) => (
-                  <option key={v._id} value={v._id}>
-                    {v.name}
-                  </option>
-                ))}
-              </select>
+                recentsKey="venues"
+                placeholder="Search venues…"
+                aria-label="Venue"
+                options={filteredVenues.map((venue) => ({
+                  id: venue._id,
+                  label: String(venue.name),
+                  hint:
+                    [venue.addressLine1, venue.city]
+                      .filter((part) => part?.trim())
+                      .join(", ") || null,
+                }))}
+              />
             </div>
 
             <div>

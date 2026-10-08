@@ -74,4 +74,43 @@ describe("guest paste with headings", () => {
       },
     ]);
   });
+  it("keeps dietary needs typed without a phone", () => {
+    expect(
+      readGuestPaste(
+        "Laura Chen, laura@example.test, vegetarian\nOmar Haddad, omar@example.test, nut allergy",
+        [],
+      ),
+    ).toEqual([
+      {
+        name: "Laura Chen",
+        email: "laura@example.test",
+        phone: undefined,
+        dietaryRestrictions: ["vegetarian"],
+        allergenRestrictions: undefined,
+      },
+      {
+        name: "Omar Haddad",
+        email: "omar@example.test",
+        phone: undefined,
+        dietaryRestrictions: undefined,
+        allergenRestrictions: ["nut allergy"],
+      },
+    ]);
+  });
+  it("reads a full five-column row by position, keeping the allergy", () => {
+    expect(
+      readGuestPaste(
+        "Alex Park,alex@example.test,5551234567,no dairy,peanuts",
+        [],
+      ),
+    ).toEqual([
+      {
+        name: "Alex Park",
+        email: "alex@example.test",
+        phone: "5551234567",
+        dietaryRestrictions: ["no dairy"],
+        allergenRestrictions: ["peanuts"],
+      },
+    ]);
+  });
 });

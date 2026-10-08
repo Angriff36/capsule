@@ -13,14 +13,25 @@ function percentage(value: number | null): string {
   return value == null ? "—" : `${value.toFixed(1)}%`;
 }
 
-function statusLabel(status: MenuProfitabilityStatus): string {
+function statusLabel(
+  status: MenuProfitabilityStatus,
+  perGuestMenu: boolean,
+): string {
+  // A per-guest menu prices every dish through the guest price.
+  if (status === "missing_price" && perGuestMenu)
+    return "In the per-guest price";
   if (status === "on_target") return "On target";
   if (status === "low_margin") return "Low margin";
   if (status === "missing_price") return "Price needed";
   return "Cost incomplete";
 }
 
-function guidance(row: MenuProfitabilityRow): string {
+function guidance(row: MenuProfitabilityRow, perGuestMenu: boolean): string {
+  if (row.status === "missing_price" && perGuestMenu) {
+    return row.costComplete
+      ? "Covered by the menu's per-guest price; no dish price needed."
+      : "Covered by the per-guest price; finish its recipe costing so the menu margin is exact.";
+  }
   if (row.status === "low_margin") {
     return "Reprice this dish or review its recipe ingredients.";
   }
@@ -142,7 +153,11 @@ export function MenuProfitabilityPanel({
             <div>
               <dt>Not ranked</dt>
               <dd>{analysis.unrankedDishCount}</dd>
-              <small>missing price or recipe cost</small>
+              <small>
+                {analysis.perGuestMenu
+                  ? "priced through the per-guest price"
+                  : "missing price or recipe cost"}
+              </small>
             </div>
           </dl>
 
@@ -205,14 +220,16 @@ export function MenuProfitabilityPanel({
                     <em>{percentage(row.grossMarginPercent)}</em>
                   </div>
                   <div className="menu-profitability__status">
-                    <span>{statusLabel(row.status)}</span>
+                    <span>
+                      {statusLabel(row.status, analysis.perGuestMenu)}
+                    </span>
                     {row.foodCostPercent != null ? (
                       <small>{percentage(row.foodCostPercent)} food cost</small>
                     ) : null}
                   </div>
 
                   <div className="menu-profitability__guidance">
-                    <p>{guidance(row)}</p>
+                    <p>{guidance(row, analysis.perGuestMenu)}</p>
                     <div>
                       <Link to={dishPath(row.dishId)}>Review recipes</Link>
                       <button
