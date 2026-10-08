@@ -231,6 +231,12 @@ projections:
         # server, 2026-10-08). The status indexes of PurchaseNeed,
         # ImportConflict and LeadershipItem give their screens generated
         # by-status lists.
+        # Not staged: on production every table these indexes cover is small
+        # (counted 2026-10-08 with `convex data` on the box: leads 3357,
+        # events 3347, invoices 3324, payments 3254, prepTasks 435,
+        # ingredientDemands 200, purchaseNeeds 87, productionBatches 12,
+        # timeRecords 13, proposals 11, every other one 0-2), so each backfill
+        # takes seconds and the screens need the indexes in the same deploy.
         Lead:
           - fields: [tenantId, createdAt]
             name: by_tenantId_and_createdAt
