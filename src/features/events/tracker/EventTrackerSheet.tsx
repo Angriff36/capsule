@@ -1,9 +1,9 @@
 import { useMemo, useState } from "react";
+import { useClientDirectory } from "../../../lib/useClientDirectory";
 import { useSearchParams } from "react-router-dom";
 import { useAuthStatus } from "../../../lib/useAuthStatus";
 import { resolveManifestPolicies } from "../../admin/rolePermissionAudit";
 import {
-  useListClient,
   useListInvoice,
   useListPerson,
   useListServiceStyle,
@@ -56,7 +56,7 @@ export function EventTrackerSheet() {
     [bounds.start, bounds.end],
   );
   const events = useEventRecordsInRange(monthWindow);
-  const clients = useListClient();
+  const clients = useClientDirectory();
   const invoices = useListInvoice();
   // Pack lists, questions, trucks and numbers of the shown month's events.
   const monthRows = useEventMonthRows(events?.map((event) => event._id));

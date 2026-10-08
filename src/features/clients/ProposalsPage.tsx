@@ -1,7 +1,6 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
-  useListClient,
   useGetEvent,
   useListEventTimelineActivity,
   useListVenue,
@@ -21,6 +20,10 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useWholeDishList } from "../../lib/useDishesByIds";
 import { useProposalPictureUrls } from "../../lib/useProposalPictureUrls";
+import {
+  useClientDirectory,
+  useReadClient,
+} from "../../lib/useClientDirectory";
 import { type Id } from "../../lib/api";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -99,7 +102,9 @@ export function ProposalsPage() {
   const { branding } = useTenantBranding();
   const withPictureUrls = useProposalPictureUrls();
   const proposals = useListProposal();
-  const clients = useListClient();
+  // Names only; the signature request reads the one client's email.
+  const clients = useClientDirectory();
+  const readClient = useReadClient();
   // Events from two years back to two years ahead, plus undated ones: the
   // linked events of recent proposals and the accept-time link picker. The
   // window moves once a day.
@@ -465,7 +470,9 @@ export function ProposalsPage() {
         return;
       }
       if (key === "requestSignature") {
-        const client = clients?.find((c) => c._id === row.clientId);
+        const client = row.clientId
+          ? await readClient(String(row.clientId)).catch(() => null)
+          : null;
         if (!client) {
           setFailure(new Error("Client not found"));
           return;

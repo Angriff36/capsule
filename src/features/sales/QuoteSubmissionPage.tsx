@@ -288,6 +288,10 @@ export function QuoteSubmissionPage() {
               <span className="block mt-2 text-sm" data-testid="quote-company">
                 {options.company.name}
                 {options.company.address ? ` · ${options.company.address}` : ""}
+                {[options.company.phone, options.company.website]
+                  .filter(Boolean)
+                  .map((part) => ` · ${part}`)
+                  .join("")}
               </span>
             ) : null}
           </p>
@@ -295,6 +299,11 @@ export function QuoteSubmissionPage() {
           {error && (
             <div className="mb-6 p-4 bg-danger-soft border border-danger/40 rounded-sm">
               <p className="text-danger">{error}</p>
+              {options?.company?.phone ? (
+                <p className="mt-1 text-sm text-danger">
+                  Call us at {options.company.phone}.
+                </p>
+              ) : null}
             </div>
           )}
 

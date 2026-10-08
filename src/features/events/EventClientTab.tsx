@@ -2,7 +2,7 @@ import { useMemo, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
 import {
-  useListClient,
+  useGetClient,
   useListClientContact,
 } from "../../lib/manifest-convex-react";
 import { useClientEvents } from "../facilities/useEventsById";
@@ -54,11 +54,11 @@ export function EventClientTab({
   serviceRequirements,
   operationalRequirements,
 }: Props) {
-  const clients = useListClient();
+  // Only this event's client: the full list is too slow for a big client book.
+  const client = useGetClient(clientId ?? "skip") ?? undefined;
   const clientContacts = useListClientContact();
   const events = useClientEvents(clientId);
-  const client = clients?.find((row) => row._id === clientId);
-  const name = clientDisplayName(clientId, clients);
+  const name = clientDisplayName(clientId, client ? [client] : undefined);
 
   const contacts = useMemo(
     () =>

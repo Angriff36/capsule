@@ -1,3 +1,4 @@
+import { useClientContacts } from "../../lib/useClientDirectory";
 import {
   useEffect,
   useRef,
@@ -15,7 +16,6 @@ import {
   useGetEventTemplate,
   useGetProposal,
   useGetLead,
-  useListClient,
   useListMenu,
   useListOccasion,
   useListPerson,
@@ -207,7 +207,7 @@ export function EventCreatePage() {
   const templateMenuName = (menus ?? []).find(
     (menu) => menu._id === template?.menuId,
   )?.name;
-  const clients = useListClient();
+  const clients = useClientContacts();
   const venues = useListVenue();
   const occasions = useListOccasion();
   const serviceStyles = useListServiceStyle();

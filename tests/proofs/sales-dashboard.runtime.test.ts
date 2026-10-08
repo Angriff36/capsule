@@ -22,6 +22,9 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
 vi.mock("../../src/features/facilities/useEventsById", () => ({
   useAllEventReportRows: () => seed.events ?? [],
 }));
+vi.mock("../../src/lib/useClientDirectory", () => ({
+  useClientDirectory: () => seed.clients ?? [],
+}));
 
 import { SalesDashboardPage } from "../../src/features/reports/SalesDashboardPage";
 

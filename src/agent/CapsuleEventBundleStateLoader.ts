@@ -16,7 +16,7 @@ import type {
 } from "./CapsuleEventBundleExistingState";
 
 type QueryClient = {
-  query(reference: unknown, args: Record<string, never>): Promise<unknown>;
+  query(reference: unknown, args: Record<string, string>): Promise<unknown>;
   setAuth?: (token: string) => void;
 };
 
@@ -83,11 +83,14 @@ export class CapsuleEventBundleStateLoader {
    * Active clients, venues and dishes as name candidates, so a bundle for a
    * client, venue or dish already in Capsule reuses the record (exact
    * normalized name or, for clients, email) instead of registering a twin.
+   * Clients come from the list that opens only email and phone: the full
+   * client list opens ten locked fields per client and runs past the server's
+   * time limit on a large client book.
    */
   async loadCatalogCandidates(): Promise<CatalogCandidates> {
     const client = await this.resolveClient();
     const [clients, venues, dishes] = await Promise.all([
-      client.query(api.queries.listClient, {}),
+      client.query(api.clientDirectory.listWithContacts, {}),
       client.query(api.queries.listVenue, {}),
       client.query(api.queries.listDish, {}),
     ]);
@@ -134,9 +137,17 @@ export class CapsuleEventBundleStateLoader {
     eventId: string,
   ): Promise<CapsuleEventBundleExistingEvent> {
     const client = await this.resolveClient();
+    // Only the event's own client is read (for its email and phone), not the
+    // whole client book.
+    const eventClient = async (events: unknown) => {
+      const event = rows(events).find((row) => String(row._id) === eventId);
+      const clientId = event?.clientId ? String(event.clientId) : "";
+      if (!clientId) return [];
+      const row = await client.query(api.queries.getClient, { id: clientId });
+      return row ? [row] : [];
+    };
     const [
-      events,
-      clients,
+      [events, clients],
       clientContacts,
       eventDishes,
       dishes,
@@ -147,8 +158,9 @@ export class CapsuleEventBundleStateLoader {
       assignments,
       venues,
     ] = await Promise.all([
-      client.query(api.queries.listEvent, {}),
-      client.query(api.queries.listClient, {}),
+      client
+        .query(api.queries.listEvent, {})
+        .then(async (events) => [events, await eventClient(events)] as const),
       client.query(api.queries.listClientContact, {}),
       client.query(api.queries.listEventDish, {}),
       client.query(api.queries.listDish, {}),

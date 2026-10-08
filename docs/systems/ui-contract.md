@@ -27,7 +27,6 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 - `queries.getContract` - live read
 - `queries.getEvent` - live read
 - `queries.getVenue` - live read
-- `queries.listClient` - live read
 - `queries.listClientCommunication` - live read
 - `queries.listClientContact` - live read
 - `queries.listClientOutreachTask` - live read
@@ -340,6 +339,8 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `clientDirectory.list` - query; live read, updates by itself
+- `clientDirectory.listWithContacts` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself
@@ -366,8 +367,8 @@ Screens (35): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 
 ### Generated reads
 
+- `queries.getClient` - live read
 - `queries.getEvent` - live read
-- `queries.listClient` - live read
 - `queries.listEvent` - live read
 - `queries.listEventTimelineActivity` - live read
 - `queries.listMenu` - live read
@@ -517,6 +518,8 @@ Screens (35): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `clientDirectory.list` - query; live read, updates by itself
+- `clientDirectory.listWithContacts` - query; live read, updates by itself
 - `dishLookup.byIds` - query; live read, updates by itself
 - `dishLookup.exclusiveToVenue` - query; live read, updates by itself
 - `dishLookup.page` - query; live read, updates by itself
@@ -566,12 +569,12 @@ Screens (66): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 
 ### Generated reads
 
+- `queries.getClient` - live read
 - `queries.getEvent` - live read
 - `queries.getEventTemplate` - live read
 - `queries.getLead` - live read
 - `queries.getProposal` - live read
 - `queries.listAvailabilityWindow` - live read
-- `queries.listClient` - live read
 - `queries.listClientContact` - live read
 - `queries.listCorrectiveAction` - live read
 - `queries.listDelivery` - live read
@@ -1243,6 +1246,8 @@ Screens (66): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `clientDirectory.list` - query; live read, updates by itself
+- `clientDirectory.listWithContacts` - query; live read, updates by itself
 - `commandReceipts.latestCascadeReceipt` - query; live read, updates by itself
 - `culinaryDemand.addNestedRecipeLine` - mutation; authored step; live reads update by themselves
 - `culinaryDemand.applyDemandHeadcount` - mutation; authored step; live reads update by themselves
@@ -4308,10 +4313,10 @@ Screens (70): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 
 ### Generated reads
 
+- `queries.getClient` - live read
 - `queries.getEvent` - live read
 - `queries.getInvoice` - live read
 - `queries.getRevenueAttribution` - live read
-- `queries.listClient` - live read
 - `queries.listComponent` - live read
 - `queries.listComponentIngredient` - live read
 - `queries.listCreditMemo` - live read
@@ -4716,6 +4721,8 @@ Screens (70): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `clientDirectory.list` - query; live read, updates by itself
+- `clientDirectory.listWithContacts` - query; live read, updates by itself
 - `closeoutSources.captureCloseoutFromSources` - mutation; authored step; live reads update by themselves
 - `closeoutSources.closeoutResults` - query; live read, updates by itself
 - `closeoutSources.correctCloseoutFromSources` - mutation; authored step; live reads update by themselves

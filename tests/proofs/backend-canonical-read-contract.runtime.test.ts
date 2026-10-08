@@ -58,7 +58,7 @@ const EVENT_PAGE_PARTS: Array<{
     part: "client, contact and accepted proposal",
     domain: "commercial",
     reads: [
-      "queries.listClient",
+      "clientDirectory.list",
       "queries.listClientContact",
       "queries.getProposal",
     ],

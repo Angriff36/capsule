@@ -1,6 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
+import { useClientDirectory } from "../../lib/useClientDirectory";
 import {
-  useListClient,
   useListDateHold,
   useListDateWaitlistEntry,
 } from "../../lib/manifest-convex-react";
@@ -25,7 +25,7 @@ export function DateHoldCollisionNotice({
 }) {
   const holds = useListDateHold();
   const waitlist = useListDateWaitlistEntry();
-  const clients = useListClient();
+  const clients = useClientDirectory();
   const { pathname } = useLocation();
   const validDate = /^\d{4}-\d{2}-\d{2}$/.test(dateKey);
   // Booked events that day: a hold on a date that already has an event is

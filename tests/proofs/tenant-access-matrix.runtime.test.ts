@@ -620,7 +620,8 @@ function publicQuoteFormExtras(value: unknown): string[] {
   for (const [key, list] of Object.entries(form)) {
     if (key === "company") {
       for (const field of Object.keys((list ?? {}) as Doc))
-        if (field !== "name" && field !== "address")
+        // The caterer's own public contact details, shown to the client.
+        if (!["name", "address", "phone", "website"].includes(field))
           extra.push(`company.${field}`);
       continue;
     }

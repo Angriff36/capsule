@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
+import { useClientDirectory } from "../../lib/useClientDirectory";
 import {
-  useListClient,
   useListInvoice,
   useListOrganization,
   useListVenue,
@@ -571,7 +571,7 @@ export function RevenueTrendsDashboard({
 
 export function RevenueTrendsPage() {
   const invoices = useListInvoice();
-  const clients = useListClient();
+  const clients = useClientDirectory();
   const eventIds = useMemo(
     () =>
       invoices === undefined ? undefined : invoices.map((row) => row.eventId),

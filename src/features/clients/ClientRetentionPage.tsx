@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import {
   useClientOutreachTaskComplete,
   useClientOutreachTaskDismiss,
-  useListClient,
+  useGetClient,
   useListClientOutreachTask,
 } from "../../lib/manifest-convex-react";
 import { useEventsInRange } from "../facilities/useEventsById";
@@ -17,6 +17,7 @@ import { useActionNotice } from "../../ui/action-result";
 import { useEnsureOpenClientOutreach } from "../../lib/useEnsureOpenClientOutreach";
 import { BulkRunFailure, runBulkItems } from "../../ui/bulk-select";
 import type { Id } from "../../lib/api";
+import { useClientDirectory } from "../../lib/useClientDirectory";
 
 interface RetentionRow {
   clientId: string;
@@ -89,8 +90,16 @@ export function computeRetention(
   return { rows, rebookedCount, rateLabel };
 }
 
+// Who to call, without opening the client first. Reads only this client's
+// phone and email; the page's client list carries names only.
+function OutreachReach({ clientId }: { clientId: string }) {
+  const client = useGetClient(clientId);
+  const reach = [client?.phone, client?.email].filter(Boolean).join(" · ");
+  return reach ? <p className="text-xs text-ink-3">{reach}</p> : null;
+}
+
 export function ClientRetentionPage() {
-  const clients = useListClient();
+  const clients = useClientDirectory();
   // Retention only looks at bookings in the prior year and the current year.
   const currentYear = new Date().getFullYear();
   const priorYear = currentYear - 1;
@@ -347,18 +356,7 @@ export function ClientRetentionPage() {
                     >
                       {clientDisplayName(String(task.clientId), clients ?? [])}
                     </Link>
-                    {/* Who to call, without opening the client first. */}
-                    {(() => {
-                      const row = clients?.find(
-                        (client) => client._id === task.clientId,
-                      );
-                      const reach = [row?.phone, row?.email]
-                        .filter(Boolean)
-                        .join(" · ");
-                      return reach ? (
-                        <p className="text-xs text-ink-3">{reach}</p>
-                      ) : null;
-                    })()}
+                    <OutreachReach clientId={String(task.clientId)} />
                   </td>
                   <td data-label="Reason">{String(task.reason)}</td>
                   <td data-label="Opened">{formatDate(task.openedAt)}</td>

@@ -54,6 +54,9 @@ vi.mock("../../src/features/facilities/useEventsById", () => ({
   useEventsInRange: (window: unknown) =>
     window === "skip" ? undefined : (seed.events ?? []),
 }));
+vi.mock("../../src/lib/useClientDirectory", () => ({
+  useClientDirectory: () => seed.clients ?? [],
+}));
 
 import { SalesDashboardPage } from "../../src/features/reports/SalesDashboardPage";
 import { TimsKPIsDashboardPage } from "../../src/features/reports/TimsKPIsDashboardPage";

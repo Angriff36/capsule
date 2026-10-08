@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useClientDirectory } from "../../lib/useClientDirectory";
 import { AllergenBriefingButton } from "./AllergenBriefingButton";
 import {
   Link,
@@ -33,7 +34,6 @@ import {
   useEventReturnToPlanning,
   useEventSubmitForApproval,
   useGetEvent,
-  useListClient,
   useListOrganization,
   useListPerson,
   useListVenue,
@@ -166,7 +166,7 @@ function EventDetailContent({
     channelKey: eventChannelKey,
     myPersonId: identity.personId,
   });
-  const clients = useHeldQueryRows("clients", useListClient());
+  const clients = useHeldQueryRows("clients", useClientDirectory());
   const organizations = useListOrganization();
   // Same functional-currency rule as the phone Money card and Finance.
   const currencyCode = normalizeCurrencyCode(

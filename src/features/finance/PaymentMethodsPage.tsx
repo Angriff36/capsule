@@ -1,9 +1,9 @@
 import { useState, type FormEvent } from "react";
+import { useClientDirectory } from "../../lib/useClientDirectory";
 import { Link } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreatePaymentMethod,
-  useListClient,
   useListPaymentMethod,
   usePaymentMethodClearDefault,
   usePaymentMethodExpire,
@@ -30,7 +30,7 @@ type MethodType = (typeof METHOD_TYPES)[number];
 
 export function PaymentMethodsPage() {
   const methods = useListPaymentMethod();
-  const clients = useListClient();
+  const clients = useClientDirectory();
   const createMethod = useCreatePaymentMethod();
   const makeDefault = usePaymentMethodMakeDefault();
   const clearDefault = usePaymentMethodClearDefault();

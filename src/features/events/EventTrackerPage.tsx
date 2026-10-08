@@ -1,3 +1,4 @@
+import { useClientDirectory } from "../../lib/useClientDirectory";
 import {
   useMemo,
   useState,
@@ -17,7 +18,6 @@ import {
   useEventLockForSales,
   useEventReschedule,
   useEventSubmitForApproval,
-  useListClient,
   useListDelivery,
   useListEventNumberAssignment,
   useListEventVehicleAssignment,
@@ -165,7 +165,7 @@ export function EventTrackerPage() {
     [today],
   );
   const events = useEventRecordsInRange(eventWindow);
-  const clients = useListClient();
+  const clients = useClientDirectory();
   const venues = useListVenue();
   const deliveries = useListDelivery();
   const vehicles = useListVehicle();

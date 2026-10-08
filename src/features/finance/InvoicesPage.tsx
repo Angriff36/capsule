@@ -1,3 +1,4 @@
+import { useClientDirectory } from "../../lib/useClientDirectory";
 import { useState, type FormEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
@@ -7,7 +8,6 @@ import {
   useInvoiceMarkVoided,
   useInvoiceSend,
   useInvoiceWriteOff,
-  useListClient,
   useListInvoice,
   useListOrganization,
   useListTaxRate,
@@ -80,7 +80,7 @@ export function InvoicesPage() {
     "";
   const openFromLink = searchParams.get("issue") === "1";
   const invoices = useListInvoice();
-  const clients = useListClient();
+  const clients = useClientDirectory();
   const events = usePickerAndNamedEvents([
     prefillEventId,
     eventScope.workingId,
