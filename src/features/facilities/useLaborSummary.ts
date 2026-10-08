@@ -70,8 +70,13 @@ export function usePayRates():
   return useQuery(api.laborSummary.listPayRates, {});
 }
 
-/** Sanitized confirmed time records for the payroll export preview. */
-export function usePayrollTimeRecords():
+/**
+ * Sanitized confirmed time records for the payroll screen: those that
+ * clocked in inside the given [from, to) pay periods. "skip" while unknown.
+ */
+export function usePayrollTimeRecords(
+  ranges: Array<{ from: number; to: number }> | "skip",
+):
   | Array<{
       personId: string;
       clockInAt: number;
@@ -82,7 +87,10 @@ export function usePayrollTimeRecords():
     }>
   | null
   | undefined {
-  return useQuery(api.laborSummary.payrollTimeRecords, {});
+  return useQuery(
+    api.laborSummary.payrollTimeRecords,
+    ranges === "skip" ? "skip" : { ranges },
+  );
 }
 
 export type AttendanceAlertsView = {
