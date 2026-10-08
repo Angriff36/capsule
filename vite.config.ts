@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { loadEnv, normalizePath, type Plugin } from "vite";
-import { defineConfig } from "vitest/config";
+import { configDefaults, defineConfig } from "vitest/config";
 
 const MARKITDOWN_MAX_INPUT_BYTES = 20 * 1024 * 1024;
 const MARKITDOWN_MAX_OUTPUT_BYTES = 512 * 1024;
@@ -290,6 +290,12 @@ export default defineConfig(({ mode }) => ({
       Number(process.env.CAPSULE_TEST_WORKERS) ||
       Math.min(8, availableParallelism()),
     include: ["tests/**/*.test.ts"],
+    // The tenant access matrix runs for minutes on every core, so plain
+    // test runs leave it out. `bun run check:access-matrix` runs it with
+    // CAPSULE_ACCESS_MATRIX=1 when a sign-in or access rule changed.
+    exclude: process.env.CAPSULE_ACCESS_MATRIX
+      ? [...configDefaults.exclude]
+      : [...configDefaults.exclude, "tests/proofs/tenant-access-matrix.*"],
     environmentMatchGlobs: [["tests/proofs/**", "edge-runtime"]],
     server: { deps: { inline: ["convex-test"] } },
     coverage: {
