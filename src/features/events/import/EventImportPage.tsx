@@ -1,10 +1,8 @@
+import { useClientContacts } from "../../../lib/useClientDirectory";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import type { CapsuleEventBundleCatalogMatch } from "../../../agent/CapsuleEventBundleExistingState";
-import {
-  useListClient,
-  useListVenue,
-} from "../../../lib/manifest-convex-react";
+import { useListVenue } from "../../../lib/manifest-convex-react";
 import { useWholeDishList } from "../../../lib/useDishesByIds";
 import {
   loadEventBundleFromText,
@@ -34,7 +32,7 @@ import { useEventImportRunner } from "./useEventImportRunner";
  */
 export function EventImportPage() {
   const navigate = useNavigate();
-  const clients = useListClient();
+  const clients = useClientContacts();
   const venues = useListVenue();
   const dishes = useWholeDishList();
   const directory = useEventImportDirectory();

@@ -76,7 +76,11 @@ vi.mock("convex/react", async (importOriginal) => {
       // The light client list (convex/clientDirectory.ts) answers from the
       // same client rows a test gives the generated list, unless the test
       // sets its own.
-      if (name === "clientDirectory:list" && !backend.values.has(name))
+      if (
+        (name === "clientDirectory:list" ||
+          name === "clientDirectory:listWithContacts") &&
+        !backend.values.has(name)
+      )
         return backend.values.get("useListClient") ?? [];
       // Events by id (convex/eventLookup.ts) answer from the same event
       // rows a test gives the generated list, unless the test sets its own.

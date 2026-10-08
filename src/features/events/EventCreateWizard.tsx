@@ -1,3 +1,4 @@
+import { useClientContacts } from "../../lib/useClientDirectory";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatMoney } from "../../lib/format";
@@ -9,7 +10,6 @@ import {
   useCanCreateInlineReference,
 } from "../../ui/InlineReferenceCreateSheet";
 import {
-  useListClient,
   useListDish,
   useListMenu,
   useListMenuDish,
@@ -88,7 +88,7 @@ export function EventCreateWizard({
   onBusyChange?: (busy: boolean) => void;
 }) {
   const navigate = useNavigate();
-  const clients = useListClient(),
+  const clients = useClientContacts(),
     venues = useListVenue(),
     dishes = useListDish(),
     people = useListPerson();

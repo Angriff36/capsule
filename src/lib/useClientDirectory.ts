@@ -17,6 +17,15 @@ export function useClientDirectory(): DirectoryClient[] | undefined {
   return useQuery(api.clientDirectory.list) as DirectoryClient[] | undefined;
 }
 
+/**
+ * Every client with names, status, email and phone (no address). For pages
+ * that search or show how to reach every client.
+ */
+export function useClientContacts(): DirectoryClient[] | undefined {
+  return useQuery(api.clientDirectory.listWithContacts) as
+    DirectoryClient[] | undefined;
+}
+
 /** Reads one client with its contact details at the moment an action needs them. */
 export function useReadClient(): (
   id: string,

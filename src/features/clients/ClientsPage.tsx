@@ -1,9 +1,9 @@
+import { useClientContacts } from "../../lib/useClientDirectory";
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   useCreateClient,
   useCreateClientMerge,
-  useListClient,
   useListClientCommunication,
   useListClientContact,
 } from "../../lib/manifest-convex-react";
@@ -60,7 +60,7 @@ const clientsState = new ListStateManager({
 export function ClientsPage() {
   const navigate = useNavigate();
   const listOrigin = useListOrigin();
-  const clients = useListClient();
+  const clients = useClientContacts();
   const contacts = useListClientContact();
   const events = useAllEventReportRows();
   const communications = useListClientCommunication();
