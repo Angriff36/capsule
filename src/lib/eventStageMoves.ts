@@ -46,14 +46,14 @@ export const AUTO_STAGE_MOVES: ReadonlyArray<{
     to: "pending_approval",
     command: "submitForApproval",
     label: "Pending approval",
-    when: "The plan is finished and the event has a client, a headcount, menu dishes and staff.",
+    when: "The plan is finished and the event has a client, a headcount, menu dishes and staff (a drop-off, pickup or ready-to-heat order needs no staff).",
   },
   {
     from: "pending_approval",
     to: "approved",
     command: "approve",
     label: "Approved",
-    when: "The event still has a client, a headcount, menu dishes and staff.",
+    when: "The event still has a client, a headcount, menu dishes and staff (none for a drop-off, pickup or ready-to-heat order).",
   },
   {
     from: "approved",
@@ -147,12 +147,21 @@ export type AutoStageStep =
 const filled = (text: string | null | undefined) =>
   text != null && text.trim().length > 0;
 
+/** Food handed over with nobody serving: no staff to assign. */
+export function serviceNeedsNoStaff(
+  serviceStyleName: string | null | undefined,
+): boolean {
+  return /drop ?-?off|pick ?-?up|ready ?-?to ?-?heat/i.test(
+    serviceStyleName ?? "",
+  );
+}
+
 function setupReady(facts: AutoStageFacts): boolean {
   return (
     facts.hasAssignedClient &&
     (facts.expectedHeadcount ?? 0) > 0 &&
     facts.hasMenuDishes &&
-    facts.hasStaffAssigned
+    (facts.hasStaffAssigned || serviceNeedsNoStaff(facts.serviceStyleName))
   );
 }
 
