@@ -116,6 +116,20 @@ function optional(data: FormData, field: string) {
   return value || undefined;
 }
 
+const COMPANY_WORD =
+  /\b(llc|inc|co|corp|company|client|customer|group|association|assn|church|school|society|club|foundation|center|centre|hotel|dental|clinic|services?|catering|bank|university|college|hoa|rotary|labs?|partners|studio|realty|team|department|county|city|district|academy|hospital|restaurant|cafe|bar|brewery|winery|farm|ranch|events?|marketing|agency|office|lodge|hall)\b/i;
+
+/** Two or three plain words with no business word: likely a person. */
+export function looksLikePersonName(value: string): boolean {
+  const words = value.trim().split(/\s+/);
+  return (
+    words.length >= 2 &&
+    words.length <= 3 &&
+    words.every((word) => /^[\p{L}'’-]+$/u.test(word)) &&
+    !COMPANY_WORD.test(value)
+  );
+}
+
 export function InlineReferenceCreateSheet({
   kind,
   open,
@@ -142,16 +156,20 @@ export function InlineReferenceCreateSheet({
   const allowed = canCreateInlineReference(kind, auth);
   useEffect(() => {
     if (!open) return;
-    setName(initialName);
-    setClientType("company");
-    setFamilyName("");
+    // "Megan Whitman" starts as a person, already split; "Holloway Dental"
+    // as a company. Either can still be switched.
+    const person = kind === "client" && looksLikePersonName(initialName);
+    const words = initialName.trim().split(/\s+/);
+    setName(person ? words.slice(0, -1).join(" ") : initialName);
+    setClientType(person ? "person" : "company");
+    setFamilyName(person ? words[words.length - 1] : "");
     setEmail("");
     setBusy(false);
     setError(null);
     setConfirmedKey(null);
     sessionKey.current = idempotencyKey();
     submitting.current = false;
-  }, [initialName, open]);
+  }, [initialName, open, kind]);
   const identity =
     kind === "client" && clientType === "person"
       ? [name.trim(), familyName.trim()].filter(Boolean).join(" ")
