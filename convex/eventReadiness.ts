@@ -197,10 +197,11 @@ export const getEventReadiness = query({
             row.status !== "completed" && row.status !== "cancelled",
         )
         .map((row: any) => String(row._id)),
+      // Only lists still being packed are open: a packed or loaded list is
+      // done packing, and a delivery does not move it on to "dispatched".
       inFlightPackListIds: packLists
         .filter(
-          (row: any) =>
-            row.status !== "dispatched" && row.status !== "cancelled",
+          (row: any) => row.status === "draft" || row.status === "packing",
         )
         .map((row: any) => String(row._id)),
       inFlightDeliveryIds: deliveries

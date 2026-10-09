@@ -747,7 +747,7 @@ export function computeEvent(doc: Record<string, any>, { user }: { user: any }):
   doc.hasFinalLockTiming = __hasFinalLockTiming;
   const __isFinalLockReady = (((doc.hasServiceStyle && doc.hasExpectedHeadcount) && doc.hasMenuDishes) && doc.hasFinalLockTiming);
   doc.isFinalLockReady = __isFinalLockReady;
-  const __isReadyForExecution = (((((doc.prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && (((doc.packLists) ?? []).filter((p: Doc<"packLists">) => (((p.status !== "dispatched") && (p.status !== "cancelled")))).length === 0)) && (((doc.deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0));
+  const __isReadyForExecution = (((((doc.prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && (((doc.packLists) ?? []).filter((p: Doc<"packLists">) => (((p.status === "draft") || (p.status === "packing")))).length === 0)) && (((doc.deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0));
   doc.isReadyForExecution = __isReadyForExecution;
   const __estimatedFoodCost = ((((doc.eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
   doc.estimatedFoodCost = __estimatedFoodCost;
