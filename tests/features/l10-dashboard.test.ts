@@ -1,6 +1,9 @@
 // @vitest-environment jsdom
 // AC-306 (CF-7.4-03): the L10 page shows the scorecard, priorities (rocks),
-// issues, to-dos and meeting-period history from live rows.
+// issues, to-dos and meeting-period history from live rows. PL-DASHBOARDS:
+// it also follows the owner's L10 meeting sheet - agenda and rules, a weekly
+// mark on each priority, client and people headlines, solving an issue with
+// the agreed answer, and the meeting's 1-10 rating.
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
@@ -13,6 +16,10 @@ import {
 type Rows = Record<string, unknown>[];
 const seed: Record<string, Rows> = {};
 const complete = vi.fn();
+const markTrack = vi.fn();
+const solve = vi.fn();
+const recordMeeting = vi.fn();
+const reviseMeeting = vi.fn();
 
 vi.mock("../../src/lib/manifest-convex-react", () => {
   const list = (name: string) => () => seed[name] ?? [];
@@ -31,6 +38,11 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
     useLeadershipItemComplete: () => complete,
     useLeadershipItemDrop: () => vi.fn(),
     useLeadershipItemReopen: () => vi.fn(),
+    useLeadershipItemMarkTrack: () => markTrack,
+    useLeadershipItemSolve: () => solve,
+    useListLeadershipMeeting: list("meetings"),
+    useCreateLeadershipMeeting: () => recordMeeting,
+    useLeadershipMeetingRevise: () => reviseMeeting,
   };
 });
 
@@ -112,6 +124,17 @@ function seedRows() {
     item("t1", "todo", "Call the linen vendor", "open", { dueAt: lastWeek }),
     item("t2", "todo", "Send the menu", "done", { closedAt: thisWeek }),
     item("x1", "todo", "Deleted one", "open", { deletedAt: thisWeek }),
+    item("h1", "client_headline", "Bride sent a thank-you", "open"),
+    item("h2", "people_headline", "New sous chef starts", "open"),
+  ];
+  seed.meetings = [
+    {
+      _id: "m1",
+      heldAt: lastWeek + 60 * 60 * 1000,
+      rating: 7,
+      recordedAt: lastWeek,
+      version: 1,
+    },
   ];
 }
 
@@ -133,7 +156,8 @@ describe("L10 dashboard", () => {
     container = document.createElement("div");
     document.body.appendChild(container);
     root = createRoot(container);
-    complete.mockReset();
+    for (const fn of [complete, markTrack, solve, recordMeeting, reviseMeeting])
+      fn.mockReset();
   });
 
   afterEach(() => {
@@ -177,8 +201,141 @@ describe("L10 dashboard", () => {
     expect(rows.length).toBe(8);
     const cells = (i: number) =>
       [...rows[i].querySelectorAll("td")].map((td) => td.textContent ?? "");
-    expect(cells(0).slice(1)).toEqual(["0", "1", "0", "1", "$2,000", "0"]);
-    expect(cells(1).slice(1)).toEqual(["4", "0", "0", "0", "$0", "1"]);
+    // Headlines are not counted as added; last week's meeting was rated 7.
+    expect(cells(0).slice(1)).toEqual(["0", "1", "0", "1", "$2,000", "0", "—"]);
+    expect(cells(1).slice(1)).toEqual([
+      "4",
+      "0",
+      "0",
+      "0",
+      "$0",
+      "1",
+      "7 / 10",
+    ]);
+
+    // The owner's sheet: 60-minute agenda in eight parts, and headlines.
+    const agenda = table("l10-agenda");
+    expect(agenda).toContain("Good news");
+    expect(agenda).toContain("Rate the meeting");
+    expect(
+      container.querySelectorAll("[data-testid='l10-agenda'] li"),
+    ).toHaveLength(8);
+    expect(container.textContent).toContain("60 minutes");
+    expect(container.textContent).not.toContain("90-minute");
+    expect(table("leadership-client_headline")).toContain(
+      "Bride sent a thank-you",
+    );
+    expect(table("leadership-people_headline")).toContain(
+      "New sous chef starts",
+    );
+    expect(table("leadership-client_headline")).toContain("Heard");
+  });
+
+  it("a priority gets this week's mark and an issue is solved with the agreed answer", async () => {
+    seedRows();
+    act(() => {
+      root.render(
+        createElement(MemoryRouter, null, createElement(L10DashboardPage)),
+      );
+    });
+    const picker = container.querySelector(
+      "[data-testid='leadership-rock'] select",
+    ) as HTMLSelectElement;
+    await act(async () => {
+      picker.value = "off_track";
+      picker.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    expect(markTrack).toHaveBeenCalledWith({
+      docId: "r1",
+      version: 1,
+      track: "off_track",
+    });
+
+    const issues = container.querySelector("[data-testid='leadership-issue']")!;
+    const solveButton = [...issues.querySelectorAll("button")].find(
+      (b) => b.textContent === "Solve",
+    )!;
+    await act(async () => {
+      solveButton.click();
+    });
+    const answer = issues.querySelector("input") as HTMLInputElement;
+    const setValue = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      "value",
+    )!.set!;
+    await act(async () => {
+      setValue.call(answer, "Use the second rental company");
+      answer.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    await act(async () => {
+      answer.form!.requestSubmit();
+    });
+    expect(solve).toHaveBeenCalledWith({
+      docId: "i1",
+      version: 1,
+      solution: "Use the second rental company",
+    });
+  });
+
+  it("rating the meeting needs a score and saves this week's meeting", async () => {
+    seedRows();
+    act(() => {
+      root.render(
+        createElement(MemoryRouter, null, createElement(L10DashboardPage)),
+      );
+    });
+    const form = container.querySelector(
+      "[data-testid='l10-rating']",
+    ) as HTMLFormElement;
+    await act(async () => {
+      form.requestSubmit();
+    });
+    expect(recordMeeting).not.toHaveBeenCalled();
+    expect(form.textContent).toContain("Pick a score from 1 to 10.");
+
+    const nine = [...form.querySelectorAll("button")].find(
+      (b) => b.textContent === "9",
+    )!;
+    await act(async () => {
+      nine.click();
+    });
+    await act(async () => {
+      form.requestSubmit();
+    });
+    expect(recordMeeting).toHaveBeenCalledTimes(1);
+    const saved = recordMeeting.mock.calls[0][0];
+    expect(saved.rating).toBe(9);
+    expect(saved.heldAt).toEqual(expect.any(Number));
+    expect(reviseMeeting).not.toHaveBeenCalled();
+  });
+
+  it("this week's rated meeting is corrected, not written twice", async () => {
+    seedRows();
+    seed.meetings = [
+      {
+        _id: "m2",
+        heldAt: thisWeek + 60 * 60 * 1000,
+        rating: 6,
+        recordedAt: thisWeek,
+        version: 3,
+      },
+    ];
+    act(() => {
+      root.render(
+        createElement(MemoryRouter, null, createElement(L10DashboardPage)),
+      );
+    });
+    const form = container.querySelector(
+      "[data-testid='l10-rating']",
+    ) as HTMLFormElement;
+    expect(form.textContent).toContain("6 out of 10");
+    await act(async () => {
+      form.requestSubmit();
+    });
+    expect(recordMeeting).not.toHaveBeenCalled();
+    expect(reviseMeeting).toHaveBeenCalledWith(
+      expect.objectContaining({ docId: "m2", version: 3, rating: 6 }),
+    );
   });
 
   it("marking a to-do done sends the complete step for that row", async () => {
