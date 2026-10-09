@@ -1,4 +1,9 @@
-import { useClientContacts } from "../../lib/useClientDirectory";
+import {
+  useClientSearch,
+  useClientsByIds,
+  useReadClient,
+} from "../../lib/useClientDirectory";
+import { ClientSearchSelect } from "../clients/ClientSearchSelect";
 import {
   useEffect,
   useRef,
@@ -209,7 +214,6 @@ export function EventCreatePage() {
   const templateMenuName = (menus ?? []).find(
     (menu) => menu._id === template?.menuId,
   )?.name;
-  const clients = useClientContacts();
   const venues = useListVenue();
   const occasions = useListOccasion();
   const serviceStyles = useListServiceStyle();
@@ -220,6 +224,9 @@ export function EventCreatePage() {
   const canCreateVenue = useCanCreateInlineReference("venue");
   const ensureBuiltInServiceStyle = useEnsureBuiltInServiceStyle();
   const [clientId, setClientId] = useState(prefillClientId);
+  // Only the picked client; the picker searches the server.
+  const clients = useClientsByIds([clientId]);
+  const readClient = useReadClient();
   const contactNameRef = useRef<HTMLInputElement>(null);
   const contactEmailRef = useRef<HTMLInputElement>(null);
   const contactPhoneRef = useRef<HTMLInputElement>(null);
@@ -227,33 +234,46 @@ export function EventCreatePage() {
   // proposal (a proposal holds no contact); the boxes stay editable and a
   // value the user typed is never replaced.
   useEffect(() => {
-    const client = clients?.find((row) => row._id === clientId);
-    if (!client) return;
-    if (contactNameRef.current && !contactNameRef.current.value)
-      // The person at the client, else the company.
-      contactNameRef.current.value =
-        [client.givenName, client.familyName]
-          .map((part) => part?.trim())
-          .filter(Boolean)
-          .join(" ") || clientDisplayName(client._id, [client]);
-    if (
-      contactEmailRef.current &&
-      !contactEmailRef.current.value &&
-      client.email
-    )
-      contactEmailRef.current.value = client.email;
-    if (
-      contactPhoneRef.current &&
-      !contactPhoneRef.current.value &&
-      client.phone
-    )
-      contactPhoneRef.current.value = client.phone;
-  }, [clientId, clients]);
+    if (!clientId) return;
+    let stale = false;
+    // Email and phone are locked fields: read the picked client on its own.
+    void readClient(clientId).then((client) => {
+      if (stale || !client) return;
+      if (contactNameRef.current && !contactNameRef.current.value)
+        // The person at the client, else the company.
+        contactNameRef.current.value =
+          [client.givenName, client.familyName]
+            .map((part) => part?.trim())
+            .filter(Boolean)
+            .join(" ") || clientDisplayName(client._id, [client]);
+      if (
+        contactEmailRef.current &&
+        !contactEmailRef.current.value &&
+        client.email
+      )
+        contactEmailRef.current.value = client.email;
+      if (
+        contactPhoneRef.current &&
+        !contactPhoneRef.current.value &&
+        client.phone
+      )
+        contactPhoneRef.current.value = client.phone;
+    });
+    return () => {
+      stale = true;
+    };
+    // readClient is a fresh function each render; the client id drives this.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clientId]);
   const [venueId, setVenueId] = useState("");
   const [inlineCreate, setInlineCreate] = useState<{
     kind: "client" | "venue";
     name: string;
   } | null>(null);
+  // Clients named like the one being made, for the "use existing" check.
+  const similarClients = useClientSearch(
+    inlineCreate?.kind === "client" ? inlineCreate.name : "",
+  );
   const [temporaryClient, setTemporaryClient] = useState<{
     id: string;
     label: string;
@@ -338,17 +358,6 @@ export function EventCreatePage() {
       venue.status === "active" &&
       venue.registeredAt != null,
   );
-  const clientOptions = [
-    ...activeClients.map((client) => ({
-      id: client._id,
-      label: clientDisplayName(client._id, activeClients),
-      hint: [client.email, client.phone].filter(Boolean).join(" · ") || null,
-    })),
-    ...(temporaryClient &&
-    !activeClients.some((client) => client._id === temporaryClient.id)
-      ? [{ id: temporaryClient.id, label: temporaryClient.label }]
-      : []),
-  ];
   const venueOptions = [
     ...activeVenues.map((venue) => ({
       id: venue._id,
@@ -1108,47 +1117,35 @@ export function EventCreatePage() {
           ) : null}
           <Section title="Client">
             <div className="space-y-3 p-3">
-              {clients === undefined ? (
-                <Skeleton className="h-8" />
-              ) : (
-                <>
-                  <label className="field-label">
-                    Account *
-                    <SearchSelect
-                      name="clientId"
-                      form="event-create-form"
-                      value={clientId}
-                      onChange={setClientId}
-                      required
-                      placeholder={`Search ${activeClients.length} clients by name or email…`}
-                      emptyText={
-                        canCreateClient
-                          ? "No client matches - create one below."
-                          : "No client matches."
-                      }
-                      onCreate={
-                        canCreateClient
-                          ? (name) => setInlineCreate({ kind: "client", name })
-                          : undefined
-                      }
-                      createLabel={(name) => `Create client “${name}”`}
-                      testId="event-create-client"
-                      recentsKey="client"
-                      options={clientOptions}
-                    />
-                  </label>
-                  {activeClients.length === 0 ? (
-                    <p className="text-sm text-ink-3">
-                      No active client accounts are available.
-                    </p>
-                  ) : null}
-                  {!clientId ? (
-                    <p className="text-sm text-ink-3" role="status">
-                      Pick a client for this event.
-                    </p>
-                  ) : null}
-                </>
-              )}
+              <label className="field-label">
+                Account *
+                <ClientSearchSelect
+                  name="clientId"
+                  form="event-create-form"
+                  value={clientId}
+                  onChange={setClientId}
+                  required
+                  placeholder="Search clients by name…"
+                  emptyText={
+                    canCreateClient
+                      ? "No client matches - create one below."
+                      : "No client matches."
+                  }
+                  onCreate={
+                    canCreateClient
+                      ? (name) => setInlineCreate({ kind: "client", name })
+                      : undefined
+                  }
+                  createLabel={(name) => `Create client “${name}”`}
+                  testId="event-create-client"
+                  extraOptions={temporaryClient ? [temporaryClient] : undefined}
+                />
+              </label>
+              {!clientId ? (
+                <p className="text-sm text-ink-3" role="status">
+                  Pick a client for this event.
+                </p>
+              ) : null}
             </div>
           </Section>
 
@@ -1206,17 +1203,11 @@ export function EventCreatePage() {
               existingOptions={
                 inlineCreate.kind === "client"
                   ? [
-                      ...activeClients.map((client) => ({
+                      ...(similarClients ?? []).map((client) => ({
                         id: client._id,
-                        label: clientDisplayName(client._id, activeClients),
-                        email: client.email,
+                        label: clientDisplayName(client._id, [client]),
                       })),
-                      ...(temporaryClient &&
-                      !activeClients.some(
-                        (client) => client._id === temporaryClient.id,
-                      )
-                        ? [temporaryClient]
-                        : []),
+                      ...(temporaryClient ? [temporaryClient] : []),
                     ]
                   : [
                       ...activeVenues.map((venue) => ({

@@ -7,6 +7,7 @@ import {
   useCreateProposal,
   useLeadClose,
   useLeadConfirmConversion,
+  useLeadRecordFirstReply,
   useLeadReopen,
   useLeadConfirmProposalSent,
   useLeadStageConversion,
@@ -74,6 +75,7 @@ interface LeadRow {
   proposalLinkedAt?: number | null;
   closedAt?: number | null;
   closeReason?: string | null;
+  firstRepliedAt?: number | null;
   deletedAt?: number | null;
 }
 
@@ -147,6 +149,7 @@ export function LeadPipelinePage() {
   const confirmProposalSent = useLeadConfirmProposalSent();
   const closeLead = useLeadClose();
   const reopenLead = useLeadReopen();
+  const recordFirstReply = useLeadRecordFirstReply();
   // Only the proposals the loaded leads point at (accepted = booked).
   const proposals = useProposalsByIds(
     leads?.map((lead) => (lead.proposalId ? String(lead.proposalId) : null)),
@@ -183,6 +186,17 @@ export function LeadPipelinePage() {
     (lead) => lead.closedAt != null || isBooked(lead),
   );
   const closedCount = closedLeads.length;
+
+  // The owner's sales audit: answer a new inquiry within 4 hours. Staff
+  // answer their usual way and press this; the Proposals page counts it.
+  const markReplied = (lead: LeadRow) =>
+    void run(`${lead._id}:reply`, async () => {
+      await recordFirstReply({
+        docId: lead._id as Id<"leads">,
+        version: lead.version,
+      });
+      setNotice(`${leadName(lead)} marked answered.`);
+    });
 
   const askClose = (lead: LeadRow) => {
     void (async () => {
@@ -704,8 +718,25 @@ export function LeadPipelinePage() {
                     {lead.notes ? (
                       <p className="lead-card-notes">{lead.notes}</p>
                     ) : null}
+                    {lead.firstRepliedAt ? (
+                      <p className="lead-card-contact">
+                        Answered {formatDate(lead.firstRepliedAt)}
+                      </p>
+                    ) : null}
 
                     <div className="lead-card-actions">
+                      {lead.firstRepliedAt ? null : (
+                        <button
+                          className="btn btn-secondary"
+                          type="button"
+                          onClick={() => markReplied(lead)}
+                          disabled={busy != null}
+                        >
+                          {busy === `${lead._id}:reply`
+                            ? "Saving…"
+                            : "Mark replied"}
+                        </button>
+                      )}
                       <button
                         className="btn btn-ghost"
                         type="button"

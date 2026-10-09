@@ -30,7 +30,13 @@ export function splitBeoNoteSections(blob: string): Record<string, string> {
   found.forEach((entry, position) => {
     const start = entry.index + entry.heading.length;
     const end = found[position + 1]?.index ?? blob.length;
-    const text = blob.slice(start, end).trim();
+    // The decor heading wraps: "Decor Collection / Linen" then "Color".
+    const section = blob.slice(start, end);
+    const text = (
+      entry.heading.endsWith("Linen")
+        ? section.replace(/^\s*Color\b:?/, "")
+        : section
+    ).trim();
     if (text.length > 0) sections[entry.heading] = text;
   });
   return sections;

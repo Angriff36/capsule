@@ -14,10 +14,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useWholeDishList } from "../../lib/useDishesByIds";
 import { useProposalPictureUrls } from "../../lib/useProposalPictureUrls";
-import {
-  useClientDirectory,
-  useReadClient,
-} from "../../lib/useClientDirectory";
+import { useClientsByIds, useReadClient } from "../../lib/useClientDirectory";
 import { type Id } from "../../lib/api";
 import {
   useEventTimelineActivities,
@@ -36,6 +33,8 @@ import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatDate, formatMoneyExact, formatTime } from "../../lib/format";
 import { useEmailProposal } from "../../lib/proposalEmailActions";
 import { ProposalEmailHistory } from "./ProposalEmailHistory";
+import { ProposalFollowUps } from "./ProposalFollowUps";
+import { SalesHabits } from "./SalesHabits";
 import { clientDisplayName } from "../events/clientName";
 import { useEventRecordsById } from "../facilities/useEventsById";
 import { eventCreatePath, eventDetailPath } from "../events/eventRoutes";
@@ -121,8 +120,6 @@ export function ProposalsPage() {
           ],
     [openProposals, proposalPages.rows],
   );
-  // Names only; the signature request reads the one client's email.
-  const clients = useClientDirectory();
   const readClient = useReadClient();
   const readClientEvents = useReadClientEvents();
   // The events the listed proposals are linked to, and nothing else.
@@ -177,12 +174,6 @@ export function ProposalsPage() {
   const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
 
-  const activeClients = (clients ?? []).filter(
-    (row) =>
-      row.deletedAt == null &&
-      row.registeredAt != null &&
-      String(row.status) === "active",
-  );
   // Newest captured revision for a proposal (the immutable revision a share link
   // pins to) and the proposal's active share link, if any (spec §4.6).
   const latestRevisionFor = (proposalId: string) =>
@@ -239,6 +230,12 @@ export function ProposalsPage() {
     singleFromEvent && singleFromEvent.deletedAt == null
       ? singleFromEvent
       : undefined;
+  // Names of these proposals' clients and the source event's only; the
+  // signature request reads the one client's email; the form's picker searches.
+  const clients = useClientsByIds([
+    ...(proposals ?? []).map((row) => row.clientId),
+    fromEvent?.clientId,
+  ]);
 
   const [pricingOpenFor, setPricingOpenFor] = useState<string | null>(null);
   const [enhancementsOpenFor, setEnhancementsOpenFor] = useState<string | null>(
@@ -835,12 +832,24 @@ export function ProposalsPage() {
         open={showDraft}
         fromEvent={fromEvent}
         clients={clients}
-        activeClients={activeClients}
         busy={busy}
         run={run}
         onFailure={setFailure}
         onNotice={setNotice}
         onClose={() => setShowDraft(false)}
+      />
+
+      <ProposalFollowUps
+        proposals={openProposals}
+        clients={clients}
+        onOpen={(proposalId) => setSearchParams({ proposal: proposalId })}
+        onNotice={setNotice}
+        onFailure={setFailure}
+      />
+
+      <SalesHabits
+        clients={clients}
+        onOpen={(proposalId) => setSearchParams({ proposal: proposalId })}
       />
 
       <section className="working-ledger">

@@ -77,22 +77,37 @@ export const getPublicMenu = query({
     ).filter((m) => m.deletedAt == null && m.status === "published");
     if (menus.length === 0) return [];
 
+    // Only the published menus' lines and their dishes; never the whole
+    // dish catalog (5,800 dishes on live) for each visitor.
     const lines = (
-      await ctx.db
-        .query("menuDishes")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .collect()
-    ).filter((md) => md.deletedAt == null && md.addedAt != null);
-    const dishes = new Map(
-      (
-        await ctx.db
-          .query("dishes")
-          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-          .collect()
+      await Promise.all(
+        menus.map((menu) =>
+          ctx.db
+            .query("menuDishes")
+            .withIndex("by_menuId", (q) => q.eq("menuId", menu._id))
+            .collect(),
+        ),
       )
-        .filter((d) => d.deletedAt == null && d.status === "active")
-        .map((d) => [d._id as string, d]),
-    );
+    )
+      .flat()
+      .filter(
+        (md) =>
+          md.tenantId === tenantId &&
+          md.deletedAt == null &&
+          md.addedAt != null,
+      );
+    const dishes = new Map<string, Doc<"dishes">>();
+    for (const dishId of new Set(lines.map((md) => md.dishId)))
+      if (!dishes.has(String(dishId))) {
+        const dish = await ctx.db.get(dishId);
+        if (
+          dish &&
+          dish.tenantId === tenantId &&
+          dish.deletedAt == null &&
+          dish.status === "active"
+        )
+          dishes.set(String(dish._id), dish);
+      }
 
     // Allergens from each listed dish's recipe (ingredients and recipe marks)
     // plus the ones typed on the dish: a guest must never see fewer.

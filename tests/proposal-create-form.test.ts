@@ -47,6 +47,17 @@ vi.mock("convex/react", () => ({ useMutation: () => draftMutation }));
 vi.mock("../src/lib/manifest-convex-react", () => ({
   useListProposalTemplate: () => templates,
 }));
+// The client picker searches the server; here it finds the one test client.
+vi.mock("../src/lib/useClientDirectory", () => {
+  const rows = [
+    { _id: "client-1", clientType: "company", companyName: "Client" },
+  ];
+  return {
+    useClientSearch: () => rows,
+    useClientsByIds: (ids: unknown) =>
+      Array.isArray(ids) ? rows.filter((row) => ids.includes(row._id)) : [],
+  };
+});
 vi.mock("../src/features/clients/useCatalogDishes", () => ({
   useCatalogDishes: () => ({ loading: false, lines: [] }),
 }));
@@ -76,9 +87,6 @@ beforeEach(async () => {
         open: true,
         fromEvent: undefined,
         clients: [
-          { _id: "client-1", clientType: "company", companyName: "Client" },
-        ],
-        activeClients: [
           { _id: "client-1", clientType: "company", companyName: "Client" },
         ],
         busy: null,
@@ -235,7 +243,6 @@ describe("ProposalCreateForm template state", () => {
           open: true,
           fromEvent: undefined,
           clients: [],
-          activeClients: [{ _id: "client-1" }],
           busy: null,
           run: async (_key: string, work: () => Promise<void>) => work(),
           onFailure: vi.fn(),
@@ -297,7 +304,6 @@ describe("ProposalCreateForm template state", () => {
           open: true,
           fromEvent: undefined,
           clients: [],
-          activeClients: [{ _id: "client-1" }],
           busy: null,
           run: async (_key: string, work: () => Promise<void>) => work(),
           onFailure: vi.fn(),
@@ -341,7 +347,6 @@ describe("ProposalCreateForm from an event (PL-CATALOGS AC-221, AC-222)", () => 
             serviceStyleName: "Full Service",
           },
           clients: [],
-          activeClients: [{ _id: "client-1" }],
           busy: null,
           run: async (_key: string, work: () => Promise<void>) => work(),
           onFailure: vi.fn(),

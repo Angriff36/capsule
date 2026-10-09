@@ -1,8 +1,6 @@
 import { useState, type FormEvent } from "react";
-import type { Doc } from "../../lib/api";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
-import { SearchSelect } from "../../ui/SearchSelect";
-import { clientDisplayName } from "../events/clientName";
+import { ClientSearchSelect } from "../clients/ClientSearchSelect";
 import { DateHoldCollisionNotice } from "./DateHoldCollisionNotice";
 import { DEFAULT_HOLD_DAYS } from "./dateHolds";
 
@@ -16,11 +14,9 @@ export interface DateHoldFormValues {
 
 /** One form for both a soft hold and a waitlist spot on a date. */
 export function DateHoldForm({
-  clients,
   busy,
   onSubmit,
 }: {
-  clients: Doc<"clients">[] | undefined;
   busy: boolean;
   onSubmit: (values: DateHoldFormValues) => Promise<boolean>;
 }) {
@@ -45,8 +41,6 @@ export function DateHoldForm({
       setNote("");
     }
   };
-
-  const liveClients = (clients ?? []).filter((c) => c.deletedAt == null);
 
   return (
     <form
@@ -80,18 +74,10 @@ export function DateHoldForm({
         </label>
         <label className="field-label">
           Client
-          <SearchSelect
+          <ClientSearchSelect
             value={clientId}
             onChange={setClientId}
-            recentsKey="client"
             placeholder="Prospect, no client yet — or search…"
-            options={liveClients.map((client) => ({
-              id: client._id,
-              label: clientDisplayName(client._id, [client]),
-              hint:
-                [client.email, client.phone].filter(Boolean).join(" · ") ||
-                null,
-            }))}
           />
         </label>
         <label className="field-label">

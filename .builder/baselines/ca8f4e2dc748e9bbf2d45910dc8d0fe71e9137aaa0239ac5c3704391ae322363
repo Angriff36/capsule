@@ -2423,6 +2423,8 @@ export const LeadSchema = z.object({
   eventType: z.string().nullable().optional(),
   closedAt: z.coerce.date().nullable().optional(),
   closeReason: z.string().nullable().optional(),
+  firstRepliedAt: z.coerce.date().nullable().optional(),
+  firstRepliedById: z.string().nullable().optional(),
   clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
   mergeTargetClientId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -3545,6 +3547,11 @@ export const ProposalSchema = z.object({
   supersededById: z.string().uuid().nullable().optional(),
   replacesProposalId: z.string().uuid().nullable().optional(),
   generationJson: z.string().nullable().optional(),
+  followUpStep: z.number().int().nullable().optional(),
+  followUpAt: z.coerce.date().nullable().optional(),
+  followUpById: z.string().nullable().optional(),
+  priceObjectionAt: z.coerce.date().nullable().optional(),
+  priceObjectionById: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -9434,6 +9441,11 @@ export const LeadReassignClientParamsSchema = z.object({});
 
 export type LeadReassignClientParams = z.infer<typeof LeadReassignClientParamsSchema>;
 
+// Command: recordFirstReply on Lead
+export const LeadRecordFirstReplyParamsSchema = z.object({});
+
+export type LeadRecordFirstReplyParams = z.infer<typeof LeadRecordFirstReplyParamsSchema>;
+
 // Command: recordSourceHistory on Lead
 export const LeadRecordSourceHistoryParamsSchema = z.object({
   stage: z.enum(["new", "qualified", "proposalSent", "negotiating"]),
@@ -11412,6 +11424,13 @@ export const ProposalReassignClientParamsSchema = z.object({});
 
 export type ProposalReassignClientParams = z.infer<typeof ProposalReassignClientParamsSchema>;
 
+// Command: recordFollowUp on Proposal
+export const ProposalRecordFollowUpParamsSchema = z.object({
+  step: z.number(),
+});
+
+export type ProposalRecordFollowUpParams = z.infer<typeof ProposalRecordFollowUpParamsSchema>;
+
 // Command: recordHistoricalAcceptance on Proposal
 export const ProposalRecordHistoricalAcceptanceParamsSchema = z.object({
   source: z.string(),
@@ -11419,6 +11438,11 @@ export const ProposalRecordHistoricalAcceptanceParamsSchema = z.object({
 });
 
 export type ProposalRecordHistoricalAcceptanceParams = z.infer<typeof ProposalRecordHistoricalAcceptanceParamsSchema>;
+
+// Command: recordPriceObjection on Proposal
+export const ProposalRecordPriceObjectionParamsSchema = z.object({});
+
+export type ProposalRecordPriceObjectionParams = z.infer<typeof ProposalRecordPriceObjectionParamsSchema>;
 
 // Command: refreshFromEvent on Proposal
 export const ProposalRefreshFromEventParamsSchema = z.object({

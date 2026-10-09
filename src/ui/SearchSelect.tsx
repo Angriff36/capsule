@@ -48,6 +48,8 @@ type Props = {
   maxVisible?: number;
   /** Starts an external, portal-backed create flow for the current no-match query. */
   onCreate?: (query: string) => void;
+  /** Told the typed text, for pickers whose options come from a server search. */
+  onQueryChange?: (query: string) => void;
   createLabel?: (query: string) => string;
 };
 
@@ -75,12 +77,16 @@ export function SearchSelect({
   maxVisible = 40,
   onCreate,
   createLabel = (query) => `Create “${query}”`,
+  onQueryChange,
 }: Props) {
   const listId = useId();
   const [internalValue, setInternalValue] = useState(defaultValue);
   const value = controlledValue ?? internalValue;
   const [recentIds, setRecentIds] = useState(() => readRecents(recentsKey));
   const [query, setQuery] = useState("");
+  useEffect(() => {
+    onQueryChange?.(query);
+  }, [query, onQueryChange]);
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const rootRef = useRef<HTMLDivElement>(null);

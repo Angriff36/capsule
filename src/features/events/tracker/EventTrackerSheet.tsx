@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useClientDirectory } from "../../../lib/useClientDirectory";
+import { useClientsByIds } from "../../../lib/useClientDirectory";
 import { useSearchParams } from "react-router-dom";
 import { useAuthStatus } from "../../../lib/useAuthStatus";
 import { resolveManifestPolicies } from "../../admin/rolePermissionAudit";
@@ -56,7 +56,10 @@ export function EventTrackerSheet() {
     [bounds.start, bounds.end],
   );
   const events = useEventRecordsInRange(monthWindow);
-  const clients = useClientDirectory();
+  // Only the clients of the shown month's events.
+  const clients = useClientsByIds(
+    (events ?? []).map((event) => event.clientId),
+  );
   // Invoices of the shown month's events only.
   const invoices = useInvoicesForEvents(events?.map((event) => event._id));
   // Pack lists, questions, trucks and numbers of the shown month's events.

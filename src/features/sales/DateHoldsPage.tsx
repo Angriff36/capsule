@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useClientDirectory } from "../../lib/useClientDirectory";
+import { useClientsByIds } from "../../lib/useClientDirectory";
 import { Link } from "react-router-dom";
 import type { Doc } from "../../lib/api";
 import {
@@ -54,7 +54,10 @@ export function DateHoldsPage() {
   const board = useDatesFrom(localDateKey(Date.now()));
   const holds = board?.holds;
   const waitlist = board?.waitlist;
-  const clients = useClientDirectory();
+  // Only the clients holding these dates; the form's picker searches.
+  const clients = useClientsByIds(
+    [...(holds ?? []), ...(waitlist ?? [])].map((row) => row.clientId),
+  );
   const leads = useLeadsForClients(
     holds?.map((hold) => (hold.clientId ? String(hold.clientId) : null)),
   );
@@ -216,7 +219,7 @@ export function DateHoldsPage() {
         </div>
       ))}
 
-      <DateHoldForm clients={clients} busy={busy} onSubmit={submit} />
+      <DateHoldForm busy={busy} onSubmit={submit} />
 
       {dates.length === 0 ? (
         <EmptyState

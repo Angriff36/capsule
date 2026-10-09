@@ -1,4 +1,4 @@
-import { useClientDirectory } from "../../lib/useClientDirectory";
+import { useClientsByIds } from "../../lib/useClientDirectory";
 import { SearchSelect } from "../../ui/SearchSelect";
 import {
   useMemo,
@@ -168,7 +168,10 @@ export function EventTrackerPage() {
     [today, laterDays],
   );
   const events = useEventRecordsInRange(eventWindow);
-  const clients = useClientDirectory();
+  // Only the clients of the events on the board.
+  const clients = useClientsByIds(
+    (events ?? []).map((event) => event.clientId),
+  );
   const venues = useListVenue();
   // Deliveries, invoices, trucks and numbers of the events on the board only.
   const trackerRows = useTrackerRows(events?.map((event) => event._id));

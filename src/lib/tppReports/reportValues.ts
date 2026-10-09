@@ -213,7 +213,12 @@ function splitStreetAndCity(value: string): {
   street?: string;
   city?: string;
 } {
-  const text = splitJoinedWords(value);
+  // A street type printed in capitals runs into the city on the next line:
+  // "N 16th STDalton Garden".
+  const text = splitJoinedWords(value).replace(
+    /\b(ST|AVE|RD|DR|BLVD|LN|WAY|CT|CIR|PL|PKWY|HWY|TER|TRL|LOOP)(?=[A-Z][a-z])/g,
+    "$1 ",
+  );
   STREET_SUFFIX.lastIndex = 0;
   let boundary = -1;
   for (const match of text.matchAll(STREET_SUFFIX)) {

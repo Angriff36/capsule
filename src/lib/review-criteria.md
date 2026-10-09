@@ -21,3 +21,4 @@ Columns:
 | TONE-01 | Welcome copy is warm and conversational for design professionals while conveying the value prop   | —                     | fast         |
 | UX-01   | Layout demonstrates clear visual hierarchy with one obvious primary action                        | ./tmp/dashboard.png   | fast         |
 | BRAND-01| Visual design reads as professional brand identity for financial services without corporate sterility | ./tmp/homepage.png | smart        |
+| MANGIA-01 | The Capsule Mangia page keeps the Round 4 report's visual hierarchy: title and subtitle, section order and names, headline figures in bordered cards with label and detail lines, similar density | .artifacts/llm-review/AC-310-side-by-side.png | smart |

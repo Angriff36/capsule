@@ -6,6 +6,7 @@ import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { clientDisplayName } from "./clientName";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
+import { ClientSearchSelect } from "../clients/ClientSearchSelect";
 
 /** Finishes the existing captured draft through the normal planning command. */
 export function CompleteDraftPlanningPanel({
@@ -93,27 +94,12 @@ export function CompleteDraftPlanningPanel({
         <fieldset disabled={busy} className="grid gap-3 sm:grid-cols-2">
           <label className="field-label">
             Client
-            <select
+            <ClientSearchSelect
               name="clientId"
-              className="input"
               required
               defaultValue={event.clientId ?? ""}
-              disabled={clients === undefined}
-            >
-              <option value="">Select client</option>
-              {(clients ?? [])
-                .filter(
-                  (client) =>
-                    client.deletedAt == null &&
-                    (client.status === "active" ||
-                      client._id === event.clientId),
-                )
-                .map((client) => (
-                  <option key={client._id} value={client._id}>
-                    {clientDisplayName(client._id, clients)}
-                  </option>
-                ))}
-            </select>
+              aria-label="Client"
+            />
           </label>
           <label className="field-label">
             Event title

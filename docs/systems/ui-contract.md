@@ -19,7 +19,7 @@ Shared rules for every area:
 
 ## 1. Lead and client
 
-Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEditForm.tsx`, `clients/ClientContactsPanel.tsx`, `clients/ClientDetailPage.tsx`, `clients/ClientDuplicateReview.tsx`, `clients/ClientEmailPreferencePanel.tsx`, `clients/ClientPreviewCard.tsx`, `clients/ClientProfilePanel.tsx`, `clients/ClientRetentionPage.tsx`, `clients/ClientSourceProvenancePanel.tsx`, `clients/ClientsPage.tsx`, `clients/ClientsWorkspaceNav.tsx`, `clients/contactDedup.ts`, `clients/ContractDocumentPage.tsx`, `clients/ContractsPage.tsx`, `clients/CrmFailureBanner.tsx`, `clients/LeadDetailsForm.tsx`, `clients/LeadPipelinePage.tsx`, `clients/LeadSourceReport.tsx`, `sales/MessageInboxPage.tsx`, `sales/PasteIncomingMessageForm.tsx`, `sales/QuoteSubmissionPage.tsx`, `sales/QuoteSubmissionsReviewPage.tsx`, `sales/SyncErrorsPanel.tsx`
+Screens (25): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEditForm.tsx`, `clients/ClientContactsPanel.tsx`, `clients/ClientDetailPage.tsx`, `clients/ClientDuplicateReview.tsx`, `clients/ClientEmailPreferencePanel.tsx`, `clients/ClientPreviewCard.tsx`, `clients/ClientProfilePanel.tsx`, `clients/ClientRetentionPage.tsx`, `clients/ClientSearchSelect.tsx`, `clients/ClientSourceProvenancePanel.tsx`, `clients/ClientsPage.tsx`, `clients/ClientsWorkspaceNav.tsx`, `clients/contactDedup.ts`, `clients/ContractDocumentPage.tsx`, `clients/ContractsPage.tsx`, `clients/CrmFailureBanner.tsx`, `clients/LeadDetailsForm.tsx`, `clients/LeadPipelinePage.tsx`, `clients/LeadSourceReport.tsx`, `sales/MessageInboxPage.tsx`, `sales/PasteIncomingMessageForm.tsx`, `sales/QuoteSubmissionPage.tsx`, `sales/QuoteSubmissionsReviewPage.tsx`, `sales/SyncErrorsPanel.tsx`
 
 ### Generated reads
 
@@ -258,6 +258,13 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
   - refusals (role, stage and rules): "Sales staff may see leads"; "Sales staff may update leads"; "Sales staff may change leads"; "Guard 0 failed"; "Guard 1 failed"; "Give a company name for a company lead, or a given name for a person lead"; and 3 more
   - effects: LeadCaptured
   - refresh: live reads update by themselves; reads affected: Lead.list, Lead.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 14 more
+- `mutations.Lead_recordFirstReply` (Lead.recordFirstReply)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see leads"; "Sales staff may update leads"; "Sales staff may change leads"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: LeadFirstReplyRecorded
+  - refresh: live reads update by themselves; reads affected: Lead.list, Lead.get, Client.list, Client.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 14 more
 - `mutations.Lead_reopen` (Lead.reopen)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -368,8 +375,11 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `clientDirectory.byIds` - query; live read, updates by itself
+- `clientDirectory.contactsPage` - query; live read, updates by itself
 - `clientDirectory.list` - query; live read, updates by itself
 - `clientDirectory.listWithContacts` - query; live read, updates by itself
+- `clientDirectory.search` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself
@@ -398,7 +408,7 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 
 ## 2. Proposal
 
-Screens (35): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposalSourceCard.tsx`, `clients/ProposalAcceptancePage.tsx`, `clients/ProposalBrandRow.tsx`, `clients/ProposalChangeAction.tsx`, `clients/ProposalChangeLabel.tsx`, `clients/ProposalCreateForm.tsx`, `clients/ProposalDraftCheck.tsx`, `clients/ProposalEmailHistory.tsx`, `clients/ProposalEnhancementsPanel.tsx`, `clients/ProposalHistoricalAcceptance.tsx`, `clients/ProposalMenuSelectionPanel.tsx`, `clients/ProposalPaymentScheduleList.tsx`, `clients/ProposalPaymentSchedulePanel.tsx`, `clients/proposalPdf.ts`, `clients/proposalPdfProjection.ts`, `clients/ProposalPricingPanel.tsx`, `clients/ProposalReadinessNotice.tsx`, `clients/proposalSignatureRequest.ts`, `clients/ProposalsPage.tsx`, `clients/proposalTemplateDefaults.ts`, `clients/ProposalTemplateServiceStyleField.tsx`, `clients/ProposalTemplatesPage.tsx`, `clients/ProposalTermsPanel.tsx`, `clients/ProposalTravelFee.tsx`, `clients/SharedProposalPage.tsx`, `clients/useCatalogDishes.ts`, `clients/useCreateEventFromProposal.ts`, `clients/useSendProposalWithRevisionCapture.ts`, `clients/useStartProposalChange.ts`, `sales/ProposalSignatureRevokeAction.tsx`, `sales/PublicMenuPage.tsx`, `sales/QuoteEstimatePanel.tsx`, `sales/QuoteMenuChoice.tsx`, `sales/QuoteRequestPicks.tsx`
+Screens (36): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposalSourceCard.tsx`, `clients/ProposalAcceptancePage.tsx`, `clients/ProposalBrandRow.tsx`, `clients/ProposalChangeAction.tsx`, `clients/ProposalChangeLabel.tsx`, `clients/ProposalCreateForm.tsx`, `clients/ProposalDraftCheck.tsx`, `clients/ProposalEmailHistory.tsx`, `clients/ProposalEnhancementsPanel.tsx`, `clients/ProposalFollowUps.tsx`, `clients/ProposalHistoricalAcceptance.tsx`, `clients/ProposalMenuSelectionPanel.tsx`, `clients/ProposalPaymentScheduleList.tsx`, `clients/ProposalPaymentSchedulePanel.tsx`, `clients/proposalPdf.ts`, `clients/proposalPdfProjection.ts`, `clients/ProposalPricingPanel.tsx`, `clients/ProposalReadinessNotice.tsx`, `clients/proposalSignatureRequest.ts`, `clients/ProposalsPage.tsx`, `clients/proposalTemplateDefaults.ts`, `clients/ProposalTemplateServiceStyleField.tsx`, `clients/ProposalTemplatesPage.tsx`, `clients/ProposalTermsPanel.tsx`, `clients/ProposalTravelFee.tsx`, `clients/SharedProposalPage.tsx`, `clients/useCatalogDishes.ts`, `clients/useCreateEventFromProposal.ts`, `clients/useSendProposalWithRevisionCapture.ts`, `clients/useStartProposalChange.ts`, `sales/ProposalSignatureRevokeAction.tsx`, `sales/PublicMenuPage.tsx`, `sales/QuoteEstimatePanel.tsx`, `sales/QuoteMenuChoice.tsx`, `sales/QuoteRequestPicks.tsx`
 
 ### Generated reads
 
@@ -538,6 +548,20 @@ Screens (35): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
   - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: ProposalViewed
   - refresh: live reads update by themselves; reads affected: Proposal.list, Proposal.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 18 more
+- `mutations.Proposal_recordFollowUp` (Proposal.recordFollowUp)
+  - inputs from the screen: step; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "Pick follow-up 1, 2 or 3."; and 2 more
+  - effects: ProposalFollowUpRecorded
+  - refresh: live reads update by themselves; reads affected: Proposal.list, Proposal.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 18 more
+- `mutations.Proposal_recordPriceObjection` (Proposal.recordPriceObjection)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
+  - effects: ProposalPriceObjectionRecorded
+  - refresh: live reads update by themselves; reads affected: Proposal.list, Proposal.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 18 more
 - `mutations.Proposal_reviseDraft` (Proposal.reviseDraft)
   - inputs from the screen: title, terms, notes, expiresAt; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -585,8 +609,11 @@ Screens (35): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `clientDirectory.byIds` - query; live read, updates by itself
+- `clientDirectory.contactsPage` - query; live read, updates by itself
 - `clientDirectory.list` - query; live read, updates by itself
 - `clientDirectory.listWithContacts` - query; live read, updates by itself
+- `clientDirectory.search` - query; live read, updates by itself
 - `dishLookup.byIds` - query; live read, updates by itself
 - `dishLookup.exclusiveToVenue` - query; live read, updates by itself
 - `dishLookup.page` - query; live read, updates by itself
@@ -1332,8 +1359,11 @@ Screens (67): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `clientDirectory.byIds` - query; live read, updates by itself
+- `clientDirectory.contactsPage` - query; live read, updates by itself
 - `clientDirectory.list` - query; live read, updates by itself
 - `clientDirectory.listWithContacts` - query; live read, updates by itself
+- `clientDirectory.search` - query; live read, updates by itself
 - `commandReceipts.latestCascadeReceipt` - query; live read, updates by itself
 - `culinaryDemand.addNestedRecipeLine` - mutation; authored step; live reads update by themselves
 - `culinaryDemand.applyDemandHeadcount` - mutation; authored step; live reads update by themselves
@@ -5059,8 +5089,11 @@ Screens (70): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `clientDirectory.byIds` - query; live read, updates by itself
+- `clientDirectory.contactsPage` - query; live read, updates by itself
 - `clientDirectory.list` - query; live read, updates by itself
 - `clientDirectory.listWithContacts` - query; live read, updates by itself
+- `clientDirectory.search` - query; live read, updates by itself
 - `closeoutSources.captureCloseoutFromSources` - mutation; authored step; live reads update by themselves
 - `closeoutSources.closeoutResults` - query; live read, updates by itself
 - `closeoutSources.correctCloseoutFromSources` - mutation; authored step; live reads update by themselves

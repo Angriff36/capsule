@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { useClientDirectory } from "../../lib/useClientDirectory";
+import { useClientsByIds } from "../../lib/useClientDirectory";
 import { Link } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import {
@@ -21,6 +21,7 @@ import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { PaymentMethodLifecyclePolicy } from "./PaymentMethodLifecyclePolicy";
 import { useActionNotice } from "../../ui/action-result";
+import { ClientSearchSelect } from "../clients/ClientSearchSelect";
 
 const policy = new PaymentMethodLifecyclePolicy();
 
@@ -30,7 +31,6 @@ type MethodType = (typeof METHOD_TYPES)[number];
 
 export function PaymentMethodsPage() {
   const methods = useListPaymentMethod();
-  const clients = useClientDirectory();
   const createMethod = useCreatePaymentMethod();
   const makeDefault = usePaymentMethodMakeDefault();
   const clearDefault = usePaymentMethodClearDefault();
@@ -45,9 +45,8 @@ export function PaymentMethodsPage() {
   const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
 
-  const registeredClients = (clients ?? []).filter(
-    (row) => row.deletedAt == null && row.registeredAt != null,
-  );
+  // Only the clients these methods belong to; the form's picker searches.
+  const clients = useClientsByIds((methods ?? []).map((row) => row.clientId));
   const activeRows = (methods ?? []).filter(
     (row) => row.deletedAt == null && row.registeredAt != null,
   );
@@ -197,87 +196,57 @@ export function PaymentMethodsPage() {
               <h2>New payment method</h2>
             </div>
           </div>
-          {registeredClients.length === 0 ? (
-            <p className="text-base text-ink-2">
-              No registered clients.{" "}
-              <Link className="text-link" to={CLIENTS_ROUTES.root}>
-                Register a client
-              </Link>{" "}
-              first.
-            </p>
-          ) : (
-            <>
-              <label className="field-label">
-                Client
-                <select
-                  className="input"
-                  name="clientId"
-                  required
-                  defaultValue=""
-                >
-                  <option value="" disabled>
-                    Select client
+          <label className="field-label">
+            Client
+            <ClientSearchSelect name="clientId" required aria-label="Client" />
+          </label>
+          <div className="supply-form-grid">
+            <label className="field-label">
+              Type
+              <select className="input" name="methodType" defaultValue="card">
+                {METHOD_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
                   </option>
-                  {registeredClients.map((client) => (
-                    <option key={client._id} value={client._id}>
-                      {clientDisplayName(client._id, clients)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div className="supply-form-grid">
-                <label className="field-label">
-                  Type
-                  <select
-                    className="input"
-                    name="methodType"
-                    defaultValue="card"
-                  >
-                    {METHOD_TYPES.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="field-label">
-                  Provider
-                  <input
-                    className="input"
-                    name="provider"
-                    placeholder="e.g. Visa"
-                  />
-                </label>
-                <label className="field-label">
-                  Last four
-                  <input
-                    className="input"
-                    name="lastFour"
-                    maxLength={4}
-                    placeholder="1234"
-                    autoComplete="off"
-                  />
-                </label>
-              </div>
-              <label className="supply-check">
-                <input name="isDefault" type="checkbox" />
-                Set as default for this client
-              </label>
-              <label className="field-label">
-                Notes
-                <textarea className="input" name="notes" rows={2} />
-              </label>
-              <div className="supply-row-actions">
-                <button
-                  className="btn btn-primary"
-                  type="submit"
-                  disabled={busy != null}
-                >
-                  {busy === "register-method" ? "Registering…" : "Register"}
-                </button>
-              </div>
-            </>
-          )}
+                ))}
+              </select>
+            </label>
+            <label className="field-label">
+              Provider
+              <input
+                className="input"
+                name="provider"
+                placeholder="e.g. Visa"
+              />
+            </label>
+            <label className="field-label">
+              Last four
+              <input
+                className="input"
+                name="lastFour"
+                maxLength={4}
+                placeholder="1234"
+                autoComplete="off"
+              />
+            </label>
+          </div>
+          <label className="supply-check">
+            <input name="isDefault" type="checkbox" />
+            Set as default for this client
+          </label>
+          <label className="field-label">
+            Notes
+            <textarea className="input" name="notes" rows={2} />
+          </label>
+          <div className="supply-row-actions">
+            <button
+              className="btn btn-primary"
+              type="submit"
+              disabled={busy != null}
+            >
+              {busy === "register-method" ? "Registering…" : "Register"}
+            </button>
+          </div>
         </form>
       ) : null}
 

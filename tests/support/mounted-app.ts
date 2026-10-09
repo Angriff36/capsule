@@ -340,6 +340,39 @@ vi.mock("convex/react", async (importOriginal) => {
         !backend.values.has(name)
       )
         return backend.values.get("useListClient") ?? [];
+      // Clients by id and by name (the pickers' server search) answer from
+      // the same client rows.
+      if (name === "queries:getClient" && !backend.values.has(name)) {
+        const id = (args as { id?: string } | undefined)?.id;
+        return (
+          (backend.values.get("useListClient") ?? []) as { _id: string }[]
+        ).find((row) => row._id === id);
+      }
+      if (name === "clientDirectory:byIds" && !backend.values.has(name)) {
+        const ids = new Set((args as { ids: string[] }).ids);
+        return (
+          (backend.values.get("useListClient") ?? []) as { _id: string }[]
+        ).filter((row) => ids.has(row._id));
+      }
+      if (name === "clientDirectory:search" && !backend.values.has(name)) {
+        const text = String((args as { text?: string }).text ?? "")
+          .trim()
+          .toLowerCase();
+        return (
+          (backend.values.get("useListClient") ?? []) as Record<
+            string,
+            unknown
+          >[]
+        ).filter(
+          (row) =>
+            !text ||
+            [row.companyName, row.givenName, row.familyName].some((part) =>
+              String(part ?? "")
+                .toLowerCase()
+                .includes(text),
+            ),
+        );
+      }
       // Events by id (convex/eventLookup.ts) answer from the same event
       // rows a test gives the generated list, unless the test sets its own.
       if (
@@ -1342,48 +1375,51 @@ vi.mock("convex/react", async (importOriginal) => {
       const rows =
         name === "eventLookup:reportPage" && !backend.values.has(name)
           ? backend.values.get("useListEvent")
-          : name === "dishLookup:page" && !backend.values.has(name)
-            ? backend.values.get("useListDish")
-            : name === "logisticsWindow:packListPage" &&
-                !backend.values.has(name)
-              ? (backend.values.get("useListPackList") ?? [])
-              : name.startsWith("inventoryWindow:") && !backend.values.has(name)
-                ? supplyPage(name, args)
-                : name.startsWith("workforceHistoryWindow:") &&
+          : name === "clientDirectory:contactsPage" && !backend.values.has(name)
+            ? backend.values.get("useListClient")
+            : name === "dishLookup:page" && !backend.values.has(name)
+              ? backend.values.get("useListDish")
+              : name === "logisticsWindow:packListPage" &&
+                  !backend.values.has(name)
+                ? (backend.values.get("useListPackList") ?? [])
+                : name.startsWith("inventoryWindow:") &&
                     !backend.values.has(name)
-                  ? (
-                      (backend.values.get(
-                        {
-                          "workforceHistoryWindow:candidatePage":
-                            "useListCandidate",
-                          "workforceHistoryWindow:oneOnOnePage":
-                            "useListOneOnOne",
-                          "workforceHistoryWindow:performanceReviewPage":
-                            "useListPerformanceReview",
-                          "workforceHistoryWindow:trainingCompletionPage":
-                            "useListTrainingCompletion",
-                          "workforceHistoryWindow:trainingSignOffPage":
-                            "useListTrainingSignOff",
-                          "workforceHistoryWindow:announcementPage":
-                            "useListAnnouncement",
-                        }[name] ?? name,
-                      ) ?? []) as { deletedAt?: number | null }[]
-                    ).filter((row) => row.deletedAt == null)
-                  : name.startsWith("workforceWindow:") &&
+                  ? supplyPage(name, args)
+                  : name.startsWith("workforceHistoryWindow:") &&
                       !backend.values.has(name)
                     ? (
                         (backend.values.get(
                           {
-                            "workforceWindow:timeRecordPage":
-                              "useListTimeRecord",
-                            "workforceWindow:availabilityWindowPage":
-                              "useListAvailabilityWindow",
-                            "workforceWindow:swapRequestPage":
-                              "useListShiftSwapRequest",
+                            "workforceHistoryWindow:candidatePage":
+                              "useListCandidate",
+                            "workforceHistoryWindow:oneOnOnePage":
+                              "useListOneOnOne",
+                            "workforceHistoryWindow:performanceReviewPage":
+                              "useListPerformanceReview",
+                            "workforceHistoryWindow:trainingCompletionPage":
+                              "useListTrainingCompletion",
+                            "workforceHistoryWindow:trainingSignOffPage":
+                              "useListTrainingSignOff",
+                            "workforceHistoryWindow:announcementPage":
+                              "useListAnnouncement",
                           }[name] ?? name,
                         ) ?? []) as { deletedAt?: number | null }[]
                       ).filter((row) => row.deletedAt == null)
-                    : backend.values.get(name);
+                    : name.startsWith("workforceWindow:") &&
+                        !backend.values.has(name)
+                      ? (
+                          (backend.values.get(
+                            {
+                              "workforceWindow:timeRecordPage":
+                                "useListTimeRecord",
+                              "workforceWindow:availabilityWindowPage":
+                                "useListAvailabilityWindow",
+                              "workforceWindow:swapRequestPage":
+                                "useListShiftSwapRequest",
+                            }[name] ?? name,
+                          ) ?? []) as { deletedAt?: number | null }[]
+                        ).filter((row) => row.deletedAt == null)
+                      : backend.values.get(name);
       return rows === undefined
         ? { results: [], status: "LoadingFirstPage", loadMore: () => {} }
         : { results: rows, status: "Exhausted", loadMore: () => {} };

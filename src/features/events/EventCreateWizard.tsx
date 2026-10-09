@@ -1,4 +1,4 @@
-import { useClientContacts } from "../../lib/useClientDirectory";
+import { useClientSearch, useClientsByIds } from "../../lib/useClientDirectory";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { formatMoney } from "../../lib/format";
@@ -37,6 +37,7 @@ import {
   type EventWizardStep,
 } from "./eventCreateWizardModel";
 import { DateHoldCollisionNotice } from "../sales/DateHoldCollisionNotice";
+import { ClientSearchSelect } from "../clients/ClientSearchSelect";
 
 const DRAFT_KEY = "capsule.event-create-wizard.active";
 /** An explicitly saved draft survives closing the tab; the active key is per tab. */
@@ -88,8 +89,7 @@ export function EventCreateWizard({
   onBusyChange?: (busy: boolean) => void;
 }) {
   const navigate = useNavigate();
-  const clients = useClientContacts(),
-    venues = useListVenue(),
+  const venues = useListVenue(),
     dishes = useListDish(),
     people = useListPerson();
   const commit = useEventWizardCommit();
@@ -101,6 +101,8 @@ export function EventCreateWizard({
     [busy, setBusy] = useState(false),
     [failure, setFailure] = useState(""),
     [savedAt, setSavedAt] = useState<Date | null>(null);
+  // Only the picked client; the picker searches the server.
+  const clients = useClientsByIds([draft.clientId]);
   const activeClients = useMemo(
     () =>
       (clients ?? []).filter(
@@ -602,6 +604,8 @@ function ClientHeadcountStep({
   // A client who is new is made right here, not on another page.
   const canCreateClient = useCanCreateInlineReference("client");
   const [newClientName, setNewClientName] = useState<string | null>(null);
+  // Clients named like the one being made, for the "use existing" check.
+  const similarClients = useClientSearch(newClientName ?? "");
   // The contact follows the client: a new client replaces the contact while
   // it is still the previous client's own name, but a name the user typed
   // stays. Read from the draft, so it holds across Back and Next.
@@ -619,16 +623,6 @@ function ClientHeadcountStep({
     id: string;
     label: string;
   } | null>(null);
-  const clientOptions = [
-    ...clients.map((client) => ({
-      id: String(client._id),
-      label: clientName(client),
-      hint: [client.email, client.phone].filter(Boolean).join(" · ") || null,
-    })),
-    ...(madeClient && !clients.some((client) => client._id === madeClient.id)
-      ? [madeClient]
-      : []),
-  ];
   const field = (
     label: string,
     key: keyof EventWizardDraft,
@@ -651,11 +645,11 @@ function ClientHeadcountStep({
     <div className="grid gap-3 sm:grid-cols-2">
       <label className="field-label sm:col-span-2">
         Client
-        <SearchSelect
+        <ClientSearchSelect
           value={draft.clientId}
           disabled={locked}
-          onChange={(id) => {
-            const client = clients.find((row) => row._id === id);
+          onChange={(id, picked) => {
+            const client = picked ?? clients.find((row) => row._id === id);
             // Start the day-of contact as the client; edit it if it differs.
             // The person at the client, else the company.
             const contact = client
@@ -669,11 +663,10 @@ function ClientHeadcountStep({
               ...(follow ? { primaryContactName: contact } : {}),
             });
           }}
-          recentsKey="client"
           placeholder="Search clients…"
           onCreate={canCreateClient ? setNewClientName : undefined}
           createLabel={(name) => `Create client “${name}”`}
-          options={clientOptions}
+          extraOptions={madeClient ? [madeClient] : undefined}
         />
       </label>
       {newClientName != null ? (
@@ -681,7 +674,10 @@ function ClientHeadcountStep({
           kind="client"
           open
           initialName={newClientName}
-          existingOptions={clientOptions}
+          existingOptions={(similarClients ?? []).map((client) => ({
+            id: String(client._id),
+            label: clientName(client),
+          }))}
           onClose={() => setNewClientName(null)}
           onUseExisting={(id) => {
             update({ clientId: id });
