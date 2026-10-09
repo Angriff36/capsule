@@ -210,9 +210,17 @@ export function VehicleMaintenancePage() {
     const form = event.currentTarget;
     const data = new FormData(form);
     const type = String(data.get("intervalType")) as IntervalType;
+    // Left blank, the first due mileage is the van's miles now + the interval.
+    const vehicleId = String(data.get("vehicleId"));
+    const dueText = String(data.get("nextDueMileage") ?? "").trim();
+    const firstDueMileage =
+      dueText === ""
+        ? (odometerByVehicle.get(vehicleId) ?? 0) +
+          Number(data.get("intervalMiles"))
+        : Number(dueText);
     void run("schedule", async () => {
       await createSchedule({
-        vehicleId: String(data.get("vehicleId")),
+        vehicleId,
         taskName: String(data.get("taskName") ?? "").trim(),
         intervalType: type,
         intervalDays:
@@ -223,8 +231,7 @@ export function VehicleMaintenancePage() {
           type === "time"
             ? new Date(String(data.get("nextDueAt"))).getTime()
             : undefined,
-        nextDueMileage:
-          type === "mileage" ? Number(data.get("nextDueMileage")) : undefined,
+        nextDueMileage: type === "mileage" ? firstDueMileage : undefined,
         instructions:
           String(data.get("instructions") ?? "").trim() || undefined,
       });
@@ -473,8 +480,7 @@ export function VehicleMaintenancePage() {
                     type="number"
                     min={0}
                     step={1}
-                    placeholder="e.g. 45000"
-                    required
+                    placeholder="Blank: miles now + interval"
                   />
                 </label>
               </>
