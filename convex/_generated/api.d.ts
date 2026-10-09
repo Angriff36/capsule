@@ -282,6 +282,7 @@ import type * as messageInboxPages from "../messageInboxPages.js";
 import type * as messageReply from "../messageReply.js";
 import type * as mutations from "../mutations.js";
 import type * as notifications from "../notifications.js";
+import type * as nowstaShiftHistory from "../nowstaShiftHistory.js";
 import type * as openingStock from "../openingStock.js";
 import type * as outboundEmailThread from "../outboundEmailThread.js";
 import type * as packScans from "../packScans.js";
@@ -643,6 +644,7 @@ declare const fullApi: ApiFromModules<{
   messageReply: typeof messageReply;
   mutations: typeof mutations;
   notifications: typeof notifications;
+  nowstaShiftHistory: typeof nowstaShiftHistory;
   openingStock: typeof openingStock;
   outboundEmailThread: typeof outboundEmailThread;
   packScans: typeof packScans;
