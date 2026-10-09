@@ -13,6 +13,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { ErrorState, Section } from "../../ui/primitives";
 import { PersonRoleDirectory } from "./PersonRoleDirectory";
+import { NowstaShiftImport } from "./NowstaShiftImport";
 import { StaffListImport } from "./StaffListImport";
 import { TeamRolesTable } from "./TeamRolesTable";
 import type { TeamPerson } from "./TeamPerson";
@@ -327,6 +328,9 @@ export function TeamRolesPanel({
       ) : null}
       {canEdit ? (
         <StaffListImport people={activePeople} onSaved={setNotice} />
+      ) : null}
+      {canEdit ? (
+        <NowstaShiftImport people={activePeople} onSaved={setNotice} />
       ) : null}
 
       <TeamRolesTable

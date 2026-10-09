@@ -1853,10 +1853,10 @@ export const ExternalRecordLinkSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
-  sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync", "quickbooks_online", "google_calendar", "stripe", "other"]).default("tpp_legacy"),
+  sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync", "quickbooks_online", "google_calendar", "stripe", "nowsta", "other"]).default("tpp_legacy"),
   recordType: z.string().default(""),
   externalId: z.string(),
-  capsuleEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]).default("contact"),
+  capsuleEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication", "shift"]).default("contact"),
   capsuleId: z.string(),
   sourceAccount: z.string().nullable().optional(),
   role: z.string().nullable().optional(),
@@ -1977,7 +1977,7 @@ export const ImportDatasetSchema = z.object({
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   datasetCategory: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "invoices", "proposals"]).default("events"),
-  targetEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]).default("event_record"),
+  targetEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication", "shift"]).default("event_record"),
   config: z.string().default("{}"),
   active: z.boolean().default(true),
   importOrder: z.number().int().min(1).default(1),
@@ -8400,10 +8400,10 @@ export type ExternalRecordLinkDiscardParams = z.infer<typeof ExternalRecordLinkD
 
 // Command: link on ExternalRecordLink
 export const ExternalRecordLinkLinkParamsSchema = z.object({
-  sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync", "quickbooks_online", "google_calendar", "stripe", "other"]),
+  sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync", "quickbooks_online", "google_calendar", "stripe", "nowsta", "other"]),
   recordType: z.string(),
   externalId: z.string(),
-  capsuleEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]),
+  capsuleEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication", "shift"]),
   capsuleId: z.string(),
   verified: z.boolean().optional(),
   sourceImportRunId: z.string().optional(),
@@ -8608,7 +8608,7 @@ export type ImportDatasetRecordLastImportParams = z.infer<typeof ImportDatasetRe
 // Command: register on ImportDataset
 export const ImportDatasetRegisterParamsSchema = z.object({
   datasetCategory: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "invoices", "proposals"]),
-  targetEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]),
+  targetEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication", "shift"]),
   config: z.string(),
   name: z.string().optional(),
   description: z.string().optional(),
