@@ -79,6 +79,15 @@ export interface ScorecardMaintenance {
   readonly deletedAt?: number | null;
 }
 
+/** One event's client score and menu lines (convex/scorecardEventScores.ts). */
+export interface ScorecardEventScore {
+  readonly startsAt?: number | null;
+  readonly stage?: string | null;
+  readonly clientRating?: number | null;
+  readonly menuLines?: number | null;
+  readonly signatureLines?: number | null;
+}
+
 export interface ScorecardSources {
   readonly events: readonly ScorecardEvent[];
   readonly closeouts: readonly ScorecardCloseout[];
@@ -91,6 +100,8 @@ export interface ScorecardSources {
   readonly waste?: readonly ScorecardWaste[];
   readonly people?: readonly ScorecardPerson[];
   readonly maintenance?: readonly ScorecardMaintenance[];
+  /** Undefined while loading or when this role may not read them. */
+  readonly eventScores?: readonly ScorecardEventScore[];
 }
 
 const live = <T extends { deletedAt?: number | null }>(
@@ -141,6 +152,31 @@ export function measureValue(
           isConvertedLead(lead, sources.acceptedProposalIds ?? new Set()),
         ).length,
         leads.length,
+      );
+    }
+    case "client_satisfaction": {
+      const scores = sources.eventScores
+        ?.filter(
+          (e) =>
+            inWindow(e.startsAt, window) &&
+            e.stage !== "cancelled" &&
+            e.clientRating != null,
+        )
+        .map((e) => Number(e.clientRating));
+      if (!scores?.length) return null;
+      return scores.reduce((sum, s) => sum + s, 0) / scores.length;
+    }
+    case "menu_adoption": {
+      const scored = sources.eventScores?.filter(
+        (e) =>
+          inWindow(e.startsAt, window) &&
+          e.stage !== "cancelled" &&
+          e.menuLines != null,
+      );
+      if (!scored) return null;
+      return percentOf(
+        scored.reduce((sum, e) => sum + (e.signatureLines ?? 0), 0),
+        scored.reduce((sum, e) => sum + (e.menuLines ?? 0), 0),
       );
     }
     case "events_completed":

@@ -15,7 +15,7 @@ export type { ScorecardSources } from "./scorecardCounts";
  * Scorecard and the L10 page both read these rows, so the two pages agree.
  */
 
-export type ScorecardUnit = "currency" | "percent" | "count";
+export type ScorecardUnit = "currency" | "percent" | "count" | "score";
 export type ScorecardDirection = "higher_better" | "lower_better";
 export type ScorecardStatus =
   "on_track" | "caution" | "off_track" | "no_target" | "not_known";
@@ -110,6 +110,16 @@ export const SCORECARD_MEASURES: readonly ScorecardMeasure[] = [
   },
   {
     ...EVENTS,
+    key: "client_satisfaction",
+    name: "Client Satisfaction Score",
+    period: "month",
+    unit: "score",
+    direction: "higher_better",
+    metricId: "dashboard.client_satisfaction",
+    scorecardTarget: "4.7 / 5.0+ (industry benchmark)",
+  },
+  {
+    ...EVENTS,
     key: "event_issue_rate",
     name: "Event-Day Issue Rate",
     period: "week",
@@ -147,6 +157,16 @@ export const SCORECARD_MEASURES: readonly ScorecardMeasure[] = [
     direction: "higher_better",
     metricId: "dashboard.prep_on_time",
     scorecardTarget: "95%+ on schedule (industry benchmark)",
+  },
+  {
+    ...KITCHEN,
+    key: "menu_adoption",
+    name: "Menu Adoption Rate",
+    period: "month",
+    unit: "percent",
+    direction: "higher_better",
+    metricId: "dashboard.menu_adoption",
+    scorecardTarget: "70%+ signature items (industry benchmark)",
   },
   {
     ...KITCHEN,
@@ -225,16 +245,6 @@ export const SCORECARD_NOT_COUNTED: ReadonlyArray<{
   readonly area: ScorecardArea;
   readonly missing: string;
 }> = [
-  {
-    name: "Client Satisfaction Score",
-    area: "Events / Production",
-    missing: "Capsule does not ask clients to rate their event yet.",
-  },
-  {
-    name: "Menu Adoption Rate",
-    area: "Kitchen / Culinary",
-    missing: "Dishes are not marked as signature items yet.",
-  },
   {
     name: "Overhead Cost %",
     area: "Operations / Admin",
@@ -338,6 +348,8 @@ export function formatScorecardValue(value: number, unit: ScorecardUnit) {
       return formatPercent(value);
     case "count":
       return formatCount(value);
+    case "score":
+      return `${value.toFixed(1)} / 5`;
   }
 }
 

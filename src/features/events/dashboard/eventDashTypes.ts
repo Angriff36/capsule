@@ -30,6 +30,8 @@ export type DashEvent = {
   recurrenceFrequency?: string | null;
   recurrenceGeneratedCount?: number | null;
   recurrenceActive?: boolean | null;
+  clientRating?: number | null;
+  clientRatingNote?: string | null;
 };
 
 export type DashOwnerPerson = {

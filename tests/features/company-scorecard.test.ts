@@ -92,6 +92,38 @@ function target(
 }
 
 function seedRows() {
+  // Client scores and menu lines (convex/scorecardEventScores.ts): this
+  // month 5 and 4 (the cancelled 1 is left out); 7 of 10 lines signature.
+  seed.eventScores = [
+    {
+      startsAt: thisMonth,
+      stage: "completed",
+      clientRating: 5,
+      menuLines: 6,
+      signatureLines: 5,
+    },
+    {
+      startsAt: thisMonth,
+      stage: "completed",
+      clientRating: 4,
+      menuLines: 4,
+      signatureLines: 2,
+    },
+    {
+      startsAt: thisMonth,
+      stage: "cancelled",
+      clientRating: 1,
+      menuLines: 9,
+      signatureLines: 0,
+    },
+    {
+      startsAt: lastMonth,
+      stage: "completed",
+      clientRating: 3,
+      menuLines: 2,
+      signatureLines: 0,
+    },
+  ];
   seed.events = [
     // This month: $3,000 booked, 1 completed, 150 guests.
     {
@@ -312,7 +344,9 @@ describe("company scorecard", () => {
       ...container.querySelectorAll("[data-testid='scorecard-not-counted'] li"),
     ].map((li) => li.textContent ?? "");
     expect(notCounted).toHaveLength(SCORECARD_NOT_COUNTED.length);
-    expect(notCounted.join("|")).toContain("Client Satisfaction Score");
+    expect(notCounted.join("|")).toContain("Overhead Cost %");
+    expect(notCounted.join("|")).not.toContain("Client Satisfaction Score");
+    expect(notCounted.join("|")).not.toContain("Menu Adoption Rate");
 
     // A number with no target shows the scorecard's written one.
     expect(row("pipeline_value").target).toBe("Not set. Scorecard: $75,000+");
@@ -351,6 +385,16 @@ describe("company scorecard", () => {
     expect(row("events_completed").status).toBe("Off track");
     expect(row("guests").actual).toContain("150");
     expect(row("lead_conversion").status).toBe("On track");
+
+    // Client scores 5 and 4 this month: 4.5 / 5, short of the 4.7 written.
+    const satisfaction = row("client_satisfaction");
+    expect(satisfaction.actual).toBe("4.5 / 5");
+    expect(satisfaction.target).toBe(
+      "Not set. Scorecard: 4.7 / 5.0+ (industry benchmark)",
+    );
+    expect([...satisfaction.trend][4].textContent).toContain("3.0 / 5");
+    // 7 of 10 menu lines are signature dishes: 70%.
+    expect(row("menu_adoption").actual).toContain("70");
   });
 
   it("a number with no target says so and offers to set one", () => {

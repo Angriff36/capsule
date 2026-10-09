@@ -9,12 +9,17 @@ import { useEventsInRange } from "../facilities/useEventsById";
 import {
   useCanReadTable,
   useCloseoutsInRange,
+  useEventScoresInRange,
   useLeadsInRange,
   useWindowRows,
 } from "@/lib/financeScopedQueries";
 import { acceptedProposalIds } from "./dashboardRecordSets";
 import type { ScorecardSources } from "./scorecardCounts";
-import { earliestTrendStart, periodWindow } from "./scorecardPeriods";
+import {
+  TREND_LENGTH,
+  earliestTrendStart,
+  periodWindow,
+} from "./scorecardPeriods";
 
 /** Open quotes are counted up to this far ahead. */
 const PIPELINE_AHEAD_DAYS = 730;
@@ -43,6 +48,10 @@ export function useScorecardSources(now: Date): {
         fields: ["dueAt"],
         ranges: [{ from: periodWindow("week", ref, 11).from, to: weekEnd }],
       },
+      months: {
+        from: periodWindow("month", ref, TREND_LENGTH.month - 1).from,
+        to: periodWindow("month", ref).to,
+      },
       shifts: {
         fields: ["startsAt"],
         ranges: [{ from: periodWindow("week", ref, 11).from, to: weekEnd }],
@@ -64,6 +73,7 @@ export function useScorecardSources(now: Date): {
   const waste = useListWasteRecord();
   const people = useListPerson();
   const maintenance = useListEquipmentMaintenanceTask();
+  const eventScores = useEventScoresInRange(windows.months);
 
   const sources = useMemo<ScorecardSources>(
     () => ({
@@ -80,6 +90,7 @@ export function useScorecardSources(now: Date): {
       waste,
       people,
       maintenance,
+      eventScores: eventScores ?? undefined,
     }),
     [
       events,
@@ -92,6 +103,7 @@ export function useScorecardSources(now: Date): {
       waste,
       people,
       maintenance,
+      eventScores,
     ],
   );
   return { sources, loading: events === undefined };

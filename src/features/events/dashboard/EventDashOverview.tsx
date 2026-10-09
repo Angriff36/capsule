@@ -16,6 +16,7 @@ import { EventProposalSourceCard } from "../../clients/EventProposalSourceCard";
 import { eventDetailPath } from "../eventRoutes";
 import { EventImportDraftPanel } from "../import/EventImportDraftPanel";
 import { EventSourceProvenancePanel } from "../EventSourceProvenancePanel";
+import { EventClientRatingCard } from "../EventClientRatingCard";
 import { EventVenueFollowUpCard } from "../EventVenueFollowUpCard";
 import { useMobileViewport } from "../../../app/shell/useMobileViewport";
 import { allergyLine, durationLabel, firstLine } from "./eventDashFacts";
@@ -356,6 +357,13 @@ export function EventDashOverview({
         <EventImportDraftPanel eventId={eventId} />
         <EventProposalSourceCard eventId={eventId} />
         <EventProposalEnhancementsCard eventId={eventId} />
+        <EventClientRatingCard
+          eventId={eventId}
+          stage={props.stage}
+          startsAt={props.startsAt}
+          rating={event.clientRating}
+          note={event.clientRatingNote}
+        />
         <EventVenueFollowUpCard
           eventId={eventId}
           venue={props.venue}

@@ -43,6 +43,7 @@ import { culinaryCanonicalMatcher } from "./CulinaryCanonicalMatcher";
 import { DishContainersPanel } from "./DishContainersPanel";
 import { DishDetailsEditor } from "./DishDetailsEditor";
 import { DishExclusiveVenueField } from "./DishExclusiveVenueField";
+import { DishSignatureField } from "./DishSignatureField";
 import { DishPrepTasksPanel } from "./DishPrepTasksPanel";
 import { DishVersionRecipeSwitch } from "./DishVersionRecipeSwitch";
 import { StylePackagingPanel } from "./StylePackagingPanel";
@@ -388,6 +389,7 @@ export function DishDetailPage() {
           </select>
         </label>
         <DishExclusiveVenueField dish={dish} onFailure={setFailure} />
+        <DishSignatureField dish={dish} onFailure={setFailure} />
         <details className="recipe-management">
           <summary>Versions</summary>
           <div className="flex flex-wrap gap-2">

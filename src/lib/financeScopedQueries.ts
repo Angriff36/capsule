@@ -439,6 +439,17 @@ export function useLeadsInRange(range: Range | null) {
 }
 
 /**
+ * Per event starting in the range: the client's 1-5 score and how many menu
+ * lines are signature dishes (convex/scorecardEventScores.ts). `undefined`
+ * while loading; null rows when this role may not read events.
+ */
+export function useEventScoresInRange(range: Range | null) {
+  const result = useQuery(api.scorecardEventScores.forWindow, range ?? "skip");
+  if (result === undefined) return undefined;
+  return result?.rows ?? null;
+}
+
+/**
  * Every event of the company in light rows (convex/eventLookup.ts
  * `reportPage`), read page by page ONLY once `enabled` (the user asked for
  * an all-time figure). Live events only. `undefined` until then.
