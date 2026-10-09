@@ -19,6 +19,7 @@ import {
   ReportSection,
   SubHeading,
   count,
+  plural,
   dayText,
   money,
   percent,
@@ -57,27 +58,30 @@ export function PipelineTab<E extends SalesEvent>({
 
   return (
     <>
-      <ReportSection title="Open Pipeline" period={`${f.year}, ${asOf}`}>
+      <ReportSection
+        title="Open Pipeline"
+        period={`${f.year}, as of ${dayText(now)}`}
+      >
         <FigureRow
           figures={[
             {
               title: "Open quotes",
               value: money(f.quotes.revenue),
-              detail: `${count(f.quotes.events)} events · ${count(f.quotes.guests)} guests`,
+              detail: `${plural(f.quotes.events, "event")} · ${count(f.quotes.guests)} guests`,
               period: asOf,
               tone: "info",
             },
             {
               title: "Waiting for approval",
               value: money(f.waiting.revenue),
-              detail: `${count(f.waiting.events)} events · ${count(f.waiting.guests)} guests`,
+              detail: `${plural(f.waiting.events, "event")} · ${count(f.waiting.guests)} guests`,
               period: asOf,
               tone: "info",
             },
             {
               title: "Total pipeline",
               value: money(f.pipeline.revenue),
-              detail: `${count(f.pipeline.events)} events · ${count(f.pipeline.guests)} guests`,
+              detail: `${plural(f.pipeline.events, "event")} · ${count(f.pipeline.guests)} guests`,
               period: asOf,
               tone: "info",
             },
@@ -102,7 +106,7 @@ export function PipelineTab<E extends SalesEvent>({
             {
               title: `Revenue lost in ${f.year}`,
               value: money(f.thisYear.lost.revenue),
-              detail: `${count(f.thisYear.lost.events)} deals, avg ${money(f.thisYear.lost.aev)}`,
+              detail: `${plural(f.thisYear.lost.events, "deal")}, avg ${money(f.thisYear.lost.aev)}`,
               period: ytdText,
               tone: "warn",
             },
@@ -125,7 +129,7 @@ export function PipelineTab<E extends SalesEvent>({
         />
       </ReportSection>
 
-      <ReportSection title="Losses" period={asOf}>
+      <ReportSection title="Losses" period={`as of ${dayText(now)}`}>
         <SubHeading title="Losses by year" />
         <FigureTable
           headers={[
@@ -147,7 +151,7 @@ export function PipelineTab<E extends SalesEvent>({
         />
       </ReportSection>
 
-      <ReportSection title="Win Rates" period={asOf}>
+      <ReportSection title="Win Rates" period={`as of ${dayText(now)}`}>
         <FigureRow
           figures={[
             {
@@ -175,7 +179,7 @@ export function PipelineTab<E extends SalesEvent>({
 
       <ReportSection
         title="Where Leads Come From"
-        period={`every year, ${asOf}`}
+        period={`every year, as of ${dayText(now)}`}
       >
         <FigureTable
           headers={[

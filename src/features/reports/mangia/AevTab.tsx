@@ -23,6 +23,7 @@ import {
   ReportSection,
   change,
   count,
+  plural,
   dayText,
   money,
 } from "./SalesReportParts";
@@ -135,14 +136,14 @@ export function AevTab<E extends SalesEvent>({
             {
               title: `${f.year} average so far (delivered)`,
               value: money(f.delivered.aev),
-              detail: `${count(f.delivered.events)} delivered events`,
+              detail: `${plural(f.delivered.events, "delivered event")}`,
               period: ytdText,
               tone: "info",
             },
             {
               title: `${f.year} average so far (won)`,
               value: money(f.won.aev),
-              detail: `${count(f.won.events)} won events (delivered + booked)`,
+              detail: `${plural(f.won.events, "won event")} (delivered + booked)`,
               period: ytdText,
               tone: "ok",
             },
@@ -150,8 +151,13 @@ export function AevTab<E extends SalesEvent>({
               title: "Against the goal",
               value: change(vsGoal(f.won.aev)),
               detail: `Won average ${money(f.won.aev)} vs ${money(f.goal)} goal`,
-              period: onTrack ? "Above the goal" : "Below the goal",
-              tone: onTrack ? "ok" : "warn",
+              period:
+                f.goal == null
+                  ? `No delivered events in ${last}`
+                  : onTrack
+                    ? "Above the goal"
+                    : "Below the goal",
+              tone: f.goal == null ? "ink" : onTrack ? "ok" : "warn",
             },
           ]}
         />
@@ -219,7 +225,7 @@ export function AevTab<E extends SalesEvent>({
             {
               title: `Starting point (${last} average)`,
               value: money(f.baseline.aev),
-              detail: `${count(f.baseline.events)} delivered events`,
+              detail: `${plural(f.baseline.events, "delivered event")}`,
               period: `Jan 1 – Dec 31, ${last}`,
             },
             {
@@ -232,21 +238,31 @@ export function AevTab<E extends SalesEvent>({
             {
               title: `${f.year} average so far (delivered)`,
               value: money(f.delivered.aev),
-              detail: `${count(f.delivered.events)} delivered events`,
+              detail: `${plural(f.delivered.events, "delivered event")}`,
               period: ytdText,
             },
             {
               title: `${f.year} average so far (won)`,
               value: money(f.won.aev),
-              detail: `${count(f.won.events)} won events`,
+              detail: `${plural(f.won.events, "won event")}`,
               period: ytdText,
             },
           ]}
         />
         <PaceBox
           title="Growth goal check"
-          value={onTrack ? "On track" : "Not on track yet"}
-          detail={`Won average ${money(f.won.aev)} is ${change(vsGoal(f.won.aev))} against the ${money(f.goal)} goal; delivered average ${money(f.delivered.aev)} is ${change(vsGoal(f.delivered.aev))}.`}
+          value={
+            f.goal == null
+              ? "No goal yet"
+              : onTrack
+                ? "On track"
+                : "Not on track yet"
+          }
+          detail={
+            f.goal == null
+              ? `No delivered events in ${last}, so there is no average to grow from yet.`
+              : `Won average ${money(f.won.aev)} is ${change(vsGoal(f.won.aev))} against the ${money(f.goal)} goal; delivered average ${money(f.delivered.aev)} is ${change(vsGoal(f.delivered.aev))}.`
+          }
         />
         <FigureRow
           figures={[
@@ -266,7 +282,12 @@ export function AevTab<E extends SalesEvent>({
             },
             {
               title: "Where it is heading",
-              value: onTrack ? "Growing" : "Below goal",
+              value:
+                f.goal == null
+                  ? "No goal yet"
+                  : onTrack
+                    ? "Growing"
+                    : "Below goal",
               detail: `${f.year} won average vs ${last} average: ${change(
                 f.won.aev == null || f.baseline.aev == null
                   ? null

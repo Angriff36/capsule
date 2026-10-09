@@ -121,7 +121,7 @@ function MangiaReport() {
   return (
     <div className="operations-stage supply-stage">
       <PageHeader title={TITLE} lead={LEAD} />
-      <p className="mt-1 inline-block rounded-xs bg-brand-soft px-2 py-0.5 text-xs font-semibold text-brand">
+      <p className="mt-1 w-fit rounded-xs bg-brand-soft px-2 py-0.5 text-xs font-semibold text-brand">
         Live figures as of {dayText(now)}
       </p>
 

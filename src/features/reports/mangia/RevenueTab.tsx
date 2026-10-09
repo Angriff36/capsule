@@ -79,12 +79,17 @@ export function RevenueTab({
     const year = now.getFullYear();
     const threeYears = [year - 2, year - 1, year];
     const [qYear, quarter] = lastFullQuarter(now);
+    // Delivered history stops at today, as "so far" does everywhere else.
+    const todayEnd = ytdPeriod(now, year).to;
+    const history = events.filter(
+      (e) => e.startsAt != null && e.startsAt < todayEnd,
+    );
     const ytd = totals(within(events, ytdPeriod(now, year), isDelivered));
     const lastYtd = totals(
       within(events, ytdPeriod(now, year - 1), isDelivered),
     );
     const thisMonth = totals(
-      within(events, monthPeriod(year, now.getMonth()), isDelivered),
+      within(history, monthPeriod(year, now.getMonth()), isDelivered),
     );
     const lastMonthDate = new Date(year, now.getMonth() - 1, 1);
     const lastMonth = totals(
@@ -103,10 +108,10 @@ export function RevenueTab({
     return {
       year,
       threeYears,
-      thisWeekly: weeklyRows(events, year, now.getMonth(), now),
-      lastWeekly: weeklyRows(events, year - 1, 11, now),
-      months: monthRows(events, threeYears),
-      quarters: quarterRows(events, threeYears, now),
+      thisWeekly: weeklyRows(history, year, now.getMonth(), now),
+      lastWeekly: weeklyRows(history, year - 1, 11, now),
+      months: monthRows(history, threeYears),
+      quarters: quarterRows(history, threeYears, now),
       years: yearRows(events),
       ytd,
       lastYtd,

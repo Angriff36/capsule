@@ -24,6 +24,7 @@ import {
   SignalStrip,
   change,
   count,
+  plural,
   dayText,
   money,
   percent,
@@ -96,27 +97,27 @@ export function OverviewTab({
             {
               title: "Revenue won this year",
               value: money(f.won.revenue),
-              detail: `Delivered + booked · ${count(f.won.events)} events`,
+              detail: `Delivered + booked · ${plural(f.won.events, "event")}`,
               period: f.ytdText,
               tone: "ok",
             },
             {
               title: "Revenue delivered this year",
               value: money(f.delivered.revenue),
-              detail: `Delivered only · ${count(f.delivered.events)} events`,
+              detail: `Delivered only · ${plural(f.delivered.events, "event")}`,
               period: f.ytdText,
               tone: "info",
             },
             {
               title: "Avg event value (won)",
               value: money(f.won.aev),
-              detail: `vs ${money(f.lastYearDelivered.aev)} (${last} delivered)`,
+              detail: `${last} delivered: ${money(f.lastYearDelivered.aev)}`,
               period: `${f.year} so far vs ${last} full year`,
             },
             {
               title: "Pipeline value",
               value: money(f.pipeline.revenue),
-              detail: `Quotes + waiting for approval · ${count(f.pipeline.events)} events`,
+              detail: `Quotes + waiting for approval · ${plural(f.pipeline.events, "event")}`,
               period: asOf,
               tone: "info",
             },
@@ -134,14 +135,17 @@ export function OverviewTab({
             {
               title: "Revenue lost this year",
               value: money(f.decisions.lost.revenue),
-              detail: `${count(f.decisions.lost.events)} events · avg ${money(f.decisions.lost.aev)}`,
+              detail: `${plural(f.decisions.lost.events, "event")} · avg ${money(f.decisions.lost.aev)}`,
               period: f.ytdText,
               tone: "warn",
             },
             {
               title: `${f.year} growth goal progress`,
               value: change(f.aevGrowth),
-              detail: `Avg ${money(f.won.aev)} vs ${money(f.goal)} goal`,
+              detail:
+                f.goal == null
+                  ? `No goal yet: no delivered events in ${last}`
+                  : `Avg ${money(f.won.aev)} vs ${money(f.goal)} goal`,
               period: `Goal: 10% above ${last} average (${money(f.lastYearDelivered.aev)})`,
               tone: "ok",
             },
@@ -222,7 +226,7 @@ export function OverviewTab({
             {
               title: `${f.year} won (delivered + booked)`,
               value: money(f.won.revenue),
-              detail: `${count(f.won.events)} events booked and delivered`,
+              detail: `${plural(f.won.events, "event")} booked and delivered`,
               period: f.ytdText,
               tone: "ok",
             },

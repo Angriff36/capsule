@@ -16,6 +16,7 @@ import {
   ReportSection,
   SubHeading,
   count,
+  plural,
   dayText,
   money,
   percent,
@@ -84,7 +85,7 @@ export function PeopleTab<E extends SalesEvent>({
   const card = (row: PersonRow, year: number, period: string) => ({
     title: `${row.label} — ${year} avg event value`,
     value: row.won.events ? money(row.won.aev) : "—",
-    detail: `${count(row.won.events)} events · ${percent(row.winRate)} close rate`,
+    detail: `${plural(row.won.events, "event")} · ${percent(row.winRate)} close rate`,
     period,
   });
 

@@ -160,6 +160,10 @@ export const money = (value: number | null | undefined) =>
 
 export const count = (value: number) => value.toLocaleString("en-US");
 
+/** "1 event", "3 events". */
+export const plural = (value: number, noun: string) =>
+  `${count(value)} ${noun}${value === 1 ? "" : "s"}`;
+
 export const percent = (value: number | null) =>
   value == null ? NOT_KNOWN : `${value.toFixed(1)}%`;
 
