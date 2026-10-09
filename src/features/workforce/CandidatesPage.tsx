@@ -30,6 +30,7 @@ import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { SearchSelect } from "../../ui/SearchSelect";
 
 import "./TrainingPage.css";
+import { convexActionErrorMessage } from "../../lib/convexActionErrorMessage";
 // ponytail: a focused set of hireable operational roles for the create-form
 // picker. roleAppliedFor is a free CapsuleRole, so a KM-sourced value outside
 // this list still lands correctly (stored verbatim by the ingest seam).
@@ -274,10 +275,15 @@ export function CandidatesPage() {
           tone: "ok",
         });
       } catch (provisionError) {
+        // A missing server setting is not something this person can fix:
+        // say so plainly instead of showing the raw server error.
+        const reason = convexActionErrorMessage(provisionError, "");
         setNotice({
-          text: `Hired ${candidate.fullName}, but the sign-in email failed${
-            provisionError instanceof Error ? `: ${provisionError.message}` : ""
-          }. Press Resend sign-in on their card to try again.`,
+          text: /missing on this deployment|is missing/i.test(reason)
+            ? `Hired ${candidate.fullName}. No sign-in email was sent: sign-in emails are not set up on this server yet. Whoever runs Capsule needs to finish that setup, then press Resend sign-in on their card.`
+            : `Hired ${candidate.fullName}, but the sign-in email failed${
+                reason ? `: ${reason}` : ""
+              }. Press Resend sign-in on their card to try again.`,
           tone: "warn",
         });
       }
