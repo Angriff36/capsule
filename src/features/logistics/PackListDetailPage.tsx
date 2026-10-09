@@ -1063,7 +1063,12 @@ export function PackListDetailPage() {
               }
               onClick={() => invokeList(action.key)}
             >
-              {busy === `list:${action.key}` ? "Working…" : action.label}
+              {busy === `list:${action.key}`
+                ? "Working…"
+                : // Each line also has "Mark packed"; say this one is the list.
+                  action.key === "markPacked"
+                  ? "Mark list packed"
+                  : action.label}
             </button>
           ))}
           {canAddItems ? (

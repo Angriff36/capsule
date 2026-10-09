@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { applyOpaqueIdParams } from "./apply-opaque-id-params.ts";
 import { applyOwnWorkspaceLinks } from "./apply-own-workspace-links.ts";
 import { ManifestLineEndingNormalizer } from "./normalizeManifestLineEndings.ts";
 import { syncBuilderBaselines } from "./sync-builder-baselines.ts";
@@ -57,7 +58,11 @@ export function regenerate(passthrough: string[] = []): number {
   if (compiled.status !== 0) return compiled.status ?? 1;
   // Make generated mutations refuse other-workspace record ids, refreshing
   // ownership digests.
-  const touched = [...applyOwnWorkspaceLinks(CAPSULE_ROOT)];
+  const touched = [
+    ...applyOwnWorkspaceLinks(CAPSULE_ROOT),
+    // Command id parameters accept Convex record ids, not only RFC uuids.
+    ...applyOpaqueIdParams(CAPSULE_ROOT),
+  ];
   if (touched.length > 0) {
     console.log(
       `manifest-regen: applied generated runtime patches (${touched.join(", ")})`,

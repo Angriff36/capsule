@@ -39,7 +39,7 @@
       "sha256": "0a182867580c09e3a3a52fb6d1e8e8a831d67e6c9d2634d5bcaeeb3443ad59d8"
     },
     "schemas/manifest-schemas.ts": {
-      "sha256": "444b6a1feb322b4b6928371e3f9e9cad3a5b5fd20d3f83432dd50dc7829b660e"
+      "sha256": "c625deef108edc5376255eb0b0d6e19d4ec879b5d3053645c18f3685a7e758c3"
     },
     "scripts/seed-convex.ts": {
       "sha256": "9e51229b51e318c8709fca540a49f01c588bee0d7b7e7296071e8aa5de70f30f"
