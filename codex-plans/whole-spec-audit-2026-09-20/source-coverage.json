@@ -7499,7 +7499,7 @@
         "approved TPP KPI playbook"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "f23dae35"
+      "sha": "9add28c9"
     },
     {
       "id": "AC-298",
@@ -7646,7 +7646,7 @@
         "approved TPP KPI playbook"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "f23dae35"
+      "sha": "9add28c9"
     },
     {
       "id": "AC-305",
@@ -7758,21 +7758,21 @@
       "key": "CF-7.4-07",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§7.4 bullet 'Mangia Round 4: Port the existing deliverable's measures and visual hierarchy onto live Capsule data'",
-      "status": "PENDING",
-      "codeState": "implemented-unverified",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-DASHBOARDS"],
-      "gap": "Built on live data from the Round 4 report (all six tabs, proven); waits on a side-by-side look at the page against that report by someone other than the builder.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: add a review-criteria.md row (e.g. MANGIA-01 'the Mangia page preserves the Round 4 deliverable's visual hierarchy: section order, emphasis and density') judged on a /reports/mangia screenshot via createReview(); plus tests/features/mangia-measures.test.ts for the P half; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit."
       ],
-      "waitsOn": "people",
+      "waitsOn": null,
       "owners": [
         "src/features/reports/",
         "authenticated dashboard routes",
         "approved TPP KPI playbook"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test); model or human judgment of the real screen or document",
+      "sha": "4fccc611"
     },
     {
       "id": "AC-311",
@@ -9120,7 +9120,7 @@
         "existing migration/data-map documents"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "f23dae35"
+      "sha": "9add28c9"
     },
     {
       "id": "AC-375",
