@@ -315,7 +315,7 @@ describe("company scorecard", () => {
     expect(notCounted.join("|")).toContain("Client Satisfaction Score");
 
     // A number with no target shows the scorecard's written one.
-    expect(row("pipeline_value").target).toBe("Not set (scorecard: $75,000+)");
+    expect(row("pipeline_value").target).toBe("Not set. Scorecard: $75,000+");
     expect(row("pipeline_value").actual).toContain("$8,000");
     // This week: $4,000 booked of $15,000 is off track; close rate 1 of 2.
     expect(row("booked_revenue_week").actual).toContain("$4,000");

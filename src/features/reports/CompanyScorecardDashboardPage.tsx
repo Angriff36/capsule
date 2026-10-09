@@ -296,7 +296,7 @@ function MetricCard({
           {row.target
             ? `${row.target.direction === "lower_better" ? "At most" : "At least"} ${formatValue(row.target.target)}`
             : measure.scorecardTarget
-              ? `Not set (scorecard: ${measure.scorecardTarget})`
+              ? `Not set. Scorecard: ${measure.scorecardTarget}`
               : "Not set"}
         </dd>
         <dt>Owner</dt>
