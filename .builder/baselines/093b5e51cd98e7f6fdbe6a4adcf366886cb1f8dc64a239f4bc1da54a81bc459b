@@ -2033,7 +2033,8 @@ export default defineSchema({
     .index("by_eventId", ["eventId"])
     .index("by_ingredientId", ["ingredientId"])
     .index("by_dishId", ["dishId"])
-    .index("by_tenantId_and_status", ["tenantId", "status"]),
+    .index("by_tenantId_and_status", ["tenantId", "status"])
+    .index("by_dishId_and_status", ["dishId", "status"]),
   ingredientPriceObservations: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2178,7 +2179,8 @@ export default defineSchema({
     .index("by_eventId", ["eventId"])
     .index("by_ingredientId", ["ingredientId"])
     .index("by_inventorySettingsId", ["inventorySettingsId"])
-    .index("by_tenantId_and_status", ["tenantId", "status"]),
+    .index("by_tenantId_and_status", ["tenantId", "status"])
+    .index("by_inventoryItemId_and_status", ["inventoryItemId", "status"]),
   inventorySettings: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -3505,7 +3507,8 @@ export default defineSchema({
     .index("by_preferredVendorId", ["preferredVendorId"])
     .index("by_vendorOrderId", ["vendorOrderId"])
     .index("by_vendorOrderLineId", ["vendorOrderLineId"])
-    .index("by_tenantId_and_status", ["tenantId", "status"]),
+    .index("by_tenantId_and_status", ["tenantId", "status"])
+    .index("by_ingredientId_and_status", ["ingredientId", "status"]),
   pushSubscriptions: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

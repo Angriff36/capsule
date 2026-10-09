@@ -321,6 +321,9 @@ projections:
         PurchaseNeed:
           - fields: [tenantId, status]
             name: by_tenantId_and_status
+          # One ingredient's open needs (moving to a new preferred vendor).
+          - fields: [ingredientId, status]
+            name: by_ingredientId_and_status
         ImportConflict:
           - fields: [tenantId, status]
             name: by_tenantId_and_status
@@ -373,9 +376,15 @@ projections:
         InventoryReservation:
           - fields: [tenantId, status]
             name: by_tenantId_and_status
+          # One item's live holds (pending, active), not every past hold.
+          - fields: [inventoryItemId, status]
+            name: by_inventoryItemId_and_status
         IngredientDemand:
           - fields: [tenantId, status]
             name: by_tenantId_and_status
+          # One dish's newest committed demand (the anomaly baseline).
+          - fields: [dishId, status]
+            name: by_dishId_and_status
         OpeningStockRecord:
           - fields: [tenantId, status]
             name: by_tenantId_and_status

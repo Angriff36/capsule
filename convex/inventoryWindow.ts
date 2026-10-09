@@ -104,6 +104,9 @@ export const demandsForEvents = query({
   },
 });
 
+// The newest committed demand rows of each dish a baseline compares against.
+const DEMAND_HISTORY_PER_DISH = 50;
+
 /**
  * Committed demand of these dishes (at most 200), the history a demand
  * anomaly compares against, with the head counts of their events.
@@ -125,10 +128,21 @@ export const demandHistory = query({
       const dishId = ctx.db.normalizeId("dishes", raw);
       if (!dishId) continue;
       for (const row of mineLive(
-        await ctx.db
-          .query("ingredientDemands")
-          .withIndex("by_dishId", (q) => q.eq("dishId", dishId))
-          .collect(),
+        // The newest committed demand of the dish is the baseline; never
+        // every demand it ever had.
+        (
+          await Promise.all(
+            (["confirmed", "fulfilled"] as const).map((status) =>
+              ctx.db
+                .query("ingredientDemands")
+                .withIndex("by_dishId_and_status", (q) =>
+                  q.eq("dishId", dishId).eq("status", status),
+                )
+                .order("desc")
+                .take(DEMAND_HISTORY_PER_DISH),
+            ),
+          )
+        ).flat(),
         tenantId,
       )) {
         if (row.status !== "confirmed" && row.status !== "fulfilled") continue;

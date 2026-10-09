@@ -127,9 +127,12 @@ export async function moveIngredientNeedsToPreferredVendor(
   if (!ingredient || ingredient.tenantId !== tenantId || ingredient.deletedAt != null) return;
   const next = ingredient.preferredVendorId ?? null;
   const needs = (
+    // Only open needs can move to the new vendor.
     await ctx.db
       .query("purchaseNeeds")
-      .withIndex("by_ingredientId", (q) => q.eq("ingredientId", ingredientId))
+      .withIndex("by_ingredientId_and_status", (q) =>
+        q.eq("ingredientId", ingredientId).eq("status", "open"),
+      )
       .collect()
   ).filter(
     (need) =>
