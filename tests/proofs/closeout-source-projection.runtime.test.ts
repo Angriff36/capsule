@@ -220,6 +220,39 @@ describe("closeout numbers come from Capsule's records (AC-625, AC-628, AC-386)"
         needsTwoPeople: false,
         evidence: "note",
       };
+      // The menu's Pulled Pork: 6 oz of pork a plate at $4 a pound = $1.50.
+      const base = { tenantId: T, version: 1, createdAt: 1, updatedAt: 1 };
+      const pork = await db.insert("ingredients", {
+        ...base,
+        name: "Pork shoulder",
+        unit: "pound",
+        costPerUnit: 4,
+        status: "active",
+      });
+      const dish = await db.insert("dishes", {
+        ...base,
+        name: "Pulled Pork",
+        category: "Mains",
+        portionSize: 6,
+        portionUnit: "ounce",
+        status: "active",
+      });
+      await db.insert("dishIngredients", {
+        ...base,
+        dishId: dish,
+        ingredientId: pork,
+        quantity: 6,
+        unit: "ounce",
+        sortOrder: 1,
+        addedAt: 1,
+      });
+      await db.insert("eventDishes", {
+        ...base,
+        eventId,
+        dishId: dish,
+        course: "main",
+        quantityServings: 40,
+      });
       return {
         done: await db.insert("fieldConfirmations", {
           ...form,
@@ -249,12 +282,18 @@ describe("closeout numbers come from Capsule's records (AC-625, AC-628, AC-386)"
       }),
     ]);
     expect(line(lines, "waste").actual).toBe(0);
+    expect(line(lines, "waste").note).toBe(
+      "About $24.00 of food left over (already in the food cost)",
+    );
     expect(line(lines, "waste").sources).toEqual([
       expect.objectContaining({
         table: "fieldConfirmations",
         id: formIds.done,
         amount: 0,
-        label: "Left over: Pulled Pork 6 lb · brought to kitchen",
+        // 6 lb = 96 oz = 16 plates x $1.50, shown but not added (the pork
+        // is already in the food cost).
+        label:
+          "Left over: Pulled Pork 6 lb (about $24.00) · brought to kitchen · about $24.00 of food made and not eaten (already in the food cost)",
       }),
     ]);
 

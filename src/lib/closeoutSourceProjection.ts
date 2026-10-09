@@ -15,6 +15,8 @@ import {
   LEFTOVER_HANDLING_LABEL,
   type MudaAnswers,
 } from "./eventPacket/finalLock/fieldFormAnswers";
+import { formatMoneyExact } from "./format";
+import { recipeUnitRatio } from "./recipeUnitConversion";
 
 export type CloseoutLineKey =
   | "revenue"
@@ -126,6 +128,14 @@ export type ProjectionFoodWasteForm = Versioned & {
   completedAt?: number | null;
   answers?: string | null;
 };
+/** Plate cost of one dish on the event menu, to price food left over. */
+export type ProjectionLeftoverDishCost = {
+  name: string;
+  /** Cost of one serving; null when the recipe has no priced lines. */
+  costPerServing: number | null;
+  portionSize: number;
+  portionUnit: string;
+};
 export type ProjectionTruckRun = Versioned & {
   label: string;
   tripCost?: number | null;
@@ -153,6 +163,8 @@ export type CloseoutProjectionInput = {
   truckRuns?: ProjectionTruckRun[];
   /** The event's signed food waste forms (the paper "Event Food MUDA"). */
   foodWasteForms?: ProjectionFoodWasteForm[];
+  /** Plate costs of the event menu's dishes (leftovers are priced by name). */
+  leftoverDishCosts?: ProjectionLeftoverDishCost[];
 };
 
 export type CloseoutCaptureValues = {
@@ -375,12 +387,46 @@ function foodWasteForm(input: CloseoutProjectionInput) {
   return newest;
 }
 
-function leftoverText(muda: MudaAnswers) {
-  const left = keptLeftovers(muda).map((l) =>
-    l.kind === "appetizer"
-      ? `${l.item} ${plural(l.amount, "serving")}`
-      : `${l.item} ${l.amount} lb`,
-  );
+// What one leftover line cost to make: servings x plate cost. Main items
+// are weighed in pounds, so they price only when the dish's portion is a
+// weight (6 oz a plate). Null when the menu has no priced dish of that name.
+function leftoverCents(
+  line: ReturnType<typeof keptLeftovers>[number],
+  costs: readonly ProjectionLeftoverDishCost[],
+): number | null {
+  const name = line.item.toLowerCase();
+  const dish = costs.find((d) => d.name.trim().toLowerCase() === name);
+  if (!dish || dish.costPerServing == null || dish.costPerServing <= 0)
+    return null;
+  let servings = line.amount;
+  if (line.kind === "main") {
+    const ratio = recipeUnitRatio("pound", dish.portionUnit);
+    if (ratio == null || !(dish.portionSize > 0)) return null;
+    servings = (line.amount * ratio) / dish.portionSize;
+  }
+  return cents(servings * dish.costPerServing);
+}
+
+const dollars = (centsValue: number) => formatMoneyExact(centsValue / 100);
+
+// The leftover food is already in the food cost (it was bought and cooked),
+// so its value is shown beside the waste line, never added to the totals.
+function leftoverText(
+  muda: MudaAnswers,
+  costs: readonly ProjectionLeftoverDishCost[],
+): { text: string; valueCents: number } {
+  let total = 0;
+  const unpriced: string[] = [];
+  const left = keptLeftovers(muda).map((l) => {
+    const value = leftoverCents(l, costs);
+    if (value == null) unpriced.push(l.item);
+    else total += value;
+    const amount =
+      l.kind === "appetizer"
+        ? `${l.item} ${plural(l.amount, "serving")}`
+        : `${l.item} ${l.amount} lb`;
+    return value == null ? amount : `${amount} (about ${dollars(value)})`;
+  });
   const parts = [
     left.length > 0 ? `Left over: ${left.join(", ")}` : "Nothing left over",
   ];
@@ -390,7 +436,14 @@ function leftoverText(muda: MudaAnswers) {
     parts.push(
       `staff mistake${muda.staffErrorNote.trim() ? `: ${muda.staffErrorNote.trim()}` : ""}`,
     );
-  return parts.join(" · ");
+  if (total > 0)
+    parts.push(
+      `about ${dollars(total)} of food made and not eaten (already in the food cost)` +
+        (unpriced.length > 0
+          ? `; no plate cost for ${unpriced.join(", ")}`
+          : ""),
+    );
+  return { text: parts.join(" · "), valueCents: total };
 }
 
 function wasteLine(input: CloseoutProjectionInput): CloseoutLine {
@@ -405,20 +458,24 @@ function wasteLine(input: CloseoutProjectionInput): CloseoutLine {
     sources.push(ref("wasteRecords", row, amount, "Waste logged"));
   }
   const form = foodWasteForm(input);
-  if (form)
-    sources.push(
-      ref("fieldConfirmations", form.form, 0, leftoverText(form.muda)),
-    );
+  const leftovers = form
+    ? leftoverText(form.muda, input.leftoverDishCosts ?? [])
+    : null;
+  if (form && leftovers)
+    sources.push(ref("fieldConfirmations", form.form, 0, leftovers.text));
+  const notes = [
+    pending > 0 ? `${plural(pending, "waste entry")} not confirmed yet` : null,
+    leftovers && leftovers.valueCents > 0
+      ? `About ${dollars(leftovers.valueCents)} of food left over (already in the food cost)`
+      : null,
+  ].filter((note): note is string => note != null);
   return {
     key: "waste",
     label: "Waste",
     planned: null,
     actual: money(total),
     complete: pending === 0,
-    note:
-      pending > 0
-        ? `${plural(pending, "waste entry")} not confirmed yet`
-        : null,
+    note: notes.length > 0 ? notes.join(". ") : null,
     sources,
   };
 }

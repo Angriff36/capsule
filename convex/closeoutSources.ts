@@ -28,6 +28,7 @@ import type { Doc, Id } from "./_generated/dataModel";
 import { mutation, query, type QueryCtx } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import { loadEventLabor } from "./laborSummary";
+import { loadLeftoverDishCosts } from "./lib/closeoutLeftoverCosts";
 import {
   closeoutCaptureValues,
   closeoutSourceSnapshot,
@@ -284,6 +285,9 @@ async function loadProjection(
       ((record.clockOutAt ?? 0) - (record.clockInAt ?? 0)) / 60_000 -
         Math.max(0, Number(record.breakMinutes ?? 0)),
     );
+  const wasteForms = mine(forms as Doc<"fieldConfirmations">[]).filter(
+    (form) => form.formKey === MUDA_FORM_KEY && form.status === "done",
+  );
   const ids = <T extends { _id: unknown }>(rows: T[]) =>
     rows.map((row) => ({ ...row, _id: String(row._id) }));
   return projectCloseoutSources({
@@ -310,11 +314,11 @@ async function loadProjection(
     attributions: ids(mine(attributions as Doc<"revenueAttributions">[])),
     guests: ids(mine(guests as Doc<"eventGuests">[])),
     truckRuns: await truckRuns(ctx, tenantId, eventId),
-    foodWasteForms: ids(
-      mine(forms as Doc<"fieldConfirmations">[]).filter(
-        (form) => form.formKey === MUDA_FORM_KEY && form.status === "done",
-      ),
-    ),
+    foodWasteForms: ids(wasteForms),
+    // Only read the menu's plate costs when a signed form lists leftovers.
+    leftoverDishCosts: wasteForms.length
+      ? await loadLeftoverDishCosts(ctx, tenantId, event._id)
+      : [],
   });
 }
 

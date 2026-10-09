@@ -393,4 +393,68 @@ describe("closeout source lines", () => {
     );
     expect(line(blank, "headcount").complete).toBe(false);
   });
+
+  it("prices food left over from the menu's plate costs, beside the waste line, never in the totals", () => {
+    const form = {
+      _id: "f1",
+      version: 1,
+      completedAt: 1,
+      answers: JSON.stringify({
+        kind: "muda",
+        muda: {
+          attendance: 40,
+          staffError: false,
+          staffErrorNote: "",
+          appetizersUsed: true,
+          appetizerStyles: [],
+          mainsHandling: "thrown_away",
+          leftovers: [
+            { item: "Meatballs", kind: "appetizer", amount: 12 },
+            { item: "chicken piccata", kind: "main", amount: 4 },
+            { item: "Rolls", kind: "main", amount: 2 },
+          ],
+        },
+      }),
+    };
+    const projection = projectCloseoutSources(
+      input({
+        foodWasteForms: [form],
+        leftoverDishCosts: [
+          {
+            name: "Meatballs",
+            costPerServing: 1.5,
+            portionSize: 1,
+            portionUnit: "portion",
+          },
+          // 6 oz a plate: 4 lb = 64 oz = 10.67 plates.
+          {
+            name: "Chicken Piccata",
+            costPerServing: 4,
+            portionSize: 6,
+            portionUnit: "ounce",
+          },
+          // A roll is counted, not weighed, so pounds cannot be priced.
+          {
+            name: "Rolls",
+            costPerServing: 0.4,
+            portionSize: 1,
+            portionUnit: "each",
+          },
+        ],
+      }),
+    );
+    const waste = line(projection, "waste");
+    expect(waste.actual).toBe(0);
+    expect(waste.sources[0].amount).toBe(0);
+    expect(waste.note).toBe(
+      "About $60.67 of food left over (already in the food cost)",
+    );
+    expect(waste.sources[0].label).toBe(
+      "Left over: Meatballs 12 servings (about $18.00), chicken piccata 4 lb (about $42.67), Rolls 2 lb · thrown away · about $60.67 of food made and not eaten (already in the food cost); no plate cost for Rolls",
+    );
+    expect(
+      closeoutCaptureValues(projection, { revenue: 1, ingredient: 1, labor: 1 })
+        .values.actualWasteCost,
+    ).toBe(0);
+  });
 });
