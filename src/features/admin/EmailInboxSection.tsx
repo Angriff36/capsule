@@ -7,9 +7,9 @@ export function EmailInboxSection() {
   if (!setup) return null;
 
   return (
-    <Section title="Client emails">
+    <Section title="Emails from clients">
       {setup.emailsReady && setup.inboxAddress ? (
-        <div className="grid gap-2 text-sm text-ink-2">
+        <div className="grid gap-2 p-4 text-sm text-ink-2">
           <p>
             Emails clients send to{" "}
             <code className="break-all">{setup.inboxAddress}</code> come into
@@ -22,7 +22,7 @@ export function EmailInboxSection() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-2 text-sm">
+        <div className="grid gap-2 p-4 text-sm">
           <p className="text-warn">
             Client emails are not switched on for Capsule yet, so no client
             emails come into the inbox.

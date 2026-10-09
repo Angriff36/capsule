@@ -93,7 +93,8 @@ export function EmailSenderSection({
           <span className="mt-1 block text-xs font-normal text-ink-3">
             When a client answers an invoice, proposal or reminder email, the
             answer goes to this address. Left empty, it comes into the Capsule
-            inbox (see Client emails below).
+            inbox once emails from clients are switched on (see Emails from
+            clients).
           </span>
         </label>
         {error ? <ErrorState title="Sender not saved" detail={error} /> : null}
