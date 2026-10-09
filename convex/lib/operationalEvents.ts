@@ -131,7 +131,9 @@ export async function handleManifestEvent(
     if (
       !list ||
       list.deletedAt != null ||
-      (list.status !== "packed" && list.status !== "loaded")
+      (list.status !== "packed" && list.status !== "loaded") ||
+      // markLoaded needs the packed time; never block the driver over it.
+      (list.status === "packed" && list.packedAt == null)
     )
       return;
     const runner = TenantSystemCommandRunner.forTenant(ctx, list.tenantId);
