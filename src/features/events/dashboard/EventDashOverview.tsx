@@ -176,7 +176,7 @@ export function EventDashOverview({
   const opsLine = firstLine(props.operationalRequirements);
   const travel = event.timingOutboundTravelMinutes;
 
-  const stats: [string, number, string][] = [
+  const stats: [string, number | null, string][] = [
     ["Menu dishes", props.dishCount, eventDetailPath(eventId, "menu")],
     ["Staff assigned", props.staffCount, eventDetailPath(eventId, "staffing")],
     [
@@ -201,7 +201,9 @@ export function EventDashOverview({
       <div className="evd-stats">
         {stats.map(([label, value, to]) => (
           <Link key={label} to={to} className="evd-stat">
-            <b className={value ? "" : "zero"}>{formatCount(value)}</b>
+            <b className={value ? "" : "zero"}>
+              {value == null ? "—" : formatCount(value)}
+            </b>
             <span className="evd-label">{label}</span>
           </Link>
         ))}

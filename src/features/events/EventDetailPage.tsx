@@ -392,17 +392,30 @@ function EventDetailContent({
       .catch((error) => setFailure(classifyCommandFailure(error)));
   };
 
-  const dishCount = (eventDishes ?? []).filter(
-    (selection) =>
-      selection.eventId === event._id &&
-      selection.deletedAt == null &&
-      selection.removedAt == null,
-  ).length;
-  const staffCount = new Set(staffingRoster.map((entry) => entry.personId))
-    .size;
-  const timelineCount = (timelineActivities ?? []).filter(
-    (activity) => activity.eventId === event._id && activity.deletedAt == null,
-  ).length;
+  // null while the rows load, so the counters never show a false "0".
+  const dishCount =
+    eventDishes === undefined
+      ? null
+      : eventDishes.filter(
+          (selection) =>
+            selection.eventId === event._id &&
+            selection.deletedAt == null &&
+            selection.removedAt == null,
+        ).length;
+  const staffCount =
+    eventAssignments === undefined ||
+    staffNeeds === undefined ||
+    shifts === undefined ||
+    people === undefined
+      ? null
+      : new Set(staffingRoster.map((entry) => entry.personId)).size;
+  const timelineCount =
+    timelineActivities === undefined
+      ? null
+      : timelineActivities.filter(
+          (activity) =>
+            activity.eventId === event._id && activity.deletedAt == null,
+        ).length;
 
   const headerActions = [
     <WalkieToggle key="walkie" channelKey={eventChannelKey} />,
