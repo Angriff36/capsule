@@ -105,6 +105,10 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   property followUpStep: int?
   property followUpAt: datetime?
   property followUpById: string?
+  // The client pushed back on price ("too expensive"), when, and who marked
+  // it. The owner's sales audit tracks what share of proposals get this.
+  property priceObjectionAt: datetime?
+  property priceObjectionById: string?
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
@@ -350,6 +354,21 @@ entity Proposal mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       clientId: self.clientId
       step: step
+    }
+  }
+
+  // The client said it costs too much. Kept on a declined proposal too, so
+  // the lost deal log can say why.
+  command recordPriceObjection() {
+    guard self.status == "sent" or self.status == "viewed" or self.status == "declined"
+    guard self.deletedAt == null
+    guard self.priceObjectionAt == null
+    mutate priceObjectionAt = now()
+    mutate priceObjectionById = user.id
+    emit ProposalPriceObjectionRecorded {
+      proposalId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
     }
   }
 
@@ -633,6 +652,12 @@ event ProposalFollowUpRecorded: "proposal.follow_up_recorded" {
   tenantId: string
   clientId: string
   step: int
+}
+
+event ProposalPriceObjectionRecorded: "proposal.price_objection_recorded" {
+  proposalId: string
+  tenantId: string
+  clientId: string
 }
 
 event ProposalViewed: "proposal.viewed" {

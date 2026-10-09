@@ -3336,6 +3336,30 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-09",
       "reason": "Optional text (string?): who did the last follow-up. Old proposals have none. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Lead.firstRepliedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-09",
+      "reason": "Optional date (datetime?): when staff first answered the inquiry. Old leads have none. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Lead.firstRepliedById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-09",
+      "reason": "Optional text (string?): who first answered the inquiry. Old leads have none. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Proposal.priceObjectionAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-09",
+      "reason": "Optional date (datetime?): when the client said the proposal costs too much. Old proposals have none. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Proposal.priceObjectionById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-09",
+      "reason": "Optional text (string?): who marked the price pushback. Old proposals have none. The checker reads a nullable field with no default as required."
     }
   ]
 }
