@@ -2793,6 +2793,7 @@ export const OrganizationSchema = z.object({
   equipmentFieldsJson: z.string().nullable().optional(),
   emailSenderName: z.string().nullable().optional(),
   emailReplyTo: z.string().nullable().optional(),
+  smsNumber: z.string().nullable().optional(),
   brandPhone: z.string().nullable().optional(),
   brandWebsite: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -10038,6 +10039,13 @@ export const OrganizationConfigureStageMovesParamsSchema = z.object({
 });
 
 export type OrganizationConfigureStageMovesParams = z.infer<typeof OrganizationConfigureStageMovesParamsSchema>;
+
+// Command: configureTextNumber on Organization
+export const OrganizationConfigureTextNumberParamsSchema = z.object({
+  smsNumber: z.string().optional(),
+});
+
+export type OrganizationConfigureTextNumberParams = z.infer<typeof OrganizationConfigureTextNumberParamsSchema>;
 
 // Command: configureTimingPolicy on Organization
 export const OrganizationConfigureTimingPolicyParamsSchema = z.object({

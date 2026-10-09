@@ -3360,6 +3360,12 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-09",
       "reason": "Optional text (string?): who marked the price pushback. Old proposals have none. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Organization.smsNumber",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-09",
+      "reason": "Optional text (string?): the company's own number clients text. Old companies have none, so no client texts come in until it is set. The checker reads a nullable field with no default as required."
     }
   ]
 }

@@ -3371,7 +3371,7 @@
       "tasks": ["PL-INBOX"],
       "gap": "Arrival of real messages needs the company's own email or social account connected.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/proofs/message-provider-connection.runtime.test.ts 'connects a (stubbed) provider account and ingests its messages with account/thread/message ids'; until the provider layer exists no honest test can claim arrival — run 2026-10-02 (PL-INBOX): data leg PASS — tests/proofs/message-ingest-idempotency.runtime.test.ts stores account/thread/message ids, send time, sender, network, body, attachment references (once, no link) and links the single matching client contact; BLOCKED: connecting a real email/social account needs the organisation's own account, and the signed provider route needs a Builder author seam beside the generated convex/http.ts (issue #52)"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/proofs/message-provider-connection.runtime.test.ts 'connects a (stubbed) provider account and ingests its messages with account/thread/message ids'; until the provider layer exists no honest test can claim arrival — run 2026-10-02 (PL-INBOX): data leg PASS — tests/proofs/message-ingest-idempotency.runtime.test.ts stores account/thread/message ids, send time, sender, network, body, attachment references (once, no link) and links the single matching client contact; 2026-10-09 connect + arrival leg PASS for client texts: a company saves its texting number on the Brand page (shows the address to paste into Twilio; real browser 360/1280 PASS) and texts to it arrive through the signed Twilio route with account (the number), thread (client phone) and message ids, time, sender, body and photo references, linked to the matching client contact (tests/proofs/client-text-inbox.runtime.test.ts 3/3); still open: one real text in production, which needs a Twilio number pointed at the route (outside account step); 2026-10-09 email leg PASS in proof and browser: client emails to the company's Capsule inbox address arrive through the signed email-service route with account (inbox address), thread (client address) and message (email id) ids, send time, sender, body and file references, linked to the matching contact (tests/proofs/client-email-inbox.runtime.test.ts 4/4); still open: one real text or email in production (outside account step)"
       ],
       "waitsOn": "outside-account",
       "owners": [
@@ -3380,7 +3380,7 @@
         "authored email/social ingress seams"
       ],
       "environment": "Not verified yet",
-      "sha": "446c7c10"
+      "sha": "8307a6f2"
     },
     {
       "id": "AC-105",
@@ -3670,7 +3670,7 @@
       "tasks": ["PL-DELIVERY-RECOVERY"],
       "gap": "Payment callbacks (Stripe) are paused; messaging callbacks need the signed route (issue #52).",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/proofs/stripe-sync-replay.runtime.test.ts 'out-of-order and repeated polls settle each session exactly once' (stub Stripe fetch). 2026-10-01: paused by Ryan's 2026-09-29 no-money rule (Stripe)"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/proofs/stripe-sync-replay.runtime.test.ts 'out-of-order and repeated polls settle each session exactly once' (stub Stripe fetch). 2026-10-01: paused by Ryan's 2026-09-29 no-money rule (Stripe). 2026-10-09: messaging leg proven without callbacks - text status is read back from Twilio and the first final answer is kept, so a delivered text never goes back and a repeat adds nothing (tests/proofs/sms-delivery-status.runtime.test.ts 2/2); payment leg still paused"
       ],
       "waitsOn": "no-money-rule",
       "owners": [
@@ -3680,7 +3680,7 @@
         "durable delivery owners"
       ],
       "environment": "Not verified yet",
-      "sha": "6fc72eab"
+      "sha": "1b6063b1"
     },
     {
       "id": "AC-119",
@@ -5554,22 +5554,22 @@
       "key": "CF-2-2-inbound-webhooks",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§2.2 bullet 7 (signed idempotent inbound webhooks)",
-      "status": "PENDING",
-      "codeState": "missing",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-DELIVERY-RECOVERY"],
-      "gap": "No provider sends signed webhooks to Capsule yet; needs the Builder signed-route seam (issue #52) and an outside signing secret.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: webhook receiver proof once any provider webhook is enabled (replay → no duplicate business record). 2026-10-01: no provider sends webhooks to Capsule (Stripe and Google are polled; convex/http.ts serves only the signed-in command API, whose retries replay by idempotency key: idempotency-replay-scope); a provider webhook needs an outside account's signing secret"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: webhook receiver proof once any provider webhook is enabled (replay → no duplicate business record). 2026-10-01: no provider sends webhooks to Capsule (Stripe and Google are polled; convex/http.ts serves only the signed-in command API, whose retries replay by idempotency key: idempotency-replay-scope); a provider webhook needs an outside account's signing secret; 2026-10-09: PASS - client texts (POST /twilio/sms, Twilio signature) and client emails (POST /resend/inbound, Svix signature + 5-minute time check) are the provider webhooks; a replayed delivery adds no second message (tests/proofs/client-text-inbox.runtime.test.ts 3/3, tests/proofs/client-email-inbox.runtime.test.ts 4/4)"
       ],
-      "waitsOn": "builder-capability",
+      "waitsOn": null,
       "owners": [
         "convex/qboSync.ts",
         "convex/googleCalendar.ts",
         "convex/invoiceReminders.ts",
         "durable delivery owners"
       ],
-      "environment": "Not verified yet",
-      "sha": "6fc72eab"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "8307a6f2"
     },
     {
       "id": "AC-208",
@@ -6407,21 +6407,21 @@
       "key": "CF-4-4-ingestion",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§4.4 paragraph 1",
-      "status": "PENDING",
-      "codeState": "missing",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-INBOX"],
-      "gap": "Signed provider messages need a signed-route author seam beside the generated HTTP router (issue #52).",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: tests/proofs/social-dm-ingest.runtime.test.ts — replayed provider delivery creates one message + one lead; a second delivery creates neither — run 2026-10-02 (PL-INBOX): replay leg PASS (one message, one lead; account/thread/message/sender/time/media/raw kept; thread matched or created; single matching contact linked; lead created when staff qualify) in tests/proofs/message-ingest-idempotency.runtime.test.ts; BLOCKED: entry through a signed webhook needs a Builder author seam beside the generated HTTP router (issue #52), and polling needs the organisation's provider account"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: tests/proofs/social-dm-ingest.runtime.test.ts — replayed provider delivery creates one message + one lead; a second delivery creates neither — run 2026-10-02 (PL-INBOX): replay leg PASS (one message, one lead; account/thread/message/sender/time/media/raw kept; thread matched or created; single matching contact linked; lead created when staff qualify) in tests/proofs/message-ingest-idempotency.runtime.test.ts; 2026-10-09 signed-webhook leg PASS: client texts enter through POST /twilio/sms (authored route seam), Twilio signature checked, company found by the number texted, one conversation per client phone, one message per Twilio message id, contact matched (tests/proofs/client-text-inbox.runtime.test.ts 3/3)"
       ],
-      "waitsOn": "builder-capability",
+      "waitsOn": null,
       "owners": [
         "src/features/clients/",
         "src/integrations/",
         "authored email/social ingress seams"
       ],
-      "environment": "Not verified yet",
-      "sha": "446c7c10"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "a37da9cc"
     },
     {
       "id": "AC-248",
@@ -8628,43 +8628,43 @@
       "key": "CF-12.5-email",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§12.5 (outbound email attached to a Message Thread and Contact/Event/Proposal; template/version, recipients, provider message ID, queued/sent/delivered/bounced/failed states, reply linkage; opt-out and tenant sender config)",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-OUTBOUND"],
-      "gap": "Thread, template, sender and opt-out legs pass; delivered / bounced states need the provider callback on the signed route (issue #52).",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: tests/proofs/email-thread-delivery.runtime.test.ts › 'an outbound client email records thread linkage and the reminder dedupe returns already_delivered on retry'. 2026-10-02 reminder leg PASS in tests/proofs/invoice-reminder-durable-job.runtime.test.ts (one email conversation per invoice linked to contact + event, outbound \"sent\" message per email id, already_delivered on retry); 2026-10-02 invoice and proposal emails join one conversation per document and inbox replies join their conversation, each with the email id (invoice-email-send, proposal-email-send, inbox-email-reply PASS); 2026-10-02 tenant sender leg PASS: each company sets the name on its client emails and a reply-to address (Organization.configureEmailSender, Brand studio \"Client emails\"); invoice, reminder, proposal and inbox reply emails all use it, the send record keeps it (tests/proofs/inbox-email-reply.runtime.test.ts 'uses the company's own sender name and reply address'); 2026-10-02 opt-out leg PASS (tests/proofs/reminder-preference-gate.runtime.test.ts: the client's email choice is read when each reminder, invoice email or proposal email goes); still open: delivered/bounced states (provider callback needs the signed route, issue #52)"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: tests/proofs/email-thread-delivery.runtime.test.ts › 'an outbound client email records thread linkage and the reminder dedupe returns already_delivered on retry'. 2026-10-02 reminder leg PASS in tests/proofs/invoice-reminder-durable-job.runtime.test.ts (one email conversation per invoice linked to contact + event, outbound \"sent\" message per email id, already_delivered on retry); 2026-10-02 invoice and proposal emails join one conversation per document and inbox replies join their conversation, each with the email id (invoice-email-send, proposal-email-send, inbox-email-reply PASS); 2026-10-02 tenant sender leg PASS: each company sets the name on its client emails and a reply-to address (Organization.configureEmailSender, Brand studio \"Client emails\"); invoice, reminder, proposal and inbox reply emails all use it, the send record keeps it (tests/proofs/inbox-email-reply.runtime.test.ts 'uses the company's own sender name and reply address'); 2026-10-02 opt-out leg PASS (tests/proofs/reminder-preference-gate.runtime.test.ts: the client's email choice is read when each reminder, invoice email or proposal email goes); 2026-10-09 delivered/bounced leg PASS without the signed route: convex/emailDelivery.ts asks the email service about each sent client email six times over two days and sets the conversation message Delivered / Bounced / Delivery failed, never backwards, never another company's (tests/proofs/email-delivery-status.runtime.test.ts 5/5)"
       ],
-      "waitsOn": "builder-capability",
+      "waitsOn": null,
       "owners": [
         "convex/invoiceReminders.ts",
         "src/lib/invoiceReminderEmail.ts",
         "src/lib/emailNotifications.ts",
         "integration delivery owners"
       ],
-      "environment": "Not verified yet",
-      "sha": "97ed7ab5"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "fc740f0d"
     },
     {
       "id": "AC-353",
       "key": "CF-12.6-sms",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§12.6 (same thread/delivery model as email; phone validation, consent/opt-out, quiet-hour rules, provider IDs, delivery/failure status; reminders scheduled/deduplicated so retries cannot duplicate)",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-SMS-SOCIAL"],
-      "gap": "Text delivered / failed status from the provider needs the signed route (issue #52).",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: tests/proofs/sms-reminder-dedupe.runtime.test.ts › 'a retried dispatch tick sends each recipient once while an explicit sendNow still sends'. 2026-10-02: that test PASSES (tests/proofs/sms-reminder-dedupe.runtime.test.ts 4/4: retried tick sends once, Send again sends once per click, night rule, STOP stops texts until a later accepted text; phone check + opt-in + provider id kept). Still open: delivered/failed status from the provider - BLOCKED on the signed provider route (issue #52)."
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: tests/proofs/sms-reminder-dedupe.runtime.test.ts › 'a retried dispatch tick sends each recipient once while an explicit sendNow still sends'. 2026-10-02: that test PASSES (tests/proofs/sms-reminder-dedupe.runtime.test.ts 4/4: retried tick sends once, Send again sends once per click, night rule, STOP stops texts until a later accepted text; phone check + opt-in + provider id kept). 2026-10-09: delivered/failed status no longer waits on the signed route: the scan chain asks Twilio about each recent text (convex/smsAlertDelivery.ts); tests/proofs/sms-delivery-status.runtime.test.ts 2/2 (first final answer kept, never goes back, repeat adds nothing, on-its-way stays accepted, plain carrier reasons)."
       ],
-      "waitsOn": "builder-capability",
+      "waitsOn": null,
       "owners": [
         "src/integrations/",
         "convex/smsAlerts.ts",
         "communication/provider owners"
       ],
-      "environment": "Not verified yet",
-      "sha": "2a92e623"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "8a813a40"
     },
     {
       "id": "AC-354",
@@ -14697,7 +14697,7 @@
       "tasks": ["PL-CONNECTIONS"],
       "gap": "Signed inbound webhooks need the Builder signed-route seam (issue #52).",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/proofs/backend-provider-contract.runtime.test.ts — provider contract satisfies the full source contract"
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/proofs/backend-provider-contract.runtime.test.ts — provider contract satisfies the full source contract; 2026-10-09: inbound leg PASS for texts and emails - signed, replay-checked (email 5-minute window; one row per provider message id), mapped to generated commands (tests/proofs/client-text-inbox.runtime.test.ts 3/3, tests/proofs/client-email-inbox.runtime.test.ts 4/4); Stripe/QuickBooks/payroll legs paused (no-live-money rule)"
       ],
       "waitsOn": "builder-capability",
       "owners": [
@@ -14707,7 +14707,7 @@
         "integration UI owners"
       ],
       "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "sha": "8307a6f2"
     },
     {
       "id": "AC-634",

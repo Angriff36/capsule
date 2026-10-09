@@ -3,6 +3,7 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { applyAuthoredHttpRoutes } from "./apply-authored-http-routes.ts";
 import { applyOpaqueIdParams } from "./apply-opaque-id-params.ts";
 import { applyOwnWorkspaceLinks } from "./apply-own-workspace-links.ts";
 import { ManifestLineEndingNormalizer } from "./normalizeManifestLineEndings.ts";
@@ -62,6 +63,8 @@ export function regenerate(passthrough: string[] = []): number {
     ...applyOwnWorkspaceLinks(CAPSULE_ROOT),
     // Command id parameters accept Convex record ids, not only RFC uuids.
     ...applyOpaqueIdParams(CAPSULE_ROOT),
+    // Authored provider routes beside the generated router (#52, #439).
+    ...applyAuthoredHttpRoutes(CAPSULE_ROOT),
   ];
   if (touched.length > 0) {
     console.log(

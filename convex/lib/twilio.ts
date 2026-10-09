@@ -84,12 +84,42 @@ export function safeTwilioMessage(cause: unknown): string {
     .slice(0, 500);
 }
 
+export interface TwilioMessageStatus {
+  status: string;
+  errorCode: number | null;
+}
+
+/** Reads one sent text back from Twilio (queued, sent, delivered, undelivered, failed…). */
+export async function fetchSmsStatus(args: {
+  config: TwilioConfig;
+  messageSid: string;
+}): Promise<TwilioMessageStatus> {
+  const { config } = args;
+  const auth = btoa(`${config.accountSid}:${config.authToken}`);
+  const response = await fetch(
+    `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(config.accountSid)}/Messages/${encodeURIComponent(args.messageSid)}.json`,
+    { method: "GET", headers: { Authorization: `Basic ${auth}` } },
+  );
+  const payload = (await response.json().catch(() => null)) as
+    | { status?: string; error_code?: number | null; message?: string }
+    | null;
+  if (!response.ok || typeof payload?.status !== "string") {
+    throw new TwilioSendError(
+      payload?.message ?? `Twilio status read failed (${response.status}).`,
+      null,
+    );
+  }
+  return { status: payload.status, errorCode: payload.error_code ?? null };
+}
+
 /** Sends one SMS via Twilio. Returns the Twilio message SID on success. */
 export async function sendSms(args: {
   config: TwilioConfig;
   to: string;
   body: string;
   idempotencyKey?: string;
+  /** Where Twilio reports delivered / not delivered for this text. */
+  statusCallback?: string;
 }): Promise<string> {
   const { config } = args;
   const auth = btoa(`${config.accountSid}:${config.authToken}`);
@@ -98,6 +128,7 @@ export async function sendSms(args: {
     From: config.fromNumber,
     Body: args.body.slice(0, 1600),
   });
+  if (args.statusCallback) form.set("StatusCallback", args.statusCallback);
   const response = await fetch(
     `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(config.accountSid)}/Messages.json`,
     {

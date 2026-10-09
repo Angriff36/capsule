@@ -51,9 +51,17 @@ calls, emails, notes and tasks through `convex/importHistory.ts`; BEO PDFs,
 contracts and floor plans are attached to the event (`convex/lib/importEventFiles.ts`).
 
 Deliveries: invoice and proposal emails keep every try with the fix when one
-did not go (invoice page and the proposal's "Emails" list). Capsule knows
-"taken by the email service", not "delivered" or "bounced" (signed provider
-callbacks wait on issue #52).
+did not go (invoice page and the proposal's "Emails" list). Since 2026-10-09
+Capsule asks the email service about each client email for two days and marks
+it Delivered, Bounced or Delivery failed (`convex/emailDelivery.ts`,
+`proofs/email-delivery-status`).
+
+Client replies: client texts (`/twilio/sms`) and client emails
+(`/resend/inbound`) come into `/clients/inbox` through signed routes, one
+conversation per client, linked to the matching contact
+(`proofs/client-text-inbox`, `proofs/client-email-inbox`). The live site
+still needs a Twilio number and the email service's receiving domain pointed
+at those routes.
 
 Open:
 - Imported events that are over and were booked in TPP (Confirmed, Sales

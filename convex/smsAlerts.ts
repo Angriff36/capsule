@@ -40,6 +40,7 @@ import {
 } from "./lib/twilio";
 import { insertStepEvent } from "./lib/commandAudit";
 import { quietHoursEnd } from "./lib/clientEmailConsent";
+import { statusCallbackUrl } from "./smsAlertDelivery";
 
 const CONFIG_ENTITY = "SmsAlertConfig";
 const ALERT_ENTITY = "SmsAlert";
@@ -644,6 +645,7 @@ export const scanTenant = internalAction({
             to: recipient.phone,
             body: trigger.body,
             idempotencyKey: `sms-alert/${dedupKey}`,
+            statusCallback: statusCallbackUrl(args.tenantId),
           });
           sentKeys.add(dedupKey);
           await ctx.runMutation(internal.smsAlerts.recordAlert, {
@@ -696,6 +698,12 @@ export const scanTenant = internalAction({
     });
 
     if (args.scheduleNext) {
+      // Ask the text service which earlier texts reached the phone.
+      await ctx.scheduler.runAfter(
+        0,
+        internal.smsAlertDelivery.checkDeliveries,
+        { tenantId: args.tenantId },
+      );
       await scheduleNextScan(ctx, args.tenantId, args.chainId);
     }
     return result;

@@ -232,6 +232,11 @@ entity Organization mixin TenantScoped, SoftDeletable {
   property emailSenderName: string?
   property emailReplyTo: string?
 
+  // Client texts (PL-INBOX): the company's own texting number on Capsule's
+  // text service. Texts clients send to it land in the company inbox.
+  // Unset = no client texts come in.
+  property smsNumber: string?
+
   // Phone and website clients see at the foot of the public menu and other
   // client papers (the printed menu book: "844-4-MANGIA · mangiacateringco.com").
   property brandPhone: string?
@@ -455,6 +460,16 @@ entity Organization mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The number clients text. Empty clears it.
+  command configureTextNumber(optional smsNumber: string) {
+    guard self.deletedAt == null
+    mutate smsNumber = smsNumber
+    emit OrganizationTextNumberConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   // Phone and website for client papers. Empty values clear them.
   command configureContactDetails(optional phone: string, optional website: string) {
     guard self.deletedAt == null
@@ -583,6 +598,11 @@ event OrganizationStageMovesConfigured: "organization.stage_moves_configured" {
 }
 
 event OrganizationEmailSenderConfigured: "organization.email_sender_configured" {
+  organizationId: string
+  tenantId: string
+}
+
+event OrganizationTextNumberConfigured: "organization.text_number_configured" {
   organizationId: string
   tenantId: string
 }
