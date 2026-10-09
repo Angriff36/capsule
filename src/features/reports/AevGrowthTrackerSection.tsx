@@ -11,7 +11,8 @@ import {
   money,
   percent,
 } from "./mangia/SalesReportParts";
-import { aevGrowthTracker } from "./aevGrowthTracker";
+import { aevGrowthTracker, pipelineByUpsell } from "./aevGrowthTracker";
+import { UPSELL_POTENTIAL } from "../events/EventUpsellPotentialCard";
 
 /**
  * The growth strategy's monthly tracker and close-rate watch
@@ -21,10 +22,13 @@ export function AevGrowthTrackerSection({
   events,
   now,
 }: {
-  events: readonly SalesEvent[];
+  events: readonly (SalesEvent & {
+    readonly upsellPotential?: string | null;
+  })[];
   now: Date;
 }) {
   const t = useMemo(() => aevGrowthTracker(events, now), [events, now]);
+  const pipeline = useMemo(() => pipelineByUpsell(events), [events]);
   const last = t.year - 1;
   const lastMonth = t.months.at(-2);
   return (
@@ -116,6 +120,31 @@ export function AevGrowthTrackerSection({
                 ? "Below"
                 : "On track",
           ])}
+        />
+      </ReportSection>
+
+      <ReportSection
+        title="Deals not held yet, by add-on potential"
+        period="quotes, deals waiting for approval and booked events still ahead; tag each on the event's Overview"
+      >
+        <FigureTable
+          headers={[
+            "Add-on potential",
+            "Deals",
+            "Value",
+            "Usual add-ons",
+            "What to do",
+          ]}
+          rows={pipeline.map((row) => {
+            const tag = row.tag ? UPSELL_POTENTIAL[row.tag] : null;
+            return [
+              tag ? tag.label : "Not tagged yet",
+              count(row.events),
+              money(row.revenue),
+              tag ? tag.range : "—",
+              tag ? tag.action : "Tag it on the event's Overview",
+            ];
+          })}
         />
       </ReportSection>
     </div>

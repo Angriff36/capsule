@@ -2,7 +2,10 @@
 // monthly tracker against the 10% goal and a close-rate watch that warns
 // after two months under last year's close rate.
 import { describe, expect, it } from "vitest";
-import { aevGrowthTracker } from "../../src/features/reports/aevGrowthTracker";
+import {
+  aevGrowthTracker,
+  pipelineByUpsell,
+} from "../../src/features/reports/aevGrowthTracker";
 
 const at = (year: number, month: number, day = 10) =>
   new Date(year, month, day, 12).getTime();
@@ -76,5 +79,28 @@ describe("average event value growth tracker", () => {
     expect(fresh.goal).toBeNull();
     expect(fresh.baselineCloseRate).toBeNull();
     expect(fresh.closeRateWarning).toBe(false);
+  });
+});
+
+describe("deals not held yet by add-on potential", () => {
+  it("groups quotes, waiting and booked-ahead deals by tag, untagged last; held and lost left out", () => {
+    const rows = pipelineByUpsell([
+      { ...ev("quote", 12000, at(2026, 10)), upsellPotential: "high" },
+      {
+        ...ev("pending_approval", 8000, at(2026, 11)),
+        upsellPotential: "high",
+      },
+      { ...ev("planning", 3000, at(2026, 10)), upsellPotential: "standard" },
+      { ...ev("quote", 2000, at(2026, 10)), upsellPotential: null },
+      { ...ev("approved", 9000, at(2026, 10)), upsellPotential: "high" },
+      { ...ev("cancelled", 9000, at(2026, 10)), upsellPotential: "moderate" },
+      { ...ev("completed", 5000, at(2026, 5)), upsellPotential: "moderate" },
+    ]);
+    expect(rows.map((r) => [r.tag, r.events, r.revenue])).toEqual([
+      ["high", 3, 29000],
+      ["moderate", 0, 0],
+      ["standard", 1, 3000],
+      [null, 1, 2000],
+    ]);
   });
 });

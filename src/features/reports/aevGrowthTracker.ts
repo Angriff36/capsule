@@ -1,7 +1,9 @@
 import {
   GROWTH_GOAL,
   changePercent,
+  isBookedAhead,
   isDelivered,
+  isOpen,
   isWon,
   monthPeriod,
   totals,
@@ -23,6 +25,9 @@ import {
  *   a month    = won events (delivered + booked) starting that month
  *   close rate = won / (won + lost) of events starting that month
  *   baseline   = last year's full-year close rate
+ * and the strategy's pipeline tagging: deals not held yet (quotes, deals
+ * waiting for approval, and booked events still ahead, since the strategy
+ * also asks for add-ons after the contract) grouped by their add-on tag.
  */
 
 export interface TrackerMonth {
@@ -96,4 +101,31 @@ export function aevGrowthTracker(
     closeRateWarning:
       lastTwo.length === 2 && lastTwo.every((m) => m.belowBaseline === true),
   };
+}
+
+export type UpsellTag = "high" | "moderate" | "standard";
+
+export interface PipelineTagRow extends Totals {
+  /** null = not tagged yet. */
+  readonly tag: UpsellTag | null;
+}
+
+const TAGS: readonly (UpsellTag | null)[] = [
+  "high",
+  "moderate",
+  "standard",
+  null,
+];
+
+/** Deals not held yet per add-on potential tag, highest first, untagged last. */
+export function pipelineByUpsell(
+  events: readonly (SalesEvent & {
+    readonly upsellPotential?: string | null;
+  })[],
+): PipelineTagRow[] {
+  const open = events.filter((e) => isOpen(e) || isBookedAhead(e));
+  return TAGS.map((tag) => ({
+    tag,
+    ...totals(open.filter((e) => (e.upsellPotential ?? null) === tag)),
+  }));
 }
