@@ -143,7 +143,15 @@ export function parseEventWorksheet(rows: string[][]): EventBundlePart {
   const venueText = coordinates
     ? venueBlob?.replace(coordinates.matched, " ").trim()
     : venueBlob;
-  const venueName = venueText?.split(/\s*\d/)[0]?.trim();
+  // The street starts at the first whole number ("7024 N 16th ST"), so a
+  // name with a number in it ("Dalton Garden, 16th ST") keeps it; with no
+  // whole number the first digit starts the street.
+  const streetNumber = venueText?.match(/(?<!\d)\d+(?=\s)/);
+  const venueName = (
+    streetNumber
+      ? venueText?.slice(0, streetNumber.index)
+      : venueText?.split(/\s*\d/)[0]
+  )?.trim();
   const venueStreet =
     venueName === undefined ? venueText : venueText?.slice(venueName.length);
   const venueAddress = venueStreet?.trim()
