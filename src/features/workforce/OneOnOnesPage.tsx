@@ -264,12 +264,18 @@ export function OneOnOnesPage() {
                 onChange={(e) => setScorecardId(e.target.value)}
               >
                 <option value="">No scorecard</option>
-                {definedScorecards.map((row) => (
-                  <option key={row._id} value={row._id}>
-                    {row.title}
-                    {row.status === "archived" ? " (old version)" : ""}
-                  </option>
-                ))}
+                {definedScorecards
+                  // Old versions stay off the list unless already picked.
+                  .filter(
+                    (row) =>
+                      row.status !== "archived" || row._id === scorecardId,
+                  )
+                  .map((row) => (
+                    <option key={row._id} value={row._id}>
+                      {row.title}
+                      {row.status === "archived" ? " (old version)" : ""}
+                    </option>
+                  ))}
               </select>
             </label>
             <label className="field-label">
