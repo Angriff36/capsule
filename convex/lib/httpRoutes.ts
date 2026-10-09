@@ -7,7 +7,9 @@
  * its sender itself.
  */
 import type { HttpRouter } from "convex/server";
+import { receiveText, TEXT_ROUTE_PATH } from "../textInbox";
 
-export function registerAuthoredRoutes(_http: HttpRouter): void {
-  // No authored routes yet.
+export function registerAuthoredRoutes(http: HttpRouter): void {
+  // Client texts to a company's texting number (PL-INBOX).
+  http.route({ path: TEXT_ROUTE_PATH, method: "POST", handler: receiveText });
 }
