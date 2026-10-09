@@ -3270,6 +3270,30 @@
       "category": "command-parameter-added",
       "acknowledgedAt": "2026-10-07",
       "reason": "Optional date on the invoice deposit step, already on dev (signed due date). Callers that leave it out keep the invoice's own due date, so nothing that works today breaks."
+    },
+    {
+      "path": "Dish.isSignature",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-09",
+      "reason": "Optional yes/no (boolean?): marks a house signature dish for the Company Scorecard menu adoption number. Old dishes simply are not marked. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Event.clientRating",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-09",
+      "reason": "Optional whole number (int?): the client's 1-5 score for the event, for the Company Scorecard client satisfaction number. Old events simply have no score. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Event.clientRatingNote",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-09",
+      "reason": "Optional text (string?): what the client said with their score. Old events have none. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Event.clientRatedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-09",
+      "reason": "Optional date (datetime?): when the client's score was written down. Old events have none. The checker reads a nullable field with no default as required."
     }
   ]
 }

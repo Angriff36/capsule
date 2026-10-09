@@ -153,6 +153,7 @@ import {
   DishLabelVersionParamsSchema,
   DishLinkAsEditionParamsSchema,
   DishMakeVersionOfParamsSchema,
+  DishMarkSignatureParamsSchema,
   DishMergeIntoParamsSchema,
   DishPurgeParamsSchema,
   DishReinstateParamsSchema,
@@ -285,6 +286,7 @@ import {
   EventPlanNeedsReviseParamsSchema,
   EventReactivateParamsSchema,
   EventReassignClientParamsSchema,
+  EventRecordClientRatingParamsSchema,
   EventRecordFinalVenueFactsParamsSchema,
   EventRecordPastCompletionParamsSchema,
   EventRescheduleParamsSchema,
@@ -3043,6 +3045,16 @@ export function useDishMakeVersionOf() {
   };
 }
 
+/** Mutation hook for Dish.markSignature. */
+export function useDishMarkSignature() {
+  const mutate = useMutation(api.mutations.Dish_markSignature);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishMarkSignatureParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Dish.mergeInto. */
 export function useDishMergeInto() {
   const mutate = useMutation(api.mutations.Dish_mergeInto);
@@ -4171,6 +4183,16 @@ export function useEventReassignClient() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventReassignClientParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Event.recordClientRating. */
+export function useEventRecordClientRating() {
+  const mutate = useMutation(api.mutations.Event_recordClientRating);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventRecordClientRatingParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -14869,4 +14891,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1571 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1573 as const;

@@ -789,6 +789,7 @@ export const DishSchema = z.object({
   finishTiming: z.enum(["finish_at_kitchen", "finish_at_event", "day_of"]).nullable().optional(),
   recipeDishId: z.string().uuid().nullable().optional(),
   exclusiveVenueId: z.string().uuid().nullable().optional(),
+  isSignature: z.boolean().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1234,6 +1235,9 @@ export const EventSchema = z.object({
   beverageDispensers: z.string().nullable().optional(),
   buffetService: z.string().nullable().optional(),
   binderBuiltAt: z.coerce.date().nullable().optional(),
+  clientRating: z.number().int().nullable().optional(),
+  clientRatingNote: z.string().nullable().optional(),
+  clientRatedAt: z.coerce.date().nullable().optional(),
   externalChannelName: z.string().nullable().optional(),
   externalChannelId: z.string().nullable().optional(),
   externalChannelUrl: z.string().nullable().optional(),
@@ -6527,6 +6531,13 @@ export const DishMakeVersionOfParamsSchema = z.object({
 
 export type DishMakeVersionOfParams = z.infer<typeof DishMakeVersionOfParamsSchema>;
 
+// Command: markSignature on Dish
+export const DishMarkSignatureParamsSchema = z.object({
+  isSignatureDish: z.boolean(),
+});
+
+export type DishMarkSignatureParams = z.infer<typeof DishMarkSignatureParamsSchema>;
+
 // Command: mergeInto on Dish
 export const DishMergeIntoParamsSchema = z.object({
   targetDishId: z.string().uuid(),
@@ -7334,6 +7345,14 @@ export type EventReactivateParams = z.infer<typeof EventReactivateParamsSchema>;
 export const EventReassignClientParamsSchema = z.object({});
 
 export type EventReassignClientParams = z.infer<typeof EventReassignClientParamsSchema>;
+
+// Command: recordClientRating on Event
+export const EventRecordClientRatingParamsSchema = z.object({
+  rating: z.number().optional(),
+  note: z.string().optional(),
+});
+
+export type EventRecordClientRatingParams = z.infer<typeof EventRecordClientRatingParamsSchema>;
 
 // Command: recordFinalVenueFacts on Event
 export const EventRecordFinalVenueFactsParamsSchema = z.object({
