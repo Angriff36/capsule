@@ -9,8 +9,14 @@
 //
 // LeadershipItem: a 90-day priority (rock), an issue to solve, or a meeting
 // to-do, with an owner, due date and open / done / dropped. The L10 page lists
-// them and builds the meeting-period history from openedAt / closedAt, so no
-// separate meeting record has to be kept.
+// them and builds the meeting-period history from openedAt / closedAt.
+// Client and people headlines are short notes read out in the meeting; a rock
+// carries this week's on track / at risk / off track mark, and an issue is
+// closed by writing the answer the team agreed on (solve).
+//
+// LeadershipMeeting: one weekly meeting as held - the day, who ran it, the
+// team's 1 to 10 rating, what went well, what to improve and the decisions
+// made (the owner's L10 meeting sheet, "Rate the Meeting").
 
 use "../foundation/base.manifest"
 use "../identity/person.manifest"
@@ -24,6 +30,14 @@ enum LeadershipItemKind {
   rock
   issue
   todo
+  client_headline
+  people_headline
+}
+
+enum RockTrack {
+  on_track
+  at_risk
+  off_track
 }
 
 enum LeadershipItemStatus {
@@ -130,6 +144,9 @@ entity LeadershipItem mixin TenantScoped, SoftDeletable {
   property dueAt: datetime?
   property required status: LeadershipItemStatus = "open"
   property notes: string?
+  property track: RockTrack?
+  property trackSetAt: datetime?
+  property solution: string?
   property openedAt: datetime?
   property openedByPersonId: uuid?
   property closedAt: datetime?
@@ -196,6 +213,36 @@ entity LeadershipItem mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command markTrack(track: RockTrack) {
+    guard self.kind == "rock"
+    guard self.status == "open"
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate track = track
+    mutate trackSetAt = now()
+    emit LeadershipItemTrackMarked {
+      leadershipItemId: self.id
+      tenantId: self.tenantId
+      track: track
+    }
+  }
+
+  command solve(solution: string) {
+    guard self.kind == "issue"
+    guard self.status == "open"
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint solveAnswer: length(trim(solution)) > 0 "Write the answer the team agreed on."
+    mutate solution = solution
+    mutate status = "done"
+    mutate closedAt = now()
+    mutate closedByPersonId = user.personId
+    emit LeadershipItemSolved {
+      leadershipItemId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   command complete() {
     guard self.status == "open"
     guard self.deletedAt == null
@@ -236,6 +283,80 @@ entity LeadershipItem mixin TenantScoped, SoftDeletable {
   }
 
   store LeadershipItem in durable
+}
+
+entity LeadershipMeeting mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property heldAt: datetime?
+  property facilitatorPersonId: uuid?
+  property rating: int?
+  property wentWell: string?
+  property toImprove: string?
+  property decisions: string?
+  property recordedAt: datetime?
+  property recordedByPersonId: uuid?
+
+  ref facilitator: Person fields [tenantId, facilitatorPersonId] references [tenantId, id]
+  ref recordedBy: Person fields [tenantId, recordedByPersonId] references [tenantId, id]
+
+  default policy leadershipMeetingRead read: roleAllows(user.role, "manageAccess") "Managers may see meeting ratings"
+  default policy leadershipMeetingWrite write: roleAllows(user.role, "manageAccess") "Managers may update meeting ratings"
+  default policy leadershipMeetingExecute execute: roleAllows(user.role, "manageAccess") "Managers may rate meetings"
+
+  command record(
+    heldAt: datetime,
+    rating: int,
+    optional facilitatorPersonId: uuid,
+    optional wentWell: string,
+    optional toImprove: string,
+    optional decisions: string
+  ) {
+    guard self.recordedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint recordRating: rating >= 1 and rating <= 10 "Rate the meeting from 1 to 10."
+    mutate heldAt = heldAt
+    mutate rating = rating
+    mutate facilitatorPersonId = facilitatorPersonId
+    mutate wentWell = wentWell
+    mutate toImprove = toImprove
+    mutate decisions = decisions
+    mutate recordedAt = now()
+    mutate recordedByPersonId = user.personId
+    emit LeadershipMeetingRecorded {
+      leadershipMeetingId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command revise(
+    heldAt: datetime,
+    rating: int,
+    optional facilitatorPersonId: uuid,
+    optional wentWell: string,
+    optional toImprove: string,
+    optional decisions: string
+  ) {
+    guard self.recordedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint reviseRating: rating >= 1 and rating <= 10 "Rate the meeting from 1 to 10."
+    mutate heldAt = heldAt
+    mutate rating = rating
+    mutate facilitatorPersonId = facilitatorPersonId
+    mutate wentWell = wentWell
+    mutate toImprove = toImprove
+    mutate decisions = decisions
+    emit LeadershipMeetingRevised {
+      leadershipMeetingId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store LeadershipMeeting in durable
 }
 
 event ScorecardTargetSet: "scorecard_target.set" {
@@ -279,5 +400,26 @@ event LeadershipItemDropped: "leadership_item.dropped" {
 
 event LeadershipItemReopened: "leadership_item.reopened" {
   leadershipItemId: string
+  tenantId: string
+}
+
+event LeadershipItemTrackMarked: "leadership_item.track_marked" {
+  leadershipItemId: string
+  tenantId: string
+  track: string
+}
+
+event LeadershipItemSolved: "leadership_item.solved" {
+  leadershipItemId: string
+  tenantId: string
+}
+
+event LeadershipMeetingRecorded: "leadership_meeting.recorded" {
+  leadershipMeetingId: string
+  tenantId: string
+}
+
+event LeadershipMeetingRevised: "leadership_meeting.revised" {
+  leadershipMeetingId: string
   tenantId: string
 }

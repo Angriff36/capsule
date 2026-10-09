@@ -2442,12 +2442,15 @@ export const LeadershipItemSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
-  kind: z.enum(["rock", "issue", "todo"]).default("todo"),
+  kind: z.enum(["rock", "issue", "todo", "client_headline", "people_headline"]).default("todo"),
   title: z.string().default(""),
   ownerPersonId: z.string().uuid().nullable().optional(),
   dueAt: z.coerce.date().nullable().optional(),
   status: z.enum(["open", "done", "dropped"]).default("open"),
   notes: z.string().nullable().optional(),
+  track: z.enum(["on_track", "at_risk", "off_track"]).nullable().optional(),
+  trackSetAt: z.coerce.date().nullable().optional(),
+  solution: z.string().nullable().optional(),
   openedAt: z.coerce.date().nullable().optional(),
   openedByPersonId: z.string().uuid().nullable().optional(),
   closedAt: z.coerce.date().nullable().optional(),
@@ -2457,6 +2460,25 @@ export const LeadershipItemSchema = z.object({
 });
 
 export type LeadershipItem = z.infer<typeof LeadershipItemSchema>;
+
+// Entity: LeadershipMeeting
+export const LeadershipMeetingSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  heldAt: z.coerce.date().nullable().optional(),
+  facilitatorPersonId: z.string().uuid().nullable().optional(),
+  rating: z.number().int().nullable().optional(),
+  wentWell: z.string().nullable().optional(),
+  toImprove: z.string().nullable().optional(),
+  decisions: z.string().nullable().optional(),
+  recordedAt: z.coerce.date().nullable().optional(),
+  recordedByPersonId: z.string().uuid().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type LeadershipMeeting = z.infer<typeof LeadershipMeetingSchema>;
 
 // Entity: LeftoverDisposition
 export const LeftoverDispositionSchema = z.object({
@@ -9471,7 +9493,7 @@ export type LeadUpdatePipelineParams = z.infer<typeof LeadUpdatePipelineParamsSc
 
 // Command: add on LeadershipItem
 export const LeadershipItemAddParamsSchema = z.object({
-  kind: z.enum(["rock", "issue", "todo"]),
+  kind: z.enum(["rock", "issue", "todo", "client_headline", "people_headline"]),
   title: z.string(),
   ownerPersonId: z.string().min(1).optional(),
   dueAt: z.coerce.date().optional(),
@@ -9490,6 +9512,13 @@ export const LeadershipItemDropParamsSchema = z.object({});
 
 export type LeadershipItemDropParams = z.infer<typeof LeadershipItemDropParamsSchema>;
 
+// Command: markTrack on LeadershipItem
+export const LeadershipItemMarkTrackParamsSchema = z.object({
+  track: z.enum(["on_track", "at_risk", "off_track"]),
+});
+
+export type LeadershipItemMarkTrackParams = z.infer<typeof LeadershipItemMarkTrackParamsSchema>;
+
 // Command: reopen on LeadershipItem
 export const LeadershipItemReopenParamsSchema = z.object({});
 
@@ -9504,6 +9533,37 @@ export const LeadershipItemReviseParamsSchema = z.object({
 });
 
 export type LeadershipItemReviseParams = z.infer<typeof LeadershipItemReviseParamsSchema>;
+
+// Command: solve on LeadershipItem
+export const LeadershipItemSolveParamsSchema = z.object({
+  solution: z.string(),
+});
+
+export type LeadershipItemSolveParams = z.infer<typeof LeadershipItemSolveParamsSchema>;
+
+// Command: record on LeadershipMeeting
+export const LeadershipMeetingRecordParamsSchema = z.object({
+  heldAt: z.coerce.date(),
+  rating: z.number().int(),
+  facilitatorPersonId: z.string().min(1).optional(),
+  wentWell: z.string().optional(),
+  toImprove: z.string().optional(),
+  decisions: z.string().optional(),
+});
+
+export type LeadershipMeetingRecordParams = z.infer<typeof LeadershipMeetingRecordParamsSchema>;
+
+// Command: revise on LeadershipMeeting
+export const LeadershipMeetingReviseParamsSchema = z.object({
+  heldAt: z.coerce.date(),
+  rating: z.number().int(),
+  facilitatorPersonId: z.string().min(1).optional(),
+  wentWell: z.string().optional(),
+  toImprove: z.string().optional(),
+  decisions: z.string().optional(),
+});
+
+export type LeadershipMeetingReviseParams = z.infer<typeof LeadershipMeetingReviseParamsSchema>;
 
 // Command: record on LeftoverDisposition
 export const LeftoverDispositionRecordParamsSchema = z.object({
