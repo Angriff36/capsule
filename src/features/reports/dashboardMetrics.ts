@@ -122,6 +122,49 @@ export const DASHBOARD_METRICS = {
     currency: "none",
     tax: NOT_MONEY,
   },
+  "dashboard.pipeline_value": {
+    ...BOOKED_BASE,
+    label: "Pipeline value",
+    measures:
+      "Quoted prices of events still in quote, planning or waiting for approval, added together.",
+    currency: "company",
+    tax: QUOTED_TAX,
+    dateBasis: "Every open event on file today, whatever its date.",
+    includes: "Quote, planning and waiting-for-approval events.",
+    leftOut:
+      "Approved and later events (already won) and cancelled events. Events with no quoted price add $0.",
+  },
+  "dashboard.win_rate": {
+    ...BOOKED_BASE,
+    label: "Win rate",
+    measures:
+      "Won events divided by won plus lost events. Won = booked (approved or later, with a price); lost = cancelled.",
+    currency: "none",
+    tax: NOT_MONEY,
+    includes: "Booked events and cancelled events.",
+    leftOut:
+      "Open quotes, planning and waiting-for-approval events: not decided yet.",
+  },
+  "dashboard.lost_revenue": {
+    ...BOOKED_BASE,
+    label: "Lost revenue",
+    measures: "Quoted prices of cancelled events added together.",
+    currency: "company",
+    tax: QUOTED_TAX,
+    includes:
+      "Cancelled events, whether lost as a quote or cancelled after booking.",
+    leftOut: "Every other stage. Cancelled events with no quoted price add $0.",
+  },
+  "dashboard.aev_growth_goal": {
+    ...COMPLETED_BASE,
+    label: "Growth goal",
+    measures:
+      "Last full year's average delivered event value times 1.10 (the company goal: 10% growth). This year's average is compared with it.",
+    currency: "company",
+    tax: QUOTED_TAX,
+    dateBasis:
+      "Event start date in last calendar year, on this device's clock.",
+  },
   "dashboard.completed_average": {
     ...COMPLETED_BASE,
     label: "Average event value",
