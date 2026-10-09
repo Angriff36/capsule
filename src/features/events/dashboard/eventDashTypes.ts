@@ -50,9 +50,10 @@ export type EventDashOverviewProps = EventDetailRevisePanelsProps & {
   blockedLifecycleActions: readonly { key: string; reason: string }[];
   onAction: (key: EventLifecycleActionKey) => void;
   people: readonly DashOwnerPerson[] | undefined;
-  dishCount: number;
-  staffCount: number;
-  timelineCount: number;
+  // null while still loading, so the page never shows a false "0".
+  dishCount: number | null;
+  staffCount: number | null;
+  timelineCount: number | null;
 };
 
 export type DashSheetId =

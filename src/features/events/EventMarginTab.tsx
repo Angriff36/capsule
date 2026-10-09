@@ -111,7 +111,11 @@ export function EventMarginTab({ eventId }: Props) {
   const canReadFoodCost = canReadEventFoodCost(authStatus?.role);
   const foodCostReport = useEventFoodCost(eventId, canReadFoodCost);
   const quoted = event?.quotedPrice ?? null;
-  const budget = event?.budgetAmount ?? null;
+  // A $0 budget means none was given (the overview says "no budget given").
+  const budget =
+    event?.budgetAmount != null && event.budgetAmount > 0
+      ? event.budgetAmount
+      : null;
 
   const recipeRollup = useMemo(
     () =>

@@ -236,9 +236,11 @@ export function EventPhoneBrief({
             </Link>
           }
         >
-          {props.staffCount === 0
-            ? "Nobody assigned yet"
-            : `${props.staffCount} ${props.staffCount === 1 ? "person" : "people"} assigned`}
+          {props.staffCount == null
+            ? "Loading…"
+            : props.staffCount === 0
+              ? "Nobody assigned yet"
+              : `${props.staffCount} ${props.staffCount === 1 ? "person" : "people"} assigned`}
         </Row>
         <Row
           label="Prep"
