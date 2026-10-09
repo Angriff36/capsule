@@ -438,8 +438,11 @@ export const listNotifications = query({
       auth.personId
         ? ctx.db
             .query("timeOffRequests")
-            .withIndex("by_personId", (q) =>
-              q.eq("personId", auth.personId as Id<"people">),
+            // Only answers from the last two weeks can become a notice.
+            .withIndex("by_personId_and_reviewedAt", (q) =>
+              q
+                .eq("personId", auth.personId as Id<"people">)
+                .gte("reviewedAt", Date.now() - 14 * 86_400_000),
             )
             .collect()
             .then((rows) =>

@@ -51,11 +51,17 @@ projections:
         Shift:
           - fields: [tenantId, endsAt]
             name: by_tenantId_and_endsAt
+          # One person's shifts from a date on, not every shift they had.
+          - fields: [personId, endsAt]
+            name: by_personId_and_endsAt
           - fields: [tenantId, personId, status, endsAt]
             name: by_staff_status_end
         TimeOffRequest:
           - fields: [tenantId, status]
             name: by_tenantId_and_status
+          # One person's requests answered recently (their notices).
+          - fields: [personId, reviewedAt]
+            name: by_personId_and_reviewedAt
           - fields: [tenantId, personId, status, endsAt]
             name: by_staff_status_end
           # Approved time off of a date window (convex/workforceWindow.ts
@@ -253,6 +259,9 @@ projections:
         PayrollInput:
           - fields: [tenantId, periodStart]
             name: by_tenantId_and_periodStart
+          # One person's inputs for pay periods ending from a date on.
+          - fields: [personId, periodEnd]
+            name: by_personId_and_periodEnd
           # Every open row (draft, prepared, sent, viewed, scheduled, active)
           # of these screens through a status index, so an older open one is
           # never cut off by a page of newer finished ones.
@@ -285,6 +294,16 @@ projections:
         AvailabilityWindow:
           - fields: [tenantId, endsAt]
             name: by_tenantId_and_endsAt
+          - fields: [personId, endsAt]
+            name: by_personId_and_endsAt
+          - fields: [personId, status]
+            name: by_personId_and_status
+        # One person's notices for one week, or for weeks from a date on.
+        WeeklyScheduleNotice:
+          - fields: [personId, weekStartsAt]
+            name: by_personId_and_weekStartsAt
+          - fields: [personId, weekEndsAt]
+            name: by_personId_and_weekEndsAt
         ProductionBatch:
           - fields: [tenantId, status, completedAt]
             name: by_tenantId_and_status_and_completedAt

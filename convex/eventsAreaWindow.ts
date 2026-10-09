@@ -169,12 +169,25 @@ export const shiftsInWindow = query({
       for (const raw of [...new Set(personIds)]) {
         const personId = ctx.db.normalizeId("people", raw);
         if (!personId) continue;
+        // Shifts ending after `from`, plus any with no end time yet; never
+        // every shift this person ever had.
         rows.push(
           ...(await ctx.db
             .query("shifts")
-            .withIndex("by_personId", (q) => q.eq("personId", personId))
+            .withIndex("by_personId_and_endsAt", (q) =>
+              q.eq("personId", personId).gt("endsAt", from),
+            )
             .collect()),
         );
+        for (const endsAt of [null, undefined])
+          rows.push(
+            ...(await ctx.db
+              .query("shifts")
+              .withIndex("by_personId_and_endsAt", (q) =>
+                q.eq("personId", personId).eq("endsAt", endsAt),
+              )
+              .collect()),
+          );
       }
     } else {
       rows = await ctx.db

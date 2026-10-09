@@ -98,7 +98,9 @@ export const awayForPeople = query({
       for (const row of live(
         await ctx.db
           .query("availabilityWindows")
-          .withIndex("by_personId", (q) => q.eq("personId", personId))
+          .withIndex("by_personId_and_endsAt", (q) =>
+            q.eq("personId", personId).gt("endsAt", from),
+          )
           .collect(),
         tenantId,
       ))
