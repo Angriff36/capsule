@@ -41,6 +41,16 @@ enum EventStage {
   closed_out
 }
 
+// How much a deal can grow with add-ons (owner's Avg Event Value Growth
+// Strategy, "Pipeline Tagging"): high = wedding, gala, milestone, budget room;
+// moderate = corporate, repeat client, larger count; standard = tight budget,
+// first-time client, small event.
+enum EventUpsellPotential {
+  high
+  moderate
+  standard
+}
+
 enum EventRecurrenceFrequency {
   weekly
   monthly
@@ -1031,6 +1041,14 @@ entity Event mixin TenantScoped, SoftDeletable {
   // The event binder is built (Ops Final Lock, Part 4). Built or not built:
   // "fully packed" and "ready" describe the load, which the pack list holds.
   property binderBuiltAt: datetime?
+  // How the client rated the event afterwards, 1 to 5 (owner's Company
+  // Scorecard "Client Satisfaction Score", target 4.7 / 5.0+), with what
+  // they said and when it was written down.
+  property clientRating: int?
+  property clientRatingNote: string?
+  property clientRatedAt: datetime?
+  // The sales team's add-on potential tag for this deal (see EventUpsellPotential).
+  property upsellPotential: EventUpsellPotential?
   // The event's channel in an outside team chat (Slack), when the team mirrors
   // the event chat there. Named event-number-event-name; Final Lock checks
   // the name still matches the event.
@@ -1897,6 +1915,30 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate binderBuiltAt = null
     emit EventBinderBuiltCleared {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Writes down the client's 1-5 score for the event (from a call, text or
+  // email after it). Can be corrected at any time; no score clears it.
+  command recordClientRating(optional rating: number, optional note: string) {
+    guard self.deletedAt == null
+    constraint clientRatingRange: rating == null or (rating >= 1 and rating <= 5) "Give a score from 1 to 5"
+    mutate clientRating = rating
+    mutate clientRatingNote = rating != null ? note : null
+    mutate clientRatedAt = rating != null ? now() : null
+    emit EventClientRatingRecorded {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Tags how much the deal can grow with add-ons, or clears the tag.
+  command setUpsellPotential(optional potential: EventUpsellPotential) {
+    guard self.deletedAt == null
+    mutate upsellPotential = potential
+    emit EventUpsellPotentialSet {
       eventId: self.id
       tenantId: self.tenantId
     }
@@ -3157,6 +3199,16 @@ event EventBinderBuilt: "event_binder.built" {
 }
 
 event EventBinderBuiltCleared: "event_binder.built_cleared" {
+  eventId: string
+  tenantId: string
+}
+
+event EventClientRatingRecorded: "event.client_rating_recorded" {
+  eventId: string
+  tenantId: string
+}
+
+event EventUpsellPotentialSet: "event.upsell_potential_set" {
   eventId: string
   tenantId: string
 }

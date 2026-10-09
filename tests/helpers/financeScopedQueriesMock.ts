@@ -178,6 +178,13 @@ export function financeScopedMock(tableRows: TableRows) {
             inWindow(row, ["finalizedAt", "capturedAt", "createdAt"], [range]),
           )
         : undefined,
+    // Seed "eventScores" with convex/scorecardEventScores.ts rows.
+    useEventScoresInRange: (range: Range | null) =>
+      range
+        ? (tableRows("eventScores") ?? []).filter((row) =>
+            inWindow(row, ["startsAt"], [range]),
+          )
+        : undefined,
     useLeadsInRange: (range: Range | null) => {
       const leads = range
         ? all("leads").filter((row) => inWindow(row, ["createdAt"], [range]))

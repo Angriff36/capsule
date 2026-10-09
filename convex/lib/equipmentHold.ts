@@ -10,6 +10,7 @@ import {
 } from "./equipmentReservationAvailability";
 import { reconcileEventPackRules } from "./packRuleReconciliation";
 import { insertStepEvent } from "./commandAudit";
+import { openHoldsForEquipment, openIssuesForEquipment } from "./openEquipmentHolds";
 
 const day = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -106,18 +107,8 @@ export async function placeEquipmentHold(
 
   const now = Date.now();
   const [reservations, issues] = await Promise.all([
-    ctx.db
-      .query("equipmentReservations")
-      .withIndex("by_equipmentId", (query) =>
-        query.eq("equipmentId", request.equipmentId),
-      )
-      .collect(),
-    ctx.db
-      .query("equipmentIssues")
-      .withIndex("by_equipmentId", (query) =>
-        query.eq("equipmentId", request.equipmentId),
-      )
-      .collect(),
+    openHoldsForEquipment(ctx, request.equipmentId),
+    openIssuesForEquipment(ctx, request.equipmentId),
   ]);
   const window = {
     tenantId,

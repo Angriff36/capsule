@@ -1,15 +1,14 @@
 import { useState, type FormEvent } from "react";
-import {
-  useCreateLeadershipItem,
-  useLeadershipItemComplete,
-  useLeadershipItemDrop,
-  useLeadershipItemReopen,
-} from "@/lib/manifest-convex-react";
+import { useCreateLeadershipItem } from "@/lib/manifest-convex-react";
 import { Section, StatusChip } from "@/ui/primitives";
 import { CHIP_TONE_CLASS } from "@/lib/statusLabels";
 import { formatDate } from "@/lib/format";
 import { BoundedDateInput } from "@/ui/BoundedDateInputs";
 import { ReportsFailureBanner } from "./ReportsFailureBanner";
+import {
+  LeadershipItemActions,
+  RockTrackPicker,
+} from "./LeadershipItemActions";
 import {
   LEADERSHIP_KIND_LABEL,
   isOverdue,
@@ -19,23 +18,40 @@ import {
 } from "./leadershipHistory";
 import type { ScorecardPerson } from "./ScorecardTargetEditor";
 
+// In the meeting's running order (see L10AgendaSection).
 const KINDS: ReadonlyArray<{
   kind: LeadershipItemKind;
   title: string;
   empty: string;
   placeholder: string;
+  hint?: string;
 }> = [
   {
     kind: "rock",
     title: "Priorities (90-day rocks)",
     empty: "No open priorities.",
     placeholder: "What must be done this quarter",
+    hint: "3 to 7 company priorities. Mark each one every week.",
+  },
+  {
+    kind: "client_headline",
+    title: "Client headlines",
+    empty: "No client headlines this week.",
+    placeholder: "A win or a complaint from a client",
+  },
+  {
+    kind: "people_headline",
+    title: "People headlines",
+    empty: "No people headlines this week.",
+    placeholder: "Hiring, recognition or a concern",
+    hint: "Keep it in the room.",
   },
   {
     kind: "issue",
     title: "Issues",
     empty: "No open issues.",
     placeholder: "What needs solving",
+    hint: "One at a time: name the real problem, talk it through, then write the answer you agreed on.",
   },
   {
     kind: "todo",
@@ -64,9 +80,6 @@ export function LeadershipItemsPanel({
   now: Date;
 }) {
   const addItem = useCreateLeadershipItem();
-  const completeItem = useLeadershipItemComplete();
-  const dropItem = useLeadershipItemDrop();
-  const reopenItem = useLeadershipItemReopen();
   const [failure, setFailure] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
 
@@ -105,6 +118,7 @@ export function LeadershipItemsPanel({
         title: String(data.get("title") || ""),
         ownerPersonId: String(data.get("ownerPersonId") || "") || undefined,
         dueAt: localDateEpoch(data.get("dueAt")),
+        notes: String(data.get("notes") || "").trim() || undefined,
       }),
     ).then((ok) => {
       if (ok) form.reset();
@@ -122,7 +136,9 @@ export function LeadershipItemsPanel({
   return (
     <div className="mt-6 grid gap-6" data-testid="leadership-items">
       {failure ? <ReportsFailureBanner error={failure} /> : null}
-      {KINDS.map(({ kind, title, empty, placeholder }) => {
+      {KINDS.map(({ kind, title, empty, placeholder, hint }) => {
+        const isHeadline =
+          kind === "client_headline" || kind === "people_headline";
         const rows = shown
           .filter((row) => row.kind === kind)
           .sort(
@@ -132,6 +148,9 @@ export function LeadershipItemsPanel({
           );
         return (
           <Section key={kind} title={title}>
+            {hint ? (
+              <p className="mb-2 px-3 pt-2 text-xs text-ink-2">{hint}</p>
+            ) : null}
             {rows.length === 0 ? (
               <p className="text-xs text-ink-2">{empty}</p>
             ) : (
@@ -143,8 +162,10 @@ export function LeadershipItemsPanel({
                   <thead>
                     <tr>
                       <th>{LEADERSHIP_KIND_LABEL[kind]}</th>
-                      <th>Owner</th>
-                      <th>Due</th>
+                      {kind === "issue" ? <th>Added by</th> : null}
+                      <th>{isHeadline ? "From" : "Owner"}</th>
+                      {isHeadline ? null : <th>Due</th>}
+                      {kind === "rock" ? <th>This week</th> : null}
                       <th>Status</th>
                       <th className="text-right">Action</th>
                     </tr>
@@ -152,22 +173,48 @@ export function LeadershipItemsPanel({
                   <tbody>
                     {rows.map((row) => (
                       <tr key={row._id}>
-                        <td>{row.title}</td>
-                        <td>{personName(row.ownerPersonId)}</td>
-                        <td
-                          className={isOverdue(row, now) ? "text-danger" : ""}
-                        >
-                          {row.dueAt ? formatDate(row.dueAt) : "—"}
-                          {isOverdue(row, now) ? " (late)" : ""}
+                        <td>
+                          {row.title}
+                          {row.notes ? (
+                            <span className="block text-xs text-ink-2">
+                              {row.notes}
+                            </span>
+                          ) : null}
+                          {row.solution ? (
+                            <span className="block text-xs text-ok">
+                              Answer: {row.solution}
+                            </span>
+                          ) : null}
                         </td>
+                        {kind === "issue" ? (
+                          <td>{personName(row.openedByPersonId)}</td>
+                        ) : null}
+                        <td>{personName(row.ownerPersonId)}</td>
+                        {isHeadline ? null : (
+                          <td
+                            className={isOverdue(row, now) ? "text-danger" : ""}
+                          >
+                            {row.dueAt ? formatDate(row.dueAt) : "—"}
+                            {isOverdue(row, now) ? " (late)" : ""}
+                          </td>
+                        )}
+                        {kind === "rock" ? (
+                          <td>
+                            <RockTrackPicker row={row} busy={busy} run={run} />
+                          </td>
+                        ) : null}
                         <td>
                           <StatusChip
                             status={
                               row.status === "open"
                                 ? "Open"
-                                : row.status === "done"
-                                  ? "Done"
-                                  : "Dropped"
+                                : row.status === "dropped"
+                                  ? "Dropped"
+                                  : isHeadline
+                                    ? "Heard"
+                                    : kind === "issue"
+                                      ? "Solved"
+                                      : "Done"
                             }
                             color={
                               row.status === "open"
@@ -179,56 +226,11 @@ export function LeadershipItemsPanel({
                           />
                         </td>
                         <td className="text-right">
-                          {row.status === "open" ? (
-                            <>
-                              <button
-                                type="button"
-                                className="btn-link btn-link-compact"
-                                disabled={busy}
-                                onClick={() =>
-                                  void run(() =>
-                                    completeItem({
-                                      docId: row._id,
-                                      version: row.version,
-                                    }),
-                                  )
-                                }
-                              >
-                                Done
-                              </button>{" "}
-                              <button
-                                type="button"
-                                className="btn-link btn-link-compact text-ink-2"
-                                disabled={busy}
-                                onClick={() =>
-                                  void run(() =>
-                                    dropItem({
-                                      docId: row._id,
-                                      version: row.version,
-                                    }),
-                                  )
-                                }
-                              >
-                                Drop
-                              </button>
-                            </>
-                          ) : (
-                            <button
-                              type="button"
-                              className="btn-link btn-link-compact"
-                              disabled={busy}
-                              onClick={() =>
-                                void run(() =>
-                                  reopenItem({
-                                    docId: row._id,
-                                    version: row.version,
-                                  }),
-                                )
-                              }
-                            >
-                              Reopen
-                            </button>
-                          )}
+                          <LeadershipItemActions
+                            row={row}
+                            busy={busy}
+                            run={run}
+                          />
                         </td>
                       </tr>
                     ))}
@@ -249,10 +251,18 @@ export function LeadershipItemsPanel({
                   required
                 />
               </label>
+              {kind === "issue" ? (
+                <label className="field-label">
+                  The real problem (optional)
+                  <input name="notes" className="input" />
+                </label>
+              ) : null}
               <label className="field-label">
-                Owner
+                {isHeadline ? "From" : "Owner"}
                 <select name="ownerPersonId" className="input" defaultValue="">
-                  <option value="">No owner</option>
+                  <option value="">
+                    {isHeadline ? "Not noted" : "No owner"}
+                  </option>
                   {people.map((person) => (
                     <option key={person._id} value={person._id}>
                       {`${person.givenName} ${person.familyName}`.trim()}
@@ -260,10 +270,12 @@ export function LeadershipItemsPanel({
                   ))}
                 </select>
               </label>
-              <label className="field-label">
-                Due (optional)
-                <BoundedDateInput name="dueAt" className="input" />
-              </label>
+              {isHeadline ? null : (
+                <label className="field-label">
+                  Due (optional)
+                  <BoundedDateInput name="dueAt" className="input" />
+                </label>
+              )}
               <div className="field-label">
                 <span>&nbsp;</span>
                 <button className="btn btn-secondary" disabled={busy}>

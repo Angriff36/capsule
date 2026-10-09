@@ -67,6 +67,9 @@ entity Dish mixin TenantScoped, SoftDeletable {
   // Venue-exclusive menu item (Mangia Venue Partner Playbook section 07): a
   // dish offered only at one partner venue. Null = offered anywhere.
   property indexed exclusiveVenueId: uuid?
+  // A house signature dish (owner's Company Scorecard "Menu Adoption Rate":
+  // the share of dishes served that are signature items, target 70%+).
+  property isSignature: boolean?
 
   hasMany ingredientLines: DishIngredient
   hasMany componentLines: DishComponent
@@ -376,6 +379,17 @@ entity Dish mixin TenantScoped, SoftDeletable {
     emit DishExclusiveVenueSet {
       dishId: self.id
       tenantId: self.tenantId
+    }
+  }
+
+  // Mark or unmark the dish as a house signature dish.
+  command markSignature(isSignatureDish: boolean) {
+    guard self.deletedAt == null
+    mutate isSignature = isSignatureDish
+    emit DishSignatureMarked {
+      dishId: self.id
+      tenantId: self.tenantId
+      isSignature: isSignatureDish
     }
   }
 
@@ -899,6 +913,12 @@ event DishFinishTimingSet: "dish.finish_timing_set" {
 event DishExclusiveVenueSet: "dish.exclusive_venue_set" {
   dishId: string
   tenantId: string
+}
+
+event DishSignatureMarked: "dish.signature_marked" {
+  dishId: string
+  tenantId: string
+  isSignature: boolean
 }
 
 event DishVersionUnlinked: "dish.version_unlinked" {

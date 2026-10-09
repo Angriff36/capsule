@@ -789,6 +789,7 @@ export const DishSchema = z.object({
   finishTiming: z.enum(["finish_at_kitchen", "finish_at_event", "day_of"]).nullable().optional(),
   recipeDishId: z.string().uuid().nullable().optional(),
   exclusiveVenueId: z.string().uuid().nullable().optional(),
+  isSignature: z.boolean().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1234,6 +1235,10 @@ export const EventSchema = z.object({
   beverageDispensers: z.string().nullable().optional(),
   buffetService: z.string().nullable().optional(),
   binderBuiltAt: z.coerce.date().nullable().optional(),
+  clientRating: z.number().int().nullable().optional(),
+  clientRatingNote: z.string().nullable().optional(),
+  clientRatedAt: z.coerce.date().nullable().optional(),
+  upsellPotential: z.enum(["high", "moderate", "standard"]).nullable().optional(),
   externalChannelName: z.string().nullable().optional(),
   externalChannelId: z.string().nullable().optional(),
   externalChannelUrl: z.string().nullable().optional(),
@@ -1848,10 +1853,10 @@ export const ExternalRecordLinkSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
-  sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync", "quickbooks_online", "google_calendar", "stripe", "other"]).default("tpp_legacy"),
+  sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync", "quickbooks_online", "google_calendar", "stripe", "nowsta", "other"]).default("tpp_legacy"),
   recordType: z.string().default(""),
   externalId: z.string(),
-  capsuleEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]).default("contact"),
+  capsuleEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication", "shift"]).default("contact"),
   capsuleId: z.string(),
   sourceAccount: z.string().nullable().optional(),
   role: z.string().nullable().optional(),
@@ -1972,7 +1977,7 @@ export const ImportDatasetSchema = z.object({
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   datasetCategory: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "invoices", "proposals"]).default("events"),
-  targetEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]).default("event_record"),
+  targetEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication", "shift"]).default("event_record"),
   config: z.string().default("{}"),
   active: z.boolean().default(true),
   importOrder: z.number().int().min(1).default(1),
@@ -2438,12 +2443,15 @@ export const LeadershipItemSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
-  kind: z.enum(["rock", "issue", "todo"]).default("todo"),
+  kind: z.enum(["rock", "issue", "todo", "client_headline", "people_headline"]).default("todo"),
   title: z.string().default(""),
   ownerPersonId: z.string().uuid().nullable().optional(),
   dueAt: z.coerce.date().nullable().optional(),
   status: z.enum(["open", "done", "dropped"]).default("open"),
   notes: z.string().nullable().optional(),
+  track: z.enum(["on_track", "at_risk", "off_track"]).nullable().optional(),
+  trackSetAt: z.coerce.date().nullable().optional(),
+  solution: z.string().nullable().optional(),
   openedAt: z.coerce.date().nullable().optional(),
   openedByPersonId: z.string().uuid().nullable().optional(),
   closedAt: z.coerce.date().nullable().optional(),
@@ -2453,6 +2461,25 @@ export const LeadershipItemSchema = z.object({
 });
 
 export type LeadershipItem = z.infer<typeof LeadershipItemSchema>;
+
+// Entity: LeadershipMeeting
+export const LeadershipMeetingSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  heldAt: z.coerce.date().nullable().optional(),
+  facilitatorPersonId: z.string().uuid().nullable().optional(),
+  rating: z.number().int().nullable().optional(),
+  wentWell: z.string().nullable().optional(),
+  toImprove: z.string().nullable().optional(),
+  decisions: z.string().nullable().optional(),
+  recordedAt: z.coerce.date().nullable().optional(),
+  recordedByPersonId: z.string().uuid().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type LeadershipMeeting = z.infer<typeof LeadershipMeetingSchema>;
 
 // Entity: LeftoverDisposition
 export const LeftoverDispositionSchema = z.object({
@@ -6527,6 +6554,13 @@ export const DishMakeVersionOfParamsSchema = z.object({
 
 export type DishMakeVersionOfParams = z.infer<typeof DishMakeVersionOfParamsSchema>;
 
+// Command: markSignature on Dish
+export const DishMarkSignatureParamsSchema = z.object({
+  isSignatureDish: z.boolean(),
+});
+
+export type DishMarkSignatureParams = z.infer<typeof DishMarkSignatureParamsSchema>;
+
 // Command: mergeInto on Dish
 export const DishMergeIntoParamsSchema = z.object({
   targetDishId: z.string().min(1),
@@ -7335,6 +7369,14 @@ export const EventReassignClientParamsSchema = z.object({});
 
 export type EventReassignClientParams = z.infer<typeof EventReassignClientParamsSchema>;
 
+// Command: recordClientRating on Event
+export const EventRecordClientRatingParamsSchema = z.object({
+  rating: z.number().optional(),
+  note: z.string().optional(),
+});
+
+export type EventRecordClientRatingParams = z.infer<typeof EventRecordClientRatingParamsSchema>;
+
 // Command: recordFinalVenueFacts on Event
 export const EventRecordFinalVenueFactsParamsSchema = z.object({
   facts: z.string(),
@@ -7377,6 +7419,13 @@ export const EventSetTravelFeeParamsSchema = z.object({
 });
 
 export type EventSetTravelFeeParams = z.infer<typeof EventSetTravelFeeParamsSchema>;
+
+// Command: setUpsellPotential on Event
+export const EventSetUpsellPotentialParamsSchema = z.object({
+  potential: z.enum(["high", "moderate", "standard"]).optional(),
+});
+
+export type EventSetUpsellPotentialParams = z.infer<typeof EventSetUpsellPotentialParamsSchema>;
 
 // Command: stageClientMerge on Event
 export const EventStageClientMergeParamsSchema = z.object({
@@ -8351,10 +8400,10 @@ export type ExternalRecordLinkDiscardParams = z.infer<typeof ExternalRecordLinkD
 
 // Command: link on ExternalRecordLink
 export const ExternalRecordLinkLinkParamsSchema = z.object({
-  sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync", "quickbooks_online", "google_calendar", "stripe", "other"]),
+  sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync", "quickbooks_online", "google_calendar", "stripe", "nowsta", "other"]),
   recordType: z.string(),
   externalId: z.string(),
-  capsuleEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]),
+  capsuleEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication", "shift"]),
   capsuleId: z.string(),
   verified: z.boolean().optional(),
   sourceImportRunId: z.string().optional(),
@@ -8559,7 +8608,7 @@ export type ImportDatasetRecordLastImportParams = z.infer<typeof ImportDatasetRe
 // Command: register on ImportDataset
 export const ImportDatasetRegisterParamsSchema = z.object({
   datasetCategory: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "invoices", "proposals"]),
-  targetEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication"]),
+  targetEntity: z.enum(["source_record", "equipment", "equipment_reservation", "menu_dish", "attachment", "event_assignment", "event_staff_need", "event_timeline_activity", "pack_list_item", "occasion", "referral_source", "event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location", "pack_list", "ingredient", "component", "component_portion_spec", "component_ingredient", "component_component", "dish", "dish_ingredient", "dish_component", "dish_task", "dish_container", "station", "unit", "event_dish", "prep_task", "service_style", "client_communication", "shift"]),
   config: z.string(),
   name: z.string().optional(),
   description: z.string().optional(),
@@ -9452,7 +9501,7 @@ export type LeadUpdatePipelineParams = z.infer<typeof LeadUpdatePipelineParamsSc
 
 // Command: add on LeadershipItem
 export const LeadershipItemAddParamsSchema = z.object({
-  kind: z.enum(["rock", "issue", "todo"]),
+  kind: z.enum(["rock", "issue", "todo", "client_headline", "people_headline"]),
   title: z.string(),
   ownerPersonId: z.string().min(1).optional(),
   dueAt: z.coerce.date().optional(),
@@ -9471,6 +9520,13 @@ export const LeadershipItemDropParamsSchema = z.object({});
 
 export type LeadershipItemDropParams = z.infer<typeof LeadershipItemDropParamsSchema>;
 
+// Command: markTrack on LeadershipItem
+export const LeadershipItemMarkTrackParamsSchema = z.object({
+  track: z.enum(["on_track", "at_risk", "off_track"]),
+});
+
+export type LeadershipItemMarkTrackParams = z.infer<typeof LeadershipItemMarkTrackParamsSchema>;
+
 // Command: reopen on LeadershipItem
 export const LeadershipItemReopenParamsSchema = z.object({});
 
@@ -9485,6 +9541,37 @@ export const LeadershipItemReviseParamsSchema = z.object({
 });
 
 export type LeadershipItemReviseParams = z.infer<typeof LeadershipItemReviseParamsSchema>;
+
+// Command: solve on LeadershipItem
+export const LeadershipItemSolveParamsSchema = z.object({
+  solution: z.string(),
+});
+
+export type LeadershipItemSolveParams = z.infer<typeof LeadershipItemSolveParamsSchema>;
+
+// Command: record on LeadershipMeeting
+export const LeadershipMeetingRecordParamsSchema = z.object({
+  heldAt: z.coerce.date(),
+  rating: z.number().int(),
+  facilitatorPersonId: z.string().min(1).optional(),
+  wentWell: z.string().optional(),
+  toImprove: z.string().optional(),
+  decisions: z.string().optional(),
+});
+
+export type LeadershipMeetingRecordParams = z.infer<typeof LeadershipMeetingRecordParamsSchema>;
+
+// Command: revise on LeadershipMeeting
+export const LeadershipMeetingReviseParamsSchema = z.object({
+  heldAt: z.coerce.date(),
+  rating: z.number().int(),
+  facilitatorPersonId: z.string().min(1).optional(),
+  wentWell: z.string().optional(),
+  toImprove: z.string().optional(),
+  decisions: z.string().optional(),
+});
+
+export type LeadershipMeetingReviseParams = z.infer<typeof LeadershipMeetingReviseParamsSchema>;
 
 // Command: record on LeftoverDisposition
 export const LeftoverDispositionRecordParamsSchema = z.object({

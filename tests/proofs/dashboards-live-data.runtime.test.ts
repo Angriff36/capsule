@@ -49,6 +49,11 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
     useLeadershipItemComplete: () => vi.fn(),
     useLeadershipItemDrop: () => vi.fn(),
     useLeadershipItemReopen: () => vi.fn(),
+    useLeadershipItemMarkTrack: () => vi.fn(),
+    useLeadershipItemSolve: () => vi.fn(),
+    useListLeadershipMeeting: list("leadershipMeetings"),
+    useCreateLeadershipMeeting: () => vi.fn(),
+    useLeadershipMeetingRevise: () => vi.fn(),
   };
 });
 

@@ -4,12 +4,21 @@ import { isCompletedEvent } from "./dashboardRecordSets";
  * L10 meeting-period history (spec §7.4): one row per week, Monday to Sunday
  * on this device's clock, newest first. Each row counts the priorities,
  * issues and to-dos opened and closed that week next to the week's completed
- * events and new leads, all from live records, so no meeting record has to
- * be kept by hand.
+ * events and new leads, all from live records, and the meeting's 1-10 rating
+ * when one was written down that week.
  */
 
-export type LeadershipItemKind = "rock" | "issue" | "todo";
+export type LeadershipItemKind =
+  "rock" | "issue" | "todo" | "client_headline" | "people_headline";
 export type LeadershipItemStatus = "open" | "done" | "dropped";
+export type RockTrack = "on_track" | "at_risk" | "off_track";
+
+/** Headlines are read out, not worked, so the history leaves them out. */
+const WORKED_KINDS: ReadonlySet<LeadershipItemKind> = new Set([
+  "rock",
+  "issue",
+  "todo",
+]);
 
 export interface LeadershipItemRow {
   readonly _id: string;
@@ -19,7 +28,11 @@ export interface LeadershipItemRow {
   readonly ownerPersonId?: string | null;
   readonly dueAt?: number | null;
   readonly notes?: string | null;
+  readonly track?: RockTrack | null;
+  readonly trackSetAt?: number | null;
+  readonly solution?: string | null;
   readonly openedAt?: number | null;
+  readonly openedByPersonId?: string | null;
   readonly closedAt?: number | null;
   readonly deletedAt?: number | null;
   readonly version?: number;
@@ -29,7 +42,40 @@ export const LEADERSHIP_KIND_LABEL: Record<LeadershipItemKind, string> = {
   rock: "Priority",
   issue: "Issue",
   todo: "To-do",
+  client_headline: "Client headline",
+  people_headline: "People headline",
 };
+
+export const ROCK_TRACK_LABEL: Record<RockTrack, string> = {
+  on_track: "On track",
+  at_risk: "At risk",
+  off_track: "Off track",
+};
+
+export interface LeadershipMeetingRow {
+  readonly _id: string;
+  readonly heldAt?: number | null;
+  readonly facilitatorPersonId?: string | null;
+  readonly rating?: number | null;
+  readonly wentWell?: string | null;
+  readonly toImprove?: string | null;
+  readonly decisions?: string | null;
+  readonly recordedAt?: number | null;
+  readonly deletedAt?: number | null;
+  readonly version?: number;
+}
+
+/** Meetings written down, newest first. */
+export function liveMeetings(
+  meetings: readonly LeadershipMeetingRow[],
+): LeadershipMeetingRow[] {
+  return meetings
+    .filter(
+      (row) =>
+        row.deletedAt == null && row.recordedAt != null && row.heldAt != null,
+    )
+    .sort((a, b) => (b.heldAt ?? 0) - (a.heldAt ?? 0));
+}
 
 export interface HistoryEvent {
   readonly startsAt?: number | null;
@@ -49,6 +95,8 @@ export interface WeekRow {
   readonly completedEvents: number;
   readonly completedRevenue: number;
   readonly newLeads: number;
+  /** The rating of the newest meeting held that week, if one was rated. */
+  readonly meetingRating: number | null;
 }
 
 /** Monday 00:00 of the week holding `now`, on this device's clock. */
@@ -70,11 +118,15 @@ export function weeklyHistory(
     readonly items: readonly LeadershipItemRow[];
     readonly events: readonly HistoryEvent[];
     readonly leads: readonly HistoryLead[];
+    readonly meetings?: readonly LeadershipMeetingRow[];
   },
   now: Date,
   weeks = 8,
 ): WeekRow[] {
-  const items = liveItems(input.items);
+  const items = liveItems(input.items).filter((row) =>
+    WORKED_KINDS.has(row.kind),
+  );
+  const meetings = liveMeetings(input.meetings ?? []);
   const thisWeek = weekStartOf(now);
   const rows: WeekRow[] = [];
   for (let i = 0; i < weeks; i++) {
@@ -103,6 +155,7 @@ export function weeklyHistory(
         0,
       ),
       newLeads: input.leads.filter((l) => within(l.createdAt)).length,
+      meetingRating: meetings.find((row) => within(row.heldAt))?.rating ?? null,
     });
   }
   return rows;

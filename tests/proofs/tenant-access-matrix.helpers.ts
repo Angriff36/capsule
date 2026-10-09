@@ -165,6 +165,7 @@ const LINK_TABLE: Record<string, string> = {
   assignedById: "@sign-in",
   assignedToId: "people",
   assignedToPersonId: "people",
+  facilitatorPersonId: "people",
   partnerOwnerPersonId: "people",
   assigneePersonIds: "people",
   authSubjectId: "@sign-in",

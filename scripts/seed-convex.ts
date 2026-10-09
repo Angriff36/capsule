@@ -446,6 +446,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.LeadershipItem_createViaAdd, { "kind": "demo-kind-1", "title": "LeadershipItem 1", "ownerPersonId": "ownerPersonId-leadership-item-1", "dueAt": 1767268800000, "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.LeadershipItem_createViaAdd, { "kind": "demo-kind-2", "title": "LeadershipItem 2", "ownerPersonId": "ownerPersonId-leadership-item-2", "dueAt": 1767355200000, "notes": "demo-notes-2" } as any);
+  // LeadershipMeeting → api.mutations.LeadershipMeeting_createViaRecord
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.LeadershipMeeting_createViaRecord, { "heldAt": 1767268800000, "facilitatorPersonId": "facilitatorPersonId-leadership-meeting-1", "rating": 1, "wentWell": "demo-wentWell-1", "toImprove": "demo-toImprove-1", "decisions": "demo-decisions-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.LeadershipMeeting_createViaRecord, { "heldAt": 1767355200000, "facilitatorPersonId": "facilitatorPersonId-leadership-meeting-2", "rating": 2, "wentWell": "demo-wentWell-2", "toImprove": "demo-toImprove-2", "decisions": "demo-decisions-2" } as any);
   // LeftoverDisposition has multiple initialization commands (record, remove); using the selected initialization command: record.
   // LeftoverDisposition → api.mutations.LeftoverDisposition_createViaRecord
   rowsAttempted += 1;
@@ -1463,6 +1468,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "LeadershipItem",
       "createMutation": "LeadershipItem_createViaAdd",
+      "rowCount": 2
+    },
+    {
+      "entity": "LeadershipMeeting",
+      "createMutation": "LeadershipMeeting_createViaRecord",
       "rowCount": 2
     },
     {

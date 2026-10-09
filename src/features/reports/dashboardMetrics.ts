@@ -308,6 +308,35 @@ export const DASHBOARD_METRICS = {
       "Cancelled events and dismissed problems. With no event this week it says “Not known yet”.",
     drill: "Open the event's Problems tab for what was reported.",
   },
+  "dashboard.client_satisfaction": {
+    ...BOOKED_BASE,
+    label: "Client satisfaction score",
+    measures:
+      "The average of the clients' 1 to 5 scores for events that started this month.",
+    currency: "none",
+    tax: NOT_MONEY,
+    source: "Events (the client's score) and venue follow-up notes",
+    includes:
+      "Every event this month with a client score, except cancelled ones. An event with no score of its own uses the client's 1 to 10 venue follow-up score, halved.",
+    leftOut:
+      "Cancelled events and events with no score. With no score this month it says “Not known yet”.",
+    drill:
+      "Open an event's Overview tab to write down how the client rated it.",
+  },
+  "dashboard.menu_adoption": {
+    ...BOOKED_BASE,
+    label: "Menu adoption rate",
+    measures:
+      "Dishes on the menus of events that started this month that are house signature dishes, divided by all dishes on those menus.",
+    currency: "none",
+    tax: NOT_MONEY,
+    source: "Event menus and dishes",
+    includes:
+      "Every menu line of every event this month except cancelled ones. A version of a signature dish counts as signature.",
+    leftOut:
+      "Cancelled events and removed menu lines. With no menu this month it says “Not known yet”.",
+    drill: "Open Kitchen > Dishes and mark the house signature dishes.",
+  },
   "dashboard.staff_utilization": {
     source: "Shifts",
     dateBasis: "Shift start, Monday to Sunday this week, up to now.",

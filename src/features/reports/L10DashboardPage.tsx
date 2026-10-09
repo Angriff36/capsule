@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   useListLeadershipItem,
+  useListLeadershipMeeting,
   useListPerson,
   useListScorecardTarget,
 } from "@/lib/manifest-convex-react";
@@ -31,6 +32,7 @@ import {
   weekStartOf,
   weeklyHistory,
   type LeadershipItemRow,
+  type LeadershipMeetingRow,
 } from "./leadershipHistory";
 import { useEventsInRange } from "../facilities/useEventsById";
 import {
@@ -38,6 +40,8 @@ import {
   useLeadsInRange,
 } from "@/lib/financeScopedQueries";
 import { LeadershipItemsPanel } from "./LeadershipItemsPanel";
+import { L10AgendaSection } from "./L10AgendaSection";
+import { L10MeetingRating } from "./L10MeetingRating";
 import { useScorecardSources } from "./useScorecardSources";
 import { PERIOD_NAME } from "./scorecardPeriods";
 import type { ScorecardPerson } from "./ScorecardTargetEditor";
@@ -45,9 +49,12 @@ import type { ScorecardPerson } from "./ScorecardTargetEditor";
 /**
  * L10 Dashboard (Priority 40)
  *
- * Weekly leadership meeting board: this week's wins, the company scorecard
- * against its targets and owners, the priorities (rocks), issues and to-dos
- * (LeadershipItem), and eight weeks of meeting history, all live.
+ * Weekly leadership meeting board, in the running order of the owner's L10
+ * meeting sheet: the agenda and rules, this week's wins, the company
+ * scorecard against its targets and owners, the priorities (rocks) with this
+ * week's mark, client and people headlines, issues and to-dos
+ * (LeadershipItem), the meeting's rating (LeadershipMeeting), and eight weeks
+ * of meeting history, all live.
  */
 
 export function L10DashboardPage() {
@@ -78,6 +85,7 @@ export function L10DashboardPage() {
   const { leads, proposals } = useLeadsInRange(eventWindow);
   const closeouts = useCloseoutsInRange(eventWindow);
   const items = useListLeadershipItem();
+  const meetings = useListLeadershipMeeting();
   const targets = useListScorecardTarget();
   const people = useListPerson();
 
@@ -110,10 +118,11 @@ export function L10DashboardPage() {
           items: (items ?? []) as LeadershipItemRow[],
           events: events ?? [],
           leads: leads ?? [],
+          meetings: (meetings ?? []) as LeadershipMeetingRow[],
         },
         now,
       ),
-    [items, events, leads, now],
+    [items, events, leads, meetings, now],
   );
 
   // This week's wins
@@ -298,8 +307,10 @@ export function L10DashboardPage() {
     <div className="operations-stage supply-stage">
       <PageHeader
         title="L10 Meeting Dashboard"
-        lead="Your weekly leadership meeting: this week's wins, the scorecard against its targets, priorities, issues, to-dos, and the last eight weeks."
+        lead="Your weekly leadership meeting: this week's wins, the scorecard against its targets, priorities, headlines, issues, to-dos, the meeting's rating, and the last eight weeks."
       />
+
+      <L10AgendaSection />
 
       {events?.length === 0 ? (
         <div data-testid="dashboard-empty">
@@ -374,6 +385,12 @@ export function L10DashboardPage() {
         now={now}
       />
 
+      <L10MeetingRating
+        meetings={(meetings ?? []) as LeadershipMeetingRow[]}
+        people={activePeople}
+        now={now}
+      />
+
       <div className="mt-6">
         <Section title="Meeting history (last 8 weeks)">
           <div className="supply-table-wrap">
@@ -387,6 +404,7 @@ export function L10DashboardPage() {
                   <th>Events completed</th>
                   <th>Completed revenue</th>
                   <th>New leads</th>
+                  <th>Meeting rating</th>
                 </tr>
               </thead>
               <tbody>
@@ -399,6 +417,11 @@ export function L10DashboardPage() {
                     <td>{week.completedEvents}</td>
                     <td>{formatMoney(week.completedRevenue)}</td>
                     <td>{week.newLeads}</td>
+                    <td>
+                      {week.meetingRating == null
+                        ? "—"
+                        : `${week.meetingRating} / 10`}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -411,7 +434,7 @@ export function L10DashboardPage() {
       <div className="mt-6 rounded-sm border border-line bg-inset p-4">
         <h4 className="text-xs font-semibold text-ink">About L10 Meetings</h4>
         <p className="mt-1 text-xs text-ink-2">
-          The L10 is a weekly 90-minute leadership meeting to review the
+          The L10 is a weekly 60-minute leadership meeting to review the
           business, solve issues, and stay aligned on priorities. Scorecard
           numbers track business health, and wins open the meeting on what went
           right this week.

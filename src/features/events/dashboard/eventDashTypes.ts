@@ -1,3 +1,4 @@
+import type { UpsellPotential } from "../EventUpsellPotentialCard";
 import type { Doc, Id } from "../../../lib/api";
 import type { EventDetailRevisePanelsProps } from "../EventDetailRevisePanels";
 import type {
@@ -30,6 +31,9 @@ export type DashEvent = {
   recurrenceFrequency?: string | null;
   recurrenceGeneratedCount?: number | null;
   recurrenceActive?: boolean | null;
+  clientRating?: number | null;
+  clientRatingNote?: string | null;
+  upsellPotential?: UpsellPotential | null;
 };
 
 export type DashOwnerPerson = {

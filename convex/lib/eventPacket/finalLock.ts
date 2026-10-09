@@ -309,10 +309,27 @@ export const myFieldForms = query({
     const tenantId = auth.tenantId;
     const personId = auth.personId;
     const eventIds = new Set<string>();
-    const assignments = await (ctx.db as any)
-      .query("eventAssignments")
-      .withIndex("by_personId", (q: any) => q.eq("personId", personId))
-      .collect();
+    const dayAgo = Date.now() - 24 * 60 * 60_000;
+    // Work ending from yesterday on, or with no end time set; never every
+    // event this person ever worked.
+    const assignments = (
+      await Promise.all([
+        (ctx.db as any)
+          .query("eventAssignments")
+          .withIndex("by_personId_and_endsAt", (q: any) =>
+            q.eq("personId", personId).gte("endsAt", dayAgo),
+          )
+          .collect(),
+        ...[null, undefined].map((endsAt) =>
+          (ctx.db as any)
+            .query("eventAssignments")
+            .withIndex("by_personId_and_endsAt", (q: any) =>
+              q.eq("personId", personId).eq("endsAt", endsAt),
+            )
+            .collect(),
+        ),
+      ])
+    ).flat();
     for (const a of assignments)
       if (
         a.tenantId === tenantId &&
@@ -321,17 +338,19 @@ export const myFieldForms = query({
         a.declinedAt == null
       )
         eventIds.add(String(a.eventId));
-    for (const [index, field] of [
-      ["by_responsiblePersonId", "responsiblePersonId"],
-      ["by_secondPersonId", "secondPersonId"],
+    // Only forms not yet done.
+    for (const [index, field, status] of [
+      ["by_responsiblePersonId_and_status", "responsiblePersonId", "open"],
+      ["by_responsiblePersonId_and_status", "responsiblePersonId", "first_signed"],
+      ["by_secondPersonId_and_status", "secondPersonId", "open"],
+      ["by_secondPersonId_and_status", "secondPersonId", "first_signed"],
     ] as const)
       for (const f of await (ctx.db as any)
         .query("fieldConfirmations")
-        .withIndex(index, (q: any) => q.eq(field, personId))
+        .withIndex(index, (q: any) => q.eq(field, personId).eq("status", status))
         .collect())
         if (f.tenantId === tenantId && f.deletedAt == null)
           eventIds.add(String(f.eventId));
-    const dayAgo = Date.now() - 24 * 60 * 60_000;
     const out = [];
     for (const id of eventIds) {
       const eventId = ctx.db.normalizeId("events", id);

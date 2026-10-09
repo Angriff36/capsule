@@ -153,6 +153,7 @@ import {
   DishLabelVersionParamsSchema,
   DishLinkAsEditionParamsSchema,
   DishMakeVersionOfParamsSchema,
+  DishMarkSignatureParamsSchema,
   DishMergeIntoParamsSchema,
   DishPurgeParamsSchema,
   DishReinstateParamsSchema,
@@ -285,12 +286,14 @@ import {
   EventPlanNeedsReviseParamsSchema,
   EventReactivateParamsSchema,
   EventReassignClientParamsSchema,
+  EventRecordClientRatingParamsSchema,
   EventRecordFinalVenueFactsParamsSchema,
   EventRecordPastCompletionParamsSchema,
   EventRescheduleParamsSchema,
   EventReturnToPlanningParamsSchema,
   EventSetEventNumberParamsSchema,
   EventSetTravelFeeParamsSchema,
+  EventSetUpsellPotentialParamsSchema,
   EventStaffNeedApplyApprovedShiftSwapParamsSchema,
   EventStaffNeedCancelParamsSchema,
   EventStaffNeedChangeCoverageParamsSchema,
@@ -474,8 +477,12 @@ import {
   LeadershipItemAddParamsSchema,
   LeadershipItemCompleteParamsSchema,
   LeadershipItemDropParamsSchema,
+  LeadershipItemMarkTrackParamsSchema,
   LeadershipItemReopenParamsSchema,
   LeadershipItemReviseParamsSchema,
+  LeadershipItemSolveParamsSchema,
+  LeadershipMeetingRecordParamsSchema,
+  LeadershipMeetingReviseParamsSchema,
   LeftoverDispositionRecordParamsSchema,
   LeftoverDispositionRemoveParamsSchema,
   LeftoverDispositionReviseParamsSchema,
@@ -3043,6 +3050,16 @@ export function useDishMakeVersionOf() {
   };
 }
 
+/** Mutation hook for Dish.markSignature. */
+export function useDishMarkSignature() {
+  const mutate = useMutation(api.mutations.Dish_markSignature);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishMarkSignatureParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Dish.mergeInto. */
 export function useDishMergeInto() {
   const mutate = useMutation(api.mutations.Dish_mergeInto);
@@ -4175,6 +4192,16 @@ export function useEventReassignClient() {
   };
 }
 
+/** Mutation hook for Event.recordClientRating. */
+export function useEventRecordClientRating() {
+  const mutate = useMutation(api.mutations.Event_recordClientRating);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventRecordClientRatingParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Event.recordFinalVenueFacts. */
 export function useEventRecordFinalVenueFacts() {
   const mutate = useMutation(api.mutations.Event_recordFinalVenueFacts);
@@ -4231,6 +4258,16 @@ export function useEventSetTravelFee() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventSetTravelFeeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Event.setUpsellPotential. */
+export function useEventSetUpsellPotential() {
+  const mutate = useMutation(api.mutations.Event_setUpsellPotential);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventSetUpsellPotentialParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -7439,6 +7476,16 @@ export function useLeadershipItemDrop() {
   };
 }
 
+/** Mutation hook for LeadershipItem.markTrack. */
+export function useLeadershipItemMarkTrack() {
+  const mutate = useMutation(api.mutations.LeadershipItem_markTrack);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadershipItemMarkTrackParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for LeadershipItem.reopen. */
 export function useLeadershipItemReopen() {
   const mutate = useMutation(api.mutations.LeadershipItem_reopen);
@@ -7459,12 +7506,63 @@ export function useLeadershipItemRevise() {
   };
 }
 
+/** Mutation hook for LeadershipItem.solve. */
+export function useLeadershipItemSolve() {
+  const mutate = useMutation(api.mutations.LeadershipItem_solve);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadershipItemSolveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Governed creation hook for LeadershipItem.add. */
 export function useCreateLeadershipItem() {
   const mutate = useMutation(api.mutations.LeadershipItem_createViaAdd);
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = LeadershipItemAddParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for LeadershipMeeting. */
+export function useListLeadershipMeeting() {
+  return useQuery(api.queries.listLeadershipMeeting);
+}
+
+/** Reactive get-by-id for LeadershipMeeting. Pass "skip" to suspend. */
+export function useGetLeadershipMeeting(id: string | "skip") {
+  return useQuery(api.queries.getLeadershipMeeting, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for LeadershipMeeting.record. */
+export function useLeadershipMeetingRecord() {
+  const mutate = useMutation(api.mutations.LeadershipMeeting_record);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadershipMeetingRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for LeadershipMeeting.revise. */
+export function useLeadershipMeetingRevise() {
+  const mutate = useMutation(api.mutations.LeadershipMeeting_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadershipMeetingReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for LeadershipMeeting.record. */
+export function useCreateLeadershipMeeting() {
+  const mutate = useMutation(api.mutations.LeadershipMeeting_createViaRecord);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadershipMeetingRecordParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -14869,4 +14967,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1571 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1581 as const;

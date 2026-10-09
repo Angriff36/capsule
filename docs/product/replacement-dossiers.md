@@ -106,9 +106,16 @@ delivery is not being built now (owner, 2026-09-29).
 No retyping: approval posts the staffing needs from the event's own style and
 guest count; later changes add or cancel only open slots.
 
-History: no way in yet for Nowsta workers, shifts or time. Past shifts and
-labor history start empty at cutover. Needs a Nowsta export file to build
-against (blocked).
+History: Nowsta's Time & Attendance export comes in on the team page
+(`/admin`, "Bring in past shifts from Nowsta"; proof
+`nowsta-shift-history`, `proofs/nowsta-shift-history`). Each shift that is
+over becomes a finished shift of its worker on the Capsule event with the
+same name that day, with the planned and (when Nowsta has them) worked
+times; it shows on the Roster week and the event's labor numbers. New workers
+are added as Staff (no sign-in email). Pay and billing columns stay in
+Nowsta, and no hours go to the time sheet or payroll, so My Day's past
+shifts (built from clock-ins) list Capsule shifts only. A row whose event is
+not in Capsule yet waits; reading the file again later brings it in once.
 
 Live Nowsta sync (PL-NOWSTA): blocked on a Nowsta account with API access.
 

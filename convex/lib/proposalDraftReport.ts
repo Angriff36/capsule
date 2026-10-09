@@ -21,6 +21,7 @@ import {
 import { readEventSources, readProposalLines } from "./proposalGenerateSources";
 import { resolveTenantBrandName } from "./proposalRevision";
 import { proposalPictureRefs } from "./proposalPictures";
+import { openHoldsForEquipment } from "./openEquipmentHolds";
 
 export type ProposalDraftReport = {
   generated: boolean;
@@ -217,10 +218,7 @@ async function availabilityIssues(
     }
     if (startsAt == null || endsAt == null || endsAt <= startsAt) continue;
     const wanted = Number(line.quantity) > 0 ? Number(line.quantity) : 1;
-    const holds = await ctx.db
-      .query("equipmentReservations")
-      .withIndex("by_equipmentId", (q) => q.eq("equipmentId", item._id))
-      .collect();
+    const holds = await openHoldsForEquipment(ctx, item._id);
     const window = {
       tenantId: proposal.tenantId,
       startsAt,
