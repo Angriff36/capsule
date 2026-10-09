@@ -553,6 +553,7 @@ export function VehicleMaintenancePage() {
             <label className="field-label">
               Filled
               <BoundedDateTimeLocalInput
+                naturalDateDirection="any"
                 name="filledAt"
                 className="input"
                 max={localDateTime(now)}
@@ -736,6 +737,7 @@ export function VehicleMaintenancePage() {
               <label className="field-label">
                 Completed
                 <BoundedDateTimeLocalInput
+                  naturalDateDirection="any"
                   name="completedAt"
                   className="input"
                   max={localDateTime(now)}

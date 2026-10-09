@@ -281,6 +281,7 @@ export function OneOnOnesPage() {
             <label className="field-label">
               Meeting date
               <BoundedDateInput
+                naturalDateDirection="any"
                 name="meetingDate"
                 className="input"
                 required

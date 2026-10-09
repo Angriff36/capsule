@@ -220,6 +220,7 @@ export function PerformanceReviewsPage() {
             <label className="field-label">
               Review date
               <BoundedDateInput
+                naturalDateDirection="any"
                 name="reviewDate"
                 className="input"
                 required

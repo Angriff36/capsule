@@ -404,6 +404,7 @@ export function ClientDetailPage() {
         <label>
           Birthday
           <BoundedDateInput
+            naturalDateDirection="any"
             name="birthday"
             defaultValue={client.birthday ?? ""}
           />

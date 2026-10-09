@@ -405,6 +405,7 @@ export function TrainingPage() {
             <label className="field-label">
               Completed
               <BoundedDateInput
+                naturalDateDirection="any"
                 name="completedAt"
                 className="input"
                 required
