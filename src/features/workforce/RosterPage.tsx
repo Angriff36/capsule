@@ -348,8 +348,14 @@ export function RosterPage() {
   const outstandingPublicationRows = currentPublicationRows.filter(
     (row) => row.notice?.acknowledgedAt == null,
   );
+  // A worker whose shifts this week are all over (finished, cancelled, no-show,
+  // or brought in from Nowsta as history) has nothing to be told.
   const unpublishedPublicationRows = publicationRows.filter(
-    (row) => !row.current,
+    (row) =>
+      !row.current &&
+      row.personShifts.some(
+        (shift) => shift.status === "scheduled" || shift.status === "started",
+      ),
   );
   const scheduleNeedsPublication = unpublishedPublicationRows.length > 0;
   const weekHasNotStarted = Date.now() < selectedWeekStartsAt;
@@ -1081,7 +1087,9 @@ export function RosterPage() {
                   ? currentPublicationRows.length > 0
                     ? "Publish updates"
                     : "Publish schedule"
-                  : "Schedule published"}
+                  : currentPublicationRows.length > 0
+                    ? "Schedule published"
+                    : "Nothing to publish"}
           </button>
         </div>
         {loading ? (
