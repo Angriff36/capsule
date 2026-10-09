@@ -1,101 +1,251 @@
 import { formatCount, formatMoney, formatPercent } from "@/lib/format";
-import {
-  COMPLETED_STAGES,
-  foodCostPercent,
-  isBookedEvent,
-  isConvertedLead,
-  percentOf,
-  profitMarginPercent,
-} from "./dashboardRecordSets";
 import type { MetricId } from "./metricDefinitions";
+import { measureValue, type ScorecardSources } from "./scorecardCounts";
+import { trendWindows, type ScorecardPeriod } from "./scorecardPeriods";
+
+export type { ScorecardSources } from "./scorecardCounts";
 
 /**
- * The company scorecard numbers (spec §7.4). Each one is counted live per
- * calendar month on this device's clock, then compared with its target
- * (ScorecardTarget) to give on track / off track. The Company Scorecard and
- * the L10 page both read these rows, so the two pages always agree.
+ * The company scorecard numbers (spec §7.4): the owner's Mangia Company
+ * Scorecard (the EOS Traction weekly scorecard, Company_Scorecard.html) -
+ * its four areas, its numbers and its written targets - plus four older
+ * Capsule numbers kept for the targets already set on them. Each is counted
+ * live over its period (scorecardCounts.ts) and compared with its target
+ * (ScorecardTarget) to give on track / caution / off track. The Company
+ * Scorecard and the L10 page both read these rows, so the two pages agree.
  */
 
 export type ScorecardUnit = "currency" | "percent" | "count";
 export type ScorecardDirection = "higher_better" | "lower_better";
 export type ScorecardStatus =
-  "on_track" | "off_track" | "no_target" | "not_known";
+  "on_track" | "caution" | "off_track" | "no_target" | "not_known";
+
+export const SCORECARD_AREAS = [
+  "Sales",
+  "Events / Production",
+  "Kitchen / Culinary",
+  "Operations / Admin",
+  "Other Capsule numbers",
+] as const;
+export type ScorecardArea = (typeof SCORECARD_AREAS)[number];
 
 export interface ScorecardMeasure {
   readonly key: string;
   readonly name: string;
+  readonly area: ScorecardArea;
+  readonly period: ScorecardPeriod;
   readonly unit: ScorecardUnit;
   readonly direction: ScorecardDirection;
   /** The dashboardMetrics.ts entry that says how the number is counted. */
   readonly metricId: MetricId;
+  /** The target written on the owner's scorecard, as written. */
+  readonly scorecardTarget?: string;
 }
+
+const SALES = { area: "Sales", direction: "higher_better" } as const;
+const EVENTS = { area: "Events / Production" } as const;
+const KITCHEN = { area: "Kitchen / Culinary" } as const;
+const OPS = { area: "Operations / Admin", period: "now" } as const;
+const OTHER = {
+  area: "Other Capsule numbers",
+  period: "month",
+  direction: "higher_better",
+} as const;
 
 export const SCORECARD_MEASURES: readonly ScorecardMeasure[] = [
   {
-    key: "monthly_revenue",
-    name: "Monthly Revenue",
+    ...SALES,
+    key: "pipeline_value",
+    name: "Pipeline Value",
+    period: "now",
     unit: "currency",
-    direction: "higher_better",
+    metricId: "dashboard.pipeline_value",
+    scorecardTarget: "$75,000+",
+  },
+  {
+    ...SALES,
+    key: "booked_revenue_week",
+    name: "Booked Revenue (Week)",
+    period: "week",
+    unit: "currency",
     metricId: "dashboard.booked_revenue",
+    scorecardTarget: "$15,000+",
   },
   {
-    key: "food_cost_percent",
-    name: "Food Cost %",
+    ...SALES,
+    key: "close_rate",
+    name: "Close Rate",
+    period: "week",
     unit: "percent",
-    direction: "lower_better",
-    metricId: "dashboard.food_cost_percent",
+    metricId: "dashboard.win_rate",
+    scorecardTarget: "35-40% (industry benchmark)",
   },
   {
-    key: "profit_margin",
-    name: "Profit Margin",
-    unit: "percent",
-    direction: "higher_better",
-    metricId: "dashboard.profit_margin",
+    ...SALES,
+    key: "avg_event_value",
+    name: "Avg. Event Value",
+    period: "week",
+    unit: "currency",
+    metricId: "dashboard.booked_average",
+    scorecardTarget: "$4,500+",
   },
   {
-    key: "lead_conversion",
-    name: "Lead Conversion",
-    unit: "percent",
-    direction: "higher_better",
-    metricId: "dashboard.lead_conversion",
+    ...SALES,
+    key: "new_leads_week",
+    name: "New Leads / Week",
+    period: "week",
+    unit: "count",
+    metricId: "dashboard.new_leads",
+    scorecardTarget: "8-12 (industry benchmark)",
   },
   {
+    ...EVENTS,
     key: "events_completed",
-    name: "Events Completed",
+    name: "Events Produced / Month",
+    period: "month",
     unit: "count",
     direction: "higher_better",
     metricId: "dashboard.completed_events",
+    scorecardTarget: "12-18",
   },
   {
+    ...EVENTS,
+    key: "event_issue_rate",
+    name: "Event-Day Issue Rate",
+    period: "week",
+    unit: "percent",
+    direction: "lower_better",
+    metricId: "dashboard.event_issue_rate",
+    scorecardTarget: "Under 5% (industry benchmark)",
+  },
+  {
+    ...EVENTS,
+    key: "staff_utilization",
+    name: "Staff Utilization Rate",
+    period: "week",
+    unit: "percent",
+    direction: "higher_better",
+    metricId: "dashboard.staff_utilization",
+    scorecardTarget: "85%+ (industry benchmark)",
+  },
+  {
+    ...KITCHEN,
+    key: "food_cost_percent",
+    name: "Food Cost %",
+    period: "week",
+    unit: "percent",
+    direction: "lower_better",
+    metricId: "dashboard.food_cost_percent",
+    scorecardTarget: "28-32% (industry benchmark)",
+  },
+  {
+    ...KITCHEN,
+    key: "prep_on_time",
+    name: "Prep Time Accuracy",
+    period: "week",
+    unit: "percent",
+    direction: "higher_better",
+    metricId: "dashboard.prep_on_time",
+    scorecardTarget: "95%+ on schedule (industry benchmark)",
+  },
+  {
+    ...KITCHEN,
+    key: "waste_percent",
+    name: "Waste %",
+    period: "week",
+    unit: "percent",
+    direction: "lower_better",
+    metricId: "dashboard.waste_percent",
+    scorecardTarget: "Under 4% (industry benchmark)",
+  },
+  {
+    ...KITCHEN,
+    key: "team_retention",
+    name: "Team Retention (Quarterly)",
+    period: "quarter",
+    unit: "percent",
+    direction: "higher_better",
+    metricId: "dashboard.team_retention",
+    scorecardTarget: "90%+ (industry benchmark)",
+  },
+  {
+    ...OPS,
+    key: "equipment_current",
+    name: "Equipment Maintenance Score",
+    unit: "percent",
+    direction: "higher_better",
+    metricId: "dashboard.equipment_current",
+    scorecardTarget: "100% current (industry benchmark)",
+  },
+  {
+    ...OPS,
+    key: "staff_w2_count",
+    name: "Staff W2 Count",
+    unit: "count",
+    direction: "higher_better",
+    metricId: "dashboard.staff_w2_count",
+    scorecardTarget: "To be set",
+  },
+  {
+    ...OTHER,
+    key: "monthly_revenue",
+    name: "Monthly Revenue",
+    unit: "currency",
+    metricId: "dashboard.booked_revenue",
+  },
+  {
+    ...OTHER,
+    key: "profit_margin",
+    name: "Profit Margin",
+    unit: "percent",
+    metricId: "dashboard.profit_margin",
+  },
+  {
+    ...OTHER,
+    key: "lead_conversion",
+    name: "Lead Conversion",
+    unit: "percent",
+    metricId: "dashboard.lead_conversion",
+  },
+  {
+    ...OTHER,
     key: "guests",
     name: "Guests This Month",
     unit: "count",
-    direction: "higher_better",
     metricId: "dashboard.guests",
   },
 ];
 
-export interface ScorecardEvent {
-  readonly startsAt?: number | null;
-  readonly stage?: string | null;
-  readonly quotedPrice?: number | null;
-  readonly expectedHeadcount?: number | null;
-}
-
-export interface ScorecardCloseout {
-  readonly finalizedAt?: number | null;
-  readonly capturedAt?: number | null;
-  readonly createdAt?: number | null;
-  readonly grossProfit?: number | null;
-  readonly actualIngredientCost?: number | null;
-  readonly budgetedCost?: number | null;
-}
-
-export interface ScorecardLead {
-  readonly createdAt?: number | null;
-  readonly stage?: string | null;
-  readonly proposalId?: string | null;
-}
+/**
+ * Numbers on the owner's scorecard that Capsule holds no records for yet,
+ * and what is missing. Shown as a list, never as a made-up figure.
+ */
+export const SCORECARD_NOT_COUNTED: ReadonlyArray<{
+  readonly name: string;
+  readonly area: ScorecardArea;
+  readonly missing: string;
+}> = [
+  {
+    name: "Client Satisfaction Score",
+    area: "Events / Production",
+    missing: "Capsule does not ask clients to rate their event yet.",
+  },
+  {
+    name: "Menu Adoption Rate",
+    area: "Kitchen / Culinary",
+    missing: "Dishes are not marked as signature items yet.",
+  },
+  {
+    name: "Overhead Cost %",
+    area: "Operations / Admin",
+    missing: "Overhead costs are not kept in Capsule.",
+  },
+  {
+    name: "Vendor Payment Timeliness",
+    area: "Operations / Admin",
+    missing: "Supplier bills and their payment dates are not kept in Capsule.",
+  },
+];
 
 export interface ScorecardTargetRow {
   readonly _id: string;
@@ -108,71 +258,6 @@ export interface ScorecardTargetRow {
   readonly deletedAt?: number | null;
   readonly setAt?: number | null;
   readonly version?: number;
-}
-
-export interface ScorecardSources {
-  readonly events: readonly ScorecardEvent[];
-  readonly closeouts: readonly ScorecardCloseout[];
-  readonly leads: readonly ScorecardLead[];
-  /** Proposals the client accepted; a lead on one became business. */
-  readonly acceptedProposalIds?: ReadonlySet<string>;
-}
-
-export interface ScorecardMonth {
-  readonly year: number;
-  /** 0-11, as Date.getMonth(). */
-  readonly month: number;
-}
-
-export function monthLabel({ year, month }: ScorecardMonth): string {
-  return `${year}-${String(month + 1).padStart(2, "0")}`;
-}
-
-function inMonth(
-  ts: number | null | undefined,
-  { year, month }: ScorecardMonth,
-) {
-  if (!ts) return false;
-  const date = new Date(ts);
-  return date.getMonth() === month && date.getFullYear() === year;
-}
-
-/** Every scorecard number for one month; null = nothing to count yet. */
-export function measureMonth(
-  sources: ScorecardSources,
-  period: ScorecardMonth,
-): Record<string, number | null> {
-  const monthEvents = sources.events.filter((e) => inMonth(e.startsAt, period));
-  const booked = monthEvents.filter(isBookedEvent);
-  const closeouts = sources.closeouts.filter((c) =>
-    inMonth(c.finalizedAt ?? c.capturedAt ?? c.createdAt, period),
-  );
-  const leads = sources.leads.filter((l) => inMonth(l.createdAt, period));
-  return {
-    monthly_revenue: booked.reduce((sum, e) => sum + (e.quotedPrice ?? 0), 0),
-    food_cost_percent: foodCostPercent(closeouts),
-    profit_margin: profitMarginPercent(closeouts),
-    lead_conversion: percentOf(
-      leads.filter((lead) =>
-        isConvertedLead(lead, sources.acceptedProposalIds ?? new Set()),
-      ).length,
-      leads.length,
-    ),
-    events_completed: monthEvents.filter((e) =>
-      COMPLETED_STAGES.includes(e.stage ?? ""),
-    ).length,
-    guests: booked.reduce((sum, e) => sum + (e.expectedHeadcount ?? 0), 0),
-  };
-}
-
-/** The given month and the months before it, oldest first. */
-export function trailingMonths(now: Date, count: number): ScorecardMonth[] {
-  const months: ScorecardMonth[] = [];
-  for (let i = count - 1; i >= 0; i--) {
-    const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    months.push({ year: date.getFullYear(), month: date.getMonth() });
-  }
-  return months;
 }
 
 /** The live target for each number: newest set, not retired or deleted. */
@@ -189,57 +274,56 @@ export function liveTargets(
   return byKey;
 }
 
+/** A miss within this share of the target is caution, not off track. */
+export const CAUTION_BAND = 0.1;
+
 export function scorecardStatus(
   actual: number | null,
   target: ScorecardTargetRow | undefined,
 ): ScorecardStatus {
   if (!target) return "no_target";
   if (actual == null) return "not_known";
-  return target.direction === "lower_better"
-    ? actual <= target.target
-      ? "on_track"
-      : "off_track"
-    : actual >= target.target
-      ? "on_track"
-      : "off_track";
+  const band = Math.abs(target.target) * CAUTION_BAND;
+  if (target.direction === "lower_better") {
+    if (actual <= target.target) return "on_track";
+    return actual <= target.target + band ? "caution" : "off_track";
+  }
+  if (actual >= target.target) return "on_track";
+  return actual >= target.target - band ? "caution" : "off_track";
 }
 
 export interface ScorecardRow {
   readonly measure: ScorecardMeasure;
   readonly actual: number | null;
+  /** The period before; null for numbers counted only for today. */
   readonly previous: number | null;
-  /** One value per month, oldest first, ending with this month. */
+  /** One value per period, oldest first, ending with this one. */
   readonly trend: ReadonlyArray<{
-    readonly month: string;
+    readonly label: string;
     readonly value: number | null;
   }>;
   readonly target: ScorecardTargetRow | undefined;
   readonly status: ScorecardStatus;
 }
 
-export const TREND_MONTHS = 6;
-
 export function scorecardRows(
   sources: ScorecardSources,
   targets: readonly ScorecardTargetRow[],
   now: Date,
 ): ScorecardRow[] {
-  const months = trailingMonths(now, TREND_MONTHS);
-  const values = months.map((period) => measureMonth(sources, period));
-  const current = values[values.length - 1];
-  const previous = values[values.length - 2];
   const live = liveTargets(targets);
   return SCORECARD_MEASURES.map((measure) => {
-    const actual = current[measure.key] ?? null;
+    const trend = trendWindows(measure.period, now).map((window) => ({
+      label: window.label,
+      value: measureValue(measure.key, sources, window, now),
+    }));
+    const actual = trend[trend.length - 1].value;
     const target = live.get(measure.key);
     return {
       measure,
       actual,
-      previous: previous[measure.key] ?? null,
-      trend: months.map((period, i) => ({
-        month: monthLabel(period),
-        value: values[i][measure.key] ?? null,
-      })),
+      previous: trend.length > 1 ? trend[trend.length - 2].value : null,
+      trend,
       target,
       status: scorecardStatus(actual, target),
     };
@@ -259,6 +343,7 @@ export function formatScorecardValue(value: number, unit: ScorecardUnit) {
 
 export const SCORECARD_STATUS_LABEL: Record<ScorecardStatus, string> = {
   on_track: "On track",
+  caution: "Caution",
   off_track: "Off track",
   no_target: "No target set",
   not_known: "Not known yet",

@@ -145,6 +145,32 @@ export const DASHBOARD_METRICS = {
     leftOut:
       "Open quotes, planning and waiting-for-approval events: not decided yet.",
   },
+  "dashboard.booked_ahead": {
+    ...BOOKED_BASE,
+    label: "Confirmed, not yet delivered",
+    measures:
+      "Quoted prices of booked events that are not completed yet, added together, and how many.",
+    currency: "company",
+    tax: QUOTED_TAX,
+    dateBasis: "Every such event on file today, whatever its date.",
+    includes:
+      "Approved, sales lock, executing and final events with a quoted price.",
+    leftOut:
+      "Completed and closed-out events (already delivered), open quotes, waiting-for-approval and cancelled events.",
+  },
+  "dashboard.weighted_forecast": {
+    ...BOOKED_BASE,
+    label: "Weighted forecast",
+    measures:
+      "Confirmed, not yet delivered events at their full quoted price, plus open quotes at half their quoted price.",
+    currency: "company",
+    tax: QUOTED_TAX,
+    dateBasis: "Every such event on file today, whatever its date.",
+    includes:
+      "Approved and later events not completed yet (100%); quote, planning and waiting-for-approval events (50%).",
+    leftOut:
+      "Completed, closed-out and cancelled events. Events with no quoted price add $0.",
+  },
   "dashboard.lost_revenue": {
     ...BOOKED_BASE,
     label: "Lost revenue",
@@ -261,6 +287,111 @@ export const DASHBOARD_METRICS = {
     includes: "Every closeout.",
     leftOut:
       "Events with no closeout. With no closeout at all the card says “Not known yet”.",
+  },
+  "dashboard.new_leads": {
+    ...LEAD_BASE,
+    dateBasis: "Date the lead was made, Monday to Sunday this week.",
+    label: "New leads",
+    measures: "How many leads were made this week.",
+    includes: "Every lead made this week, whatever its stage now.",
+  },
+  "dashboard.event_issue_rate": {
+    ...BOOKED_BASE,
+    label: "Event-day issue rate",
+    measures:
+      "Events this week with at least one reported problem, divided by all events this week.",
+    currency: "none",
+    tax: NOT_MONEY,
+    source: "Events and reported problems",
+    includes: "Every event this week except cancelled ones.",
+    leftOut:
+      "Cancelled events and dismissed problems. With no event this week it says “Not known yet”.",
+    drill: "Open the event's Problems tab for what was reported.",
+  },
+  "dashboard.staff_utilization": {
+    source: "Shifts",
+    dateBasis: "Shift start, Monday to Sunday this week, up to now.",
+    timeBasis: "device",
+    currency: "none",
+    tax: NOT_MONEY,
+    recordBasis: "live",
+    label: "Staff utilization",
+    measures:
+      "Shifts the person turned up for (started or completed), divided by all shifts that should have started by now.",
+    includes: "Scheduled, started, completed and no-show shifts.",
+    leftOut: "Cancelled shifts and shifts still to come.",
+    drill: "Open Staff > Schedule for the shifts behind this figure.",
+  },
+  "dashboard.prep_on_time": {
+    source: "Prep tasks",
+    dateBasis: "Task due time, Monday to Sunday this week, up to now.",
+    timeBasis: "device",
+    currency: "none",
+    tax: NOT_MONEY,
+    recordBasis: "live",
+    label: "Prep on time",
+    measures:
+      "Prep tasks finished by their due time, divided by all tasks whose due time has come.",
+    includes: "Every prep task due this week whose due time has passed.",
+    leftOut: "Cancelled tasks, tasks with no due time, tasks still to come.",
+    drill: "Open Kitchen > Prep for this week's tasks.",
+  },
+  "dashboard.waste_percent": {
+    ...CLOSEOUT_BASE,
+    source: "Waste records and event closeouts",
+    dateBasis:
+      "Waste: date recorded; closeouts: date finished. Monday to Sunday this week.",
+    currency: "none",
+    label: "Waste %",
+    measures:
+      "Cost of food thrown away (amount times cost each) divided by the food cost of the events closed out this week.",
+    includes: "Waste records not voided; closeouts with a food cost.",
+    leftOut:
+      "Voided waste records. With no closeout food cost this week it says “Not known yet”.",
+    drill: "Open Inventory > Waste for the records behind this figure.",
+  },
+  "dashboard.team_retention": {
+    source: "People",
+    dateBasis: "Hire date and leaving date, this calendar quarter.",
+    timeBasis: "device",
+    currency: "none",
+    tax: NOT_MONEY,
+    recordBasis: "live",
+    label: "Team retention",
+    measures:
+      "People on the team when the quarter began who are still on it at its end (or today), divided by everyone on the team when it began.",
+    includes:
+      "Everyone hired before the quarter began (or added before it, with no hire date) and not gone before it.",
+    leftOut: "People hired during the quarter, and deleted people.",
+    drill: "Open Staff > People for the team.",
+  },
+  "dashboard.equipment_current": {
+    source: "Equipment maintenance",
+    dateBasis: "Next due date of each maintenance task, against today.",
+    timeBasis: "device",
+    currency: "none",
+    tax: NOT_MONEY,
+    recordBasis: "live",
+    label: "Equipment maintenance current",
+    measures:
+      "Maintenance tasks not past their due date, divided by all scheduled maintenance tasks.",
+    includes: "Maintenance tasks with a next due date.",
+    leftOut:
+      "Deleted tasks and tasks with no due date. With none scheduled it says “Not known yet”.",
+    drill: "Open Facilities > Equipment for the maintenance list.",
+  },
+  "dashboard.staff_w2_count": {
+    source: "People",
+    dateBasis: "Today.",
+    timeBasis: "device",
+    currency: "none",
+    tax: NOT_MONEY,
+    recordBasis: "live",
+    label: "Staff on payroll (W-2)",
+    measures: "Active people who are not contractors.",
+    includes: "Active full-time, part-time and temporary staff.",
+    leftOut: "Contractors, people who have left, and deleted people.",
+    drill: "Open Staff > People for the team.",
   },
   "dashboard.events_today": {
     ...TODAY_BASE,

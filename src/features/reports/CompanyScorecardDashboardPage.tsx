@@ -11,17 +11,13 @@ import { BarChart } from "@/ui/charts/BarChart";
 import { EmptyState, PageHeader, StatusChip } from "@/ui/primitives";
 import { CHIP_TONE_CLASS } from "@/lib/statusLabels";
 import { formatMoney } from "@/lib/format";
-import { useEventsInRange } from "../facilities/useEventsById";
-import {
-  useCloseoutsInRange,
-  useLeadsInRange,
-} from "@/lib/financeScopedQueries";
-import { acceptedProposalIds, isBookedEvent } from "./dashboardRecordSets";
+import { isBookedEvent } from "./dashboardRecordSets";
 import { MetricDefinitionList } from "./MetricDefinitionList";
 import {
+  SCORECARD_AREAS,
   SCORECARD_MEASURES,
+  SCORECARD_NOT_COUNTED,
   SCORECARD_STATUS_LABEL,
-  TREND_MONTHS,
   formatScorecardValue,
   scorecardRows,
   type ScorecardRow,
@@ -32,6 +28,8 @@ import {
   ScorecardTargetEditor,
   type ScorecardPerson,
 } from "./ScorecardTargetEditor";
+import { useScorecardSources } from "./useScorecardSources";
+import { PERIOD_NAME } from "./scorecardPeriods";
 
 /**
  * Company Scorecard Dashboard (Priority 37)
@@ -44,44 +42,26 @@ import {
 
 const STATUS_TONE: Record<ScorecardStatus, string> = {
   on_track: CHIP_TONE_CLASS.ok,
+  caution: CHIP_TONE_CLASS.warn,
   off_track: CHIP_TONE_CLASS.danger,
   no_target: CHIP_TONE_CLASS.mute,
   not_known: CHIP_TONE_CLASS.mute,
 };
 
 export function CompanyScorecardDashboardPage() {
-  const now = new Date();
-  const currentMonth = now.getMonth();
-  const currentYear = now.getFullYear();
-  // The scorecard and its trend cover the last six months.
-  const eventWindow = useMemo(
-    () => ({
-      from: new Date(currentYear, currentMonth - TREND_MONTHS + 1, 1).getTime(),
-      to: new Date(currentYear, currentMonth + 1, 1).getTime(),
-    }),
-    [currentYear, currentMonth],
-  );
-  const events = useEventsInRange(eventWindow);
-  // Closeouts and leads of the same six months, and the leads' proposals.
-  const closeouts = useCloseoutsInRange(eventWindow);
-  const { leads, proposals } = useLeadsInRange(eventWindow);
+  const refNow = useMemo(() => new Date(), []);
+  const currentMonth = refNow.getMonth();
+  const currentYear = refNow.getFullYear();
+  const { sources, loading } = useScorecardSources(refNow);
+  const events = sources.events;
   const targets = useListScorecardTarget();
   const people = useListPerson();
   const [editing, setEditing] = useState<string | null>(null);
 
   const rows = useMemo(
     () =>
-      scorecardRows(
-        {
-          events: events ?? [],
-          closeouts: closeouts ?? [],
-          leads: leads ?? [],
-          acceptedProposalIds: acceptedProposalIds(proposals),
-        },
-        (targets ?? []) as ScorecardTargetRow[],
-        new Date(currentYear, currentMonth, 15),
-      ),
-    [events, closeouts, leads, proposals, targets, currentYear, currentMonth],
+      scorecardRows(sources, (targets ?? []) as ScorecardTargetRow[], refNow),
+    [sources, targets, refNow],
   );
 
   const activePeople: ScorecardPerson[] = (people ?? []).filter(
@@ -95,8 +75,6 @@ export function CompanyScorecardDashboardPage() {
 
   // Monthly trend data (last 6 months of revenue)
   const monthlyTrendData = useMemo(() => {
-    if (!events) return [];
-
     const monthMap = new Map<string, { revenue: number; eventCount: number }>();
 
     // Populate with last 6 months
@@ -125,32 +103,33 @@ export function CompanyScorecardDashboardPage() {
     }));
   }, [events, currentYear, currentMonth]);
 
+  const card = (row: ScorecardRow) => ({
+    id: row.measure.key,
+    size: "medium" as const,
+    content: (
+      <MetricCard
+        row={row}
+        ownerName={personName(row.target?.ownerPersonId)}
+        editing={editing === row.measure.key}
+        onEdit={() => setEditing(row.measure.key)}
+        editor={
+          <ScorecardTargetEditor
+            measure={row.measure}
+            target={row.target}
+            people={activePeople}
+            onDone={() => setEditing(null)}
+          />
+        }
+      />
+    ),
+  });
+
   const dashboardItems: Array<{
     id: string;
     size: DashboardGridSize;
     content: React.ReactNode;
     title?: string;
   }> = [
-    ...rows.map((row) => ({
-      id: row.measure.key,
-      size: "medium" as const,
-      content: (
-        <MetricCard
-          row={row}
-          ownerName={personName(row.target?.ownerPersonId)}
-          editing={editing === row.measure.key}
-          onEdit={() => setEditing(row.measure.key)}
-          editor={
-            <ScorecardTargetEditor
-              measure={row.measure}
-              target={row.target}
-              people={activePeople}
-              onDone={() => setEditing(null)}
-            />
-          }
-        />
-      ),
-    })),
     {
       id: "monthly-trends",
       size: "full",
@@ -177,10 +156,10 @@ export function CompanyScorecardDashboardPage() {
     <div className="operations-stage supply-stage">
       <PageHeader
         title="Company Scorecard"
-        lead="The core monthly numbers against their targets, with owners and a six-month trend, live from your events, closeouts, and leads."
+        lead="The weekly scorecard reviewed at the L10: each number against its target, with its owner, status and trend, live from Capsule."
       />
 
-      {events?.length === 0 ? (
+      {!loading && events.length === 0 ? (
         <div data-testid="dashboard-empty">
           <EmptyState
             title="No events yet"
@@ -189,18 +168,58 @@ export function CompanyScorecardDashboardPage() {
         </div>
       ) : null}
 
-      <DashboardGrid items={dashboardItems} />
+      {SCORECARD_AREAS.map((area) => {
+        const notCounted = SCORECARD_NOT_COUNTED.filter(
+          (item) => item.area === area,
+        );
+        return (
+          <section
+            key={area}
+            className="mt-6 first:mt-0"
+            data-testid={`scorecard-area-${area}`}
+          >
+            <h2 className="border-b border-line pb-1.5 text-base font-semibold text-ink">
+              {area}
+            </h2>
+            <div className="mt-3">
+              <DashboardGrid
+                items={rows
+                  .filter((row) => row.measure.area === area)
+                  .map(card)}
+              />
+            </div>
+            {notCounted.length > 0 ? (
+              <ul
+                className="mt-2 space-y-1 text-xs text-ink-2"
+                data-testid="scorecard-not-counted"
+              >
+                {notCounted.map((item) => (
+                  <li key={item.name}>
+                    <span className="font-semibold text-ink">{item.name}</span>{" "}
+                    is on the scorecard but not counted yet: {item.missing}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </section>
+        );
+      })}
+
+      <div className="mt-6">
+        <DashboardGrid items={dashboardItems} />
+      </div>
 
       <div className="mt-6 rounded-sm border border-line bg-inset p-4">
         <h4 className="text-xs font-semibold text-ink">
           Where these numbers come from
         </h4>
         <p className="mt-1 text-xs text-ink-2">
-          Revenue and guest counts come from events scheduled this month. Food
-          cost and profit margin come from finished event closeouts. Lead
-          conversion counts leads created this month that converted. A number is
-          on track when this month meets its target; set a target and an owner
-          on each card.
+          The numbers and areas are the company&apos;s EOS scorecard. Weekly
+          numbers run Monday to Sunday; the rest say their period on the card.
+          Each card shows the target written on the scorecard until you set your
+          own. A number is on track when it meets its target, caution when it
+          misses by up to 10%, and off track beyond that; set a target and an
+          owner on each card.
         </p>
       </div>
 
@@ -225,6 +244,7 @@ function MetricCard({
   editor: React.ReactNode;
 }) {
   const { measure } = row;
+  const period = PERIOD_NAME[measure.period];
   const formatValue = (value: number) =>
     formatScorecardValue(value, measure.unit);
 
@@ -254,18 +274,20 @@ function MetricCard({
           <span
             className={`text-xs font-medium ${improving ? "text-ok" : "text-danger"}`}
           >
-            {change >= 0 ? "▲" : "▼"} {Math.abs(change).toFixed(1)}% vs last
-            month
+            {change >= 0 ? "▲" : "▼"} {Math.abs(change).toFixed(1)}% vs last{" "}
+            {period}
           </span>
         ) : null}
       </div>
 
       <p className="mt-2 text-2xs text-ink-3">
-        {row.actual == null
-          ? "Nothing recorded yet this month."
-          : row.previous != null
-            ? `Last month: ${formatValue(row.previous)}`
-            : "No data for last month yet."}
+        {measure.period === "now"
+          ? "Counted from what is on file today."
+          : row.actual == null
+            ? `Nothing recorded yet this ${period}.`
+            : row.previous != null
+              ? `Last ${period}: ${formatValue(row.previous)}`
+              : `No data for last ${period} yet.`}
       </p>
 
       <dl className="mt-2 grid grid-cols-2 gap-x-2 text-2xs text-ink-2">
@@ -273,7 +295,9 @@ function MetricCard({
         <dd data-testid="scorecard-target">
           {row.target
             ? `${row.target.direction === "lower_better" ? "At most" : "At least"} ${formatValue(row.target.target)}`
-            : "Not set"}
+            : measure.scorecardTarget
+              ? `Not set. Scorecard: ${measure.scorecardTarget}`
+              : "Not set"}
         </dd>
         <dt>Owner</dt>
         <dd data-testid="scorecard-owner">{ownerName ?? "No owner"}</dd>
@@ -288,15 +312,13 @@ function MetricCard({
 
       <ol
         className="mt-2 flex flex-wrap gap-x-2 text-2xs text-ink-3"
-        aria-label={`${measure.name}, last six months`}
+        aria-label={`${measure.name}, last ${row.trend.length} ${period}s`}
         data-testid="scorecard-trend"
       >
         {row.trend.map((point) => (
-          <li key={point.month}>
-            {new Date(`${point.month}-01T12:00:00`).toLocaleString("en-US", {
-              month: "short",
-            })}
-            : {point.value == null ? "—" : formatValue(point.value)}
+          <li key={point.label}>
+            {point.label}:{" "}
+            {point.value == null ? "—" : formatValue(point.value)}
           </li>
         ))}
       </ol>

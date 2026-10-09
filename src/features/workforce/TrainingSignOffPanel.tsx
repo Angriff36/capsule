@@ -231,6 +231,7 @@ export function TrainingSignOffPanel({
           <label className="field-label">
             Training start
             <BoundedDateInput
+              naturalDateDirection="any"
               name="startedAt"
               className="input"
               defaultValue={todayInput()}
@@ -399,6 +400,7 @@ export function TrainingSignOffPanel({
                         <label className="field-label">
                           Training end
                           <BoundedDateInput
+                            naturalDateDirection="any"
                             name="finishedAt"
                             className="input"
                             defaultValue={todayInput()}

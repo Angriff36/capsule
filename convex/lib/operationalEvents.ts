@@ -122,16 +122,26 @@ export async function handleManifestEvent(
     await checkOutDispatchedEquipment(ctx, event.entityId as Id<"packLists">);
     return;
   }
-  // The truck leaving with a loaded list is that list leaving the kitchen.
+  // The truck leaving with a packed or loaded list is that list leaving the
+  // kitchen: a packed list is on the truck, so it is loaded first.
   if (event.entity === "Delivery" && event.type === "DeliveryTransitStarted") {
     const packListId = event.payload.packListId;
     if (typeof packListId !== "string") return;
     const list = await ctx.db.get(packListId as Id<"packLists">);
-    if (!list || list.deletedAt != null || list.status !== "loaded") return;
-    await TenantSystemCommandRunner.forTenant(
-      ctx,
-      list.tenantId,
-    ).context.runMutation(api.mutations.PackList_dispatch, {
+    if (
+      !list ||
+      list.deletedAt != null ||
+      (list.status !== "packed" && list.status !== "loaded") ||
+      // markLoaded needs the packed time; never block the driver over it.
+      (list.status === "packed" && list.packedAt == null)
+    )
+      return;
+    const runner = TenantSystemCommandRunner.forTenant(ctx, list.tenantId);
+    if (list.status === "packed")
+      await runner.context.runMutation(api.mutations.PackList_markLoaded, {
+        docId: list._id,
+      });
+    await runner.context.runMutation(api.mutations.PackList_dispatch, {
       docId: list._id,
     });
     return;

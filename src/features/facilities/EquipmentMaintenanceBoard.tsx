@@ -407,6 +407,7 @@ export function EquipmentMaintenanceBoard({
                     <label className="field-label">
                       Completed
                       <BoundedDateTimeLocalInput
+                        naturalDateDirection="any"
                         name="completedAt"
                         className="input"
                         max={localDateTime(now)}

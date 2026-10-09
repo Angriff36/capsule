@@ -134,6 +134,7 @@ export function TimeSheetClockInForm({
         <label className="field-label">
           Clock in
           <BoundedDateTimeLocalInput
+            naturalDateDirection="any"
             name="clockInAt"
             className="input"
             defaultValue={defaultClockInLocal}
@@ -143,6 +144,7 @@ export function TimeSheetClockInForm({
         <label className="field-label">
           Clock out
           <BoundedDateTimeLocalInput
+            naturalDateDirection="any"
             name="clockOutAt"
             className="input"
             data-testid="clock-out-at"

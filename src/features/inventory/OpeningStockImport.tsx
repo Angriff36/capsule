@@ -103,6 +103,7 @@ export function OpeningStockImport() {
         <label className="field-label">
           Count date for rows with no date
           <BoundedDateInput
+            naturalDateDirection="any"
             className="input"
             value={countDate}
             onChange={(event) => setCountDate(event.target.value)}
