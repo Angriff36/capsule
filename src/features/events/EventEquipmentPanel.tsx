@@ -342,10 +342,25 @@ export function EventEquipmentPanel({
                 onSubmit={submitReservation}
                 onDismiss={() => setShowReserveForm(false)}
                 canOverride={OVERRIDE_ROLES.has(role ?? "")}
-                availability={availability?.map((row) => ({
-                  ...row,
-                  equipmentId: String(row.equipmentId),
-                }))}
+                availability={availability?.map((row) => {
+                  // The availability read leaves out this event's own holds;
+                  // a new hold is checked against them too, so the picker
+                  // counts them the same way.
+                  const onEvent = eventReservations
+                    .filter(
+                      (hold) =>
+                        String(hold.equipmentId) === String(row.equipmentId) &&
+                        (hold.status === "reserved" ||
+                          hold.status === "checked_out"),
+                    )
+                    .reduce((sum, hold) => sum + Number(hold.quantity ?? 0), 0);
+                  return {
+                    ...row,
+                    equipmentId: String(row.equipmentId),
+                    free: Math.max(0, row.free - onEvent),
+                    onEvent,
+                  };
+                })}
               />
             ) : (
               <button
