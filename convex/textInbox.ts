@@ -13,6 +13,11 @@ import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { httpAction, internalMutation, query } from "./_generated/server";
 import type { MessageMediaRef } from "./lib/messageMedia";
+import {
+  lastInboxArrivalAt,
+  recordInboxArrival,
+} from "./lib/inboxConnectionMirror";
+import { getAuthContext } from "./lib/authContext";
 import { redactSecrets } from "./lib/redactPayload";
 import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 import { twilioSignatureMatches } from "./lib/twilioSignature";
@@ -165,6 +170,7 @@ export const ingestText = internalMutation({
         idempotencyKey: `tenant-shared/msg:${threadId}:${args.messageSid}`,
       },
     );
+    await recordInboxArrival(ctx, tenantId, "sms", to);
     return { result: "stored", threadId, messageId: posted.docId };
   },
 });
@@ -219,12 +225,30 @@ export const textSetup = query({
   args: {},
   handler: async (
     ctx,
-  ): Promise<{ address: string | null; textsReady: boolean } | null> => {
+  ): Promise<{
+    address: string | null;
+    textsReady: boolean;
+    lastTextAt: number | null;
+  } | null> => {
     if (!(await ctx.auth.getUserIdentity())) return null;
     const site = process.env.CONVEX_SITE_URL?.trim().replace(/\/$/, "");
+    const { tenantId } = await getAuthContext(ctx);
+    let lastTextAt: number | null = null;
+    if (typeof tenantId === "string") {
+      const company = (
+        await ctx.db
+          .query("organizations")
+          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+          .collect()
+      ).find((org) => org.deletedAt == null);
+      const number = normalizePhone(company?.smsNumber);
+      if (number)
+        lastTextAt = await lastInboxArrivalAt(ctx, tenantId, "sms", number);
+    }
     return {
       address: site ? `${site}${TEXT_ROUTE_PATH}` : null,
       textsReady: Boolean(process.env.TWILIO_AUTH_TOKEN?.trim()),
+      lastTextAt,
     };
   },
 });

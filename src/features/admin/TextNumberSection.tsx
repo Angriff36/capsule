@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { formatDateTime } from "../../lib/format";
 import { useOrganizationConfigureTextNumber } from "../../lib/manifest-convex-react";
 import { useTextInboxSetup } from "../../lib/textInboxSetup";
 import { ErrorState, Section } from "../../ui/primitives";
@@ -86,6 +87,13 @@ export function TextNumberSection({
             In Twilio, under this number's "A message comes in", choose Webhook,
             HTTP POST, and paste{" "}
             <code className="break-all">{setup.address}</code>
+          </p>
+        ) : null}
+        {setup?.textsReady && record?.smsNumber ? (
+          <p className="text-sm text-ink-2">
+            {setup.lastTextAt
+              ? `Last client text came in ${formatDateTime(setup.lastTextAt)}.`
+              : "No client text has come in to this number yet."}
           </p>
         ) : null}
         {setup && !setup.textsReady ? (

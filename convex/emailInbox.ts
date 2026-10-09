@@ -26,6 +26,10 @@ import {
   inboundDomain,
   inboxLocalPart,
 } from "./lib/emailInboxAddress";
+import {
+  lastInboxArrivalAt,
+  recordInboxArrival,
+} from "./lib/inboxConnectionMirror";
 import { redactSecrets } from "./lib/redactPayload";
 import { svixSignatureMatches } from "./lib/svixSignature";
 import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
@@ -205,6 +209,7 @@ export const ingestEmail = internalMutation({
         idempotencyKey: `tenant-shared/msg:${threadId}:${args.emailId}`,
       },
     );
+    await recordInboxArrival(ctx, tenantId, "email", inbox);
     return { result: "stored", threadId, messageId: posted.docId };
   },
 });
@@ -289,14 +294,20 @@ export const emailSetup = query({
     inboxAddress: string | null;
     webhookAddress: string | null;
     emailsReady: boolean;
+    lastEmailAt: number | null;
   } | null> => {
     if (!(await ctx.auth.getUserIdentity())) return null;
     const auth = await getAuthContext(ctx);
     const tenantId = auth.tenantId;
     const site = process.env.CONVEX_SITE_URL?.trim().replace(/\/$/, "");
+    const inboxAddress =
+      typeof tenantId === "string" ? companyInboxAddress(tenantId) : null;
     return {
-      inboxAddress:
-        typeof tenantId === "string" ? companyInboxAddress(tenantId) : null,
+      inboxAddress,
+      lastEmailAt:
+        typeof tenantId === "string" && inboxAddress
+          ? await lastInboxArrivalAt(ctx, tenantId, "email", inboxAddress)
+          : null,
       webhookAddress: site ? `${site}${EMAIL_ROUTE_PATH}` : null,
       emailsReady: Boolean(
         process.env.RESEND_WEBHOOK_SECRET?.trim() &&

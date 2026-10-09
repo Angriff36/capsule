@@ -14,6 +14,7 @@
 import { createHmac } from "node:crypto";
 import { convexTest } from "convex-test";
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { api } from "../../convex/_generated/api";
 import schema from "../../convex/schema";
 import { modules } from "./convex-test-modules";
 
@@ -174,6 +175,34 @@ describe("PL-INBOX client texts come into the company inbox", () => {
       "Also a vegan plate.",
       "Can we add 20 guests to Saturday?",
     ]);
+
+    // PL-CONNECTIONS: the company's one text connection row is for its
+    // number and says when the last client text came in; company B has none.
+    const connections = await t.run(async (ctx) =>
+      ctx.db.query("integrationConnections").collect(),
+    );
+    expect(connections).toHaveLength(1);
+    expect(connections[0]).toMatchObject({
+      tenantId: "tenant-text-a",
+      provider: "sms",
+      status: "connected",
+      externalAccountId: "+15550102000",
+    });
+    expect(typeof connections[0]!.lastSuccessfulSyncAt).toBe("number");
+    const owner = (tenantId: string) => ({
+      subject: `text-owner-${tenantId}`,
+      tokenIdentifier: `text|owner-${tenantId}`,
+      role: "org:owner",
+      tenantId,
+    });
+    const setup = await t
+      .withIdentity(owner("tenant-text-a"))
+      .query(api.textInbox.textSetup, {});
+    expect(setup?.lastTextAt).toBe(connections[0]!.lastSuccessfulSyncAt);
+    const other = await t
+      .withIdentity(owner("tenant-text-b"))
+      .query(api.textInbox.textSetup, {});
+    expect(other?.lastTextAt).toBeNull();
   });
 
   it("an unsigned or wrongly signed request stores nothing", async () => {

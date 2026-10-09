@@ -181,6 +181,7 @@ import type * as lib_importPackListLines from "../lib/importPackListLines.js";
 import type * as lib_importRecordHomes from "../lib/importRecordHomes.js";
 import type * as lib_importResolution from "../lib/importResolution.js";
 import type * as lib_importSourceFields from "../lib/importSourceFields.js";
+import type * as lib_inboxConnectionMirror from "../lib/inboxConnectionMirror.js";
 import type * as lib_ingredientAllergenParser from "../lib/ingredientAllergenParser.js";
 import type * as lib_ingredientCatalogImageImport from "../lib/ingredientCatalogImageImport.js";
 import type * as lib_ingredientLookupApplyCost from "../lib/ingredientLookupApplyCost.js";
@@ -555,6 +556,7 @@ declare const fullApi: ApiFromModules<{
   "lib/importRecordHomes": typeof lib_importRecordHomes;
   "lib/importResolution": typeof lib_importResolution;
   "lib/importSourceFields": typeof lib_importSourceFields;
+  "lib/inboxConnectionMirror": typeof lib_inboxConnectionMirror;
   "lib/ingredientAllergenParser": typeof lib_ingredientAllergenParser;
   "lib/ingredientCatalogImageImport": typeof lib_ingredientCatalogImageImport;
   "lib/ingredientLookupApplyCost": typeof lib_ingredientLookupApplyCost;

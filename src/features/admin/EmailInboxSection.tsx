@@ -1,3 +1,4 @@
+import { formatDateTime } from "../../lib/format";
 import { useEmailInboxSetup } from "../../lib/emailInboxSetup";
 import { Section } from "../../ui/primitives";
 
@@ -14,6 +15,11 @@ export function EmailInboxSection() {
             Emails clients send to{" "}
             <code className="break-all">{setup.inboxAddress}</code> come into
             the inbox, one conversation per client email address.
+          </p>
+          <p>
+            {setup.lastEmailAt
+              ? `Last client email came in ${formatDateTime(setup.lastEmailAt)}.`
+              : "No client email has come in yet."}
           </p>
           <p>
             When "Replies go to" above is empty, clients who answer an invoice,

@@ -189,6 +189,28 @@ describe("PL-INBOX client emails come into the company inbox", () => {
       { id: "att-1", kind: "application/pdf", name: "seating.pdf" },
     ]);
     expect(messages[0]!.rawPayload).not.toContain("https://");
+
+    // PL-CONNECTIONS: the company's one email connection row says when the
+    // last client email came in, and the Brand page reads it.
+    const connections = await t.run(async (ctx) =>
+      ctx.db.query("integrationConnections").collect(),
+    );
+    expect(connections).toHaveLength(1);
+    expect(connections[0]).toMatchObject({
+      tenantId: "tenant-mail-a",
+      provider: "email",
+      status: "connected",
+      externalAccountId: `tenant-mail-a@${DOMAIN}`,
+    });
+    expect(typeof connections[0]!.lastSuccessfulSyncAt).toBe("number");
+    const setup = await t
+      .withIdentity(owner("tenant-mail-a"))
+      .query(api.emailInbox.emailSetup, {});
+    expect(setup?.lastEmailAt).toBe(connections[0]!.lastSuccessfulSyncAt);
+    const other = await t
+      .withIdentity(owner("tenant-mail-b"))
+      .query(api.emailInbox.emailSetup, {});
+    expect(other?.lastEmailAt).toBeNull();
   });
 
   it("an unsigned, wrongly signed or old request stores nothing and reads nothing", async () => {
