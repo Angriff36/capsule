@@ -31,7 +31,8 @@ import { InvoiceEquipmentCharges } from "./InvoiceEquipmentCharges";
 import { InvoiceTravelFee } from "./InvoiceTravelFee";
 import "./taxWorkspace.css";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
-import { SearchSelect } from "../../ui/SearchSelect";
+import { useClientsByIds } from "../../lib/useClientDirectory";
+import { ClientSearchSelect } from "../clients/ClientSearchSelect";
 
 type ClientOption = {
   _id: string;
@@ -51,14 +52,6 @@ type EventOption = {
   quotedPrice?: number | null;
   clientId?: string | null;
   deletedAt?: number | null;
-};
-
-const clientLabel = (row: ClientOption) => {
-  if (row.displayName) return String(row.displayName);
-  if (row.clientType === "person") {
-    return `${row.givenName ?? ""} ${row.familyName ?? ""}`.trim() || "Client";
-  }
-  return row.companyName?.trim() || "Client";
 };
 
 /**
@@ -108,10 +101,7 @@ export function InvoiceIssueForm({
   /** Numbers already used, so the form can suggest the next one. */
   existingInvoiceNumbers?: readonly (string | null | undefined)[];
 }) {
-  const clientDefault =
-    defaultClientId && clients.some((row) => row._id === defaultClientId)
-      ? defaultClientId
-      : "";
+  const clientDefault = defaultClientId ?? "";
   const eventDefault =
     defaultEventId &&
     events.some((row) => row._id === defaultEventId && row.deletedAt == null)
@@ -120,8 +110,7 @@ export function InvoiceIssueForm({
   const functionalCode = normalizeCurrencyCode(functionalCurrencyCode, "USD");
   // With no client given, the chosen event's client is the one billed.
   const eventClient = (eventId: string) => {
-    const id = events.find((row) => row._id === eventId)?.clientId ?? "";
-    return clients.some((row) => row._id === id) ? id : "";
+    return events.find((row) => row._id === eventId)?.clientId ?? "";
   };
   const [selectedClientId, setSelectedClientId] = useState(
     clientDefault || eventClient(eventDefault),
@@ -157,7 +146,13 @@ export function InvoiceIssueForm({
   const [discountAmount, setDiscountAmount] = useState(0);
   const [currencyCode, setCurrencyCode] = useState(functionalCode);
   const [exchangeRate, setExchangeRate] = useState("1");
-  const selectedClient = clients.find((row) => row._id === selectedClientId);
+  // The picked client read on its own (its tax status), not the client list.
+  const pickedRows = useClientsByIds(
+    selectedClientId ? [selectedClientId] : [],
+  );
+  const selectedClient =
+    pickedRows?.find((row) => row._id === selectedClientId) ??
+    clients.find((row) => row._id === selectedClientId);
   const taxExempt = selectedClient?.taxExempt === true;
   const activeTaxRates = taxRates.filter(
     (rate) => rate.active === true && rate.deletedAt == null,
@@ -213,26 +208,6 @@ export function InvoiceIssueForm({
     );
   };
 
-  if (clients.length === 0) {
-    return (
-      <form
-        className="supply-form"
-        onSubmit={(event) => event.preventDefault()}
-      >
-        <div className="supply-form-heading">
-          <div>
-            <p className="eyebrow">Issue</p>
-            <h2>New invoice</h2>
-          </div>
-        </div>
-        <p className="text-base text-ink-2">
-          No active clients are available. Register a client from Events (sales)
-          before issuing an invoice.
-        </p>
-      </form>
-    );
-  }
-
   return (
     <form className="supply-form invoice-composer" onSubmit={onSubmit}>
       <div className="supply-form-heading invoice-composer-heading">
@@ -252,7 +227,7 @@ export function InvoiceIssueForm({
       <div className="invoice-composer-basics">
         <label className="field-label">
           Client
-          <SearchSelect
+          <ClientSearchSelect
             name="clientId"
             required
             value={selectedClientId}
@@ -269,15 +244,7 @@ export function InvoiceIssueForm({
                 setSelectedEventId(next);
               }
             }}
-            recentsKey="client"
             placeholder="Search clients…"
-            options={clients.map((client) => ({
-              id: client._id,
-              label: clientLabel(client),
-              hint:
-                [client.email, client.phone].filter(Boolean).join(" · ") ||
-                null,
-            }))}
           />
         </label>
         <label className="field-label">

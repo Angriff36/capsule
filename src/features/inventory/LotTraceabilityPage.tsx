@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useClientDirectory } from "../../lib/useClientDirectory";
+import { useClientsByIds } from "../../lib/useClientDirectory";
 import { Link } from "react-router-dom";
 import {
   useListIngredient,
@@ -22,7 +22,6 @@ const quantity = new Intl.NumberFormat(undefined, {
 });
 
 export function LotTraceabilityPage() {
-  const clients = useClientDirectory();
   const ingredients = useListIngredient();
   const vendors = useListVendor();
   const locations = useListStorageLocation();
@@ -59,6 +58,10 @@ export function LotTraceabilityPage() {
     [reservations],
   );
   const events = useEventsById(eventIds);
+  // Only the clients of the traced events.
+  const clients = useClientsByIds(
+    hasFilter && events ? events.map((event) => event.clientId) : [],
+  );
 
   const loading = [
     clients,

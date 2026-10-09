@@ -1,4 +1,4 @@
-import { useClientDirectory } from "../../lib/useClientDirectory";
+import { useClientsByIds } from "../../lib/useClientDirectory";
 import { useState, type FormEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
@@ -92,7 +92,6 @@ export function InvoicesPage() {
     searchParams.get("eventId")?.trim() ||
     "";
   const openFromLink = searchParams.get("issue") === "1";
-  const clients = useClientDirectory();
   const events = usePickerAndNamedEvents([
     prefillEventId,
     eventScope.workingId,
@@ -150,6 +149,12 @@ export function InvoicesPage() {
   const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
 
+  // Only the clients these invoices and events name; the form's picker searches.
+  const clients = useClientsByIds([
+    ...(invoices ?? []).map((row) => row.clientId),
+    ...(events ?? []).map((row) => row.clientId),
+    prefillClientId,
+  ]);
   const activeClients = (clients ?? []).filter(
     (row) => row.deletedAt == null && String(row.status) !== "archived",
   );

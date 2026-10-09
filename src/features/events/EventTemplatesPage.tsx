@@ -1,4 +1,4 @@
-import { useClientDirectory } from "../../lib/useClientDirectory";
+import { useClientsByIds } from "../../lib/useClientDirectory";
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { formatCount } from "../../lib/format";
@@ -78,7 +78,11 @@ export function EventTemplatesPage() {
       ? fromEventId
       : "skip",
   );
-  const clients = useClientDirectory();
+  // Only the clients of the events this page lists.
+  const clients = useClientsByIds([
+    ...(events ?? []).map((event) => event.clientId),
+    linkedEvent?.clientId,
+  ]);
   const menus = useListMenu();
   const createTemplate = useCreateEventTemplate();
   const reviseTemplate = useEventTemplateRevise();

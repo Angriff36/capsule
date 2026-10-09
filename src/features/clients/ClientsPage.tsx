@@ -1,4 +1,8 @@
-import { useClientContacts } from "../../lib/useClientDirectory";
+import {
+  useClientContacts,
+  useClientContactsPage,
+  useClientSearch,
+} from "../../lib/useClientDirectory";
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -61,7 +65,6 @@ const clientsState = new ListStateManager({
 export function ClientsPage() {
   const navigate = useNavigate();
   const listOrigin = useListOrigin();
-  const clients = useClientContacts();
   // Bookings and lifetime value add up every event on file, so events are
   // read only when the user asks for those columns.
   const [showBookings, setShowBookings] = useState(false);
@@ -75,6 +78,19 @@ export function ClientsPage() {
   const [clientType, setClientType] = useState<"company" | "person">("company");
   const [busy, setBusy] = useState(false);
   const [find, setFind] = useState("");
+  // The whole client book loads only on request: duplicate review, the
+  // bookings columns, or a search by email or phone (those fields are
+  // locked, so the server cannot search them). Otherwise a page at a time,
+  // and a name search on the server.
+  const typed = find.trim();
+  const wholeBook = showDuplicates || showBookings || /[@\d]/.test(typed);
+  const allClients = useClientContacts(wholeBook);
+  const found = useClientSearch(typed, {
+    withContacts: true,
+    enabled: !wholeBook && typed !== "",
+  });
+  const paged = useClientContactsPage(!wholeBook && typed === "");
+  const clients = wholeBook ? allClients : typed ? found : paged.rows;
   const [failure, setFailure] = useState<unknown>(null);
   const { notice, setNotice } = useActionNotice();
   const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(
@@ -87,6 +103,10 @@ export function ClientsPage() {
   const [draftIdentity, setDraftIdentity] = useState({ name: "", email: "" });
   const draftName = draftIdentity.name.trim().toLowerCase();
   const draftEmail = draftIdentity.email.trim().toLowerCase();
+  // A new client's name checked against the whole book on the server.
+  const nameMatches = useClientSearch(draftIdentity.name.trim(), {
+    enabled: draftName !== "",
+  });
   const sameEmail = draftEmail
     ? (clients ?? []).find(
         (row) =>
@@ -98,7 +118,7 @@ export function ClientsPage() {
     : undefined;
   const sameName =
     !sameEmail && draftName
-      ? (clients ?? []).find(
+      ? [...(nameMatches ?? []), ...(clients ?? [])].find(
           (row) =>
             row.deletedAt == null &&
             clientDisplayName(row._id, [row]).trim().toLowerCase() ===
@@ -111,9 +131,10 @@ export function ClientsPage() {
     (row) => row.deletedAt == null && row.registeredAt != null,
   );
   const duplicateCandidates = useMemo(
-    () => findProbableClientDuplicates(clients ?? []),
-    [clients],
+    () => findProbableClientDuplicates(allClients ?? []),
+    [allClients],
   );
+
   // Transfer counts are shown only for the pair under review, so only that
   // pair's contacts and history are read.
   const reviewing = duplicateCandidates.find(
@@ -336,21 +357,25 @@ export function ClientsPage() {
           {notice}
         </p>
       ) : null}
-      {dataLoaded && duplicateCandidates.length > 0 ? (
-        <div className="flex items-center gap-2 text-sm text-ink-2">
-          <span className="chip chip-tone-warn">
+      <div className="flex items-center gap-2 text-sm text-ink-2">
+        {showDuplicates && allClients !== undefined ? (
+          <span
+            className={
+              duplicateCandidates.length > 0 ? "chip chip-tone-warn" : "chip"
+            }
+          >
             {duplicateCandidates.length} possible duplicate
             {duplicateCandidates.length === 1 ? "" : "s"}
           </span>
-          <button
-            className="text-link cursor-pointer"
-            type="button"
-            onClick={() => setShowDuplicates((value) => !value)}
-          >
-            {showDuplicates ? "Hide" : "Review"}
-          </button>
-        </div>
-      ) : null}
+        ) : null}
+        <button
+          className="text-link cursor-pointer"
+          type="button"
+          onClick={() => setShowDuplicates((value) => !value)}
+        >
+          {showDuplicates ? "Hide duplicates" : "Check for duplicates"}
+        </button>
+      </div>
 
       {showRegister ? (
         <form
@@ -470,7 +495,7 @@ export function ClientsPage() {
         />
       ) : null}
 
-      {registered.length > 0 ? (
+      {registered.length > 0 || typed ? (
         <input
           type="search"
           className="input min-h-10 w-full max-w-sm"
@@ -595,6 +620,16 @@ export function ClientsPage() {
           </table>
         )}
       </div>
+      {!wholeBook && !typed && paged.canLoadMore ? (
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          disabled={paged.loadingMore}
+          onClick={paged.loadMore}
+        >
+          {paged.loadingMore ? "Loading…" : "Load more clients"}
+        </button>
+      ) : null}
     </div>
   );
 }

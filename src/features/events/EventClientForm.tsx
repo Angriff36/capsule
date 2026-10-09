@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Doc, Id } from "../../lib/api";
 import { useEventMoveToClient } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
+import { useClientsByIds, useReadClient } from "../../lib/useClientDirectory";
+import { ClientSearchSelect } from "../clients/ClientSearchSelect";
 import { resolveManifestPolicies } from "../admin/rolePermissionAudit";
 import { clientDisplayName } from "./clientName";
-import { SearchSelect } from "../../ui/SearchSelect";
 
 interface EventClientFormProps {
   eventId: Id<"events">;
@@ -40,19 +41,24 @@ export function EventClientForm({
   const blockedReason = canChange
     ? undefined
     : "Moving an event to another client needs sales access";
-  const choices = (clients ?? [])
-    .filter(
-      (client) =>
-        client.deletedAt == null &&
-        client.status === "active" &&
-        client._id !== clientId,
-    )
-    .map((client) => ({
-      client,
-      name: clientDisplayName(client._id, clients),
-    }))
-    .sort((a, b) => a.name.localeCompare(b.name));
-  const next = choices.find((choice) => choice.client._id === nextClientId);
+  // The picker searches the server; only the picked client is read here.
+  const picked = useClientsByIds(nextClientId ? [nextClientId] : []);
+  const readClient = useReadClient();
+  const nextClient =
+    nextClientId && nextClientId !== clientId
+      ? picked?.find((row) => row._id === nextClientId)
+      : undefined;
+  const next = nextClient
+    ? {
+        client: nextClient,
+        name: clientDisplayName(nextClient._id, [nextClient]),
+      }
+    : undefined;
+  // A person client is usually the contact; a company is not.
+  const nextType = next?.client.clientType;
+  useEffect(() => {
+    if (nextType) setUseClientContact(nextType === "person");
+  }, [nextType]);
 
   return (
     <form
@@ -60,14 +66,18 @@ export function EventClientForm({
       onSubmit={(formEvent) => {
         formEvent.preventDefault();
         if (!next) return;
-        const contact = useClientContact
-          ? {
-              primaryContactName: next.name,
-              primaryContactEmail: next.client.email ?? undefined,
-              primaryContactPhone: next.client.phone ?? undefined,
-            }
-          : {};
         void run(async () => {
+          // Email and phone are locked fields: read them from the client.
+          const full = useClientContact
+            ? await readClient(String(next.client._id))
+            : null;
+          const contact = useClientContact
+            ? {
+                primaryContactName: next.name,
+                primaryContactEmail: full?.email ?? undefined,
+                primaryContactPhone: full?.phone ?? undefined,
+              }
+            : {};
           await moveToClient({
             docId: eventId,
             version,
@@ -84,23 +94,13 @@ export function EventClientForm({
       </p>
       <label className="field-label">
         <span>Move to client</span>
-        <SearchSelect
+        <ClientSearchSelect
           name="clientId"
           value={nextClientId}
-          onChange={(id) => {
-            const picked = choices.find((choice) => choice.client._id === id);
-            setNextClientId(id);
-            // A person client is usually the contact; a company is not.
-            setUseClientContact(picked?.client.clientType === "person");
-          }}
+          onChange={setNextClientId}
           placeholder="Type a client's name…"
           aria-label="Move to client"
-          disabled={!canChange || clients === undefined}
-          options={choices.map((choice) => ({
-            id: choice.client._id,
-            label: choice.name,
-            hint: choice.client.email ?? null,
-          }))}
+          disabled={!canChange}
         />
       </label>
       {next ? (

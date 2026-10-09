@@ -19,7 +19,7 @@ Shared rules for every area:
 
 ## 1. Lead and client
 
-Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEditForm.tsx`, `clients/ClientContactsPanel.tsx`, `clients/ClientDetailPage.tsx`, `clients/ClientDuplicateReview.tsx`, `clients/ClientEmailPreferencePanel.tsx`, `clients/ClientPreviewCard.tsx`, `clients/ClientProfilePanel.tsx`, `clients/ClientRetentionPage.tsx`, `clients/ClientSourceProvenancePanel.tsx`, `clients/ClientsPage.tsx`, `clients/ClientsWorkspaceNav.tsx`, `clients/contactDedup.ts`, `clients/ContractDocumentPage.tsx`, `clients/ContractsPage.tsx`, `clients/CrmFailureBanner.tsx`, `clients/LeadDetailsForm.tsx`, `clients/LeadPipelinePage.tsx`, `clients/LeadSourceReport.tsx`, `sales/MessageInboxPage.tsx`, `sales/PasteIncomingMessageForm.tsx`, `sales/QuoteSubmissionPage.tsx`, `sales/QuoteSubmissionsReviewPage.tsx`, `sales/SyncErrorsPanel.tsx`
+Screens (25): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEditForm.tsx`, `clients/ClientContactsPanel.tsx`, `clients/ClientDetailPage.tsx`, `clients/ClientDuplicateReview.tsx`, `clients/ClientEmailPreferencePanel.tsx`, `clients/ClientPreviewCard.tsx`, `clients/ClientProfilePanel.tsx`, `clients/ClientRetentionPage.tsx`, `clients/ClientSearchSelect.tsx`, `clients/ClientSourceProvenancePanel.tsx`, `clients/ClientsPage.tsx`, `clients/ClientsWorkspaceNav.tsx`, `clients/contactDedup.ts`, `clients/ContractDocumentPage.tsx`, `clients/ContractsPage.tsx`, `clients/CrmFailureBanner.tsx`, `clients/LeadDetailsForm.tsx`, `clients/LeadPipelinePage.tsx`, `clients/LeadSourceReport.tsx`, `sales/MessageInboxPage.tsx`, `sales/PasteIncomingMessageForm.tsx`, `sales/QuoteSubmissionPage.tsx`, `sales/QuoteSubmissionsReviewPage.tsx`, `sales/SyncErrorsPanel.tsx`
 
 ### Generated reads
 
@@ -368,8 +368,11 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `clientDirectory.byIds` - query; live read, updates by itself
+- `clientDirectory.contactsPage` - query; live read, updates by itself
 - `clientDirectory.list` - query; live read, updates by itself
 - `clientDirectory.listWithContacts` - query; live read, updates by itself
+- `clientDirectory.search` - query; live read, updates by itself
 - `eventLookup.byClient` - query; live read, updates by itself
 - `eventLookup.byIds` - query; live read, updates by itself
 - `eventLookup.docsByIds` - query; live read, updates by itself
@@ -585,8 +588,11 @@ Screens (35): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `clientDirectory.byIds` - query; live read, updates by itself
+- `clientDirectory.contactsPage` - query; live read, updates by itself
 - `clientDirectory.list` - query; live read, updates by itself
 - `clientDirectory.listWithContacts` - query; live read, updates by itself
+- `clientDirectory.search` - query; live read, updates by itself
 - `dishLookup.byIds` - query; live read, updates by itself
 - `dishLookup.exclusiveToVenue` - query; live read, updates by itself
 - `dishLookup.page` - query; live read, updates by itself
@@ -1332,8 +1338,11 @@ Screens (67): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `clientDirectory.byIds` - query; live read, updates by itself
+- `clientDirectory.contactsPage` - query; live read, updates by itself
 - `clientDirectory.list` - query; live read, updates by itself
 - `clientDirectory.listWithContacts` - query; live read, updates by itself
+- `clientDirectory.search` - query; live read, updates by itself
 - `commandReceipts.latestCascadeReceipt` - query; live read, updates by itself
 - `culinaryDemand.addNestedRecipeLine` - mutation; authored step; live reads update by themselves
 - `culinaryDemand.applyDemandHeadcount` - mutation; authored step; live reads update by themselves
@@ -5059,8 +5068,11 @@ Screens (70): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `authStatus.getAuthStatus` - query; live read, updates by itself
 - `brandLogo.getBrandLogoUrl` - query; live read, updates by itself
 - `brandLogo.getVenueLogoUrl` - query; live read, updates by itself
+- `clientDirectory.byIds` - query; live read, updates by itself
+- `clientDirectory.contactsPage` - query; live read, updates by itself
 - `clientDirectory.list` - query; live read, updates by itself
 - `clientDirectory.listWithContacts` - query; live read, updates by itself
+- `clientDirectory.search` - query; live read, updates by itself
 - `closeoutSources.captureCloseoutFromSources` - mutation; authored step; live reads update by themselves
 - `closeoutSources.closeoutResults` - query; live read, updates by itself
 - `closeoutSources.correctCloseoutFromSources` - mutation; authored step; live reads update by themselves

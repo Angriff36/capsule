@@ -3,6 +3,8 @@
 // past the server's time limit and failed every page that only needed client
 // names. Pages that show one client's email, phone or address read that client
 // on its own (getClient).
+import { paginationOptsValidator } from "convex/server";
+import { v } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
 import { query, type QueryCtx } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
@@ -107,4 +109,112 @@ export const listWithContacts = query({
         phone: await openField(ctx, "phone", row.phone),
       })),
     ),
+});
+
+// At most this many clients by id in one read (a page names its own rows).
+const BY_IDS_CAP = 500;
+const SEARCH_LIMIT = 25;
+
+async function readerTenant(ctx: QueryCtx): Promise<string | null> {
+  const auth = await getAuthContext(ctx);
+  return auth.tenantId && canRead(auth, ["salesAccess", "financeAccess"])
+    ? auth.tenantId
+    : null;
+}
+
+/** These clients only (names, no locked fields): what a page names. */
+export const byIds = query({
+  args: { ids: v.array(v.string()) },
+  handler: async (ctx, { ids }): Promise<DirectoryClient[]> => {
+    const tenantId = await readerTenant(ctx);
+    if (!tenantId) return [];
+    const out: DirectoryClient[] = [];
+    for (const raw of [...new Set(ids)].slice(0, BY_IDS_CAP)) {
+      const id = ctx.db.normalizeId("clients", raw);
+      const row = id ? await ctx.db.get(id) : null;
+      if (row && row.tenantId === tenantId && row.deletedAt == null)
+        out.push(withoutLocked(row));
+    }
+    return out;
+  },
+});
+
+/**
+ * Clients whose company, first or last name matches the typed text, at most
+ * 25; with no text, the newest clients. A picker searches; it never loads
+ * every client.
+ */
+export const search = query({
+  args: { text: v.string(), withContacts: v.optional(v.boolean()) },
+  handler: async (
+    ctx,
+    { text, withContacts },
+  ): Promise<DirectoryClient[] | ContactClient[]> => {
+    const tenantId = await readerTenant(ctx);
+    if (!tenantId) return [];
+    const typed = text.trim();
+    const rows = new Map<string, Doc<"clients">>();
+    if (!typed) {
+      for (const row of await ctx.db
+        .query("clients")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .order("desc")
+        .take(SEARCH_LIMIT * 2))
+        if (row.deletedAt == null) rows.set(String(row._id), row);
+    } else {
+      for (const [index, field] of [
+        ["search_companyName", "companyName"],
+        ["search_givenName", "givenName"],
+        ["search_familyName", "familyName"],
+      ] as const)
+        for (const row of await ctx.db
+          .query("clients")
+          .withSearchIndex(index, (q) =>
+            q.search(field, typed).eq("tenantId", tenantId),
+          )
+          .take(SEARCH_LIMIT))
+          if (row.deletedAt == null) rows.set(String(row._id), row);
+    }
+    const picked = [...rows.values()].slice(0, SEARCH_LIMIT);
+    return withContacts
+      ? await Promise.all(picked.map((row) => withContactFields(ctx, row)))
+      : picked.map(withoutLocked);
+  },
+});
+
+async function withContactFields(
+  ctx: QueryCtx,
+  row: Doc<"clients">,
+): Promise<ContactClient> {
+  return {
+    ...withoutLocked(row),
+    email: await openField(ctx, "email", row.email),
+    phone: await openField(ctx, "phone", row.phone),
+  };
+}
+
+/**
+ * The client book a page at a time, newest first, with email and phone
+ * opened for the page's rows only (the client list).
+ */
+export const contactsPage = query({
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (ctx, { paginationOpts }) => {
+    const tenantId = await readerTenant(ctx);
+    if (!tenantId)
+      return { page: [] as ContactClient[], isDone: true, continueCursor: "" };
+    const result = await ctx.db
+      .query("clients")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .order("desc")
+      .paginate(paginationOpts);
+    return {
+      ...result,
+      page: await Promise.all(
+        result.page
+          .filter((row) => row.deletedAt == null)
+          .map((row) => withContactFields(ctx, row)),
+      ),
+    };
+  },
 });

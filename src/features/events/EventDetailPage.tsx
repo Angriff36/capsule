@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useClientDirectory } from "../../lib/useClientDirectory";
+import { useClientsByIds } from "../../lib/useClientDirectory";
 import { AllergenBriefingButton } from "./AllergenBriefingButton";
 import {
   Link,
@@ -166,7 +166,11 @@ function EventDetailContent({
     channelKey: eventChannelKey,
     myPersonId: identity.personId,
   });
-  const clients = useHeldQueryRows("clients", useClientDirectory());
+  // Only this event's client; pickers on the page search the server.
+  const clients = useHeldQueryRows(
+    `clients:${event._id}`,
+    useClientsByIds([event.clientId]),
+  );
   const organizations = useListOrganization();
   // Same functional-currency rule as the phone Money card and Finance.
   const currencyCode = normalizeCurrencyCode(

@@ -1,4 +1,4 @@
-import { useClientDirectory } from "../../lib/useClientDirectory";
+import { useClientsByIds } from "../../lib/useClientDirectory";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -46,8 +46,12 @@ export function ContractsPage() {
             ]),
           ).values(),
         ];
-  const clients = useClientDirectory();
   const events = usePickerAndNamedEvents([workingId]);
+  // Only the clients these contracts and events name.
+  const clients = useClientsByIds([
+    ...(contracts ?? []).map((row) => row.clientId),
+    ...(events ?? []).map((row) => row.clientId),
+  ]);
   const createContract = useCreateContract();
   const send = useContractSend();
   const markViewed = useContractMarkViewed();
@@ -61,12 +65,6 @@ export function ContractsPage() {
   const { notice, setNotice } = useActionNotice();
   const { prompt, host } = useActionPrompt(busy != null);
 
-  const activeClients = (clients ?? []).filter(
-    (row) =>
-      row.deletedAt == null &&
-      row.registeredAt != null &&
-      String(row.status) === "active",
-  );
   const draftableEvents = (events ?? []).filter(
     (row) =>
       row.deletedAt == null &&
@@ -236,7 +234,7 @@ export function ContractsPage() {
               <h2>New contract</h2>
             </div>
           </div>
-          {activeClients.length === 0 || draftableEvents.length === 0 ? (
+          {draftableEvents.length === 0 ? (
             <p className="text-base text-ink-2">
               You need an active client and an open event first.{" "}
               <Link className="text-link" to={CLIENTS_ROUTES.root}>

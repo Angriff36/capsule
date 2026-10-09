@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { useClientDirectory } from "../../lib/useClientDirectory";
+import { useClientsByIds } from "../../lib/useClientDirectory";
 import { useDayHolds } from "../../lib/financeScopedQueries";
 import { formatDate } from "../../lib/format";
 import { clientDisplayName } from "../events/clientName";
@@ -20,11 +20,13 @@ export function DateHoldCollisionNotice({
   dateKey: string;
   ignoreHoldId?: string;
 }) {
-  const clients = useClientDirectory();
   const { pathname } = useLocation();
   const validDate = /^\d{4}-\d{2}-\d{2}$/.test(dateKey);
-  // Only this day's holds and waitlist.
+  // Only this day's holds and waitlist, and the clients holding them.
   const { holds, waitlist } = useDayHolds(validDate ? dateKey : null);
+  const clients = useClientsByIds(
+    [...(holds ?? []), ...(waitlist ?? [])].map((row) => row.clientId),
+  );
   // Booked events that day: a hold on a date that already has an event is
   // worth knowing about too (the kitchen and staff are split).
   const dayStart = validDate ? dateKeyToMs(dateKey) - 12 * 3_600_000 : 0;

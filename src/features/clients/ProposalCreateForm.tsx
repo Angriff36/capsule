@@ -30,6 +30,7 @@ import {
   proposalTemplateDefaults,
   templateForServiceStyle,
 } from "./proposalTemplateDefaults";
+import { ClientSearchSelect } from "./ClientSearchSelect";
 
 // In-memory pricing line in the draft form (spec §5.4). Numeric inputs are kept
 // as strings for clean editing; parsed for the central calc on submit/preview.
@@ -86,7 +87,6 @@ export type ProposalCreateFormProps = {
   open: boolean;
   fromEvent: Doc<"events"> | undefined;
   clients: Doc<"clients">[] | undefined;
-  activeClients: Doc<"clients">[];
   busy: string | null;
   run: (key: string, work: () => Promise<void>) => Promise<void>;
   onFailure: (error: unknown) => void;
@@ -98,7 +98,6 @@ export function ProposalCreateForm({
   open,
   fromEvent,
   clients,
-  activeClients,
   busy,
   run,
   onFailure,
@@ -115,8 +114,8 @@ export function ProposalCreateForm({
   const [searchParams, setSearchParams] = useSearchParams();
   const fromEventId = searchParams.get("event");
 
-  const hasClientSource =
-    Boolean(fromEvent?.clientId) || activeClients.length > 0;
+  // The client picker searches every client, so there is always a source.
+  const hasClientSource = true;
   const prefill = fromEvent
     ? {
         title: fromEvent.title ?? "",
@@ -590,19 +589,11 @@ export function ProposalCreateForm({
             ) : (
               <label className="field-label supply-span-2">
                 Client
-                <SearchSelect
+                <ClientSearchSelect
                   name="clientId"
                   required
                   defaultValue=""
-                  recentsKey="client"
                   placeholder="Search clients…"
-                  options={activeClients.map((row) => ({
-                    id: row._id,
-                    label: clientDisplayName(row._id, clients),
-                    hint:
-                      [row.email, row.phone].filter(Boolean).join(" · ") ||
-                      null,
-                  }))}
                 />
               </label>
             )}

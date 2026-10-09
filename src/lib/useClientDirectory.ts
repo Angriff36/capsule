@@ -1,4 +1,5 @@
-import { useConvex, useQuery } from "convex/react";
+import { useConvex, usePaginatedQuery, useQuery } from "convex/react";
+import { useMemo } from "react";
 import { api } from "./api";
 import type { Doc, Id } from "./api";
 
@@ -8,7 +9,7 @@ import type { Doc, Id } from "./api";
  * client with useGetClient for its contact details. The full list opens ten
  * locked fields per client and is too slow for a big client book.
  */
-type DirectoryClient = Doc<"clients"> & {
+export type DirectoryClient = Doc<"clients"> & {
   displayName: string;
   isArchived: boolean;
 };
@@ -21,9 +22,13 @@ export function useClientDirectory(): DirectoryClient[] | undefined {
  * Every client with names, status, email and phone (no address). For pages
  * that search or show how to reach every client.
  */
-export function useClientContacts(): DirectoryClient[] | undefined {
-  return useQuery(api.clientDirectory.listWithContacts) as
-    DirectoryClient[] | undefined;
+export function useClientContacts(
+  enabled = true,
+): DirectoryClient[] | undefined {
+  return useQuery(
+    api.clientDirectory.listWithContacts,
+    enabled ? {} : "skip",
+  ) as DirectoryClient[] | undefined;
 }
 
 /** Reads one client with its contact details at the moment an action needs them. */
@@ -33,4 +38,51 @@ export function useReadClient(): (
   const convex = useConvex();
   return (id) =>
     convex.query(api.queries.getClient, { id: id as Id<"clients"> });
+}
+
+/** These clients only (names, no locked fields). "skip" or [] reads nothing. */
+export function useClientsByIds(
+  ids: readonly (string | null | undefined)[] | "skip",
+): DirectoryClient[] | undefined {
+  const key =
+    ids === "skip"
+      ? null
+      : [...new Set(ids.filter((id): id is string => Boolean(id)))]
+          .sort()
+          .join(",");
+  const args = useMemo(() => (key ? { ids: key.split(",") } : "skip"), [key]);
+  const rows = useQuery(api.clientDirectory.byIds, args) as
+    DirectoryClient[] | undefined;
+  return key === "" ? [] : rows;
+}
+
+/** Clients matching the typed text (at most 25); newest ones with no text. */
+export function useClientSearch(
+  text: string,
+  options: { withContacts?: boolean; enabled?: boolean } = {},
+): DirectoryClient[] | undefined {
+  return useQuery(
+    api.clientDirectory.search,
+    options.enabled === false
+      ? "skip"
+      : { text, withContacts: options.withContacts },
+  ) as DirectoryClient[] | undefined;
+}
+
+/** The client book 50 at a time, newest first, with email and phone. */
+export function useClientContactsPage(enabled = true) {
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.clientDirectory.contactsPage,
+    enabled ? {} : "skip",
+    { initialNumItems: 50 },
+  );
+  return {
+    rows:
+      !enabled || status === "LoadingFirstPage"
+        ? undefined
+        : (results as DirectoryClient[]),
+    canLoadMore: status === "CanLoadMore" || status === "LoadingMore",
+    loadingMore: status === "LoadingMore",
+    loadMore: () => loadMore(50),
+  };
 }
