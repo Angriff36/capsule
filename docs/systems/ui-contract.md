@@ -398,7 +398,7 @@ Screens (24): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 
 ## 2. Proposal
 
-Screens (35): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposalSourceCard.tsx`, `clients/ProposalAcceptancePage.tsx`, `clients/ProposalBrandRow.tsx`, `clients/ProposalChangeAction.tsx`, `clients/ProposalChangeLabel.tsx`, `clients/ProposalCreateForm.tsx`, `clients/ProposalDraftCheck.tsx`, `clients/ProposalEmailHistory.tsx`, `clients/ProposalEnhancementsPanel.tsx`, `clients/ProposalHistoricalAcceptance.tsx`, `clients/ProposalMenuSelectionPanel.tsx`, `clients/ProposalPaymentScheduleList.tsx`, `clients/ProposalPaymentSchedulePanel.tsx`, `clients/proposalPdf.ts`, `clients/proposalPdfProjection.ts`, `clients/ProposalPricingPanel.tsx`, `clients/ProposalReadinessNotice.tsx`, `clients/proposalSignatureRequest.ts`, `clients/ProposalsPage.tsx`, `clients/proposalTemplateDefaults.ts`, `clients/ProposalTemplateServiceStyleField.tsx`, `clients/ProposalTemplatesPage.tsx`, `clients/ProposalTermsPanel.tsx`, `clients/ProposalTravelFee.tsx`, `clients/SharedProposalPage.tsx`, `clients/useCatalogDishes.ts`, `clients/useCreateEventFromProposal.ts`, `clients/useSendProposalWithRevisionCapture.ts`, `clients/useStartProposalChange.ts`, `sales/ProposalSignatureRevokeAction.tsx`, `sales/PublicMenuPage.tsx`, `sales/QuoteEstimatePanel.tsx`, `sales/QuoteMenuChoice.tsx`, `sales/QuoteRequestPicks.tsx`
+Screens (36): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposalSourceCard.tsx`, `clients/ProposalAcceptancePage.tsx`, `clients/ProposalBrandRow.tsx`, `clients/ProposalChangeAction.tsx`, `clients/ProposalChangeLabel.tsx`, `clients/ProposalCreateForm.tsx`, `clients/ProposalDraftCheck.tsx`, `clients/ProposalEmailHistory.tsx`, `clients/ProposalEnhancementsPanel.tsx`, `clients/ProposalFollowUps.tsx`, `clients/ProposalHistoricalAcceptance.tsx`, `clients/ProposalMenuSelectionPanel.tsx`, `clients/ProposalPaymentScheduleList.tsx`, `clients/ProposalPaymentSchedulePanel.tsx`, `clients/proposalPdf.ts`, `clients/proposalPdfProjection.ts`, `clients/ProposalPricingPanel.tsx`, `clients/ProposalReadinessNotice.tsx`, `clients/proposalSignatureRequest.ts`, `clients/ProposalsPage.tsx`, `clients/proposalTemplateDefaults.ts`, `clients/ProposalTemplateServiceStyleField.tsx`, `clients/ProposalTemplatesPage.tsx`, `clients/ProposalTermsPanel.tsx`, `clients/ProposalTravelFee.tsx`, `clients/SharedProposalPage.tsx`, `clients/useCatalogDishes.ts`, `clients/useCreateEventFromProposal.ts`, `clients/useSendProposalWithRevisionCapture.ts`, `clients/useStartProposalChange.ts`, `sales/ProposalSignatureRevokeAction.tsx`, `sales/PublicMenuPage.tsx`, `sales/QuoteEstimatePanel.tsx`, `sales/QuoteMenuChoice.tsx`, `sales/QuoteRequestPicks.tsx`
 
 ### Generated reads
 
@@ -537,6 +537,13 @@ Screens (35): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: ProposalViewed
+  - refresh: live reads update by themselves; reads affected: Proposal.list, Proposal.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 18 more
+- `mutations.Proposal_recordFollowUp` (Proposal.recordFollowUp)
+  - inputs from the screen: step; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales staff may see proposals"; "Sales staff may update proposals"; "Sales staff may change proposals"; "Guard 0 failed"; "Guard 1 failed"; "Pick follow-up 1, 2 or 3."; and 2 more
+  - effects: ProposalFollowUpRecorded
   - refresh: live reads update by themselves; reads affected: Proposal.list, Proposal.get, Client.list, Client.get, ClientMerge.list, ClientMerge.get, Event.list, Event.get and 18 more
 - `mutations.Proposal_reviseDraft` (Proposal.reviseDraft)
   - inputs from the screen: title, terms, notes, expiresAt; filled by the server: none
