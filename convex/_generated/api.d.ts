@@ -44,6 +44,7 @@ import type * as deploymentProbe from "../deploymentProbe.js";
 import type * as dishLookup from "../dishLookup.js";
 import type * as driverAssignment from "../driverAssignment.js";
 import type * as emailDelivery from "../emailDelivery.js";
+import type * as emailInbox from "../emailInbox.js";
 import type * as emailNotifications from "../emailNotifications.js";
 import type * as equipmentCheckout from "../equipmentCheckout.js";
 import type * as eventActivity from "../eventActivity.js";
@@ -140,6 +141,7 @@ import type * as lib_demandReconciliation from "../lib/demandReconciliation.js";
 import type * as lib_dietaryTags from "../lib/dietaryTags.js";
 import type * as lib_dishRecipeRepair from "../lib/dishRecipeRepair.js";
 import type * as lib_dropOffDelivery from "../lib/dropOffDelivery.js";
+import type * as lib_emailInboxAddress from "../lib/emailInboxAddress.js";
 import type * as lib_encryption from "../lib/encryption.js";
 import type * as lib_equipmentHold from "../lib/equipmentHold.js";
 import type * as lib_equipmentReservationAvailability from "../lib/equipmentReservationAvailability.js";
@@ -265,6 +267,7 @@ import type * as lib_staffingReconciliation from "../lib/staffingReconciliation.
 import type * as lib_standInPurchaseNeed from "../lib/standInPurchaseNeed.js";
 import type * as lib_stripeCheckout from "../lib/stripeCheckout.js";
 import type * as lib_styleReconciliation from "../lib/styleReconciliation.js";
+import type * as lib_svixSignature from "../lib/svixSignature.js";
 import type * as lib_teamChatRead from "../lib/teamChatRead.js";
 import type * as lib_teamChatScan from "../lib/teamChatScan.js";
 import type * as lib_tenantSystemCommandRunner from "../lib/tenantSystemCommandRunner.js";
@@ -415,6 +418,7 @@ declare const fullApi: ApiFromModules<{
   dishLookup: typeof dishLookup;
   driverAssignment: typeof driverAssignment;
   emailDelivery: typeof emailDelivery;
+  emailInbox: typeof emailInbox;
   emailNotifications: typeof emailNotifications;
   equipmentCheckout: typeof equipmentCheckout;
   eventActivity: typeof eventActivity;
@@ -511,6 +515,7 @@ declare const fullApi: ApiFromModules<{
   "lib/dietaryTags": typeof lib_dietaryTags;
   "lib/dishRecipeRepair": typeof lib_dishRecipeRepair;
   "lib/dropOffDelivery": typeof lib_dropOffDelivery;
+  "lib/emailInboxAddress": typeof lib_emailInboxAddress;
   "lib/encryption": typeof lib_encryption;
   "lib/equipmentHold": typeof lib_equipmentHold;
   "lib/equipmentReservationAvailability": typeof lib_equipmentReservationAvailability;
@@ -636,6 +641,7 @@ declare const fullApi: ApiFromModules<{
   "lib/standInPurchaseNeed": typeof lib_standInPurchaseNeed;
   "lib/stripeCheckout": typeof lib_stripeCheckout;
   "lib/styleReconciliation": typeof lib_styleReconciliation;
+  "lib/svixSignature": typeof lib_svixSignature;
   "lib/teamChatRead": typeof lib_teamChatRead;
   "lib/teamChatScan": typeof lib_teamChatScan;
   "lib/tenantSystemCommandRunner": typeof lib_tenantSystemCommandRunner;

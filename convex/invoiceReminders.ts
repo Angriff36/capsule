@@ -43,6 +43,7 @@ import {
   recipientKey,
   type ClientEmailChoice,
 } from "./lib/clientEmailConsent";
+import { companyInboxAddress } from "./lib/emailInboxAddress";
 import {
   normalizeInvoiceReminderOffsets,
   reminderOffsetLabel,
@@ -748,10 +749,18 @@ export function bytesToBase64(bytes: Uint8Array): string {
   return btoa(binary);
 }
 
-/** The company's own email sender setting, with the display name as fallback. */
+/**
+ * The company's own email sender setting, with the display name as fallback.
+ * With no reply address of its own, answers go to the company's Capsule inbox
+ * address (when client emails are set up), so they land in the inbox.
+ */
 export function companySender(
   organization:
-    | { emailSenderName?: string | null; emailReplyTo?: string | null }
+    | {
+        tenantId?: string;
+        emailSenderName?: string | null;
+        emailReplyTo?: string | null;
+      }
     | null
     | undefined,
   displayName: string,
@@ -759,7 +768,12 @@ export function companySender(
   const replyTo = organization?.emailReplyTo?.replace(/[\r\n]/gu, "").trim();
   return {
     senderName: organization?.emailSenderName?.trim() || displayName,
-    replyTo: replyTo && replyTo.includes("@") ? replyTo : null,
+    replyTo:
+      replyTo && replyTo.includes("@")
+        ? replyTo
+        : organization?.tenantId
+          ? companyInboxAddress(organization.tenantId)
+          : null,
   };
 }
 
