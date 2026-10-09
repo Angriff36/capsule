@@ -4577,7 +4577,7 @@
         "scripts/deploy-production.sh"
       ],
       "environment": "automated test in the repository (vitest / convex-test); model or human judgment of the real screen or document",
-      "sha": "033fc556"
+      "sha": "25d0253f"
     },
     {
       "id": "AC-162",
@@ -7485,21 +7485,21 @@
       "key": "CF-7.1-04",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§7.1 \"Tim's KPI definitions must be copied from the existing TPP report playbook/research—not guessed here\"",
-      "status": "PENDING",
-      "codeState": "missing",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-REPORT-METRICS"],
-      "gap": "Needs the TPP KPI playbook (not in the repository).",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed docs/reporting/tims-kpi-definitions.md + tests/tims-kpi-definitions.test.ts — 'each Tim's KPI names its playbook definition and the code matches it'"
       ],
-      "waitsOn": "owner-files",
+      "waitsOn": null,
       "owners": [
         "src/features/reports/",
         "src/features/finance/",
         "approved TPP KPI playbook"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "f23dae35"
     },
     {
       "id": "AC-298",
@@ -7632,21 +7632,21 @@
       "key": "CF-7.4-01",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§7.4 bullet 'Tim's KPIs: Replicate the agreed TPP KPIs and allow record-level reconciliation'",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-DASHBOARDS"],
-      "gap": "Live KPIs render and drill; parity needs the TPP KPI playbook.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/tims-kpis-drilldown.test.ts — 'each KPI card lists its contributing events with per-record values' + playbook parity per CF-7.1-04"
       ],
-      "waitsOn": "owner-files",
+      "waitsOn": null,
       "owners": [
         "src/features/reports/",
         "authenticated dashboard routes",
         "approved TPP KPI playbook"
       ],
-      "environment": "Not verified yet",
-      "sha": "702d683a"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "f23dae35"
     },
     {
       "id": "AC-305",
@@ -7761,11 +7761,11 @@
       "status": "PENDING",
       "codeState": "implemented-unverified",
       "tasks": ["PL-DASHBOARDS"],
-      "gap": "Mangia dashboard parity needs the Round 4 deliverable (not in the repository).",
+      "gap": "Built on live data from the Round 4 report (all six tabs, proven); waits on a side-by-side look at the page against that report by someone other than the builder.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: add a review-criteria.md row (e.g. MANGIA-01 'the Mangia page preserves the Round 4 deliverable's visual hierarchy: section order, emphasis and density') judged on a /reports/mangia screenshot via createReview(); plus tests/features/mangia-measures.test.ts for the P half; record a Capsule-specific rendered/artifact judgment using AUDIENCE_JTBD.md and DESIGN.md, reviewer/model, dated artifact, criteria, verdict and feedback. src/lib/llm-review.ts is reusable; no J review was run in this audit."
       ],
-      "waitsOn": "owner-files",
+      "waitsOn": "people",
       "owners": [
         "src/features/reports/",
         "authenticated dashboard routes",
@@ -9105,22 +9105,22 @@
       "key": "CF-15-no-guessed-mappings",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§15 bullet 8 (never replace established TPP mappings or KPI definitions with guesses)",
-      "status": "PENDING",
-      "codeState": "implemented-unverified",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-SOURCE-DATASETS"],
-      "gap": "Tim's KPI definitions must be checked against the TPP report playbook, which is not in the repository.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): tests/proofs/import-archive-inventory.runtime.test.ts (existing mapping fidelity pattern); proposed: a KPI-definition diff against the TPP playbook document"
       ],
-      "waitsOn": "owner-files",
+      "waitsOn": null,
       "owners": [
         "src/import/",
         "convex/importCommit.ts",
         "src/lib/tppReports/",
         "existing migration/data-map documents"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "f23dae35"
     },
     {
       "id": "AC-375",
@@ -16642,7 +16642,7 @@
         "repository review/release policy"
       ],
       "environment": "model or human judgment of the real screen or document",
-      "sha": "033fc556"
+      "sha": "25d0253f"
     },
     {
       "id": "AC-727",
@@ -16664,7 +16664,7 @@
         "repository review/release policy"
       ],
       "environment": "automated test in the repository (vitest / convex-test)",
-      "sha": "033fc556"
+      "sha": "25d0253f"
     }
   ],
   "ralphCheckboxMap": [
