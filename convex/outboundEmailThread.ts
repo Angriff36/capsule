@@ -2,13 +2,14 @@
 // client's conversation (PL-OUTBOUND, AC-352): one email conversation per
 // invoice, linked to the contact the email went to and to the invoice's
 // event, with each sent email as an outbound message carrying the email
-// service's id. Status "sent" = the email service took it; Capsule does not
-// hear about delivery or bounces yet.
+// service's id. Status "sent" = the email service took it; convex/emailDelivery.ts
+// later asks the email service and sets delivered, bounced or failed.
 //
 // Scheduled sends run with nobody signed in, so the conversation steps run as
 // the company's system role (the send itself was already allowed).
 import { v } from "convex/values";
 import { api } from "./_generated/api";
+import { scheduleEmailDeliveryCheck } from "./emailDelivery";
 import type { Id } from "./_generated/dataModel";
 import { internalMutation, type MutationCtx } from "./_generated/server";
 import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
@@ -149,6 +150,11 @@ async function recordOutboundEmail(
       sentAt: args.sentAt,
       idempotencyKey: `tenant-shared/msg:${threadId}:${args.providerMessageId}`,
     });
+    await scheduleEmailDeliveryCheck(
+      ctx,
+      args.tenantId,
+      args.providerMessageId,
+    );
   }
   return { threadId };
 }

@@ -43,6 +43,7 @@ import type * as demandProvenance from "../demandProvenance.js";
 import type * as deploymentProbe from "../deploymentProbe.js";
 import type * as dishLookup from "../dishLookup.js";
 import type * as driverAssignment from "../driverAssignment.js";
+import type * as emailDelivery from "../emailDelivery.js";
 import type * as emailNotifications from "../emailNotifications.js";
 import type * as equipmentCheckout from "../equipmentCheckout.js";
 import type * as eventActivity from "../eventActivity.js";
@@ -411,6 +412,7 @@ declare const fullApi: ApiFromModules<{
   deploymentProbe: typeof deploymentProbe;
   dishLookup: typeof dishLookup;
   driverAssignment: typeof driverAssignment;
+  emailDelivery: typeof emailDelivery;
   emailNotifications: typeof emailNotifications;
   equipmentCheckout: typeof equipmentCheckout;
   eventActivity: typeof eventActivity;

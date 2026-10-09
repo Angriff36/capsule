@@ -2,7 +2,8 @@
 // AC-107/AC-109/AC-352). Capsule sends the reply through the email service,
 // answers the client's last email (same subject, In-Reply-To), and adds the
 // reply to the conversation with the email service's id. Status "sent" = the
-// email service took it; Capsule does not hear about delivery or bounces yet.
+// email service took it; convex/emailDelivery.ts later sets delivered,
+// bounced or failed.
 //
 // A retry with the same requestId never sends twice: the email service and
 // the conversation step both key on it. A failed send keeps nothing and
@@ -11,6 +12,7 @@ import { ConvexError, v } from "convex/values";
 import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { action, internalQuery } from "./_generated/server";
+import { FIRST_EMAIL_CHECK_MS } from "./emailDelivery";
 import { getAuthContext } from "./lib/authContext";
 import {
   classifyReminderFailure,
@@ -231,6 +233,11 @@ export const sendEmailReply = action({
       sentAt: Date.now(),
       idempotencyKey: `inbox-reply/${args.threadId}/${requestId}`,
     })) as { _id?: string; docId?: string };
+    await ctx.scheduler.runAfter(
+      FIRST_EMAIL_CHECK_MS,
+      internal.emailDelivery.checkEmail,
+      { tenantId: auth.tenantId, emailId, attempt: 0 },
+    );
     return {
       messageId: String(posted.docId ?? posted._id ?? ""),
       emailId,
