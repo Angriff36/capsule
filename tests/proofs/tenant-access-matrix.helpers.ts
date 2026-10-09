@@ -163,6 +163,10 @@ const LINK_TABLE: Record<string, string> = {
   archiveStorageId: "@file",
   archivedById: "@sign-in",
   assignedById: "@sign-in",
+  // PL-SALES habits: who answered first, followed up, logged the objection.
+  firstRepliedById: "@sign-in",
+  followUpById: "@sign-in",
+  priceObjectionById: "@sign-in",
   assignedToId: "people",
   assignedToPersonId: "people",
   facilitatorPersonId: "people",
