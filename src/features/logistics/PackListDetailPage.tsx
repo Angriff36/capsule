@@ -54,7 +54,7 @@ import {
   usePackListItemsFor,
   usePackSectionClaimsFor,
 } from "../facilities/useLogisticsWindow";
-import { useDishesByIds, useWholeDishList } from "../../lib/useDishesByIds";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
@@ -159,7 +159,6 @@ export function PackListDetailPage() {
   const cancel = usePackListCancel();
   const [showAdd, setShowAdd] = useState(false);
   // The whole dish list only while the add-item form is open.
-  const formDishes = useWholeDishList(showAdd);
   const [showTemplates, setShowTemplates] = useState(false);
   const [showScan, setShowScan] = useState(false);
   const [previewTemplateId, setPreviewTemplateId] = useState<string | null>(
@@ -1211,11 +1210,7 @@ export function PackListDetailPage() {
       ) : null}
 
       {showAdd && canAddItems ? (
-        <PackListItemForm
-          dishes={formDishes ?? []}
-          busy={busy === "add-item"}
-          onSubmit={submitItem}
-        />
+        <PackListItemForm busy={busy === "add-item"} onSubmit={submitItem} />
       ) : null}
 
       {showTemplates && canAddItems ? (

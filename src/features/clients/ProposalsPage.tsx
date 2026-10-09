@@ -12,7 +12,7 @@ import {
   useShareLinkCreate,
   useShareLinkRevoke,
 } from "../../lib/manifest-convex-react";
-import { useWholeDishList } from "../../lib/useDishesByIds";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { useProposalPictureUrls } from "../../lib/useProposalPictureUrls";
 import { useClientsByIds, useReadClient } from "../../lib/useClientDirectory";
 import { type Id } from "../../lib/api";
@@ -149,7 +149,10 @@ export function ProposalsPage() {
   const timelineActivities = useEventTimelineActivities(
     openEventId ? String(openEventId) : null,
   );
-  const dishes = useWholeDishList();
+  // Only the open proposal's picked dishes.
+  const dishes = useDishesByIds(
+    proposalDishSelections?.map((selection) => String(selection.dishId)),
+  );
   // Send captures a revision snapshot server-side (spec §5.5 / Priority 10) —
   // a thin authored action wraps the generated Proposal_send + best-effort
   // capture, so a sent proposal always has a reproducible revision record.

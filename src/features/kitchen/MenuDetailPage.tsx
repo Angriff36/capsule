@@ -9,7 +9,7 @@ import {
   useMenuRestore,
   useMenuUnpublish,
 } from "../../lib/manifest-convex-react";
-import { useWholeDishList } from "../../lib/useDishesByIds";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { useMenuDishRows } from "../../lib/recipeScopedQueries";
 import { useSharedRecipeRows } from "../../lib/useMenuRecipeRows";
 import { formatMoneyExact } from "../../lib/format";
@@ -23,7 +23,7 @@ import { KitchenBookNav } from "./KitchenBookNav";
 import { ReturnToListLink } from "../list-state/listOrigin";
 import { MenuDetailsEditor } from "./MenuDetailsEditor";
 import { MenuDishManager } from "./MenuDishManager";
-import { dishRecipeLinks } from "./dishVersions";
+import { dishRecipeLinks, withRecipeDishIds } from "./dishVersions";
 import { buildMenuProfitability } from "./MenuProfitabilityAnalysis";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import { MenuProfitabilityPanel } from "./MenuProfitabilityPanel";
@@ -59,8 +59,19 @@ export function MenuDetailPage() {
   const navigate = useNavigate();
   const menu = useRouteRecord(useGetMenu, id);
   useTrackRecent("Menu", menu?.name);
-  const dishes = useWholeDishList();
   const menuDishes = useMenuDishRows(menu?._id);
+  // This menu's dishes and the main dishes whose recipes they cook from;
+  // never the whole catalog (the add picker searches the server).
+  const ownDishes = useDishesByIds(
+    menuDishes
+      ?.filter((row) => row.deletedAt == null)
+      .map((row) => String(row.dishId)),
+  );
+  const dishes = useDishesByIds(
+    ownDishes === undefined
+      ? undefined
+      : withRecipeDishIds(dishRecipeLinks(ownDishes)),
+  );
   // The recipe, price and unit rows of this menu's dishes only, never the
   // whole lists. A version that shares its main dish's recipe shows those
   // lines as its own.

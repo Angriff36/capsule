@@ -22,6 +22,10 @@ vi.mock("../../../src/lib/manifest-convex-react", () => ({
   useMenuDishRemove: () => vi.fn(async () => null),
   useMenuDishUpdateDetails: () => harness.updateDetails,
 }));
+// The add-dish picker searches the server; nothing to find in these tests.
+vi.mock("../../../src/lib/useDishesByIds", () => ({
+  useDishSearch: () => [],
+}));
 vi.mock("../../../src/ui/action-prompt", () => ({
   useActionPrompt: () => ({
     prompt: { askFields: harness.askFields, askReason: vi.fn() },

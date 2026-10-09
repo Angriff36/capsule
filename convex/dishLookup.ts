@@ -91,3 +91,92 @@ export const page = query({
     };
   },
 });
+
+const SEARCH_LIMIT = 40;
+
+/**
+ * Live dishes whose name matches the typed text (at most 40); with no text,
+ * the newest. A dish picker searches; it never loads the whole catalog.
+ */
+export const search = query({
+  args: { text: v.string() },
+  handler: async (ctx, { text }): Promise<DishRow[] | null> => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || !canRead(auth, DISH_READERS)) return null;
+    const tenantId = auth.tenantId;
+    const typed = text.trim();
+    const rows = typed
+      ? await ctx.db
+          .query("dishes")
+          .withSearchIndex("search_name", (q) =>
+            q.search("name", typed).eq("tenantId", tenantId),
+          )
+          .take(SEARCH_LIMIT * 2)
+      : await ctx.db
+          .query("dishes")
+          .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+          .order("desc")
+          .take(SEARCH_LIMIT * 2);
+    return rows
+      .filter((dish) => dish.deletedAt == null)
+      .slice(0, SEARCH_LIMIT)
+      .map(dishRow);
+  },
+});
+
+const FAMILY_CAP = 100;
+const FACET_SAMPLE = 300;
+
+/**
+ * A dish's family: its main dish and every version of that main dish (what
+ * the dish page shows as tabs). Never the whole catalog.
+ */
+export const family = query({
+  args: { dishId: v.string() },
+  handler: async (ctx, { dishId }): Promise<DishRow[] | null> => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || !canRead(auth, DISH_READERS)) return null;
+    const id = ctx.db.normalizeId("dishes", dishId);
+    const dish = id ? await ctx.db.get(id) : null;
+    if (!dish || dish.tenantId !== auth.tenantId) return [];
+    const mainId = dish.versionOfDishId ?? dish._id;
+    const main = mainId === dish._id ? dish : await ctx.db.get(mainId);
+    const versions = await ctx.db
+      .query("dishes")
+      .withIndex("by_versionOfDishId", (q) => q.eq("versionOfDishId", mainId))
+      .take(FAMILY_CAP);
+    return [main, ...versions]
+      .filter(
+        (row): row is Doc<"dishes"> =>
+          row != null &&
+          row.tenantId === auth.tenantId &&
+          row.deletedAt == null,
+      )
+      .map(dishRow);
+  },
+});
+
+/**
+ * Category, course and diet tag values in use, from the newest 300 dishes:
+ * the new-dish form's suggestions, without reading the whole catalog.
+ */
+export const facets = query({
+  args: {},
+  handler: async (ctx) => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || !canRead(auth, DISH_READERS)) return null;
+    const tenantId = auth.tenantId;
+    const rows = (
+      await ctx.db
+        .query("dishes")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .order("desc")
+        .take(FACET_SAMPLE)
+    ).filter((dish) => dish.deletedAt == null && dish.mergedIntoDishId == null);
+    return rows.map((dish) => ({
+      category: dish.category ?? null,
+      course: dish.course ?? null,
+      dietaryTags: dish.dietaryTags ?? [],
+    }));
+  },
+});

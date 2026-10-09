@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import {
@@ -14,7 +14,7 @@ import {
   useDishSetFinishTiming,
   useGetDish,
 } from "../../lib/manifest-convex-react";
-import { useWholeDishList } from "../../lib/useDishesByIds";
+import { useDishFamily, useDishSearch } from "../../lib/useDishesByIds";
 import { useMenuRecipeRows } from "../../lib/useMenuRecipeRows";
 import { deriveDishAllergens } from "./dishAllergens";
 import { useEventsById } from "../facilities/useEventsById";
@@ -66,7 +66,23 @@ export function DishDetailPage() {
   const { id } = useParams();
   const dish = useRouteRecord(useGetDish, id);
   useTrackRecent("Dish", dish?.name);
-  const allDishes = useWholeDishList();
+  // This dish's family (main dish and its versions) and dishes named like
+  // it; never the whole catalog. The "version of" picker searches.
+  const family = useDishFamily(dish?._id);
+  const similar = useDishSearch(dish?.name ?? "", dish != null);
+  const allDishes = useMemo(
+    () =>
+      family === undefined || similar === undefined
+        ? undefined
+        : [
+            ...new Map(
+              [...family, ...similar].map((row) => [String(row._id), row]),
+            ).values(),
+          ],
+    [family, similar],
+  );
+  const [mainQuery, setMainQuery] = useState("");
+  const mainFound = useDishSearch(mainQuery);
   const eventDishes = useMenuLinesForDish(dish?._id);
   const events = useEventsById(
     dish === undefined || eventDishes === undefined
@@ -422,7 +438,7 @@ export function DishDetailPage() {
               </button>
             ) : null}
           </div>
-          {!isVersion && !hasVersions && allDishes ? (
+          {!isVersion && !hasVersions && mainFound ? (
             <div className="mt-3">
               <p className="mb-2 text-sm text-ink-2">
                 Make this a version of another dish:
@@ -430,7 +446,8 @@ export function DishDetailPage() {
               <CulinaryRecordPicker
                 kind="dish"
                 label="Search main dishes"
-                records={mainDishRows(allDishes)
+                onQueryChange={setMainQuery}
+                records={mainDishRows(mainFound)
                   .filter((row) => row._id !== dish._id)
                   .map((row) => ({
                     _id: row._id,

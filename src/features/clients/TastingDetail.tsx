@@ -7,7 +7,7 @@ import {
   useTastingMarkTasted,
   useTastingDishRecordFeedback,
 } from "../../lib/manifest-convex-react";
-import { useWholeDishList } from "../../lib/useDishesByIds";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { useApplyTastingSelections } from "../../lib/useTastings";
 import type { Id } from "../../lib/api";
 import { useTastingDishes } from "../../lib/financeScopedQueries";
@@ -51,9 +51,30 @@ export function TastingDetail({
 }: TastingDetailProps) {
   const menus = useListMenu();
   const menuDishes = useListMenuDish();
-  const dishes = useWholeDishList();
   // Only this tasting's dishes.
   const tastingDishes = useTastingDishes(tasting._id);
+  // Only the published menus' dishes (what can be offered) and this
+  // tasting's own, never the whole dish catalog.
+  const publishedIds = new Set(
+    (menus ?? [])
+      .filter((m) => m.deletedAt == null && String(m.status) === "published")
+      .map((m) => String(m._id)),
+  );
+  const dishes = useDishesByIds(
+    menus === undefined ||
+      menuDishes === undefined ||
+      tastingDishes === undefined
+      ? undefined
+      : [
+          ...menuDishes
+            .filter(
+              (md) =>
+                md.deletedAt == null && publishedIds.has(String(md.menuId)),
+            )
+            .map((md) => String(md.dishId)),
+          ...tastingDishes.map((line) => String(line.dishId)),
+        ],
+  );
   const addDish = useCreateTastingDish();
   const recordFeedback = useTastingDishRecordFeedback();
   const complete = useTastingMarkTasted();
