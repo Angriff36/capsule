@@ -67,9 +67,17 @@ export async function validateNewEventStaffing(
     await assertNeedQualification(ctx, row as Doc<"eventStaffNeeds">, personId,
       window.endsAt ?? event.endsAt ?? null);
   if (window.startsAt == null || window.endsAt == null) return;
+  // Only approved time off that ends after this work starts can clash.
+  const windowStartsAt = window.startsAt;
   const requests = await ctx.db
     .query("timeOffRequests")
-    .withIndex("by_personId", (q) => q.eq("personId", personId))
+    .withIndex("by_staff_status_end", (q) =>
+      q
+        .eq("tenantId", row.tenantId)
+        .eq("personId", personId)
+        .eq("status", "approved")
+        .gt("endsAt", windowStartsAt),
+    )
     .collect();
   const away = findApprovedTimeOffConflict(
     requests.filter((request) => request.tenantId === row.tenantId),
@@ -154,8 +162,10 @@ export async function validateTimeRecordClockIn(
 ): Promise<void> {
   const record = await ctx.db.get(recordId);
   if (!record || record.clockInAt == null) return;
+  // Only entries still open can block a new clock-in.
   const others = await ctx.db.query("timeRecords")
-    .withIndex("by_personId", (q) => q.eq("personId", record.personId)).collect();
+    .withIndex("by_personId_and_status", (q) =>
+      q.eq("personId", record.personId).eq("status", "open")).collect();
   const stillIn = others.find((row) => row._id !== recordId &&
     row.tenantId === record.tenantId && row.deletedAt == null &&
     row.status === "open" && row.clockOutAt == null && row.clockInAt != null &&
@@ -186,8 +196,19 @@ export async function validatePayrollInputSources(
         "One of these time entries is not a finished entry for this person. Refresh and try again.",
       );
   }
+  // Pay periods ending within two months before these entries or later;
+  // an input holding them covers their dates.
+  let earliest = Infinity;
+  for (const id of ids) {
+    const record = await ctx.db.get(id as Id<"timeRecords">).catch(() => null);
+    if (record?.clockInAt != null) earliest = Math.min(earliest, record.clockInAt);
+  }
   const others = await ctx.db.query("payrollInputs")
-    .withIndex("by_personId", (q) => q.eq("personId", input.personId)).collect();
+    .withIndex("by_personId_and_periodEnd", (q) =>
+      q.eq("personId", input.personId).gte(
+        "periodEnd",
+        Number.isFinite(earliest) ? earliest - 62 * 86_400_000 : 0,
+      )).collect();
   const taken = others.find((row) => row._id !== inputId &&
     row.tenantId === input.tenantId && row.deletedAt == null &&
     row.status !== "voided" &&
@@ -299,8 +320,11 @@ export async function validateScheduledShift(
 ): Promise<void> {
   const shift = await validateShiftWindow(ctx, shiftId);
   const { personId, startsAt, endsAt } = shift;
+  // Only approved time off that ends after this shift starts can clash.
   const requests = await ctx.db.query("timeOffRequests")
-    .withIndex("by_personId", (q) => q.eq("personId", personId)).collect();
+    .withIndex("by_staff_status_end", (q) =>
+      q.eq("tenantId", shift.tenantId).eq("personId", personId)
+        .eq("status", "approved").gt("endsAt", startsAt!)).collect();
   if (findApprovedTimeOffConflict(
     requests.filter((row) => row.tenantId === shift.tenantId),
     { personId, startsAt: startsAt!, endsAt: endsAt! },
@@ -312,8 +336,10 @@ export async function validateScheduledShift(
   // A hand-made shift over the same person's other work is a double booking.
   // Event staffing across events is shown on the roster instead (CF-9.1).
   if (shift.eventStaffingSourceIds?.length) return;
+  // Only shifts ending after this one starts can overlap it.
   const others = await ctx.db.query("shifts")
-    .withIndex("by_personId", (q) => q.eq("personId", personId)).collect();
+    .withIndex("by_personId_and_endsAt", (q) =>
+      q.eq("personId", personId).gt("endsAt", startsAt!)).collect();
   const clash = others.find((row) => row._id !== shift._id &&
     row.tenantId === shift.tenantId && row.deletedAt == null &&
     row.status !== "cancelled" && row.startsAt != null && row.endsAt != null &&
@@ -360,7 +386,8 @@ export async function clockShiftTime(
   const shift = await ctx.db.get(shiftId);
   if (!shift || shift.deletedAt != null || !shift.personId) return;
   const records = await ctx.db.query("timeRecords")
-    .withIndex("by_personId", (q) => q.eq("personId", shift.personId)).collect();
+    .withIndex("by_personId_and_status", (q) =>
+      q.eq("personId", shift.personId!).eq("status", "open")).collect();
   const open = records.filter((row) => row.tenantId === shift.tenantId &&
     row.deletedAt == null && row.status === "open" &&
     row.clockInAt != null && row.clockOutAt == null);

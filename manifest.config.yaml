@@ -291,6 +291,9 @@ projections:
         TimeRecord:
           - fields: [tenantId, clockInAt]
             name: by_tenantId_and_clockInAt
+          # A person's open entries (still clocked in), not their whole clock.
+          - fields: [personId, status]
+            name: by_personId_and_status
         AvailabilityWindow:
           - fields: [tenantId, endsAt]
             name: by_tenantId_and_endsAt

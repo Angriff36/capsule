@@ -4393,7 +4393,8 @@ export default defineSchema({
     .index("by_personId", ["personId"])
     .index("by_shiftId", ["shiftId"])
     .index("by_eventId", ["eventId"])
-    .index("by_tenantId_and_clockInAt", ["tenantId", "clockInAt"]),
+    .index("by_tenantId_and_clockInAt", ["tenantId", "clockInAt"])
+    .index("by_personId_and_status", ["personId", "status"]),
   tppReportFavorites: defineTable({
     tenantId: v.string(),
     personId: v.optional(v.union(v.string(), v.null())),
