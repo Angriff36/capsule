@@ -32,6 +32,7 @@ import {
   useProposalsByIds,
 } from "@/lib/financeScopedQueries";
 import { KpiRecordList } from "./KpiRecordList";
+import { TimsScorecardSection } from "./TimsScorecardSection";
 
 /**
  * Tim's KPIs Dashboard (Priority 35)
@@ -88,6 +89,7 @@ function TimsKPIsDashboardBody() {
   );
   const venues = useListVenue();
   const serviceStyles = useListServiceStyle();
+  const now = useMemo(() => new Date(), []);
 
   // Revenue KPIs
   const revenueMetrics = useMemo(() => {
@@ -519,6 +521,10 @@ function TimsKPIsDashboardBody() {
         </div>
       ) : null}
 
+      {events?.length ? (
+        <TimsScorecardSection events={events} now={now} />
+      ) : null}
+
       <DashboardGrid items={dashboardItems} />
 
       <KpiRecordList
@@ -543,6 +549,11 @@ function TimsKPIsDashboardBody() {
 
       <MetricDefinitionList
         metricIds={[
+          "dashboard.win_rate",
+          "dashboard.pipeline_value",
+          "dashboard.weighted_forecast",
+          "dashboard.booked_ahead",
+          "dashboard.lost_revenue",
           "dashboard.completed_revenue",
           "dashboard.completed_events",
           "dashboard.completed_average",
