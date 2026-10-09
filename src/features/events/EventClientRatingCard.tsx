@@ -59,7 +59,7 @@ export function EventClientRatingCard({
   return (
     <Section title="How the client rated it">
       <form
-        className="space-y-3"
+        className="space-y-3 p-4"
         data-testid="event-client-rating"
         onSubmit={submit}
       >
