@@ -62,7 +62,7 @@ export function L10AgendaSection() {
   return (
     <div className="mt-6">
       <Section title="Agenda (60 minutes)">
-        <ol className="grid gap-2" data-testid="l10-agenda">
+        <ol className="grid gap-2 p-4 pb-0" data-testid="l10-agenda">
           {AGENDA.map((part, index) => (
             <li key={part.name} className="flex gap-3 text-sm">
               <span className="w-14 shrink-0 font-semibold text-brand">
@@ -77,7 +77,7 @@ export function L10AgendaSection() {
             </li>
           ))}
         </ol>
-        <div className="mt-4 rounded-sm border border-line bg-inset p-3">
+        <div className="m-4 rounded-sm border border-line bg-inset p-3">
           <h4 className="text-xs font-semibold text-ink">Meeting rules</h4>
           <ul className="mt-1 list-disc pl-5 text-xs text-ink-2">
             {RULES.map((rule) => (

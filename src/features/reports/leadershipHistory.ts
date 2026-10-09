@@ -29,6 +29,7 @@ export interface LeadershipItemRow {
   readonly dueAt?: number | null;
   readonly notes?: string | null;
   readonly track?: RockTrack | null;
+  readonly trackSetAt?: number | null;
   readonly solution?: string | null;
   readonly openedAt?: number | null;
   readonly openedByPersonId?: string | null;

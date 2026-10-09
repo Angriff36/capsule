@@ -14,6 +14,9 @@ vi.mock("../src/lib/manifest-convex-react", () => {
     useListEvent: list("events"),
     useListRevenueAttribution: list("attributions"),
     useListPerson: list("people"),
+    useListScorecardTarget: list("targets"),
+    useListLeadershipItem: list("items"),
+    useListLeadershipMeeting: list("meetings"),
   };
 });
 

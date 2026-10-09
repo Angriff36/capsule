@@ -148,7 +148,9 @@ export function LeadershipItemsPanel({
           );
         return (
           <Section key={kind} title={title}>
-            {hint ? <p className="mb-2 text-xs text-ink-2">{hint}</p> : null}
+            {hint ? (
+              <p className="mb-2 px-3 pt-2 text-xs text-ink-2">{hint}</p>
+            ) : null}
             {rows.length === 0 ? (
               <p className="text-xs text-ink-2">{empty}</p>
             ) : (

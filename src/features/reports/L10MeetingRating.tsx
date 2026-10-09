@@ -122,7 +122,11 @@ function MeetingForm({
   };
 
   return (
-    <form onSubmit={(event) => void submit(event)} data-testid="l10-rating">
+    <form
+      className="p-4"
+      onSubmit={(event) => void submit(event)}
+      data-testid="l10-rating"
+    >
       {failure ? <ReportsFailureBanner error={failure} /> : null}
       {saved ? (
         <p className="mb-2 text-xs text-ink-2">

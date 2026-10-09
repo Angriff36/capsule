@@ -14,6 +14,7 @@ import { formatMoney } from "@/lib/format";
 import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import { calculateCommissionMetrics } from "./compMasterValues";
 import { MetricDefinitionList } from "./MetricDefinitionList";
+import { CompGoalsSection } from "./CompGoalsSection";
 
 const LOADING = "Loading…";
 const NOT_ASKED = "Show all-time to see";
@@ -236,8 +237,9 @@ export function CompMasterDashboardPage() {
     <div className="operations-stage supply-stage">
       <PageHeader
         title="Comp Master Dashboard"
-        lead="Applied sales commission allocations, taken straight from revenue attribution."
+        lead="The sales lead's performance goals from the owner's Comp Master Status sheet, then applied sales commission allocations, taken straight from revenue attribution."
       />
+      <CompGoalsSection />
       {showAllTime && attributions?.length === 0 ? (
         <div data-testid="dashboard-empty">
           <EmptyState
