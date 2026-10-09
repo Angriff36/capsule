@@ -3545,6 +3545,9 @@ export const ProposalSchema = z.object({
   supersededById: z.string().uuid().nullable().optional(),
   replacesProposalId: z.string().uuid().nullable().optional(),
   generationJson: z.string().nullable().optional(),
+  followUpStep: z.number().int().nullable().optional(),
+  followUpAt: z.coerce.date().nullable().optional(),
+  followUpById: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -11411,6 +11414,13 @@ export type ProposalMarkViewedParams = z.infer<typeof ProposalMarkViewedParamsSc
 export const ProposalReassignClientParamsSchema = z.object({});
 
 export type ProposalReassignClientParams = z.infer<typeof ProposalReassignClientParamsSchema>;
+
+// Command: recordFollowUp on Proposal
+export const ProposalRecordFollowUpParamsSchema = z.object({
+  step: z.number(),
+});
+
+export type ProposalRecordFollowUpParams = z.infer<typeof ProposalRecordFollowUpParamsSchema>;
 
 // Command: recordHistoricalAcceptance on Proposal
 export const ProposalRecordHistoricalAcceptanceParamsSchema = z.object({

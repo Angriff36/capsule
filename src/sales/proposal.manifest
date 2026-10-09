@@ -99,6 +99,12 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   // and the sources staff took out. convex/lib/proposalGenerate.ts reads it to
   // refresh an unsent draft without undoing staff edits. Null = typed by hand.
   property generationJson: string?
+  // Follow-ups on a sent proposal with no answer yet (the owner's May 2026
+  // sales audit): 1 = day 3 note, 2 = day 10 check-in, 3 = day 21 "close the
+  // file" email. The last one done, when, and who (auth subject).
+  property followUpStep: int?
+  property followUpAt: datetime?
+  property followUpById: string?
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
@@ -329,6 +335,21 @@ entity Proposal mixin TenantScoped, SoftDeletable {
       clientId: self.clientId
       title: self.title
       total: self.total
+    }
+  }
+
+  command recordFollowUp(step: number) {
+    guard self.status == "sent" or self.status == "viewed"
+    guard self.deletedAt == null
+    constraint followUpStepRange: step >= 1 and step <= 3 "Pick follow-up 1, 2 or 3."
+    mutate followUpStep = step
+    mutate followUpAt = now()
+    mutate followUpById = user.id
+    emit ProposalFollowUpRecorded {
+      proposalId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      step: step
     }
   }
 
@@ -605,6 +626,13 @@ event ProposalSent: "proposal.sent" {
   clientId: string
   title: string
   total: money(12, 2)
+}
+
+event ProposalFollowUpRecorded: "proposal.follow_up_recorded" {
+  proposalId: string
+  tenantId: string
+  clientId: string
+  step: int
 }
 
 event ProposalViewed: "proposal.viewed" {

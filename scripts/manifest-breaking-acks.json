@@ -3318,6 +3318,24 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-09",
       "reason": "Optional choice (EventUpsellPotential?): the sales team's high / moderate / standard add-on potential tag on a deal. Old events simply have no tag. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Proposal.followUpStep",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-09",
+      "reason": "Optional number (int?): the last follow-up done on a sent proposal with no answer (1 = day 3 note, 2 = day 10 check-in, 3 = day 21 close-the-file email). Old proposals have none. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Proposal.followUpAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-09",
+      "reason": "Optional date (datetime?): when the last follow-up was done. Old proposals have none. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Proposal.followUpById",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-09",
+      "reason": "Optional text (string?): who did the last follow-up. Old proposals have none. The checker reads a nullable field with no default as required."
     }
   ]
 }
