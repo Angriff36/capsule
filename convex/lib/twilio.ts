@@ -118,6 +118,8 @@ export async function sendSms(args: {
   to: string;
   body: string;
   idempotencyKey?: string;
+  /** Where Twilio reports delivered / not delivered for this text. */
+  statusCallback?: string;
 }): Promise<string> {
   const { config } = args;
   const auth = btoa(`${config.accountSid}:${config.authToken}`);
@@ -126,6 +128,7 @@ export async function sendSms(args: {
     From: config.fromNumber,
     Body: args.body.slice(0, 1600),
   });
+  if (args.statusCallback) form.set("StatusCallback", args.statusCallback);
   const response = await fetch(
     `https://api.twilio.com/2010-04-01/Accounts/${encodeURIComponent(config.accountSid)}/Messages.json`,
     {

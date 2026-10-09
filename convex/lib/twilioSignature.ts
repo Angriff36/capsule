@@ -29,3 +29,32 @@ export async function twilioSignatureMatches(args: {
   }
   return diff === 0;
 }
+
+/**
+ * Checks a Twilio webhook request. Behind a proxy the URL Twilio called can
+ * differ from the one this server sees, so the public site address is also
+ * tried.
+ */
+export async function twilioRequestSigned(args: {
+  authToken: string;
+  request: Request;
+  params: Array<[string, string]>;
+}): Promise<boolean> {
+  const signature = args.request.headers.get("X-Twilio-Signature") ?? "";
+  const requestUrl = new URL(args.request.url);
+  const urls = [args.request.url];
+  const site = process.env.CONVEX_SITE_URL?.trim().replace(/\/$/, "");
+  if (site) urls.push(`${site}${requestUrl.pathname}${requestUrl.search}`);
+  for (const url of urls) {
+    if (
+      await twilioSignatureMatches({
+        authToken: args.authToken,
+        url,
+        params: args.params,
+        signature,
+      })
+    )
+      return true;
+  }
+  return false;
+}

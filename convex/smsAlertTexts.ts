@@ -26,7 +26,11 @@ import {
   TWILIO_UNSUBSCRIBED_CODE,
 } from "./lib/twilio";
 import { canManage, decryptField, personName } from "./smsAlerts";
-import { DELIVERY_ENTITY, notDeliveredReason } from "./smsAlertDelivery";
+import {
+  DELIVERY_ENTITY,
+  notDeliveredReason,
+  statusCallbackUrl,
+} from "./smsAlertDelivery";
 
 const ALERT_ENTITY = "SmsAlert";
 const SEND_AGAIN_ENTITY = "SmsAlertSendAgain";
@@ -288,6 +292,7 @@ export const sendAgain = action({
         to: loaded.phone,
         body: loaded.body,
         idempotencyKey: `sms-alert-again/${args.requestId}`,
+        statusCallback: statusCallbackUrl(tenantId),
       });
       await ctx.runMutation(internal.smsAlerts.recordAlert, {
         tenantId,

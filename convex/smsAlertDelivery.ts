@@ -1,14 +1,16 @@
 /**
- * AUTHOR SEAM — did a staff alert text reach the phone? (PL-SMS-SOCIAL, AC-353)
- * Twilio's delivery callback needs a signed route beside the generated
- * convex/http.ts (issue #439). Capsule does not wait for that: the scan chain
- * asks Twilio about each recent text instead. The first final answer
- * (delivered / not delivered) is kept; later reads never change it, so a
- * delivered text never goes back to "sent" and a repeated check adds nothing.
+ * AUTHOR SEAM — did a staff alert text reach the phone? (PL-SMS-SOCIAL, AC-353;
+ * issue #439) Twilio reports each text to POST /twilio/status (signed with
+ * X-Twilio-Signature; the company is named in the signed callback address).
+ * The scan chain also asks Twilio about each recent text that has no answer
+ * yet, so a lost report still settles. The first final answer (delivered /
+ * not delivered) is kept; later reports never change it, so a delivered text
+ * never goes back to "sent" and a repeated report adds nothing.
  */
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import {
+  httpAction,
   internalAction,
   internalMutation,
   internalQuery,
@@ -19,6 +21,17 @@ import {
   requireTwilioConfig,
   TWILIO_UNSUBSCRIBED_CODE,
 } from "./lib/twilio";
+import { twilioRequestSigned } from "./lib/twilioSignature";
+
+export const STATUS_ROUTE_PATH = "/twilio/status";
+
+/** Where Twilio reports this company's texts; none when the site is unknown. */
+export function statusCallbackUrl(tenantId: string): string | undefined {
+  const site = process.env.CONVEX_SITE_URL?.trim().replace(/\/$/, "");
+  return site
+    ? `${site}${STATUS_ROUTE_PATH}?tenant=${encodeURIComponent(tenantId)}`
+    : undefined;
+}
 
 const ALERT_ENTITY = "SmsAlert";
 export const DELIVERY_ENTITY = "SmsAlertDelivery";
@@ -113,15 +126,19 @@ export const recordDelivery = internalMutation({
       .query("manifestEvents")
       .withIndex("by_entityId", (q) => q.eq("entityId", args.tenantId))
       .collect();
-    const known = ledger.some((row) => {
+    const ofText = ledger.filter((row) => {
       const payload = asRecord(row.payload);
       return (
-        row.entity === DELIVERY_ENTITY &&
         payload.tenantId === args.tenantId &&
         payload.messageSid === args.messageSid
       );
     });
-    if (known) return { recorded: false };
+    // Only this company's own sent alert texts get an answer, and only once.
+    const sent = ofText.some(
+      (row) => row.entity === ALERT_ENTITY && row.type === "SmsAlertSent",
+    );
+    const known = ofText.some((row) => row.entity === DELIVERY_ENTITY);
+    if (!sent || known) return { recorded: false };
     await insertStepEvent(ctx, {
       type:
         args.outcome === "delivered"
@@ -184,4 +201,35 @@ export const checkDeliveries = internalAction({
     }
     return result;
   },
+});
+
+/** POST /twilio/status?tenant=… — Twilio's delivery report for one text. */
+export const receiveStatus = httpAction(async (ctx, request) => {
+  const authToken = process.env.TWILIO_AUTH_TOKEN?.trim();
+  if (!authToken) return new Response("Texts are not set up.", { status: 503 });
+  const params = [...new URLSearchParams(await request.text())] as Array<
+    [string, string]
+  >;
+  if (!(await twilioRequestSigned({ authToken, request, params })))
+    return new Response("Signature does not match.", { status: 403 });
+
+  const form = new Map(params);
+  const tenantId = new URL(request.url).searchParams.get("tenant") ?? "";
+  const messageSid = form.get("MessageSid") ?? form.get("SmsSid") ?? "";
+  const outcome = deliveryOutcome(
+    form.get("MessageStatus") ?? form.get("SmsStatus") ?? "",
+  );
+  // "queued" / "sent" reports come first; only a final answer is kept.
+  if (tenantId && messageSid && outcome) {
+    const code = Number(form.get("ErrorCode"));
+    await ctx.runMutation(internal.smsAlertDelivery.recordDelivery, {
+      tenantId,
+      messageSid,
+      outcome,
+      ...(outcome === "not_delivered" && Number.isFinite(code) && code > 0
+        ? { errorCode: code }
+        : {}),
+    });
+  }
+  return new Response(null, { status: 204 });
 });

@@ -20,7 +20,7 @@ import {
 import { getAuthContext } from "./lib/authContext";
 import { redactSecrets } from "./lib/redactPayload";
 import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
-import { twilioSignatureMatches } from "./lib/twilioSignature";
+import { twilioRequestSigned } from "./lib/twilioSignature";
 
 export const TEXT_ROUTE_PATH = "/twilio/sms";
 const MAX_RAW_PAYLOAD = 8192;
@@ -183,20 +183,7 @@ export const receiveText = httpAction(async (ctx, request) => {
   const params = [...new URLSearchParams(await request.text())] as Array<
     [string, string]
   >;
-  const signature = request.headers.get("X-Twilio-Signature") ?? "";
-  // Behind a proxy the URL Twilio called can differ from the one this
-  // server sees, so the public site address is also tried.
-  const requestUrl = new URL(request.url);
-  const urls = [request.url];
-  const site = process.env.CONVEX_SITE_URL?.trim().replace(/\/$/, "");
-  if (site) urls.push(`${site}${requestUrl.pathname}${requestUrl.search}`);
-  let signed = false;
-  for (const url of urls) {
-    if (await twilioSignatureMatches({ authToken, url, params, signature })) {
-      signed = true;
-      break;
-    }
-  }
+  const signed = await twilioRequestSigned({ authToken, request, params });
   if (!signed)
     return new Response("Signature does not match.", { status: 403 });
 
