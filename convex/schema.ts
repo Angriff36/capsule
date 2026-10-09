@@ -970,6 +970,7 @@ export default defineSchema({
     .index("by_eventId", ["eventId"])
     .index("by_vendorId", ["vendorId"])
     .index("by_tenantId_and_status", ["tenantId", "status"])
+    .index("by_equipmentId_and_status", ["equipmentId", "status"])
     .searchIndex("search_description", { searchField: "description", filterFields: ["tenantId"] }),
   equipmentMaintenanceTasks: defineTable({
     tenantId: v.string(),
@@ -1036,7 +1037,8 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_equipmentId", ["equipmentId"])
     .index("by_eventId", ["eventId"])
-    .index("by_equipmentId_and_status", ["equipmentId", "status"]),
+    .index("by_equipmentId_and_status", ["equipmentId", "status"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   equipmentServiceEntries: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

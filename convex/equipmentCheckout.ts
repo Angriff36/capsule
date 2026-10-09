@@ -16,6 +16,7 @@ import {
   heldUnits,
   vendorRentedUnits,
 } from "./lib/acceptedRentalHolds";
+import { openHoldsForTenant } from "./lib/openEquipmentHolds";
 
 const EQUIPMENT_ROLES = new Set([
   "inventory_staff",
@@ -119,10 +120,8 @@ export const equipmentAvailability = query({
         .query("equipments")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
         .collect(),
-      ctx.db
-        .query("equipmentReservations")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-        .collect(),
+      // Only open holds can take units; returned and cancelled ones never.
+      openHoldsForTenant(ctx, tenantId),
       // Only open problems hold units out of use.
       ctx.db
         .query("equipmentIssues")

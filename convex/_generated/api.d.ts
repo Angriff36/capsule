@@ -199,6 +199,7 @@ import type * as lib_messageMedia from "../lib/messageMedia.js";
 import type * as lib_nutritionUnitScaler from "../lib/nutritionUnitScaler.js";
 import type * as lib_oldSystemEventStage from "../lib/oldSystemEventStage.js";
 import type * as lib_oneOnlyRules from "../lib/oneOnlyRules.js";
+import type * as lib_openEquipmentHolds from "../lib/openEquipmentHolds.js";
 import type * as lib_openFoodFactsMapper from "../lib/openFoodFactsMapper.js";
 import type * as lib_operationalEvents from "../lib/operationalEvents.js";
 import type * as lib_operationalTransactions from "../lib/operationalTransactions.js";
@@ -561,6 +562,7 @@ declare const fullApi: ApiFromModules<{
   "lib/nutritionUnitScaler": typeof lib_nutritionUnitScaler;
   "lib/oldSystemEventStage": typeof lib_oldSystemEventStage;
   "lib/oneOnlyRules": typeof lib_oneOnlyRules;
+  "lib/openEquipmentHolds": typeof lib_openEquipmentHolds;
   "lib/openFoodFactsMapper": typeof lib_openFoodFactsMapper;
   "lib/operationalEvents": typeof lib_operationalEvents;
   "lib/operationalTransactions": typeof lib_operationalTransactions;

@@ -16,6 +16,7 @@ import { getAuthContext } from "./lib/authContext";
 import { decrypt } from "./lib/encryption";
 import type { EventLookupRow } from "./eventLookup";
 import { canRead } from "./search";
+import { openHoldsForEquipment } from "./lib/openEquipmentHolds";
 
 export const LOGISTICS_EVENT_CAP = 1000;
 const EQUIPMENT_CAP = 50;
@@ -378,15 +379,7 @@ export const holdsForEquipment = query({
     for (const raw of [...new Set(equipmentIds)].slice(0, EQUIPMENT_CAP)) {
       const id = ctx.db.normalizeId("equipments", raw);
       if (!id) continue;
-      out.push(
-        ...mineLive(
-          await ctx.db
-            .query("equipmentReservations")
-            .withIndex("by_equipmentId", (q) => q.eq("equipmentId", id))
-            .collect(),
-          tenantId,
-        ),
-      );
+      out.push(...mineLive(await openHoldsForEquipment(ctx, id), tenantId));
     }
     return out;
   },
