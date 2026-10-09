@@ -191,6 +191,7 @@ import type * as lib_invoiceReminderPdf from "../lib/invoiceReminderPdf.js";
 import type * as lib_invoiceStripeReconcile from "../lib/invoiceStripeReconcile.js";
 import type * as lib_kitchenAccessGate from "../lib/kitchenAccessGate.js";
 import type * as lib_lineOverridePurchasing from "../lib/lineOverridePurchasing.js";
+import type * as lib_liveStockHolds from "../lib/liveStockHolds.js";
 import type * as lib_lookupCostBarcodeDiscovery from "../lib/lookupCostBarcodeDiscovery.js";
 import type * as lib_lookupCostFromOpenPrices from "../lib/lookupCostFromOpenPrices.js";
 import type * as lib_lookupCostTenantFallback from "../lib/lookupCostTenantFallback.js";
@@ -555,6 +556,7 @@ declare const fullApi: ApiFromModules<{
   "lib/invoiceStripeReconcile": typeof lib_invoiceStripeReconcile;
   "lib/kitchenAccessGate": typeof lib_kitchenAccessGate;
   "lib/lineOverridePurchasing": typeof lib_lineOverridePurchasing;
+  "lib/liveStockHolds": typeof lib_liveStockHolds;
   "lib/lookupCostBarcodeDiscovery": typeof lib_lookupCostBarcodeDiscovery;
   "lib/lookupCostFromOpenPrices": typeof lib_lookupCostFromOpenPrices;
   "lib/lookupCostTenantFallback": typeof lib_lookupCostTenantFallback;

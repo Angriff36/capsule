@@ -47,9 +47,12 @@ export async function publishedNoticeFor(
 ): Promise<Doc<"weeklyScheduleNotices"> | null> {
   const at = shift.startsAt;
   if (typeof at !== "number") return null;
+  // Only notices for weeks that end after this shift starts.
   const notices = await ctx.db
     .query("weeklyScheduleNotices")
-    .withIndex("by_personId", (q) => q.eq("personId", shift.personId))
+    .withIndex("by_personId_and_weekEndsAt", (q) =>
+      q.eq("personId", shift.personId).gt("weekEndsAt", at),
+    )
     .collect();
   return (
     notices
