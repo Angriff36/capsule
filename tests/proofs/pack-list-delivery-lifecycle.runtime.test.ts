@@ -223,6 +223,11 @@ describe("runtime proof: PackList → Delivery lifecycle", () => {
       docId: deliveryId,
       version: afterDriver.version,
     });
+    // The truck left with the packed list, so the list went out with it.
+    const sentList = await logistics.run(async (ctx) =>
+      ctx.db.get(pack.docId as never),
+    );
+    expect((sentList as { status?: string } | null)?.status).toBe("dispatched");
     const confirmed = (await proof.executeCommand(
       logistics,
       api.mutations.Delivery_confirmDelivery,
