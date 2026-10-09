@@ -700,7 +700,8 @@ export default defineSchema({
     .index("by_eventId", ["eventId"])
     .index("by_driverId", ["driverId"])
     .index("by_vehicleId", ["vehicleId"])
-    .index("by_tenantId_and_status", ["tenantId", "status"]),
+    .index("by_tenantId_and_status", ["tenantId", "status"])
+    .index("by_vehicleId_and_status", ["vehicleId", "status"]),
   departureOverrides: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -970,6 +971,7 @@ export default defineSchema({
     .index("by_eventId", ["eventId"])
     .index("by_vendorId", ["vendorId"])
     .index("by_tenantId_and_status", ["tenantId", "status"])
+    .index("by_equipmentId_and_status", ["equipmentId", "status"])
     .searchIndex("search_description", { searchField: "description", filterFields: ["tenantId"] }),
   equipmentMaintenanceTasks: defineTable({
     tenantId: v.string(),
@@ -1035,7 +1037,9 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_equipmentId", ["equipmentId"])
-    .index("by_eventId", ["eventId"]),
+    .index("by_eventId", ["eventId"])
+    .index("by_equipmentId_and_status", ["equipmentId", "status"])
+    .index("by_tenantId_and_status", ["tenantId", "status"]),
   equipmentServiceEntries: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -1200,6 +1204,7 @@ export default defineSchema({
     .index("by_referralSourceId", ["referralSourceId"])
     .index("by_recurrenceTemplateEventId", ["recurrenceTemplateEventId"])
     .index("by_tenantId_and_startsAt", ["tenantId", "startsAt"])
+    .index("by_venueId_and_startsAt", ["venueId", "startsAt"])
     .index("by_tenantId_and_endsAt", ["tenantId", "endsAt"])
     .index("by_tenantId_and_stage_and_startsAt", ["tenantId", "stage", "startsAt"])
     .index("by_tenantId_and_approvedAt", ["tenantId", "approvedAt"])
@@ -1258,7 +1263,8 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_eventId", ["eventId"])
     .index("by_personId", ["personId"])
-    .index("by_rideVehicleAssignmentId", ["rideVehicleAssignmentId"]),
+    .index("by_rideVehicleAssignmentId", ["rideVehicleAssignmentId"])
+    .index("by_personId_and_endsAt", ["personId", "endsAt"]),
   eventChecklists: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -1737,7 +1743,9 @@ export default defineSchema({
     .index("by_vehicleId", ["vehicleId"])
     .index("by_trailerId", ["trailerId"])
     .index("by_eventId", ["eventId"])
-    .index("by_driverId", ["driverId"]),
+    .index("by_driverId", ["driverId"])
+    .index("by_vehicleId_and_activeEventId", ["vehicleId", "activeEventId"])
+    .index("by_trailerId_and_activeEventId", ["trailerId", "activeEventId"]),
   externalRecordLinks: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -1819,7 +1827,9 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_eventId", ["eventId"])
     .index("by_responsiblePersonId", ["responsiblePersonId"])
-    .index("by_secondPersonId", ["secondPersonId"]),
+    .index("by_secondPersonId", ["secondPersonId"])
+    .index("by_responsiblePersonId_and_status", ["responsiblePersonId", "status"])
+    .index("by_secondPersonId_and_status", ["secondPersonId", "status"]),
   importArtifacts: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2043,7 +2053,8 @@ export default defineSchema({
     .index("by_vendorId", ["vendorId"])
     .index("by_vendorOrderLineId", ["vendorOrderLineId"])
     .index("by_vendorOrderId", ["vendorOrderId"])
-    .index("by_tenantId_and_observedAt_and_createdAt", ["tenantId", "observedAt", "createdAt"]),
+    .index("by_tenantId_and_observedAt_and_createdAt", ["tenantId", "observedAt", "createdAt"])
+    .index("by_ingredientId_and_observedAt_and_createdAt", ["ingredientId", "observedAt", "createdAt"]),
   integrationConnections: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

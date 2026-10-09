@@ -6,6 +6,7 @@ import {
   unitsOutOfUse,
 } from "./equipmentReservationAvailability";
 import { placeEquipmentHold } from "./equipmentHold";
+import { openHoldsForEquipment, openIssuesForEquipment } from "./openEquipmentHolds";
 
 /** Stages where the event is booked and its gear should be held. */
 const HOLD_STAGES = new Set(["approved", "sales_lock", "executing", "final"]);
@@ -152,14 +153,8 @@ export async function holdApprovedRentals(
     )
       continue;
     const [reservations, issues] = await Promise.all([
-      ctx.db
-        .query("equipmentReservations")
-        .withIndex("by_equipmentId", (q) => q.eq("equipmentId", equipmentId))
-        .collect(),
-      ctx.db
-        .query("equipmentIssues")
-        .withIndex("by_equipmentId", (q) => q.eq("equipmentId", equipmentId))
-        .collect(),
+      openHoldsForEquipment(ctx, equipmentId),
+      openIssuesForEquipment(ctx, equipmentId),
     ]);
     const free = availableEquipmentQuantity(
       equipment.quantity - unitsOutOfUse(issues, event.tenantId),

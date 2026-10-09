@@ -89,12 +89,19 @@ export const assign = mutation({
       );
     }
 
-    const siblingDeliveries = await ctx.db
-      .query("deliveries")
-      .withIndex("by_vehicleId", (query) =>
-        query.eq("vehicleId", args.vehicleId),
+    // Only runs still to drive can clash; delivered history is never read.
+    const siblingDeliveries = (
+      await Promise.all(
+        (["scheduled", "in_transit"] as const).map((status) =>
+          ctx.db
+            .query("deliveries")
+            .withIndex("by_vehicleId_and_status", (query) =>
+              query.eq("vehicleId", args.vehicleId).eq("status", status),
+            )
+            .collect(),
+        ),
       )
-      .collect();
+    ).flat();
     const conflicts = conflictingVehicleDeliveries(siblingDeliveries, {
       tenantId,
       startsAt: delivery.windowStartsAt,

@@ -15,6 +15,7 @@ import type {
   ReconciliationReceiptOutput,
   TimingWindow,
 } from "./reconciliationReceipt";
+import { openHoldsForEquipment } from "./openEquipmentHolds";
 
 /** Which ledger command triggered this reconcile — recorded on the receipt. */
 export type RentalReconcileTrigger = {
@@ -143,10 +144,10 @@ export class EventRentalReconciliation {
   ): Promise<boolean> {
     const equipment = await ctx.db.get(row.equipmentId);
     if (!equipment || equipment.deletedAt != null) return false;
-    const others = (await ctx.db
-      .query("equipmentReservations")
-      .withIndex("by_equipmentId", (q) => q.eq("equipmentId", row.equipmentId))
-      .collect()) as ReservationRow[];
+    const others = (await openHoldsForEquipment(
+      ctx,
+      row.equipmentId,
+    )) as ReservationRow[];
     const available = availableEquipmentQuantity(
       equipment.quantity,
       others.filter((other) => other._id !== row._id),

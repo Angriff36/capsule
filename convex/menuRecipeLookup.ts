@@ -11,6 +11,7 @@ import { getAuthContext } from "./lib/authContext";
 import { canRead } from "./search";
 import { DISH_IDS_CAP } from "./dishLookup";
 import { latestPriceByIngredient } from "../src/features/kitchen/IngredientPriceHistory";
+import { newestPriceRows } from "./lib/newestPrices";
 
 export type MenuRecipeRows = {
   dishIngredients: Doc<"dishIngredients">[];
@@ -145,15 +146,7 @@ export const forDishes = query({
     // prices stay on the server.
     if (priceRead)
       for (const ingredientId of menuIngredientIds) {
-        const rows = live(
-          await ctx.db
-            .query("ingredientPriceObservations")
-            .withIndex("by_ingredientId", (q) =>
-              q.eq("ingredientId", ingredientId),
-            )
-            .collect(),
-          tenantId,
-        );
+        const rows = live(await newestPriceRows(ctx, ingredientId), tenantId);
         const latest = latestPriceByIngredient(rows).get(ingredientId);
         const row = latest && rows.find((entry) => entry._id === latest._id);
         if (row) priceObservations.push(row);
