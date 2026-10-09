@@ -74,6 +74,7 @@ export function OpeningStockFixForm({
   );
   const [unit, setUnit] = useState(String(record.unit ?? ""));
   const [asOf, setAsOf] = useState(dateInput(record.asOfAt));
+  const [asOfError, setAsOfError] = useState("");
   const [countState, setCountState] = useState(
     record.countState as OpeningStockCountState,
   );
@@ -88,6 +89,12 @@ export function OpeningStockFixForm({
 
   const submit = (event: FormEvent) => {
     event.preventDefault();
+    // A count can't happen in the future (YYYY-MM-DD compares as text).
+    if (asOf && asOf > dateInput(Date.now())) {
+      setAsOfError("A count date can't be in the future.");
+      return;
+    }
+    setAsOfError("");
     const amount = quantity.trim() === "" ? null : Number(quantity);
     onSave({
       kind,
@@ -183,10 +190,16 @@ export function OpeningStockFixForm({
       <label className="field-label">
         Counted on
         <BoundedDateInput
+          naturalDateDirection="any"
           className="input"
           value={asOf}
           onChange={(event) => setAsOf(event.target.value)}
         />
+        {asOfError ? (
+          <span role="alert" className="text-sm text-danger">
+            {asOfError}
+          </span>
+        ) : null}
       </label>
       <label className="field-label">
         How sure

@@ -88,16 +88,18 @@ export function checkStockLedger(
 ): StockLedgerCheck {
   let running = 0;
   const gaps: StockLedgerEntry[] = [];
+  // Stored amounts are rounded to 4 places, so adding up many changes can
+  // drift by a hair (12.0001 vs 12). That is not a real gap.
+  const near = (left: number, right: number) => Math.abs(left - right) < 0.001;
   for (const entry of entries) {
     if (entry.measure !== "on_hand") continue;
-    if (stockQuantity(entry.quantityBefore) !== stockQuantity(running))
-      gaps.push(entry);
+    if (!near(entry.quantityBefore, running)) gaps.push(entry);
     running = stockQuantity(running + entry.delta);
   }
   const difference = stockQuantity(amount(storedOnHand) - running);
   return {
     ledgerOnHand: running,
-    matches: difference === 0 && gaps.length === 0,
+    matches: near(difference, 0) && gaps.length === 0,
     difference,
     gaps,
   };

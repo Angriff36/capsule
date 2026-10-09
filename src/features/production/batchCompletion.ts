@@ -25,8 +25,9 @@ export function batchCompletionArgs(
   entry: BatchCompletionEntry | undefined,
 ): BatchCompletionArgs {
   const actualYield = amount(entry?.yield);
-  if (actualYield == null || Number.isNaN(actualYield) || actualYield < 0)
-    throw new Error("Enter the actual batch yield. It can't be negative.");
+  if (actualYield == null) throw new Error("Enter the actual batch yield.");
+  if (Number.isNaN(actualYield) || actualYield < 0)
+    throw new Error("The batch yield can't be negative. Use zero or more.");
   const waste = amount(entry?.waste);
   if (waste == null || waste === 0) return { actualYield };
   if (Number.isNaN(waste) || waste < 0)

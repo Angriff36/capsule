@@ -459,7 +459,11 @@ export function PaymentsPage() {
                 </label>
                 <label className="field-label">
                   Date paid (optional)
-                  <BoundedDateInput className="input" name="paidOn" />
+                  <BoundedDateInput
+                    className="input"
+                    name="paidOn"
+                    naturalDateDirection="any"
+                  />
                 </label>
               </div>
               <label className="field-label">

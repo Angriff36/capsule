@@ -246,6 +246,7 @@ function LeftoverForm({
         <label className="field-label">
           Date *
           <BoundedDateInput
+            naturalDateDirection="any"
             name="dispositionDate"
             className="input"
             required
