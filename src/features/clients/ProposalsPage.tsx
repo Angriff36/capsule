@@ -33,6 +33,8 @@ import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatDate, formatMoneyExact, formatTime } from "../../lib/format";
 import { useEmailProposal } from "../../lib/proposalEmailActions";
 import { ProposalEmailHistory } from "./ProposalEmailHistory";
+import { ProposalFollowUps } from "./ProposalFollowUps";
+import { SalesHabits } from "./SalesHabits";
 import { clientDisplayName } from "../events/clientName";
 import { useEventRecordsById } from "../facilities/useEventsById";
 import { eventCreatePath, eventDetailPath } from "../events/eventRoutes";
@@ -835,6 +837,19 @@ export function ProposalsPage() {
         onFailure={setFailure}
         onNotice={setNotice}
         onClose={() => setShowDraft(false)}
+      />
+
+      <ProposalFollowUps
+        proposals={openProposals}
+        clients={clients}
+        onOpen={(proposalId) => setSearchParams({ proposal: proposalId })}
+        onNotice={setNotice}
+        onFailure={setFailure}
+      />
+
+      <SalesHabits
+        clients={clients}
+        onOpen={(proposalId) => setSearchParams({ proposal: proposalId })}
       />
 
       <section className="working-ledger">

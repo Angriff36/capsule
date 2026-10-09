@@ -42,6 +42,10 @@ entity Lead mixin TenantScoped, SoftDeletable {
   property closedAt: datetime?
   // Why it left the pipeline, as the salesperson wrote it.
   property closeReason: string?
+  // When someone first answered the inquiry, and who (auth subject). The
+  // owner's May 2026 sales audit: answer a new inquiry within 4 hours.
+  property firstRepliedAt: datetime?
+  property firstRepliedById: string?
   // A client merge moves the lead to the client kept (PL-SOURCE-MERGE).
   property clientMergeAuthorizationId: uuid?
   property mergeTargetClientId: uuid?
@@ -281,6 +285,19 @@ entity Lead mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Staff answered the inquiry (email, call or text, their usual way).
+  // Recorded once; the first answer is what the reply time counts.
+  command recordFirstReply() {
+    guard self.firstRepliedAt == null
+    guard self.deletedAt == null
+    mutate firstRepliedAt = now()
+    mutate firstRepliedById = user.id
+    emit LeadFirstReplyRecorded {
+      leadId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   // A dead inquiry leaves the pipeline; the reason is optional.
   command close(optional reason: string) {
     guard self.closedAt == null
@@ -308,6 +325,11 @@ entity Lead mixin TenantScoped, SoftDeletable {
 }
 
 event LeadClosed: "lead.closed" {
+  leadId: string
+  tenantId: string
+}
+
+event LeadFirstReplyRecorded: "lead.first_reply_recorded" {
   leadId: string
   tenantId: string
 }

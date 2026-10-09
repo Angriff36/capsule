@@ -5,6 +5,12 @@ import type {
 } from "./eventBundle";
 import type { PdfTextLine } from "./pdfTextReader";
 import { parseClockMinutes, parseCount, parseReportDate } from "./reportValues";
+import {
+  joinSpacedDigits,
+  readSpacedNotes,
+  readSpacedRoster,
+  readSpacedTitle,
+} from "./battleBoardSpaced";
 
 /**
  * Parses the Mangia battle board PDF — the front-of-house run sheet.
@@ -260,8 +266,12 @@ function readTimelineFromText(lines: readonly string[]): BundleTimelineEntry[] {
 
 /** The scope table prints one label and value pair per column. */
 function readScopeNotes(lines: readonly string[]): string | undefined {
-  const scope = lines.filter((line) =>
-    /^(Bar service|Cocktail hour food|Dessert|Bussing|Place)\b/.test(line),
+  // The browser-printed board draws its Y / N answers as boxes, so its scope
+  // lines read "Bar service Y N —" with no answer: those are left out.
+  const scope = lines.filter(
+    (line) =>
+      /^(Bar service|Cocktail hour food|Dessert|Bussing|Place)\b/.test(line) &&
+      !/\bY N —/.test(line),
   );
   return scope.length > 0 ? scope.join(" | ") : undefined;
 }
@@ -287,24 +297,35 @@ export function parseBattleBoard(
     .map((line) => line.text.trim())
     .filter((line) => line.length > 0);
 
-  // "Mendenhall / Jarvis Wedding 8/22/2026 - Saturday 98 Final Buffet - Bring Hot"
-  const factLine = lines.find(
-    (line) => /\d{1,2}\/\d{1,2}\/\d{4}/.test(line) && /\d+\s+Final/.test(line),
-  );
+  // "Mendenhall / Jarvis Wedding 8/22/2026 - Saturday 98 Final Buffet - Bring Hot";
+  // the browser-printed board splits the digits ("6/20 /20 26 - Saturday 15 0 Final").
+  const isFactLine = (line: string) =>
+    /\d{1,2}\/\d{1,2}\/\d{4}/.test(line) && /\d+\s+Final/.test(line);
+  const factLine =
+    lines.find(isFactLine) ?? lines.map(joinSpacedDigits).find(isFactLine);
+  const spacedNotes = readSpacedNotes(textLines);
+  const staff = readStaff(lines);
 
   return {
     source: "battleBoard",
     header: {
+      ...readSpacedTitle(textLines),
       eventDate: parseReportDate(factLine),
       guestCount: parseCount(factLine?.match(/(\d+)\s+Final/)?.[1]),
     },
-    staff: readStaff(lines),
+    staff: staff.length > 0 ? staff : readSpacedRoster(textLines),
     timeline: readTimeline(textLines),
     notes: {
-      serviceSetup: readPrefixed(lines, "Service Setup / Layout"),
-      cateringKitchen: readPrefixed(lines, "Catering Kitchen / Staging"),
-      operationsNotes: readPrefixed(lines, "Operations Notes"),
-      additionalTasks: readScopeNotes(lines),
+      ...spacedNotes,
+      serviceSetup:
+        readPrefixed(lines, "Service Setup / Layout") ??
+        spacedNotes.serviceSetup,
+      cateringKitchen:
+        readPrefixed(lines, "Catering Kitchen / Staging") ??
+        spacedNotes.cateringKitchen,
+      operationsNotes:
+        readPrefixed(lines, "Operations Notes") ?? spacedNotes.operationsNotes,
+      additionalTasks: readScopeNotes(lines) ?? spacedNotes.additionalTasks,
     },
   };
 }
