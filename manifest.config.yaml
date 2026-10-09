@@ -297,6 +297,17 @@ projections:
         LeadershipItem:
           - fields: [tenantId, status]
             name: by_tenantId_and_status
+        # Final Lock conflict checks read only open holds of one item and the
+        # vans still on an event, not every booking ever made (a 575-guest
+        # event timed out on live, 2026-10-08).
+        EquipmentReservation:
+          - fields: [equipmentId, status]
+            name: by_equipmentId_and_status
+        EventVehicleAssignment:
+          - fields: [vehicleId, activeEventId]
+            name: by_vehicleId_and_activeEventId
+          - fields: [trailerId, activeEventId]
+            name: by_trailerId_and_activeEventId
         # Supply reads of convex/inventoryWindow.ts by the row's own date
         # (received, recorded, observed; else when it was made) instead of
         # save time with a margin, and supply rows by state.

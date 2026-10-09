@@ -19,6 +19,11 @@ function billingParts(billing: EventBillingRollup): string[] {
   if (billing.collectedTotal > 0) {
     parts.push(`Collected ${formatMoneyExact(billing.collectedTotal)}`);
   }
+  // Billed but not yet paid: the folio is not ready to freeze.
+  const owed = billing.billedTotal - billing.collectedTotal;
+  if (owed > 0.005) {
+    parts.push(`${formatMoneyExact(owed)} still owed`);
+  }
   if (billing.draftTotal > 0) {
     parts.push(
       `${formatMoneyExact(billing.draftTotal)} in ${billing.draftCount} draft invoice${billing.draftCount === 1 ? "" : "s"}`,
@@ -49,8 +54,13 @@ export function CloseoutRevenueNote({
     return <small>Not reconciled — nothing billed yet</small>;
   }
   // Reconciled and saved, just not finalized yet: say that, not the opposite.
+  const owed = billing.billedTotal - billing.collectedTotal;
   const label =
-    row.capturedAt != null ? "Reconciled, ready to finalize" : "Not reconciled";
+    row.capturedAt == null
+      ? "Not reconciled"
+      : owed > 0.005
+        ? "Reconciled, waiting on payment"
+        : "Reconciled, ready to finalize";
   return (
     <small>
       {label}

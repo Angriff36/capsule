@@ -1035,7 +1035,8 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_equipmentId", ["equipmentId"])
-    .index("by_eventId", ["eventId"]),
+    .index("by_eventId", ["eventId"])
+    .index("by_equipmentId_and_status", ["equipmentId", "status"]),
   equipmentServiceEntries: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -1737,7 +1738,9 @@ export default defineSchema({
     .index("by_vehicleId", ["vehicleId"])
     .index("by_trailerId", ["trailerId"])
     .index("by_eventId", ["eventId"])
-    .index("by_driverId", ["driverId"]),
+    .index("by_driverId", ["driverId"])
+    .index("by_vehicleId_and_activeEventId", ["vehicleId", "activeEventId"])
+    .index("by_trailerId_and_activeEventId", ["trailerId", "activeEventId"]),
   externalRecordLinks: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

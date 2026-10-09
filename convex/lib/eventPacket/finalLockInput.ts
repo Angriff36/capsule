@@ -187,9 +187,13 @@ export async function readFinalLockInput(
     for (const field of ["vehicleId", "trailerId"] as const) {
       const id = row[field];
       if (typeof id !== "string") continue;
+      // Only assignments still on an event (activeEventId is null once
+      // released), not every trip this truck ever made.
       const others = await ctx.db
         .query("eventVehicleAssignments")
-        .withIndex(`by_${field}`, (q: any) => q.eq(field, id))
+        .withIndex(`by_${field}_and_activeEventId`, (q: any) =>
+          q.eq(field, id).gt("activeEventId", null),
+        )
         .collect();
       for (const other of others as any[]) {
         if (
@@ -249,10 +253,20 @@ export async function readFinalLockInput(
     const item = await own(ctx, "equipments", row.equipmentId, tenantId);
     let shortBy = item ? 0 : row.quantity;
     if (item && row.startsAt != null && row.endsAt != null) {
-      const all = await ctx.db
-        .query("equipmentReservations")
-        .withIndex("by_equipmentId", (q) => q.eq("equipmentId", row.equipmentId))
-        .collect();
+      // Only open holds (reserved or still out) can overlap; returned and
+      // cancelled history is never read.
+      const all = (
+        await Promise.all(
+          (["reserved", "checked_out"] as const).map((status) =>
+            ctx.db
+              .query("equipmentReservations")
+              .withIndex("by_equipmentId_and_status", (q) =>
+                q.eq("equipmentId", row.equipmentId).eq("status", status),
+              )
+              .collect(),
+          ),
+        )
+      ).flat();
       const booked = overlappingReservationQuantity(all as any, {
         tenantId,
         startsAt: row.startsAt,
