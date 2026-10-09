@@ -28,6 +28,7 @@ import {
   percentText,
 } from "./dashboardRecordSets";
 import { MetricDefinitionList } from "./MetricDefinitionList";
+import { AevGrowthTrackerSection } from "./AevGrowthTrackerSection";
 
 const NOT_ENOUGH_HISTORY = "Not enough history";
 
@@ -46,6 +47,7 @@ const NOT_ENOUGH_HISTORY = "Not enough history";
  * - Value breakdown by salesperson
  * - Event size vs. value correlation
  * - Top growing segments
+ * - The growth strategy's 10% goal tracker and close-rate watch
  */
 
 const TITLE = "Average Event Value Growth";
@@ -78,6 +80,7 @@ export function AvgEventValueGrowthDashboardPage() {
 
 function AvgEventValueGrowthBody() {
   const events = useAllEventReportRows();
+  const now = useMemo(() => new Date(), []);
   const serviceStyles = useListServiceStyle();
   const occasions = useListOccasion();
   const venues = useListVenue();
@@ -563,6 +566,8 @@ function AvgEventValueGrowthBody() {
       ) : null}
 
       <DashboardGrid items={dashboardItems} />
+
+      {events ? <AevGrowthTrackerSection events={events} now={now} /> : null}
 
       {/* Analysis Note */}
       <div className="mt-6 rounded-sm border border-line bg-inset p-4">
