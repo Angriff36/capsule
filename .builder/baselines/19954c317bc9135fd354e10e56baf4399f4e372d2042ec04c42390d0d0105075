@@ -293,6 +293,7 @@ import {
   EventReturnToPlanningParamsSchema,
   EventSetEventNumberParamsSchema,
   EventSetTravelFeeParamsSchema,
+  EventSetUpsellPotentialParamsSchema,
   EventStaffNeedApplyApprovedShiftSwapParamsSchema,
   EventStaffNeedCancelParamsSchema,
   EventStaffNeedChangeCoverageParamsSchema,
@@ -4257,6 +4258,16 @@ export function useEventSetTravelFee() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventSetTravelFeeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Event.setUpsellPotential. */
+export function useEventSetUpsellPotential() {
+  const mutate = useMutation(api.mutations.Event_setUpsellPotential);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventSetUpsellPotentialParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -14956,4 +14967,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1580 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1581 as const;

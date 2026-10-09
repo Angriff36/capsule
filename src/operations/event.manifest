@@ -41,6 +41,16 @@ enum EventStage {
   closed_out
 }
 
+// How much a deal can grow with add-ons (owner's Avg Event Value Growth
+// Strategy, "Pipeline Tagging"): high = wedding, gala, milestone, budget room;
+// moderate = corporate, repeat client, larger count; standard = tight budget,
+// first-time client, small event.
+enum EventUpsellPotential {
+  high
+  moderate
+  standard
+}
+
 enum EventRecurrenceFrequency {
   weekly
   monthly
@@ -1037,6 +1047,8 @@ entity Event mixin TenantScoped, SoftDeletable {
   property clientRating: int?
   property clientRatingNote: string?
   property clientRatedAt: datetime?
+  // The sales team's add-on potential tag for this deal (see EventUpsellPotential).
+  property upsellPotential: EventUpsellPotential?
   // The event's channel in an outside team chat (Slack), when the team mirrors
   // the event chat there. Named event-number-event-name; Final Lock checks
   // the name still matches the event.
@@ -1917,6 +1929,16 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate clientRatingNote = rating != null ? note : null
     mutate clientRatedAt = rating != null ? now() : null
     emit EventClientRatingRecorded {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Tags how much the deal can grow with add-ons, or clears the tag.
+  command setUpsellPotential(optional potential: EventUpsellPotential) {
+    guard self.deletedAt == null
+    mutate upsellPotential = potential
+    emit EventUpsellPotentialSet {
       eventId: self.id
       tenantId: self.tenantId
     }
@@ -3182,6 +3204,11 @@ event EventBinderBuiltCleared: "event_binder.built_cleared" {
 }
 
 event EventClientRatingRecorded: "event.client_rating_recorded" {
+  eventId: string
+  tenantId: string
+}
+
+event EventUpsellPotentialSet: "event.upsell_potential_set" {
   eventId: string
   tenantId: string
 }

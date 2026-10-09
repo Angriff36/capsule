@@ -1179,6 +1179,7 @@ export default defineSchema({
     clientRating: v.optional(v.union(v.number(), v.null())),
     clientRatingNote: v.optional(v.union(v.string(), v.null())),
     clientRatedAt: v.optional(v.union(v.number(), v.null())),
+    upsellPotential: v.optional(v.union(v.literal("high"), v.literal("moderate"), v.literal("standard"), v.null())),
     externalChannelName: v.optional(v.union(v.string(), v.null())),
     externalChannelId: v.optional(v.union(v.string(), v.null())),
     externalChannelUrl: v.optional(v.union(v.string(), v.null())),

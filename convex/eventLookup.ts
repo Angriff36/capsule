@@ -36,6 +36,7 @@ export type EventLookupRow = Pick<
   | "referralSourceId"
   | "serviceStyleName"
   | "budgetAmount"
+  | "upsellPotential"
   | "createdAt"
   | "updatedAt"
 >;
@@ -345,6 +346,7 @@ function lookupRow(e: Doc<"events">): EventLookupRow {
     referralSourceId: e.referralSourceId ?? null,
     serviceStyleName: e.serviceStyleName ?? null,
     budgetAmount: e.budgetAmount ?? null,
+    upsellPotential: e.upsellPotential ?? null,
     createdAt: e.createdAt,
     updatedAt: e.updatedAt,
   };

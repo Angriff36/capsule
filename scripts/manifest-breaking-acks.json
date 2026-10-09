@@ -3312,6 +3312,12 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-09",
       "reason": "Optional text (string?): the answer the team agreed on when an issue is solved. Old items have none. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Event.upsellPotential",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-09",
+      "reason": "Optional choice (EventUpsellPotential?): the sales team's high / moderate / standard add-on potential tag on a deal. Old events simply have no tag. The checker reads a nullable field with no default as required."
     }
   ]
 }

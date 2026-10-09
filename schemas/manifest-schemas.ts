@@ -1238,6 +1238,7 @@ export const EventSchema = z.object({
   clientRating: z.number().int().nullable().optional(),
   clientRatingNote: z.string().nullable().optional(),
   clientRatedAt: z.coerce.date().nullable().optional(),
+  upsellPotential: z.enum(["high", "moderate", "standard"]).nullable().optional(),
   externalChannelName: z.string().nullable().optional(),
   externalChannelId: z.string().nullable().optional(),
   externalChannelUrl: z.string().nullable().optional(),
@@ -7418,6 +7419,13 @@ export const EventSetTravelFeeParamsSchema = z.object({
 });
 
 export type EventSetTravelFeeParams = z.infer<typeof EventSetTravelFeeParamsSchema>;
+
+// Command: setUpsellPotential on Event
+export const EventSetUpsellPotentialParamsSchema = z.object({
+  potential: z.enum(["high", "moderate", "standard"]).optional(),
+});
+
+export type EventSetUpsellPotentialParams = z.infer<typeof EventSetUpsellPotentialParamsSchema>;
 
 // Command: stageClientMerge on Event
 export const EventStageClientMergeParamsSchema = z.object({
