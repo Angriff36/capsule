@@ -158,10 +158,14 @@ export async function validateEventVehicleAssignment(
   const window = runWindow(legs.find((leg) => leg.id === String(row._id)), event);
   if (!window) return;
   const shared = [
+    // Only runs still on an event (activeEventId is null once released),
+    // never every trip this truck ever made.
     ...(row.vehicleId ? await ctx.db.query("eventVehicleAssignments")
-      .withIndex("by_vehicleId", (q) => q.eq("vehicleId", row.vehicleId!)).collect() : []),
+      .withIndex("by_vehicleId_and_activeEventId", (q) =>
+        q.eq("vehicleId", row.vehicleId!).gt("activeEventId", null)).collect() : []),
     ...(row.trailerId ? await ctx.db.query("eventVehicleAssignments")
-      .withIndex("by_trailerId", (q) => q.eq("trailerId", row.trailerId!)).collect() : []),
+      .withIndex("by_trailerId_and_activeEventId", (q) =>
+        q.eq("trailerId", row.trailerId!).gt("activeEventId", null)).collect() : []),
   ].filter((other) => other._id !== row._id && other.tenantId === row.tenantId &&
     other.deletedAt == null && other.releasedAt == null && other.activeEventId != null);
   const legsByEvent = new Map<string, RouteLeg[]>([[String(event._id), legs]]);
@@ -312,9 +316,11 @@ export async function readEventRouteLegsWithConflicts(
   const trailerIds = new Set(legs.flatMap((leg) => leg.trailerId ? [leg.trailerId] : []));
   const shared = [
     ...(await Promise.all([...vehicleIds].map((id) => ctx.db.query("eventVehicleAssignments")
-      .withIndex("by_vehicleId", (q) => q.eq("vehicleId", id as Id<"vehicles">)).collect()))).flat(),
+      .withIndex("by_vehicleId_and_activeEventId", (q) =>
+        q.eq("vehicleId", id as Id<"vehicles">).gt("activeEventId", null)).collect()))).flat(),
     ...(await Promise.all([...trailerIds].map((id) => ctx.db.query("eventVehicleAssignments")
-      .withIndex("by_trailerId", (q) => q.eq("trailerId", id as Id<"trailers">)).collect()))).flat(),
+      .withIndex("by_trailerId_and_activeEventId", (q) =>
+        q.eq("trailerId", id as Id<"trailers">).gt("activeEventId", null)).collect()))).flat(),
   ];
   const otherEventIds = new Set(shared
     .filter((row) => row.tenantId === tenantId && row.deletedAt == null && row.releasedAt == null &&

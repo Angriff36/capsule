@@ -120,6 +120,9 @@ projections:
         Delivery:
           - fields: [tenantId, status]
             name: by_tenantId_and_status
+          # A van's clash check reads only its runs still to drive.
+          - fields: [vehicleId, status]
+            name: by_vehicleId_and_status
         InventoryItem:
           - fields: [tenantId, reorderThreshold]
             name: by_tenantId_and_reorderThreshold
@@ -307,6 +310,16 @@ projections:
             name: by_equipmentId_and_status
           - fields: [tenantId, status]
             name: by_tenantId_and_status
+        # One person's work from yesterday on, and their forms not yet done
+        # (My day-of forms), not everything they ever worked.
+        EventAssignment:
+          - fields: [personId, endsAt]
+            name: by_personId_and_endsAt
+        FieldConfirmation:
+          - fields: [responsiblePersonId, status]
+            name: by_responsiblePersonId_and_status
+          - fields: [secondPersonId, status]
+            name: by_secondPersonId_and_status
         EventVehicleAssignment:
           - fields: [vehicleId, activeEventId]
             name: by_vehicleId_and_activeEventId

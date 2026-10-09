@@ -700,7 +700,8 @@ export default defineSchema({
     .index("by_eventId", ["eventId"])
     .index("by_driverId", ["driverId"])
     .index("by_vehicleId", ["vehicleId"])
-    .index("by_tenantId_and_status", ["tenantId", "status"]),
+    .index("by_tenantId_and_status", ["tenantId", "status"])
+    .index("by_vehicleId_and_status", ["vehicleId", "status"]),
   departureOverrides: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -1261,7 +1262,8 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_eventId", ["eventId"])
     .index("by_personId", ["personId"])
-    .index("by_rideVehicleAssignmentId", ["rideVehicleAssignmentId"]),
+    .index("by_rideVehicleAssignmentId", ["rideVehicleAssignmentId"])
+    .index("by_personId_and_endsAt", ["personId", "endsAt"]),
   eventChecklists: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -1824,7 +1826,9 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_eventId", ["eventId"])
     .index("by_responsiblePersonId", ["responsiblePersonId"])
-    .index("by_secondPersonId", ["secondPersonId"]),
+    .index("by_secondPersonId", ["secondPersonId"])
+    .index("by_responsiblePersonId_and_status", ["responsiblePersonId", "status"])
+    .index("by_secondPersonId_and_status", ["secondPersonId", "status"]),
   importArtifacts: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
