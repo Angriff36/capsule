@@ -18,7 +18,6 @@ import {
   foodCostPercent,
   isBookedEvent,
   isCompletedEvent,
-  acceptedProposalIds,
   percentText,
 } from "./dashboardRecordSets";
 import { MetricDefinitionList } from "./MetricDefinitionList";
@@ -39,6 +38,8 @@ import {
   useLeadsInRange,
 } from "@/lib/financeScopedQueries";
 import { LeadershipItemsPanel } from "./LeadershipItemsPanel";
+import { useScorecardSources } from "./useScorecardSources";
+import { PERIOD_NAME } from "./scorecardPeriods";
 import type { ScorecardPerson } from "./ScorecardTargetEditor";
 
 /**
@@ -90,19 +91,16 @@ export function L10DashboardPage() {
       : "No owner";
   };
 
+  // The same rows the Company Scorecard counts, so the two pages agree.
+  const { sources: scorecardSources } = useScorecardSources(now);
   const scorecard = useMemo(
     () =>
       scorecardRows(
-        {
-          events: events ?? [],
-          closeouts: closeouts ?? [],
-          leads: leads ?? [],
-          acceptedProposalIds: acceptedProposalIds(proposals),
-        },
+        scorecardSources,
         (targets ?? []) as ScorecardTargetRow[],
         now,
       ),
-    [events, closeouts, leads, proposals, targets, now],
+    [scorecardSources, targets, now],
   );
 
   const history = useMemo(
@@ -322,7 +320,7 @@ export function L10DashboardPage() {
                 <tr>
                   <th>Number</th>
                   <th>Target</th>
-                  <th>This month</th>
+                  <th>Now</th>
                   <th>Owner</th>
                   <th>Status</th>
                 </tr>
@@ -330,7 +328,16 @@ export function L10DashboardPage() {
               <tbody>
                 {scorecard.map((row) => (
                   <tr key={row.measure.key}>
-                    <td>{row.measure.name}</td>
+                    <td>
+                      {row.measure.name}
+                      <span className="ml-1 text-2xs text-ink-3">
+                        (
+                        {PERIOD_NAME[row.measure.period] === "today"
+                          ? "today"
+                          : `this ${PERIOD_NAME[row.measure.period]}`}
+                        )
+                      </span>
+                    </td>
                     <td>
                       {row.target
                         ? formatScorecardValue(

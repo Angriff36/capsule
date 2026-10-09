@@ -1,17 +1,21 @@
 // @vitest-environment jsdom
 // AC-305 (CF-7.4-02): every Company Scorecard row shows its target, live
-// actual, six-month trend, owner and on-track status from seeded rows.
+// actual, trend, owner and on-track status from seeded rows. The numbers and
+// areas are the owner's EOS Company Scorecard (Company_Scorecard.html).
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   SCORECARD_MEASURES,
+  SCORECARD_NOT_COUNTED,
   liveTargets,
   scorecardRows,
   scorecardStatus,
   type ScorecardTargetRow,
 } from "../../src/features/reports/scorecardMeasures";
+import { TREND_LENGTH } from "../../src/features/reports/scorecardPeriods";
+import { weekStartOf } from "../../src/features/reports/leadershipHistory";
 
 type Rows = object[];
 const seed: Record<string, Rows> = {};
@@ -25,6 +29,9 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
     useListEventCloseout: list("closeouts"),
     useListPerson: list("people"),
     useListScorecardTarget: list("targets"),
+    useListIncident: list("incidents"),
+    useListWasteRecord: list("waste"),
+    useListEquipmentMaintenanceTask: list("maintenance"),
     useCreateScorecardTarget: () => vi.fn(),
     useScorecardTargetRevise: () => vi.fn(),
     useScorecardTargetRetire: () => vi.fn(),
@@ -51,8 +58,21 @@ vi.mock("../../src/features/facilities/useEventsById", () => ({
 import { CompanyScorecardDashboardPage } from "../../src/features/reports/CompanyScorecardDashboardPage";
 
 const now = new Date();
-const thisMonth = new Date(now.getFullYear(), now.getMonth(), 10).getTime();
+const weekFrom = weekStartOf(now).getTime();
+const inThisWeek = (t: number) =>
+  t >= weekFrom && t < weekFrom + 7 * 86_400_000;
+// A day this month outside this week, so month and week figures stay apart.
+const thisMonth = [10, 20]
+  .map((day) => new Date(now.getFullYear(), now.getMonth(), day).getTime())
+  .find((t) => !inThisWeek(t))!;
 const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 10).getTime();
+// In this week (Monday to Sunday) and already past.
+const thisWeek = Math.max(weekFrom, now.getTime() - 3_600_000);
+// The $4,000 booked this week also counts this month when the week is.
+const weekInMonth = new Date(thisWeek).getMonth() === now.getMonth();
+const monthRevenue = weekInMonth ? "$7,000" : "$3,000";
+const lastMonthRevenue = weekInMonth ? "$500" : "$4,500";
+const DAY = 86_400_000;
 
 function target(
   metricKey: string,
@@ -104,13 +124,70 @@ function seedRows() {
       startsAt: lastMonth,
     },
   ];
+  seed.events.push(
+    // This week: one booked $4,000, one cancelled, one open quote $8,000.
+    { _id: "w1", stage: "approved", quotedPrice: 4000, startsAt: thisWeek },
+    { _id: "w2", stage: "cancelled", quotedPrice: 1000, startsAt: thisWeek },
+    {
+      _id: "q1",
+      stage: "quote",
+      quotedPrice: 8000,
+      startsAt: thisWeek + 30 * DAY,
+    },
+  );
   seed.closeouts = [
     {
       _id: "c1",
       grossProfit: 700,
       actualIngredientCost: 300,
-      finalizedAt: thisMonth,
+      finalizedAt: thisWeek,
     },
+  ];
+  // A problem reported at w1, none at the cancelled w2.
+  seed.incidents = [{ _id: "i1", eventId: "w1", status: "open" }];
+  // Three shifts due by now: two worked, one no-show; one cancelled.
+  seed.shifts = [
+    { _id: "s1", startsAt: thisWeek, status: "completed" },
+    { _id: "s2", startsAt: thisWeek, status: "started" },
+    { _id: "s3", startsAt: thisWeek, status: "no_show" },
+    { _id: "s4", startsAt: thisWeek, status: "cancelled" },
+  ];
+  // Two prep tasks due by now: one done on time, one done late.
+  seed.prepTasks = [
+    {
+      _id: "t1",
+      dueAt: thisWeek,
+      completedAt: thisWeek - 60_000,
+      status: "completed",
+    },
+    {
+      _id: "t2",
+      dueAt: thisWeek,
+      completedAt: thisWeek + 60_000,
+      status: "completed",
+    },
+  ];
+  // $15 of waste against $300 of food cost = 5%.
+  seed.waste = [
+    {
+      _id: "x1",
+      recordedAt: thisWeek,
+      quantity: 3,
+      unitCost: 5,
+      status: "recorded",
+    },
+    {
+      _id: "x2",
+      recordedAt: thisWeek,
+      quantity: 9,
+      unitCost: 9,
+      status: "voided",
+    },
+  ];
+  // Maintenance: one current, one overdue.
+  seed.maintenance = [
+    { _id: "m1", nextDueAt: now.getTime() + 10 * DAY },
+    { _id: "m2", nextDueAt: now.getTime() - 10 * DAY },
   ];
   seed.proposals = [{ _id: "pr1", status: "accepted" }];
   seed.leads = [
@@ -119,12 +196,27 @@ function seedRows() {
       _id: "l1",
       stage: "proposalSent",
       proposalId: "pr1",
-      createdAt: thisMonth,
+      createdAt: thisWeek,
     },
-    { _id: "l2", stage: "new", createdAt: thisMonth },
+    { _id: "l2", stage: "new", createdAt: thisWeek },
   ];
   seed.people = [
-    { _id: "p1", givenName: "Tim", familyName: "Owner", status: "active" },
+    {
+      _id: "p1",
+      givenName: "Tim",
+      familyName: "Owner",
+      status: "active",
+      employmentType: "full_time",
+      hireDate: 1,
+    },
+    {
+      _id: "p2",
+      givenName: "Con",
+      familyName: "Tractor",
+      status: "active",
+      employmentType: "contractor",
+      hireDate: 1,
+    },
   ];
   seed.targets = [
     target("monthly_revenue", 2500, "higher_better", "p1"),
@@ -133,6 +225,8 @@ function seedRows() {
     target("lead_conversion", 40, "higher_better", "p1"),
     target("events_completed", 2, "higher_better"),
     target("guests", 100, "higher_better", "p1"),
+    target("booked_revenue_week", 15000, "higher_better", "p1"),
+    target("prep_on_time", 52, "higher_better"),
   ];
 }
 
@@ -190,25 +284,65 @@ describe("company scorecard", () => {
       };
     };
 
+    const targeted = new Set(
+      (seed.targets as { metricKey: string }[]).map((t) => t.metricKey),
+    );
     for (const measure of SCORECARD_MEASURES) {
       const r = row(measure.key);
-      expect(r.trend.length, measure.key).toBe(6);
-      expect(r.target, measure.key).not.toBe("Not set");
-      expect(r.status, measure.key).toMatch(/On track|Off track/);
+      expect(r.trend.length, measure.key).toBe(TREND_LENGTH[measure.period]);
+      if (targeted.has(measure.key)) {
+        expect(r.target, measure.key).not.toMatch(/^Not set/);
+        expect(r.status, measure.key).toMatch(/On track|Caution|Off track/);
+      }
     }
 
+    // The owner's four areas, in order, then the older Capsule numbers.
+    const areas = [
+      ...container.querySelectorAll("[data-testid^='scorecard-area-'] h2"),
+    ].map((h) => h.textContent);
+    expect(areas).toEqual([
+      "Sales",
+      "Events / Production",
+      "Kitchen / Culinary",
+      "Operations / Admin",
+      "Other Capsule numbers",
+    ]);
+    // Numbers Capsule cannot count yet are named, never shown as a figure.
+    const notCounted = [
+      ...container.querySelectorAll("[data-testid='scorecard-not-counted'] li"),
+    ].map((li) => li.textContent ?? "");
+    expect(notCounted).toHaveLength(SCORECARD_NOT_COUNTED.length);
+    expect(notCounted.join("|")).toContain("Client Satisfaction Score");
+
+    // A number with no target shows the scorecard's written one.
+    expect(row("pipeline_value").target).toBe("Not set (scorecard: $75,000+)");
+    expect(row("pipeline_value").actual).toContain("$8,000");
+    // This week: $4,000 booked of $15,000 is off track; close rate 1 of 2.
+    expect(row("booked_revenue_week").actual).toContain("$4,000");
+    expect(row("booked_revenue_week").status).toBe("Off track");
+    expect(row("close_rate").actual).toContain("50");
+    expect(row("event_issue_rate").actual).toContain("100");
+    expect(row("staff_utilization").actual).toContain("66.7");
+    // Prep 1 of 2 on time = 50% against 52%: within 10%, so caution.
+    expect(row("prep_on_time").actual).toContain("50");
+    expect(row("prep_on_time").status).toBe("Caution");
+    expect(row("waste_percent").actual).toContain("5");
+    expect(row("equipment_current").actual).toContain("50");
+    expect(row("staff_w2_count").actual).toBe("1");
+    expect(row("team_retention").actual).toContain("100");
+
     const revenue = row("monthly_revenue");
-    expect(revenue.actual).toContain("$3,000");
+    expect(revenue.actual).toContain(monthRevenue);
     expect(revenue.target).toContain("At least");
     expect(revenue.target).toContain("$2,500");
     expect(revenue.owner).toBe("Tim Owner");
     expect(revenue.status).toBe("On track");
     // The trend ends with this month and carries last month's $500.
     const points = [...revenue.trend].map((li) => li.textContent ?? "");
-    expect(points[5]).toContain("$3,000");
-    expect(points[4]).toContain("$500");
+    expect(points[5]).toContain(monthRevenue);
+    expect(points[4]).toContain(lastMonthRevenue);
 
-    // Food cost 30% against "at most 25%": off track.
+    // Food cost 30% this week against "at most 25%": off track.
     const food = row("food_cost_percent");
     expect(food.target).toContain("At most");
     expect(food.status).toBe("Off track");
@@ -248,7 +382,7 @@ describe("scorecard status and targets", () => {
   it("lower-better numbers are on track at or below the target", () => {
     const t = target("food_cost_percent", 30, "lower_better");
     expect(scorecardStatus(30, t)).toBe("on_track");
-    expect(scorecardStatus(31, t)).toBe("off_track");
+    expect(scorecardStatus(34, t)).toBe("off_track");
     expect(scorecardStatus(null, t)).toBe("not_known");
     expect(scorecardStatus(10, undefined)).toBe("no_target");
   });
@@ -264,13 +398,26 @@ describe("scorecard status and targets", () => {
   });
 
   it("an empty month is not known for percents and zero for sums", () => {
-    const [revenue, food] = scorecardRows(
+    const rows = scorecardRows(
       { events: [], closeouts: [], leads: [] },
       [],
       now,
     );
-    expect(revenue.actual).toBe(0);
-    expect(food.actual).toBeNull();
-    expect(food.status).toBe("no_target");
+    const by = (key: string) => rows.find((r) => r.measure.key === key)!;
+    expect(by("monthly_revenue").actual).toBe(0);
+    expect(by("food_cost_percent").actual).toBeNull();
+    expect(by("food_cost_percent").status).toBe("no_target");
+    // Rows not loaded (or not readable) are not known, never zero.
+    expect(by("staff_utilization").actual).toBeNull();
+    expect(by("staff_w2_count").actual).toBeNull();
+  });
+
+  it("a miss within 10% of the target is caution", () => {
+    const t = target("guests", 100, "higher_better");
+    expect(scorecardStatus(95, t)).toBe("caution");
+    expect(scorecardStatus(85, t)).toBe("off_track");
+    const low = target("food_cost_percent", 30, "lower_better");
+    expect(scorecardStatus(32, low)).toBe("caution");
+    expect(scorecardStatus(34, low)).toBe("off_track");
   });
 });
