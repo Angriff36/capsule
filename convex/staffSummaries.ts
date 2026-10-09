@@ -339,19 +339,32 @@ export const plan = internalQuery({
       if (canRead(reader, ["inventoryAccess", "kitchenAccess", "manageAccess"]))
         add(stockSummary);
       if (isEmailNotificationSubscribed(subscription, "shift_changes")) {
-        const shifts = (
-          await ctx.db
-            .query("shifts")
-            .withIndex("by_personId", (q) => q.eq("personId", person._id))
-            .collect()
-        ).filter(
-          (row) =>
-            row.tenantId === tenantId &&
-            row.deletedAt == null &&
-            (row.updatedAt ?? 0) >= since &&
-            row.startsAt != null &&
-            row.startsAt >= now,
-        );
+        const shifts =
+          // Only shifts still ahead (or with no end time) can be in it.
+          (
+            await Promise.all(
+              [
+                (q: any) => q.eq("personId", person._id).gte("endsAt", now),
+                (q: any) => q.eq("personId", person._id).eq("endsAt", null),
+                (q: any) =>
+                  q.eq("personId", person._id).eq("endsAt", undefined),
+              ].map((range) =>
+                ctx.db
+                  .query("shifts")
+                  .withIndex("by_personId_and_endsAt", range)
+                  .collect(),
+              ),
+            )
+          )
+            .flat()
+            .filter(
+              (row) =>
+                row.tenantId === tenantId &&
+                row.deletedAt == null &&
+                (row.updatedAt ?? 0) >= since &&
+                row.startsAt != null &&
+                row.startsAt >= now,
+            );
         const titles = await Promise.all(
           shifts.map((row) => (row.eventId ? ctx.db.get(row.eventId) : null)),
         );

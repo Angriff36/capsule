@@ -11,6 +11,7 @@ import type { Doc, Id } from "./_generated/dataModel";
 import { query, type QueryCtx } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import { canRead } from "./search";
+import { liveStockHolds } from "./lib/liveStockHolds";
 
 /** Board screens read at most this many events. */
 export const AREA_EVENT_CAP = 2000;
@@ -169,12 +170,25 @@ export const shiftsInWindow = query({
       for (const raw of [...new Set(personIds)]) {
         const personId = ctx.db.normalizeId("people", raw);
         if (!personId) continue;
+        // Shifts ending after `from`, plus any with no end time yet; never
+        // every shift this person ever had.
         rows.push(
           ...(await ctx.db
             .query("shifts")
-            .withIndex("by_personId", (q) => q.eq("personId", personId))
+            .withIndex("by_personId_and_endsAt", (q) =>
+              q.eq("personId", personId).gt("endsAt", from),
+            )
             .collect()),
         );
+        for (const endsAt of [null, undefined])
+          rows.push(
+            ...(await ctx.db
+              .query("shifts")
+              .withIndex("by_personId_and_endsAt", (q) =>
+                q.eq("personId", personId).eq("endsAt", endsAt),
+              )
+              .collect()),
+          );
       }
     } else {
       rows = await ctx.db
@@ -412,10 +426,8 @@ export const stockForEvent = query({
     for (const itemId of items.keys()) {
       const id = ctx.db.normalizeId("inventoryItems", itemId);
       if (!id) continue;
-      for (const hold of await ctx.db
-        .query("inventoryReservations")
-        .withIndex("by_inventoryItemId", (q) => q.eq("inventoryItemId", id))
-        .collect())
+      // Other events' live holds on the item; this event's own come above.
+      for (const hold of await liveStockHolds(ctx, id))
         holds.set(hold._id, hold);
     }
 

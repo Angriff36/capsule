@@ -72951,15 +72951,15 @@ async function __runVendorOrderEnsureWeeklyDraft(ctx: MutationCtx, { docId, vend
     const __manifestEvent0 = { type: "VendorOrderWeeklyDraftEnsured", entity: "VendorOrder", entityId: docId, payload: { vendorOrderId: docId, tenantId: __after.tenantId, vendorId: vendorId, purchasingWeekStart: sourceRangeStart, purchaseNeedId: purchaseNeedId, ingredientDemandId: ingredientDemandId, ingredientId: ingredientId, requiredQuantity: requiredQuantity, unit: unit }, createdAt: Date.now() };
     const __manifestEventId0 = await ctx.db.insert("manifestEvents", __manifestEvent0);
     // Reactions
-    const __agg0_rows = await ctx.db.query("purchaseNeeds").withIndex("by_ingredientId", (q) => q.eq("ingredientId", payload.ingredientId)).collect();
+    const __agg0_rows = await ctx.db.query("purchaseNeeds").withIndex("by_ingredientId_and_status", (q) => q.eq("ingredientId", payload.ingredientId).eq("status", "open")).collect();
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
-    const __agg0_rowsf = __agg0_rows.filter((d) => (d as any).purchasingWeekStart === payload.purchasingWeekStart).filter((d) => (d as any).unit === payload.unit).filter((d) => (d as any).status === "open").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg0_rowsf = __agg0_rows.filter((d) => (d as any).purchasingWeekStart === payload.purchasingWeekStart).filter((d) => (d as any).unit === payload.unit).filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg0 = __agg0_rowsf.reduce((acc, d) => { const n = Number((d as any).requiredQuantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
-    const __agg1_rows = await ctx.db.query("purchaseNeeds").withIndex("by_ingredientId", (q) => q.eq("ingredientId", payload.ingredientId)).collect();
-    const __agg1_rowsf = __agg1_rows.filter((d) => (d as any).purchasingWeekStart === payload.purchasingWeekStart).filter((d) => (d as any).unit === payload.unit).filter((d) => (d as any).status === "ordered").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg1_rows = await ctx.db.query("purchaseNeeds").withIndex("by_ingredientId_and_status", (q) => q.eq("ingredientId", payload.ingredientId).eq("status", "ordered")).collect();
+    const __agg1_rowsf = __agg1_rows.filter((d) => (d as any).purchasingWeekStart === payload.purchasingWeekStart).filter((d) => (d as any).unit === payload.unit).filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg1 = __agg1_rowsf.reduce((acc, d) => { const n = Number((d as any).requiredQuantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
-    const __agg2_rows = await ctx.db.query("purchaseNeeds").withIndex("by_ingredientId", (q) => q.eq("ingredientId", payload.ingredientId)).collect();
-    const __agg2_rowsf = __agg2_rows.filter((d) => (d as any).purchasingWeekStart === payload.purchasingWeekStart).filter((d) => (d as any).unit === payload.unit).filter((d) => (d as any).status === "fulfilled").filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
+    const __agg2_rows = await ctx.db.query("purchaseNeeds").withIndex("by_ingredientId_and_status", (q) => q.eq("ingredientId", payload.ingredientId).eq("status", "fulfilled")).collect();
+    const __agg2_rowsf = __agg2_rows.filter((d) => (d as any).purchasingWeekStart === payload.purchasingWeekStart).filter((d) => (d as any).unit === payload.unit).filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
     const __agg2 = __agg2_rowsf.reduce((acc, d) => { const n = Number((d as any).requiredQuantity); return acc + (Number.isFinite(n) ? n : 0); }, 0);
     const __agg3_rows = await ctx.db.query("inventoryItems").withIndex("by_ingredientId", (q) => q.eq("ingredientId", payload.ingredientId)).collect();
     const __agg3_rowsf = __agg3_rows.filter((d) => (d as any).unit === payload.unit).filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);

@@ -389,7 +389,10 @@ export const personPeriodLaborSummary = query({
       (
         ctx.db
           .query("payrollInputs")
-          .withIndex("by_personId", (q: any) => q.eq("personId", args.personId))
+          // Periods that end inside or after this one; older ones can't overlap.
+          .withIndex("by_personId_and_periodEnd", (q: any) =>
+            q.eq("personId", args.personId).gte("periodEnd", args.periodStart),
+          )
           .collect() as Promise<Doc<"payrollInputs">[]>
       ).then((rows) => rows.filter((row) => row.tenantId === auth.tenantId)),
     ]);

@@ -12,6 +12,7 @@ import { canRead } from "./search";
 import { DISH_IDS_CAP } from "./dishLookup";
 import { latestPriceByIngredient } from "../src/features/kitchen/IngredientPriceHistory";
 import { newestPriceRows } from "./lib/newestPrices";
+import { liveStockHolds } from "./lib/liveStockHolds";
 
 export type MenuRecipeRows = {
   dishIngredients: Doc<"dishIngredients">[];
@@ -194,15 +195,7 @@ export const forDishes = query({
         if (holdRead)
           for (const item of items)
             inventoryReservations.push(
-              ...live(
-                await ctx.db
-                  .query("inventoryReservations")
-                  .withIndex("by_inventoryItemId", (q) =>
-                    q.eq("inventoryItemId", item._id),
-                  )
-                  .collect(),
-                tenantId,
-              ),
+              ...live(await liveStockHolds(ctx, item._id), tenantId),
             );
       }
 

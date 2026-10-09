@@ -169,7 +169,12 @@ export const applyShiftTimingChange = mutation({
       const personShifts = (
         await ctx.db
           .query("shifts")
-          .withIndex("by_personId", (q) => q.eq("personId", notice.personId))
+          // Only this notice's week.
+          .withIndex("by_personId_and_endsAt", (q) =>
+            q
+              .eq("personId", notice.personId)
+              .gte("endsAt", notice.weekStartsAt),
+          )
           .collect()
       ).filter(
         (row) =>

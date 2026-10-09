@@ -335,7 +335,9 @@ export const weekNotices = query({
       if (!personId) continue;
       for (const row of await ctx.db
         .query("weeklyScheduleNotices")
-        .withIndex("by_personId", (q) => q.eq("personId", personId))
+        .withIndex("by_personId_and_weekStartsAt", (q) =>
+          q.eq("personId", personId).eq("weekStartsAt", weekStartsAt),
+        )
         .collect())
         if (
           row.tenantId === auth.tenantId &&
@@ -361,7 +363,9 @@ export const personScheduleNotices = query({
     return (
       await ctx.db
         .query("weeklyScheduleNotices")
-        .withIndex("by_personId", (q) => q.eq("personId", personId))
+        .withIndex("by_personId_and_weekEndsAt", (q) =>
+          q.eq("personId", personId).gte("weekEndsAt", from),
+        )
         .collect()
     ).filter(
       (row) =>
@@ -382,7 +386,9 @@ export const personActiveWindows = query({
     const out: Doc<"availabilityWindows">[] = [];
     for (const row of await ctx.db
       .query("availabilityWindows")
-      .withIndex("by_personId", (q) => q.eq("personId", personId))
+      .withIndex("by_personId_and_status", (q) =>
+        q.eq("personId", personId).eq("status", "active"),
+      )
       .collect()) {
       if (
         row.tenantId !== auth.tenantId ||

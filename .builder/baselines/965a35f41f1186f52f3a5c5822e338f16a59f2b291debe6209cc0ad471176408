@@ -92,7 +92,9 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_personId", ["personId"])
-    .index("by_tenantId_and_endsAt", ["tenantId", "endsAt"]),
+    .index("by_tenantId_and_endsAt", ["tenantId", "endsAt"])
+    .index("by_personId_and_endsAt", ["personId", "endsAt"])
+    .index("by_personId_and_status", ["personId", "status"]),
   candidates: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2031,7 +2033,8 @@ export default defineSchema({
     .index("by_eventId", ["eventId"])
     .index("by_ingredientId", ["ingredientId"])
     .index("by_dishId", ["dishId"])
-    .index("by_tenantId_and_status", ["tenantId", "status"]),
+    .index("by_tenantId_and_status", ["tenantId", "status"])
+    .index("by_dishId_and_status", ["dishId", "status"]),
   ingredientPriceObservations: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -2176,7 +2179,8 @@ export default defineSchema({
     .index("by_eventId", ["eventId"])
     .index("by_ingredientId", ["ingredientId"])
     .index("by_inventorySettingsId", ["inventorySettingsId"])
-    .index("by_tenantId_and_status", ["tenantId", "status"]),
+    .index("by_tenantId_and_status", ["tenantId", "status"])
+    .index("by_inventoryItemId_and_status", ["inventoryItemId", "status"]),
   inventorySettings: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -3021,6 +3025,7 @@ export default defineSchema({
     .index("by_eventId", ["eventId"])
     .index("by_shiftId", ["shiftId"])
     .index("by_tenantId_and_periodStart", ["tenantId", "periodStart"])
+    .index("by_personId_and_periodEnd", ["personId", "periodEnd"])
     .index("by_tenantId_and_status", ["tenantId", "status"]),
   performanceReviews: defineTable({
     tenantId: v.string(),
@@ -3509,7 +3514,8 @@ export default defineSchema({
     .index("by_preferredVendorId", ["preferredVendorId"])
     .index("by_vendorOrderId", ["vendorOrderId"])
     .index("by_vendorOrderLineId", ["vendorOrderLineId"])
-    .index("by_tenantId_and_status", ["tenantId", "status"]),
+    .index("by_tenantId_and_status", ["tenantId", "status"])
+    .index("by_ingredientId_and_status", ["ingredientId", "status"]),
   pushSubscriptions: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
@@ -3973,6 +3979,7 @@ export default defineSchema({
     .index("by_swapTargetQualificationId", ["swapTargetQualificationId"])
     .index("by_swapTargetTrainingCompletionId", ["swapTargetTrainingCompletionId"])
     .index("by_tenantId_and_endsAt", ["tenantId", "endsAt"])
+    .index("by_personId_and_endsAt", ["personId", "endsAt"])
     .index("by_staff_status_end", ["tenantId", "personId", "status", "endsAt"]),
   shiftSwapRequests: defineTable({
     tenantId: v.string(),
@@ -4361,6 +4368,7 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_personId", ["personId"])
     .index("by_tenantId_and_status", ["tenantId", "status"])
+    .index("by_personId_and_reviewedAt", ["personId", "reviewedAt"])
     .index("by_staff_status_end", ["tenantId", "personId", "status", "endsAt"])
     .index("by_tenantId_and_status_and_endsAt", ["tenantId", "status", "endsAt"]),
   timeRecords: defineTable({
@@ -4395,7 +4403,8 @@ export default defineSchema({
     .index("by_personId", ["personId"])
     .index("by_shiftId", ["shiftId"])
     .index("by_eventId", ["eventId"])
-    .index("by_tenantId_and_clockInAt", ["tenantId", "clockInAt"]),
+    .index("by_tenantId_and_clockInAt", ["tenantId", "clockInAt"])
+    .index("by_personId_and_status", ["personId", "status"]),
   tppReportFavorites: defineTable({
     tenantId: v.string(),
     personId: v.optional(v.union(v.string(), v.null())),
@@ -5110,7 +5119,9 @@ export default defineSchema({
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
-    .index("by_personId", ["personId"]),
+    .index("by_personId", ["personId"])
+    .index("by_personId_and_weekStartsAt", ["personId", "weekStartsAt"])
+    .index("by_personId_and_weekEndsAt", ["personId", "weekEndsAt"]),
   manifestEvents: defineTable({
     type: v.string(),
     entity: v.string(),
