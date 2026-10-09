@@ -4,6 +4,7 @@
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { api } from "./_generated/api";
+import { registerAuthoredRoutes } from "./lib/httpRoutes";
 
 const http = httpRouter();
 
@@ -5116,5 +5117,7 @@ http.route({
     return new Response(JSON.stringify({ entity: match[1], command: match[2], params: entry.paramMeta, execute: "POST /api/manifest/" + match[1] + "/commands/" + match[2], wire: DISPATCHER_WIRE_NOTES }), { status: 200, headers: { "Content-Type": "application/json" } });
   }),
 });
+
+registerAuthoredRoutes(http);
 
 export default http;
