@@ -8650,21 +8650,21 @@
       "key": "CF-12.6-sms",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§12.6 (same thread/delivery model as email; phone validation, consent/opt-out, quiet-hour rules, provider IDs, delivery/failure status; reminders scheduled/deduplicated so retries cannot duplicate)",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-SMS-SOCIAL"],
-      "gap": "Text delivered / failed status from the provider needs the signed route (issue #52).",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: tests/proofs/sms-reminder-dedupe.runtime.test.ts › 'a retried dispatch tick sends each recipient once while an explicit sendNow still sends'. 2026-10-02: that test PASSES (tests/proofs/sms-reminder-dedupe.runtime.test.ts 4/4: retried tick sends once, Send again sends once per click, night rule, STOP stops texts until a later accepted text; phone check + opt-in + provider id kept). Still open: delivered/failed status from the provider - BLOCKED on the signed provider route (issue #52)."
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: tests/proofs/sms-reminder-dedupe.runtime.test.ts › 'a retried dispatch tick sends each recipient once while an explicit sendNow still sends'. 2026-10-02: that test PASSES (tests/proofs/sms-reminder-dedupe.runtime.test.ts 4/4: retried tick sends once, Send again sends once per click, night rule, STOP stops texts until a later accepted text; phone check + opt-in + provider id kept). 2026-10-09: delivered/failed status no longer waits on the signed route: the scan chain asks Twilio about each recent text (convex/smsAlertDelivery.ts); tests/proofs/sms-delivery-status.runtime.test.ts 2/2 (first final answer kept, never goes back, repeat adds nothing, on-its-way stays accepted, plain carrier reasons)."
       ],
-      "waitsOn": "builder-capability",
+      "waitsOn": null,
       "owners": [
         "src/integrations/",
         "convex/smsAlerts.ts",
         "communication/provider owners"
       ],
-      "environment": "Not verified yet",
-      "sha": "2a92e623"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "f70cfab6"
     },
     {
       "id": "AC-354",

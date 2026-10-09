@@ -200,9 +200,10 @@ describe("SMS outbox sends each alert once per person", () => {
       });
     const scheduledChains = () =>
       t.run(async (ctx) =>
-        (await ctx.db.system.query("_scheduled_functions").collect()).map(
-          (job) => (job.args[0] as { chainId?: string }).chainId,
-        ),
+        (await ctx.db.system.query("_scheduled_functions").collect())
+          // The scan also queues a delivery check; only scan jobs are chains.
+          .filter((job) => job.name.includes("scanTenant"))
+          .map((job) => (job.args[0] as { chainId?: string }).chainId),
       );
 
     expect(await chainScan("chain-old")).toMatchObject({

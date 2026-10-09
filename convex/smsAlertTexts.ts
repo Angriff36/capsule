@@ -3,8 +3,7 @@
  * AC-353). The scan in smsAlerts.ts sends each alert to each person once, even
  * when a tick runs twice. A manager can still send one text again on purpose;
  * one click (one request id) sends at most once, even when the call repeats.
- * "Accepted by the text service" is all Capsule knows: the provider's
- * delivered/failed callback needs the signed provider route (issue #52).
+ * Whether an accepted text reached the phone comes from smsAlertDelivery.ts.
  */
 import { ConvexError, v } from "convex/values";
 import { internal } from "./_generated/api";
@@ -27,6 +26,7 @@ import {
   TWILIO_UNSUBSCRIBED_CODE,
 } from "./lib/twilio";
 import { canManage, decryptField, personName } from "./smsAlerts";
+import { DELIVERY_ENTITY, notDeliveredReason } from "./smsAlertDelivery";
 
 const ALERT_ENTITY = "SmsAlert";
 const SEND_AGAIN_ENTITY = "SmsAlertSendAgain";
@@ -57,7 +57,9 @@ export interface RecentText {
   sentAgain: boolean;
   /** The text service's id for this text (shown short, for support calls). */
   providerId: string | null;
-  /** Plain words: why it did not go; null when it went. */
+  /** Did the accepted text reach the phone? null = no answer yet. */
+  delivered: boolean | null;
+  /** Plain words: why it did not go or did not arrive; null when fine. */
   problem: string | null;
 }
 
@@ -72,6 +74,17 @@ export const recentTexts = query({
       .query("manifestEvents")
       .withIndex("by_entityId", (q) => q.eq("entityId", tenantId))
       .collect();
+    const deliveries = new Map<string, Record<string, unknown>>();
+    for (const row of ledger) {
+      const payload = asRecord(row.payload);
+      if (
+        row.entity === DELIVERY_ENTITY &&
+        payload.tenantId === tenantId &&
+        typeof payload.messageSid === "string"
+      ) {
+        deliveries.set(payload.messageSid, payload);
+      }
+    }
     const rows = ledger
       .filter(
         (row) =>
@@ -98,6 +111,11 @@ export const recentTexts = query({
       const payload = asRecord(row.payload);
       const personId = String(payload.personId);
       const sent = row.type === "SmsAlertSent";
+      const delivery =
+        sent && typeof payload.messageSid === "string"
+          ? deliveries.get(payload.messageSid)
+          : undefined;
+      const delivered = delivery ? delivery.outcome === "delivered" : null;
       return {
         at: row.createdAt,
         triggerKey: String(payload.triggerKey),
@@ -108,8 +126,15 @@ export const recentTexts = query({
         sentAgain: typeof payload.sentAgainBy === "string",
         providerId:
           typeof payload.messageSid === "string" ? payload.messageSid : null,
+        delivered,
         problem: sent
-          ? null
+          ? delivered === false
+            ? `The text did not reach the phone: ${notDeliveredReason(
+                typeof delivery?.errorCode === "number"
+                  ? delivery.errorCode
+                  : null,
+              )}.`
+            : null
           : payload.optedOut === true
             ? OPTED_OUT_NOTE
             : `The text service did not take it: ${String(payload.error ?? "no reason given")}`,

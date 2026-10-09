@@ -696,6 +696,12 @@ export const scanTenant = internalAction({
     });
 
     if (args.scheduleNext) {
+      // Ask the text service which earlier texts reached the phone.
+      await ctx.scheduler.runAfter(
+        0,
+        internal.smsAlertDelivery.checkDeliveries,
+        { tenantId: args.tenantId },
+      );
       await scheduleNextScan(ctx, args.tenantId, args.chainId);
     }
     return result;

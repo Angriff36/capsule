@@ -14,7 +14,8 @@ function formatWhen(value: number): string {
 
 /**
  * The newest staff alert texts (PL-SMS-SOCIAL, AC-353): who got which alert,
- * whether the text service accepted it, and "Send again" for one text. Each
+ * whether the text service accepted it, whether it reached the phone, and
+ * "Send again" for one text. Each
  * click carries its own request id, so a double click or a repeated call
  * still sends one text.
  */
@@ -52,8 +53,8 @@ export function SmsRecentTexts({ canManage }: { readonly canManage: boolean }) {
     <div className="mt-5" data-testid="sms-recent-texts">
       <h3 className="text-sm font-semibold text-ink">Recent alert texts</h3>
       <p className="mt-1 text-sm text-ink-3">
-        "Accepted" means the text service took the text. Capsule does not yet
-        hear back when it reaches the phone.
+        "Accepted" means the text service took the text. Capsule checks every
+        few minutes and shows "Delivered" once it reaches the phone.
       </p>
       {error ? (
         <div className="mt-3">
@@ -80,15 +81,23 @@ export function SmsRecentTexts({ canManage }: { readonly canManage: boolean }) {
                 <span className="text-ink-2">{text.alertLabel}</span>{" "}
                 <span className="text-ink-3">{formatWhen(text.at)}</span>
                 <span
-                  className={`block ${text.sent ? "text-ink-3" : "text-warn"}`}
+                  className={`block ${text.problem ? "text-warn" : "text-ink-3"}`}
                 >
-                  {text.sent
-                    ? `${text.sentAgain ? "Sent again, accepted" : "Accepted"}${
+                  {text.problem
+                    ? text.problem
+                    : `${text.sentAgain ? "Sent again, " : ""}${
+                        text.delivered
+                          ? text.sentAgain
+                            ? "delivered"
+                            : "Delivered"
+                          : text.sentAgain
+                            ? "accepted"
+                            : "Accepted"
+                      }${
                         text.providerId
                           ? ` (text number ${text.providerId.slice(-6)})`
                           : ""
-                      }`
-                    : text.problem}
+                      }`}
                 </span>
               </span>
               <button
