@@ -12,6 +12,7 @@ import { query } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
 import { canRead } from "./search";
 import { latestPriceByIngredient } from "../src/features/kitchen/IngredientPriceHistory";
+import { newestPriceRows } from "./lib/newestPrices";
 
 export const INGREDIENT_IDS_CAP = 1000;
 export const BOARD_EVENT_CAP = 500;
@@ -78,15 +79,7 @@ export const latestPriceObservations = query({
     )) {
       const id = ctx.db.normalizeId("ingredients", raw);
       if (!id) continue;
-      out.push(
-        ...live(
-          await ctx.db
-            .query("ingredientPriceObservations")
-            .withIndex("by_ingredientId", (q) => q.eq("ingredientId", id))
-            .collect(),
-          tenantId,
-        ),
-      );
+      out.push(...live(await newestPriceRows(ctx, id), tenantId));
     }
     const latest = new Set(
       [...latestPriceByIngredient(out).values()].map((row) => row._id),

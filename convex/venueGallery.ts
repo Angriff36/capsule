@@ -35,6 +35,9 @@ async function storageUrl(
   return id ? await ctx.storage.getUrl(id) : null;
 }
 
+// Events looked at for the gallery: the venue's newest ones.
+const GALLERY_EVENTS = 60;
+
 /**
  * Photos staff took at events held at this venue (the event photo gallery),
  * newest event first, for picking the venue gallery. Own company only.
@@ -47,11 +50,13 @@ export const eventPhotos = query({
     const venue = await ctx.db.get(venueId);
     if (!venue || venue.deletedAt != null || venue.tenantId !== auth.tenantId)
       return [];
+    // The venue's newest events only; the gallery never walks its whole past.
     const events = (
       await ctx.db
         .query("events")
-        .withIndex("by_venueId", (q) => q.eq("venueId", venueId))
-        .collect()
+        .withIndex("by_venueId_and_startsAt", (q) => q.eq("venueId", venueId))
+        .order("desc")
+        .take(GALLERY_EVENTS)
     )
       .filter((row) => row.tenantId === auth.tenantId && row.deletedAt == null)
       .sort((a, b) => Number(b.startsAt ?? 0) - Number(a.startsAt ?? 0));

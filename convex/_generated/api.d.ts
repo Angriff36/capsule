@@ -196,6 +196,7 @@ import type * as lib_lookupCostFromOpenPrices from "../lib/lookupCostFromOpenPri
 import type * as lib_lookupCostTenantFallback from "../lib/lookupCostTenantFallback.js";
 import type * as lib_materializationReceipt from "../lib/materializationReceipt.js";
 import type * as lib_messageMedia from "../lib/messageMedia.js";
+import type * as lib_newestPrices from "../lib/newestPrices.js";
 import type * as lib_nutritionUnitScaler from "../lib/nutritionUnitScaler.js";
 import type * as lib_oldSystemEventStage from "../lib/oldSystemEventStage.js";
 import type * as lib_oneOnlyRules from "../lib/oneOnlyRules.js";
@@ -559,6 +560,7 @@ declare const fullApi: ApiFromModules<{
   "lib/lookupCostTenantFallback": typeof lib_lookupCostTenantFallback;
   "lib/materializationReceipt": typeof lib_materializationReceipt;
   "lib/messageMedia": typeof lib_messageMedia;
+  "lib/newestPrices": typeof lib_newestPrices;
   "lib/nutritionUnitScaler": typeof lib_nutritionUnitScaler;
   "lib/oldSystemEventStage": typeof lib_oldSystemEventStage;
   "lib/oneOnlyRules": typeof lib_oneOnlyRules;

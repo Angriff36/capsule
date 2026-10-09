@@ -203,6 +203,9 @@ projections:
         Event:
           - fields: [tenantId, startsAt]
             name: by_tenantId_and_startsAt
+          # A venue's events from a date on, or its newest ones (gallery).
+          - fields: [venueId, startsAt]
+            name: by_venueId_and_startsAt
           - fields: [tenantId, endsAt]
             name: by_tenantId_and_endsAt
           - fields: [tenantId, stage, startsAt]
@@ -341,6 +344,10 @@ projections:
         IngredientPriceObservation:
           - fields: [tenantId, observedAt, createdAt]
             name: by_tenantId_and_observedAt_and_createdAt
+          # The newest prices of one ingredient (its latest price), not
+          # every price ever paid for it.
+          - fields: [ingredientId, observedAt, createdAt]
+            name: by_ingredientId_and_observedAt_and_createdAt
         InventoryReservation:
           - fields: [tenantId, status]
             name: by_tenantId_and_status

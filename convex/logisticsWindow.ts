@@ -428,7 +428,9 @@ export const venueEventsSince = query({
       for (const e of mineLive(
         await ctx.db
           .query("events")
-          .withIndex("by_venueId", (q) => q.eq("venueId", venueId))
+          .withIndex("by_venueId_and_startsAt", (q) =>
+            q.eq("venueId", venueId).gte("startsAt", from),
+          )
           .collect(),
         tenantId,
       ))

@@ -1204,6 +1204,7 @@ export default defineSchema({
     .index("by_referralSourceId", ["referralSourceId"])
     .index("by_recurrenceTemplateEventId", ["recurrenceTemplateEventId"])
     .index("by_tenantId_and_startsAt", ["tenantId", "startsAt"])
+    .index("by_venueId_and_startsAt", ["venueId", "startsAt"])
     .index("by_tenantId_and_endsAt", ["tenantId", "endsAt"])
     .index("by_tenantId_and_stage_and_startsAt", ["tenantId", "stage", "startsAt"])
     .index("by_tenantId_and_approvedAt", ["tenantId", "approvedAt"])
@@ -2052,7 +2053,8 @@ export default defineSchema({
     .index("by_vendorId", ["vendorId"])
     .index("by_vendorOrderLineId", ["vendorOrderLineId"])
     .index("by_vendorOrderId", ["vendorOrderId"])
-    .index("by_tenantId_and_observedAt_and_createdAt", ["tenantId", "observedAt", "createdAt"]),
+    .index("by_tenantId_and_observedAt_and_createdAt", ["tenantId", "observedAt", "createdAt"])
+    .index("by_ingredientId_and_observedAt_and_createdAt", ["ingredientId", "observedAt", "createdAt"]),
   integrationConnections: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
