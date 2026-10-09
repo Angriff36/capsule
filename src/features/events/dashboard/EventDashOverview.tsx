@@ -22,6 +22,7 @@ import { allergyLine, durationLabel, firstLine } from "./eventDashFacts";
 import { EventPhoneBrief } from "./EventPhoneBrief";
 import type { DashSheetId, EventDashOverviewProps } from "./eventDashTypes";
 import { useEventDayForecast } from "./useEventDayForecast";
+import { serviceNeedsNoStaff } from "../../../lib/eventStageMoves";
 
 const ARROW = (
   <svg
@@ -138,11 +139,16 @@ export function EventDashOverview({
     serviceStyles?.find((row) => row._id === event.serviceStyleId)?.name ||
     null;
 
+  // A drop-off, pickup or ready-to-heat order has nobody serving, so it needs
+  // no staff (the same rule the stage moves use).
+  const noStaffNeeded = serviceNeedsNoStaff(serviceStyle);
   const setup = [
     ["Client assigned", event.hasAssignedClient],
     ["Headcount set", event.hasExpectedHeadcount],
     ["Menu dishes added", event.hasMenuDishes],
-    ["Staff assigned", event.hasStaffAssigned],
+    ...(noStaffNeeded
+      ? []
+      : ([["Staff assigned", event.hasStaffAssigned]] as const)),
   ] as const;
   const ready = setup.filter(([, ok]) => ok).length;
   const firstGap = setup.find(([, ok]) => !ok)?.[0];
