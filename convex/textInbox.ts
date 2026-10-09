@@ -11,7 +11,7 @@
 import { v } from "convex/values";
 import { api, internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
-import { httpAction, internalMutation } from "./_generated/server";
+import { httpAction, internalMutation, query } from "./_generated/server";
 import type { MessageMediaRef } from "./lib/messageMedia";
 import { redactSecrets } from "./lib/redactPayload";
 import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
@@ -212,4 +212,19 @@ export const receiveText = httpAction(async (ctx, request) => {
     status: 200,
     headers: { "Content-Type": "text/xml" },
   });
+});
+
+/** What a company needs to point its Twilio number at Capsule. */
+export const textSetup = query({
+  args: {},
+  handler: async (
+    ctx,
+  ): Promise<{ address: string | null; textsReady: boolean } | null> => {
+    if (!(await ctx.auth.getUserIdentity())) return null;
+    const site = process.env.CONVEX_SITE_URL?.trim().replace(/\/$/, "");
+    return {
+      address: site ? `${site}${TEXT_ROUTE_PATH}` : null,
+      textsReady: Boolean(process.env.TWILIO_AUTH_TOKEN?.trim()),
+    };
+  },
 });
