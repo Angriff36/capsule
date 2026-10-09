@@ -8,7 +8,7 @@ import {
   useDishSetFinishTiming,
   useListDishContainer,
 } from "../../lib/manifest-convex-react";
-import { useWholeDishList } from "../../lib/useDishesByIds";
+import { useDishFacets, useDishSearch } from "../../lib/useDishesByIds";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import {
@@ -49,7 +49,7 @@ function containerMethodFor(timing: string) {
   return timing === "finish_at_event" ? "cooked_on_site" : "cooked_at_kitchen";
 }
 
-type Dish = NonNullable<ReturnType<typeof useWholeDishList>>[number];
+type Dish = NonNullable<ReturnType<typeof useDishSearch>>[number];
 
 function createdIdOf(created: unknown): string | undefined {
   return typeof created === "string"
@@ -156,7 +156,6 @@ function PickOrAdd({
  */
 export function NewDishPanel({ onClose }: { onClose: () => void }) {
   const navigate = useNavigate();
-  const allDishes = useWholeDishList();
   const allContainers = useListDishContainer();
   const createDish = useCreateDish();
   const makeVersionOf = useDishMakeVersionOf();
@@ -165,6 +164,12 @@ export function NewDishPanel({ onClose }: { onClose: () => void }) {
   const defineContainer = useCreateDishContainer();
   const { prompt, host } = useActionPrompt();
   const [name, setName] = useState("");
+  // Dishes named like the one being typed (the duplicate check) and the
+  // newest dishes' categories, courses and tags (the suggestions); never
+  // the whole catalog.
+  const typedName = name.trim();
+  const allDishes = useDishSearch(typedName, typedName.length >= 3);
+  const facets = useDishFacets();
   const [timing, setTiming] = useState<FinishTiming | "">("");
   const [instructions, setInstructions] = useState("");
   const [containerName, setContainerName] = useState("");
@@ -189,12 +194,13 @@ export function NewDishPanel({ onClose }: { onClose: () => void }) {
   const mains = useMemo(() => mainDishRows(live), [live]);
   const versions = useMemo(() => versionsByMain(live), [live]);
   const options = useMemo(() => {
+    const sample = facets ?? [];
     const usedTags = new Set(
-      live.flatMap((dish) => (dish.dietaryTags ?? []).map(dietTag)),
+      sample.flatMap((dish) => (dish.dietaryTags ?? []).map(dietTag)),
     );
     return {
-      category: valuesByUse(live.map((dish) => menuCategory(dish.category))),
-      course: valuesByUse(live.map((dish) => dish.course)),
+      category: valuesByUse(sample.map((dish) => menuCategory(dish.category))),
+      course: valuesByUse(sample.map((dish) => dish.course)),
       container: valuesByUse(
         (allContainers ?? [])
           .filter((row) => row.deletedAt == null)
@@ -205,7 +211,7 @@ export function NewDishPanel({ onClose }: { onClose: () => void }) {
         ...EXTRA_DIETARY.filter((tag) => usedTags.has(tag)),
       ],
     };
-  }, [live, allContainers]);
+  }, [facets, allContainers]);
 
   const matches = useMemo(() => findDishMatches(mains, name), [mains, name]);
   const sameFood = matches.find((match) => match.sameFood)?.dish;

@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { usePaginatedQuery, useQuery } from "convex/react";
 import type { DishRow } from "../../convex/dishLookup";
 import { api } from "./api";
@@ -65,4 +65,42 @@ export function useWholeDishList(enabled = true): DishRow[] | undefined {
     () => (enabled && status === "Exhausted" ? results : undefined),
     [enabled, results, status],
   );
+}
+
+/** Live dishes matching the typed text (at most 40); newest with no text. */
+export function useDishSearch(text: string, enabled = true) {
+  const rows = useQuery(api.dishLookup.search, enabled ? { text } : "skip");
+  // Keep the last answer while the next search runs, so a picker never
+  // blinks back to "loading" (and loses what was typed) on each key.
+  const last = useRef<DishRow[] | undefined>(undefined);
+  if (!enabled) last.current = undefined;
+  else if (rows !== undefined) last.current = rows ?? [];
+  return last.current;
+}
+
+/** A dish's main dish and every version of that main dish. */
+export function useDishFamily(dishId: string | null | undefined) {
+  const rows = useQuery(api.dishLookup.family, dishId ? { dishId } : "skip");
+  return rows === undefined ? undefined : (rows ?? []);
+}
+
+/** Category, course and diet tags of the newest dishes (form suggestions). */
+export function useDishFacets() {
+  const rows = useQuery(api.dishLookup.facets, {});
+  return rows === undefined ? undefined : (rows ?? []);
+}
+
+/** The dish catalog 100 at a time, with "load more" (the catalog list). */
+export function useDishPages(enabled = true) {
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.dishLookup.page,
+    enabled ? {} : "skip",
+    { initialNumItems: 100 },
+  );
+  return {
+    rows: !enabled || status === "LoadingFirstPage" ? undefined : results,
+    canLoadMore: status === "CanLoadMore" || status === "LoadingMore",
+    loadingMore: status === "LoadingMore",
+    loadMore: () => loadMore(100),
+  };
 }

@@ -1,17 +1,13 @@
 import type { FormEvent } from "react";
 import { PACK_LIST_UNITS } from "./packListUnits";
+import { DishSearchSelect } from "../kitchen/DishSearchSelect";
 
 interface PackListItemFormProps {
-  dishes: Array<{ _id: string; name: string; deletedAt?: number | null }>;
   busy: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }
 
-export function PackListItemForm({
-  dishes,
-  busy,
-  onSubmit,
-}: PackListItemFormProps) {
+export function PackListItemForm({ busy, onSubmit }: PackListItemFormProps) {
   return (
     <form className="supply-form" onSubmit={onSubmit}>
       <div className="supply-form-heading">
@@ -56,16 +52,11 @@ export function PackListItemForm({
         </label>
         <label className="field-label">
           Dish (optional)
-          <select name="dishId" className="input">
-            <option value="">No dish</option>
-            {dishes
-              .filter((dish) => dish.deletedAt == null)
-              .map((dish) => (
-                <option key={dish._id} value={dish._id}>
-                  {dish.name}
-                </option>
-              ))}
-          </select>
+          <DishSearchSelect
+            name="dishId"
+            placeholder="No dish — or search…"
+            aria-label="Dish"
+          />
         </label>
       </div>
     </form>

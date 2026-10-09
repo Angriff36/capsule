@@ -484,6 +484,48 @@ vi.mock("convex/react", async (importOriginal) => {
         }[];
         return rows.filter((row) => ids.has(row._id) && row.deletedAt == null);
       }
+      // Dish name search, a dish's family and the form suggestions answer
+      // from the test's dish rows (the real ones read only what they need).
+      if (name === "dishLookup:search" && !backend.values.has(name)) {
+        const text = String((args as { text?: string }).text ?? "")
+          .trim()
+          .toLowerCase();
+        const words = text.split(/\s+/).filter(Boolean);
+        return (
+          (backend.values.get("useListDish") ?? []) as {
+            name?: string;
+            deletedAt?: number | null;
+          }[]
+        ).filter(
+          (row) =>
+            row.deletedAt == null &&
+            (words.length === 0 ||
+              words.some((word) =>
+                String(row.name ?? "")
+                  .toLowerCase()
+                  .includes(word),
+              )),
+        );
+      }
+      if (name === "dishLookup:family" && !backend.values.has(name)) {
+        const rows = (backend.values.get("useListDish") ?? []) as {
+          _id: string;
+          versionOfDishId?: string | null;
+          deletedAt?: number | null;
+        }[];
+        const dish = rows.find(
+          (row) => row._id === (args as { dishId: string }).dishId,
+        );
+        if (!dish) return [];
+        const mainId = dish.versionOfDishId ?? dish._id;
+        return rows.filter(
+          (row) =>
+            row.deletedAt == null &&
+            (row._id === mainId || row.versionOfDishId === mainId),
+        );
+      }
+      if (name === "dishLookup:facets" && !backend.values.has(name))
+        return backend.values.get("useListDish") ?? [];
       // Month tracker rows of some events: the test's rows for those events.
       if (name === "eventMonthRows:forEvents" && !backend.values.has(name)) {
         const ids = new Set((args as { eventIds: string[] }).eventIds);

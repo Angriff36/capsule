@@ -1,5 +1,5 @@
 import { useConvex, usePaginatedQuery, useQuery } from "convex/react";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { api } from "./api";
 import type { Doc, Id } from "./api";
 
@@ -61,12 +61,17 @@ export function useClientSearch(
   text: string,
   options: { withContacts?: boolean; enabled?: boolean } = {},
 ): DirectoryClient[] | undefined {
-  return useQuery(
+  const enabled = options.enabled !== false;
+  const rows = useQuery(
     api.clientDirectory.search,
-    options.enabled === false
-      ? "skip"
-      : { text, withContacts: options.withContacts },
+    enabled ? { text, withContacts: options.withContacts } : "skip",
   ) as DirectoryClient[] | undefined;
+  // Keep the last answer while the next search runs, so the list does not
+  // empty out on each key.
+  const last = useRef<DirectoryClient[] | undefined>(undefined);
+  if (!enabled) last.current = undefined;
+  else if (rows !== undefined) last.current = rows;
+  return last.current;
 }
 
 /** The client book 50 at a time, newest first, with email and phone. */

@@ -1,5 +1,4 @@
 import { PACK_EVENT_FACTS } from "../../lib/packRules";
-import { SearchSelect } from "../../ui/SearchSelect";
 import { PACK_LIST_UNITS } from "./packListUnits";
 import { packCategoryLabel } from "./packLineExplanation";
 import {
@@ -7,6 +6,7 @@ import {
   PACK_RULE_TRIGGERS,
   type PackRuleDraft,
 } from "./packRuleDraft";
+import { DishSearchSelect } from "../kitchen/DishSearchSelect";
 
 type Option = { _id: string; name: string };
 
@@ -14,13 +14,11 @@ type Option = { _id: string; name: string };
  * the inputs the chosen "when" needs are shown. */
 export function PackRuleFields({
   draft,
-  dishes,
   styles,
   disabled,
   onChange,
 }: {
   draft: PackRuleDraft;
-  dishes: Option[];
   styles: Option[];
   disabled: boolean;
   onChange: (patch: Partial<PackRuleDraft>) => void;
@@ -74,15 +72,13 @@ export function PackRuleFields({
         // Thousands of dishes: search, not a dropdown.
         <label className="field-label">
           <span>{t === "dish" ? "Dish" : "Only for this dish (optional)"}</span>
-          <SearchSelect
+          <DishSearchSelect
             value={draft.dishId}
             disabled={disabled}
             onChange={(dishId) => onChange({ dishId })}
-            recentsKey="dish"
             placeholder={
               t === "dish" ? "Search dishes…" : "Any dish — or search…"
             }
-            options={dishes.map((dish) => ({ id: dish._id, label: dish.name }))}
           />
         </label>
       ) : null}

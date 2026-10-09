@@ -30,7 +30,7 @@ import {
   useMenuRestore,
   useMenuUnpublish,
 } from "../../lib/manifest-convex-react";
-import { useWholeDishList } from "../../lib/useDishesByIds";
+import { useDishPages, useDishSearch } from "../../lib/useDishesByIds";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useSuccessToast } from "../../ui/useSuccessToast";
@@ -99,14 +99,32 @@ function ComponentCatalogPage() {
 }
 
 function DishCatalogPage() {
-  const data = useWholeDishList();
+  // 5,800 dishes on live: a page at a time, or the server's name search;
+  // never the whole catalog.
+  const [{ search }] = useListViewState(kitchenListState);
+  const typed = search.trim();
+  const pages = useDishPages(typed === "");
+  const found = useDishSearch(typed, typed !== "");
+  const data = typed ? found : pages.rows;
   // Versions show as tabs on their main dish, not as rows of their own.
   const mains = useMemo(() => (data ? mainDishRows(data) : undefined), [data]);
   return (
-    <KitchenCatalogPageContent
-      section="dishes"
-      data={mains as CatalogItem[] | undefined}
-    />
+    <>
+      <KitchenCatalogPageContent
+        section="dishes"
+        data={mains as CatalogItem[] | undefined}
+      />
+      {!typed && pages.canLoadMore ? (
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          disabled={pages.loadingMore}
+          onClick={pages.loadMore}
+        >
+          {pages.loadingMore ? "Loading…" : "Load more dishes"}
+        </button>
+      ) : null}
+    </>
   );
 }
 

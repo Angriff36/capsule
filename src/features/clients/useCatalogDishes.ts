@@ -1,5 +1,5 @@
 import { useListMenu, useListMenuDish } from "../../lib/manifest-convex-react";
-import { useWholeDishList } from "../../lib/useDishesByIds";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import { effectiveSellingPrice } from "../../lib/catalogEligibility";
 
 // A catalog dish a proposal pricing line can be linked to (spec §5.4 L276). A
@@ -24,7 +24,21 @@ export function useCatalogDishes(): {
 } {
   const menus = useListMenu();
   const menuDishes = useListMenuDish();
-  const dishes = useWholeDishList();
+  // Only the dishes on published menus, never the whole dish catalog.
+  const publishedIds = new Set(
+    (menus ?? [])
+      .filter((m) => m.deletedAt == null && String(m.status) === "published")
+      .map((m) => String(m._id)),
+  );
+  const dishes = useDishesByIds(
+    menus === undefined || menuDishes === undefined
+      ? undefined
+      : menuDishes
+          .filter(
+            (md) => md.deletedAt == null && publishedIds.has(String(md.menuId)),
+          )
+          .map((md) => String(md.dishId)),
+  );
 
   if (menus === undefined || menuDishes === undefined || dishes === undefined) {
     return { loading: true, lines: [] };

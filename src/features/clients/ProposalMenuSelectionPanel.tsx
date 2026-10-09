@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation } from "convex/react";
 import { api, type Id } from "../../lib/api";
 import { useListMenu, useListMenuDish } from "../../lib/manifest-convex-react";
-import { useWholeDishList } from "../../lib/useDishesByIds";
+import { useDishesByIds } from "../../lib/useDishesByIds";
 import {
   useProposalDishSelections,
   useProposalLineItems,
@@ -37,9 +37,27 @@ export function ProposalMenuSelectionPanel({
 }: ProposalMenuSelectionPanelProps) {
   const menus = useListMenu();
   const menuDishes = useListMenuDish();
-  const dishes = useWholeDishList();
   // Only this proposal's choices and price lines.
   const selections = useProposalDishSelections(proposalId);
+  // Only the published menus' dishes and the ones already picked.
+  const publishedIds = new Set(
+    (menus ?? [])
+      .filter((m) => m.deletedAt == null && String(m.status) === "published")
+      .map((m) => String(m._id)),
+  );
+  const dishes = useDishesByIds(
+    menus === undefined || menuDishes === undefined || selections === undefined
+      ? undefined
+      : [
+          ...menuDishes
+            .filter(
+              (md) =>
+                md.deletedAt == null && publishedIds.has(String(md.menuId)),
+            )
+            .map((md) => String(md.dishId)),
+          ...selections.map((row) => String(row.dishId)),
+        ],
+  );
   const lineItems = useProposalLineItems(proposalId);
   const pickDish = useMutation(api.lib.proposalDishPricing.pickProposalDish);
   const adjustServings = useMutation(

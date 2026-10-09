@@ -16,7 +16,7 @@ import { useEventGuests } from "../../lib/useEventRows";
 import { formatMoneyExact } from "../../lib/format";
 import { useHeldQueryRows } from "../../lib/heldQueryRows";
 import { useEventMenuLines } from "../../lib/useEventMenuLines";
-import { useDishesByIds, useWholeDishList } from "../../lib/useDishesByIds";
+import { useDishesByIds, useDishSearch } from "../../lib/useDishesByIds";
 import { useSharedRecipeRows } from "../../lib/useMenuRecipeRows";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import type { Id } from "../../lib/api";
@@ -149,7 +149,9 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     demandVersionsForEvent,
   } = useEventMenuSync(eventId);
   const [showPicker, setShowPicker] = useState(false);
-  const pickerDishes = useWholeDishList(showPicker);
+  // The picker searches the server as the user types; never the whole list.
+  const [pickerQuery, setPickerQuery] = useState("");
+  const pickerDishes = useDishSearch(pickerQuery, showPicker);
   const venues = useListVenue();
   const venueNames = useMemo(
     () => new Map((venues ?? []).map((v) => [String(v._id), v.name])),
@@ -818,6 +820,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
             ),
           }))}
           excludeIds={existingDishIds}
+          onQueryChange={setPickerQuery}
           onSelect={(dishId) =>
             void run("add", async () => {
               const servings = await requestServings("Dish servings");

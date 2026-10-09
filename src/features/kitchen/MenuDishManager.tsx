@@ -9,6 +9,7 @@ import { useActionPrompt } from "../../ui/action-prompt";
 import { AllergenIconRow } from "./AllergenIconRow";
 import { CulinaryRecordPicker, type PickerDish } from "./CulinaryRecordPicker";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
+import { useDishSearch } from "../../lib/useDishesByIds";
 
 type MenuDishRow = {
   _id: string;
@@ -50,6 +51,27 @@ export function MenuDishManager({
   const removeMenuDish = useMenuDishRemove();
   const updateDetails = useMenuDishUpdateDetails();
   const [showPicker, setShowPicker] = useState(false);
+  // The picker searches the whole catalog on the server as the user types.
+  const [pickerQuery, setPickerQuery] = useState("");
+  const found = useDishSearch(pickerQuery, showPicker);
+  const pickerRecords = useMemo(
+    () =>
+      (found ?? []).map((dish) => ({
+        _id: dish._id,
+        name: dish.name,
+        description: dish.description,
+        allergenSummary: dish.allergenSummary,
+        primaryImageStorageId: dish.primaryImageStorageId,
+        editionNumber: dish.editionNumber,
+        deletedAt: dish.deletedAt,
+        status: String(dish.status),
+        mergedIntoDishId: dish.mergedIntoDishId,
+        canonicalDishId: dish.canonicalDishId,
+        versionOfDishId: dish.versionOfDishId,
+        versionLabel: dish.versionLabel,
+      })),
+    [found],
+  );
   const [busy, setBusy] = useState<string | null>(null);
   const { prompt, host } = useActionPrompt();
 
@@ -100,7 +122,8 @@ export function MenuDishManager({
         <div className="mb-4">
           <CulinaryRecordPicker
             kind="dish"
-            records={dishes}
+            records={pickerRecords}
+            onQueryChange={setPickerQuery}
             excludeIds={existingDishIds}
             onSelect={(dishId) =>
               void run("add", async () => {

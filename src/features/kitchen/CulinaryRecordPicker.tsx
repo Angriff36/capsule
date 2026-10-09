@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AllergenIconRow } from "./AllergenIconRow";
 import {
   culinaryCanonicalMatcher,
@@ -28,6 +28,8 @@ type Props = {
   onCreateEdition?: (sourceId: string, name: string) => void;
   excludeIds?: readonly string[];
   label?: string;
+  /** Told the typed text, when `records` come from a server search. */
+  onQueryChange?: (query: string) => void;
 };
 
 /**
@@ -43,8 +45,12 @@ export function CulinaryRecordPicker({
   onCreateEdition,
   excludeIds = [],
   label,
+  onQueryChange,
 }: Props) {
   const [query, setQuery] = useState("");
+  useEffect(() => {
+    onQueryChange?.(query);
+  }, [query, onQueryChange]);
   const excluded = useMemo(() => new Set(excludeIds), [excludeIds]);
   const versions = useMemo(() => versionsByMain(records), [records]);
   const choices = (row: PickerDish) =>
