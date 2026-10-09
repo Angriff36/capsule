@@ -246,11 +246,21 @@ export function KitchenDisplayPage() {
       return (left.dueAt ?? Infinity) - (right.dueAt ?? Infinity);
     });
 
-  const filterEvents = (events ?? []).filter(
-    (event) =>
-      event.deletedAt == null &&
-      ["approved", "executing"].includes(String(event.stage)),
-  );
+  // The events whose cards this screen shows, soonest first, whatever stage
+  // they are in.
+  const filterEvents = (namedEvents ?? [])
+    .filter(
+      (event) =>
+        event.deletedAt == null &&
+        !["cancelled", "completed", "closed_out"].includes(
+          String(event.stage),
+        ) &&
+        !(event.startsAt != null && event.startsAt < now - 2 * 86_400_000),
+    )
+    .sort(
+      (left, right) =>
+        (left.startsAt ?? Infinity) - (right.startsAt ?? Infinity),
+    );
 
   const bump = async (item: BoardItem) => {
     const action =
