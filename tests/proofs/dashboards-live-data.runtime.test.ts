@@ -33,6 +33,7 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
     useListVenue: list("venues"),
     useListServiceStyle: list("serviceStyles"),
     useListOccasion: list("occasions"),
+    useListReferralSource: list("referralSources"),
     useListRevenueAttribution: list("attributions"),
     useListPrepTask: list("prepTasks"),
     useListPackList: list("packLists"),
@@ -229,8 +230,8 @@ const PAGES: PageCase[] = [
     name: "Mangia",
     file: "MangiaDashboardPage.tsx",
     Page: MangiaDashboardPage,
-    card: "Guests Today",
-    expected: "160",
+    card: "Revenue won this year",
+    expected: "$3,200",
   },
 ];
 

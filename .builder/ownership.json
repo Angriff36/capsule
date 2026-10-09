@@ -2,7 +2,7 @@
   "version": 1,
   "files": {
     "convex/computed.ts": {
-      "sha256": "bfb97010770587194d9aaf513a6cd8295891bcf3f8f8b042f289f9248a1a257d"
+      "sha256": "e35a33e2dc2211f5c53b7b606a801cc0218321eed5d44224140787fbcbdd7343"
     },
     "convex/crons.ts": {
       "sha256": "3b83373150a367f16a8d4b1d26b9cf03d7b33e0d03d4a7c6efd3a769e1d6b030"
@@ -21,7 +21,7 @@
       "sha256": "8f0c4e704527c5c62896e9dd116dcac5746c9816b85b385c26de129bb2257d1a"
     },
     "convex/queries.ts": {
-      "sha256": "37cfd4fecb1fb9d557b0039645352566c7c1e8d5989b8abe90a2d41d4c60a6bd"
+      "sha256": "88c4c97ace23e3a94aa5d47b1a7218d5e6b976a4e5399e01fa569bcbfcdcf107"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
@@ -30,7 +30,7 @@
       "sha256": "8de308f85aa701721b0baab8a37da0bed7c8e08c7d4072b3ea0e72b5b8598ca8"
     },
     "manifest-context-summary.json": {
-      "sha256": "70d1418453a2d11193d0bebd5e394a3a91f87f41df9b7ce05138661e9b241b92"
+      "sha256": "7ef534bb5ad47bb41dc043e0fbb4fb6045004500f47df3a62d0716295b8ef25b"
     },
     "package.json": {
       "sha256": "40f3044ea9a476c692d98859288f175f6992d9c15bc2ee907bf053607157b545"
@@ -45,10 +45,10 @@
       "sha256": "a32453e0b6265a1657f7c84ed11a8a2ba987e872549eb88afcb1d1da9cdc8760"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "c19956e26b3fa88c59338c49e60206b4bf0cf4afa3510c621b47819c1788b60d"
+      "sha256": "39c9bbfd104b65f88564997e1ae9b16ac9395dcec095c52f945cb830016bab25"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "a74909939507f050c7cf82cb1fcc1088294ecf0a377cf460e2aa20355e8fef32"
+      "sha256": "dcc953ff3dfb658120ac7b132c65a352edda88428753260c59cd372426df4f2d"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "3548937a29911fe3961741393817dda0619b9fb01ba7dd6bc91608d1e462db4d"
@@ -57,7 +57,7 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "88a6a3bbc6d5ee03e99c4e1f85341791afae1278abe2e40cfc8c64b726ea390c"
+      "sha256": "48c576148b24f3ff407974ce5b83d362f7b32747fec6d7c87a2e4949a44fdffe"
     }
   },
   "package": {

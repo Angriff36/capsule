@@ -1107,7 +1107,8 @@ entity Event mixin TenantScoped, SoftDeletable {
   // yet (assignments hasMany is navigation only). A draft pack list counts as
   // open packing: approve makes one and nobody has packed it yet. (Drafts were
   // left out while this blocked beginExecution; it no longer blocks anything.)
-  computed isReadyForExecution: boolean = count_of(self.prepTasks, (t) => t.status != "completed" and t.status != "cancelled") == 0 and count_of(self.packLists, (p) => p.status != "dispatched" and p.status != "cancelled") == 0 and count_of(self.deliveries, (d) => d.status != "delivered" and d.status != "cancelled" and d.status != "failed") == 0
+  // A packed or loaded list is done: a delivery never moves it to dispatched.
+  computed isReadyForExecution: boolean = count_of(self.prepTasks, (t) => t.status != "completed" and t.status != "cancelled") == 0 and count_of(self.packLists, (p) => p.status == "draft" or p.status == "packing") == 0 and count_of(self.deliveries, (d) => d.status != "delivered" and d.status != "cancelled" and d.status != "failed") == 0
   // Live internal food-cost estimate from menu dishes. Does NOT overwrite
   // budgets, invoices, quotedPrice, or locked customer prices.
   computed estimatedFoodCost: money(12, 2) = sum(filter(self.eventDishes, (item) => item.deletedAt == null and item.addedAt != null), (item) => item.estimatedCost)
