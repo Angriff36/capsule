@@ -48,6 +48,7 @@ export interface FollowUpProposal {
   deletedAt?: unknown;
   followUpStep?: unknown;
   followUpAt?: unknown;
+  priceObjectionAt?: unknown;
 }
 
 export interface FollowUpRow {
@@ -63,6 +64,8 @@ export interface FollowUpRow {
   next?: FollowUpStep;
   nextDueAt?: number;
   due: boolean;
+  /** The client already said it costs too much. */
+  saidTooExpensive: boolean;
 }
 
 /** Sent or opened proposals with no answer, the ones due now first. */
@@ -92,6 +95,7 @@ export function proposalFollowUps(
       next,
       nextDueAt,
       due: nextDueAt !== undefined && nextDueAt <= now,
+      saidTooExpensive: proposal.priceObjectionAt != null,
     });
   }
   const order = (row: FollowUpRow) =>

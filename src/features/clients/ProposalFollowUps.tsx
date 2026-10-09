@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { useProposalRecordFollowUp } from "../../lib/manifest-convex-react";
+import {
+  useProposalRecordFollowUp,
+  useProposalRecordPriceObjection,
+} from "../../lib/manifest-convex-react";
 import { formatDate } from "../../lib/format";
 import {
   proposalFollowUps,
@@ -28,6 +31,7 @@ export function ProposalFollowUps({
   onFailure: (error: unknown) => void;
 }) {
   const recordFollowUp = useProposalRecordFollowUp();
+  const recordPriceObjection = useProposalRecordPriceObjection();
   const [busy, setBusy] = useState<string | null>(null);
   const rows = proposals ? proposalFollowUps(proposals, Date.now()) : undefined;
   const dueCount = rows?.filter((row) => row.due).length ?? 0;
@@ -57,6 +61,20 @@ export function ProposalFollowUps({
     try {
       await recordFollowUp({ docId: row.proposalId, step: row.next.step });
       onNotice(`${row.next.label} marked sent for ${row.title}.`);
+    } catch (error) {
+      onFailure(error);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const markTooExpensive = async (row: FollowUpRow) => {
+    setBusy(row.proposalId);
+    try {
+      await recordPriceObjection({ docId: row.proposalId });
+      onNotice(
+        `${row.title || "The proposal"} marked "said too expensive". Offer a smaller menu or fewer extras.`,
+      );
     } catch (error) {
       onFailure(error);
     } finally {
@@ -125,6 +143,18 @@ export function ProposalFollowUps({
                   {row.done
                     ? `${row.done.label}${row.doneAt ? `, ${formatDate(row.doneAt)}` : ""}`
                     : "None yet"}
+                  {row.saidTooExpensive ? (
+                    <p className="text-xs text-ink-3">Said too expensive</p>
+                  ) : (
+                    <button
+                      className="text-link block text-left text-xs"
+                      type="button"
+                      disabled={busy === row.proposalId}
+                      onClick={() => void markTooExpensive(row)}
+                    >
+                      Client said too expensive
+                    </button>
+                  )}
                 </td>
                 <td data-label="Next">
                   {row.next ? (
