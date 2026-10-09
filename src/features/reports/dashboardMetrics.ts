@@ -145,6 +145,32 @@ export const DASHBOARD_METRICS = {
     leftOut:
       "Open quotes, planning and waiting-for-approval events: not decided yet.",
   },
+  "dashboard.booked_ahead": {
+    ...BOOKED_BASE,
+    label: "Confirmed, not yet delivered",
+    measures:
+      "Quoted prices of booked events that are not completed yet, added together, and how many.",
+    currency: "company",
+    tax: QUOTED_TAX,
+    dateBasis: "Every such event on file today, whatever its date.",
+    includes:
+      "Approved, sales lock, executing and final events with a quoted price.",
+    leftOut:
+      "Completed and closed-out events (already delivered), open quotes, waiting-for-approval and cancelled events.",
+  },
+  "dashboard.weighted_forecast": {
+    ...BOOKED_BASE,
+    label: "Weighted forecast",
+    measures:
+      "Confirmed, not yet delivered events at their full quoted price, plus open quotes at half their quoted price.",
+    currency: "company",
+    tax: QUOTED_TAX,
+    dateBasis: "Every such event on file today, whatever its date.",
+    includes:
+      "Approved and later events not completed yet (100%); quote, planning and waiting-for-approval events (50%).",
+    leftOut:
+      "Completed, closed-out and cancelled events. Events with no quoted price add $0.",
+  },
   "dashboard.lost_revenue": {
     ...BOOKED_BASE,
     label: "Lost revenue",

@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 // AC-304 (CF-7.4-01, P leg): each KPI card on Tim's KPIs lists its
 // contributing records with per-record values, and the list adds up to the
-// card. (Playbook parity stays open: the TPP KPI playbook is not in the repo.)
+// card. Playbook parity: the L10 scorecard figures sit above the cards
+// (definitions proven in tests/tims-kpi-definitions.test.ts).
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
@@ -124,6 +125,12 @@ describe("Tim's KPIs drill-down", () => {
     if (ask) act(() => ask.click());
     const section = (id: string) =>
       container.querySelector(`[data-testid='${id}']`) as HTMLElement;
+
+    const scorecard = section("tims-scorecard");
+    expect(scorecard.textContent).toContain("L10 sales scorecard");
+    expect(scorecard.textContent).toContain("Weighted forecast");
+    // The open $9,000 quote counts at half in the forecast.
+    expect(scorecard.textContent).toContain("$4,500");
 
     const revenue = section("kpi-records-revenue");
     expect(revenue.querySelector("summary")?.textContent).toContain(
