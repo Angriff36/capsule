@@ -15,3 +15,17 @@ export function useSendEmailReply() {
     [sendAction],
   );
 }
+
+/** Authored text-reply action: answers a client text from the company number. */
+export function useSendTextReply() {
+  const sendAction = useAction(api.messageTextReply.sendTextReply);
+  return useCallback(
+    (input: { threadId: string; bodyText: string; requestId: string }) =>
+      sendAction({
+        threadId: input.threadId as Id<"messageThreads">,
+        bodyText: input.bodyText,
+        requestId: input.requestId,
+      }),
+    [sendAction],
+  );
+}

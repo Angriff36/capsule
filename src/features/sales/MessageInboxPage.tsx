@@ -2,7 +2,10 @@ import { useMemo, useRef, useState } from "react";
 import { useAction } from "convex/react";
 import { api } from "../../lib/api";
 import { copyText } from "../../lib/copyText";
-import { useSendEmailReply } from "../../lib/messageReplyActions";
+import {
+  useSendEmailReply,
+  useSendTextReply,
+} from "../../lib/messageReplyActions";
 import {
   useCreateLead,
   useCreateMessage,
@@ -116,8 +119,9 @@ export function MessageInboxPage() {
   const createLead = useCreateLead();
   const setStatus = useMessageThreadSetStatus();
   const sendEmailReply = useSendEmailReply();
-  // One id per typed email reply: pressing Send again after a failure or a
-  // lost answer never emails the client twice.
+  const sendTextReply = useSendTextReply();
+  // One id per typed email or text reply: pressing Send again after a failure
+  // or a lost answer never emails or texts the client twice.
   const replyRequestId = useRef<{ threadId: string; id: string } | null>(null);
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -256,23 +260,31 @@ export function MessageInboxPage() {
     if (replyRequestId.current?.threadId !== threadId) {
       replyRequestId.current = { threadId, id: crypto.randomUUID() };
     }
+    const isText = selected.provider === "sms";
     setSending(true);
     try {
-      const result = await sendEmailReply({
+      const input = {
         threadId,
         bodyText: body,
         requestId: replyRequestId.current.id,
-      });
+      };
+      const result = isText
+        ? await sendTextReply(input)
+        : await sendEmailReply(input);
       replyRequestId.current = null;
       setReply("");
-      setNotice(`Reply emailed to ${result.to} just now.`);
+      setNotice(
+        isText
+          ? `Reply texted to ${result.to} just now.`
+          : `Reply emailed to ${result.to} just now.`,
+      );
     } catch (e) {
       // The typed reply stays; Send again reuses the same id. Nothing was
-      // being saved, so the title says the email was not sent.
+      // being saved, so the title says the email or text was not sent.
       const failure = classifyCommandFailure(e);
       setFailure({
         ...failure,
-        title: "Couldn't send this email",
+        title: isText ? "Couldn't send this text" : "Couldn't send this email",
         detail: failure.detail.replace(
           " Nothing was saved. Fix that, then try again.",
           " Your reply is kept here; copy the draft to send it another way.",
@@ -775,14 +787,21 @@ export function MessageInboxPage() {
                     Send email answers the client's last email from your company
                     address.
                   </p>
+                ) : selected.provider === "sms" ? (
+                  <p
+                    className="border-t border-line-2 px-4 pt-3 text-base text-ink-2"
+                    role="status"
+                  >
+                    Send text answers the client from your company texting
+                    number.
+                  </p>
                 ) : selected.provider !== "internal" ? (
                   <p
                     className="border-t border-line-2 px-4 pt-3 text-base text-ink-2"
                     role="status"
                   >
-                    Capsule cannot send text or social messages yet. Keep
-                    editing here, then copy the draft into the app the client
-                    used.
+                    Capsule cannot send social messages yet. Keep editing here,
+                    then copy the draft into the app the client used.
                   </p>
                 ) : null}
                 <form
@@ -791,7 +810,10 @@ export function MessageInboxPage() {
                     e.preventDefault();
                     if (selected.provider === "internal") {
                       void submitReply();
-                    } else if (selected.provider === "email") {
+                    } else if (
+                      selected.provider === "email" ||
+                      selected.provider === "sms"
+                    ) {
                       void submitEmailReply();
                     } else {
                       void copyExternalDraft();
@@ -810,7 +832,8 @@ export function MessageInboxPage() {
                     }}
                     aria-label="Reply text"
                   />
-                  {selected.provider === "email" ? (
+                  {selected.provider === "email" ||
+                  selected.provider === "sms" ? (
                     <button
                       type="button"
                       className="btn btn-ghost"
@@ -823,7 +846,8 @@ export function MessageInboxPage() {
                   <button
                     type={
                       selected.provider === "internal" ||
-                      selected.provider === "email"
+                      selected.provider === "email" ||
+                      selected.provider === "sms"
                         ? "submit"
                         : "button"
                     }
@@ -831,7 +855,8 @@ export function MessageInboxPage() {
                     disabled={sending || reply.trim().length === 0}
                     onClick={
                       selected.provider === "internal" ||
-                      selected.provider === "email"
+                      selected.provider === "email" ||
+                      selected.provider === "sms"
                         ? undefined
                         : () => void copyExternalDraft()
                     }
@@ -839,14 +864,17 @@ export function MessageInboxPage() {
                     {sending
                       ? selected.provider === "internal"
                         ? "Logging…"
-                        : selected.provider === "email"
+                        : selected.provider === "email" ||
+                            selected.provider === "sms"
                           ? "Sending…"
                           : "Copying…"
                       : selected.provider === "internal"
                         ? "Log note"
                         : selected.provider === "email"
                           ? "Send email"
-                          : "Copy draft"}
+                          : selected.provider === "sms"
+                            ? "Send text"
+                            : "Copy draft"}
                   </button>
                 </form>
               </>

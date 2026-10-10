@@ -291,6 +291,7 @@ import type * as menuRecipeLookup from "../menuRecipeLookup.js";
 import type * as messageInbox from "../messageInbox.js";
 import type * as messageInboxPages from "../messageInboxPages.js";
 import type * as messageReply from "../messageReply.js";
+import type * as messageTextReply from "../messageTextReply.js";
 import type * as mutations from "../mutations.js";
 import type * as notifications from "../notifications.js";
 import type * as nowstaShiftHistory from "../nowstaShiftHistory.js";
@@ -667,6 +668,7 @@ declare const fullApi: ApiFromModules<{
   messageInbox: typeof messageInbox;
   messageInboxPages: typeof messageInboxPages;
   messageReply: typeof messageReply;
+  messageTextReply: typeof messageTextReply;
   mutations: typeof mutations;
   notifications: typeof notifications;
   nowstaShiftHistory: typeof nowstaShiftHistory;
