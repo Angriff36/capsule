@@ -64,7 +64,17 @@ export function ClientSearchSelect({
       out.push({
         id: String(row._id),
         label: clientDisplayName(row._id, [row]),
-        hint: row.isArchived ? "Archived" : null,
+        // Two clients can share a name: show the person's company, else
+        // the client type, so they can be told apart.
+        hint:
+          [
+            row.clientType === "person"
+              ? row.companyName?.trim() || "Person"
+              : "Company",
+            row.isArchived ? "Archived" : null,
+          ]
+            .filter(Boolean)
+            .join(" · ") || null,
       });
     }
     for (const extra of extraOptions) if (!rows.has(extra.id)) out.push(extra);
