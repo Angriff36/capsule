@@ -182,14 +182,15 @@ export function parseNaturalDate(
   }
 
   const relative = text.match(
-    /^(?:in\s+|\+)(\d+)\s*(h|hours?|d|days?|w|weeks?)$/,
+    /^(?:in\s+|\+)(\d+)\s*(m|mins?|minutes?|h|hrs?|hours?|d|days?|w|weeks?)$/,
   );
   if (!value && relative) {
     value = new Date(anchor);
     preserveTime = true;
     const amount = Number(relative[1]);
     const unit = relative[2];
-    if (unit.startsWith("h")) value.setHours(value.getHours() + amount);
+    if (unit.startsWith("m")) value.setMinutes(value.getMinutes() + amount);
+    else if (unit.startsWith("h")) value.setHours(value.getHours() + amount);
     else if (unit.startsWith("d")) value.setDate(value.getDate() + amount);
     else value.setDate(value.getDate() + amount * 7);
   }

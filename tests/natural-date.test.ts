@@ -66,6 +66,9 @@ describe("natural schedule date entry", () => {
       value: "2026-10-16T22:00",
     });
     expect(
+      parse("+30m", { kind: "datetime", anchor: "2026-10-16T18:00" }),
+    ).toMatchObject({ ok: true, value: "2026-10-16T18:30" });
+    expect(
       parse("11pm", { kind: "datetime", anchor: "2026-10-16T18:00" }),
     ).toMatchObject({
       ok: true,
