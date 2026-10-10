@@ -498,4 +498,89 @@ describe("client pays from the portal link", () => {
     ).rejects.toThrow(/isn't available from this link/);
     expect((await state(env)).payments).toEqual([]);
   });
+
+  it("a disconnected card processor never shows a payment as made (AC-103)", async () => {
+    const env = await setup({ deposit: 250 });
+    const stripe = fakeStripe();
+    const started = await env.t.action(api.clientPortalPayments.startPayment, {
+      token: env.token,
+      invoiceId: env.invoiceId,
+      part: "deposit",
+    });
+    const sessionId = started.status === "checkout" ? started.sessionId : "";
+    // The client pays at Stripe, but the company disconnects before the
+    // client comes back to the portal.
+    stripe.pay(sessionId);
+
+    const portalOnline = async () =>
+      (
+        (await env.t.query(api.clientPortal.getEvent, {
+          token: env.token,
+        })) as { payments: { online: boolean } }
+      ).payments.online;
+    const expectNothingPaid = async () => {
+      const now = await state(env);
+      expect(now.payments).toEqual([]);
+      expect(now.invoice).toMatchObject({ amountPaid: 0, amountDue: 1000 });
+      expect(now.invoice?.status).not.toBe("paid");
+      expect(now.invoice?.depositPaidAt ?? null).toBeNull();
+    };
+    const expectRefused = async () => {
+      await expect(
+        env.t.action(api.clientPortalPayments.startPayment, {
+          token: env.token,
+          invoiceId: env.invoiceId,
+          part: "balance",
+        }),
+      ).rejects.toThrow(/Online payment isn't set up yet/);
+      await expect(
+        env.t.action(api.clientPortalPayments.checkPayment, {
+          token: env.token,
+          invoiceId: env.invoiceId,
+          sessionId,
+        }),
+      ).rejects.toThrow(/Online payment isn't set up yet/);
+    };
+    const setConnection = (patch: {
+      status?: "connected" | "disconnected";
+      chargesEnabled?: boolean;
+    }) =>
+      env.t.run(async (ctx) => {
+        const row = (
+          await ctx.db.query("integrationConnections").collect()
+        )[0]!;
+        await ctx.db.patch(row._id, patch);
+      });
+
+    // 1. The company disconnected its card processor.
+    await setConnection({ status: "disconnected" });
+    expect(await portalOnline()).toBe(false);
+    await expectRefused();
+    await expectNothingPaid();
+
+    // 2. Connected, but the processor stopped taking charges.
+    await setConnection({ status: "connected", chargesEnabled: false });
+    expect(await portalOnline()).toBe(false);
+    await expectRefused();
+    await expectNothingPaid();
+
+    // 3. The server has no card processor key at all.
+    await setConnection({ chargesEnabled: true });
+    vi.stubEnv("STRIPE_SECRET_KEY", "");
+    expect(await portalOnline()).toBe(false);
+    await expectRefused();
+    await expectNothingPaid();
+
+    // Connected again: the payment the client made is found and recorded once.
+    vi.stubEnv("STRIPE_SECRET_KEY", "sk_test_proof");
+    expect(await portalOnline()).toBe(true);
+    expect(
+      await env.t.action(api.clientPortalPayments.checkPayment, {
+        token: env.token,
+        invoiceId: env.invoiceId,
+        sessionId,
+      }),
+    ).toMatchObject({ outcome: "succeeded", amountPaid: 250, amountDue: 750 });
+    expect((await state(env)).payments).toHaveLength(1);
+  });
 });
