@@ -16,6 +16,44 @@ import { useActionNotice } from "../../ui/action-result";
 
 const usd = formatMoneyExact;
 
+type TaxPeriod =
+  | "this_month"
+  | "last_month"
+  | "this_quarter"
+  | "last_quarter"
+  | "this_year"
+  | "all";
+
+const TAX_PERIODS: Array<{ value: TaxPeriod; label: string }> = [
+  { value: "this_month", label: "This month" },
+  { value: "last_month", label: "Last month" },
+  { value: "this_quarter", label: "This quarter" },
+  { value: "last_quarter", label: "Last quarter" },
+  { value: "this_year", label: "This year" },
+  { value: "all", label: "All time" },
+];
+
+/** Local [start, end) of a filing period; null for all time. */
+function periodRange(period: TaxPeriod, now: Date): [number, number] | null {
+  const y = now.getFullYear();
+  const m = now.getMonth();
+  const q = m - (m % 3);
+  switch (period) {
+    case "this_month":
+      return [new Date(y, m, 1).getTime(), new Date(y, m + 1, 1).getTime()];
+    case "last_month":
+      return [new Date(y, m - 1, 1).getTime(), new Date(y, m, 1).getTime()];
+    case "this_quarter":
+      return [new Date(y, q, 1).getTime(), new Date(y, q + 3, 1).getTime()];
+    case "last_quarter":
+      return [new Date(y, q - 3, 1).getTime(), new Date(y, q, 1).getTime()];
+    case "this_year":
+      return [new Date(y, 0, 1).getTime(), new Date(y + 1, 0, 1).getTime()];
+    case "all":
+      return null;
+  }
+}
+
 const applicability = (rate: {
   appliesToFood?: unknown;
   appliesToService?: unknown;
@@ -48,13 +86,17 @@ export function TaxRatesPage() {
     .filter((rate) => rate.deletedAt == null)
     .sort((a, b) => String(a.name).localeCompare(String(b.name)));
   const editing = configuredRates.find((rate) => rate._id === editingId);
-  const remittance = useMemo(
-    () =>
-      calculateTaxRemittance(
-        (invoices ?? []) as Array<Record<string, unknown>>,
-      ),
-    [invoices],
-  );
+  const [period, setPeriod] = useState<TaxPeriod>("last_month");
+  const remittance = useMemo(() => {
+    const range = periodRange(period, new Date());
+    // Tax is filed by the period the invoice was issued in.
+    const inPeriod = (invoices ?? []).filter((invoice) => {
+      if (!range) return true;
+      const issuedAt = Number(invoice.issuedAt ?? invoice.createdAt);
+      return issuedAt >= range[0] && issuedAt < range[1];
+    });
+    return calculateTaxRemittance(inPeriod as Array<Record<string, unknown>>);
+  }, [invoices, period]);
   const collectedTotal = remittance.reduce(
     (sum, row) => sum + row.collectedAmount,
     0,
@@ -332,6 +374,23 @@ export function TaxRatesPage() {
               excluded; assessed tax stays visible beside cash collected.
             </p>
           </div>
+          {remittanceRequested ? (
+            <label>
+              <span>Period</span>
+              <select
+                className="input"
+                value={period}
+                onChange={(event) => setPeriod(event.target.value as TaxPeriod)}
+                aria-label="Tax period"
+              >
+                {TAX_PERIODS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
           {invoices !== undefined ? (
             <dl>
               <div>
@@ -359,7 +418,7 @@ export function TaxRatesPage() {
           <TableSkeleton rows={4} />
         ) : remittance.length === 0 ? (
           <div className="document-empty">
-            <p>No invoice tax has been assessed yet.</p>
+            <p>No invoice tax was assessed in this period.</p>
             <span>
               Named totals will appear after invoices are issued with taxed
               lines.
