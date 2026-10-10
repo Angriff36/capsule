@@ -33,6 +33,8 @@ export interface ReasonPromptRequest {
   description: string;
   label: string;
   placeholder?: string;
+  /** Text the box starts with; the user can change it. */
+  defaultReason?: string;
   confirmLabel: string;
   cancelLabel?: string;
   tone?: ActionPromptTone;
