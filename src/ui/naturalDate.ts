@@ -148,9 +148,14 @@ function echo(value: Date, kind: NaturalDateKind) {
 function nextWeekday(now: Date, weekday: number, nextWeek: boolean) {
   const date = new Date(now);
   date.setHours(0, 0, 0, 0);
-  let days = (weekday - date.getDay() + 7) % 7;
-  if (nextWeek) days += 7;
-  date.setDate(date.getDate() + days);
+  if (nextWeek) {
+    // That weekday in the following Monday-to-Sunday week: on a Saturday,
+    // "next Wednesday" is four days away, not eleven.
+    const intoWeek = (date.getDay() + 6) % 7;
+    date.setDate(date.getDate() - intoWeek + 7 + ((weekday + 6) % 7));
+    return date;
+  }
+  date.setDate(date.getDate() + ((weekday - date.getDay() + 7) % 7));
   return date;
 }
 
