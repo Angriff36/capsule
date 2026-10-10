@@ -32,6 +32,13 @@ export function ProposalAcceptancePage({
     callbackToken ? { token: callbackToken } : "skip",
   );
   const complete = useMutation(api.signatureAcceptance.completeSignature);
+  // Read only once the link cannot be signed: says why (already accepted,
+  // withdrawn, expired) instead of a bare "invalid link".
+  const outcomeResult = useQuery(
+    api.signatureAcceptance.getSignatureRequestOutcome,
+    callbackToken && pending === null ? { token: callbackToken } : "skip",
+  );
+  const outcome = pending === null ? outcomeResult : undefined;
 
   const handleAccept = async () => {
     if (!callbackToken || busy) return;
@@ -64,6 +71,56 @@ export function ProposalAcceptancePage({
               confirm the next steps.
             </p>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (callbackToken && pending === null && outcome === undefined) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-canvas">
+        <div className="w-full max-w-2xl p-8">
+          <TableSkeleton rows={3} />
+        </div>
+      </div>
+    );
+  }
+
+  if (outcome?.state === "accepted") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-canvas">
+        <div className="w-full max-w-2xl p-8">
+          <div className="bg-panel rounded-sm shadow-lg p-8 text-center">
+            <div className="text-ok text-3xl mb-4">✓</div>
+            <h1 className="text-xl font-bold text-ink mb-2">
+              Proposal Accepted
+            </h1>
+            <p className="text-ink-2">
+              You accepted {outcome.title}
+              {outcome.completedAt
+                ? ` on ${formatDate(outcome.completedAt)}`
+                : ""}
+              . There is nothing more to do here. We'll be in touch about the
+              next steps.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (outcome) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-canvas">
+        <div className="w-full max-w-2xl p-8">
+          <ErrorState
+            title={
+              outcome.state === "withdrawn"
+                ? "This link was withdrawn"
+                : "This link has expired"
+            }
+            detail="Please contact us and we will send you the current proposal to accept."
+          />
         </div>
       </div>
     );

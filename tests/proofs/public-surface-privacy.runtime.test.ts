@@ -394,6 +394,64 @@ describe("AC-152 public pages reveal nothing private", () => {
     ).toBeNull();
   });
 
+  it("/accept tells a used link what happened, and nothing private", async () => {
+    const proof = harness();
+    const a = await sentProposal(proof, "tenant-outcome-a", "Porter dinner");
+    const request = (await proof.executeCommand(
+      a.owner,
+      api.mutations.SignatureRequest_createViaRequestSignature,
+      {
+        proposalRevisionId: a.revisionId,
+        proposalId: a.proposalId,
+        recipientEmail: "signer@example.com",
+        recipientName: "Casey Contact",
+      },
+    )) as { docId: string };
+    const outcome = () =>
+      proof.anonymous.query(
+        api.signatureAcceptance.getSignatureRequestOutcome,
+        {
+          token: request.docId,
+        },
+      );
+    // Still signable: the page shows the proposal, not an outcome.
+    expect(await outcome()).toBeNull();
+
+    const completedAt = Date.UTC(2026, 9, 10, 17, 0);
+    await a.owner.run(async (ctx) => {
+      await ctx.db.patch(request.docId as never, {
+        status: "completed",
+        completedAt,
+      });
+    });
+    const accepted = await outcome();
+    expect(accepted).toEqual({
+      state: "accepted",
+      title: "Porter dinner",
+      completedAt,
+    });
+    expectNothingPrivate(accepted);
+
+    await a.owner.run(async (ctx) => {
+      await ctx.db.patch(request.docId as never, { status: "revoked" });
+    });
+    expect(await outcome()).toEqual({ state: "withdrawn" });
+    await a.owner.run(async (ctx) => {
+      await ctx.db.patch(request.docId as never, {
+        status: "requested",
+        expiresAt: Date.now() - 60_000,
+      });
+    });
+    expect(await outcome()).toEqual({ state: "expired" });
+    // A share-link id is not a signing token.
+    expect(
+      await proof.anonymous.query(
+        api.signatureAcceptance.getSignatureRequestOutcome,
+        { token: a.shareToken },
+      ),
+    ).toBeNull();
+  });
+
   it("/quote offers only service style and occasion names", async () => {
     const proof = harness();
     await sentProposal(proof, "tenant-quote-a", "Porter dinner");
