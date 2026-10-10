@@ -188,7 +188,12 @@ export function QualificationsPage() {
             </label>
             <label className="field-label">
               Issued
-              <BoundedDateInput name="issuedAt" className="input" required />
+              <BoundedDateInput
+                name="issuedAt"
+                className="input"
+                required
+                naturalDateDirection="any"
+              />
             </label>
             <label className="field-label">
               Type
