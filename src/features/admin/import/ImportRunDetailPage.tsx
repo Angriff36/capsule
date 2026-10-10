@@ -28,6 +28,7 @@ const SOURCE_SYSTEM_LABELS: Record<string, string> = {
   tpp_legacy: "TPP Legacy",
   csv_export: "CSV Export",
   api_sync: "API Sync",
+  quickbooks_online: "QuickBooks Online",
 };
 
 // Dataset type labels

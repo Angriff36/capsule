@@ -75,7 +75,12 @@ type DatasetType = (typeof DATASET_TYPES)[number];
 /**
  * Source systems matching ImportRun manifest
  */
-const SOURCE_SYSTEMS = ["tpp_legacy", "csv_export", "api_sync"] as const;
+const SOURCE_SYSTEMS = [
+  "tpp_legacy",
+  "csv_export",
+  "api_sync",
+  "quickbooks_online",
+] as const;
 type SourceSystem = (typeof SOURCE_SYSTEMS)[number];
 
 /**

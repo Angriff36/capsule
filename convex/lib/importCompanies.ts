@@ -11,7 +11,11 @@ import { skippedByPerson } from "./importResolution";
 import { SOURCE_FIELD_MAPS, sourceVersionOf } from "./importSourceFields";
 import { reconcileExistingLink, type DeltaOutcome } from "../importSourceDelta";
 
-type SourceSystem = "tpp_legacy" | "csv_export" | "api_sync";
+type SourceSystem =
+  | "tpp_legacy"
+  | "csv_export"
+  | "api_sync"
+  | "quickbooks_online";
 
 export const COMPANY_RECORD_TYPE = "company";
 
