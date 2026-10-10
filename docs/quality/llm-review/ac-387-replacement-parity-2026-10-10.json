@@ -1,0 +1,25 @@
+{
+  "acceptance": "AC-387 (J leg only)",
+  "at": "2026-10-10T19:18:27.977Z",
+  "model": "glm-5.3-flash",
+  "runner": "src/lib/llm-review.ts createReview",
+  "artifact": "docs/product/replacement-dossiers.md + docs/product/decision-order-log.md",
+  "base": "Artifact: Capsule's replacement map for a catering company (Mangia) moving off old tools, plus its decision-order log. Audience: the owner deciding when an old tool may stop. Judge only the criterion. Honest 'not done / needs people' lines count as meeting the criterion.",
+  "criteria": {
+    "AC-387 parity": "Every tool Capsule replaces - Total Party Planner, Nowsta, Galley, Goodshuffle Pro, the Final Lock binder, the event tracker board, shared drives (Drive/Dropbox) and Slack event channels - has its jobs mapped to Capsule job by job (what the staff member gets done), not as a copy of the old screens.",
+    "AC-387 manual first": "The documents say that where the Mangia Final Lock training manual and an old tool's behaviour differ, Capsule follows the manual, with old-tool records used only as evidence for moving data in, and show at least one real disagreement with the source Capsule followed.",
+    "AC-387 no early retire": "The documents make no claim that any old tool is retired or may stop yet; they say retirement waits on the replacement checks (side-by-side trial events and the owner's sign-off on cutover and the way back)."
+  },
+  "results": {
+    "AC-387 parity": {
+      "pass": true
+    },
+    "AC-387 manual first": {
+      "pass": true
+    },
+    "AC-387 no early retire": {
+      "pass": true
+    }
+  },
+  "notOwned": "The P leg (operator trials with real Mangia events, owner cutover sign-off) needs people; see AC-711/712/176."
+}
