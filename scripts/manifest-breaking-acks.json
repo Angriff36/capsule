@@ -3366,6 +3366,18 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-09",
       "reason": "Optional text (string?): the company's own number clients text. Old companies have none, so no client texts come in until it is set. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Organization.facebookPageId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-10",
+      "reason": "Optional text (string?): the company's Facebook Page id clients message. Old companies have none, so no Facebook messages come in until it is set. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Organization.instagramAccountId",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-10",
+      "reason": "Optional text (string?): the company's Instagram account id clients message. Old companies have none, so no Instagram messages come in until it is set. The checker reads a nullable field with no default as required."
     }
   ]
 }

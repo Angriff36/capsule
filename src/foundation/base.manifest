@@ -237,6 +237,12 @@ entity Organization mixin TenantScoped, SoftDeletable {
   // Unset = no client texts come in.
   property smsNumber: string?
 
+  // Client social messages (PL-SMS-SOCIAL, AC-354): the company's Facebook
+  // Page id and Instagram account id. Messages clients send to them land in
+  // the company inbox. Unset = no messages come in from that account.
+  property facebookPageId: string?
+  property instagramAccountId: string?
+
   // Phone and website clients see at the foot of the public menu and other
   // client papers (the printed menu book: "844-4-MANGIA · mangiacateringco.com").
   property brandPhone: string?
@@ -470,6 +476,17 @@ entity Organization mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The Facebook Page and Instagram account clients message. Empty clears.
+  command configureSocialAccounts(optional facebookPageId: string, optional instagramAccountId: string) {
+    guard self.deletedAt == null
+    mutate facebookPageId = facebookPageId
+    mutate instagramAccountId = instagramAccountId
+    emit OrganizationSocialAccountsConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   // Phone and website for client papers. Empty values clear them.
   command configureContactDetails(optional phone: string, optional website: string) {
     guard self.deletedAt == null
@@ -603,6 +620,11 @@ event OrganizationEmailSenderConfigured: "organization.email_sender_configured" 
 }
 
 event OrganizationTextNumberConfigured: "organization.text_number_configured" {
+  organizationId: string
+  tenantId: string
+}
+
+event OrganizationSocialAccountsConfigured: "organization.social_accounts_configured" {
   organizationId: string
   tenantId: string
 }

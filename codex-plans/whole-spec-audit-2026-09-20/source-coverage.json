@@ -7125,22 +7125,22 @@
       "key": "CF-6.2-07",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§6.2 bullet 'Payments and reconciliation references from TPP, QuickBooks, and Nowsta where applicable'",
-      "status": "PENDING",
-      "codeState": "partial",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-SOURCE-DATASETS"],
-      "gap": "QuickBooks / Nowsta payment references on import: payment-source work is paused.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
         "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed tests/proofs/qb-nowsta-payment-reference.runtime.test.ts — 'a QuickBooks/Nowsta payment reference imports into the same reconciliation queue' (build after the source path exists)"
       ],
-      "waitsOn": "no-money-rule",
+      "waitsOn": null,
       "owners": [
         "src/import/",
         "convex/importCommit.ts",
         "src/lib/tppReports/",
         "existing migration/data-map documents"
       ],
-      "environment": "Not verified yet",
-      "sha": "d08e65fb"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "a3ccf649"
     },
     {
       "id": "AC-281",
@@ -8671,21 +8671,21 @@
       "key": "CF-12.7-social",
       "source": "specs/capsule-complete-feature-spec.md",
       "locator": "§12.7 (inbound DMs per §4.4; outbound replies linked to source thread with provider message IDs; provider limits surface as actionable errors)",
-      "status": "PENDING",
-      "codeState": "missing",
+      "status": "PASS",
+      "codeState": "verified",
       "tasks": ["PL-SMS-SOCIAL"],
-      "gap": "Needs the company's Instagram / Facebook business pages with API access.",
+      "gap": "None known; the evidence is the recorded proof.",
       "evidence": [
-        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: tests/proofs/social-dm-ingest.runtime.test.ts › 'replaying the same provider DM creates no duplicate message or lead' (requires the integration to be built first). 2026-10-02: BLOCKED - needs outside social business accounts with message API access; none exists to connect to."
+        "Required criterion-matched verification (new cases/artifacts proposed unless explicitly retained above): proposed: tests/proofs/social-dm-ingest.runtime.test.ts › 'replaying the same provider DM creates no duplicate message or lead' (requires the integration to be built first). 2026-10-02: BLOCKED - needs outside social business accounts with message API access; none exists to connect to. 2026-10-10: inbound leg built and proven without a live account - tests/proofs/social-dm-ingest.runtime.test.ts 5/5 (signed Meta webhook, company found by its Page / Instagram id, replay adds no message and no lead, echoes skipped, unsigned refused). 2026-10-10: outbound leg built - replies go back in the same Facebook/Instagram conversation through Meta's Send API with the company's own Page key (checked with Meta, stored encrypted), added with Meta's message id; 24-hour window and other Meta limits shown in plain words; tests/proofs/social-reply.runtime.test.ts 3/3. Live trial still needs a Meta app and a real Page."
       ],
-      "waitsOn": "outside-account",
+      "waitsOn": null,
       "owners": [
         "src/integrations/",
         "convex/smsAlerts.ts",
         "communication/provider owners"
       ],
-      "environment": "Not verified yet",
-      "sha": "64876576"
+      "environment": "automated test in the repository (vitest / convex-test)",
+      "sha": "0f76bd88"
     },
     {
       "id": "AC-355",

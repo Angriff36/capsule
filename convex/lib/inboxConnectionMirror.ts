@@ -11,11 +11,13 @@ import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx, QueryCtx } from "../_generated/server";
 import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
 
-export type InboxProvider = "sms" | "email";
+export type InboxProvider = "sms" | "email" | "facebook" | "instagram";
 
 const NAMES: Record<InboxProvider, string> = {
   sms: "Client texts",
   email: "Client emails",
+  facebook: "Facebook messages",
+  instagram: "Instagram messages",
 };
 
 export async function inboxConnection(

@@ -1999,7 +1999,7 @@ export const ImportRunSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
-  sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync"]).default("tpp_legacy"),
+  sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync", "quickbooks_online"]).default("tpp_legacy"),
   datasetType: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "pack_list", "stock", "history"]).default("events"),
   status: z.enum(["started", "parsing", "validating", "reviewing", "committing", "completed", "failed", "reverted"]).default("started"),
   startTime: z.coerce.date().nullable().optional(),
@@ -2794,6 +2794,8 @@ export const OrganizationSchema = z.object({
   emailSenderName: z.string().nullable().optional(),
   emailReplyTo: z.string().nullable().optional(),
   smsNumber: z.string().nullable().optional(),
+  facebookPageId: z.string().nullable().optional(),
+  instagramAccountId: z.string().nullable().optional(),
   brandPhone: z.string().nullable().optional(),
   brandWebsite: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -8723,7 +8725,7 @@ export type ImportRunRevertParams = z.infer<typeof ImportRunRevertParamsSchema>;
 
 // Command: start on ImportRun
 export const ImportRunStartParamsSchema = z.object({
-  sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync"]),
+  sourceSystem: z.enum(["tpp_legacy", "csv_export", "api_sync", "quickbooks_online"]),
   datasetType: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "pack_list", "stock", "history"]),
   checksum: z.string().optional(),
 });
@@ -10032,6 +10034,14 @@ export const OrganizationConfigureRoutePolicyParamsSchema = z.object({
 });
 
 export type OrganizationConfigureRoutePolicyParams = z.infer<typeof OrganizationConfigureRoutePolicyParamsSchema>;
+
+// Command: configureSocialAccounts on Organization
+export const OrganizationConfigureSocialAccountsParamsSchema = z.object({
+  facebookPageId: z.string().optional(),
+  instagramAccountId: z.string().optional(),
+});
+
+export type OrganizationConfigureSocialAccountsParams = z.infer<typeof OrganizationConfigureSocialAccountsParamsSchema>;
 
 // Command: configureStageMoves on Organization
 export const OrganizationConfigureStageMovesParamsSchema = z.object({

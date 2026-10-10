@@ -8,7 +8,7 @@
  * never goes back to "sent" and a repeated report adds nothing.
  */
 import { v } from "convex/values";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 import {
   httpAction,
   internalAction,
@@ -16,6 +16,7 @@ import {
   internalQuery,
 } from "./_generated/server";
 import { insertStepEvent } from "./lib/commandAudit";
+import { TenantSystemCommandRunner } from "./lib/tenantSystemCommandRunner";
 import {
   fetchSmsStatus,
   requireTwilioConfig,
@@ -138,7 +139,35 @@ export const recordDelivery = internalMutation({
       (row) => row.entity === ALERT_ENTITY && row.type === "SmsAlertSent",
     );
     const known = ofText.some((row) => row.entity === DELIVERY_ENTITY);
-    if (!sent || known) return { recorded: false };
+    if (!sent) {
+      // An inbox reply to a client text (convex/messageTextReply.ts): the
+      // first final answer moves it on from "sent"; later reports change
+      // nothing.
+      const reply = (
+        await ctx.db
+          .query("messages")
+          .withIndex("by_providerMessageId", (q) =>
+            q.eq("providerMessageId", args.messageSid),
+          )
+          .collect()
+      ).find(
+        (row) =>
+          row.tenantId === args.tenantId &&
+          row.direction === "outbound" &&
+          row.status === "sent" &&
+          row.deletedAt == null,
+      );
+      if (!reply) return { recorded: false };
+      await TenantSystemCommandRunner.forTenant(
+        ctx,
+        args.tenantId,
+      ).context.runMutation(api.mutations.Message_setDelivery, {
+        docId: reply._id,
+        status: args.outcome === "delivered" ? "delivered" : "failed",
+      });
+      return { recorded: true };
+    }
+    if (known) return { recorded: false };
     await insertStepEvent(ctx, {
       type:
         args.outcome === "delivered"

@@ -4,6 +4,8 @@ enum ImportSourceSystem {
   tpp_legacy
   csv_export
   api_sync
+  // QuickBooks payment reports (AC-280): past payments as match references.
+  quickbooks_online
 }
 
 enum ImportDatasetType {

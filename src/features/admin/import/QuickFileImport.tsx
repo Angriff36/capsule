@@ -10,6 +10,10 @@ import { useAction, useMutation } from "convex/react";
 import { useRef, useState, type ChangeEvent } from "react";
 import { api } from "../../../lib/api";
 import { sourceRowsFromGrid } from "../../../lib/importSourceFile";
+import {
+  isQuickBooksPaymentReport,
+  quickBooksPaymentRowsFromGrid,
+} from "../../../lib/quickbooksPayments";
 import { tppMenuTableToRows } from "../../../lib/tppMenuCsv";
 import {
   contactTaskRowsFromGrid,
@@ -41,6 +45,8 @@ const KINDS = [
   { value: "events", label: "Events" },
   { value: "leads", label: "Leads" },
   { value: "history", label: "Messages and tasks" },
+  { value: "payments", label: "Payments (old system)" },
+  { value: "qbo_payments", label: "Past payments (QuickBooks report)" },
 ] as const;
 
 /** SHA-256 of the file as read, so each run records its source version. */
@@ -181,6 +187,15 @@ export function QuickFileImport() {
         setColumns(
           `Read as the old system's Venue Listing: ${rows.length.toLocaleString()} venues. Each area under a venue goes to its access notes.`,
         );
+      } else if (kind === "qbo_payments") {
+        if (!isQuickBooksPaymentReport(grid))
+          throw new Error(
+            `No QuickBooks headings found in ${file.name}. Export a QuickBooks report with Date, Transaction type and Amount columns (for example Transaction List by Date).`,
+          );
+        rows = quickBooksPaymentRowsFromGrid(grid);
+        setColumns(
+          `Read as a QuickBooks report: ${rows.length.toLocaleString()} dated lines. Payments wait on the leftover match list; invoices and totals are kept for the record only.`,
+        );
       } else {
         const read = sourceRowsFromGrid(grid, kind);
         if (read.rows.length === 0)
@@ -206,8 +221,9 @@ export function QuickFileImport() {
         );
         sent = true;
         const result = await importFile({
-          datasetType: kind,
-          sourceSystem: "tpp_legacy",
+          datasetType: kind === "qbo_payments" ? "payments" : kind,
+          sourceSystem:
+            kind === "qbo_payments" ? "quickbooks_online" : "tpp_legacy",
           rows: part,
           checksum,
         });
@@ -251,9 +267,11 @@ export function QuickFileImport() {
             (.xlsx): each package becomes a draft menu with its dishes. The
             other kinds read the old system&apos;s report: its headings (First
             Name, Zip, Venue Name…) are matched for you, and columns Capsule has
-            no place for are kept with each row. Records are made right away —
-            no extra steps. Importing the same file again is safe; records
-            already brought in are skipped.
+            no place for are kept with each row. A QuickBooks report
+            (Transaction List by Date, Deposit Detail…) brings in past payments
+            to match against Capsule payments; nothing is charged or sent to
+            QuickBooks. Records are made right away — no extra steps. Importing
+            the same file again is safe; records already brought in are skipped.
           </p>
         </div>
       </div>
@@ -335,9 +353,15 @@ export function QuickFileImport() {
             {totalErrors > 0 ? `, ${totalErrors} parse errors` : ""}
             {skippedRows > 0 ? `, ${skippedRows} empty rows ignored` : ""}.
           </p>
-          {totalPending > 0 || totalErrors > 0 || totalConflicted > 0 ? (
+          {totalPending > 0 ||
+          totalErrors > 0 ||
+          totalConflicted > 0 ||
+          kind === "payments" ||
+          kind === "qbo_payments" ? (
             <p className="mt-1 text-xs text-ink-3">
-              Items that need review are in the{" "}
+              {kind === "payments" || kind === "qbo_payments"
+                ? "Payments wait to be matched to a Capsule payment in the"
+                : "Items that need review are in the"}{" "}
               <Link to="/admin/reconcile" className="text-brand">
                 leftover match list
               </Link>

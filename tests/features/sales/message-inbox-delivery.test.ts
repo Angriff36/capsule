@@ -26,6 +26,20 @@ const harness = vi.hoisted(() => ({
       to: "a•••@garden.example",
     }),
   ),
+  sendText: vi.fn(
+    async (_input: {
+      threadId: string;
+      bodyText: string;
+      requestId: string;
+    }) => ({ messageId: "message-texted", to: "•••1234" }),
+  ),
+  sendSocial: vi.fn(
+    async (_input: {
+      threadId: string;
+      bodyText: string;
+      requestId: string;
+    }) => ({ messageId: "message-social", network: "Facebook" }),
+  ),
 }));
 
 vi.mock("convex/react", () => ({
@@ -45,6 +59,8 @@ vi.mock("../../../src/features/facilities/usePickerAndNamedEvents", () => ({
 
 vi.mock("../../../src/lib/messageReplyActions", () => ({
   useSendEmailReply: () => harness.sendReply,
+  useSendTextReply: () => harness.sendText,
+  useSendSocialReply: () => harness.sendSocial,
 }));
 
 // The inbox reads threads a page at a time and the open thread's messages.
@@ -227,7 +243,52 @@ describe("MessageInboxPage delivery honesty", () => {
     expect(harness.createMessage).not.toHaveBeenCalled();
   });
 
-  for (const provider of ["sms", "social", "other"]) {
+  it("texts a reply to a client text from the company number", async () => {
+    harness.provider = "sms";
+    harness.sendText.mockClear();
+    await renderSelectedThread();
+    const input = container.querySelector<HTMLInputElement>(
+      'input[aria-label="Reply text"]',
+    )!;
+    setInputValue(input, "See you Saturday");
+    expect(container.textContent).toContain(
+      "Send text answers the client from your company texting number.",
+    );
+    const send = Array.from(container.querySelectorAll("button")).find(
+      (node) => node.textContent === "Send text",
+    );
+    await act(async () => send?.click());
+    expect(harness.sendText).toHaveBeenCalledTimes(1);
+    expect(harness.sendText.mock.calls[0]![0]).toMatchObject({
+      threadId: "thread-1",
+      bodyText: "See you Saturday",
+    });
+    expect(input.value).toBe("");
+    expect(container.textContent).toContain(
+      "Reply texted to •••1234 just now.",
+    );
+    expect(harness.createMessage).not.toHaveBeenCalled();
+  });
+
+  it("answers a Facebook or Instagram message with Send message", async () => {
+    harness.provider = "social";
+    harness.sendSocial.mockClear();
+    await renderSelectedThread();
+    const input = container.querySelector<HTMLInputElement>(
+      'input[aria-label="Reply text"]',
+    )!;
+    setInputValue(input, "Yes, we cater weddings");
+    const send = Array.from(container.querySelectorAll("button")).find(
+      (node) => node.textContent === "Send message",
+    );
+    await act(async () => send?.click());
+    expect(harness.sendSocial).toHaveBeenCalledTimes(1);
+    expect(input.value).toBe("");
+    expect(container.textContent).toContain("Reply sent on Facebook just now.");
+    expect(harness.createMessage).not.toHaveBeenCalled();
+  });
+
+  for (const provider of ["other"]) {
     it(`keeps the ${provider} draft and creates no row when only manual delivery is available`, async () => {
       harness.provider = provider;
       await renderSelectedThread();
@@ -238,7 +299,7 @@ describe("MessageInboxPage delivery honesty", () => {
       setInputValue(input, "Please review this draft");
 
       expect(container.textContent).toContain(
-        "Capsule cannot send text or social messages yet",
+        "Capsule cannot send in this conversation",
       );
       expect(container.textContent).toContain(
         "Queued — not delivered; no provider is connected",

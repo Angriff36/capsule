@@ -534,6 +534,7 @@ import {
   OrganizationConfigureEquipmentFieldsParamsSchema,
   OrganizationConfigurePlanningChecksParamsSchema,
   OrganizationConfigureRoutePolicyParamsSchema,
+  OrganizationConfigureSocialAccountsParamsSchema,
   OrganizationConfigureStageMovesParamsSchema,
   OrganizationConfigureTextNumberParamsSchema,
   OrganizationConfigureTimingPolicyParamsSchema,
@@ -8281,6 +8282,16 @@ export function useOrganizationConfigureRoutePolicy() {
   };
 }
 
+/** Mutation hook for Organization.configureSocialAccounts. */
+export function useOrganizationConfigureSocialAccounts() {
+  const mutate = useMutation(api.mutations.Organization_configureSocialAccounts);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationConfigureSocialAccountsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Organization.configureStageMoves. */
 export function useOrganizationConfigureStageMoves() {
   const mutate = useMutation(api.mutations.Organization_configureStageMoves);
@@ -15011,4 +15022,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1585 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1586 as const;

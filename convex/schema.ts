@@ -1896,7 +1896,7 @@ export default defineSchema({
   importRuns: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
-    sourceSystem: v.union(v.literal("tpp_legacy"), v.literal("csv_export"), v.literal("api_sync")),
+    sourceSystem: v.union(v.literal("tpp_legacy"), v.literal("csv_export"), v.literal("api_sync"), v.literal("quickbooks_online")),
     datasetType: v.union(v.literal("events"), v.literal("contacts"), v.literal("leads"), v.literal("menus"), v.literal("venues"), v.literal("payments"), v.literal("pack_list"), v.literal("stock"), v.literal("history")),
     status: v.union(v.literal("started"), v.literal("parsing"), v.literal("validating"), v.literal("reviewing"), v.literal("committing"), v.literal("completed"), v.literal("failed"), v.literal("reverted")),
     startTime: v.optional(v.union(v.number(), v.null())),
@@ -2636,6 +2636,8 @@ export default defineSchema({
     emailSenderName: v.optional(v.union(v.string(), v.null())),
     emailReplyTo: v.optional(v.union(v.string(), v.null())),
     smsNumber: v.optional(v.union(v.string(), v.null())),
+    facebookPageId: v.optional(v.union(v.string(), v.null())),
+    instagramAccountId: v.optional(v.union(v.string(), v.null())),
     brandPhone: v.optional(v.union(v.string(), v.null())),
     brandWebsite: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
