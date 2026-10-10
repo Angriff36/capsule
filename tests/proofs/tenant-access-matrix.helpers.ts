@@ -229,8 +229,11 @@ const LINK_TABLE: Record<string, string> = {
   externalId: "@outside",
   externalInterviewId: "@outside",
   externalPaymentId: "@outside",
+  // Inbox (2026-10-10): the company's Facebook page and Instagram account.
+  facebookPageId: "@outside",
   hiredPersonId: "people",
   importId: "componentImports",
+  instagramAccountId: "@outside",
   interviewerPersonId: "people",
   issueId: "eventPacketIssues",
   lastImportRunId: "importRuns",

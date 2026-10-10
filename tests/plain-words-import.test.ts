@@ -366,7 +366,9 @@ describe("plain words on leftover import manifests", () => {
       "create the real items",
       "The items this import linked are marked as replaced.",
       "Those counts aren't valid. Check the numbers and try again.",
-      "Items that need review are in the leftover match list",
+      "Items that need review are in the",
+      "Payments wait to be matched to a Capsule payment in the",
+      "leftover match list",
     ]) {
       expect(visible).toContain(fresh);
       expectPlain(fresh);

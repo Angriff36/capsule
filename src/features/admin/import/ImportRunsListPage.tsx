@@ -17,7 +17,8 @@ import { ListStateManager } from "../../list-state/ListStateManager";
 import { useListViewState } from "../../list-state/useListViewState";
 import { formatDateTime } from "../../../lib/format";
 
-type SourceSystem = "tpp_legacy" | "csv_export" | "api_sync";
+type SourceSystem =
+  "tpp_legacy" | "csv_export" | "api_sync" | "quickbooks_online";
 type DatasetType =
   | "events"
   | "contacts"
@@ -33,6 +34,7 @@ const SOURCE_SYSTEM_LABELS: Record<string, string> = {
   tpp_legacy: "TPP Legacy",
   csv_export: "CSV Export",
   api_sync: "API Sync",
+  quickbooks_online: "QuickBooks Online",
 };
 
 // Dataset type labels

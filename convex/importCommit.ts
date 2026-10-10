@@ -1794,12 +1794,14 @@ export const commitImportRun = action({
         }
         const waitsForMatch = payment.movesMoney && !sameMoneyAs;
         const label = FINANCIAL_ROW_LABEL[payment.rowClass];
+        const source =
+          sourceSystem === "quickbooks_online" ? "QuickBooks" : "TPP";
         const note = [
           sameMoneyAs
             ? `Same money as payment ${sameMoneyAs} (same accounting transaction ${payment.providerTransactionId}) — counted once, kept for the record`
             : waitsForMatch
-              ? `Imported TPP ${label} — reconciliation reference (match via markMatched on a Capsule payment)`
-              : `Imported TPP ${label} — reference only, not money of its own, not counted`,
+              ? `Imported ${source} ${label} — reconciliation reference (match via markMatched on a Capsule payment)`
+              : `Imported ${source} ${label} — reference only, not money of its own, not counted`,
           payment.invoiceId
             ? `external invoice ${payment.invoiceId} (no invoice import)`
             : null,
