@@ -286,8 +286,13 @@ export function DeliveriesPage() {
       driverId: String(data.get("driverId") || "") || undefined,
       notes: String(data.get("notes") || "") || undefined,
     };
+    // Reuse a run of this list that is still waiting to go out; a cancelled,
+    // failed or finished run can't be scheduled again, so that makes a new one.
     const existing = [...activeRows, ...(pickedPackRuns ?? [])].find(
-      (row) => row.deletedAt == null && row.packListId === packListId,
+      (row) =>
+        row.deletedAt == null &&
+        row.packListId === packListId &&
+        row.status === "scheduled",
     );
     void run("create-delivery", async () => {
       if (existing) {
