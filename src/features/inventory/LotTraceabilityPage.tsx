@@ -180,6 +180,7 @@ export function LotTraceabilityPage() {
           Lots received from
           <BoundedDateInput
             id="trace-from-date"
+            naturalDateDirection="any"
             className="input"
             value={fromDate}
             onChange={(event) => setFromDate(event.currentTarget.value)}
@@ -189,6 +190,7 @@ export function LotTraceabilityPage() {
           Lots received through
           <BoundedDateInput
             id="trace-to-date"
+            naturalDateDirection="any"
             className="input"
             value={toDate}
             onChange={(event) => setToDate(event.currentTarget.value)}
