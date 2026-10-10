@@ -232,6 +232,27 @@ entity Client mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Fix a typo in a client's name, or a company/person mix-up: the name was
+  // otherwise fixed forever at registration.
+  command rename(
+    clientType: ClientType,
+    optional companyName: string,
+    optional givenName: string,
+    optional familyName: string
+  ) {
+    guard self.deletedAt == null
+    constraint renameIdentity: (clientType == "company" and companyName != null and length(trim(companyName)) > 0) or (clientType == "person" and givenName != null and length(trim(givenName)) > 0) "Company clients require a company name; person clients require a given name"
+    mutate clientType = clientType
+    mutate companyName = companyName
+    mutate givenName = givenName
+    mutate familyName = familyName
+    emit ClientRenamed {
+      clientId: self.id
+      tenantId: self.tenantId
+      clientType: clientType
+    }
+  }
+
   command changeContact(
     optional email: string,
     optional phone: string,
@@ -2830,6 +2851,12 @@ event VenueActivated: "venue.activated" {
 }
 
 event ClientRegistered: "client.registered" {
+  clientId: string
+  tenantId: string
+  clientType: string
+}
+
+event ClientRenamed: "client.renamed" {
   clientId: string
   tenantId: string
   clientType: string

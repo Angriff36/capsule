@@ -40,6 +40,7 @@ import {
   ClientPortalLinkRevokeParamsSchema,
   ClientReactivateParamsSchema,
   ClientRegisterParamsSchema,
+  ClientRenameParamsSchema,
   ClientSetBirthdayParamsSchema,
   ClientSetEmailPreferenceParamsSchema,
   ClientStageClientMergeParamsSchema,
@@ -1381,6 +1382,16 @@ export function useClientRegister() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ClientRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Client.rename. */
+export function useClientRename() {
+  const mutate = useMutation(api.mutations.Client_rename);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ClientRenameParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -15033,4 +15044,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1587 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1588 as const;

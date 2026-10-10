@@ -5622,6 +5622,16 @@ export const ClientRegisterParamsSchema = z.object({
 
 export type ClientRegisterParams = z.infer<typeof ClientRegisterParamsSchema>;
 
+// Command: rename on Client
+export const ClientRenameParamsSchema = z.object({
+  clientType: z.enum(["company", "person"]),
+  companyName: z.string().optional(),
+  givenName: z.string().optional(),
+  familyName: z.string().optional(),
+});
+
+export type ClientRenameParams = z.infer<typeof ClientRenameParamsSchema>;
+
 // Command: setBirthday on Client
 export const ClientSetBirthdayParamsSchema = z.object({
   birthday: z.string().optional(),
