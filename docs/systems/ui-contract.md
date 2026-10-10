@@ -404,6 +404,7 @@ Screens (25): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 - `quoteBuilder.processQuoteSubmission` - action; one-time call (not live); the live reads it changes update by themselves
 - `quoteBuilder.submitQuote` - action; one-time call (not live); the live reads it changes update by themselves
 - `scorecardEventScores.forWindow` - query; live read, updates by itself
+- `socialReply.sendSocialReply` - action; one-time call (not live); the live reads it changes update by themselves
 - `sourceProvenance.listByCapsuleId` - query; live read, updates by itself
 - `sourceProvenance.listMergedClients` - query; live read, updates by itself
 

@@ -8,7 +8,7 @@ export function replyDisposition(provider: string): ReplyDisposition {
   return {
     canRecord: false,
     notice:
-      "Capsule cannot send social messages yet. Your draft is kept — copy it into the app the client used.",
+      "Capsule cannot send in this conversation. Your draft is kept — copy it into the app the client used.",
   };
 }
 

@@ -29,3 +29,17 @@ export function useSendTextReply() {
     [sendAction],
   );
 }
+
+/** Authored social-reply action: answers a Facebook / Instagram message. */
+export function useSendSocialReply() {
+  const sendAction = useAction(api.socialReply.sendSocialReply);
+  return useCallback(
+    (input: { threadId: string; bodyText: string; requestId: string }) =>
+      sendAction({
+        threadId: input.threadId as Id<"messageThreads">,
+        bodyText: input.bodyText,
+        requestId: input.requestId,
+      }),
+    [sendAction],
+  );
+}

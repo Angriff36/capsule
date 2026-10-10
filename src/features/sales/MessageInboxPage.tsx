@@ -4,6 +4,7 @@ import { api } from "../../lib/api";
 import { copyText } from "../../lib/copyText";
 import {
   useSendEmailReply,
+  useSendSocialReply,
   useSendTextReply,
 } from "../../lib/messageReplyActions";
 import {
@@ -43,6 +44,11 @@ import { ThreadLinksBar } from "./ThreadLinksBar";
 
 type Thread = Doc<"messageThreads">;
 type Failure = ReturnType<typeof classifyCommandFailure>;
+
+/** Conversations Capsule answers itself (email, text, Facebook / Instagram). */
+function sendsOut(provider: string): boolean {
+  return provider === "email" || provider === "sms" || provider === "social";
+}
 
 const PROVIDER_LABEL: Record<string, string> = {
   internal: "Internal",
@@ -120,6 +126,7 @@ export function MessageInboxPage() {
   const setStatus = useMessageThreadSetStatus();
   const sendEmailReply = useSendEmailReply();
   const sendTextReply = useSendTextReply();
+  const sendSocialReply = useSendSocialReply();
   // One id per typed email or text reply: pressing Send again after a failure
   // or a lost answer never emails or texts the client twice.
   const replyRequestId = useRef<{ threadId: string; id: string } | null>(null);
@@ -260,7 +267,12 @@ export function MessageInboxPage() {
     if (replyRequestId.current?.threadId !== threadId) {
       replyRequestId.current = { threadId, id: crypto.randomUUID() };
     }
-    const isText = selected.provider === "sms";
+    const kind =
+      selected.provider === "sms"
+        ? "text"
+        : selected.provider === "social"
+          ? "message"
+          : "email";
     setSending(true);
     try {
       const input = {
@@ -268,23 +280,25 @@ export function MessageInboxPage() {
         bodyText: body,
         requestId: replyRequestId.current.id,
       };
-      const result = isText
-        ? await sendTextReply(input)
-        : await sendEmailReply(input);
+      if (kind === "text") {
+        const result = await sendTextReply(input);
+        setNotice(`Reply texted to ${result.to} just now.`);
+      } else if (kind === "message") {
+        const result = await sendSocialReply(input);
+        setNotice(`Reply sent on ${result.network} just now.`);
+      } else {
+        const result = await sendEmailReply(input);
+        setNotice(`Reply emailed to ${result.to} just now.`);
+      }
       replyRequestId.current = null;
       setReply("");
-      setNotice(
-        isText
-          ? `Reply texted to ${result.to} just now.`
-          : `Reply emailed to ${result.to} just now.`,
-      );
     } catch (e) {
       // The typed reply stays; Send again reuses the same id. Nothing was
       // being saved, so the title says the email or text was not sent.
       const failure = classifyCommandFailure(e);
       setFailure({
         ...failure,
-        title: isText ? "Couldn't send this text" : "Couldn't send this email",
+        title: `Couldn't send this ${kind}`,
         detail: failure.detail.replace(
           " Nothing was saved. Fix that, then try again.",
           " Your reply is kept here; copy the draft to send it another way.",
@@ -795,12 +809,20 @@ export function MessageInboxPage() {
                     Send text answers the client from your company texting
                     number.
                   </p>
+                ) : selected.provider === "social" ? (
+                  <p
+                    className="border-t border-line-2 px-4 pt-3 text-base text-ink-2"
+                    role="status"
+                  >
+                    Send message answers the client in Facebook or Instagram,
+                    within 24 hours of their last message.
+                  </p>
                 ) : selected.provider !== "internal" ? (
                   <p
                     className="border-t border-line-2 px-4 pt-3 text-base text-ink-2"
                     role="status"
                   >
-                    Capsule cannot send social messages yet. Keep editing here,
+                    Capsule cannot send in this conversation. Keep editing here,
                     then copy the draft into the app the client used.
                   </p>
                 ) : null}
@@ -810,10 +832,7 @@ export function MessageInboxPage() {
                     e.preventDefault();
                     if (selected.provider === "internal") {
                       void submitReply();
-                    } else if (
-                      selected.provider === "email" ||
-                      selected.provider === "sms"
-                    ) {
+                    } else if (sendsOut(selected.provider)) {
                       void submitEmailReply();
                     } else {
                       void copyExternalDraft();
@@ -832,8 +851,7 @@ export function MessageInboxPage() {
                     }}
                     aria-label="Reply text"
                   />
-                  {selected.provider === "email" ||
-                  selected.provider === "sms" ? (
+                  {sendsOut(selected.provider) ? (
                     <button
                       type="button"
                       className="btn btn-ghost"
@@ -846,8 +864,7 @@ export function MessageInboxPage() {
                   <button
                     type={
                       selected.provider === "internal" ||
-                      selected.provider === "email" ||
-                      selected.provider === "sms"
+                      sendsOut(selected.provider)
                         ? "submit"
                         : "button"
                     }
@@ -855,8 +872,7 @@ export function MessageInboxPage() {
                     disabled={sending || reply.trim().length === 0}
                     onClick={
                       selected.provider === "internal" ||
-                      selected.provider === "email" ||
-                      selected.provider === "sms"
+                      sendsOut(selected.provider)
                         ? undefined
                         : () => void copyExternalDraft()
                     }
@@ -864,8 +880,7 @@ export function MessageInboxPage() {
                     {sending
                       ? selected.provider === "internal"
                         ? "Logging…"
-                        : selected.provider === "email" ||
-                            selected.provider === "sms"
+                        : sendsOut(selected.provider)
                           ? "Sending…"
                           : "Copying…"
                       : selected.provider === "internal"
@@ -874,7 +889,9 @@ export function MessageInboxPage() {
                           ? "Send email"
                           : selected.provider === "sms"
                             ? "Send text"
-                            : "Copy draft"}
+                            : selected.provider === "social"
+                              ? "Send message"
+                              : "Copy draft"}
                   </button>
                 </form>
               </>

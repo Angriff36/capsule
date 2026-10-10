@@ -3,6 +3,7 @@ import { formatDateTime } from "../../lib/format";
 import { useOrganizationConfigureSocialAccounts } from "../../lib/manifest-convex-react";
 import { useSocialInboxSetup } from "../../lib/socialInboxSetup";
 import { ErrorState, Section } from "../../ui/primitives";
+import { SocialPageKeyForm } from "./SocialPageKeyForm";
 
 interface OrganizationSocialRecord {
   _id: string;
@@ -152,6 +153,10 @@ export function SocialAccountsSection({
           </button>
         </div>
       </form>
+      <SocialPageKeyForm
+        canEdit={canEdit}
+        hasPage={Boolean(record?.facebookPageId)}
+      />
     </Section>
   );
 }
