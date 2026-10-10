@@ -699,6 +699,7 @@ Screens (67): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
 - `queries.listEventChecklist` - live read
+- `queries.listEventCloseoutByEventId` - live read
 - `queries.listEventDishByEventId` - live read
 - `queries.listEventDishLineOverrideByEventDishId` - live read
 - `queries.listEventGuestByEventId` - live read
@@ -1517,6 +1518,7 @@ Screens (176): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventCloseoutByEventId` - live read
 - `queries.listEventDish` - live read
 - `queries.listEventDishByEventId` - live read
 - `queries.listEventDishLineOverrideByEventDishId` - live read
@@ -2673,6 +2675,7 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventCloseoutByEventId` - live read
 - `queries.listEventDishLineOverrideByEventDishId` - live read
 - `queries.listEventGuestByEventId` - live read
 - `queries.listEventLayoutSectionByEventId` - live read
@@ -2883,6 +2886,7 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventCloseoutByEventId` - live read
 - `queries.listEventDishLineOverrideByEventDishId` - live read
 - `queries.listEventGuestByEventId` - live read
 - `queries.listEventLayoutSectionByEventId` - live read
@@ -4253,6 +4257,7 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventCloseoutByEventId` - live read
 - `queries.listEventDishLineOverrideByEventDishId` - live read
 - `queries.listEventGuestByEventId` - live read
 - `queries.listEventLayoutSectionByEventId` - live read

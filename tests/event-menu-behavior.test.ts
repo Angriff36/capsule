@@ -227,6 +227,38 @@ it("includes recipe food cost in the margin view when no purchase order exists",
   ).toBe("$80");
 });
 
+it("shows the locked closeout's actual figures in place of the estimate", async () => {
+  menu();
+  backend.values.set("useListEventCloseout", [
+    {
+      _id: "closeout-a",
+      eventId: "event-a",
+      status: "finalized",
+      finalizedAt: Date.UTC(2027, 5, 20, 12),
+      actualRevenue: 1200,
+      actualIngredientCost: 300,
+      actualWasteCost: 10,
+      actualLaborCost: 350,
+      actualVendorCost: 50,
+      totalActualCost: 710,
+      actualHeadcount: 38,
+    },
+  ]);
+  await mount(createElement(EventMarginTab, { eventId: "event-a" }));
+  expect(
+    container.querySelector('[data-testid="event-margin-closeout"]')
+      ?.textContent,
+  ).toContain("final numbers from the closeout");
+  expect(container.textContent).toContain("Food, ingredients & waste");
+  expect(container.textContent).toContain("$710");
+  expect(container.textContent).toContain("Closeout revenue");
+  // The live estimate stays below for comparison.
+  expect(
+    container.querySelector('[data-testid="live-profit-ingredients"]')
+      ?.textContent,
+  ).toBe("$80");
+});
+
 it("drafts an order from the planning menu's needs without sending an event approval", async () => {
   menu();
   backend.values.set("useListIngredientDemand", [
