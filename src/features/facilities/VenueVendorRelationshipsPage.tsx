@@ -467,7 +467,11 @@ export function VenueVendorRelationshipsPage() {
               <label className="block text-xs font-medium text-ink-2">
                 Effective From
               </label>
-              <BoundedDateInput name="effectiveFrom" className="input mt-1" />
+              <BoundedDateInput
+                name="effectiveFrom"
+                className="input mt-1"
+                naturalDateDirection="any"
+              />
             </div>
 
             <div>
