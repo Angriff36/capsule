@@ -125,7 +125,8 @@ export function SharedProposalPage({ token }: { token: string }) {
         "Service type",
         vl.onPremise ? "On-premise" : "Off-premise",
       ]);
-    if (vl.capacity !== null)
+    // An unknown capacity is stored as 0; a client should not read "0".
+    if (vl.capacity !== null && vl.capacity > 0)
       venueLogisticsRows.push(["Capacity", `${vl.capacity}`]);
     if (vl.seatedCapacity != null)
       venueLogisticsRows.push(["Seated guests", `${vl.seatedCapacity}`]);
@@ -191,7 +192,7 @@ export function SharedProposalPage({ token }: { token: string }) {
         )}
         {proposal.eventType && (
           <div className="flex justify-between">
-            <span className="text-ink-2">Service:</span>
+            <span className="text-ink-2">Event type:</span>
             <span className="font-medium">
               {formatCodeAsWords(proposal.eventType)}
             </span>
