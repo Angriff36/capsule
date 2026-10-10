@@ -174,6 +174,13 @@ Screens (25): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
   - refusals (role, stage and rules): "Sales and finance may see client accounts for CRM and billing"; "Sales staff may update client accounts"; "Sales staff may change client accounts"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
   - effects: ClientReactivated
   - refresh: live reads update by themselves; reads affected: Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 28 more
+- `mutations.Client_rename` (Client.rename)
+  - inputs from the screen: clientType, companyName, givenName, familyName; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales and finance may see client accounts for CRM and billing"; "Sales staff may update client accounts"; "Sales staff may change client accounts"; "Guard 0 failed"; "Company clients require a company name; person clients require a given name"; "ConcurrencyConflict:"; and 1 more
+  - effects: ClientRenamed
+  - refresh: live reads update by themselves; reads affected: Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 28 more
 - `mutations.Client_setBirthday` (Client.setBirthday)
   - inputs from the screen: birthday; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
