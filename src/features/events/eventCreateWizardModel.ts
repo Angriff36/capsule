@@ -276,6 +276,12 @@ export function eventWizardStepState(
     return validateEventWizardStep(step, draft).length === 0
       ? "Complete"
       : "Incomplete";
+  // Lines added by jumping straight to another step still count as done.
+  const filled =
+    (step === "Menu & dishes" && draft.dishes.length > 0) ||
+    (step === "Staffing" && draft.staff.length > 0);
+  if (filled && validateEventWizardStep(step, draft).length === 0)
+    return "Complete";
   return "Not started";
 }
 export type WizardAutomation = {
@@ -292,7 +298,8 @@ export function eventWizardUnlocks(
     Number.isFinite(Date.parse(draft.startsAt)) ? "" : "date",
     Number.isFinite(headcount) && headcount >= 1 ? "" : "headcount",
   ].filter(Boolean);
-  const venue = draft.venueId ? [] : ["venue"],
+  // A pickup needs no venue: the client comes to the kitchen.
+  const venue = draft.venueId || draft.pickup ? [] : ["venue"],
     dishes = draft.dishes.length ? [] : ["dishes"],
     staff = draft.staff.length ? [] : ["staff"];
   return [
