@@ -9,8 +9,8 @@
  * with no sign-in. Staff steps run as the signed-in testing user. The walk
  * writes real rows to the LOCAL backend (one client, lead, event, proposal,
  * invoice, payment, delivery, time card, closeout per run, named
- * "Qualify Walk <stamp>"). It runs once, at desktop width; the phone pass
- * records a skip.
+ * "Qualify Walk <stamp>"). Staff steps run once, at desktop width (the
+ * phone pass records a skip); the client's pages run at phone width.
  *
  * Money: the payment is a check recorded by staff. No card processor, payment
  * link or reminder is touched (no live money, Ryan 2026-09-29).
@@ -72,7 +72,10 @@ export default async function check({
     .context()
     .browser()
     .newContext({
-      viewport: { width: 1280, height: 800 },
+      // The client is on a phone (360px wide) and not signed in.
+      viewport: { width: 360, height: 740 },
+      isMobile: true,
+      hasTouch: true,
     });
   const clientPage = await anonymous.newPage();
 
