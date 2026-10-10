@@ -4,6 +4,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import type { ActionPromptSession } from "../../ui/action-prompt";
 import { toDatetimeLocalValue } from "../../lib/format";
+import { unitOptionsFor } from "../kitchen/import/UnitOfMeasureMapper";
 
 export type VendorContractRow = {
   _id: string;
@@ -132,7 +133,16 @@ export function useVendorContractEdits(
             inputType: "number",
             defaultValue: String(tier.unitPrice ?? 0),
           },
-          { name: "unit", label: "Unit", defaultValue: tier.unit ?? "each" },
+          {
+            name: "unit",
+            label: "Unit",
+            defaultValue: tier.unit ?? "each",
+            // Orders match a tier on the exact unit name.
+            options: unitOptionsFor(tier.unit).map((value) => ({
+              value,
+              label: value.replace(/_/g, " "),
+            })),
+          },
           {
             name: "minQuantity",
             label: "Min quantity",
