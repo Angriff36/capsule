@@ -4,6 +4,7 @@ import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { localDateTime } from "./eventDetailFormHelpers";
 import { EventEquipmentAvailabilityNote } from "./EventEquipmentAvailabilityNote";
 import type { ItemAvailability } from "./equipmentAvailabilityView";
+import { SearchSelect } from "../../ui/SearchSelect";
 
 export type ReservableEquipment = {
   readonly _id: string;
@@ -62,32 +63,36 @@ export function EventEquipmentReserveForm({
       </div>
       <label className="field-label sm:col-span-2">
         Equipment
-        <select
+        {/* Hundreds of items: type part of a name or tag to find one. */}
+        <SearchSelect
           name="equipmentId"
-          className="input"
           required
+          aria-label="Equipment"
+          placeholder="Type a name or tag…"
           value={selectedEquipmentId}
-          onChange={(event) => onSelectEquipment(event.target.value)}
-        >
-          <option value="">Choose equipment</option>
-          {equipment.map((item) => {
-            const free = freeById.get(item._id);
-            return (
-              <option key={item._id} value={item._id}>
-                {item.name} · {item.assetTag} ·{" "}
-                {free == null
-                  ? `${item.quantity} in the catalog`
-                  : free.blocked === "out_of_service"
-                    ? "out of service"
-                    : `${free.free} of ${item.quantity} free${
-                        free.onEvent
-                          ? ` · ${free.onEvent} already on this event`
-                          : ""
-                      }`}
-              </option>
-            );
-          })}
-        </select>
+          onChange={(id) => onSelectEquipment(id)}
+          options={[...equipment]
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map((item) => {
+              const free = freeById.get(item._id);
+              return {
+                id: item._id,
+                label: item.name,
+                keywords: item.assetTag,
+                hint: `${item.assetTag} · ${
+                  free == null
+                    ? `${item.quantity} in the catalog`
+                    : free.blocked === "out_of_service"
+                      ? "out of service"
+                      : `${free.free} of ${item.quantity} free${
+                          free.onEvent
+                            ? ` · ${free.onEvent} already on this event`
+                            : ""
+                        }`
+                }`,
+              };
+            })}
+        />
         {selectedAvailability ? (
           <EventEquipmentAvailabilityNote
             item={selectedAvailability}
