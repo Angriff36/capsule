@@ -7922,6 +7922,11 @@ export const EventGuestRsvpDeclineParamsSchema = z.object({
 
 export type EventGuestRsvpDeclineParams = z.infer<typeof EventGuestRsvpDeclineParamsSchema>;
 
+// Command: undoCheckIn on EventGuest
+export const EventGuestUndoCheckInParamsSchema = z.object({});
+
+export type EventGuestUndoCheckInParams = z.infer<typeof EventGuestUndoCheckInParamsSchema>;
+
 // Command: withdraw on EventGuest
 export const EventGuestWithdrawParamsSchema = z.object({
   reason: z.string(),

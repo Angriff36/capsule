@@ -131,13 +131,19 @@ export function ContractsPage() {
   };
 
   const invoke = (
-    row: { _id: string; version: number; status: unknown },
+    row: { _id: string; version: number; status: unknown; clientId?: unknown },
     key: string,
   ) => {
     void (async () => {
       if (key === "sign") {
         const signedBy = await prompt.askReason({
           ...ReasonCopy.signContract,
+          // A person client usually signs for themself: start with their name.
+          defaultReason:
+            clients?.find((c) => c._id === row.clientId)?.clientType ===
+            "person"
+              ? clientDisplayName(String(row.clientId), clients)
+              : undefined,
         });
         if (!signedBy) return;
         void run(`${row._id}:sign`, async () => {

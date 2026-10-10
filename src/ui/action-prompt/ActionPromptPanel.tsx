@@ -53,7 +53,9 @@ export function ActionPromptPanel({
       ? null
       : (document.activeElement as HTMLElement | null),
   );
-  const [reason, setReason] = useState("");
+  const [reason, setReason] = useState(
+    request.kind === "reason" ? (request.defaultReason ?? "") : "",
+  );
   const [values, setValues] = useState<Record<string, string>>(() =>
     initialValues(request),
   );

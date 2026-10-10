@@ -254,6 +254,7 @@ export function RoleScorecardsPage() {
             <label className="field-label">
               Effective from (optional)
               <BoundedDateInput
+                naturalDateDirection="any"
                 name="effectiveFrom"
                 className="input"
                 defaultValue={

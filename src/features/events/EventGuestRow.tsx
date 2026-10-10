@@ -22,6 +22,7 @@ type Props = {
   entreeLines: readonly EntreeLine[];
   onConfirm: () => void;
   onCheckIn: () => void;
+  onUndoCheckIn: () => void;
   onOpenAction: (kind: GuestRowAction) => void;
   onCloseAction: () => void;
   onSubmitAction: (kind: GuestRowAction, value: string) => void;
@@ -45,6 +46,7 @@ export function EventGuestRow({
   entreeLines,
   onConfirm,
   onCheckIn,
+  onUndoCheckIn,
   onOpenAction,
   onCloseAction,
   onSubmitAction,
@@ -140,6 +142,15 @@ export function EventGuestRow({
             >
               Confirm RSVP
             </button>
+            {guest.checkedInAt != null ? (
+              <button
+                type="button"
+                disabled={guest.deletedAt != null || isBusy}
+                onClick={onUndoCheckIn}
+              >
+                Undo check-in
+              </button>
+            ) : null}
             <button
               type="button"
               disabled={!eventGuestPolicy.canDecline(guest) || isBusy}

@@ -60,6 +60,8 @@ export function AnnouncementBanner() {
   const createDismissal = useCreateAnnouncementDismissal();
   const [closing, setClosing] = useState<ReadonlySet<string>>(new Set());
   const [closeError, setCloseError] = useState<string | null>(null);
+  // Several notices stacked push every page down; show one and fold the rest.
+  const [expanded, setExpanded] = useState(false);
 
   const visible = useMemo(() => {
     if (!announcements || !dismissals || !user?.id) return [];
@@ -78,7 +80,11 @@ export function AnnouncementBanner() {
           !dismissed.has(String(a._id)) &&
           !closing.has(String(a._id)),
       )
-      .sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+      .sort(
+        (a, b) =>
+          Number(b.category === "safety") - Number(a.category === "safety") ||
+          (b.createdAt ?? 0) - (a.createdAt ?? 0),
+      );
   }, [announcements, dismissals, user?.id, closing]);
 
   if (visible.length === 0 && closeError == null) return null;
@@ -116,7 +122,7 @@ export function AnnouncementBanner() {
         </p>
       ) : null}
       <ul className="mx-auto max-w-[1440px] divide-y divide-line max-xl:px-8 max-md:px-5">
-        {visible.map((a) => {
+        {(expanded ? visible : visible.slice(0, 1)).map((a) => {
           const style = categoryStyle(String(a.category));
           return (
             <li
@@ -152,6 +158,20 @@ export function AnnouncementBanner() {
             </li>
           );
         })}
+        {visible.length > 1 ? (
+          <li className="px-4 py-1.5">
+            <button
+              type="button"
+              className="cursor-pointer text-sm font-medium text-brand hover:underline"
+              aria-expanded={expanded}
+              onClick={() => setExpanded((open) => !open)}
+            >
+              {expanded
+                ? "Show fewer notices"
+                : `Show ${visible.length - 1} more ${visible.length - 1 === 1 ? "notice" : "notices"}`}
+            </button>
+          </li>
+        ) : null}
       </ul>
     </div>
   );

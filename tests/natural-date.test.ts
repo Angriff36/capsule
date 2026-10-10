@@ -28,6 +28,13 @@ describe("natural schedule date entry", () => {
       ok: true,
       value: "2026-10-16",
     });
+    // From a Saturday, the next week's Wednesday is four days away.
+    expect(
+      parseNaturalDate("next Wednesday", {
+        kind: "date",
+        now: new Date(2026, 9, 10, 11, 0),
+      }),
+    ).toMatchObject({ ok: true, value: "2026-10-14" });
     expect(parse("in 2 weeks", { kind: "date" })).toMatchObject({
       ok: true,
       value: "2026-10-19",

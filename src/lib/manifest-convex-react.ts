@@ -266,6 +266,7 @@ import {
   EventGuestInviteParamsSchema,
   EventGuestRsvpConfirmParamsSchema,
   EventGuestRsvpDeclineParamsSchema,
+  EventGuestUndoCheckInParamsSchema,
   EventGuestWithdrawParamsSchema,
   EventIngredientContributionRecordParamsSchema,
   EventIngredientContributionRefreshRecipeSyncParamsSchema,
@@ -4971,6 +4972,16 @@ export function useEventGuestRsvpDecline() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventGuestRsvpDeclineParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventGuest.undoCheckIn. */
+export function useEventGuestUndoCheckIn() {
+  const mutate = useMutation(api.mutations.EventGuest_undoCheckIn);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventGuestUndoCheckInParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -15022,4 +15033,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1586 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1587 as const;
