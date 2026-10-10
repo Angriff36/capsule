@@ -42,8 +42,21 @@ export function DishSearchSelect({
       if (row.isActive || row._id === current)
         out.push({
           id: String(row._id),
-          label: row.name,
-          hint: row.isActive ? null : "Retired",
+          // Versions share the main dish's name: show which one this is.
+          label: row.versionLabel?.trim()
+            ? `${row.name} — ${row.versionLabel.trim()}`
+            : row.name,
+          hint: !row.isActive
+            ? "Retired"
+            : [row.serviceStyle, row.category]
+                .map((part) => part?.trim())
+                .filter(
+                  (part) =>
+                    part &&
+                    part.toLowerCase() !==
+                      row.versionLabel?.trim().toLowerCase(),
+                )
+                .join(" · ") || null,
         });
     return out;
   }, [chosen, found, current]);
