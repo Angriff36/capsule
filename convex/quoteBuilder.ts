@@ -743,6 +743,8 @@ export const processQuoteSubmission = action({
     let clientId: Id<"clients"> | null = submission.clientId ?? null;
     if (!clientId) {
       try {
+        // Emails are stored sealed, so matching one means opening the client
+        // book; this runs once per conversion, never on a page load.
         const existingClients = await ctx.runQuery(api.queries.listClient);
         const existingClient = existingClients.find(
           (c) =>
@@ -755,7 +757,8 @@ export const processQuoteSubmission = action({
         } else {
           const created = await ctx.runMutation(
             api.mutations.Client_createViaRegister,
-            { clientType: "company", companyName: clientName, email, phone },
+            // The quote form asks for a person's name, not a company's.
+            { clientType: "person", ...personName(clientName), email, phone },
           );
           clientId = created.docId;
         }
@@ -774,7 +777,7 @@ export const processQuoteSubmission = action({
           const leadResult = await ctx.runMutation(
             api.mutations.Lead_createViaCapture,
             {
-              leadType: "company",
+              leadType: "person",
               source: "quote-builder",
               estimatedValue:
                 parseQuoteEstimate(submission.estimateJson)?.total ?? 0,
@@ -782,7 +785,7 @@ export const processQuoteSubmission = action({
                 ? { referralSourceId: submission.referralSourceId }
                 : {}),
               ...(leadNotes ? { notes: leadNotes } : {}),
-              companyName: clientName,
+              ...personName(clientName),
               email,
               phone,
             },
@@ -803,12 +806,12 @@ export const processQuoteSubmission = action({
     let clientContactId: Id<"clientContacts"> | null = null;
     if (clientId) {
       try {
+        // This client's own contacts, never every contact on file.
         const existingContacts = await ctx.runQuery(
-          api.queries.listClientContact,
+          api.queries.listClientContactByClientId,
+          { clientId },
         );
-        const existingContact = existingContacts.find(
-          (c) => c.clientId === clientId,
-        );
+        const existingContact = existingContacts[0];
         if (existingContact) {
           clientContactId = existingContact._id;
         } else {
@@ -890,6 +893,19 @@ export const processQuoteSubmission = action({
               : eventStart + 4 * 60 * 60 * 1000;
           // The typed venue joins a saved venue only when one saved venue
           // has that name and an address to drive to (lib/quoteInquiryVenue).
+          // A picked occasion names the event as well as a typed one.
+          const occasionName =
+            (submission.occasionId
+              ? String(
+                  (
+                    await ctx.runQuery(api.queries.getOccasion, {
+                      id: submission.occasionId,
+                    })
+                  )?.name ?? "",
+                ).trim()
+              : "") ||
+            submission.occasionText?.trim() ||
+            "";
           const savedVenue = submission.venueName?.trim()
             ? inquiryVenueMatch(
                 submission.venueName,
@@ -902,10 +918,10 @@ export const processQuoteSubmission = action({
               clientId,
               // Named for what it is ("Company holiday party - Sarah
               // Lindqvist"), not for the form it came through.
-              title: submission.occasionText?.trim()
-                ? `${submission.occasionText.trim()} - ${clientName}`
+              title: occasionName
+                ? `${occasionName} - ${clientName}`
                 : `${clientName} event`,
-              eventType: submission.occasionText?.trim() || "Catering Inquiry",
+              eventType: occasionName || "Catering Inquiry",
               startsAt: eventStart,
               endsAt: eventEnd,
               expectedHeadcount: submission.guestCount ?? 0,
@@ -1245,3 +1261,13 @@ export const getQuoteSubmissionStatus = action({
     };
   },
 });
+
+/** "Priya Raman" → given "Priya", family "Raman"; one word is a given name. */
+function personName(full: string): { givenName: string; familyName?: string } {
+  const parts = full.trim().split(/\s+/);
+  if (parts.length < 2) return { givenName: parts[0] ?? full.trim() };
+  return {
+    givenName: parts.slice(0, -1).join(" "),
+    familyName: parts[parts.length - 1]!,
+  };
+}

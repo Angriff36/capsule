@@ -141,6 +141,12 @@ describe("runtime proof: quote submission → conversion (AC-008)", () => {
     const clients = await liveRows(owner, "clients");
     expect(clients).toHaveLength(1);
     expect((clients[0] as { _id?: string })._id).toBe(converted.clientId);
+    // The form asks for a person's name: the client is that person.
+    expect(clients[0]).toMatchObject({
+      clientType: "person",
+      givenName: "Dana",
+      familyName: "Prospect",
+    });
 
     const leads = await liveRows(owner, "leads");
     expect(leads).toHaveLength(1);
