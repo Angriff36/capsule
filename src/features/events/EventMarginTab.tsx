@@ -258,7 +258,18 @@ export function EventMarginTab({ eventId }: Props) {
           : "Food & ingredients",
       amount: foodCost,
     },
-    { key: "labor", label: "Labor & staffing", amount: laborCost },
+    {
+      key: "labor",
+      // No shift has times yet, so $0 is "not planned", not "free".
+      label:
+        laborCost === 0 &&
+        clockedLabor != null &&
+        (clockedLabor.scheduledShiftCount ?? 0) === 0 &&
+        clockedLabor.recordCount === 0
+          ? "Labor & staffing (set crew times on the Plan tab)"
+          : "Labor & staffing",
+      amount: laborCost,
+    },
     { key: "equipment", label: "Equipment & rentals", amount: equipmentCost },
   ];
   const revenueLines: MarginRevenueLine[] = [
