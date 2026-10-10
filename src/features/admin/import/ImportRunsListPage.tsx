@@ -1,10 +1,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
-import { useMutation, usePaginatedQuery } from "convex/react";
-import {
-  useImportRunMarkFailed,
-  useImportRunRevert,
-} from "../../../lib/manifest-convex-react";
+import { useAction, useMutation, usePaginatedQuery } from "convex/react";
+import { useImportRunMarkFailed } from "../../../lib/manifest-convex-react";
 import { api } from "../../../lib/api";
 import { importRunDetailPath } from "./importRoutes";
 import { StatusChip, TableSkeleton } from "../../../ui/primitives";
@@ -104,7 +101,9 @@ export function ImportRunsListPage() {
   // so the "Start Import" form could never allocate a row with it.
   const startImport = useMutation(api.importCoordinator.startImport);
   const markFailed = useImportRunMarkFailed();
-  const revertImport = useImportRunRevert();
+  // Same rollback as the run's own page: the status flip alone left every
+  // match the import made in place.
+  const revertImportRun = useAction(api.importCommit.revertImportRun);
   const { prompt, host } = useActionPrompt();
 
   const [showForm, setShowForm] = useState(false);
@@ -140,13 +139,13 @@ export function ImportRunsListPage() {
 
   const clearNotice = () => setNotice(null);
 
-  const run = async (key: string, work: () => Promise<void>) => {
+  const run = async (key: string, work: () => Promise<string | void>) => {
     setError(null);
     setNotice(null);
     setBusy(key);
     try {
-      await work();
-      setNotice(`Action completed successfully.`);
+      const message = await work();
+      setNotice(message || `Action completed successfully.`);
     } catch (cause: unknown) {
       setError(cause instanceof Error ? cause.message : "Operation failed");
     } finally {
@@ -199,13 +198,14 @@ export function ImportRunsListPage() {
     const confirmed = await prompt.askConfirm({
       title: "Revert Import",
       description:
-        "Reverting rolls back everything this import brought in. This can't be undone from here.",
+        "The items this import linked are marked as replaced. Imported venues and other items stay in place — deactivate them yourself if needed.",
       confirmLabel: "Revert import",
       tone: "danger",
     });
     if (!confirmed) return;
     void run(`revert-${id}`, async () => {
-      await revertImport({ docId: runId, version });
+      const result = await revertImportRun({ importRunId: runId as never });
+      return `Reverted — ${result.rolledBack} match(es) marked as replaced.`;
     });
   };
 
