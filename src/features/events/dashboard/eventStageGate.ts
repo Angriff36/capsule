@@ -59,6 +59,8 @@ export type StageGateFacts = {
   hasMenuDishes?: boolean;
   hasStaffAssigned?: boolean;
   hasServiceStyle?: boolean;
+  /** A venue picked or typed, or a pickup order (no venue to drive to). */
+  hasVenueOrPickup?: boolean;
   hasFinalLockTiming?: boolean;
   /** Only read before Executing; undefined while it loads. */
   execution?: StageGateExecution;
@@ -160,7 +162,15 @@ function salesLockChecks(facts: StageGateFacts): StageGateCheck[] {
       required: true,
       fix: basicsFix(facts, "Set headcount"),
     },
-    // Event.lockForSales refuses an event with no service style.
+    // Event.lockForSales refuses an event with no venue unless it is a
+    // pickup order, and one with no service style.
+    {
+      key: "venue",
+      label: "Venue picked",
+      done: Boolean(facts.hasVenueOrPickup),
+      required: true,
+      fix: { label: "Pick venue", to: { kind: "sheet", sheet: "edit" } },
+    },
     {
       key: "style",
       label: "Service style picked",

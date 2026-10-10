@@ -662,6 +662,7 @@ Screens (36): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `shareLinks.recordShareView` - mutation; authored step; live reads update by themselves
 - `signatureAcceptance.completeSignature` - mutation; authored step; live reads update by themselves
 - `signatureAcceptance.getPendingSignatureRequest` - query; live read, updates by itself
+- `signatureAcceptance.getSignatureRequestOutcome` - query; live read, updates by itself
 - `sourceProvenance.listByCapsuleId` - query; live read, updates by itself
 - `sourceProvenance.listMergedClients` - query; live read, updates by itself
 - `travelFees.applyProposalTravelFee` - mutation; authored step; live reads update by themselves
