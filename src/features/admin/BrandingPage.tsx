@@ -18,6 +18,7 @@ import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
 import { ContactDetailsSection } from "./ContactDetailsSection";
 import { EmailSenderSection } from "./EmailSenderSection";
 import { EmailInboxSection } from "./EmailInboxSection";
+import { SocialAccountsSection } from "./SocialAccountsSection";
 import { TextNumberSection } from "./TextNumberSection";
 import { useBrandLogoManager } from "./brandLogoUpload";
 import { isValidBrandColor, useTenantBranding } from "./tenantBranding";
@@ -474,6 +475,8 @@ export function BrandingPage() {
         <EmailInboxSection />
 
         <TextNumberSection record={record} canEdit={canEdit} />
+
+        <SocialAccountsSection record={record} canEdit={canEdit} />
 
         <ContactDetailsSection record={record} canEdit={canEdit} />
 

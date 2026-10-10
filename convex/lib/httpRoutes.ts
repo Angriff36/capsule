@@ -9,6 +9,11 @@
 import type { HttpRouter } from "convex/server";
 import { EMAIL_ROUTE_PATH, receiveEmail } from "../emailInbox";
 import { receiveStatus, STATUS_ROUTE_PATH } from "../smsAlertDelivery";
+import {
+  receiveSocialMessage,
+  SOCIAL_ROUTE_PATH,
+  verifySocialWebhook,
+} from "../socialInbox";
 import { receiveText, TEXT_ROUTE_PATH } from "../textInbox";
 
 export function registerAuthoredRoutes(http: HttpRouter): void {
@@ -18,4 +23,7 @@ export function registerAuthoredRoutes(http: HttpRouter): void {
   http.route({ path: EMAIL_ROUTE_PATH, method: "POST", handler: receiveEmail });
   // Delivered / not delivered reports for staff alert texts (AC-353, #439).
   http.route({ path: STATUS_ROUTE_PATH, method: "POST", handler: receiveStatus });
+  // Client Facebook / Instagram messages (AC-354): Meta's setup check + messages.
+  http.route({ path: SOCIAL_ROUTE_PATH, method: "GET", handler: verifySocialWebhook });
+  http.route({ path: SOCIAL_ROUTE_PATH, method: "POST", handler: receiveSocialMessage });
 }

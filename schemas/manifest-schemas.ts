@@ -2794,6 +2794,8 @@ export const OrganizationSchema = z.object({
   emailSenderName: z.string().nullable().optional(),
   emailReplyTo: z.string().nullable().optional(),
   smsNumber: z.string().nullable().optional(),
+  facebookPageId: z.string().nullable().optional(),
+  instagramAccountId: z.string().nullable().optional(),
   brandPhone: z.string().nullable().optional(),
   brandWebsite: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -10032,6 +10034,14 @@ export const OrganizationConfigureRoutePolicyParamsSchema = z.object({
 });
 
 export type OrganizationConfigureRoutePolicyParams = z.infer<typeof OrganizationConfigureRoutePolicyParamsSchema>;
+
+// Command: configureSocialAccounts on Organization
+export const OrganizationConfigureSocialAccountsParamsSchema = z.object({
+  facebookPageId: z.string().optional(),
+  instagramAccountId: z.string().optional(),
+});
+
+export type OrganizationConfigureSocialAccountsParams = z.infer<typeof OrganizationConfigureSocialAccountsParamsSchema>;
 
 // Command: configureStageMoves on Organization
 export const OrganizationConfigureStageMovesParamsSchema = z.object({

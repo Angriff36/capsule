@@ -334,6 +334,7 @@ import type * as smsAlertClaims from "../smsAlertClaims.js";
 import type * as smsAlertDelivery from "../smsAlertDelivery.js";
 import type * as smsAlertTexts from "../smsAlertTexts.js";
 import type * as smsAlerts from "../smsAlerts.js";
+import type * as socialInbox from "../socialInbox.js";
 import type * as sourceProvenance from "../sourceProvenance.js";
 import type * as staffSelfReviews from "../staffSelfReviews.js";
 import type * as staffShiftSwaps from "../staffShiftSwaps.js";
@@ -709,6 +710,7 @@ declare const fullApi: ApiFromModules<{
   smsAlertDelivery: typeof smsAlertDelivery;
   smsAlertTexts: typeof smsAlertTexts;
   smsAlerts: typeof smsAlerts;
+  socialInbox: typeof socialInbox;
   sourceProvenance: typeof sourceProvenance;
   staffSelfReviews: typeof staffSelfReviews;
   staffShiftSwaps: typeof staffShiftSwaps;
