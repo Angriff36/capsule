@@ -910,6 +910,9 @@ export const processQuoteSubmission = action({
               endsAt: eventEnd,
               expectedHeadcount: submission.guestCount ?? 0,
               primaryContactName: clientName,
+              // The person who asked is who we call on the day.
+              primaryContactEmail: email.trim() || undefined,
+              primaryContactPhone: phone?.trim() || undefined,
               budgetAmount: 0,
               quotedPrice: 0,
               serviceStyleId: submission.serviceStyleId ?? undefined,

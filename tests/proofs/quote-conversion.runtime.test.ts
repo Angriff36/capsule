@@ -162,6 +162,20 @@ describe("runtime proof: quote submission → conversion (AC-008)", () => {
     expect((events[0] as { clientId?: string }).clientId).toBe(
       converted.clientId,
     );
+    // The person who asked is the event's day-of contact, with the email
+    // and phone they typed (stored encrypted; read back through the event).
+    const event = (await owner.query(api.queries.getEvent, {
+      id: eventId,
+    } as never)) as {
+      primaryContactName?: string;
+      primaryContactEmail?: string;
+      primaryContactPhone?: string;
+    };
+    expect(event).toMatchObject({
+      primaryContactName: "Dana Prospect",
+      primaryContactEmail: "dana@example.com",
+      primaryContactPhone: "555-0100",
+    });
     expect((leads[0] as { clientId?: string }).clientId).toBe(
       converted.clientId,
     );
