@@ -8,6 +8,7 @@ import {
   useEventGuestAssignMeal,
   useEventGuestAssignTable,
   useEventGuestCheckIn,
+  useEventGuestUndoCheckIn,
   useEventGuestRsvpConfirm,
   useEventGuestRsvpDecline,
   useEventGuestWithdraw,
@@ -94,6 +95,7 @@ export function EventGuestPanel({
   const confirm = useEventGuestRsvpConfirm();
   const decline = useEventGuestRsvpDecline();
   const checkIn = useEventGuestCheckIn();
+  const undoCheckIn = useEventGuestUndoCheckIn();
   const assignTable = useEventGuestAssignTable();
   const withdraw = useEventGuestWithdraw();
   const assignMeal = useEventGuestAssignMeal();
@@ -420,6 +422,11 @@ export function EventGuestPanel({
                       onCheckIn={() =>
                         void run(`checkin-${guest._id}`, () =>
                           checkIn({ docId: guest._id, version }),
+                        )
+                      }
+                      onUndoCheckIn={() =>
+                        void run(`checkin-${guest._id}`, () =>
+                          undoCheckIn({ docId: guest._id, version }),
                         )
                       }
                       onOpenAction={(kind) =>
