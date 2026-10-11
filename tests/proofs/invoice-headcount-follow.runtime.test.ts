@@ -69,6 +69,37 @@ describe("invoice from an accepted proposal follows the guest count (#441)", () 
     expect(back).toMatchObject({ _id: draft._id, total: 600 });
   });
 
+  it("a proposal signed with no tax stays one signed amount and still follows the count", async () => {
+    const proof = harness();
+    const tenantId = "tenant-441-c";
+    const owner = await ownerOf(proof, tenantId, "o-441-c");
+    // The workspace charges tax the signed proposal did not show.
+    await proof.executeCommand(owner, M.TaxRate_createViaDefine, {
+      name: "Food tax",
+      percentage: 9,
+      appliesToFood: true,
+      appliesToService: false,
+      appliesToRental: false,
+    });
+    const fx = await acceptedProposalEvent(proof, owner, "Issue 441 no tax");
+    await approve(proof, owner, fx.eventId);
+    const [draft] = await invoicesOf(owner, tenantId);
+    // Never billed tax the client did not see.
+    expect(draft).toMatchObject({ subtotal: 600, taxAmount: 0, total: 600 });
+    expect(draft.lineItems).toEqual([]);
+
+    await changeHeadcount(proof, owner, fx.eventId, 15);
+    const [after, ...more] = await invoicesOf(owner, tenantId);
+    expect(more).toHaveLength(0);
+    expect(after).toMatchObject({
+      _id: draft._id,
+      subtotal: 900,
+      taxAmount: 0,
+      total: 900,
+      amountDue: 900,
+    });
+  });
+
   it("a sent invoice keeps its amount when the count changes", async () => {
     const proof = harness();
     const tenantId = "tenant-441-b";

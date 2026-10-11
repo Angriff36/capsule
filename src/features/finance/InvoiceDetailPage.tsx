@@ -61,6 +61,7 @@ import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { formatInvoiceNumber } from "./invoiceNumberDisplay";
 import { InvoiceNumberEditor } from "./InvoiceNumberEditor";
+import { InvoiceSignedProposalLines } from "./InvoiceSignedProposalLines";
 import { downloadInvoicePdf } from "./invoicePdf";
 import { readInvoiceLineItems, readTaxBreakdown } from "./invoiceTax";
 import { ReminderHistoryList } from "./ReminderHistoryList";
@@ -950,7 +951,14 @@ export function InvoiceDetailPage() {
           </div>
           <span>{lineItems.length}</span>
         </div>
-        {lineItems.length === 0 ? (
+        {lineItems.length === 0 && invoice.proposalId ? (
+          <InvoiceSignedProposalLines
+            proposalId={String(invoice.proposalId)}
+            guestCount={linkedEvent?.expectedHeadcount}
+            subtotal={Number(invoice.subtotal ?? 0)}
+            usd={usd}
+          />
+        ) : lineItems.length === 0 ? (
           <EmptyState
             title="This invoice predates itemized tax."
             hint="Its aggregate subtotal and tax remain available below."

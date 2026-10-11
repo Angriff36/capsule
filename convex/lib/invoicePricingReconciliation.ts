@@ -361,24 +361,74 @@ export async function followAcceptedProposalPrice(
   await applyAcceptedDeposit(ctx, event, proposal);
 }
 
+const cents = (value: unknown) => Math.round(Number(value ?? 0) * 100);
+
 /**
- * The bill for an accepted proposal: its priced lines at the event's guest
- * count. A proposal with no priced lines becomes the single amount it
- * signed; so do lines whose worked total at the signed guest count is not
- * what the client signed (an older proposal taxed another way).
+ * The bill for an accepted proposal at a guest count (the event's own count
+ * unless another is given): its priced lines, taxed the usual way. When those
+ * lines and the workspace's tax do not add up to what the client signed (a
+ * proposal taxed another way, or with no tax shown) the bill stays one amount
+ * as signed, so the client is never billed money they did not see; at
+ * another guest count that amount is the proposal's prices at that count,
+ * with the signed tax in the same share.
  */
 async function acceptedProposalTotals(
   ctx: MutationCtx,
   event: Doc<"events">,
   proposal: Doc<"proposals">,
+  guestCount?: number,
 ) {
   const signedGuests = Number(proposal.guestCount ?? 0);
+  const requested = Number(guestCount ?? event.expectedHeadcount ?? 0);
+  const guests = requested > 0 ? requested : signedGuests;
   const signed = await itemizedFromProposal(ctx, proposal, signedGuests);
-  if (!signed || Math.round(signed.total * 100) !== Math.round(Number(proposal.total ?? 0) * 100))
-    return signedProposalTotals(ctx, event, proposal);
-  const guests = Number(event.expectedHeadcount ?? 0);
-  if (!(guests > 0) || guests === signedGuests) return signed;
-  return (await itemizedFromProposal(ctx, proposal, guests)) ?? signed;
+  if (signed && cents(signed.total) === cents(proposal.total)) {
+    if (guests === signedGuests) return signed;
+    return (await itemizedFromProposal(ctx, proposal, guests)) ?? signed;
+  }
+  const amount = await signedProposalTotals(ctx, event, proposal);
+  if (guests === signedGuests) return amount;
+  const lines = await pricedProposalLines(ctx, proposal);
+  const pricing = (count: number) =>
+    computeProposalPricing({
+      lines: lines.map((row) => ({
+        pricingBasis: row.pricingBasis as PricingBasis,
+        unitPrice: Number(row.unitPrice) || 0,
+        quantity: Number(row.quantity) || 0,
+      })),
+      guestCount: count,
+    }).subtotal;
+  // The lines must explain the signed subtotal before they can resize it.
+  if (lines.length === 0 || cents(pricing(signedGuests)) !== cents(amount.subtotal)) return amount;
+  const subtotal = pricing(guests);
+  const taxAmount =
+    amount.subtotal > 0
+      ? LedgerMoney.fromDollars(amount.taxAmount).times(subtotal / amount.subtotal).toDollars()
+      : amount.taxAmount;
+  const total = LedgerMoney.fromDollars(subtotal)
+    .add(LedgerMoney.fromDollars(taxAmount))
+    .subtract(LedgerMoney.fromDollars(amount.discountAmount))
+    .toDollars();
+  if (total < 0) return amount;
+  return {
+    ...amount,
+    subtotal,
+    taxAmount,
+    total,
+    taxBreakdown: amount.taxBreakdown.map((rate) => ({ ...rate, amount: taxAmount })),
+  };
+}
+
+/** An accepted proposal's live priced lines, in display order. */
+async function pricedProposalLines(ctx: MutationCtx, proposal: Doc<"proposals">) {
+  return (
+    await ctx.db
+      .query("proposalLineItems")
+      .withIndex("by_proposalId", (q) => q.eq("proposalId", proposal._id))
+      .collect()
+  )
+    .filter((row) => row.tenantId === proposal.tenantId && row.deletedAt == null && row.removedAt == null)
+    .sort(byLineDisplayOrder);
 }
 
 /**
@@ -392,14 +442,7 @@ async function itemizedFromProposal(
   proposal: Doc<"proposals">,
   guests: number,
 ) {
-  const lines = (
-    await ctx.db
-      .query("proposalLineItems")
-      .withIndex("by_proposalId", (q) => q.eq("proposalId", proposal._id))
-      .collect()
-  )
-    .filter((row) => row.tenantId === proposal.tenantId && row.deletedAt == null && row.removedAt == null)
-    .sort(byLineDisplayOrder);
+  const lines = await pricedProposalLines(ctx, proposal);
   if (lines.length === 0) return null;
   // At another guest count a percentage line (service charge) is worked
   // again from the lines it is taken from; every other line keeps its amount.
@@ -463,6 +506,7 @@ async function itemizedFromProposal(
 export async function followEventHeadcountInvoice(
   ctx: MutationCtx,
   eventId: Id<"events">,
+  previousHeadcount: number,
 ): Promise<void> {
   const event = await ctx.db.get(eventId);
   if (!event || event.deletedAt != null) return;
@@ -472,17 +516,36 @@ export async function followEventHeadcountInvoice(
       .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
       .collect()
   ).filter((row) => row.tenantId === event.tenantId && row.deletedAt == null && row.status !== "voided");
-  if (invoices.length !== 1 || !isAcceptedProposalDraft(invoices[0])) return;
+  if (invoices.length !== 1) return;
   const draft = invoices[0];
+  if (
+    draft.status !== "draft" ||
+    draft.sentAt != null ||
+    !isZero(draft.amountPaid) ||
+    !isZero(draft.amountCredited) ||
+    draft.depositPaidAt != null ||
+    draft.proposalId == null
+  )
+    return;
   const proposalId = ctx.db.normalizeId("proposals", String(draft.proposalId));
   const proposal = proposalId ? await ctx.db.get(proposalId) : null;
   if (!proposal || proposal.tenantId !== event.tenantId || proposal.deletedAt != null) return;
+  // Untouched: still exactly the bill made for the old guest count.
+  const before = await acceptedProposalTotals(ctx, event, proposal, previousHeadcount);
+  const stored = Array.isArray(draft.lineItems) ? (draft.lineItems as unknown[]) : [];
+  if (
+    cents(draft.subtotal) !== cents(before.subtotal) ||
+    cents(draft.taxAmount) !== cents(before.taxAmount) ||
+    cents(draft.discountAmount) !== cents(before.discountAmount) ||
+    cents(draft.total) !== cents(before.total) ||
+    stored.length !== before.lineItems.length ||
+    (stored.length > 0 && !isAcceptedProposalDraft(draft))
+  )
+    return;
   const next = await acceptedProposalTotals(ctx, event, proposal);
-  if (next.lineItems.length === 0) return;
-  if (Number(draft.discountAmount ?? 0) !== next.discountAmount) return;
   if (draft.depositAmount != null && Number(draft.depositAmount) > next.total) return;
   const system = TenantSystemCommandRunner.forTenant(ctx, event.tenantId).context;
-  if (Math.round(Number(draft.total) * 100) !== Math.round(next.total * 100)) {
+  if (cents(draft.total) !== cents(next.total)) {
     await system.runMutation(api.mutations.Invoice_followEventHeadcount, {
       docId: draft._id,
       version: draft.version,

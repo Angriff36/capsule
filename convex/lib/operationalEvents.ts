@@ -361,7 +361,11 @@ export async function handleManifestEvent(
       },
     );
     // The unsent draft bill from the accepted proposal bills the new count.
-    await followEventHeadcountInvoice(ctx, event.entityId as Id<"events">);
+    await followEventHeadcountInvoice(
+      ctx,
+      event.entityId as Id<"events">,
+      Number(event.payload.previousHeadcount),
+    );
     // A headcount change never rewrites an accepted proposal — it records a
     // `proposal/change requirement` and keeps the signed document as history.
     await eventProposalReconciliation.run(

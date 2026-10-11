@@ -567,6 +567,16 @@ export default async function check({
       .click();
     await wait(4000);
     const invoicePath = new URL(page.url()).pathname;
+    t = await pageText();
+    await step(
+      "the bill follows the new count with the proposal's lines",
+      t.includes("TOTAL $3,780.00") &&
+        t.includes("at 75 guests") &&
+        t.includes("Dinner buffet per guest") &&
+        !t.includes("predates itemized tax"),
+      t.slice(t.indexOf("Line items") - 40, t.indexOf("Line items") + 600),
+    );
+    await shot("invoice-from-proposal");
     await page
       .locator("a, button", { hasText: /^\s*add payment\s*$/i })
       .first()
@@ -576,7 +586,7 @@ export default async function check({
       .locator("form")
       .filter({ has: page.locator('select[name="invoiceId"]') })
       .first();
-    await pay.locator('input[name="amount"]').fill("3024");
+    await pay.locator('input[name="amount"]').fill("3780");
     await pay.locator('select[name="method"]').selectOption({ label: "Check" });
     await pay
       .locator('textarea[name="notes"]')
@@ -594,7 +604,7 @@ export default async function check({
     t = await pageText();
     await step(
       `invoice ${invoiceNumber} paid in full`,
-      t.includes("PAID $3,024.00") && t.includes("Amount due $0.00"),
+      t.includes("PAID $3,780.00") && t.includes("Amount due $0.00"),
       t.slice(t.indexOf("TOTAL $") - 80, t.indexOf("TOTAL $") + 80),
     );
 
@@ -631,9 +641,9 @@ export default async function check({
     const sources = squash(await capture.innerText());
     await step(
       "closeout reads the event's own records",
-      sources.includes("Revenue 1 record $3,024.00") &&
+      sources.includes("Revenue 1 record $3,780.00") &&
         /Staff time 1 record — \$\d/.test(sources) &&
-        sources.includes("Received $3,024.00"),
+        sources.includes("Received $3,780.00"),
       sources,
     );
     await capture.locator('input[name="entered.ingredient"]').fill("640");
@@ -663,7 +673,7 @@ export default async function check({
     t = await pageText();
     await step(
       "management sees revenue, clocked labor and actual food cost",
-      t.includes("TOTAL REVENUE $3,024") &&
+      t.includes("TOTAL REVENUE $3,780") &&
         t.includes("2.5 clocked hours") &&
         t.includes("Actual (purchases + recorded waste) $640"),
       t.slice(t.indexOf("Margin"), t.indexOf("Margin") + 900),
