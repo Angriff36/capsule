@@ -56119,6 +56119,13 @@ export const PurchaseNeed_closeWithFinishedEvent = mutation({
 async function __runPurchaseNeedCreate(ctx: MutationCtx, args: any) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
+    const __rel_ingredientDemand = await __resolveRelation(ctx, "ingredientDemands", [__auth.tenantId, args.ingredientDemandId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __aggRoot: Record<string, any> = {};
+    (__aggRoot as any).ingredientDemand = __rel_ingredientDemand;
+    if ((__aggRoot as any).ingredientDemand) {
+      (__aggRoot as any).ingredientDemand.purchaseNeeds = await ctx.db.query("purchaseNeeds").withIndex("by_ingredientDemandId", (q: any) => q.eq("ingredientDemandId", (__aggRoot as any).ingredientDemand._id)).collect();
+      (__aggRoot as any).ingredientDemand.purchaseNeeds = (__aggRoot as any).ingredientDemand.purchaseNeeds.filter((row: any) => row.tenantId === __auth.tenantId);
+    }
     const doc: Record<string, any> = {
       tenantId: __auth.tenantId,
       deletedAt: args.deletedAt,
@@ -56148,6 +56155,7 @@ async function __runPurchaseNeedCreate(ctx: MutationCtx, args: any) {
     if (!((checkRole(user, "inventoryAccess") || checkRole(user, "manageAccess")))) throw new Error("Inventory staff and managers may change purchase needs");
     if (!(((args.openedAt == null) || ((args.eventId === args.eventId) && (args.ingredientDemandId === args.ingredientDemandId))))) throw new Error("Guard 0 failed");
     if (!((args.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!(((__rel_ingredientDemand == null) || (((((__rel_ingredientDemand.purchaseNeeds) ?? []).filter((need: Doc<"purchaseNeeds">) => (((need.deletedAt == null) && (need.status !== "cancelled"))))) ?? []).length === 0)))) throw new Error("This ingredient already has an open purchase need for this event.");
     if (!((args.requiredQuantity > 0))) throw new Error("The amount needed has to be more than zero.");
     const _id = await ctx.db.insert("purchaseNeeds", doc as any);
     const payload: Record<string, any> = { _id, id: _id, ...doc, result: { _id, id: _id, ...doc }, purchaseNeedId: _id, tenantId: doc.tenantId, eventId: doc.eventId, ingredientDemandId: doc.ingredientDemandId, ingredientId: doc.ingredientId, preferredVendorId: doc.preferredVendorId, requiredQuantity: doc.requiredQuantity, unit: doc.unit, purchasingWeekStart: doc.purchasingWeekStart, status: "open", _subject: { entity: "PurchaseNeed", command: "create", id: _id } };

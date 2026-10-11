@@ -82,6 +82,8 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     // and never rewrites an existing one (proof: create-server-owned-fields).
     guard self.openedAt == null or (self.eventId == eventId and self.ingredientDemandId == ingredientDemandId)
     guard self.deletedAt == null
+    // One live need per demand (#396): a second create for the same demand is refused.
+    constraint oneLiveNeedPerDemand: self.ingredientDemand == null or count_of(filter(self.ingredientDemand.purchaseNeeds, (need) => need.deletedAt == null and need.status != "cancelled")) == 0 "This ingredient already has an open purchase need for this event."
     constraint createNeedQuantityPositive: requiredQuantity > 0 "The amount needed has to be more than zero."
     // Full event requirement — weekly line applies on-hand once across consolidated needs.
     mutate requiredQuantity = self.openedAt != null ? self.requiredQuantity : requiredQuantity

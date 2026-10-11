@@ -75,6 +75,8 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+  // One live purchase need per demand (#396): PurchaseNeed.create counts these.
+  hasMany purchaseNeeds: PurchaseNeed
 
   constraint demandQuantityNonnegative: self.calculatedAt == null or self.requiredQuantity >= 0 "The required amount can't be negative. Use zero or more."
 
