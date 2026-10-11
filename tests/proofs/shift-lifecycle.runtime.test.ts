@@ -215,4 +215,44 @@ describe("runtime proof: Shift schedule -> start -> complete", () => {
       expect.objectContaining({ tenantId: S.tenantA, personId }),
     ]);
   });
+
+  it("refuses a shift over approved time off through the shared schedule command", async () => {
+    const proof = harness();
+    const { manager, personId } = await hireWorkforceStaff(proof, S.tenantA);
+    const request = (await proof.executeCommand(
+      manager,
+      api.mutations.TimeOffRequest_createViaSubmit,
+      {
+        personId,
+        startsAt: S.startsAt - 60 * 60_000,
+        endsAt: S.endsAt + 60 * 60_000,
+        reason: "Family wedding",
+      },
+    )) as { docId: string };
+    await proof.executeCommand(manager, api.mutations.TimeOffRequest_approve, {
+      docId: request.docId,
+      version: 1,
+    });
+
+    // The same generated command backs the app, the command API, MCP and agents.
+    await expect(
+      proof.executeCommand(manager, api.mutations.Shift_createViaSchedule, {
+        personId,
+        startsAt: S.startsAt,
+        endsAt: S.endsAt,
+        role: "Event captain",
+      }),
+    ).rejects.toThrow(/overlaps approved time off/);
+    expect(
+      await manager.run(async (ctx) => ctx.db.query("shifts").collect()),
+    ).toEqual([]);
+
+    // A shift after the time off ends still schedules.
+    await proof.executeCommand(manager, api.mutations.Shift_createViaSchedule, {
+      personId,
+      startsAt: S.endsAt + 2 * 60 * 60_000,
+      endsAt: S.endsAt + 6 * 60 * 60_000,
+      role: "Event captain",
+    });
+  });
 });
