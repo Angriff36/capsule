@@ -1070,6 +1070,7 @@
     "shareLinks:getSharedProposal": "no owner reach: same answer with or without workspace A records",
     "shiftTimingChanges:listEventShiftChanges": "no owner reach: same answer with or without workspace A records",
     "signatureAcceptance:getPendingSignatureRequest": "no owner reach: same answer with or without workspace A records",
+    "signatureAcceptance:getSignatureRequestOutcome": "no owner reach: same answer with or without workspace A records",
     "smsAlerts:getStatus": "no owner reach: same answer with or without workspace A records",
     "sourceProvenance:listByCapsuleId": "reaches workspace A records",
     "sourceProvenance:listMergedClients": "no owner reach: same answer with or without workspace A records",

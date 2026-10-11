@@ -90,6 +90,14 @@ export function useDishComponentLines(dishId: string) {
   });
 }
 
+/** One event's closeouts (empty for roles that may not read them). */
+export function useEventCloseouts(eventId: string) {
+  return useQuery(
+    api.queries.listEventCloseoutByEventId,
+    eventId ? { eventId: eventId as Id<"events"> } : "skip",
+  );
+}
+
 /** One event's payroll inputs; nothing is read without an event. */
 export function useEventPayrollInputs(eventId: string) {
   return useQuery(

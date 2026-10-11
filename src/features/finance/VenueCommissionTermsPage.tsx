@@ -257,6 +257,7 @@ export function VenueCommissionTermsPage() {
           <label className="field-label">
             Effective start date
             <BoundedDateInput
+              naturalDateDirection="any"
               className="input"
               name="effectiveStartDate"
               required

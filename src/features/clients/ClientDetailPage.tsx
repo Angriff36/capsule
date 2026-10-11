@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import {
   useClientArchive,
   useClientChangeContact,
+  useClientRename,
   useClientContactRemove,
   useClientContactSetPrimary,
   useClientReactivate,
@@ -69,6 +70,7 @@ export function ClientDetailPage() {
   const setPrimary = useClientContactSetPrimary();
   const removeContact = useClientContactRemove();
   const changeContact = useClientChangeContact();
+  const renameClient = useClientRename();
   const setBirthday = useClientSetBirthday();
   const archive = useClientArchive();
   const reactivate = useClientReactivate();
@@ -381,6 +383,66 @@ export function ClientDetailPage() {
           clientId: client._id,
         }}
       />
+
+      <form
+        key={`name-${client.version}`}
+        className="supply-form"
+        onSubmit={(event) => {
+          event.preventDefault();
+          const data = new FormData(event.currentTarget);
+          const text = (key: string) =>
+            String(data.get(key) ?? "").trim() || undefined;
+          const clientType = String(data.get("clientType")) as
+            "company" | "person";
+          void run("rename", async () => {
+            await renameClient({
+              docId: client._id,
+              version: client.version,
+              clientType,
+              companyName: text("companyName"),
+              givenName: text("givenName"),
+              familyName: text("familyName"),
+            });
+            setNotice("Name saved.");
+          });
+        }}
+      >
+        <div className="supply-form-heading">
+          <div>
+            <p className="eyebrow">Profile</p>
+            <h2>Name</h2>
+          </div>
+        </div>
+        <label>
+          Type
+          <select name="clientType" defaultValue={String(client.clientType)}>
+            <option value="person">Person</option>
+            <option value="company">Company</option>
+          </select>
+        </label>
+        <label>
+          Company name
+          <input name="companyName" defaultValue={client.companyName ?? ""} />
+          <span className="field-hint">
+            For a person, the company they work for (optional).
+          </span>
+        </label>
+        <label>
+          Given name
+          <input name="givenName" defaultValue={client.givenName ?? ""} />
+        </label>
+        <label>
+          Family name
+          <input name="familyName" defaultValue={client.familyName ?? ""} />
+        </label>
+        <button
+          className="btn btn-ghost"
+          type="submit"
+          disabled={busy === "rename"}
+        >
+          Save name
+        </button>
+      </form>
 
       <form className="supply-form" onSubmit={submitAccountContact}>
         <div className="supply-form-heading">

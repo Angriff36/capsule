@@ -3,13 +3,14 @@ import {
   useEventRentalOrderLines,
 } from "../../lib/useEventRows";
 import {
+  useEventCloseouts,
   useEventInvoices,
   useEventPayrollInputs,
   useEventPurchasing,
 } from "../../lib/useEventAreaRows";
 import { useMemo } from "react";
 import { useLatestIngredientPriceRows } from "../../lib/recipeScopedQueries";
-import { formatMoney } from "../../lib/format";
+import { formatDate, formatMoney } from "../../lib/format";
 import { useEventLaborSummary } from "../facilities/useLaborSummary";
 import {
   useGetEvent,
@@ -41,6 +42,7 @@ import {
 import { EventMarginSummaryAside } from "./EventMarginSummaryAside";
 import { buildLiveEventProfitability } from "./liveEventProfitability";
 import { LiveEventProfitabilityWidget } from "./LiveEventProfitabilityWidget";
+import { finalCloseout } from "./eventFinalCloseout";
 
 type Props = {
   eventId: string;
@@ -105,6 +107,8 @@ export function EventMarginTab({ eventId }: Props) {
   // Live labor from clocked time × pay rates (laborSummary seam). Payroll
   // inputs are only the fallback — their rate fields are encrypted-stripped.
   const clockedLabor = useEventLaborSummary(eventId);
+  // Once the closeout is locked, its actual figures are the event's numbers.
+  const closeout = finalCloseout(useEventCloseouts(eventId));
 
   // The one food-cost read: menu priced at the event date, gaps counted.
   const authStatus = useAuthStatus();
@@ -229,22 +233,38 @@ export function EventMarginTab({ eventId }: Props) {
   );
 
   // Some food has no price: costs shown are only the known part.
-  const costsIncomplete = foodCostReport
-    ? !foodCostReport.estimated.complete
-    : recipeRollup.dishes.some(
-        (dish) => dish.incompleteLineCount > 0 || dish.pricedLineCount === 0,
-      );
-  const laborCost = live.laborCost;
-  const equipmentCost = live.equipmentCost;
-  const revenue = live.invoiceCount > 0 ? live.confirmedRevenue : quoted;
-  const totalCost = foodCost + laborCost + equipmentCost;
+  const costsIncomplete = closeout
+    ? false
+    : foodCostReport
+      ? !foodCostReport.estimated.complete
+      : recipeRollup.dishes.some(
+          (dish) => dish.incompleteLineCount > 0 || dish.pricedLineCount === 0,
+        );
+  const shownFoodCost = closeout
+    ? closeout.actualIngredientCost + closeout.actualWasteCost
+    : foodCost;
+  const laborCost = closeout ? closeout.actualLaborCost : live.laborCost;
+  const equipmentCost = closeout
+    ? closeout.actualVendorCost
+    : live.equipmentCost;
+  const revenue = closeout
+    ? closeout.actualRevenue
+    : live.invoiceCount > 0
+      ? live.confirmedRevenue
+      : quoted;
+  const totalCost = closeout
+    ? closeout.totalActualCost
+    : shownFoodCost + laborCost + equipmentCost;
   const grossProfit = revenue == null ? null : revenue - totalCost;
   const marginPct =
     revenue != null && revenue > 0 && grossProfit != null
       ? (grossProfit / revenue) * 100
       : null;
   const budgetVariance = budget == null ? null : budget - totalCost;
-  const headcount = event?.expectedHeadcount ?? null;
+  const headcount =
+    closeout && closeout.actualHeadcount > 0
+      ? closeout.actualHeadcount
+      : (event?.expectedHeadcount ?? null);
   const perPerson =
     headcount != null && headcount > 0 && quoted != null
       ? quoted / headcount
@@ -252,14 +272,31 @@ export function EventMarginTab({ eventId }: Props) {
   const costBuckets: MarginCostBucket[] = [
     {
       key: "food",
-      label:
-        foodCostReport && !foodCostReport.estimated.complete
+      label: closeout
+        ? "Food, ingredients & waste"
+        : foodCostReport && !foodCostReport.estimated.complete
           ? "Food & ingredients (not all priced)"
           : "Food & ingredients",
-      amount: foodCost,
+      amount: shownFoodCost,
     },
-    { key: "labor", label: "Labor & staffing", amount: laborCost },
-    { key: "equipment", label: "Equipment & rentals", amount: equipmentCost },
+    {
+      key: "labor",
+      // No shift has times yet, so $0 is "not planned", not "free".
+      label:
+        !closeout &&
+        laborCost === 0 &&
+        clockedLabor != null &&
+        (clockedLabor.scheduledShiftCount ?? 0) === 0 &&
+        clockedLabor.recordCount === 0
+          ? "Labor & staffing (set crew times on the Plan tab)"
+          : "Labor & staffing",
+      amount: laborCost,
+    },
+    {
+      key: "equipment",
+      label: closeout ? "Vendors, equipment & rentals" : "Equipment & rentals",
+      amount: equipmentCost,
+    },
   ];
   const revenueLines: MarginRevenueLine[] = [
     {
@@ -278,6 +315,17 @@ export function EventMarginTab({ eventId }: Props) {
       amount: live.confirmedRevenue,
       tone: "ok",
     },
+    ...(closeout
+      ? [
+          {
+            key: "closeout",
+            label: "Closeout revenue",
+            hint: "Locked at closeout",
+            amount: closeout.actualRevenue,
+            tone: "ok",
+          } as MarginRevenueLine,
+        ]
+      : []),
     ...(budget != null
       ? [
           {
@@ -308,6 +356,17 @@ export function EventMarginTab({ eventId }: Props) {
           any.
         </p>
       </header>
+
+      {closeout ? (
+        <p
+          className="banner border-line bg-inset text-ink-3"
+          data-testid="event-margin-closeout"
+        >
+          These are the final numbers from the closeout locked on{" "}
+          {formatDate(closeout.finalizedAt)}. The live estimate further down is
+          only for comparison.
+        </p>
+      ) : null}
 
       <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_18.5rem]">
         <div className="flex min-w-0 flex-col gap-4">

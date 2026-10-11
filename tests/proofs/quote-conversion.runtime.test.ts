@@ -141,6 +141,12 @@ describe("runtime proof: quote submission → conversion (AC-008)", () => {
     const clients = await liveRows(owner, "clients");
     expect(clients).toHaveLength(1);
     expect((clients[0] as { _id?: string })._id).toBe(converted.clientId);
+    // The form asks for a person's name: the client is that person.
+    expect(clients[0]).toMatchObject({
+      clientType: "person",
+      givenName: "Dana",
+      familyName: "Prospect",
+    });
 
     const leads = await liveRows(owner, "leads");
     expect(leads).toHaveLength(1);
@@ -162,6 +168,20 @@ describe("runtime proof: quote submission → conversion (AC-008)", () => {
     expect((events[0] as { clientId?: string }).clientId).toBe(
       converted.clientId,
     );
+    // The person who asked is the event's day-of contact, with the email
+    // and phone they typed (stored encrypted; read back through the event).
+    const event = (await owner.query(api.queries.getEvent, {
+      id: eventId,
+    } as never)) as {
+      primaryContactName?: string;
+      primaryContactEmail?: string;
+      primaryContactPhone?: string;
+    };
+    expect(event).toMatchObject({
+      primaryContactName: "Dana Prospect",
+      primaryContactEmail: "dana@example.com",
+      primaryContactPhone: "555-0100",
+    });
     expect((leads[0] as { clientId?: string }).clientId).toBe(
       converted.clientId,
     );

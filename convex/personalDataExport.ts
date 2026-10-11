@@ -207,6 +207,10 @@ async function exportStaffPerson(
     clientCommunications,
     incidents,
     correctiveActions,
+    performanceReviews,
+    oneOnOnes,
+    trainingCompletions,
+    candidates,
   ] = await Promise.all([
     decryptFields(ctx, "Person", person, ["email", "phone"]),
     ctx.db
@@ -277,6 +281,24 @@ async function exportStaffPerson(
       .query("correctiveActions")
       .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
       .collect(),
+    // Reviews, one-on-ones, training and the hiring record are about this
+    // person too.
+    ctx.db
+      .query("performanceReviews")
+      .withIndex("by_personId", (q) => q.eq("personId", personId))
+      .collect(),
+    ctx.db
+      .query("oneOnOnes")
+      .withIndex("by_staffMemberId", (q) => q.eq("staffMemberId", personId))
+      .collect(),
+    ctx.db
+      .query("trainingCompletions")
+      .withIndex("by_personId", (q) => q.eq("personId", personId))
+      .collect(),
+    ctx.db
+      .query("candidates")
+      .withIndex("by_hiredPersonId", (q) => q.eq("hiredPersonId", personId))
+      .collect(),
   ]);
 
   const actorIds = new Set(
@@ -325,6 +347,18 @@ async function exportStaffPerson(
       reportedIncidents: incidents.filter((row) =>
         matchesActor(row.reportedById),
       ),
+      performanceReviews: await Promise.all(
+        belongsToTenant(performanceReviews, tenantId).map((row) =>
+          decryptFields(ctx, "PerformanceReview", row, ["notes"]),
+        ),
+      ),
+      oneOnOnes: belongsToTenant(oneOnOnes, tenantId),
+      trainingCompletions: await Promise.all(
+        belongsToTenant(trainingCompletions, tenantId).map((row) =>
+          decryptFields(ctx, "TrainingCompletion", row, ["notes"]),
+        ),
+      ),
+      hiringRecords: belongsToTenant(candidates, tenantId),
       correctiveActions: correctiveActions.filter(
         (row) => matchesActor(row.openedById) || matchesActor(row.closedById),
       ),

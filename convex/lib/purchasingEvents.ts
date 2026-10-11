@@ -377,14 +377,98 @@ export async function settleEventPurchasing(
     .collect();
   for (const need of needs) {
     if (need.tenantId !== tenantId || need.deletedAt != null) continue;
-    if (["ordered", "fulfilled"].includes(need.status))
-      await ctx.runMutation(api.mutations.PurchaseNeed_settleWithEvent, {
-        docId: need._id,
-      });
-    else if (need.status === "open")
-      await ctx.runMutation(api.mutations.PurchaseNeed_closeWithFinishedEvent, {
-        docId: need._id,
-      });
+    await settleNeed(ctx, need);
+  }
+}
+
+async function settleNeed(ctx: MutationCtx, need: Doc<"purchaseNeeds">) {
+  if (["ordered", "fulfilled"].includes(need.status))
+    await ctx.runMutation(api.mutations.PurchaseNeed_settleWithEvent, {
+      docId: need._id,
+    });
+  else if (need.status === "open")
+    await ctx.runMutation(api.mutations.PurchaseNeed_closeWithFinishedEvent, {
+      docId: need._id,
+    });
+}
+
+/**
+ * Stock fully given to an event has left the shelf. Its purchase need stops
+ * counting now, not when the event ends; otherwise a later event in the same
+ * week buys that amount again.
+ */
+export async function settleIssuedDemandPurchasing(
+  ctx: MutationCtx,
+  demandId: Id<"ingredientDemands">,
+) {
+  const tenantId = requireTenant(await getAuthContext(ctx));
+  const needs = await ctx.db
+    .query("purchaseNeeds")
+    .withIndex("by_ingredientDemandId", (q) =>
+      q.eq("ingredientDemandId", demandId),
+    )
+    .collect();
+  for (const need of needs) {
+    if (need.tenantId !== tenantId || need.deletedAt != null) continue;
+    await settleNeed(ctx, need);
+  }
+}
+
+/**
+ * A used need no longer counts toward its week. Re-run the weekly line for
+ * each editable draft that still buys this ingredient that week, so its
+ * quantity drops instead of keeping the old amount.
+ */
+export async function refreshWeeklyDraftsAfterNeedUsed(
+  ctx: MutationCtx,
+  needId: Id<"purchaseNeeds">,
+) {
+  const tenantId = requireTenant(await getAuthContext(ctx));
+  const used = await ctx.db.get(needId);
+  if (!used || used.tenantId !== tenantId || used.purchasingWeekStart == null)
+    return;
+  const open = await ctx.db
+    .query("purchaseNeeds")
+    .withIndex("by_ingredientId_and_status", (q) =>
+      q.eq("ingredientId", used.ingredientId).eq("status", "open"),
+    )
+    .collect();
+  const refreshed = new Set<string>();
+  for (const need of open) {
+    if (
+      need.tenantId !== tenantId ||
+      need.deletedAt != null ||
+      need.unit !== used.unit ||
+      need.purchasingWeekStart !== used.purchasingWeekStart ||
+      need.vendorOrderId == null ||
+      refreshed.has(need.vendorOrderId)
+    )
+      continue;
+    const order = await ctx.db.get(need.vendorOrderId);
+    if (
+      !order ||
+      order.tenantId !== tenantId ||
+      order.deletedAt != null ||
+      order.status !== "draft" ||
+      order.sourceRangeStart == null ||
+      order.sourceRangeEnd == null
+    )
+      continue;
+    refreshed.add(order._id);
+    await ctx.runMutation(api.mutations.VendorOrder_ensureWeeklyDraft, {
+      docId: order._id,
+      version: order.version,
+      vendorId: order.vendorId,
+      sourceRangeStart: order.sourceRangeStart,
+      sourceRangeEnd: order.sourceRangeEnd,
+      purchaseNeedId: need._id,
+      ingredientDemandId: need.ingredientDemandId,
+      ingredientId: need.ingredientId,
+      requiredQuantity: need.requiredQuantity,
+      unit: need.unit,
+      // The draft already has its order number; this only names a new one.
+      orderSequence: 0,
+    });
   }
 }
 

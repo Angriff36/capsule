@@ -592,3 +592,146 @@ describe("runtime proof: event dishes → shared weekly VendorOrder draft", () =
     expect(second.map((need) => need.status)).toEqual(["cancelled"]);
   });
 });
+
+/** First event: 40 guests x 0.1 kg = 4 kg is ordered and delivered. */
+async function deliveredFirstEvent(tenantId: string) {
+  const proof = harness();
+  const roles = rolesFor(proof, tenantId);
+  const owner = proof.asRole({
+    subject: `owner-${tenantId}`,
+    role: "owner",
+    tenantId,
+  });
+  const buy = runner(proof, roles.procurement);
+  const catalog = await seedCatalog(proof, tenantId, [
+    { name: "Chicken", perServing: S.flourPerServing },
+  ]);
+  const [ingredientId] = catalog.ingredientIds as [string];
+  const first = await approvedEvent(proof, tenantId, {
+    title: "Delivered first",
+    headcount: 40,
+    dishIds: catalog.dishIds,
+  });
+  const [draft] = await drafts(roles.procurement, tenantId);
+  await buy(api.mutations.VendorOrder_submit, {
+    docId: draft!._id,
+    version: draft!.version,
+  });
+  await buy(api.mutations.VendorOrder_confirm, {
+    docId: draft!._id,
+    version: await versionOf(roles.procurement, draft!._id),
+  });
+  const bought = await lineFor(
+    roles.procurement,
+    tenantId,
+    draft!._id,
+    ingredientId,
+  );
+  expect(Number(bought!.orderedQuantity)).toBeCloseTo(4, 4);
+  await buy(api.mutations.VendorOrderLine_recordReceipt, {
+    docId: bought!._id,
+    quantity: 4,
+    locationId: catalog.locationId,
+    unitPrice: 2,
+    supplierLotNumber: "DELIVERED-LOT-1",
+  });
+  const stockRow = async () =>
+    (
+      await liveRows<{
+        _id: string;
+        tenantId: string;
+        ingredientId: string;
+        quantityOnHand: number;
+        version: number;
+      }>(owner, "inventoryItems", tenantId)
+    ).find((row) => row.ingredientId === ingredientId)!;
+  expect(Number((await stockRow()).quantityOnHand)).toBeCloseTo(4, 4);
+  await roles.events.run(async (ctx) =>
+    ctx.db.patch(first as never, { stage: "executing" } as never),
+  );
+  const secondEventLine = async () => {
+    await approvedEvent(proof, tenantId, {
+      title: "Delivered second",
+      headcount: 20,
+      dishIds: catalog.dishIds,
+    });
+    const [next] = await drafts(roles.procurement, tenantId);
+    return async () =>
+      (await lineFor(roles.procurement, tenantId, next!._id, ingredientId))!;
+  };
+  return {
+    proof,
+    roles,
+    owner,
+    catalog,
+    ingredientId,
+    first,
+    stockRow,
+    secondEventLine,
+  };
+}
+
+describe("runtime proof: stock given to an event is not bought again", () => {
+  it("a later event in the week buys only its own need after an earlier event used its delivery", async () => {
+    const tenantId = "tenant-issued-stock-not-rebought";
+    const w = await deliveredFirstEvent(tenantId);
+    // The kitchen gives all 4 kg to the first event while it runs.
+    const reservationId = await w.proof.seedEntity(
+      w.owner,
+      "inventoryReservations",
+      {
+        tenantId,
+        inventoryItemId: (await w.stockRow())._id,
+        eventId: w.first,
+        ingredientId: w.ingredientId,
+        quantity: 4,
+        status: "active",
+        reservedAt: 1,
+        version: 1,
+      },
+    );
+    await w.owner.mutation(
+      (api.lib as any).operationalTransactions.issueEventStock,
+      {
+        eventId: w.first,
+        reservationId,
+        reservationVersion: 1,
+        operationKey: "issued-first",
+      },
+    );
+    expect(Number((await w.stockRow()).quantityOnHand)).toBeCloseTo(0, 4);
+
+    // Second event in the same week: 20 guests x 0.1 kg = 2 kg. Nothing is
+    // on the shelf and the first event's 4 kg is gone: buy 2 kg, not 6.
+    const line = await w.secondEventLine();
+    expect(Number((await line()).orderedQuantity)).toBeCloseTo(2, 4);
+  });
+
+  it("an open draft line drops the finished event's amount when that event completes", async () => {
+    const tenantId = "tenant-settled-need-refreshes-draft";
+    const w = await deliveredFirstEvent(tenantId);
+    // The 4 kg is used without a stock issue; a count finds the shelf empty.
+    const item = await w.stockRow();
+    await runner(w.proof, w.roles.inventory)(
+      api.mutations.InventoryItem_recount,
+      { docId: item._id, version: item.version, actualQuantity: 0 },
+    );
+    const line = await w.secondEventLine();
+    // While the first event still runs its bought 4 kg looks unmet.
+    expect(Number((await line()).orderedQuantity)).toBeCloseTo(6, 4);
+
+    await w.roles.events.run(async (ctx) =>
+      ctx.db.patch(w.first as never, { stage: "final" } as never),
+    );
+    await runner(w.proof, w.roles.events)(
+      api.mutations.Event_complete as never,
+      {
+        docId: w.first,
+        version: await versionOf(w.roles.events, w.first),
+      },
+    );
+    // The finished event no longer counts, so the draft drops to 2 kg.
+    expect(Number((await line()).orderedQuantity)).toBeCloseTo(2, 4);
+    expect(Number((await line()).plannedQuantity)).toBeCloseTo(2, 4);
+  });
+});

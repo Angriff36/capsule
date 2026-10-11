@@ -65,6 +65,8 @@ type BoardItem = {
   eventId: string | null;
   status: string;
   dueAt: number | null;
+  /** The event's start: orders work with no prep time and tells its day. */
+  eventStartsAt?: number | null;
   plannedYield?: number;
   componentId?: string;
   startedAt?: number | null;
@@ -240,10 +242,21 @@ export function KitchenDisplayPage() {
         event?.startsAt != null && event.startsAt < now - 2 * 86_400_000
       );
     })
+    .map((item): BoardItem => {
+      const event = item.eventId
+        ? (namedEvents?.find((row) => row._id === item.eventId) ??
+          events?.find((row) => row._id === item.eventId))
+        : undefined;
+      return { ...item, eventStartsAt: event?.startsAt ?? null };
+    })
     .sort((left, right) => {
       const rank = urgencyRank(left, now) - urgencyRank(right, now);
       if (rank !== 0) return rank;
-      return (left.dueAt ?? Infinity) - (right.dueAt ?? Infinity);
+      // With no prep time, the sooner event's work comes first.
+      return (
+        (left.dueAt ?? left.eventStartsAt ?? Infinity) -
+        (right.dueAt ?? right.eventStartsAt ?? Infinity)
+      );
     });
 
   // The events whose cards this screen shows, soonest first, whatever stage
@@ -399,6 +412,9 @@ export function KitchenDisplayPage() {
                 <h2>{item.title}</h2>
                 <p className="kds-detail">
                   {item.detail} · {eventName(item.eventId)}
+                  {item.eventStartsAt != null
+                    ? ` (${new Date(item.eventStartsAt).toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" })})`
+                    : ""}
                   {item.station ? ` · ${item.station}` : ""}
                 </p>
                 {item.facts ? (

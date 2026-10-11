@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useIngredientUpdateCosting } from "../../lib/manifest-convex-react";
+import { reportActionOk } from "../../ui/action-result";
 
 export type IngredientCostingTarget = {
   _id: string;
@@ -51,6 +52,9 @@ export function IngredientCostingEditor({
         version: ingredient.version,
         costPerUnit: parsedCost,
       });
+      reportActionOk(
+        `Cost saved: $${parsedCost.toFixed(2)} per ${ingredient.unit}.`,
+      );
     } catch (error) {
       onFailure(error);
     } finally {

@@ -40,6 +40,7 @@ import {
   ClientPortalLinkRevokeParamsSchema,
   ClientReactivateParamsSchema,
   ClientRegisterParamsSchema,
+  ClientRenameParamsSchema,
   ClientSetBirthdayParamsSchema,
   ClientSetEmailPreferenceParamsSchema,
   ClientStageClientMergeParamsSchema,
@@ -266,6 +267,7 @@ import {
   EventGuestInviteParamsSchema,
   EventGuestRsvpConfirmParamsSchema,
   EventGuestRsvpDeclineParamsSchema,
+  EventGuestUndoCheckInParamsSchema,
   EventGuestWithdrawParamsSchema,
   EventIngredientContributionRecordParamsSchema,
   EventIngredientContributionRefreshRecipeSyncParamsSchema,
@@ -445,6 +447,7 @@ import {
   InvoiceApplyPaymentParamsSchema,
   InvoiceAssignNumberParamsSchema,
   InvoiceFollowEventClientParamsSchema,
+  InvoiceFollowEventHeadcountParamsSchema,
   InvoiceFollowEventPriceParamsSchema,
   InvoiceFollowEventPriceTaxedParamsSchema,
   InvoiceIssueParamsSchema,
@@ -1380,6 +1383,16 @@ export function useClientRegister() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ClientRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Client.rename. */
+export function useClientRename() {
+  const mutate = useMutation(api.mutations.Client_rename);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ClientRenameParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -4975,6 +4988,16 @@ export function useEventGuestRsvpDecline() {
   };
 }
 
+/** Mutation hook for EventGuest.undoCheckIn. */
+export function useEventGuestUndoCheckIn() {
+  const mutate = useMutation(api.mutations.EventGuest_undoCheckIn);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventGuestUndoCheckInParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for EventGuest.withdraw. */
 export function useEventGuestWithdraw() {
   const mutate = useMutation(api.mutations.EventGuest_withdraw);
@@ -7084,6 +7107,16 @@ export function useInvoiceFollowEventClient() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = InvoiceFollowEventClientParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Invoice.followEventHeadcount. */
+export function useInvoiceFollowEventHeadcount() {
+  const mutate = useMutation(api.mutations.Invoice_followEventHeadcount);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceFollowEventHeadcountParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -15022,4 +15055,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1586 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1589 as const;

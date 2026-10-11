@@ -331,7 +331,8 @@ const CONNECTORS = /\s*(?:,|\bor\b|\band\b|\/|&)\s*/;
 function familyForPhrase(
   phrase: string,
 ): { term: string; family: string } | null {
-  const words = plain(phrase).split(" ").filter(Boolean);
+  // "tree-nut allergy" names the same food as "tree nut allergy".
+  const words = plain(phrase).replace(/-/g, " ").split(" ").filter(Boolean);
   if (words.length === 0) return null;
   const candidates = [
     words.join(" "),

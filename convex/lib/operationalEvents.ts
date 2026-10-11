@@ -31,7 +31,7 @@ import { eventStyleReconciliation } from "./styleReconciliation";
 import { eventRentalReconciliation } from "./rentalReconciliation";
 import {
   assertInvoiceCommercialSource, ensureEventDraftInvoice, eventInvoicePricingReconciliation,
-  followAcceptedProposalPrice, retaxDraftForClient,
+  followAcceptedProposalPrice, followEventHeadcountInvoice, retaxDraftForClient,
 } from "./invoicePricingReconciliation";
 import { eventCloseoutCommercialReconciliation } from "./closeoutCommercialReconciliation";
 import {
@@ -50,9 +50,11 @@ import {
 import {
   adoptLegacyDraftQuantity,
   reconcileCancelledPurchaseDrafts,
+  refreshWeeklyDraftsAfterNeedUsed,
   retireCoveredZeroLine,
   retireUnusedAutomaticDraft,
   settleEventPurchasing,
+  settleIssuedDemandPurchasing,
 } from "./purchasingEvents";
 import {
   moveEventPurchasingWeek,
@@ -358,6 +360,12 @@ export async function handleManifestEvent(
         newHeadcount: Number(event.payload.newHeadcount),
       },
     );
+    // The unsent draft bill from the accepted proposal bills the new count.
+    await followEventHeadcountInvoice(
+      ctx,
+      event.entityId as Id<"events">,
+      Number(event.payload.previousHeadcount),
+    );
     // A headcount change never rewrites an accepted proposal — it records a
     // `proposal/change requirement` and keeps the signed document as history.
     await eventProposalReconciliation.run(
@@ -582,6 +590,23 @@ export async function handleManifestEvent(
       event.eventId,
     );
     await retireCoveredZeroLine(ctx, event.entityId as Id<"vendorOrderLines">);
+    return;
+  }
+  if (
+    event.entity === "IngredientDemand" &&
+    event.type === "IngredientDemandFulfilled"
+  ) {
+    await settleIssuedDemandPurchasing(
+      ctx,
+      event.entityId as Id<"ingredientDemands">,
+    );
+    return;
+  }
+  if (event.entity === "PurchaseNeed" && event.type === "PurchaseNeedUsed") {
+    await refreshWeeklyDraftsAfterNeedUsed(
+      ctx,
+      event.entityId as Id<"purchaseNeeds">,
+    );
     return;
   }
   if (

@@ -4,6 +4,7 @@
 // stock for that item and place. Using a row is the cutover choice.
 import { Fragment, useMemo, useState } from "react";
 import {
+  useCreateStorageLocation,
   useListComponent,
   useListIngredient,
   useListStorageLocation,
@@ -67,6 +68,7 @@ export function OpeningStockPage() {
   const ingredients = useListIngredient();
   const components = useListComponent();
   const locations = useListStorageLocation();
+  const createLocation = useCreateStorageLocation();
   const review = useReviewOpeningStock();
   const setAside = useSetAsideOpeningStock();
   const apply = useApplyOpeningStock();
@@ -118,9 +120,24 @@ export function OpeningStockPage() {
     }
   };
 
-  const save = (id: string, values: OpeningStockFixValues) =>
+  const save = (
+    id: string,
+    values: OpeningStockFixValues,
+    newLocationName?: string,
+  ) =>
     run(`${id}:save`, async () => {
-      await review({ ...values, recordId: id } as Parameters<typeof review>[0]);
+      const locationId = newLocationName
+        ? String(
+            (
+              (await createLocation({ name: newLocationName })) as {
+                docId: string;
+              }
+            ).docId,
+          )
+        : values.locationId;
+      await review({ ...values, locationId, recordId: id } as Parameters<
+        typeof review
+      >[0]);
       setEditing(null);
       return "Row saved.";
     });
@@ -346,7 +363,9 @@ export function OpeningStockPage() {
                               components={(components ?? []) as never}
                               locations={(locations ?? []) as never}
                               busy={busy === `${id}:save`}
-                              onSave={(values) => void save(id, values)}
+                              onSave={(values, newLocationName) =>
+                                void save(id, values, newLocationName)
+                              }
                               onCancel={() => setEditing(null)}
                             />
                           </td>

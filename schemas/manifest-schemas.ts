@@ -5622,6 +5622,16 @@ export const ClientRegisterParamsSchema = z.object({
 
 export type ClientRegisterParams = z.infer<typeof ClientRegisterParamsSchema>;
 
+// Command: rename on Client
+export const ClientRenameParamsSchema = z.object({
+  clientType: z.enum(["company", "person"]),
+  companyName: z.string().optional(),
+  givenName: z.string().optional(),
+  familyName: z.string().optional(),
+});
+
+export type ClientRenameParams = z.infer<typeof ClientRenameParamsSchema>;
+
 // Command: setBirthday on Client
 export const ClientSetBirthdayParamsSchema = z.object({
   birthday: z.string().optional(),
@@ -7922,6 +7932,11 @@ export const EventGuestRsvpDeclineParamsSchema = z.object({
 
 export type EventGuestRsvpDeclineParams = z.infer<typeof EventGuestRsvpDeclineParamsSchema>;
 
+// Command: undoCheckIn on EventGuest
+export const EventGuestUndoCheckInParamsSchema = z.object({});
+
+export type EventGuestUndoCheckInParams = z.infer<typeof EventGuestUndoCheckInParamsSchema>;
+
 // Command: withdraw on EventGuest
 export const EventGuestWithdrawParamsSchema = z.object({
   reason: z.string(),
@@ -9262,6 +9277,17 @@ export const InvoiceFollowEventClientParamsSchema = z.object({
 });
 
 export type InvoiceFollowEventClientParams = z.infer<typeof InvoiceFollowEventClientParamsSchema>;
+
+// Command: followEventHeadcount on Invoice
+export const InvoiceFollowEventHeadcountParamsSchema = z.object({
+  subtotal: z.number(),
+  taxAmount: z.number(),
+  total: z.number(),
+  lineItems: z.unknown(),
+  taxBreakdown: z.unknown(),
+});
+
+export type InvoiceFollowEventHeadcountParams = z.infer<typeof InvoiceFollowEventHeadcountParamsSchema>;
 
 // Command: followEventPrice on Invoice
 export const InvoiceFollowEventPriceParamsSchema = z.object({});

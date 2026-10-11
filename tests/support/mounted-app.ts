@@ -571,6 +571,7 @@ vi.mock("convex/react", async (importOriginal) => {
             "useListEventDishLineOverride",
           "queries:listPayrollInputByEventId": "useListPayrollInput",
           "queries:listVendorOrderByEventId": "useListVendorOrder",
+          "queries:listEventCloseoutByEventId": "useListEventCloseout",
         };
         if (scoped[name]) {
           const [field, value] = Object.entries(

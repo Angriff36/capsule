@@ -17,7 +17,7 @@ import {
 import { useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
-import { formatCountNoun, formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import {
   EmptyState,
   PageHeader,
@@ -371,6 +371,12 @@ export function QuoteSubmissionsReviewPage() {
                   <div>
                     {sub.eventDate ? formatDate(sub.eventDate) : "No date"}
                   </div>
+                  {sub.eventDate && sub.eventEndTime != null && (
+                    <div>
+                      {formatTime(sub.eventDate)} –{" "}
+                      {formatTime(sub.eventEndTime)}
+                    </div>
+                  )}
                   <div>{formatCountNoun(sub.guestCount ?? 0, "guest")}</div>
                   {sub.submittedAt && (
                     <div className="text-2xs text-ink-3">

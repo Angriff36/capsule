@@ -174,6 +174,13 @@ Screens (25): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
   - refusals (role, stage and rules): "Sales and finance may see client accounts for CRM and billing"; "Sales staff may update client accounts"; "Sales staff may change client accounts"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 2 more
   - effects: ClientReactivated
   - refresh: live reads update by themselves; reads affected: Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 28 more
+- `mutations.Client_rename` (Client.rename)
+  - inputs from the screen: clientType, companyName, givenName, familyName; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Sales and finance may see client accounts for CRM and billing"; "Sales staff may update client accounts"; "Sales staff may change client accounts"; "Guard 0 failed"; "Company clients require a company name; person clients require a given name"; "ConcurrencyConflict:"; and 1 more
+  - effects: ClientRenamed
+  - refresh: live reads update by themselves; reads affected: Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientContact.list, ClientContact.get, ClientMerge.list, ClientMerge.get and 28 more
 - `mutations.Client_setBirthday` (Client.setBirthday)
   - inputs from the screen: birthday; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -662,6 +669,7 @@ Screens (36): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `shareLinks.recordShareView` - mutation; authored step; live reads update by themselves
 - `signatureAcceptance.completeSignature` - mutation; authored step; live reads update by themselves
 - `signatureAcceptance.getPendingSignatureRequest` - query; live read, updates by itself
+- `signatureAcceptance.getSignatureRequestOutcome` - query; live read, updates by itself
 - `sourceProvenance.listByCapsuleId` - query; live read, updates by itself
 - `sourceProvenance.listMergedClients` - query; live read, updates by itself
 - `travelFees.applyProposalTravelFee` - mutation; authored step; live reads update by themselves
@@ -691,6 +699,7 @@ Screens (67): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
 - `queries.listEventChecklist` - live read
+- `queries.listEventCloseoutByEventId` - live read
 - `queries.listEventDishByEventId` - live read
 - `queries.listEventDishLineOverrideByEventDishId` - live read
 - `queries.listEventGuestByEventId` - live read
@@ -881,6 +890,13 @@ Screens (67): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: EventGuestRsvpDeclined
+  - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
+- `mutations.EventGuest_undoCheckIn` (EventGuest.undoCheckIn)
+  - inputs from the screen: none; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Event staff may see guest attendance"; "Event staff may update the guest list"; "Event staff may change the guest list"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
+  - effects: EventGuestCheckInUndone
   - refresh: live reads update by themselves; reads affected: EventGuest.list, EventGuest.get, Event.list, Event.get, EventDish.list, EventDish.get
 - `mutations.EventGuest_withdraw` (EventGuest.withdraw)
   - inputs from the screen: reason; filled by the server: none
@@ -1502,6 +1518,7 @@ Screens (176): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventCloseoutByEventId` - live read
 - `queries.listEventDish` - live read
 - `queries.listEventDishByEventId` - live read
 - `queries.listEventDishLineOverrideByEventDishId` - live read
@@ -2658,6 +2675,7 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventCloseoutByEventId` - live read
 - `queries.listEventDishLineOverrideByEventDishId` - live read
 - `queries.listEventGuestByEventId` - live read
 - `queries.listEventLayoutSectionByEventId` - live read
@@ -2868,6 +2886,7 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventCloseoutByEventId` - live read
 - `queries.listEventDishLineOverrideByEventDishId` - live read
 - `queries.listEventGuestByEventId` - live read
 - `queries.listEventLayoutSectionByEventId` - live read
@@ -4238,6 +4257,7 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventCloseoutByEventId` - live read
 - `queries.listEventDishLineOverrideByEventDishId` - live read
 - `queries.listEventGuestByEventId` - live read
 - `queries.listEventLayoutSectionByEventId` - live read
@@ -4644,7 +4664,7 @@ Screens (13): `events/packet/EventPacketPanel.tsx`, `events/packet/EventWorkbook
 
 ## 10. Billing and closeout
 
-Screens (70): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`, `events/EventInvoiceCard.tsx`, `events/EventMarginBreakdown.tsx`, `events/EventMarginSummaryAside.tsx`, `events/EventMarginTab.tsx`, `events/LiveEventProfitabilityWidget.tsx`, `finance/CloseoutBillingTruth.tsx`, `finance/CloseoutCaptureForm.tsx`, `finance/CloseoutCorrectionPanel.tsx`, `finance/CloseoutLifecyclePolicy.ts`, `finance/CloseoutPage.tsx`, `finance/CloseoutSourcesPanel.tsx`, `finance/CommercialLifecyclePolicy.ts`, `finance/DonationSummaryPage.tsx`, `finance/eventCostSummary.ts`, `finance/EventCostSummaryReport.tsx`, `finance/EventFoodCostPanel.tsx`, `finance/FinanceFailureBanner.tsx`, `finance/FinanceOverviewPage.tsx`, `finance/FinanceReconciliationPage.tsx`, `finance/financeRoutes.ts`, `finance/FinanceWorkspaceNav.tsx`, `finance/foodCostPercentage.ts`, `finance/FoodCostPercentagePage.tsx`, `finance/invoiceBilling.ts`, `finance/InvoiceDetailPage.tsx`, `finance/InvoiceEquipmentCharges.tsx`, `finance/InvoiceIssueForm.tsx`, `finance/invoiceNumberDisplay.ts`, `finance/InvoiceNumberEditor.tsx`, `finance/invoicePdf.ts`, `finance/InvoicesPage.tsx`, `finance/invoiceTax.ts`, `finance/InvoiceTravelFee.tsx`, `finance/laborCost.ts`, `finance/LeftoverDispositionPanel.tsx`, `finance/leftoverDispositions.ts`, `finance/paymentBreakdown.ts`, `finance/PaymentMethodLifecyclePolicy.ts`, `finance/PaymentMethodsPage.tsx`, `finance/PaymentsLedgerPresenter.ts`, `finance/PaymentsPage.tsx`, `finance/payrollExport.ts`, `finance/PayrollExportPanel.tsx`, `finance/PayrollLifecyclePolicy.ts`, `finance/PayrollPage.tsx`, `finance/payrollPeriod.ts`, `finance/PayrollPrepareForm.tsx`, `finance/PayrollPreparePayloadBuilder.ts`, `finance/PayrollReceipts.tsx`, `finance/payrollReconcile.ts`, `finance/PayrollWorksheet.tsx`, `finance/profitMarginReport.ts`, `finance/ProfitMarginReportsPage.tsx`, `finance/ReconciliationTables.tsx`, `finance/ReminderHistoryList.tsx`, `finance/RevenueAttributionDetailPage.tsx`, `finance/RevenueAttributionsPage.tsx`, `finance/revenueAttributionValues.ts`, `finance/RevenueSplitChanges.tsx`, `finance/revenueSplitMeasures.ts`, `finance/RevenueSplitSummary.tsx`, `finance/revenueTrend.ts`, `finance/RevenueTrendsPage.tsx`, `finance/TaxRatesPage.tsx`, `finance/tipDistribution.ts`, `finance/TipDistributionPage.tsx`, `finance/useFinanceReportFilters.ts`, `finance/VenueCommissionTermsPage.tsx`
+Screens (71): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`, `events/EventInvoiceCard.tsx`, `events/EventMarginBreakdown.tsx`, `events/EventMarginSummaryAside.tsx`, `events/EventMarginTab.tsx`, `events/LiveEventProfitabilityWidget.tsx`, `finance/CloseoutBillingTruth.tsx`, `finance/CloseoutCaptureForm.tsx`, `finance/CloseoutCorrectionPanel.tsx`, `finance/CloseoutLifecyclePolicy.ts`, `finance/CloseoutPage.tsx`, `finance/CloseoutSourcesPanel.tsx`, `finance/CommercialLifecyclePolicy.ts`, `finance/DonationSummaryPage.tsx`, `finance/eventCostSummary.ts`, `finance/EventCostSummaryReport.tsx`, `finance/EventFoodCostPanel.tsx`, `finance/FinanceFailureBanner.tsx`, `finance/FinanceOverviewPage.tsx`, `finance/FinanceReconciliationPage.tsx`, `finance/financeRoutes.ts`, `finance/FinanceWorkspaceNav.tsx`, `finance/foodCostPercentage.ts`, `finance/FoodCostPercentagePage.tsx`, `finance/invoiceBilling.ts`, `finance/InvoiceDetailPage.tsx`, `finance/InvoiceEquipmentCharges.tsx`, `finance/InvoiceIssueForm.tsx`, `finance/invoiceNumberDisplay.ts`, `finance/InvoiceNumberEditor.tsx`, `finance/invoicePdf.ts`, `finance/InvoiceSignedProposalLines.tsx`, `finance/InvoicesPage.tsx`, `finance/invoiceTax.ts`, `finance/InvoiceTravelFee.tsx`, `finance/laborCost.ts`, `finance/LeftoverDispositionPanel.tsx`, `finance/leftoverDispositions.ts`, `finance/paymentBreakdown.ts`, `finance/PaymentMethodLifecyclePolicy.ts`, `finance/PaymentMethodsPage.tsx`, `finance/PaymentsLedgerPresenter.ts`, `finance/PaymentsPage.tsx`, `finance/payrollExport.ts`, `finance/PayrollExportPanel.tsx`, `finance/PayrollLifecyclePolicy.ts`, `finance/PayrollPage.tsx`, `finance/payrollPeriod.ts`, `finance/PayrollPrepareForm.tsx`, `finance/PayrollPreparePayloadBuilder.ts`, `finance/PayrollReceipts.tsx`, `finance/payrollReconcile.ts`, `finance/PayrollWorksheet.tsx`, `finance/profitMarginReport.ts`, `finance/ProfitMarginReportsPage.tsx`, `finance/ReconciliationTables.tsx`, `finance/ReminderHistoryList.tsx`, `finance/RevenueAttributionDetailPage.tsx`, `finance/RevenueAttributionsPage.tsx`, `finance/revenueAttributionValues.ts`, `finance/RevenueSplitChanges.tsx`, `finance/revenueSplitMeasures.ts`, `finance/RevenueSplitSummary.tsx`, `finance/revenueTrend.ts`, `finance/RevenueTrendsPage.tsx`, `finance/TaxRatesPage.tsx`, `finance/tipDistribution.ts`, `finance/TipDistributionPage.tsx`, `finance/useFinanceReportFilters.ts`, `finance/VenueCommissionTermsPage.tsx`
 
 ### Generated reads
 

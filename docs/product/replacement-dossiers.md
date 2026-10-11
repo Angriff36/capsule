@@ -17,6 +17,13 @@ Questions 6 and 7 need real Mangia events run in both tools by the people who
 do the job, and the owner's sign-off. Those are not done. No tool is retired
 by this document.
 
+Parity rule (spec §1.2, AC-387): Capsule replaces each tool job for job, not
+screen for screen. Where the Mangia Operations Final Lock training manual and an
+old tool do the job differently, Capsule follows the manual (rule 2 in
+`docs/product/decision-order-log.md`); old-tool records are only evidence for
+moving data in (rule 6). The owner's dated decisions come first (rule 1), for
+example Capsule's own event chat in place of a Slack channel.
+
 "Built" means a screen, the server step and a proof test exist. It does not
 mean an operator has tried it. Paths: screens are page addresses; proofs are
 under `tests/`.
@@ -222,6 +229,7 @@ assigned as field work (§20.6).
 | Keep BEOs, worksheets, drawings with the event | Workbook sources, Photos tab | `proofs/event-packet-evidence`, `proofs/record-source-provenance` | Built (kept and linked) |
 | Route, map, load-in, setup drawings in the packet | packet venue part, pages at the back | `proofs/backend-golden-event` step 10, `proofs/packet-print-files`, `event-packet-attached-files` | Built (drawings, maps and uploaded BEOs print at the back as PDF pages or pictures; since 2026-10-03 a venue map picture from OpenStreetMap prints there too, `venue-map-picture`; when the address is missing, not found, or the map service does not answer, the packet prints without the picture and keeps the map link, so staff see at once that it did not come) |
 | Tracker board | `/events/tracker` | `proofs/packet-out-of-date-readiness` (binder mark) | Built; the binder mark is set by hand and clears itself when a changed packet is printed |
+| Find diagrams, menus, packets and source files (replaces Drive / Dropbox) | event Photos tab, Workbook sources, packet pages at the back | `proofs/event-packet-evidence`, `event-packet-attached-files` | Built (files stay on the event and print in its packet) |
 | Event chat (replaces Slack) | event Chat tab | `proofs/event-communication`, `proofs/event-chat-channel` | Built |
 
 No retyping: the packet parts are built from the event itself (menu, guest

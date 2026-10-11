@@ -23,6 +23,7 @@ import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { useVendorContractEdits } from "./VendorContractEdits";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { SearchSelect } from "../../ui/SearchSelect";
+import { unitOptionsFor } from "../kitchen/import/UnitOfMeasureMapper";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const EXPIRY_ALERT_DAYS = 30;
@@ -468,6 +469,29 @@ export function VendorContractsPage() {
                           required
                           list={`tier-items-${contract._id}`}
                           autoComplete="off"
+                          onChange={(event) => {
+                            // Orders also match on the unit: start with the
+                            // ingredient's own unit once its name is picked.
+                            const typed = event.currentTarget.value
+                              .trim()
+                              .toLowerCase();
+                            const match = (ingredients ?? []).find(
+                              (item) =>
+                                item.deletedAt == null &&
+                                String(item.name).trim().toLowerCase() ===
+                                  typed,
+                            );
+                            const unitField =
+                              event.currentTarget.form?.elements.namedItem(
+                                "unit",
+                              );
+                            if (
+                              match?.unit &&
+                              unitField instanceof HTMLSelectElement
+                            ) {
+                              unitField.value = String(match.unit);
+                            }
+                          }}
                         />
                         <datalist id={`tier-items-${contract._id}`}>
                           {ingredientNames.map((name) => (
@@ -488,11 +512,17 @@ export function VendorContractsPage() {
                       </label>
                       <label className="field-label">
                         Unit
-                        <input
+                        <select
                           name="unit"
                           className="input"
                           defaultValue="each"
-                        />
+                        >
+                          {unitOptionsFor().map((value) => (
+                            <option key={value} value={value}>
+                              {value.replace(/_/g, " ")}
+                            </option>
+                          ))}
+                        </select>
                       </label>
                       <label className="field-label">
                         Min quantity

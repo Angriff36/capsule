@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode, type RefObject } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { ALLERGEN_BRIEFING_HASH } from "../AllergenBriefingButton";
 import type { EventDetailTab } from "../eventRoutes";
+import { useIsPickupEvent } from "../eventVenueLabel";
 import { useEventReviewFlags } from "../review-flags/useEventReviewFlags";
 import { EventDashHero } from "./EventDashHero";
 import { EventDashNav } from "./EventDashNav";
@@ -45,6 +46,7 @@ export function EventDashboard(props: Props) {
     },
   };
   const flags = useEventReviewFlags(overview.eventId);
+  const pickup = useIsPickupEvent(overview.event);
   const location = useLocation();
 
   // Old "Edit" links land on #event-setup-basics: open the edit sheet.
@@ -139,6 +141,10 @@ export function EventDashboard(props: Props) {
             hasMenuDishes: overview.event.hasMenuDishes,
             hasStaffAssigned: overview.event.hasStaffAssigned,
             hasServiceStyle: overview.event.hasServiceStyle,
+            hasVenueOrPickup:
+              Boolean(overview.event.venueId) ||
+              Boolean(overview.event.venueName?.trim()) ||
+              pickup,
             hasFinalLockTiming: overview.event.hasFinalLockTiming,
           }}
           openQuestions={flags.loading ? undefined : flags.openFlags.length}

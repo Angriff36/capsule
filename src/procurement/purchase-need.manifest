@@ -285,11 +285,13 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
   // A finished event has used its stock, so its bought need no longer counts
   // toward the week's buying. Otherwise a later event in the same week buys
   // the finished event's amount again. The handler runs this only for
-  // ordered and fulfilled needs.
+  // ordered and fulfilled needs. Stock fully given to the event (its demand
+  // fulfilled) is used the same way: it has left the shelf, so the need must
+  // stop counting before the event ends.
   command settleWithEvent() {
     guard self.status == "ordered" or self.status == "fulfilled"
     guard self.deletedAt == null
-    guard self.event != null and (self.event.stage == "completed" or self.event.stage == "closed_out")
+    guard (self.event != null and (self.event.stage == "completed" or self.event.stage == "closed_out")) or (self.ingredientDemand != null and self.ingredientDemand.status == "fulfilled")
     compute previousStatus = self.status
     mutate status = "used"
     mutate usedAt = now()
@@ -306,12 +308,13 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
 
   // A need still unbought when its event finished will never be bought: it
   // closes, and its draft order line lets it go (PurchaseNeedCancelled).
+  // A need the event already got from stock (its demand fulfilled) closes too.
   command closeWithFinishedEvent() {
     guard self.status == "open"
     guard self.deletedAt == null
-    guard self.event != null and (self.event.stage == "completed" or self.event.stage == "closed_out")
+    guard (self.event != null and (self.event.stage == "completed" or self.event.stage == "closed_out")) or (self.ingredientDemand != null and self.ingredientDemand.status == "fulfilled")
     compute previousStatus = self.status
-    compute reason = "The event finished before this was bought"
+    compute reason = self.ingredientDemand != null and self.ingredientDemand.status == "fulfilled" ? "The event already got this from stock" : "The event finished before this was bought"
     mutate status = "cancelled"
     mutate cancelledAt = now()
     mutate cancellationReason = reason

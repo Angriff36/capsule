@@ -32,6 +32,7 @@ export type OpeningStockFixRecord = {
   quantity?: number | null;
   unit?: string | null;
   sourceUnit: string;
+  locationName?: string;
   asOfAt?: number | null;
   countState: string;
   note?: string | null;
@@ -43,6 +44,8 @@ const COUNT_STATE_TEXT: Record<OpeningStockCountState, string> = {
   estimated: "Estimate",
   unknown: "Not known",
 };
+
+const NEW_PLACE = "__new_place__";
 
 const dateInput = (at: number | null | undefined) =>
   at == null ? "" : new Date(at).toISOString().slice(0, 10);
@@ -61,7 +64,8 @@ export function OpeningStockFixForm({
   components: Named[];
   locations: Named[];
   busy: boolean;
-  onSave: (values: OpeningStockFixValues) => void;
+  /** newLocationName: the sheet's place, to be created before saving. */
+  onSave: (values: OpeningStockFixValues, newLocationName?: string) => void;
   onCancel: () => void;
 }) {
   const [kind, setKind] = useState(record.kind as OpeningStockKind);
@@ -69,6 +73,15 @@ export function OpeningStockFixForm({
     String(record.ingredientId ?? record.componentId ?? ""),
   );
   const [locationId, setLocationId] = useState(String(record.locationId ?? ""));
+  // The sheet names a place Capsule does not have yet: offer to add it here
+  // instead of sending the user to another page.
+  const sheetPlace = record.locationName?.trim() ?? "";
+  const canAddSheetPlace =
+    sheetPlace !== "" &&
+    !locations.some(
+      (location) =>
+        location.name.trim().toLowerCase() === sheetPlace.toLowerCase(),
+    );
   const [quantity, setQuantity] = useState(
     record.quantity == null ? "" : String(record.quantity),
   );
@@ -96,17 +109,21 @@ export function OpeningStockFixForm({
     }
     setAsOfError("");
     const amount = quantity.trim() === "" ? null : Number(quantity);
-    onSave({
-      kind,
-      ingredientId: kind === "ingredient" && itemId ? itemId : null,
-      componentId: kind === "component" && itemId ? itemId : null,
-      locationId: locationId || null,
-      quantity: amount != null && Number.isFinite(amount) ? amount : null,
-      unit: unit || null,
-      asOfAt: asOf ? Date.parse(`${asOf}T12:00:00Z`) : null,
-      countState,
-      note: note.trim() || null,
-    });
+    const addPlace = locationId === NEW_PLACE;
+    onSave(
+      {
+        kind,
+        ingredientId: kind === "ingredient" && itemId ? itemId : null,
+        componentId: kind === "component" && itemId ? itemId : null,
+        locationId: addPlace ? null : locationId || null,
+        quantity: amount != null && Number.isFinite(amount) ? amount : null,
+        unit: unit || null,
+        asOfAt: asOf ? Date.parse(`${asOf}T12:00:00Z`) : null,
+        countState,
+        note: note.trim() || null,
+      },
+      addPlace ? sheetPlace : undefined,
+    );
   };
 
   return (
@@ -160,6 +177,9 @@ export function OpeningStockFixForm({
               {location.name}
             </option>
           ))}
+          {canAddSheetPlace ? (
+            <option value={NEW_PLACE}>Add “{sheetPlace}” as a new place</option>
+          ) : null}
         </select>
       </label>
       <label className="field-label">

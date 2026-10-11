@@ -90,6 +90,57 @@ async function resolvePendingRequest(
   return request;
 }
 
+/**
+ * What happened to an acceptance link that can no longer be signed, so a
+ * client who refreshes after accepting reads "you accepted on <day>" rather
+ * than "invalid link". Only the proposal title and the day are shown: the
+ * token holder already saw both on the page they signed.
+ */
+export const getSignatureRequestOutcome = query({
+  args: { token: v.string() },
+  handler: async (
+    ctx,
+    { token },
+  ): Promise<
+    | { state: "accepted"; title: string; completedAt: number | null }
+    | { state: "withdrawn" | "expired" }
+    | null
+  > => {
+    const requestId = ctx.db.normalizeId("signatureRequests", token);
+    if (!requestId) return null;
+    const request = await ctx.db.get(requestId);
+    if (!request || request.deletedAt != null) return null;
+    if (request.provider !== "internal") return null;
+    if (request.status === "revoked") return { state: "withdrawn" };
+    if (
+      request.status === "expired" ||
+      (request.status === "requested" &&
+        request.expiresAt != null &&
+        request.expiresAt <= Date.now())
+    ) {
+      return { state: "expired" };
+    }
+    if (request.status !== "completed") return null;
+    const revision = await ctx.db.get(request.proposalRevisionId);
+    let title = "your proposal";
+    if (revision && revision.tenantId === request.tenantId) {
+      try {
+        const snapshot = revision.snapshot ? JSON.parse(revision.snapshot) : {};
+        if (typeof snapshot.proposal?.title === "string") {
+          title = snapshot.proposal.title;
+        }
+      } catch {
+        // An unreadable copy keeps the plain title.
+      }
+    }
+    return {
+      state: "accepted",
+      title,
+      completedAt: request.completedAt ?? null,
+    };
+  },
+});
+
 /** Resolve an acceptance token to a client-safe pending view, or null. */
 export const getPendingSignatureRequest = query({
   args: { token: v.string() },
