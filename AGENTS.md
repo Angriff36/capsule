@@ -83,6 +83,7 @@ bun run manifest:regen      # only regen entry — Builder apply when conflict-f
 bun run seed             # requires Convex URL
 bun run agent:mint-jwt   # write CAPSULE_AGENT_JWT (UI session first; org optional for person-first accounts)
 bun run agent:enter-component -- <component.txt>
+bun run agent:enter-event -- --preview <folder>   # TPP event bundle; drop --preview and add --accept-warnings to write
 bun run agent:mcp        # Capsule MCP stdio host for Cursor (idle in a TTY is expected; needs CAPSULE_AGENT_JWT)
 # Note: agent:llm-tools / agent:mcp:verify are documented in docs/generation/capsule-agent-mcp.md
 # but are not package.json scripts in this checkout — use the MCP host + mint-jwt path above.
