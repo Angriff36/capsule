@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { ConvexError } from "convex/values";
 import { createElement } from "react";
+import { act } from "react-dom/test-utils";
 import { expect, it } from "vitest";
 import {
   backend,
@@ -43,7 +44,16 @@ it("a refused reservation says why and what to do next, and the form stays fille
 
   await click(button("Reserve equipment"));
   const form = container.querySelector("form")!;
-  input("equipmentId", "equip-warmer", form);
+  // The equipment picker is a type-to-search box: open it and pick the item.
+  const picker = form.querySelector<HTMLInputElement>("[role=combobox]")!;
+  await act(async () => {
+    picker.focus();
+  });
+  const option = container.querySelector("[role=option]")!;
+  expect(option.textContent).toContain("Hot box warmer");
+  await act(async () => {
+    option.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+  });
   input("quantity", "1", form);
   await submit(form);
 
