@@ -19,6 +19,7 @@ function Say($m) { "[$(Get-Date -Format s)] $m" | Tee-Object -FilePath $log -App
 
 function Record($h, $verdict, $reason) {
   $ledgerPath = Join-Path $root 'loop-ledger.json'
+  if (-not (Test-Path $ledgerPath)) { '{ "attempts": [] }' | Set-Content $ledgerPath -Encoding utf8NoBOM }
   $ledger = Get-Content $ledgerPath -Raw | ConvertFrom-Json
   $ledger.attempts += [pscustomobject]@{ item = $h.item; runId = $h.runId; verdict = $verdict; timestamp = (Get-Date).ToUniversalTime().ToString('o'); reason = $reason }
   $ledger | ConvertTo-Json -Depth 8 | Set-Content $ledgerPath -Encoding utf8NoBOM
