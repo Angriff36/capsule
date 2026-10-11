@@ -13,7 +13,7 @@
  * the draft followed is a no-op (nothing differs), and replaying it against an
  * unchanged flagged invoice finds the prior receipt and writes nothing.
  */
-import { byLineDisplayOrder } from "../../src/lib/pricing";
+import { byLineDisplayOrder, computeProposalPricing, type PricingBasis } from "../../src/lib/pricing";
 import { api } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import type { MutationCtx } from "../_generated/server";
@@ -50,6 +50,28 @@ function followsEventPrice(invoice: InvoiceRow): boolean {
 
 /** Marks the one line of a draft made from the event's own quoted price. */
 const EVENT_PRICE_LINE = "event_price";
+
+/** Marks the lines of a draft made from an accepted proposal's priced lines. */
+const ACCEPTED_PROPOSAL_LINE = "accepted_proposal";
+
+/**
+ * True for the itemized draft made from an accepted proposal that nobody has
+ * sent, paid, credited or changed: every line still carries its mark.
+ */
+function isAcceptedProposalDraft(invoice: InvoiceRow): boolean {
+  const lines = invoice.lineItems as unknown;
+  return (
+    invoice.status === "draft" &&
+    invoice.sentAt == null &&
+    isZero(invoice.amountPaid) &&
+    isZero(invoice.amountCredited) &&
+    invoice.depositPaidAt == null &&
+    invoice.proposalId != null &&
+    Array.isArray(lines) &&
+    lines.length > 0 &&
+    lines.every((line) => (line as { source?: unknown })?.source === ACCEPTED_PROPOSAL_LINE)
+  );
+}
 
 /**
  * True for the taxed one-line draft the approval made from the event's price
@@ -167,7 +189,15 @@ export class EventInvoicePricingReconciliation {
     for (const invoice of differing) {
       // An untouched draft (the older untaxed shape, or the taxed one-line
       // one) moves to the new price as a taxed one-line draft.
-      if (followsEventPrice(invoice) || isEventPriceDraft(invoice)) {
+      // So does the untouched itemized draft from an accepted proposal when
+      // it holds no deposit or discount.
+      if (
+        followsEventPrice(invoice) ||
+        isEventPriceDraft(invoice) ||
+        (isAcceptedProposalDraft(invoice) &&
+          isZero(invoice.depositAmount) &&
+          isZero(invoice.discountAmount))
+      ) {
         // The command checks the subtotal is the event's own price (AC-372).
         await TenantSystemCommandRunner.forTenant(
           ctx,
@@ -238,7 +268,7 @@ export async function ensureEventDraftInvoice(
   // changes until finance changes or sends it.
   const totals =
     source && Number(source.total ?? 0) > 0
-      ? await signedProposalTotals(ctx, event, source)
+      ? await acceptedProposalTotals(ctx, event, source)
       : {
           ...(await eventPriceTotals(ctx, event, quotedPrice)),
           discountAmount: 0,
@@ -308,14 +338,7 @@ export async function followAcceptedProposalPrice(
   if (invoices.length !== 1) return;
   const draft = (await ctx.db.get(invoices[0]._id)) as InvoiceRow;
   if (!followsEventPrice(draft) && !isEventPriceDraft(draft)) return;
-  // A proposal with no priced lines becomes the single amount it signed.
-  // Lines whose worked total is not what the client signed (an older
-  // proposal taxed another way) also become the signed amount.
-  const lines = await itemizedFromProposal(ctx, proposal);
-  const itemized =
-    lines && Math.round(lines.total * 100) === Math.round(total * 100)
-      ? lines
-      : await signedProposalTotals(ctx, event, proposal);
+  const itemized = await acceptedProposalTotals(ctx, event, proposal);
   await system.runMutation(api.mutations.Invoice_markVoided, {
     docId: draft._id,
     version: draft.version,
@@ -339,10 +362,36 @@ export async function followAcceptedProposalPrice(
 }
 
 /**
- * Invoice lines and tax from an accepted proposal's priced lines, worked out
- * with the same calculation the issue form and the issue check use.
+ * The bill for an accepted proposal: its priced lines at the event's guest
+ * count. A proposal with no priced lines becomes the single amount it
+ * signed; so do lines whose worked total at the signed guest count is not
+ * what the client signed (an older proposal taxed another way).
  */
-async function itemizedFromProposal(ctx: MutationCtx, proposal: Doc<"proposals">) {
+async function acceptedProposalTotals(
+  ctx: MutationCtx,
+  event: Doc<"events">,
+  proposal: Doc<"proposals">,
+) {
+  const signedGuests = Number(proposal.guestCount ?? 0);
+  const signed = await itemizedFromProposal(ctx, proposal, signedGuests);
+  if (!signed || Math.round(signed.total * 100) !== Math.round(Number(proposal.total ?? 0) * 100))
+    return signedProposalTotals(ctx, event, proposal);
+  const guests = Number(event.expectedHeadcount ?? 0);
+  if (!(guests > 0) || guests === signedGuests) return signed;
+  return (await itemizedFromProposal(ctx, proposal, guests)) ?? signed;
+}
+
+/**
+ * Invoice lines and tax from an accepted proposal's priced lines at a guest
+ * count, worked out with the central price calc (percentage lines follow the
+ * lines they are taken from) and the same tax calculation the issue form and
+ * the issue check use.
+ */
+async function itemizedFromProposal(
+  ctx: MutationCtx,
+  proposal: Doc<"proposals">,
+  guests: number,
+) {
   const lines = (
     await ctx.db
       .query("proposalLineItems")
@@ -352,9 +401,22 @@ async function itemizedFromProposal(ctx: MutationCtx, proposal: Doc<"proposals">
     .filter((row) => row.tenantId === proposal.tenantId && row.deletedAt == null && row.removedAt == null)
     .sort(byLineDisplayOrder);
   if (lines.length === 0) return null;
-  const guests = Number(proposal.guestCount ?? 0);
+  // At another guest count a percentage line (service charge) is worked
+  // again from the lines it is taken from; every other line keeps its amount.
+  const priced = computeProposalPricing({
+    lines: lines.map((row) => ({
+      pricingBasis: row.pricingBasis as PricingBasis,
+      unitPrice: Number(row.unitPrice) || 0,
+      quantity: Number(row.quantity) || 0,
+    })),
+    guestCount: guests,
+  });
+  const resized = guests !== Number(proposal.guestCount ?? 0);
   const drafts: InvoiceLineDraft[] = lines.map((row, index) => {
-    const amount = Number(row.amount) || 0;
+    const amount =
+      resized && row.pricingBasis === "percentage"
+        ? priced.lines[index].amount
+        : Number(row.amount) || 0;
     const category = row.equipmentId ? "rental" : row.pricingBasis === "per_person" || row.pricingBasis === "per_unit" ? "food" : "service";
     const perGuest = row.pricingBasis === "per_person" && guests > 0;
     const perUnit = row.pricingBasis === "per_unit" && Number(row.quantity) > 0;
@@ -384,9 +446,64 @@ async function itemizedFromProposal(ctx: MutationCtx, proposal: Doc<"proposals">
       .add(LedgerMoney.fromDollars(worked.taxAmount))
       .subtract(LedgerMoney.fromDollars(discount))
       .toDollars(),
-    lineItems: worked.lineItems,
+    lineItems: worked.lineItems.map((line) => ({ ...line, source: ACCEPTED_PROPOSAL_LINE })),
     taxBreakdown: worked.taxBreakdown,
   };
+}
+
+/**
+ * The guest count changed: the untouched draft made from the accepted
+ * proposal bills the new count with the proposal's own prices, through the
+ * governed Invoice.followEventHeadcount. While the event's price can still
+ * change, its quoted price moves to the new bill too, so the money pages and
+ * a later price change agree with it. A draft finance changed, sent or took
+ * money on stays as it is; so does one whose deposit would be more than the
+ * new total.
+ */
+export async function followEventHeadcountInvoice(
+  ctx: MutationCtx,
+  eventId: Id<"events">,
+): Promise<void> {
+  const event = await ctx.db.get(eventId);
+  if (!event || event.deletedAt != null) return;
+  const invoices = (
+    await ctx.db
+      .query("invoices")
+      .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+      .collect()
+  ).filter((row) => row.tenantId === event.tenantId && row.deletedAt == null && row.status !== "voided");
+  if (invoices.length !== 1 || !isAcceptedProposalDraft(invoices[0])) return;
+  const draft = invoices[0];
+  const proposalId = ctx.db.normalizeId("proposals", String(draft.proposalId));
+  const proposal = proposalId ? await ctx.db.get(proposalId) : null;
+  if (!proposal || proposal.tenantId !== event.tenantId || proposal.deletedAt != null) return;
+  const next = await acceptedProposalTotals(ctx, event, proposal);
+  if (next.lineItems.length === 0) return;
+  if (Number(draft.discountAmount ?? 0) !== next.discountAmount) return;
+  if (draft.depositAmount != null && Number(draft.depositAmount) > next.total) return;
+  const system = TenantSystemCommandRunner.forTenant(ctx, event.tenantId).context;
+  if (Math.round(Number(draft.total) * 100) !== Math.round(next.total * 100)) {
+    await system.runMutation(api.mutations.Invoice_followEventHeadcount, {
+      docId: draft._id,
+      version: draft.version,
+      subtotal: next.subtotal,
+      taxAmount: next.taxAmount,
+      total: next.total,
+      lineItems: next.lineItems,
+      taxBreakdown: next.taxBreakdown,
+    });
+  }
+  if (
+    ["planning", "pending_approval", "approved"].includes(event.stage) &&
+    Number(event.quotedPrice ?? 0) !== next.total
+  ) {
+    await system.runMutation(api.mutations.Event_changePricing, {
+      docId: event._id,
+      version: event.version,
+      budgetAmount: Number(event.budgetAmount ?? 0),
+      quotedPrice: next.total,
+    });
+  }
 }
 
 /**

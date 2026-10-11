@@ -447,6 +447,7 @@ import {
   InvoiceApplyPaymentParamsSchema,
   InvoiceAssignNumberParamsSchema,
   InvoiceFollowEventClientParamsSchema,
+  InvoiceFollowEventHeadcountParamsSchema,
   InvoiceFollowEventPriceParamsSchema,
   InvoiceFollowEventPriceTaxedParamsSchema,
   InvoiceIssueParamsSchema,
@@ -7106,6 +7107,16 @@ export function useInvoiceFollowEventClient() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = InvoiceFollowEventClientParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Invoice.followEventHeadcount. */
+export function useInvoiceFollowEventHeadcount() {
+  const mutate = useMutation(api.mutations.Invoice_followEventHeadcount);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = InvoiceFollowEventHeadcountParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -15044,4 +15055,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1588 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1589 as const;

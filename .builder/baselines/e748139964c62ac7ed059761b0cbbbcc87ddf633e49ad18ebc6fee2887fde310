@@ -9278,6 +9278,17 @@ export const InvoiceFollowEventClientParamsSchema = z.object({
 
 export type InvoiceFollowEventClientParams = z.infer<typeof InvoiceFollowEventClientParamsSchema>;
 
+// Command: followEventHeadcount on Invoice
+export const InvoiceFollowEventHeadcountParamsSchema = z.object({
+  subtotal: z.number(),
+  taxAmount: z.number(),
+  total: z.number(),
+  lineItems: z.unknown(),
+  taxBreakdown: z.unknown(),
+});
+
+export type InvoiceFollowEventHeadcountParams = z.infer<typeof InvoiceFollowEventHeadcountParamsSchema>;
+
 // Command: followEventPrice on Invoice
 export const InvoiceFollowEventPriceParamsSchema = z.object({});
 

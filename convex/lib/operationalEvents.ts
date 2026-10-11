@@ -31,7 +31,7 @@ import { eventStyleReconciliation } from "./styleReconciliation";
 import { eventRentalReconciliation } from "./rentalReconciliation";
 import {
   assertInvoiceCommercialSource, ensureEventDraftInvoice, eventInvoicePricingReconciliation,
-  followAcceptedProposalPrice, retaxDraftForClient,
+  followAcceptedProposalPrice, followEventHeadcountInvoice, retaxDraftForClient,
 } from "./invoicePricingReconciliation";
 import { eventCloseoutCommercialReconciliation } from "./closeoutCommercialReconciliation";
 import {
@@ -360,6 +360,8 @@ export async function handleManifestEvent(
         newHeadcount: Number(event.payload.newHeadcount),
       },
     );
+    // The unsent draft bill from the accepted proposal bills the new count.
+    await followEventHeadcountInvoice(ctx, event.entityId as Id<"events">);
     // A headcount change never rewrites an accepted proposal — it records a
     // `proposal/change requirement` and keeps the signed document as history.
     await eventProposalReconciliation.run(
