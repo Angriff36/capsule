@@ -9,8 +9,8 @@ import {
   writeMaterializationReceipt,
 } from "./materializationReceipt";
 import { orgCapabilityDeniesAction } from "./orgCapabilityGate";
-import { materializeCateringPackage, type CateringPackageResult } from "./cateringPackageOperations";
-import { cateringPackages } from "../../src/data/cateringPackages";
+import { bookDish, materializeCateringPackage, type CateringPackageResult } from "./cateringPackageOperations";
+import { cateringPackages, cateringRecipes, cateringSource } from "../../src/data/cateringPackages";
 
 export const eventTimingPlan = query({
   args: { eventId: v.id("events") },
@@ -422,5 +422,75 @@ export const scheduleEventTimeline = mutation({
       created++;
     }
     return { created, existing: reused };
+  },
+});
+
+/**
+ * A catering-book package as a menu in the catalog (TPP's priced menu
+ * packages): its dishes, its "choose one" courses, and a price per guest the
+ * kitchen sets on the menu page, kept for every event. Asking again opens the
+ * menu made before.
+ */
+export const cateringPackageAsMenu = mutation({
+  args: { packageId: v.string() },
+  handler: async (ctx, args): Promise<{ menuId: Id<"menus">; created: boolean }> => {
+    const auth = await getAuthContext(ctx);
+    const tenantId = requireTenant(auth);
+    requireMenuAccess(auth);
+    const pack = cateringPackages.find((entry) => entry.id === args.packageId);
+    if (!pack) throw new Error("Catering package not found");
+    const menus = await ctx.db
+      .query("menus")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .collect();
+    // The menu made from this package before: same name, in Catering books.
+    const made = menus.find(
+      (menu) =>
+        menu.deletedAt == null &&
+        menu.category === "Catering books" &&
+        menu.name === pack.name,
+    );
+    if (made) return { menuId: made._id, created: false };
+
+    const menu: { docId: Id<"menus"> } = await ctx.runMutation(api.mutations.Menu_createViaDraft, {
+      name: pack.name,
+      description: `${pack.notes}\n\nSource: ${cateringSource(pack)}`,
+      category: "Catering books",
+      // A book package is reused on many events: offer it under "Use template".
+      isTemplate: true,
+      idempotencyKey: `catering-package-menu:${pack.id}`,
+    });
+    const liveDishes = (
+      await ctx.db
+        .query("dishes")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .collect()
+    ).filter((dish) => dish.deletedAt == null && dish.status === "active" && !dish.mergedIntoDishId);
+    let sortOrder = 0;
+    const added = new Set<string>();
+    const pickOne = new Set<string>();
+    for (const group of pack.groups) {
+      for (const recipeId of group.recipeIds) {
+        const recipe = cateringRecipes.get(recipeId);
+        if (!recipe) continue;
+        const { dish } = await bookDish(ctx, tenantId, recipeId, pack.serviceStyle, liveDishes);
+        if (added.has(String(dish._id))) continue;
+        added.add(String(dish._id));
+        await ctx.runMutation(api.mutations.MenuDish_createViaAdd, {
+          menuId: menu.docId,
+          dishId: dish._id,
+          sortOrder: sortOrder++,
+          course: recipe.course,
+          serviceStyle: pack.serviceStyle,
+        });
+        if (group.choice && recipe.course) pickOne.add(recipe.course);
+      }
+    }
+    if (pickOne.size)
+      await ctx.runMutation(api.mutations.Menu_setService, {
+        docId: menu.docId,
+        pickOneCourses: [...pickOne],
+      });
+    return { menuId: menu.docId, created: true };
   },
 });

@@ -2642,6 +2642,7 @@ Screens (176): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `lib.culinaryOperations.restoreComponentSnapshot` - mutation; authored step; live reads update by themselves
 - `lib.culinaryOperations.saveComponentImportReview` - mutation; authored step; live reads update by themselves
 - `lib.operationalTransactions.applyCateringPackage` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.cateringPackageAsMenu` - mutation; authored step; live reads update by themselves
 - `lib.operationalTransactions.eventTimingPlan` - query; live read, updates by itself
 - `lib.operationalTransactions.issueEventStock` - mutation; authored step; live reads update by themselves
 - `lib.operationalTransactions.materializeEventMenuTemplate` - mutation; authored step; live reads update by themselves

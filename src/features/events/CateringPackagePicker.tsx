@@ -15,6 +15,8 @@ import type { CateringPackageResult } from "../../../convex/lib/cateringPackageO
 import { classifyCommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { Link } from "react-router-dom";
+import { useCateringPackageAsMenu } from "../../lib/cateringPackageMenu";
 
 export type CateringPackageInput = {
   packageId: string;
@@ -55,6 +57,11 @@ export function CateringPackagePicker({
   const [selections, setSelections] = useState<CateringSelection[]>([]);
   const [serviceTime, setServiceTime] = useState(localDateTime(startsAt));
   const [price, setPrice] = useState("");
+  const asMenu = useCateringPackageAsMenu();
+  const [menuLink, setMenuLink] = useState<{
+    packageId: string;
+    menuId: string;
+  } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState<ReturnType<
     typeof classifyCommandFailure
@@ -255,6 +262,36 @@ export function CateringPackagePicker({
               <div className="border-l-2 border-line-2 pl-3 text-base text-ink-2">
                 <p>{cateringSource(pack)}</p>
                 <p className="mt-1">{pack.notes}</p>
+                {menuLink?.packageId === pack.id ? (
+                  <p className="mt-2">
+                    <Link
+                      className="text-link"
+                      to={`/kitchen/menus/${menuLink.menuId}`}
+                    >
+                      Open the {pack.name} menu to set its price per guest
+                    </Link>
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm mt-2"
+                    disabled={disabled}
+                    onClick={() =>
+                      void asMenu({ packageId: pack.id })
+                        .then((made) =>
+                          setMenuLink({
+                            packageId: pack.id,
+                            menuId: String(made.menuId),
+                          }),
+                        )
+                        .catch((error) =>
+                          setFailure(classifyCommandFailure(error)),
+                        )
+                    }
+                  >
+                    Keep a price for this package
+                  </button>
+                )}
               </div>
               {pack.groups.length > 0 && (
                 <p className="text-base text-ink-2">
