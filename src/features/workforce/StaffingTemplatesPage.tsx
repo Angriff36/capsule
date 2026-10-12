@@ -11,6 +11,7 @@ import { parseTemplateLines } from "../../lib/staffingTemplates";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
+import { reportActionOk } from "../../ui/action-result";
 import {
   StaffingTemplateForm,
   type StaffingTemplateDraft,
@@ -79,11 +80,12 @@ export function StaffingTemplatesPage() {
 
   const save = (draft: StaffingTemplateDraft) => {
     const current = rows.find((row) => row._id === editing);
-    void run(() =>
-      current
+    void run(async () => {
+      await (current
         ? revise({ docId: current._id, version: current.version, ...draft })
-        : create(draft),
-    );
+        : create(draft));
+      reportActionOk(`Saved ${draft.name}.`);
+    });
   };
 
   return (
