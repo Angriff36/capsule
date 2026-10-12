@@ -13,6 +13,7 @@ import {
 } from "../../lib/pricing";
 import { useCatalogDishes } from "./useCatalogDishes";
 import { ProposalTravelFee } from "./ProposalTravelFee";
+import { ProposalDiscount } from "./ProposalDiscount";
 import { useListTaxRate } from "../../lib/manifest-convex-react";
 
 interface ProposalPricingPanelProps {
@@ -20,6 +21,8 @@ interface ProposalPricingPanelProps {
   guestCount: number;
   taxAmount: number;
   discountAmount: number;
+  /** A percent discount, when the discount is set as one. */
+  discountPercent?: number | null;
   /** When true (proposal is a draft), surface Edit/Remove/Add so the persisted
    * lines can be revised through the generated commands + the recompute seam
    * (reviseLine/removeLine were previously dead). */
@@ -71,6 +74,7 @@ export function ProposalPricingPanel({
   guestCount,
   taxAmount,
   discountAmount,
+  discountPercent = null,
   editable = false,
   onFailure,
 }: ProposalPricingPanelProps) {
@@ -489,7 +493,16 @@ export function ProposalPricingPanel({
       ) : null}
 
       {editable ? (
-        <ProposalTravelFee proposalId={proposalId} onFailure={onFailure} />
+        <>
+          <ProposalTravelFee proposalId={proposalId} onFailure={onFailure} />
+          <ProposalDiscount
+            key={`${discountAmount}:${discountPercent ?? ""}`}
+            proposalId={proposalId}
+            discountAmount={discountAmount}
+            discountPercent={discountPercent}
+            onFailure={onFailure}
+          />
+        </>
       ) : null}
 
       <p className="mt-2 text-base text-ink-2">

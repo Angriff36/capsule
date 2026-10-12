@@ -59,6 +59,8 @@ export const forEvent = query({
       subtotal: Number(list.subtotal ?? 0),
       taxAmount: Number(list.taxAmount ?? 0),
       discountAmount: Number(list.discountAmount ?? 0),
+      discountPercent:
+        list.discountPercent == null ? null : Number(list.discountPercent),
       total: Number(list.total ?? 0),
       // The event's price follows the list only while both can still change.
       followsEvent: list.status === "draft" && PRICEABLE.has(String(event.stage)),

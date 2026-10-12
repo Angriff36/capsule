@@ -3529,6 +3529,7 @@ export const ProposalSchema = z.object({
   subtotal: z.number().default(0),
   taxAmount: z.number().default(0),
   discountAmount: z.number().default(0),
+  discountPercent: z.number().nullable().optional(),
   total: z.number().default(0),
   expiresAt: z.coerce.date().nullable().optional(),
   notes: z.string().nullable().optional(),
@@ -11514,6 +11515,15 @@ export type ProposalReviseDraftParams = z.infer<typeof ProposalReviseDraftParams
 export const ProposalSendParamsSchema = z.object({});
 
 export type ProposalSendParams = z.infer<typeof ProposalSendParamsSchema>;
+
+// Command: setDiscount on Proposal
+export const ProposalSetDiscountParamsSchema = z.object({
+  discountPercent: z.number().optional(),
+  discountAmount: z.number(),
+  total: z.number(),
+});
+
+export type ProposalSetDiscountParams = z.infer<typeof ProposalSetDiscountParamsSchema>;
 
 // Command: setPaymentSchedule on Proposal
 export const ProposalSetPaymentScheduleParamsSchema = z.object({

@@ -67,5 +67,40 @@ describe("event price list", () => {
     // 40 × $26 + 30 × $18.50
     expect((await proposalRow(w, built.proposalId)).total).toBe(1595);
     expect(await quoted(w)).toBe(1595);
+
+    // A 10% discount stays 10% when a price changes.
+    await w.sales.mutation(
+      (api.lib as any).proposalPricing.setProposalDiscount,
+      {
+        proposalId: built.proposalId,
+        percent: 10,
+      },
+    );
+    expect(await proposalRow(w, built.proposalId)).toMatchObject({
+      subtotal: 1595,
+      total: 1435.5,
+    });
+    expect(await quoted(w)).toBe(1435.5);
+    const brisket = (await liveLines(w, built.proposalId)).find(
+      (line) => line.description === "Smoked brisket",
+    )!;
+    await w.sales.mutation(
+      (api.lib as any).proposalPricing.reviseProposalLineAndRecompute,
+      {
+        docId: brisket._id,
+        version: brisket.version,
+        description: brisket.description,
+        pricingBasis: "per_unit",
+        unitPrice: 20,
+        quantity: brisket.quantity,
+        overrideReason: "Price for this client",
+      },
+    );
+    // 40 × $26 + 30 × $20 = $1,640, less 10%
+    expect(await proposalRow(w, built.proposalId)).toMatchObject({
+      subtotal: 1640,
+      total: 1476,
+    });
+    expect(await quoted(w)).toBe(1476);
   });
 });

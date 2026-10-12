@@ -3339,6 +3339,7 @@ export default defineSchema({
     subtotal: v.number(),
     taxAmount: v.number(),
     discountAmount: v.number(),
+    discountPercent: v.optional(v.union(v.number(), v.null())),
     total: v.number(),
     expiresAt: v.optional(v.union(v.number(), v.null())),
     notes: v.optional(v.union(v.string(), v.null())),

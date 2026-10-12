@@ -721,6 +721,7 @@ import {
   ProposalReviseDraftParamsSchema,
   ProposalRevisionCaptureParamsSchema,
   ProposalSendParamsSchema,
+  ProposalSetDiscountParamsSchema,
   ProposalSetPaymentScheduleParamsSchema,
   ProposalStageClientMergeParamsSchema,
   ProposalStageEventLinkParamsSchema,
@@ -10578,6 +10579,16 @@ export function useProposalSend() {
   };
 }
 
+/** Mutation hook for Proposal.setDiscount. */
+export function useProposalSetDiscount() {
+  const mutate = useMutation(api.mutations.Proposal_setDiscount);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalSetDiscountParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Proposal.setPaymentSchedule. */
 export function useProposalSetPaymentSchedule() {
   const mutate = useMutation(api.mutations.Proposal_setPaymentSchedule);
@@ -15055,4 +15066,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1589 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1590 as const;

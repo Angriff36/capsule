@@ -157,6 +157,7 @@ import type * as lib_eventPacket_dishCosts from "../lib/eventPacket/dishCosts.js
 import type * as lib_eventPacket_finalLock from "../lib/eventPacket/finalLock.js";
 import type * as lib_eventPacket_finalLockInput from "../lib/eventPacket/finalLockInput.js";
 import type * as lib_eventPacket_reconcileNative from "../lib/eventPacket/reconcileNative.js";
+import type * as lib_eventPriceList from "../lib/eventPriceList.js";
 import type * as lib_eventReadinessProjection from "../lib/eventReadinessProjection.js";
 import type * as lib_eventRouteLegRead from "../lib/eventRouteLegRead.js";
 import type * as lib_eventStaffingOperations from "../lib/eventStaffingOperations.js";
@@ -537,6 +538,7 @@ declare const fullApi: ApiFromModules<{
   "lib/eventPacket/finalLock": typeof lib_eventPacket_finalLock;
   "lib/eventPacket/finalLockInput": typeof lib_eventPacket_finalLockInput;
   "lib/eventPacket/reconcileNative": typeof lib_eventPacket_reconcileNative;
+  "lib/eventPriceList": typeof lib_eventPriceList;
   "lib/eventReadinessProjection": typeof lib_eventReadinessProjection;
   "lib/eventRouteLegRead": typeof lib_eventRouteLegRead;
   "lib/eventStaffingOperations": typeof lib_eventStaffingOperations;

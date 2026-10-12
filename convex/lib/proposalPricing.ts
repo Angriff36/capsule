@@ -243,14 +243,31 @@ export const recomputeProposalTotals = internalMutation({
     }
     const lines = await activeLines(ctx, args.proposalId);
 
+    const inputs = lines.map((l) => ({
+      pricingBasis: l.pricingBasis as PricingBasis,
+      unitPrice: Number(l.unitPrice) || 0,
+      quantity: Number(l.quantity) || 0,
+    }));
+    const guestCount = Number(proposal.guestCount) || 0;
+    // A percent discount stays that percent of the new subtotal.
+    const percent = proposal.discountPercent;
+    const discountAmount =
+      percent != null
+        ? roundCents(
+            (computeProposalPricing({
+              lines: inputs,
+              guestCount,
+              discountAmount: 0,
+              taxAmount: 0,
+            }).subtotal *
+              Number(percent)) /
+              100,
+          )
+        : Number(proposal.discountAmount) || 0;
     const result = computeProposalPricing({
-      lines: lines.map((l) => ({
-        pricingBasis: l.pricingBasis as PricingBasis,
-        unitPrice: Number(l.unitPrice) || 0,
-        quantity: Number(l.quantity) || 0,
-      })),
-      guestCount: Number(proposal.guestCount) || 0,
-      discountAmount: Number(proposal.discountAmount) || 0,
+      lines: inputs,
+      guestCount,
+      discountAmount,
       taxAmount: Number(proposal.taxAmount) || 0,
     });
 
@@ -265,6 +282,7 @@ export const recomputeProposalTotals = internalMutation({
     await ctx.db.patch(args.proposalId, {
       subtotal: result.subtotal,
       total: result.total,
+      ...(percent != null ? { discountAmount } : {}),
     });
     // The event this list prices follows its new total while it is planned.
     await followEventPriceList(ctx, args.proposalId);
@@ -417,6 +435,42 @@ export const removeProposalLineAndRecompute = mutation({
     });
     await ctx.runMutation(internal.lib.proposalPricing.recomputeProposalTotals, {
       proposalId: line.proposalId,
+    });
+  },
+});
+
+const roundCents = (value: number) => Math.round(value * 100) / 100;
+
+/**
+ * The discount on a draft: a percent of the subtotal (it stays that percent as
+ * lines change) or a dollar amount. The event's price follows the new total.
+ */
+export const setProposalDiscount = mutation({
+  args: {
+    proposalId: v.id("proposals"),
+    percent: v.optional(v.number()),
+    amount: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const auth = await getAuthContext(ctx);
+    const proposal = await ctx.db.get(args.proposalId);
+    if (!proposal || !auth.tenantId || proposal.tenantId !== auth.tenantId) {
+      throw new Error("Proposal not found");
+    }
+    const subtotal = Number(proposal.subtotal) || 0;
+    const taxAmount = Number(proposal.taxAmount) || 0;
+    const discountAmount =
+      args.percent != null
+        ? roundCents((subtotal * args.percent) / 100)
+        : roundCents(Number(args.amount ?? 0));
+    await ctx.runMutation(api.mutations.Proposal_setDiscount, {
+      docId: args.proposalId,
+      discountPercent: args.percent ?? undefined,
+      discountAmount,
+      total: subtotal + taxAmount - discountAmount,
+    });
+    await ctx.runMutation(internal.lib.proposalPricing.recomputeProposalTotals, {
+      proposalId: args.proposalId,
     });
   },
 });

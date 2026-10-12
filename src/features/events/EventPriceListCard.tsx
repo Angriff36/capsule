@@ -93,6 +93,7 @@ export function EventPriceListCard({
             guestCount={guestCount}
             taxAmount={list.taxAmount}
             discountAmount={list.discountAmount}
+            discountPercent={list.discountPercent}
             editable={list.status === "draft"}
             onFailure={(error) =>
               reportActionFail(
