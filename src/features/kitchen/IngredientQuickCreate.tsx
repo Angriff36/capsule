@@ -122,7 +122,7 @@ export function IngredientQuickCreate({
       const classified = classifyCommandFailure(failure);
       setError(
         classified.detail && classified.detail !== classified.title
-          ? `${classified.title} ${classified.detail}`
+          ? `${classified.title}: ${classified.detail}`
           : classified.title,
       );
     } finally {

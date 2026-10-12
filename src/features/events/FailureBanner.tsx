@@ -10,7 +10,9 @@ export function FailureBanner({
   onDismiss?: () => void;
 }) {
   useEffect(() => {
-    reportActionFail(`${failure.title} ${failure.detail}`.trim());
+    reportActionFail(
+      failure.detail ? `${failure.title}: ${failure.detail}` : failure.title,
+    );
   }, [failure.title, failure.detail]);
 
   return (
