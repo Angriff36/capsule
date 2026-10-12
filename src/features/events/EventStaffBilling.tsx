@@ -1,7 +1,11 @@
 import { useState } from "react";
 import type { Id } from "../../lib/api";
 import { useEventAssignmentRows } from "../../lib/eventScopedQueries";
-import { useAddPriceListLine } from "../../lib/eventPriceListQueries";
+import {
+  useAddPriceListLine,
+  useRevisePriceListLine,
+} from "../../lib/eventPriceListQueries";
+import { useProposalLineItems } from "../../lib/financeScopedQueries";
 import { reportActionFail, reportActionOk } from "../../ui/action-result";
 
 const HOUR = 3_600_000;
@@ -32,6 +36,8 @@ export function EventStaffBilling({
 }) {
   const rows = useEventAssignmentRows(eventId);
   const addLine = useAddPriceListLine();
+  const reviseLine = useRevisePriceListLine();
+  const lines = useProposalLineItems(proposalId);
   const [open, setOpen] = useState(false);
   const [rates, setRates] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
@@ -47,7 +53,16 @@ export function EventStaffBilling({
     roles.set(role, { people: sum.people + 1, hours: sum.hours + hours });
   }
 
-  if (rows === undefined) return null;
+  // A role billed before keeps one line: billing again updates it.
+  const billedLine = (role: string) =>
+    (lines ?? []).find(
+      (line) =>
+        line.deletedAt == null &&
+        line.proposalId === proposalId &&
+        line.description.startsWith(`Staff: ${role} (`),
+    );
+
+  if (rows === undefined || lines === undefined) return null;
   if (!open)
     return (
       <button
@@ -66,19 +81,26 @@ export function EventStaffBilling({
       for (const [role, { people, hours }] of roles) {
         const rate = Number(rates[role]);
         if (!(rate > 0) || !(hours > 0)) continue;
-        await addLine({
-          proposalId,
+        const line = {
           description: `Staff: ${role} (${people} × ${hours / people} hr)`,
           pricingBasis: "per_unit",
           unitPrice: rate,
           quantity: hours,
           unit: "hr",
-        });
+        };
+        const existing = billedLine(role);
+        if (existing)
+          await reviseLine({
+            docId: existing._id,
+            version: existing.version,
+            ...line,
+          });
+        else await addLine({ proposalId, ...line });
         added++;
       }
       if (added) {
         reportActionOk(
-          `Added ${added} staff line${added === 1 ? "" : "s"} to the price list.`,
+          `Billed ${added} staff role${added === 1 ? "" : "s"} on the price list.`,
         );
         setOpen(false);
         setRates({});

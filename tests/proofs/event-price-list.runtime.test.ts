@@ -102,5 +102,16 @@ describe("event price list", () => {
       total: 1476,
     });
     expect(await quoted(w)).toBe(1476);
+
+    // A 100% discount brings the event's price to $0 too.
+    await w.sales.mutation(
+      (api.lib as any).proposalPricing.setProposalDiscount,
+      {
+        proposalId: built.proposalId,
+        percent: 100,
+      },
+    );
+    expect((await proposalRow(w, built.proposalId)).total).toBe(0);
+    expect(await quoted(w)).toBe(0);
   });
 });

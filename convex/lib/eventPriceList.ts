@@ -91,7 +91,16 @@ export async function followEventPriceList(
   const list = await findGeneratedDraft(ctx, event);
   if (!list || list._id !== proposal._id || list.generationJson == null) return;
   const total = Number(proposal.total ?? 0);
-  if (!(total > 0) || cents(event.quotedPrice) === cents(total)) return;
+  if (cents(event.quotedPrice) === cents(total)) return;
+  // A list with no lines yet (a menu with no prices) never wipes the event's
+  // price; a priced list that comes to $0 (lines removed, 100% off) does.
+  if (!(total > 0)) {
+    const lines = await ctx.db
+      .query("proposalLineItems")
+      .withIndex("by_proposalId", (q) => q.eq("proposalId", proposalId))
+      .collect();
+    if (!lines.some((line) => line.deletedAt == null)) return;
+  }
   const system = TenantSystemCommandRunner.forTenant(ctx, event.tenantId).context;
   await system.runMutation(api.mutations.Event_changePricing, {
     docId: event._id,

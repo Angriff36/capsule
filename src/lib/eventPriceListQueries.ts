@@ -11,3 +11,7 @@ export const useEventPriceList = (eventId: Id<"events">) =>
 // the totals; the event's price follows them).
 export const useAddPriceListLine = () =>
   useMutation(api.lib.proposalPricing.addProposalLineAndRecompute);
+
+// Change one line already on a price list.
+export const useRevisePriceListLine = () =>
+  useMutation(api.lib.proposalPricing.reviseProposalLineAndRecompute);
