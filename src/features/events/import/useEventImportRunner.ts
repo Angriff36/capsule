@@ -25,6 +25,7 @@ import { useClientEvents, useEventsById } from "../../facilities/useEventsById";
 import { useEventsByNumber } from "../../../lib/eventHistoryQueries";
 import { useAuthStatus } from "../../../lib/useAuthStatus";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
+import { reportActionOk } from "../../../ui/action-result";
 import { useEventImportCommandExecutor } from "./useEventImportCommandExecutor";
 
 /**
@@ -287,11 +288,12 @@ export function useEventImportRunner(input: {
             error,
           );
         }
-        if (!attached) {
-          throw new Error(
-            `The event was created, but the pasted BEO could not be attached to its workbook (the text was not recognized as a BEO). Open the event and add the BEO under Workbook sources.`,
+        // The event is made either way: open it, so nobody presses Create
+        // again and makes a second copy.
+        if (!attached)
+          reportActionOk(
+            "Event created. The pasted text was not added to its workbook, because it does not read as a TPP report. Add the BEO file under Workbook sources if you want it there.",
           );
-        }
       }
       setResult({ eventId, executedSteps: plan.steps.length });
     } catch (error) {
