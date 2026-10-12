@@ -251,19 +251,17 @@ export const recomputeProposalTotals = internalMutation({
     const guestCount = Number(proposal.guestCount) || 0;
     // A percent discount stays that percent of the new subtotal.
     const percent = proposal.discountPercent;
+    const undiscounted = computeProposalPricing({
+      lines: inputs,
+      guestCount,
+      discountAmount: 0,
+      taxAmount: 0,
+    }).subtotal;
+    // A dollar discount never takes the total below zero when lines go away.
     const discountAmount =
       percent != null
-        ? roundCents(
-            (computeProposalPricing({
-              lines: inputs,
-              guestCount,
-              discountAmount: 0,
-              taxAmount: 0,
-            }).subtotal *
-              Number(percent)) /
-              100,
-          )
-        : Number(proposal.discountAmount) || 0;
+        ? roundCents((undiscounted * Number(percent)) / 100)
+        : Math.min(Number(proposal.discountAmount) || 0, undiscounted);
     const result = computeProposalPricing({
       lines: inputs,
       guestCount,
@@ -282,7 +280,9 @@ export const recomputeProposalTotals = internalMutation({
     await ctx.db.patch(args.proposalId, {
       subtotal: result.subtotal,
       total: result.total,
-      ...(percent != null ? { discountAmount } : {}),
+      ...(discountAmount !== (Number(proposal.discountAmount) || 0)
+        ? { discountAmount }
+        : {}),
     });
     // The event this list prices follows its new total while it is planned.
     await followEventPriceList(ctx, args.proposalId);

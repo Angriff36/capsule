@@ -114,4 +114,30 @@ describe("event price list", () => {
     expect((await proposalRow(w, built.proposalId)).total).toBe(0);
     expect(await quoted(w)).toBe(0);
   });
+
+  it("a dollar discount never takes the total below zero", async () => {
+    const w = await seedWorld("tenant-event-price-list-clamp");
+    const built = await generate(w);
+    await w.sales.mutation(
+      (api.lib as any).proposalPricing.setProposalDiscount,
+      {
+        proposalId: built.proposalId,
+        amount: 600,
+      },
+    );
+    expect((await proposalRow(w, built.proposalId)).total).toBe(915);
+    const salmon = (await liveLines(w, built.proposalId)).find(
+      (line) => line.description === "Cedar salmon",
+    )!;
+    await w.sales.mutation(
+      (api.lib as any).proposalPricing.removeProposalLineAndRecompute,
+      { docId: salmon._id, version: salmon.version },
+    );
+    // $555 left, so the $600 discount becomes $555.
+    expect(await proposalRow(w, built.proposalId)).toMatchObject({
+      subtotal: 555,
+      total: 0,
+    });
+    expect(await quoted(w)).toBe(0);
+  });
 });

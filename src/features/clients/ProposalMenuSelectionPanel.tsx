@@ -150,6 +150,10 @@ export function ProposalMenuSelectionPanel({
     ? (menus ?? []).filter(
         (menu) =>
           Number(menu.pricePerPerson) > 0 &&
+          // Charged already: never offer the same menu's price twice.
+          !priceLines.some((line) =>
+            line.description.startsWith(`${menu.name} (per `),
+          ) &&
           unpriced.some((row) => row.menuId === menu._id),
       )
     : [];
