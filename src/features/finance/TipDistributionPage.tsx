@@ -123,7 +123,14 @@ export function TipDistributionPage() {
     const peopleById = new Map(
       (people ?? []).map((person) => [person._id, person]),
     );
-    return (assignments ?? [])
+    const pickedEvent = (events ?? []).find((event) => event._id === eventId);
+    const liveShifts = (shifts ?? []).filter(
+      (shift) =>
+        shift.eventId === eventId &&
+        shift.deletedAt == null &&
+        !["cancelled", "no_show"].includes(String(shift.status)),
+    );
+    const fromAssignments = (assignments ?? [])
       .filter(
         (assignment) =>
           assignment.eventId === eventId &&
@@ -135,29 +142,55 @@ export function TipDistributionPage() {
         if (!person || person.deletedAt != null || person.status !== "active") {
           return null;
         }
-        const personShifts = (shifts ?? []).filter(
-          (shift) =>
-            shift.eventId === eventId &&
-            shift.personId === assignment.personId &&
-            shift.deletedAt == null &&
-            !["cancelled", "no_show"].includes(String(shift.status)),
+        const personShifts = liveShifts.filter(
+          (shift) => shift.personId === assignment.personId,
         );
         const scheduledHours = personShifts.reduce(
           (sum, shift) => sum + durationHours(shift.startsAt, shift.endsAt),
           0,
         );
-        const assignmentHours = durationHours(
-          assignment.startsAt,
-          assignment.endsAt,
-        );
+        // A roster spot that follows the event's timing has no times of its
+        // own; the event's start and end stand in.
+        const assignmentHours =
+          durationHours(assignment.startsAt, assignment.endsAt) ||
+          durationHours(pickedEvent?.startsAt, pickedEvent?.endsAt);
         return {
-          assignment,
+          role: String(assignment.role || "staff"),
           person,
           shiftId: personShifts.length === 1 ? personShifts[0]!._id : undefined,
           suggestedHours: scheduledHours || assignmentHours,
         };
       })
-      .filter((row): row is NonNullable<typeof row> => row != null)
+      .filter((row): row is NonNullable<typeof row> => row != null);
+    // Someone who worked a shift on the event without a roster spot shares
+    // the tips too.
+    const assigned = new Set(fromAssignments.map((row) => row.person._id));
+    const fromShifts = [
+      ...new Set(
+        liveShifts
+          .map((shift) => shift.personId)
+          .filter((id) => !assigned.has(id)),
+      ),
+    ].flatMap((personId) => {
+      const person = peopleById.get(personId);
+      if (!person || person.deletedAt != null || person.status !== "active")
+        return [];
+      const personShifts = liveShifts.filter(
+        (shift) => shift.personId === personId,
+      );
+      return [
+        {
+          role: String(personShifts[0]?.role || "staff"),
+          person,
+          shiftId: personShifts.length === 1 ? personShifts[0]!._id : undefined,
+          suggestedHours: personShifts.reduce(
+            (sum, shift) => sum + durationHours(shift.startsAt, shift.endsAt),
+            0,
+          ),
+        },
+      ];
+    });
+    return [...fromAssignments, ...fromShifts]
       .filter(
         (row, index, rows) =>
           rows.findIndex(
@@ -167,12 +200,10 @@ export function TipDistributionPage() {
       .sort((left, right) =>
         personName(left.person).localeCompare(personName(right.person)),
       );
-  }, [assignments, eventId, people, shifts]);
+  }, [assignments, eventId, events, people, shifts]);
 
   const roles = useMemo(
-    () => [
-      ...new Set(staff.map((row) => String(row.assignment.role || "staff"))),
-    ],
+    () => [...new Set(staff.map((row) => row.role))],
     [staff],
   );
 
@@ -181,7 +212,7 @@ export function TipDistributionPage() {
       staff
         .filter((row) => !excluded[row.person._id])
         .map((row) => {
-          const role = String(row.assignment.role || "staff");
+          const role = row.role;
           return {
             personId: row.person._id,
             name: personName(row.person),
@@ -495,7 +526,7 @@ export function TipDistributionPage() {
                     const share = calculation.shares.find(
                       (item) => item.personId === row.person._id,
                     );
-                    const role = String(row.assignment.role || "staff");
+                    const role = row.role;
                     const hours =
                       hoursByPerson[row.person._id] ?? row.suggestedHours;
                     return (
