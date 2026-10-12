@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { inPickerWindow } from "../facilities/usePickerAndNamedEvents";
 import {
   useCreateEventAssignment,
   useCreateWeeklyScheduleNotice,
@@ -252,7 +253,8 @@ export function RosterPage() {
           (!["cancelled", "closed_out", "completed"].includes(
             String(item.stage),
           ) &&
-            Number(item.endsAt ?? item.startsAt ?? 0) >= Date.now() - DAY_MS)),
+            Number(item.endsAt ?? item.startsAt ?? 0) >= Date.now() - DAY_MS &&
+            inPickerWindow(item, "upcoming"))),
     )
     .sort((a, b) => Number(a.startsAt ?? 0) - Number(b.startsAt ?? 0));
   const personName = (id: string) => {

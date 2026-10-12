@@ -1,4 +1,7 @@
 import { useState, type FormEvent } from "react";
+import { SearchSelect } from "../../ui/SearchSelect";
+import { formatDate } from "../../lib/format";
+import { inPickerWindow } from "../facilities/usePickerAndNamedEvents";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { usePersonPeriodLaborSummary } from "../facilities/useLaborSummary";
 import { localDayEndExclusive, localDayStart } from "./payrollPeriod";
@@ -17,6 +20,7 @@ type PersonOption = {
 type EventOption = {
   _id: string;
   title?: string | null;
+  startsAt?: number | null;
   deletedAt?: number | null;
 };
 
@@ -214,21 +218,26 @@ export function PayrollPrepareForm({
       ) : null}
       <label className="field-label">
         Event (optional)
-        <select
-          key={events.length ? "events-ready" : "events-loading"}
-          className="input"
+        <SearchSelect
           name="eventId"
+          aria-label="Event"
           defaultValue={workingId ?? ""}
-        >
-          <option value="">No linked event</option>
-          {events
-            .filter((event) => event.deletedAt == null)
-            .map((event) => (
-              <option key={event._id} value={event._id}>
-                {event.title || "Untitled event"}
-              </option>
-            ))}
-        </select>
+          placeholder="No linked event — or search…"
+          options={[
+            { id: "", label: "No linked event" },
+            ...events
+              .filter(
+                (event) =>
+                  event.deletedAt == null &&
+                  (event._id === workingId || inPickerWindow(event, "past")),
+              )
+              .map((event) => ({
+                id: event._id as string,
+                label: event.title || "Untitled event",
+                hint: event.startsAt ? formatDate(event.startsAt) : null,
+              })),
+          ]}
+        />
       </label>
       {personId && clocked !== undefined ? (
         rate != null ? (

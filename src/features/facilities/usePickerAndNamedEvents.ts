@@ -14,9 +14,29 @@ import {
 
 const DAY = 86_400_000;
 /** "past": the last 30 days and today, for work already done (tips, closeout, hours).
- * "upcoming": today to 60 days ahead, plus undated, for work still ahead
+ * "upcoming": today to 60 days ahead, for work still ahead
  * (packing, rosters, purchasing). The events the rows name always stay. */
 export type PickerWhen = "past" | "upcoming";
+
+/**
+ * Whether a picker of this kind offers the event. Screens filter their
+ * pick list with it: the hook's result also holds the events the rows name
+ * (old ones too), which are there to name rows, not to be picked.
+ */
+export function inPickerWindow(
+  event: Pick<EventLookupRow, "startsAt">,
+  when: PickerWhen | undefined,
+  now = Date.now(),
+) {
+  if (!when) return true;
+  const startsAt = event.startsAt;
+  if (startsAt == null) return false;
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+  if (when === "past")
+    return startsAt < today.getTime() + DAY && startsAt > now - 30 * DAY;
+  return startsAt >= today.getTime() && startsAt < now + 60 * DAY;
+}
 
 /**
  * `ids` are the event ids the screen's rows (and its selection) name; pass
@@ -39,24 +59,7 @@ export function usePickerAndNamedEvents(
     // The old every-event list left removed events out; so does this one.
     // Closest to today first, so a picker opens on the events being worked.
     const now = Date.now();
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const inWindow = (event: EventLookupRow) => {
-      const startsAt = event.startsAt;
-      if (when === "past")
-        return (
-          startsAt != null &&
-          startsAt < today.getTime() + DAY &&
-          startsAt > now - 30 * DAY
-        );
-      if (when === "upcoming")
-        return (
-          startsAt == null ||
-          (startsAt >= today.getTime() && startsAt < now + 60 * DAY)
-        );
-      return true;
-    };
-    const shown = picker.filter(inWindow);
+    const shown = picker.filter((event) => inPickerWindow(event, when));
     const seen = new Set<string>(shown.map((event) => event._id));
     const distance = (event: EventLookupRow) =>
       Math.abs(Number(event.startsAt ?? 0) - now);

@@ -1,4 +1,6 @@
+import { formatDate } from "../../lib/format";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { inPickerWindow } from "../facilities/usePickerAndNamedEvents";
 import {
   InlineReferenceCreateSheet,
   useCanCreateInlineReference,
@@ -19,6 +21,7 @@ type VendorOption = {
 type EventOption = {
   _id: string;
   title: string;
+  startsAt?: number | null;
   deletedAt?: number | null;
 };
 
@@ -282,21 +285,29 @@ export function PurchasingCommandForm({
               />
               <label className="field-label">
                 Event (optional)
-                <select
-                  key={events?.length ? "events-ready" : "events-loading"}
+                <SearchSelect
                   name="eventId"
-                  className="input"
+                  aria-label="Event"
                   defaultValue={workingId ?? ""}
-                >
-                  <option value="">General stock</option>
-                  {(events ?? [])
-                    .filter((event) => event.deletedAt == null)
-                    .map((event) => (
-                      <option key={event._id} value={event._id}>
-                        {event.title}
-                      </option>
-                    ))}
-                </select>
+                  placeholder="General stock — or search events…"
+                  options={[
+                    { id: "", label: "General stock" },
+                    ...(events ?? [])
+                      .filter(
+                        (event) =>
+                          event.deletedAt == null &&
+                          (event._id === workingId ||
+                            inPickerWindow(event, "upcoming")),
+                      )
+                      .map((event) => ({
+                        id: event._id as string,
+                        label: event.title || "Untitled event",
+                        hint: event.startsAt
+                          ? formatDate(event.startsAt)
+                          : null,
+                      })),
+                  ]}
+                />
               </label>
               <label className="field-label">
                 Order number

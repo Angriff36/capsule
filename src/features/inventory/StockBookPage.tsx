@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { SearchSelect } from "../../ui/SearchSelect";
+import { inPickerWindow } from "../facilities/usePickerAndNamedEvents";
 import {
   useCreateInventoryItem,
   useCreateInventoryReservation,
@@ -1460,22 +1462,27 @@ function SupplyStockForm({
             </label>
             <label className="field-label">
               Event
-              <select
-                key={events.length ? "events-ready" : "events-loading"}
+              <SearchSelect
                 name="eventId"
-                className="input"
+                aria-label="Event"
                 defaultValue={workingId ?? ""}
+                placeholder="Search upcoming events…"
                 required
-              >
-                <option value="">Select event</option>
-                {events
-                  .filter((item: any) => item.deletedAt == null)
-                  .map((item: any) => (
-                    <option key={item._id} value={item._id}>
-                      {item.title}
-                    </option>
-                  ))}
-              </select>
+                options={[
+                  ...events
+                    .filter(
+                      (item: any) =>
+                        item.deletedAt == null &&
+                        (item._id === workingId ||
+                          inPickerWindow(item, "upcoming")),
+                    )
+                    .map((item: any) => ({
+                      id: item._id as string,
+                      label: item.title || "Untitled event",
+                      hint: item.startsAt ? formatDate(item.startsAt) : null,
+                    })),
+                ]}
+              />
             </label>
             <label className="field-label">
               Supplier lot

@@ -1727,7 +1727,9 @@
   }
 
   .operations-stage > * {
-    animation: journal-entry 420ms ease-out both;
+    /* backwards, not both: a filled transform traps dropdowns
+       (SearchSelect) under later siblings, as on .card above. */
+    animation: journal-entry 420ms ease-out backwards;
   }
   .operations-stage > :nth-child(2) {
     animation-delay: 60ms;

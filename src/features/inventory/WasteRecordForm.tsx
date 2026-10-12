@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { inPickerWindow } from "../facilities/usePickerAndNamedEvents";
 import {
   useCreateWasteRecord,
   useListIngredient,
@@ -154,7 +155,11 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
             defaultValue={workingId ?? ""}
             placeholder="No event · kitchen operations — or search…"
             options={(events ?? [])
-              .filter((item) => item.deletedAt == null)
+              .filter(
+                (item) =>
+                  item.deletedAt == null &&
+                  (item._id === workingId || inPickerWindow(item, "past")),
+              )
               .map((item) => ({
                 id: item._id,
                 label: item.title,

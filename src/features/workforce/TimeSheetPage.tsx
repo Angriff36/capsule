@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { inPickerWindow } from "../facilities/usePickerAndNamedEvents";
 import {
   useAvailabilityWindowWithdraw,
   useCreateAvailabilityWindow,
@@ -373,7 +374,12 @@ export function TimeSheetPage() {
   // newest first, then what is coming; cancelled events stay out.
   const cutoff = Date.now() + 86_400_000;
   const activeEvents = (events ?? [])
-    .filter((event) => event.deletedAt == null && event.stage !== "cancelled")
+    .filter(
+      (event) =>
+        event.deletedAt == null &&
+        event.stage !== "cancelled" &&
+        (event._id === workingId || inPickerWindow(event, "past")),
+    )
     .sort((a, b) => {
       const aStart = a.startsAt ?? 0;
       const bStart = b.startsAt ?? 0;

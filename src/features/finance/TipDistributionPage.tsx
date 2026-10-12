@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { inPickerWindow } from "../facilities/usePickerAndNamedEvents";
 import { Link } from "react-router-dom";
 import {
   useCreatePayrollInput,
@@ -98,7 +99,10 @@ export function TipDistributionPage() {
     () =>
       (events ?? [])
         .filter(
-          (event) => event.deletedAt == null && event.stage !== "cancelled",
+          (event) =>
+            event.deletedAt == null &&
+            event.stage !== "cancelled" &&
+            (event._id === eventId || inPickerWindow(event, "past")),
         )
         // Tips come after the work: events that already started come
         // first, newest first; events still ahead go last.
