@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { api } from "../_generated/api";
 import type { Id } from "../_generated/dataModel";
-import { mutation, query } from "../_generated/server";
+import { mutation, query, type MutationCtx } from "../_generated/server";
 import { readEventTimingPlan } from "./eventTimingOperations";
 import { getAuthContext, requireTenant } from "./authContext";
 import {
@@ -10,6 +10,7 @@ import {
 } from "./materializationReceipt";
 import { orgCapabilityDeniesAction } from "./orgCapabilityGate";
 import { materializeCateringPackage, type CateringPackageResult } from "./cateringPackageOperations";
+import { cateringPackages } from "../../src/data/cateringPackages";
 
 export const eventTimingPlan = query({
   args: { eventId: v.id("events") },
@@ -23,14 +24,55 @@ export const applyCateringPackage = mutation({
     operationKey: v.string(),
     selections: v.array(v.object({ recipeId: v.string(), servings: v.number(), notes: v.string() })),
     serviceStartsAt: v.optional(v.number()),
+    // The package's price per guest for this event. It goes on the event's
+    // price list as one line, which staff can change there later.
+    pricePerGuest: v.optional(v.number()),
   },
   handler: async (ctx, args): Promise<CateringPackageResult> => {
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
     requireMenuAccess(auth);
-    return materializeCateringPackage(ctx, tenantId, args);
+    const { pricePerGuest, ...input } = args;
+    if (pricePerGuest != null && !(pricePerGuest >= 0))
+      throw new Error("Enter a price per guest of zero or more.");
+    const result = await materializeCateringPackage(ctx, tenantId, input);
+    if (!result.recovered && pricePerGuest != null && pricePerGuest > 0)
+      await pricePackageOnEvent(ctx, args.eventId, args.packageId, pricePerGuest);
+    return result;
   },
 });
+
+/** The package as one per-guest line on the event's price list. */
+async function pricePackageOnEvent(
+  ctx: MutationCtx,
+  eventId: Id<"events">,
+  packageId: string,
+  pricePerGuest: number,
+) {
+  const pack = cateringPackages.find((entry) => entry.id === packageId);
+  const event = await ctx.db.get(eventId);
+  if (!pack || !event?.clientId) return;
+  const built: { proposalId: Id<"proposals"> } = await ctx.runMutation(
+    api.lib.proposalGenerate.generateProposalDraft,
+    { eventId },
+  );
+  const description = `${pack.name} (per guest)`;
+  const lines = (
+    await ctx.db
+      .query("proposalLineItems")
+      .withIndex("by_proposalId", (q) => q.eq("proposalId", built.proposalId))
+      .collect()
+  ).filter((line) => line.deletedAt == null && line.removedAt == null);
+  if (lines.some((line) => line.description === description)) return;
+  await ctx.runMutation(api.lib.proposalPricing.addProposalLineAndRecompute, {
+    proposalId: built.proposalId,
+    description,
+    pricingBasis: "per_person",
+    unitPrice: pricePerGuest,
+    sortOrder:
+      lines.reduce((max, line) => Math.max(max, Number(line.sortOrder) || 0), -1) + 1,
+  });
+}
 
 const MANAGE_ROLES = new Set([
   "admin",
