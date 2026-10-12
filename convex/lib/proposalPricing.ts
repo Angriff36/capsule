@@ -31,6 +31,7 @@ import type { Doc, Id } from "../_generated/dataModel";
 import { computeProposalPricing, type PricingBasis } from "../../src/lib/pricing";
 import { effectiveSellingPrice } from "../../src/lib/catalogEligibility";
 import { getAuthContext } from "./authContext";
+import { followEventPriceList } from "./eventPriceList";
 
 // Active, non-deleted priced lines for a proposal. JS loose-equality filter
 // (governed-creation omits deletedAt at insert → fresh active rows have it
@@ -265,6 +266,8 @@ export const recomputeProposalTotals = internalMutation({
       subtotal: result.subtotal,
       total: result.total,
     });
+    // The event this list prices follows its new total while it is planned.
+    await followEventPriceList(ctx, args.proposalId);
   },
 });
 

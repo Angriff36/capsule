@@ -25,6 +25,7 @@ import {
   readProposalLines,
   readScopedEvent,
 } from "./proposalGenerateSources";
+import { followEventPriceList } from "./eventPriceList";
 import {
   parseGenerationRecord,
   planLines,
@@ -181,6 +182,8 @@ export const generateProposalDraft = mutation({
         venueAddress: read.facts.venueAddress ?? undefined,
       });
     }
+    // The event's price follows the list it was just built into.
+    await followEventPriceList(ctx, proposalId);
     const saved = await ctx.db.get(proposalId);
     return {
       proposalId,

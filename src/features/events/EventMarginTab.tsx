@@ -43,6 +43,7 @@ import { EventMarginSummaryAside } from "./EventMarginSummaryAside";
 import { buildLiveEventProfitability } from "./liveEventProfitability";
 import { LiveEventProfitabilityWidget } from "./LiveEventProfitabilityWidget";
 import { finalCloseout } from "./eventFinalCloseout";
+import { EventPriceListCard } from "./EventPriceListCard";
 
 type Props = {
   eventId: string;
@@ -370,6 +371,11 @@ export function EventMarginTab({ eventId }: Props) {
 
       <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_18.5rem]">
         <div className="flex min-w-0 flex-col gap-4">
+          <EventPriceListCard
+            eventId={event._id}
+            guestCount={Number(event.expectedHeadcount ?? 0)}
+            quotedPrice={Number(event.quotedPrice ?? 0)}
+          />
           <EventMarginTiles
             revenue={revenue}
             totalCost={totalCost}
