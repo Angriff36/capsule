@@ -17,15 +17,6 @@ const dateFormat = new Intl.DateTimeFormat(undefined, {
   year: "numeric",
 });
 
-export function eventChoiceLabel(
-  event: Pick<EventRow, "title" | "eventNumber" | "startsAt">,
-): string {
-  const title = event.title?.trim() || "Untitled event";
-  const number = event.eventNumber ? `#${event.eventNumber} ` : "";
-  const when = event.startsAt ? ` · ${dateFormat.format(event.startsAt)}` : "";
-  return `${number}${title}${when}`;
-}
-
 /**
  * PL-INBOX (AC-106, AC-248, AC-249): what this conversation is about and
  * where it belongs. Staff link it to an event, mark it as not a sales lead,
@@ -76,7 +67,7 @@ export function ThreadLinksBar({
       data-testid="thread-links"
     >
       <span className="text-ink-3">Event</span>
-      <div className="max-w-64 min-w-48">
+      <div className="w-80 max-w-full">
         <SearchSelect
           aria-label="Link event"
           value={thread.eventId ?? ""}
@@ -85,7 +76,10 @@ export function ThreadLinksBar({
             ...(thread.eventId ? [{ id: "", label: "No event" }] : []),
             ...liveEvents.map((e) => ({
               id: e._id as string,
-              label: eventChoiceLabel(e),
+              label: `${e.eventNumber ? `#${e.eventNumber} ` : ""}${
+                e.title?.trim() || "Untitled event"
+              }`,
+              hint: e.startsAt ? dateFormat.format(e.startsAt) : null,
             })),
           ]}
           onChange={(eventId) => {
