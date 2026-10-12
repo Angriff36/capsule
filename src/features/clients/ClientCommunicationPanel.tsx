@@ -284,6 +284,7 @@ export function ClientCommunicationPanelView({
             <label className="field-label">
               Date &amp; time
               <BoundedDateTimeLocalInput
+                naturalDateDirection="any"
                 name="occurredAt"
                 className="input"
                 defaultValue={localDateTimeValue()}
