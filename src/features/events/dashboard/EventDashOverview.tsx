@@ -267,7 +267,15 @@ export function EventDashOverview({
               </span>
             </div>
           }
-          hint={firstGap ? `${firstGap} — open` : "Ready for approval"}
+          hint={
+            firstGap
+              ? `${firstGap} — open`
+              : ["quote", "planning", "pending_approval"].includes(
+                    String(props.stage),
+                  )
+                ? "Ready for approval"
+                : "All set"
+          }
         />
         <Tile
           id="money"
