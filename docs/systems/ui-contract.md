@@ -3670,6 +3670,7 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `workforceHistoryWindow.oneOnOnePage` - query; live read, updates by itself
 - `workforceHistoryWindow.pendingImportConflicts` - query; live read, updates by itself
 - `workforceHistoryWindow.performanceReviewPage` - query; live read, updates by itself
+- `workforceHistoryWindow.reviewEventsForPerson` - query; live read, updates by itself
 - `workforceHistoryWindow.trainingCompletionCounts` - query; live read, updates by itself
 - `workforceHistoryWindow.trainingCompletionPage` - query; live read, updates by itself
 - `workforceHistoryWindow.trainingSignOffPage` - query; live read, updates by itself

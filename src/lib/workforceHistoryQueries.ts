@@ -132,3 +132,12 @@ export function useActiveAnnouncements() {
 export function usePendingImportConflicts() {
   return useQuery(api.workforceHistoryWindow.pendingImportConflicts, {});
 }
+
+/** Events the person had a shift at in the last six months; [] without one. */
+export function useReviewEventsForPerson(personId: string) {
+  const rows = useQuery(
+    api.workforceHistoryWindow.reviewEventsForPerson,
+    personId ? { personId } : "skip",
+  );
+  return personId ? rows : [];
+}
