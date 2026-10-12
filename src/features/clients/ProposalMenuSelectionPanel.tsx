@@ -69,6 +69,9 @@ export function ProposalMenuSelectionPanel({
   const removeLine = useMutation(
     api.lib.proposalPricing.removeProposalLineAndRecompute,
   );
+  const addLine = useMutation(
+    api.lib.proposalPricing.addProposalLineAndRecompute,
+  );
   const [busy, setBusy] = useState<string | null>(null);
   const { prompt, host } = useActionPrompt();
 
@@ -141,6 +144,41 @@ export function ProposalMenuSelectionPanel({
             !lineNames.has(dishName(row.dishId).trim().toLowerCase()),
         );
 
+  // A per-guest menu prices itself only once every dish of it is picked.
+  // With part of it picked, offer its per-guest price in one click.
+  const unpricedMenus = draft
+    ? (menus ?? []).filter(
+        (menu) =>
+          Number(menu.pricePerPerson) > 0 &&
+          unpriced.some((row) => row.menuId === menu._id),
+      )
+    : [];
+  const priceMenu = (menu: (typeof unpricedMenus)[number]) =>
+    void run(`menu:${menu._id}`, async () => {
+      const sortOrder =
+        priceLines.reduce(
+          (max, row) => Math.max(max, Number(row.sortOrder) || 0),
+          -1,
+        ) + 1;
+      await addLine({
+        proposalId: proposalId as Id<"proposals">,
+        description: `${menu.name} (per guest)`,
+        pricingBasis: "per_person",
+        unitPrice: Number(menu.pricePerPerson),
+        sortOrder,
+        menuId: String(menu._id),
+      });
+      if (Number(menu.basePrice) > 0)
+        await addLine({
+          proposalId: proposalId as Id<"proposals">,
+          description: `${menu.name} (base price)`,
+          pricingBasis: "flat",
+          unitPrice: Number(menu.basePrice),
+          sortOrder: sortOrder + 1,
+          menuId: String(menu._id),
+        });
+    });
+
   // A menu's per-guest or base price line, added by a dish pick, left behind
   // after every dish of that menu was taken off: the client would pay for a
   // menu with no food on it. Only lines linked to their menu count, so a
@@ -209,6 +247,22 @@ export function ProposalMenuSelectionPanel({
           would get {unpriced.length === 1 ? "it" : "them"} free. Add a line
           under Pricing.
         </p>
+      ) : null}
+      {unpricedMenus.length > 0 ? (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {unpricedMenus.map((menu) => (
+            <button
+              key={menu._id}
+              className="btn btn-ghost btn-sm"
+              type="button"
+              disabled={busy != null}
+              onClick={() => priceMenu(menu)}
+            >
+              Charge {menu.name} at ${Number(menu.pricePerPerson).toFixed(2)}{" "}
+              per guest
+            </button>
+          ))}
+        </div>
       ) : null}
 
       {host}

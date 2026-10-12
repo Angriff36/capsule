@@ -471,6 +471,7 @@ Screens (36): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `queries.listShareLinkByProposalId` - live read
 - `queries.listSignatureRequestByProposalRevisionId` - live read
 - `queries.listTastingDishByTastingId` - live read
+- `queries.listTaxRate` - live read
 - `queries.listVenue` - live read
 
 ### Generated actions
