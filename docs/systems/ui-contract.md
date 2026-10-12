@@ -35,6 +35,7 @@ Screens (25): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 - `queries.listClientCommunicationByClientId` - live read
 - `queries.listClientCommunicationByEventId` - live read
 - `queries.listClientContactByClientId` - live read
+- `queries.listClientOutreachTaskByClientId` - live read
 - `queries.listContractByClientId` - live read
 - `queries.listCreditMemoByClientId` - live read
 - `queries.listCreditMemoBySourceInvoiceId` - live read
@@ -431,6 +432,7 @@ Screens (36): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `queries.listClientCommunicationByClientId` - live read
 - `queries.listClientCommunicationByEventId` - live read
 - `queries.listClientContactByClientId` - live read
+- `queries.listClientOutreachTaskByClientId` - live read
 - `queries.listContractByClientId` - live read
 - `queries.listCreditMemoByClientId` - live read
 - `queries.listCreditMemoBySourceInvoiceId` - live read
@@ -4680,6 +4682,7 @@ Screens (71): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `queries.listClientCommunicationByClientId` - live read
 - `queries.listClientCommunicationByEventId` - live read
 - `queries.listClientContactByClientId` - live read
+- `queries.listClientOutreachTaskByClientId` - live read
 - `queries.listComponent` - live read
 - `queries.listComponentComponentByComponentId` - live read
 - `queries.listComponentEquipmentByComponentId` - live read
