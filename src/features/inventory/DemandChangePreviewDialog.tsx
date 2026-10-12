@@ -64,6 +64,21 @@ export function DemandChangePreviewDialog({
     }
   };
 
+  // A guest count that moves no food or stock amount has nothing to review:
+  // apply it at once instead of asking to confirm "no changes".
+  const autoApplied = useRef(false);
+  useEffect(() => {
+    if (
+      autoApplied.current ||
+      preview === undefined ||
+      changed.length > 0 ||
+      request.kind !== "headcount"
+    )
+      return;
+    autoApplied.current = true;
+    void apply();
+  });
+
   return (
     <dialog
       ref={dialogRef}
@@ -98,7 +113,7 @@ export function DemandChangePreviewDialog({
             </p>
           ) : changed.length === 0 ? (
             <p className="rounded-md border border-line bg-inset p-4 text-sm text-ink-2">
-              No quantity changes result from this action.
+              No food or stock amounts change.
             </p>
           ) : (
             <>
