@@ -58,6 +58,7 @@ export function EventStaffBilling({
     (lines ?? []).find(
       (line) =>
         line.deletedAt == null &&
+        line.removedAt == null &&
         line.proposalId === proposalId &&
         line.description.startsWith(`Staff: ${role} (`),
     );
