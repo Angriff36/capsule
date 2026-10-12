@@ -10,6 +10,8 @@ import {
 import { formatDate, formatTime } from "../../lib/format";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { SearchSelect } from "../../ui/SearchSelect";
+import { reportActionOk } from "../../ui/action-result";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { TastingDetail } from "./TastingDetail";
@@ -87,6 +89,8 @@ export function TastingsPage() {
   const [failure, setFailure] = useState<unknown>(null);
   const [saving, setSaving] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [leadPick, setLeadPick] = useState("");
+  const [proposalPick, setProposalPick] = useState("");
 
   const liveLeads = (leads ?? []).filter(
     (lead) => lead.deletedAt == null && lead.closedAt == null,
@@ -94,9 +98,18 @@ export function TastingsPage() {
   const liveProposals = (proposals ?? []).filter(
     (proposal) => proposal.deletedAt == null,
   );
+  // Coming tastings soonest first, then the ones already held, newest first.
+  const startOfToday = new Date().setHours(0, 0, 0, 0);
   const rows = (tastings ?? [])
     .filter((row) => row.deletedAt == null && row.bookedAt != null)
-    .sort((a, b) => Number(b.scheduledAt) - Number(a.scheduledAt));
+    .sort((a, b) => {
+      const aAt = Number(a.scheduledAt);
+      const bAt = Number(b.scheduledAt);
+      const aAhead = aAt >= startOfToday;
+      const bAhead = bAt >= startOfToday;
+      if (aAhead !== bAhead) return aAhead ? -1 : 1;
+      return aAhead ? aAt - bAt : bAt - aAt;
+    });
 
   const schedule = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -123,7 +136,12 @@ export function TastingsPage() {
         notes: text("notes") || undefined,
       });
       form.reset();
+      setLeadPick("");
+      setProposalPick("");
       setOpenId(String(created.docId));
+      reportActionOk(
+        `Tasting booked for ${formatDate(scheduledAt)} at ${formatTime(scheduledAt)}.`,
+      );
     } catch (error) {
       setFailure(error);
     } finally {
@@ -169,25 +187,42 @@ export function TastingsPage() {
         <div className="supply-form-grid mt-3">
           <label className="field-label">
             Lead
-            <select name="leadId" className="input" defaultValue="">
-              <option value="">No lead</option>
-              {liveLeads.map((lead) => (
-                <option key={lead._id} value={lead._id}>
-                  {leadLabel(lead)}
-                </option>
-              ))}
-            </select>
+            <SearchSelect
+              name="leadId"
+              aria-label="Lead"
+              value={leadPick}
+              placeholder="No lead — or search leads…"
+              onChange={(id) => {
+                setLeadPick(id);
+                // The lead's own proposal, when it has one.
+                const lead = liveLeads.find((row) => row._id === id);
+                if (lead?.proposalId) setProposalPick(String(lead.proposalId));
+              }}
+              options={[
+                { id: "", label: "No lead" },
+                ...liveLeads.map((lead) => ({
+                  id: lead._id as string,
+                  label: leadLabel(lead),
+                })),
+              ]}
+            />
           </label>
           <label className="field-label">
             Proposal
-            <select name="proposalId" className="input" defaultValue="">
-              <option value="">No proposal</option>
-              {liveProposals.map((proposal) => (
-                <option key={proposal._id} value={proposal._id}>
-                  {String(proposal.title || "Untitled proposal")}
-                </option>
-              ))}
-            </select>
+            <SearchSelect
+              name="proposalId"
+              aria-label="Proposal"
+              value={proposalPick}
+              onChange={setProposalPick}
+              placeholder="No proposal — or search proposals…"
+              options={[
+                { id: "", label: "No proposal" },
+                ...liveProposals.map((proposal) => ({
+                  id: proposal._id as string,
+                  label: String(proposal.title || "Untitled proposal"),
+                })),
+              ]}
+            />
           </label>
           <label className="field-label">
             Date and time
