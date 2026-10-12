@@ -484,7 +484,7 @@ export function ComponentDetailPage() {
           },
           {
             label: "Serves",
-            value: `${servesPerYield} guests`,
+            value: formatCountNoun(servesPerYield, "guest", "guests"),
           },
         ]}
         actions={
@@ -605,8 +605,11 @@ export function ComponentDetailPage() {
           <div>
             <dt>Serves per yield</dt>
             <dd>
-              {(component as { servesPerYield?: number }).servesPerYield ?? 1}{" "}
-              guests
+              {formatCountNoun(
+                (component as { servesPerYield?: number }).servesPerYield ?? 1,
+                "guest",
+                "guests",
+              )}
             </dd>
           </div>
           <div>
