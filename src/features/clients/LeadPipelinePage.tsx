@@ -36,15 +36,23 @@ import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { useActionNotice } from "../../ui/action-result";
 import { useActionPrompt } from "../../ui/action-prompt";
 
+// `chance` is the starting chance of booking at each stage. Moving a lead
+// moves its chance with it, unless someone typed their own.
 const STAGES = [
-  { key: "new", label: "New", caption: "Fresh inquiries" },
-  { key: "qualified", label: "Qualified", caption: "A real fit" },
+  { key: "new", label: "New", caption: "Fresh inquiries", chance: 10 },
+  { key: "qualified", label: "Qualified", caption: "A real fit", chance: 25 },
   {
     key: "proposalSent",
     label: "Proposal sent",
     caption: "Offer in hand",
+    chance: 50,
   },
-  { key: "negotiating", label: "Negotiating", caption: "Closing details" },
+  {
+    key: "negotiating",
+    label: "Negotiating",
+    caption: "Closing details",
+    chance: 75,
+  },
 ] as const;
 
 type LeadStage = (typeof STAGES)[number]["key"];
@@ -828,6 +836,28 @@ export function LeadPipelinePage() {
                             name="stage"
                             defaultValue={lead.stage}
                             aria-label={`${leadName(lead)} stage`}
+                            data-previous={lead.stage}
+                            onChange={(event) => {
+                              const select = event.currentTarget;
+                              const chance = select.form?.elements.namedItem(
+                                "probability",
+                              ) as HTMLInputElement | null;
+                              const from = STAGES.find(
+                                (stage) =>
+                                  stage.key === select.dataset.previous,
+                              );
+                              const to = STAGES.find(
+                                (stage) => stage.key === select.value,
+                              );
+                              if (
+                                chance &&
+                                from &&
+                                to &&
+                                Number(chance.value) === from.chance
+                              )
+                                chance.value = String(to.chance);
+                              select.dataset.previous = select.value;
+                            }}
                           >
                             {STAGES.map((option) => (
                               <option key={option.key} value={option.key}>
