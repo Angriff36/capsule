@@ -2882,18 +2882,33 @@ Screens (75): `events/EventStaffBilling.tsx`, `events/EventStaffingAddForm.tsx`,
 
 ### Generated reads
 
+- `queries.getClientContact` - live read
 - `queries.getEvent` - live read
+- `queries.getInvoice` - live read
+- `queries.getLead` - live read
+- `queries.getProposal` - live read
+- `queries.listClientCommunicationByClientContactId` - live read
+- `queries.listClientCommunicationByClientId` - live read
+- `queries.listClientCommunicationByEventId` - live read
 - `queries.listClientContactByClientId` - live read
+- `queries.listClientOutreachTaskByClientId` - live read
+- `queries.listContractByClientId` - live read
 - `queries.listCorrectiveActionByEventId` - live read
+- `queries.listCreditMemoByClientId` - live read
+- `queries.listCreditMemoBySourceInvoiceId` - live read
+- `queries.listDateHoldByHoldDate` - live read
+- `queries.listDateWaitlistEntryByHoldDate` - live read
 - `queries.listDishComponentByDishId` - live read
 - `queries.listDishIngredientByDishId` - live read
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
 - `queries.listEventCloseoutByEventId` - live read
+- `queries.listEventCloseoutByTenantIdAndStatus` - live read
 - `queries.listEventDishLineOverrideByEventDishId` - live read
 - `queries.listEventGuestByEventId` - live read
 - `queries.listEventLayoutSectionByEventId` - live read
+- `queries.listEventNumberAssignmentByEventId` - live read
 - `queries.listEventStaffNeed` - live read
 - `queries.listEventStaffNeedByEventId` - live read
 - `queries.listEventTaskByEventId` - live read
@@ -2901,31 +2916,47 @@ Screens (75): `events/EventStaffBilling.tsx`, `events/EventStaffingAddForm.tsx`,
 - `queries.listEventTimelineCommentByEventId` - live read
 - `queries.listIncidentByEventId` - live read
 - `queries.listIngredientDemandByEventId` - live read
+- `queries.listInvoiceByClientId` - live read
 - `queries.listInvoiceByEventId` - live read
 - `queries.listInvoiceByTenantIdAndInvoiceNumber` - live read
+- `queries.listInvoiceByTenantIdAndStatus` - live read
+- `queries.listLeadByClientId` - live read
+- `queries.listLeftoverDispositionByEventId` - live read
+- `queries.listMessageByThreadId` - live read
 - `queries.listPackListByEventId` - live read
+- `queries.listPaymentByInvoiceId` - live read
+- `queries.listPayrollExportRecordByPersonId` - live read
 - `queries.listPayrollInputByEventId` - live read
 - `queries.listPerson` - live read
 - `queries.listPlanningOverrideByEventId` - live read
 - `queries.listPlanningReceiptByEventId` - live read
 - `queries.listPrepTaskByEventId` - live read
+- `queries.listProposalByClientId` - live read
 - `queries.listProposalByEventId` - live read
 - `queries.listProposalDishSelectionByProposalId` - live read
 - `queries.listProposalEnhancementByProposalId` - live read
+- `queries.listProposalLineItemByProposalId` - live read
+- `queries.listProposalRevisionByProposalId` - live read
 - `queries.listQualification` - live read
+- `queries.listQuoteSubmissionByTenantIdAndStatus` - live read
 - `queries.listRecurringAvailability` - live read
 - `queries.listRecurringAvailabilityByPersonId` - live read
 - `queries.listRentalOrderLineByEventId` - live read
+- `queries.listRevenueAttributionByEventId` - live read
 - `queries.listReviewFlagByEventId` - live read
 - `queries.listRoleScorecard` - live read
+- `queries.listSavedReportSnapshotBySavedReportDefinitionId` - live read
 - `queries.listServiceStyle` - live read
+- `queries.listShareLinkByProposalId` - live read
 - `queries.listShiftByEventId` - live read
 - `queries.listShiftSwapRequestByRecipientPersonIdAndStatus` - live read
 - `queries.listShiftSwapRequestByRequesterPersonId` - live read
 - `queries.listShiftSwapRequestByTenantIdAndStatus` - live read
 - `queries.listShiftType` - live read
+- `queries.listSignatureRequestByProposalRevisionId` - live read
 - `queries.listSkillLevel` - live read
 - `queries.listStaffingTemplate` - live read
+- `queries.listTastingDishByTastingId` - live read
 - `queries.listTimeOffRequestByPersonId` - live read
 - `queries.listTimeOffRequestByTenantIdAndStatus` - live read
 - `queries.listTimeRecordByPersonId` - live read
@@ -3645,6 +3676,11 @@ Screens (75): `events/EventStaffBilling.tsx`, `events/EventStaffingAddForm.tsx`,
 - `eventsAreaWindow.waitlistForEvent` - query; live read, updates by itself
 - `fileStorage.discardOrphanUploads` - mutation; authored step; live reads update by themselves
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
+- `financeWindow.canReadTable` - query; live read, updates by itself
+- `financeWindow.datesFrom` - query; live read, updates by itself
+- `financeWindow.leftoversInYear` - query; live read, updates by itself
+- `financeWindow.page` - query; live read, updates by itself
+- `financeWindow.threadLastMessageAt` - query; live read, updates by itself
 - `hiringPipeline.ingestKmCandidates` - mutation; authored step; live reads update by themselves
 - `historyWindow.awayForPeople` - query; live read, updates by itself
 - `historyWindow.dishTasksByIds` - query; live read, updates by itself
@@ -3660,8 +3696,10 @@ Screens (75): `events/EventStaffBilling.tsx`, `events/EventStaffingAddForm.tsx`,
 - `lib.eventPacket.finalLock.prepareFieldForms` - mutation; authored step; live reads update by themselves
 - `lib.eventPriceList.forEvent` - query; live read, updates by itself
 - `lib.proposalPricing.addProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
+- `lib.proposalPricing.reviseProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
 - `personEmail.correctStaffEmail` - action; one-time call (not live); the live reads it changes update by themselves
 - `planWindow.forEvents` - query; live read, updates by itself
+- `scorecardEventScores.forWindow` - query; live read, updates by itself
 - `staffSelfReviews.listMyReviews` - query; live read, updates by itself
 - `staffShiftSwaps.getCandidates` - query; live read, updates by itself
 - `staffShiftSwaps.listRelatedShifts` - query; live read, updates by itself
