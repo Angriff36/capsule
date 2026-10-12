@@ -115,7 +115,12 @@ export function toDatetimeLocalValue(ms: number): string {
 }
 
 export function relativeDays(ms: number, from = Date.now()): string {
-  const days = Math.round((ms - from) / 86_400_000);
+  // Whole calendar days, so the time of day stored on a date never adds one.
+  const day = (at: number) => {
+    const d = new Date(at);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  };
+  const days = Math.round((day(ms) - day(from)) / 86_400_000);
   if (days === 0) return "today";
   if (days === 1) return "tomorrow";
   if (days === -1) return "yesterday";
