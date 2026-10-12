@@ -73,6 +73,7 @@ export function ReportFilterBar({
       <label>
         <span>{REPORT_FILTER_LABELS.from}</span>
         <BoundedDateInput
+          naturalDateDirection="any"
           className="input"
           value={filters.from ?? ""}
           onChange={(event) => set("from", event.target.value)}
@@ -81,6 +82,7 @@ export function ReportFilterBar({
       <label>
         <span>{REPORT_FILTER_LABELS.to}</span>
         <BoundedDateInput
+          naturalDateDirection="any"
           className="input"
           value={filters.to ?? ""}
           onChange={(event) => set("to", event.target.value)}

@@ -137,6 +137,7 @@ export function VehicleSchedulePage() {
             ← Previous
           </button>
           <BoundedDateInput
+            naturalDateDirection="any"
             className="input"
             aria-label="Schedule day"
             value={day}

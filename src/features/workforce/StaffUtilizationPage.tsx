@@ -260,6 +260,7 @@ export function StaffUtilizationDashboard({
           <label className="field-label">
             From
             <BoundedDateInput
+              naturalDateDirection="any"
               className="input"
               value={startDate}
               max={endDate}
@@ -272,6 +273,7 @@ export function StaffUtilizationDashboard({
           <label className="field-label">
             Through
             <BoundedDateInput
+              naturalDateDirection="any"
               className="input"
               value={endDate}
               min={startDate}

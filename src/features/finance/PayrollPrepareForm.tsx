@@ -128,6 +128,7 @@ export function PayrollPrepareForm({
         <label className="field-label">
           Period start
           <BoundedDateInput
+            naturalDateDirection="any"
             className="input"
             name="periodStart"
             required
@@ -142,6 +143,7 @@ export function PayrollPrepareForm({
         <label className="field-label">
           Period end
           <BoundedDateInput
+            naturalDateDirection="any"
             className="input"
             name="periodEnd"
             required

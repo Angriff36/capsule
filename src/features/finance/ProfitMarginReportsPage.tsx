@@ -254,6 +254,7 @@ export function ProfitMarginDashboard({
         <label>
           From
           <BoundedDateInput
+            naturalDateDirection="any"
             className="input"
             value={rangeStart}
             max={rangeEnd}
@@ -263,6 +264,7 @@ export function ProfitMarginDashboard({
         <label>
           Through
           <BoundedDateInput
+            naturalDateDirection="any"
             className="input"
             value={rangeEnd}
             min={rangeStart}

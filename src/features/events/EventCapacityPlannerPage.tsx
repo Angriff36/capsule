@@ -166,6 +166,7 @@ export function EventCapacityPlannerPage() {
           <label>
             From
             <BoundedDateInput
+              naturalDateDirection="any"
               value={startDate}
               max={endDate}
               onChange={(event) => setStartDate(event.target.value)}
@@ -176,6 +177,7 @@ export function EventCapacityPlannerPage() {
           <label>
             Through
             <BoundedDateInput
+              naturalDateDirection="any"
               value={endDate}
               min={startDate}
               onChange={(event) => setEndDate(event.target.value)}

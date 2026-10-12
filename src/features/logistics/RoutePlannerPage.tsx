@@ -261,6 +261,7 @@ export function RoutePlannerPage() {
         </div>
         <div className="supply-row-actions">
           <BoundedDateInput
+            naturalDateDirection="any"
             className="input"
             aria-label="Route day"
             value={day}
