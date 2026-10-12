@@ -417,7 +417,7 @@ export const PAGE_GUIDES: PageGuide[] = [
     prefix: "/logistics/route",
     title: "Route planner",
     purpose: "Put the day's stops in a sensible driving order.",
-    steps: ["Drag stops into order; hand the route to the driver."],
+    steps: ["Move stops into order, then print the route for the driver."],
   },
   {
     prefix: "/logistics/fleet",

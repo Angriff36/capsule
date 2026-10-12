@@ -255,8 +255,8 @@ export function RoutePlannerPage() {
             {roadConfigured === false
               ? "Stops in the shortest straight-line order. Drive times are a rough guess at 25 mph until the map service is switched on."
               : "Stops in the shortest order, with real road times from the map service."}{" "}
-            Move a stop up or down if you need to; your order is kept on this
-            screen only and is not saved.
+            Move a stop up or down if you need to, then print the route for the
+            driver; the order is kept on this screen only and is not saved.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -286,11 +286,20 @@ export function RoutePlannerPage() {
               </option>
             ))}
           </select>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => window.print()}
+          >
+            Print route
+          </button>
         </div>
       </header>
       <LogisticsWorkspaceNav />
 
-      <section className="working-ledger">
+      {/* The printed stop list is what the driver takes: the order on screen
+          is not saved, so print it once it is right. */}
+      <section className="working-ledger print-sheet">
         <div className="ledger-heading">
           <div>
             <p className="eyebrow">
