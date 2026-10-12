@@ -876,18 +876,6 @@ export function ImportRunDetailPage() {
                 {formatDateTime(importRun.completionTime)}
               </dd>
             </div>
-            <div>
-              <dt className="font-medium text-ink">Actor ID</dt>
-              <dd className="mt-1 text-ink-2 font-mono text-2xs">
-                {importRun.actorId || "—"}
-              </dd>
-            </div>
-            <div>
-              <dt className="font-medium text-ink">Checksum</dt>
-              <dd className="mt-1 text-ink-2 font-mono text-2xs">
-                {importRun.checksum || "—"}
-              </dd>
-            </div>
           </dl>
         </div>
       </div>
