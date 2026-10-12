@@ -230,3 +230,20 @@
   font-size: 12px;
   color: #5c6a63;
 }
+
+/* A card is narrow: the batch steps share its width instead of scrolling
+   sideways inside it (the last step was cut to "Co…"). */
+.kds-card .lifecycle-stepper,
+.kds-card .lifecycle-stepper-track {
+  overflow: visible;
+  min-width: 0;
+}
+.kds-card .lifecycle-stepper {
+  padding-inline: 0.25rem;
+}
+.kds-card .lifecycle-step {
+  min-width: 0;
+  font-size: 0.68rem;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}

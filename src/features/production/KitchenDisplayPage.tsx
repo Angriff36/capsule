@@ -253,9 +253,13 @@ export function KitchenDisplayPage() {
       const rank = urgencyRank(left, now) - urgencyRank(right, now);
       if (rank !== 0) return rank;
       // With no prep time, the sooner event's work comes first.
-      return (
+      const when =
         (left.dueAt ?? left.eventStartsAt ?? Infinity) -
-        (right.dueAt ?? right.eventStartsAt ?? Infinity)
+        (right.dueAt ?? right.eventStartsAt ?? Infinity);
+      if (when !== 0 && !Number.isNaN(when)) return when;
+      // Ties keep a fixed place: a card must not jump when it is started.
+      return (
+        left.title.localeCompare(right.title) || left.id.localeCompare(right.id)
       );
     });
 
