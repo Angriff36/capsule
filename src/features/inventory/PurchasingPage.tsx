@@ -200,6 +200,7 @@ export function PurchasingPage() {
           ...draftRows.filled.demands.map((row) => row.eventId),
         ]
       : undefined,
+    "upcoming",
   );
   const ingredientName = (id: string) =>
     ingredients?.find((item) => item._id === id)?.name ?? "Unknown ingredient";

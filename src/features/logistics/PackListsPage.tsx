@@ -50,6 +50,7 @@ export function PackListsPage() {
   const packListLines = usePackListItemsLookup();
   const events = usePickerAndNamedEvents(
     packLists ? [workingId, ...packLists.map((row) => row.eventId)] : undefined,
+    "upcoming",
   );
   const createPackList = useCreatePackList();
   const startPacking = usePackListStartPacking();

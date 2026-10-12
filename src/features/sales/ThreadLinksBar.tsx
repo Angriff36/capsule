@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { SearchSelect } from "../../ui/SearchSelect";
 import type { Doc } from "../../lib/api";
 import {
   useMessageThreadLinkEvent,
@@ -75,31 +76,33 @@ export function ThreadLinksBar({
       data-testid="thread-links"
     >
       <span className="text-ink-3">Event</span>
-      <select
-        className="input max-w-64"
-        aria-label="Link event"
-        value={thread.eventId ?? ""}
-        onChange={(e) => {
-          const eventId = e.target.value;
-          void run(
-            () =>
-              linkEvent({
-                docId: thread._id,
-                ...(eventId ? { eventId: eventId as EventRow["_id"] } : {}),
-              }),
-            eventId
-              ? "Linked this conversation to the event."
-              : "Removed the event link.",
-          );
-        }}
-      >
-        <option value="">No event</option>
-        {liveEvents.map((e) => (
-          <option key={e._id} value={e._id}>
-            {eventChoiceLabel(e)}
-          </option>
-        ))}
-      </select>
+      <div className="max-w-64 min-w-48">
+        <SearchSelect
+          aria-label="Link event"
+          value={thread.eventId ?? ""}
+          placeholder="Search events…"
+          options={[
+            ...(thread.eventId ? [{ id: "", label: "No event" }] : []),
+            ...liveEvents.map((e) => ({
+              id: e._id as string,
+              label: eventChoiceLabel(e),
+            })),
+          ]}
+          onChange={(eventId) => {
+            if (eventId === (thread.eventId ?? "")) return;
+            void run(
+              () =>
+                linkEvent({
+                  docId: thread._id,
+                  ...(eventId ? { eventId: eventId as EventRow["_id"] } : {}),
+                }),
+              eventId
+                ? "Linked this conversation to the event."
+                : "Removed the event link.",
+            );
+          }}
+        />
+      </div>
       {linkedEvent ? (
         <Link
           className="text-brand underline"

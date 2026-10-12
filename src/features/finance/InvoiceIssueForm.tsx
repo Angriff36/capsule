@@ -33,6 +33,8 @@ import "./taxWorkspace.css";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { useClientsByIds } from "../../lib/useClientDirectory";
 import { ClientSearchSelect } from "../clients/ClientSearchSelect";
+import { SearchSelect } from "../../ui/SearchSelect";
+import { formatDate } from "../../lib/format";
 
 type ClientOption = {
   _id: string;
@@ -51,6 +53,7 @@ type EventOption = {
   title?: string | null;
   quotedPrice?: number | null;
   clientId?: string | null;
+  startsAt?: number | null;
   deletedAt?: number | null;
 };
 
@@ -259,30 +262,31 @@ export function InvoiceIssueForm({
         </label>
         <label className="field-label">
           Event (optional)
-          <select
-            className="input"
+          <SearchSelect
             name="eventId"
+            aria-label="Event"
             value={selectedEventId}
-            onChange={(event) => {
-              choosePriceLine(event.target.value);
-              setSelectedEventId(event.target.value);
-              if (!selectedClientId)
-                setSelectedClientId(eventClient(event.target.value));
+            placeholder="No linked event — or search…"
+            onChange={(eventId) => {
+              choosePriceLine(eventId);
+              setSelectedEventId(eventId);
+              if (!selectedClientId) setSelectedClientId(eventClient(eventId));
             }}
-          >
-            <option value="">No linked event</option>
-            {events
-              .filter(
-                (row) =>
-                  row.deletedAt == null &&
-                  (!selectedClientId || row.clientId === selectedClientId),
-              )
-              .map((event) => (
-                <option key={event._id} value={event._id}>
-                  {event.title}
-                </option>
-              ))}
-          </select>
+            options={[
+              { id: "", label: "No linked event" },
+              ...events
+                .filter(
+                  (row) =>
+                    row.deletedAt == null &&
+                    (!selectedClientId || row.clientId === selectedClientId),
+                )
+                .map((event) => ({
+                  id: event._id,
+                  label: event.title || "Untitled event",
+                  hint: event.startsAt ? formatDate(event.startsAt) : null,
+                })),
+            ]}
+          />
         </label>
         <InvoiceEquipmentCharges
           eventId={selectedEventId}

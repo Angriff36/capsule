@@ -63,7 +63,7 @@ export function TipDistributionPage() {
   const eventShifts = useEventShiftRows(eventScope);
   const assignments = eventId ? eventAssignments : [];
   const shifts = eventId ? eventShifts : [];
-  const events = usePickerAndNamedEvents([eventId]);
+  const events = usePickerAndNamedEvents([eventId], "past");
   // Tip shares this event already sent to Payroll (not voided). A new split
   // replaces the prepared ones, so the same tips are never paid twice.
   const eventPayrollInputs = useEventPayrollInputs(eventId);

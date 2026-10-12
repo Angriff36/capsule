@@ -141,6 +141,7 @@ export function StockBookPage() {
     reservations
       ? [workingId, ...reservations.map((row) => row.eventId)]
       : undefined,
+    "upcoming",
   );
   const inventorySettings = useListInventorySettings();
   const createLocation = useCreateStorageLocation();

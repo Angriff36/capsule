@@ -177,6 +177,7 @@ export function RosterPage() {
           ...staffNeeds.map((row) => row.eventId),
         ]
       : undefined,
+    "upcoming",
   );
   const scheduleShift = useScheduleShift();
   const createScheduleNotice = useCreateWeeklyScheduleNotice();

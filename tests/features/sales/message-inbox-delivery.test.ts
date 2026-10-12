@@ -365,13 +365,19 @@ describe("MessageInboxPage delivery honesty", () => {
   it("links the conversation to an event", async () => {
     harness.provider = "email";
     await renderSelectedThread();
-    const select = container.querySelector<HTMLSelectElement>(
-      'select[aria-label="Link event"]',
+    const search = container.querySelector<HTMLInputElement>(
+      'input[aria-label="Link event"]',
     )!;
-    expect(select.textContent).toContain("#6014 Smith wedding");
     await act(async () => {
-      select.value = "event-1";
-      select.dispatchEvent(new Event("change", { bubbles: true }));
+      search.focus();
+      search.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+    });
+    const option = [
+      ...container.querySelectorAll<HTMLElement>('[role="option"]'),
+    ].find((row) => row.textContent?.includes("#6014 Smith wedding"))!;
+    expect(option).toBeTruthy();
+    await act(async () => {
+      option.dispatchEvent(new Event("pointerdown", { bubbles: true }));
     });
     expect(harness.linkEvent).toHaveBeenCalledWith({
       docId: "thread-1",

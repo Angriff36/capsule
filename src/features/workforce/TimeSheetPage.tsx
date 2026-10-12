@@ -329,6 +329,7 @@ export function TimeSheetPage() {
   const workingId = useWorkingEventId();
   const events = usePickerAndNamedEvents(
     records ? [workingId, ...records.map((row) => row.eventId)] : undefined,
+    "past",
   );
   // The planned shifts of the entries shown, and today's shifts for a new
   // clock-in.
