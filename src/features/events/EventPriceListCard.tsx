@@ -6,6 +6,7 @@ import { useEventPriceList } from "../../lib/eventPriceListQueries";
 import { reportActionFail, reportActionOk } from "../../ui/action-result";
 import { useGenerateProposalDraft } from "../clients/ProposalDraftCheck";
 import { ProposalPricingPanel } from "../clients/ProposalPricingPanel";
+import { EventStaffBilling } from "./EventStaffBilling";
 
 /**
  * The event's price, line by line: each menu per guest or per dish, a dish
@@ -17,10 +18,14 @@ export function EventPriceListCard({
   eventId,
   guestCount,
   quotedPrice,
+  startsAt,
+  endsAt,
 }: {
   eventId: Id<"events">;
   guestCount: number;
   quotedPrice: number;
+  startsAt: number | null;
+  endsAt: number | null;
 }) {
   const list = useEventPriceList(eventId);
   const build = useGenerateProposalDraft();
@@ -105,6 +110,14 @@ export function EventPriceListCard({
               )
             }
           />
+          {list.status === "draft" ? (
+            <EventStaffBilling
+              eventId={eventId}
+              proposalId={list.proposalId}
+              eventStartsAt={startsAt}
+              eventEndsAt={endsAt}
+            />
+          ) : null}
         </>
       ) : (
         <>

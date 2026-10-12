@@ -375,6 +375,8 @@ export function EventMarginTab({ eventId }: Props) {
             eventId={event._id}
             guestCount={Number(event.expectedHeadcount ?? 0)}
             quotedPrice={Number(event.quotedPrice ?? 0)}
+            startsAt={event.startsAt ?? null}
+            endsAt={event.endsAt ?? null}
           />
           <EventMarginTiles
             revenue={revenue}

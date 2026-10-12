@@ -2878,7 +2878,7 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 
 ## 6. Staffing and My Day
 
-Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageView.tsx`, `events/EventStaffingRoleSelect.tsx`, `events/EventStaffingSummaryAside.tsx`, `events/EventStaffingTab.tsx`, `events/EventStaffTimingForm.tsx`, `events/EventStaffTravelSelect.tsx`, `events/StaffNeedSuggestions.tsx`, `events/StaffNeedWaitlist.tsx`, `staff/clockLocation.ts`, `staff/MyDayDashboard.tsx`, `staff/MyDayFieldForms.tsx`, `staff/MyDayFrame.tsx`, `staff/MyDayIdentityResolver.ts`, `staff/MyDayPage.tsx`, `staff/MyDayPrepList.tsx`, `staff/MyDayProfileLink.tsx`, `staff/MyPastShiftsCard.tsx`, `staff/MyShiftWorkDetails.tsx`, `staff/offlineStore.ts`, `staff/OpenShiftsCard.tsx`, `staff/resolveMyDayAccount.ts`, `staff/ShiftSwapCard.tsx`, `staff/SwapCandidateExclusions.tsx`, `staff/TimeOffRequestCard.tsx`, `staff/WeeklyAvailabilityCard.tsx`, `staff/workedShifts.ts`, `workforce/availabilityGrid.ts`, `workforce/AvailabilityGridSection.tsx`, `workforce/CandidateEmailMismatchNotice.tsx`, `workforce/CandidateRevokeHireControl.tsx`, `workforce/CandidatesPage.tsx`, `workforce/MessagesPage.tsx`, `workforce/MyReviewsPage.tsx`, `workforce/oneOnOneCarryOver.ts`, `workforce/OneOnOnesPage.tsx`, `workforce/overtimeProjection.ts`, `workforce/PerformanceReviewsPage.tsx`, `workforce/QualificationsPage.tsx`, `workforce/ReviewFeedback.tsx`, `workforce/RoleScorecardsPage.tsx`, `workforce/RosterAttentionSection.tsx`, `workforce/rosterConflicts.ts`, `workforce/RosterPage.tsx`, `workforce/scorecardVersions.ts`, `workforce/ShiftRescheduleAction.tsx`, `workforce/shiftSwapEligibility.ts`, `workforce/ShiftSwapRequestsPage.tsx`, `workforce/skillLevels.ts`, `workforce/SkillsMatrixPanel.tsx`, `workforce/SmsAlertOptInSection.tsx`, `workforce/StaffingTemplateForm.tsx`, `workforce/StaffingTemplatesPage.tsx`, `workforce/StaffOverviewPage.tsx`, `workforce/StaffPayRatesSection.tsx`, `workforce/StaffSchedulingSection.tsx`, `workforce/staffUtilization.ts`, `workforce/StaffUtilizationPage.tsx`, `workforce/TimeAttentionPanel.tsx`, `workforce/TimeOffRequestsPage.tsx`, `workforce/timePay.ts`, `workforce/timeRecordEntry.ts`, `workforce/TimeSheetPage.tsx`, `workforce/trainingDoc.ts`, `workforce/TrainingDocAction.tsx`, `workforce/TrainingLifecycleActions.tsx`, `workforce/TrainingPage.tsx`, `workforce/TrainingSignOffPanel.tsx`, `workforce/trainingStarters.ts`, `workforce/weeklySchedule.ts`, `workforce/WorkforceFailureBanner.tsx`, `workforce/WorkforceLifecyclePolicy.ts`, `workforce/workforceRoutes.ts`, `workforce/WorkforceWorkspaceNav.tsx`
+Screens (75): `events/EventStaffBilling.tsx`, `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageView.tsx`, `events/EventStaffingRoleSelect.tsx`, `events/EventStaffingSummaryAside.tsx`, `events/EventStaffingTab.tsx`, `events/EventStaffTimingForm.tsx`, `events/EventStaffTravelSelect.tsx`, `events/StaffNeedSuggestions.tsx`, `events/StaffNeedWaitlist.tsx`, `staff/clockLocation.ts`, `staff/MyDayDashboard.tsx`, `staff/MyDayFieldForms.tsx`, `staff/MyDayFrame.tsx`, `staff/MyDayIdentityResolver.ts`, `staff/MyDayPage.tsx`, `staff/MyDayPrepList.tsx`, `staff/MyDayProfileLink.tsx`, `staff/MyPastShiftsCard.tsx`, `staff/MyShiftWorkDetails.tsx`, `staff/offlineStore.ts`, `staff/OpenShiftsCard.tsx`, `staff/resolveMyDayAccount.ts`, `staff/ShiftSwapCard.tsx`, `staff/SwapCandidateExclusions.tsx`, `staff/TimeOffRequestCard.tsx`, `staff/WeeklyAvailabilityCard.tsx`, `staff/workedShifts.ts`, `workforce/availabilityGrid.ts`, `workforce/AvailabilityGridSection.tsx`, `workforce/CandidateEmailMismatchNotice.tsx`, `workforce/CandidateRevokeHireControl.tsx`, `workforce/CandidatesPage.tsx`, `workforce/MessagesPage.tsx`, `workforce/MyReviewsPage.tsx`, `workforce/oneOnOneCarryOver.ts`, `workforce/OneOnOnesPage.tsx`, `workforce/overtimeProjection.ts`, `workforce/PerformanceReviewsPage.tsx`, `workforce/QualificationsPage.tsx`, `workforce/ReviewFeedback.tsx`, `workforce/RoleScorecardsPage.tsx`, `workforce/RosterAttentionSection.tsx`, `workforce/rosterConflicts.ts`, `workforce/RosterPage.tsx`, `workforce/scorecardVersions.ts`, `workforce/ShiftRescheduleAction.tsx`, `workforce/shiftSwapEligibility.ts`, `workforce/ShiftSwapRequestsPage.tsx`, `workforce/skillLevels.ts`, `workforce/SkillsMatrixPanel.tsx`, `workforce/SmsAlertOptInSection.tsx`, `workforce/StaffingTemplateForm.tsx`, `workforce/StaffingTemplatesPage.tsx`, `workforce/StaffOverviewPage.tsx`, `workforce/StaffPayRatesSection.tsx`, `workforce/StaffSchedulingSection.tsx`, `workforce/staffUtilization.ts`, `workforce/StaffUtilizationPage.tsx`, `workforce/TimeAttentionPanel.tsx`, `workforce/TimeOffRequestsPage.tsx`, `workforce/timePay.ts`, `workforce/timeRecordEntry.ts`, `workforce/TimeSheetPage.tsx`, `workforce/trainingDoc.ts`, `workforce/TrainingDocAction.tsx`, `workforce/TrainingLifecycleActions.tsx`, `workforce/TrainingPage.tsx`, `workforce/TrainingSignOffPanel.tsx`, `workforce/trainingStarters.ts`, `workforce/weeklySchedule.ts`, `workforce/WorkforceFailureBanner.tsx`, `workforce/WorkforceLifecyclePolicy.ts`, `workforce/workforceRoutes.ts`, `workforce/WorkforceWorkspaceNav.tsx`
 
 ### Generated reads
 
@@ -2896,6 +2896,7 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `queries.listEventLayoutSectionByEventId` - live read
 - `queries.listEventStaffNeed` - live read
 - `queries.listEventStaffNeedByEventId` - live read
+- `queries.listEventTaskByEventId` - live read
 - `queries.listEventTimelineActivityByEventId` - live read
 - `queries.listEventTimelineCommentByEventId` - live read
 - `queries.listIncidentByEventId` - live read
@@ -2905,6 +2906,8 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `queries.listPackListByEventId` - live read
 - `queries.listPayrollInputByEventId` - live read
 - `queries.listPerson` - live read
+- `queries.listPlanningOverrideByEventId` - live read
+- `queries.listPlanningReceiptByEventId` - live read
 - `queries.listPrepTaskByEventId` - live read
 - `queries.listProposalByEventId` - live read
 - `queries.listProposalDishSelectionByProposalId` - live read
@@ -3655,7 +3658,10 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `lib.eventPacket.finalLock.listEventFieldForms` - query; live read, updates by itself
 - `lib.eventPacket.finalLock.myFieldForms` - query; live read, updates by itself
 - `lib.eventPacket.finalLock.prepareFieldForms` - mutation; authored step; live reads update by themselves
+- `lib.eventPriceList.forEvent` - query; live read, updates by itself
+- `lib.proposalPricing.addProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
 - `personEmail.correctStaffEmail` - action; one-time call (not live); the live reads it changes update by themselves
+- `planWindow.forEvents` - query; live read, updates by itself
 - `staffSelfReviews.listMyReviews` - query; live read, updates by itself
 - `staffShiftSwaps.getCandidates` - query; live read, updates by itself
 - `staffShiftSwaps.listRelatedShifts` - query; live read, updates by itself
