@@ -120,7 +120,16 @@ export function TimeSheetClockInForm({
             key={events.length ? "events-ready" : "events-loading"}
             name="eventId"
             className="input"
-            defaultValue={workingId ?? ""}
+            // The open event is the default only once its day has come.
+            defaultValue={
+              workingId &&
+              events.some(
+                (item) =>
+                  item._id === workingId && inPickerWindow(item, "past"),
+              )
+                ? workingId
+                : ""
+            }
             data-testid="clock-in-event"
           >
             <option value="">No event · unassigned</option>

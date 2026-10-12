@@ -223,7 +223,15 @@ export function PayrollPrepareForm({
         <SearchSelect
           name="eventId"
           aria-label="Event"
-          defaultValue={workingId ?? ""}
+          // The open event is the default only once its day has come.
+          defaultValue={
+            workingId &&
+            events.some(
+              (item) => item._id === workingId && inPickerWindow(item, "past"),
+            )
+              ? workingId
+              : ""
+          }
           placeholder="No linked event — or search…"
           options={[
             { id: "", label: "No linked event" },
