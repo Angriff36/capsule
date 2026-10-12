@@ -164,15 +164,20 @@ export function ProposalMenuSelectionPanel({
           (max, row) => Math.max(max, Number(row.sortOrder) || 0),
           -1,
         ) + 1;
-      await addLine({
-        proposalId: proposalId as Id<"proposals">,
-        description: `${menu.name} (per guest)`,
-        pricingBasis: "per_person",
-        unitPrice: Number(menu.pricePerPerson),
-        sortOrder,
-        menuId: String(menu._id),
-      });
-      if (Number(menu.basePrice) > 0)
+      // Only the lines still missing, so a base price left on the proposal
+      // is never charged a second time.
+      const has = (description: string) =>
+        priceLines.some((line) => line.description === description);
+      if (!has(`${menu.name} (per guest)`))
+        await addLine({
+          proposalId: proposalId as Id<"proposals">,
+          description: `${menu.name} (per guest)`,
+          pricingBasis: "per_person",
+          unitPrice: Number(menu.pricePerPerson),
+          sortOrder,
+          menuId: String(menu._id),
+        });
+      if (Number(menu.basePrice) > 0 && !has(`${menu.name} (base price)`))
         await addLine({
           proposalId: proposalId as Id<"proposals">,
           description: `${menu.name} (base price)`,
