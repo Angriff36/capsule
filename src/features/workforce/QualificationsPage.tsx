@@ -308,8 +308,12 @@ export function QualificationsPage() {
                     </td>
                     <td>
                       <div className="supply-row-actions">
-                        {policy
-                          .qualificationActions(String(row.status))
+                        {/* A replaced card needs no revoke or expire: the
+                            newer card is the live one. */}
+                        {(isRenewed(row, activeRows)
+                          ? []
+                          : policy.qualificationActions(String(row.status))
+                        )
                           // Generated expire guards `expiresAt != null`; do
                           // not offer an action that can never succeed.
                           .filter(
