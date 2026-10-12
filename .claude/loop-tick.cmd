@@ -17,7 +17,6 @@ cd /d C:\Projects\capsule
 set BUILDER_DIR=C:\Projects\builder
 findstr /C:"loop-pause-all" STATE.md >nul 2>&1 && exit /b 0
 pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-lock.ps1" || exit /b 0
-if exist ".loop-worktrees\_nothing-left" del ".loop-worktrees\_nothing-left"
 pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-review-due.ps1" >> ".claude\loop-tick.log" 2>&1
 REM A hand-off left from an earlier run (no reviewer was available) is reviewed
 REM again BEFORE new work starts. Still no reviewer -> stop this run.
@@ -35,6 +34,9 @@ if exist ".loop-worktrees\_control-blocker.json" exit /b 0
 REM Ryan's comments on the live site become issues the maker works first, and are
 REM marked done when the fix is live (Ryan 2026-10-01). Never stops the round.
 pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-site-comments.ps1"
+REM An empty round (_nothing-left) is not repeated until an input changes (watch 2026-10-12).
+pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-idle-check.ps1" || exit /b 0
+if exist ".loop-worktrees\_nothing-left" del ".loop-worktrees\_nothing-left"
 echo [%date% %time%] build round start >> ".claude\loop-tick.log"
 set MAKEROK=1
 type ".claude\loop-tick-prompt.txt" | claude -p --model claude-opus-5-5 --settings ".claude\loop-maker-settings.json" >> ".claude\loop-tick.log" 2>&1
@@ -55,6 +57,7 @@ REM batch has uncommitted changes, no new commits, or a failed typecheck.
 pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-publish.ps1" >> ".claude\loop-tick.log" 2>&1
 REM A failed production release is retried every round (Ryan 2026-10-03).
 if exist ".loop-worktrees\_release-pending" pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-land.ps1" >> ".claude\loop-tick.log" 2>&1
+if exist ".loop-worktrees\_nothing-left" pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-idle-check.ps1" -Save
 if exist ".loop-worktrees\_nothing-left" exit /b 0
 if "%MAKEROK%"=="0" exit /b 0
 if exist ".loop-worktrees\_handoff\*.json" pwsh -NoProfile -ExecutionPolicy Bypass -File ".claude\loop-land.ps1" >> ".claude\loop-tick.log" 2>&1

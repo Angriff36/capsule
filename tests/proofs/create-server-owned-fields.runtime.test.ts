@@ -299,37 +299,40 @@ describe("create steps keep approval, totals and results server-owned (AC-372)",
       return (r.docId ?? r._id)!;
     };
     const { ingredientId } = await openPurchaseNeed(proof, tenantId, eventId);
-    const demand = idOf(
-      await proof.executeCommand(
-        inventory,
-        api.mutations.IngredientDemand_createViaCalculate,
-        {
-          eventId,
-          ingredientId,
-          requiredQuantity: 2,
-          unit: "kilogram",
-          servings: 40,
-        },
-      ),
-    );
-    const createArgs = {
+    // Each need gets its own demand: a demand holds one live need (#396).
+    const newDemand = async () =>
+      idOf(
+        await proof.executeCommand(
+          inventory,
+          api.mutations.IngredientDemand_createViaCalculate,
+          {
+            eventId,
+            ingredientId,
+            requiredQuantity: 2,
+            unit: "kilogram",
+            servings: 40,
+          },
+        ),
+      );
+    const createArgs = (ingredientDemandId: string) => ({
       eventId,
-      ingredientDemandId: demand,
+      ingredientDemandId,
       ingredientId,
       requiredQuantity: 2,
       unit: "kilogram",
-    };
-    const create = async () =>
+    });
+    const create = async (ingredientDemandId: string) =>
       idOf(
         await proof.executeCommand(
           inventory,
           api.mutations.PurchaseNeed_create,
-          createArgs,
+          createArgs(ingredientDemandId),
         ),
       );
-    const receivedId = await create();
-    const orderedOnly = { docId: await create() };
-    const cancelledNeed = { docId: await create() };
+    const demands = [await newDemand(), await newDemand(), await newDemand()];
+    const receivedId = await create(demands[0]!);
+    const orderedOnly = { docId: await create(demands[1]!) };
+    const cancelledNeed = { docId: await create(demands[2]!) };
 
     // Ordered and received history (how it got there does not matter here).
     await inventory.run(async (ctx) => {
@@ -357,8 +360,18 @@ describe("create steps keep approval, totals and results server-owned (AC-372)",
       "cancelled",
     ]);
 
-    // Replay the create for the same demand (as a repeated approval would).
-    const replayId = await create();
+    // Replay the create for each demand (as a repeated approval would). A
+    // live need refuses a second one; a cancelled need lets a fresh one open.
+    for (const demand of [demands[0]!, demands[1]!]) {
+      await expect(
+        proof.executeCommand(
+          inventory,
+          api.mutations.PurchaseNeed_create,
+          createArgs(demand),
+        ),
+      ).rejects.toThrow(/already has an open purchase need/);
+    }
+    const replayId = await create(demands[2]!);
     expect(ids).not.toContain(replayId);
     expect(await read()).toEqual(before);
   });

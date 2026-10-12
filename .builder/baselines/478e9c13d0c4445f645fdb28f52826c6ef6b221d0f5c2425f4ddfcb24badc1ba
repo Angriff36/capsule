@@ -10,6 +10,7 @@
   },
   "scripts": {
     "agent:enter-component": "bun scripts/capsule-enter-component.ts",
+    "agent:enter-event": "bun scripts/capsule-enter-event.ts",
     "agent:mcp": "bun scripts/capsule-mcp.ts",
     "agent:mint-jwt": "bun scripts/capsule-mint-agent-jwt.ts",
     "baseline:decay": "bun scripts/check-baseline-decay.ts",

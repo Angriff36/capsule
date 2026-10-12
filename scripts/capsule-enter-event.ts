@@ -1,9 +1,9 @@
 /**
  * Preview or enter a whole TPP event export bundle via governed commands.
  *
- *   bun scripts/capsule-enter-event.ts --preview <folder-or-files>
- *   bun scripts/capsule-enter-event.ts <folder-or-files> --accept-warnings
- *   bun scripts/capsule-enter-event.ts <folder-or-files> --event <id> --accept-warnings
+ *   bun run agent:enter-event -- --preview <folder-or-files>
+ *   bun run agent:enter-event -- <folder-or-files> --accept-warnings
+ *   bun run agent:enter-event -- <folder-or-files> --event <id> --accept-warnings
  *
  * Reads the TPP reports for one event — event worksheet, proposal, BEO,
  * production worksheet, pack list, order list and the battle board PDF — and
@@ -26,9 +26,9 @@ const REPORT_FILE = /\.(csv|xlsx|pdf)$/i;
 
 function usage(): never {
   console.error(`Usage:
-  bun scripts/capsule-enter-event.ts --preview <folder | file...>
-  bun scripts/capsule-enter-event.ts <folder | file...> --accept-warnings
-  bun scripts/capsule-enter-event.ts <folder | file...> --event <id> [--preview] [--accept-warnings]
+  bun run agent:enter-event -- --preview <folder | file...>
+  bun run agent:enter-event -- <folder | file...> --accept-warnings
+  bun run agent:enter-event -- <folder | file...> --event <id> [--preview] [--accept-warnings]
 
 Preview never writes. It reports what each file was read as, what would be
 created, and every warning.

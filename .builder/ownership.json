@@ -18,7 +18,7 @@
       "sha256": "4b449355bc105081e34e079a88842aacf4361374eb1184e93a15810c8dea39e8"
     },
     "convex/mutations.ts": {
-      "sha256": "a932f791453ea6caead82d573c548be52020985967dedcea8ac21bc31edb2624"
+      "sha256": "0904edafc437c9e798bb11afe315bfcb893eed4de48859bcff6182f49d032e3e"
     },
     "convex/queries.ts": {
       "sha256": "d8ded8ed3b338475d63981c220f00a2608b4a1e5210e406ae0b44de9df5ec9a3"
@@ -30,10 +30,10 @@
       "sha256": "2ce333c7c47229a1b39656f3144decb4d752ef09b330dec8498b65fa05d6a6a4"
     },
     "manifest-context-summary.json": {
-      "sha256": "fea8fa2c2d4a059c951d0f1796b9b5cd01615100988ab397670898c66d79f3a8"
+      "sha256": "42eba3f9dc868222db0d0f1f58414dafe6c0fd584a3bff38df20d2d195fe2ef3"
     },
     "package.json": {
-      "sha256": "40f3044ea9a476c692d98859288f175f6992d9c15bc2ee907bf053607157b545"
+      "sha256": "478e9c13d0c4445f645fdb28f52826c6ef6b221d0f5c2425f4ddfcb24badc1ba"
     },
     "PRESET.md": {
       "sha256": "0a182867580c09e3a3a52fb6d1e8e8a831d67e6c9d2634d5bcaeeb3443ad59d8"
@@ -45,10 +45,10 @@
       "sha256": "45a1650ef51a1cf1dfae59557ed7d6edc17e4e01be34781c4357058a0cf4e3c4"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "40ff87d252b7ffa9cb7dcd856299aeb877f7b2630ccae88045bdd15e26c67146"
+      "sha256": "f2b818266c25a381ec856d081457002dca6f76b054bade3c5d1e54a9e0001d94"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "321af4dbc5d8ed5354338d4672796397963c0b06092a448a96e2b1ffed55d9db"
+      "sha256": "5d7fa643373708f11baba2cc7c1ad01feab7911274df475b42d5c26eb80cd29a"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "6f6a90ef6ea2af8b026b326a08516a118f63d8d42da655e925f380c6e3527b52"
@@ -57,7 +57,7 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "1d68e5913581389a95a77f8c515a79271770555b3cee55b321b7e19170e3d271"
+      "sha256": "5adcec1429032a8ae4a75c0615b21ea70e7f72751d6f5d4a496ab0a0798a273a"
     }
   },
   "package": {

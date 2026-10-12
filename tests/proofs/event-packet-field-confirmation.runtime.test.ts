@@ -28,6 +28,10 @@ const FORMS = [
   "field.leaving-event",
 ];
 
+// Service two days from now: the crew's list drops an event a day after it
+// ends, so a fixed date fails once the calendar passes it.
+const SERVICE_AT = Date.now() + 2 * 24 * 60 * 60_000;
+
 async function setup() {
   const t = convexTest(schema, modules);
   const manager = t.withIdentity({
@@ -57,8 +61,8 @@ async function setup() {
       eventNumber: "6014",
       venueName: "Lakeside Lawn",
       venueAddress: "1 Shore Road",
-      startsAt: Date.parse("2026-10-10T18:00:00Z"),
-      endsAt: Date.parse("2026-10-10T21:00:00Z"),
+      startsAt: SERVICE_AT,
+      endsAt: SERVICE_AT + 3 * 60 * 60_000,
       expectedHeadcount: 100,
       timingSetupMinutes: 60,
       budgetAmount: 0,
@@ -131,9 +135,7 @@ describe("day-of forms are people's work, never the office's", () => {
     expect(forms["field.arrival"].responsible).toBe("Lena Crew");
     expect(forms["field.arrival"].responsiblePersonId).toBe(leadId);
     // Due when the crew is due on site: an hour of setup before service.
-    expect(forms["field.arrival"].dueAt).toBe(
-      Date.parse("2026-10-10T17:00:00Z"),
-    );
+    expect(forms["field.arrival"].dueAt).toBe(SERVICE_AT - 60 * 60_000);
     expect(forms["field.takeoff-readiness"].needsTwoPeople).toBe(true);
     expect(forms["field.muda"].evidence).toBe("note");
     expect(forms["field.buffet-drawing"].evidence).toBe("photo");

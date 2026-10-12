@@ -8,12 +8,12 @@
  * quantities — retries never create a second child, and the identity stays per
  * parent (a second event still gets its own children).
  *
- * PurchaseNeed note: the create command is insert-only in the Convex
- * projection (self maps to command args; docId is not accepted; the unique
- * demand key is not enforced), so a DIRECT replay call cannot reconcile the
- * row — the convergence is carried by the reaction identity: the first open
- * releases the demand, so a replayed EventApproved fanOut matches zero rows.
- * This proof asserts that release condition plus child singleness.
+ * PurchaseNeed note: the create command inserts (docId is not accepted), so
+ * the reaction identity carries convergence: the first open releases the
+ * demand, so a replayed EventApproved fanOut matches zero rows. A DIRECT
+ * second create for the same demand is refused while a live need exists
+ * (#396). This proof asserts the release condition, the refusal, and child
+ * singleness.
  */
 import { convexTest } from "convex-test";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -164,6 +164,17 @@ describe("runtime proof: EventApproved child commands replay to the same rows (A
     expect(stillBatches).toHaveLength(1);
     expect(stillBatches[0]!._id).toBe(batch._id);
     expect(Number(stillBatches[0]!.plannedYield)).toBe(40);
+
+    // A direct second create for the same demand is refused (#396).
+    await expect(
+      proof.executeCommand(inventory, M.PurchaseNeed_create, {
+        eventId,
+        ingredientDemandId: need.ingredientDemandId as string,
+        ingredientId: need.ingredientId as string,
+        requiredQuantity: 4.5,
+        unit: "kilogram",
+      }),
+    ).rejects.toThrow(/already has an open purchase need/);
 
     const stillNeeds = await liveRows(logistics, "purchaseNeeds", eventId);
     expect(stillNeeds).toHaveLength(1);
