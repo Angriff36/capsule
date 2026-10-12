@@ -439,7 +439,9 @@ export function LeadPipelinePage() {
       });
       form.reset();
       setProposalLeadId(null);
-      setNotice(`Proposal sent and linked to ${leadName(lead)}.`);
+      setNotice(
+        `Proposal created and marked sent for ${leadName(lead)}. Nothing was emailed: share or email it from Proposals.`,
+      );
     });
   };
 
@@ -886,6 +888,7 @@ export function LeadPipelinePage() {
                       >
                         <p>
                           This creates the proposal and marks it sent in one go.
+                          It does not email the client.
                         </p>
                         <label>
                           Proposal title
