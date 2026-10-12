@@ -152,7 +152,17 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
           <SearchSelect
             key={events?.length ? "events-ready" : "events-loading"}
             name="eventId"
-            defaultValue={workingId ?? ""}
+            // The open event is the default only when its day has come:
+            // waste is logged as it happens, not against next month's party.
+            defaultValue={
+              workingId &&
+              (events ?? []).some(
+                (item) =>
+                  item._id === workingId && inPickerWindow(item, "past"),
+              )
+                ? workingId
+                : ""
+            }
             placeholder="No event · kitchen operations — or search…"
             options={(events ?? [])
               .filter(
