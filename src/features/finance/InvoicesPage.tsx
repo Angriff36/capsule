@@ -433,20 +433,49 @@ export function InvoicesPage() {
         // the form waits for them so it never proposes a number in use.
         <TableSkeleton rows={3} />
       ) : showIssue ? (
-        <InvoiceIssueForm
-          clients={activeClients}
-          events={events ?? []}
-          taxRates={taxRates ?? []}
-          busy={busy === "issue-invoice"}
-          onSubmit={submitIssue}
-          defaultClientId={prefillClientId}
-          defaultEventId={prefillEventId || eventScope.workingId || ""}
-          functionalCurrencyCode={functionalCurrencyCode}
-          existingInvoiceNumbers={[
-            ...(invoices ?? []),
-            ...(pagedInvoices.rows ?? []),
-          ].map((row) => row.invoiceNumber)}
-        />
+        <>
+          {(() => {
+            // The event named for this new invoice already has a bill: say
+            // so before a second one is made for the same food.
+            const eventId = prefillEventId || eventScope.workingId || "";
+            const existing = eventId
+              ? [...(invoices ?? []), ...(pagedInvoices.rows ?? [])].find(
+                  (row) =>
+                    String(row.eventId) === eventId &&
+                    row.deletedAt == null &&
+                    String(row.status) !== "voided",
+                )
+              : undefined;
+            return existing ? (
+              <p className="banner banner-warn mb-3" role="status">
+                This event already has invoice {existing.invoiceNumber} (
+                {formatMoney(Number(existing.total ?? 0))},{" "}
+                {String(existing.status)}).{" "}
+                <Link
+                  className="text-link"
+                  to={FINANCE_ROUTES.invoiceDetail(String(existing._id))}
+                >
+                  Open it
+                </Link>{" "}
+                instead of making a second bill, unless this is an extra charge.
+              </p>
+            ) : null;
+          })()}
+          <InvoiceIssueForm
+            clients={activeClients}
+            events={events ?? []}
+            taxRates={taxRates ?? []}
+            busy={busy === "issue-invoice"}
+            onSubmit={submitIssue}
+            defaultClientId={prefillClientId}
+            defaultEventId={prefillEventId || eventScope.workingId || ""}
+            functionalCurrencyCode={functionalCurrencyCode}
+            existingInvoiceNumbers={[
+              ...(invoices ?? []),
+              ...(pagedInvoices.rows ?? []),
+            ].map((row) => row.invoiceNumber)}
+          />
+        </>
       ) : null}
 
       {!prefillClientId && !prefillEventId ? (

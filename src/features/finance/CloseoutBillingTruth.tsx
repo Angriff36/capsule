@@ -63,9 +63,11 @@ export function CloseoutRevenueNote({
       ? "Not reconciled"
       : owed > 0.005
         ? "Reconciled, waiting on payment"
-        : isCloseoutListProfitPending(row)
-          ? "Billing settled, costs not brought in yet — press Reconcile"
-          : "Reconciled, ready to finalize";
+        : billing.draftCount > 0 && billing.billedTotal === 0
+          ? "Invoice not issued yet — issue it, then press Reconcile"
+          : isCloseoutListProfitPending(row)
+            ? "Billing settled, costs not brought in yet — press Reconcile"
+            : "Reconciled, ready to finalize";
   return (
     <small>
       {label}
