@@ -288,7 +288,7 @@ export function QualificationsPage() {
                       {row.expiresAt ? formatDate(row.expiresAt) : "—"}
                       {(() => {
                         if (isRenewed(row, activeRows))
-                          return <small>Renewed</small>;
+                          return <small>Renewed — see the newer card</small>;
                         const expiry = expiryLabel(row.expiresAt, now);
                         return expiry ? (
                           <small className={expiry.className}>
@@ -298,7 +298,13 @@ export function QualificationsPage() {
                       })()}
                     </td>
                     <td data-label="State">
-                      <StatusChip status={String(row.status)} />
+                      {/* A renewed card is replaced by the newer one, not a
+                          second live credential. */}
+                      {isRenewed(row, activeRows) ? (
+                        <span className="text-ink-3">Replaced</span>
+                      ) : (
+                        <StatusChip status={String(row.status)} />
+                      )}
                     </td>
                     <td>
                       <div className="supply-row-actions">
