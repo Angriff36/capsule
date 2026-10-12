@@ -1,6 +1,6 @@
 /**
- * The review form offers only the events the person worked a shift at in the
- * last six months, not every event the company ever booked.
+ * The review form offers only the events the person worked (a shift or a
+ * roster assignment) in the last six months, not every event the company ever booked.
  */
 import { convexTest } from "convex-test";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -64,6 +64,7 @@ describe("review events for a person", () => {
     const old = await event("Old picnic", now - 300 * DAY);
     const others = await event("Sam's lunch", now - 5 * DAY);
     const ahead = await event("Next week dinner", now + 7 * DAY);
+    const rostered = await event("Rostered brunch", now - 3 * DAY);
     const shift = (personId: string, eventId: string, startsAt: number) =>
       proof.executeCommand(admin, M.Shift_createViaSchedule, {
         personId,
@@ -75,11 +76,20 @@ describe("review events for a person", () => {
     await shift(riley, old, now - 300 * DAY);
     await shift(riley, ahead, now + 7 * DAY);
     await shift(sam, others, now - 5 * DAY);
+    // A roster assignment that follows the event's timing counts too.
+    await proof.executeCommand(admin, M.EventAssignment_createViaAssign, {
+      eventId: rostered,
+      personId: riley,
+      role: "Server",
+    });
 
     const rows = (await admin.query(
       api.workforceHistoryWindow.reviewEventsForPerson,
       { personId: riley },
     )) as Array<{ _id: string; title: string }>;
-    expect(rows.map((row) => row.title)).toEqual(["Recent gala"]);
+    expect(rows.map((row) => row.title)).toEqual([
+      "Rostered brunch",
+      "Recent gala",
+    ]);
   });
 });

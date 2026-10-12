@@ -133,7 +133,7 @@ export function usePendingImportConflicts() {
   return useQuery(api.workforceHistoryWindow.pendingImportConflicts, {});
 }
 
-/** Events the person had a shift at in the last six months; [] without one. */
+/** Events the person worked in the last six months; [] without one. */
 export function useReviewEventsForPerson(personId: string) {
   const rows = useQuery(
     api.workforceHistoryWindow.reviewEventsForPerson,

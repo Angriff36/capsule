@@ -212,10 +212,10 @@ export function PerformanceReviewsPage() {
                     : workedEvents === undefined
                       ? "Loading their events…"
                       : workedEvents.length === 0
-                        ? "No shifts in the last 6 months"
+                        ? "No events worked in the last 6 months"
                         : "No specific event"}
                 </option>
-                {/* Only events the person had a shift at, newest first. */}
+                {/* Only events the person worked, newest first. */}
                 {(workedEvents ?? []).map((event) => (
                   <option key={event._id} value={event._id}>
                     {event.title} — {formatDate(event.startsAt ?? 0)}
