@@ -12,7 +12,7 @@ import {
   useVendorContractTerminate,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import {
   formatCountNoun,
   formatDate,
@@ -162,25 +162,26 @@ export function VendorContractsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Procurement · Vendor contracts</p>
-          <h1 className="display-title mt-2">Vendor contracts</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Vendor contracts"
+        lead={
+          <>
             Agreed pricing tiers, payment terms, and delivery lead times per
             vendor. Prices lock when a contract is activated.
-          </p>
-        </div>
-        <div className="supply-masthead-actions">
-          <button
-            className="btn btn-primary"
-            disabled={busy != null}
-            onClick={() => setShowDraftForm((value) => !value)}
-          >
-            {showDraftForm ? "Close contract form" : "Draft contract"}
-          </button>
-        </div>
-      </header>
+          </>
+        }
+        actions={
+          <>
+            <button
+              className="btn btn-primary"
+              disabled={busy != null}
+              onClick={() => setShowDraftForm((value) => !value)}
+            >
+              {showDraftForm ? "Close contract form" : "Draft contract"}
+            </button>
+          </>
+        }
+      />
       <InventoryWorkspaceNav />
       {failure ? <SupplyFailureBanner error={failure} /> : null}
       {host}

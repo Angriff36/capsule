@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { useClientDirectory } from "../../lib/useClientDirectory";
 import { useCloseoutsForEventDays } from "../../lib/financeScopedQueries";
 import { TableSkeleton } from "../../ui/primitives";
@@ -176,6 +177,7 @@ export function ProfitMarginDashboard({
   /** The page reads only the closeouts of the days picked here. */
   onRangeChange?: (rangeStart: string, rangeEnd: string) => void;
 }) {
+  const embedded = useEmbedded();
   const [granularity, setGranularity] =
     useState<ProfitMarginGranularity>("month");
   const [view, setView] = useState<ProfitMarginView>("event");
@@ -239,26 +241,42 @@ export function ProfitMarginDashboard({
 
   return (
     <div className="operations-stage supply-stage profit-margin-stage">
-      <header className="profit-margin-masthead">
-        <div>
-          <p className="eyebrow">Finance · Profit intelligence</p>
-          <h1 className="display-title mt-2">Margin, plated.</h1>
-          <p className="mt-3 max-w-180 text-ink-2">
-            See what each event earned after food, labor, equipment, and
-            overheads—then follow the pattern by client and season.
-          </p>
+      {embedded ? (
+        <div className="flex flex-wrap gap-2">
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={downloadCsv}
+            disabled={!validRange || rowCount === 0}
+            data-testid="profit-margin-export"
+          >
+            Export {view} CSV
+          </button>
         </div>
-        <button
-          className="btn btn-primary"
-          type="button"
-          onClick={downloadCsv}
-          disabled={!validRange || rowCount === 0}
-          data-testid="profit-margin-export"
-        >
-          Export {view} CSV
-        </button>
-      </header>
-      <ReportsWorkspaceNav />
+      ) : (
+        <>
+          <header className="profit-margin-masthead">
+            <div>
+              <p className="eyebrow">Finance · Profit intelligence</p>
+              <h1 className="display-title mt-2">Margin, plated.</h1>
+              <p className="mt-3 max-w-180 text-ink-2">
+                See what each event earned after food, labor, equipment, and
+                overheads—then follow the pattern by client and season.
+              </p>
+            </div>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={downloadCsv}
+              disabled={!validRange || rowCount === 0}
+              data-testid="profit-margin-export"
+            >
+              Export {view} CSV
+            </button>
+          </header>
+          <ReportsWorkspaceNav />
+        </>
+      )}
 
       <section className="profit-margin-controls" aria-label="Report filters">
         <label>

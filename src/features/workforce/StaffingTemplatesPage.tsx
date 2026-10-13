@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import {
   useCreateStaffingTemplate,
   useListServiceStyle,
@@ -44,6 +45,7 @@ function guestRange(min?: number | null, max?: number | null) {
 
 /** Crew templates: the crew an approved event gets for its style and size. */
 export function StaffingTemplatesPage() {
+  const embedded = useEmbedded();
   const templates = useListStaffingTemplate();
   const styles = useListServiceStyle();
   const create = useCreateStaffingTemplate();
@@ -90,20 +92,11 @@ export function StaffingTemplatesPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Staff · Crew templates</p>
-          <h1 className="display-title mt-2">
-            The crew each kind of event needs.
-          </h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            When an event is approved, the template for its service style and
-            guest count posts its open shifts. If the guest count changes, only
-            shifts nobody has taken are added or removed. No matching template
-            means no shifts are added.
-          </p>
-        </div>
-        <div aria-label="Crew template actions">
+      {embedded ? (
+        <div
+          className="flex flex-wrap gap-2"
+          aria-label="Crew template actions"
+        >
           <button
             className="btn btn-primary"
             onClick={() => setEditing(editing === "new" ? null : "new")}
@@ -111,9 +104,34 @@ export function StaffingTemplatesPage() {
             {editing === "new" ? "Close" : "New crew template"}
           </button>
         </div>
-      </header>
+      ) : (
+        <>
+          <header className="supply-masthead">
+            <div>
+              <p className="eyebrow">Staff · Crew templates</p>
+              <h1 className="display-title mt-2">
+                The crew each kind of event needs.
+              </h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                When an event is approved, the template for its service style
+                and guest count posts its open shifts. If the guest count
+                changes, only shifts nobody has taken are added or removed. No
+                matching template means no shifts are added.
+              </p>
+            </div>
+            <div aria-label="Crew template actions">
+              <button
+                className="btn btn-primary"
+                onClick={() => setEditing(editing === "new" ? null : "new")}
+              >
+                {editing === "new" ? "Close" : "New crew template"}
+              </button>
+            </div>
+          </header>
 
-      <WorkforceWorkspaceNav />
+          <WorkforceWorkspaceNav />
+        </>
+      )}
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
 
       {editing === "new" ? (

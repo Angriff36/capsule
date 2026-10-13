@@ -128,8 +128,8 @@ export function StylePackagingPanel({
       {styles !== undefined && lines.length === 0 ? (
         <p className="text-base text-ink-3">
           No service styles yet. Add them on the{" "}
-          <Link to="/admin/catalogs">Catalogs</Link> page, then write how this
-          goes out for each one.
+          <Link to="/admin/branding#catalogs">Pick lists</Link> on the Company
+          page, then write how this goes out for each one.
         </p>
       ) : null}
       {rows !== undefined && lines.length > 0 && written.length === 0 ? (

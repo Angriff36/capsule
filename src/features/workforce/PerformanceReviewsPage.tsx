@@ -1,4 +1,7 @@
 import { reportActionOk } from "../../ui/action-result";
+import { MergedSection } from "../../ui/MergedSection";
+import { OneOnOnesPage } from "./OneOnOnesPage";
+import { RoleScorecardsPage } from "./RoleScorecardsPage";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -6,7 +9,7 @@ import {
   useListPerson,
   useListRoleScorecard,
 } from "../../lib/manifest-convex-react";
-import { TableSkeleton } from "../../ui/primitives";
+import { PageHeader, TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
@@ -132,23 +135,17 @@ export function PerformanceReviewsPage() {
 
   return (
     <div className="operations-stage">
-      <header className="training-masthead">
-        <div>
-          <p className="eyebrow">Staff · Performance</p>
-          <h1 className="display-title mt-2">Reviews that guide the roster.</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Record structured reviews for each person — reliability, quality,
-            and teamwork — as context for shift assignment and compensation. The
-            person reviewed sees their ratings, strengths, things to work on,
-            comments and follow-up. Private notes stay with staff managers.
-          </p>
-        </div>
-        <div aria-label="Performance actions">
-          <button className="btn btn-primary" onClick={() => setOpen(!open)}>
-            {open ? "Close" : "Record review"}
-          </button>
-        </div>
-      </header>
+      <PageHeader
+        title="Performance"
+        lead="Reviews, role expectations and one-on-ones. The person reviewed sees their ratings and feedback; private notes stay with staff managers."
+        actions={
+          <>
+            <button className="btn btn-primary" onClick={() => setOpen(!open)}>
+              {open ? "Close" : "Record review"}
+            </button>
+          </>
+        }
+      />
 
       <WorkforceWorkspaceNav />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
@@ -397,6 +394,20 @@ export function PerformanceReviewsPage() {
           </div>
         ) : null}
       </section>
+      <MergedSection
+        id="scorecards"
+        title="Role expectations"
+        summary="What good looks like for each role."
+      >
+        <RoleScorecardsPage />
+      </MergedSection>
+      <MergedSection
+        id="one-on-ones"
+        title="One-on-ones"
+        summary="Regular check-ins and the actions agreed."
+      >
+        <OneOnOnesPage />
+      </MergedSection>
     </div>
   );
 }

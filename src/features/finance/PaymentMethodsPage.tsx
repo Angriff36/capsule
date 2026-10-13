@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { useClientsByIds } from "../../lib/useClientDirectory";
 import { Link } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
@@ -30,6 +31,7 @@ const METHOD_TYPES = ["card", "check", "cash", "ach", "other"] as const;
 type MethodType = (typeof METHOD_TYPES)[number];
 
 export function PaymentMethodsPage() {
+  const embedded = useEmbedded();
   const methods = useListPaymentMethod();
   const createMethod = useCreatePaymentMethod();
   const makeDefault = usePaymentMethodMakeDefault();
@@ -149,20 +151,8 @@ export function PaymentMethodsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Finance · Payment methods</p>
-          <h1 className="display-title mt-2">Stored payment instruments</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Register a client payment instrument, set the default, then pick it
-            when{" "}
-            <Link className="text-link" to={FINANCE_ROUTES.payments}>
-              adding a payment
-            </Link>
-            .
-          </p>
-        </div>
-        <div className="supply-row-actions">
+      {embedded ? (
+        <div className="flex flex-wrap gap-2">
           <button
             className="btn btn-ghost"
             type="button"
@@ -178,8 +168,41 @@ export function PaymentMethodsPage() {
             {showRegister ? "Close form" : "Register method"}
           </button>
         </div>
-      </header>
-      <FinanceWorkspaceNav />
+      ) : (
+        <>
+          <header className="supply-masthead">
+            <div>
+              <p className="eyebrow">Finance · Payment methods</p>
+              <h1 className="display-title mt-2">Stored payment instruments</h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                Register a client payment instrument, set the default, then pick
+                it when{" "}
+                <Link className="text-link" to={FINANCE_ROUTES.payments}>
+                  adding a payment
+                </Link>
+                .
+              </p>
+            </div>
+            <div className="supply-row-actions">
+              <button
+                className="btn btn-ghost"
+                type="button"
+                onClick={() => setShowTerminal((value) => !value)}
+              >
+                {showTerminal ? "Hide removed" : "Show removed"}
+              </button>
+              <button
+                className="btn btn-primary"
+                type="button"
+                onClick={() => setShowRegister((value) => !value)}
+              >
+                {showRegister ? "Close form" : "Register method"}
+              </button>
+            </div>
+          </header>
+          <FinanceWorkspaceNav />
+        </>
+      )}
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (
         <p className="mt-3 text-base text-ink-2" role="status">

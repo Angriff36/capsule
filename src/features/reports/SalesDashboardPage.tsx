@@ -1,4 +1,6 @@
 import { useMemo, useState } from "react";
+import { MergedSection } from "@/ui/MergedSection";
+import { AvgEventValueGrowthDashboardPage } from "./AvgEventValueGrowthDashboardPage";
 import { useClientDirectory } from "../../lib/useClientDirectory";
 import { useListPerson } from "@/lib/manifest-convex-react";
 import {
@@ -64,7 +66,23 @@ const LEAD =
  */
 export function SalesDashboardPage() {
   const [requested, setRequested] = useState(false);
-  if (requested) return <SalesDashboardBody />;
+  // Average event value is its own all-time report, folded in here.
+  const avgEventValue = (
+    <MergedSection
+      id="avg-event-value"
+      title="Average event value"
+      summary="Average event value over time and what drives it."
+    >
+      <AvgEventValueGrowthDashboardPage />
+    </MergedSection>
+  );
+  if (requested)
+    return (
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8">
+        <SalesDashboardBody />
+        {avgEventValue}
+      </div>
+    );
   return (
     <div className="operations-stage supply-stage">
       <PageHeader title={TITLE} lead={LEAD} />
@@ -78,6 +96,7 @@ export function SalesDashboardPage() {
       >
         Show all-time sales figures
       </button>
+      {avgEventValue}
     </div>
   );
 }

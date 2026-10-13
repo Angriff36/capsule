@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import {
   useListRoleScorecard,
   useCreateRoleScorecard,
@@ -44,6 +45,7 @@ function localDateEpoch(value: FormDataEntryValue | null) {
 }
 
 export function RoleScorecardsPage() {
+  const embedded = useEmbedded();
   const scorecards = useListRoleScorecard();
   // Creation must use the governed creation hook (RoleScorecard_createViaDefine);
   // the entity-command variant targets an existing docId and fails on create.
@@ -179,20 +181,8 @@ export function RoleScorecardsPage() {
 
   return (
     <div className="operations-stage">
-      <header className="training-masthead">
-        <div>
-          <p className="eyebrow">Staff · Role Scorecards</p>
-          <h1 className="display-title mt-2">
-            Measurable expectations for every role.
-          </h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Define the current scorecard for each staff role — the metrics and
-            targets reviews and one-on-ones measure against. Each revision is a
-            new version; prior versions stay intact so historical assessments
-            stay interpretable.
-          </p>
-        </div>
-        <div aria-label="Scorecard actions">
+      {embedded ? (
+        <div className="flex flex-wrap gap-2">
           <button
             className="btn btn-primary"
             onClick={() => (open ? setOpen(false) : startDefine())}
@@ -200,9 +190,34 @@ export function RoleScorecardsPage() {
             {open ? "Close" : "New scorecard"}
           </button>
         </div>
-      </header>
+      ) : (
+        <>
+          <header className="training-masthead">
+            <div>
+              <p className="eyebrow">Staff · Role Scorecards</p>
+              <h1 className="display-title mt-2">
+                Measurable expectations for every role.
+              </h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                Define the current scorecard for each staff role — the metrics
+                and targets reviews and one-on-ones measure against. Each
+                revision is a new version; prior versions stay intact so
+                historical assessments stay interpretable.
+              </p>
+            </div>
+            <div aria-label="Scorecard actions">
+              <button
+                className="btn btn-primary"
+                onClick={() => (open ? setOpen(false) : startDefine())}
+              >
+                {open ? "Close" : "New scorecard"}
+              </button>
+            </div>
+          </header>
 
-      <WorkforceWorkspaceNav />
+          <WorkforceWorkspaceNav />
+        </>
+      )}
       {host}
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
 

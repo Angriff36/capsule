@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useEmbedded } from "../../../ui/embedded";
 import {
   useMutation,
   useQuery,
@@ -115,6 +116,7 @@ function SourceParts({ id }: { id: Id<"tppUploads"> }) {
   );
 }
 export function TppUploadPage() {
+  const embedded = useEmbedded();
   const convex = useConvex();
   const telemetry = useTppUploadTelemetry();
   const auth = useAuthStatus();
@@ -573,17 +575,21 @@ export function TppUploadPage() {
   };
   return (
     <div className="space-y-6">
-      <AdminWorkspaceNav />
-      <header>
-        <Link className="text-link" to="/admin/imports">
-          Imports
-        </Link>
-        <h1 className="text-3xl font-bold text-ink">Import TPP account</h1>
-        <p className="text-ink-2">
-          Upload the JSON export downloaded by TPP Brief into{" "}
-          <strong>{organization?.name || "this organization"}</strong>.
-        </p>
-      </header>
+      {embedded ? null : (
+        <>
+          <AdminWorkspaceNav />
+          <header>
+            <Link className="text-link" to="/admin/imports">
+              Imports
+            </Link>
+            <h1 className="text-3xl font-bold text-ink">Import TPP account</h1>
+            <p className="text-ink-2">
+              Upload the JSON export downloaded by TPP Brief into{" "}
+              <strong>{organization?.name || "this organization"}</strong>.
+            </p>
+          </header>
+        </>
+      )}
       <section
         className="space-y-4 border-y border-line py-6"
         aria-label="Choose TPP export"

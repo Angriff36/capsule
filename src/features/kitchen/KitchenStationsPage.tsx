@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import {
   useCreateStation,
   useListStation,
@@ -34,6 +35,7 @@ function wholeNumber(raw: string | undefined): number | undefined {
  * import.
  */
 export function KitchenStationsPage() {
+  const embedded = useEmbedded();
   const stations = useListStation();
   const defineStation = useCreateStation();
   const renameStation = useStationRename();
@@ -146,11 +148,15 @@ export function KitchenStationsPage() {
 
   return (
     <div className="component-book-stage culinary-studio">
-      <PageHeader
-        title="Kitchen stations"
-        lead="The station names the printed prep sheets group work by. Renaming one never moves the work that already names it."
-      />
-      <KitchenBookNav />
+      {embedded ? null : (
+        <>
+          <PageHeader
+            title="Kitchen stations"
+            lead="The station names the printed prep sheets group work by. Renaming one never moves the work that already names it."
+          />
+          <KitchenBookNav />
+        </>
+      )}
       {host}
       {failure ? (
         <div className="mt-4">

@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { Link } from "react-router-dom";
 import {
   useListPerson,
@@ -33,6 +34,7 @@ const money = (value: number) =>
  * that need a call first (Mangia Venue Partner Playbook sections 02-05, 12).
  */
 export function VenuePartnersPage() {
+  const embedded = useEmbedded();
   const venues = useListVenue();
   const people = useListPerson();
   const sources = useListReferralSource();
@@ -143,14 +145,18 @@ export function VenuePartnersPage() {
 
   return (
     <div className="space-y-4">
-      <FacilitiesWorkspaceNav />
-      <header>
-        <h1 className="text-xl font-bold">Venue partners</h1>
-        <p className="text-sm text-ink-3">
-          Each partner venue has one owner who checks in at least every{" "}
-          {CONTACT_DAYS} days. Venues that need a call are at the top.
-        </p>
-      </header>
+      {embedded ? null : (
+        <>
+          <FacilitiesWorkspaceNav />
+          <header>
+            <h1 className="text-xl font-bold">Venue partners</h1>
+            <p className="text-sm text-ink-3">
+              Each partner venue has one owner who checks in at least every{" "}
+              {CONTACT_DAYS} days. Venues that need a call are at the top.
+            </p>
+          </header>
+        </>
+      )}
       {loading ? (
         <p className="text-sm text-ink-3">Loading partner venues…</p>
       ) : rows.length === 0 ? (

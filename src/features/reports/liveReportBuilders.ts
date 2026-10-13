@@ -149,7 +149,7 @@ function buildSalesReport(
     sourceLabel: "Proposals",
     sourceDescription:
       "Current proposals supply pipeline status, guest counts, and proposed value.",
-    sourcePath: "/clients/proposals",
+    sourcePath: "/clients/pipeline",
     effectiveWindow: dateWindow.window,
     kpis: [
       kpi("sales.proposals", formatCount(rows.length)),
@@ -215,7 +215,7 @@ function buildInventoryReport(
     sourceLabel: "Ingredient demand",
     sourceDescription:
       "Demand lines supply quantities and purchasing status. Units stay separate, and the ingredient and event they belong to only show what you're allowed to see.",
-    sourcePath: "/inventory/demand",
+    sourcePath: "/inventory/purchasing#demand",
     effectiveWindow: dateWindow.window,
     kpis: [
       kpi("inventory.demand_lines", formatCount(rows.length)),

@@ -84,10 +84,10 @@ it("renders empty catalog recovery links and updates the selectors when live cat
     );
   expect(standardButtons()).toHaveLength(3);
   expect(standardButtons().every((node) => !node.disabled)).toBe(true);
-  // Occasions and referral sources each point to Admin → Catalogs.
-  expect(container.querySelectorAll('a[href="/admin/catalogs"]')).toHaveLength(
-    2,
-  );
+  // Occasions and referral sources each point to Company → Pick lists.
+  expect(
+    container.querySelectorAll('a[href="/admin/branding#catalogs"]'),
+  ).toHaveLength(2);
   expect(container.textContent).toContain("No referral sources yet.");
   expect(selectWith("Full Service").required).toBe(false);
   expect(selectWith("Select an occasion").required).toBe(false);

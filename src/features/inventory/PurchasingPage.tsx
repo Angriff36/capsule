@@ -1,3 +1,5 @@
+import { MergedSection } from "../../ui/MergedSection";
+import { DemandLedgerPage } from "./DemandLedgerPage";
 import { useMemo, useState, type FormEvent } from "react";
 import { FinishedEventsBuyingNotice } from "./FinishedEventsBuyingNotice";
 import { Link } from "react-router-dom";
@@ -24,7 +26,7 @@ import {
   useBulkRun,
   useBulkSelection,
 } from "../../ui/bulk-select";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatDate, formatMoneyExact } from "../../lib/format";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import {
@@ -501,42 +503,43 @@ export function PurchasingPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Procurement · Purchase queue</p>
-          <h1 className="display-title mt-2">Weekly purchasing drafts</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Weekly purchasing drafts"
+        lead={
+          <>
             Approved events automatically maintain a shared weekly draft. Review
             quantities, adjust if needed, then submit.
-          </p>
-        </div>
-        <div className="supply-masthead-actions">
-          <button
-            className="btn btn-ghost"
-            disabled={busy != null}
-            onClick={editApprovalThreshold}
-          >
-            {approvalThreshold != null
-              ? `Orders over ${formatMoneyExact(Number(approvalThreshold))} need approval`
-              : "Orders need no approval"}
-          </button>
-          <button
-            className="btn btn-ghost"
-            disabled={busy != null}
-            onClick={editDefaultVendor}
-          >
-            {defaultVendorId != null
-              ? `Usual vendor: ${vendorName(defaultVendorId)}`
-              : "Usual vendor: not set"}
-          </button>
-          <button className="btn btn-ghost" onClick={() => setForm("vendor")}>
-            Add a vendor
-          </button>
-          <button className="btn btn-ghost" onClick={() => setForm("order")}>
-            Start an extra order
-          </button>
-        </div>
-      </header>
+          </>
+        }
+        actions={
+          <>
+            <button
+              className="btn btn-ghost"
+              disabled={busy != null}
+              onClick={editApprovalThreshold}
+            >
+              {approvalThreshold != null
+                ? `Orders over ${formatMoneyExact(Number(approvalThreshold))} need approval`
+                : "Orders need no approval"}
+            </button>
+            <button
+              className="btn btn-ghost"
+              disabled={busy != null}
+              onClick={editDefaultVendor}
+            >
+              {defaultVendorId != null
+                ? `Usual vendor: ${vendorName(defaultVendorId)}`
+                : "Usual vendor: not set"}
+            </button>
+            <button className="btn btn-ghost" onClick={() => setForm("vendor")}>
+              Add a vendor
+            </button>
+            <button className="btn btn-ghost" onClick={() => setForm("order")}>
+              Start an extra order
+            </button>
+          </>
+        }
+      />
       <InventoryWorkspaceNav />
       <aside className="supply-degraded" role="note">
         <strong>Automatic weekly draft</strong>
@@ -598,7 +601,10 @@ export function PurchasingPage() {
               <Link to="/events" className="btn btn-primary btn-sm">
                 Go to events
               </Link>
-              <Link to="/inventory/demand" className="btn btn-ghost btn-sm">
+              <Link
+                to="/inventory/purchasing#demand"
+                className="btn btn-ghost btn-sm"
+              >
                 Demand ledger
               </Link>
             </div>
@@ -841,6 +847,13 @@ export function PurchasingPage() {
           Cancel ({selection.selected.filter(needCanCancel).length})
         </button>
       </BulkActionBar>
+      <MergedSection
+        id="demand"
+        title="What each event needs"
+        summary="Ingredient amounts each event needs; purchasing draws from this."
+      >
+        <DemandLedgerPage />
+      </MergedSection>
     </div>
   );
 }

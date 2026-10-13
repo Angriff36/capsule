@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { useListPerson } from "../../lib/manifest-convex-react";
 import {
   useShiftsByIds,
@@ -153,6 +154,7 @@ export function StaffUtilizationDashboard({
   /** Told the chosen period, so the page can read only that period. */
   onRangeChange?: (range: { startAt: number; endAt: number }) => void;
 }) {
+  const embedded = useEmbedded();
   const initialRange = useMemo(() => presetRange("month", now), [now]);
   const [preset, setPreset] = useState<PeriodPreset>("month");
   const [startDate, setStartDate] = useState(initialRange.startDate);
@@ -210,15 +212,7 @@ export function StaffUtilizationDashboard({
 
   return (
     <div className="operations-stage supply-stage staff-utilization-stage">
-      <header className="supply-masthead staff-utilization-masthead">
-        <div>
-          <p className="eyebrow">Staff · Hours</p>
-          <h1 className="display-title mt-2">How staff time is used.</h1>
-          <p className="mt-3 max-w-180 text-ink-2">
-            Compare planned shifts with confirmed work, see how much time was
-            worked on events, and spot thin schedules before service gets busy.
-          </p>
-        </div>
+      {embedded ? (
         <div className="staff-utilization-range" aria-label="Displayed period">
           <span>Reporting period</span>
           <strong>
@@ -228,8 +222,34 @@ export function StaffUtilizationDashboard({
           </strong>
           <small>{report.calendarDays} calendar days</small>
         </div>
-      </header>
-      <WorkforceWorkspaceNav />
+      ) : (
+        <>
+          <header className="supply-masthead staff-utilization-masthead">
+            <div>
+              <p className="eyebrow">Staff · Hours</p>
+              <h1 className="display-title mt-2">How staff time is used.</h1>
+              <p className="mt-3 max-w-180 text-ink-2">
+                Compare planned shifts with confirmed work, see how much time
+                was worked on events, and spot thin schedules before service
+                gets busy.
+              </p>
+            </div>
+            <div
+              className="staff-utilization-range"
+              aria-label="Displayed period"
+            >
+              <span>Reporting period</span>
+              <strong>
+                {rangeIsValid
+                  ? `${dateRange.format(report.startAt)} — ${dateRange.format(displayedRangeEnd)}`
+                  : "Choose a valid range"}
+              </strong>
+              <small>{report.calendarDays} calendar days</small>
+            </div>
+          </header>
+          <WorkforceWorkspaceNav />
+        </>
+      )}
 
       <section
         className="staff-utilization-controls"
@@ -531,6 +551,7 @@ export function StaffUtilizationDashboard({
 }
 
 export function StaffUtilizationPage() {
+  const embedded = useEmbedded();
   const people = useListPerson();
   const now = useMemo(() => new Date(), []);
   // Only the chosen period: shifts that overlap it, entries inside it, and

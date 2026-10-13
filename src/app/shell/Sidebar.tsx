@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useQuery } from "convex/react";
 import { api } from "../../lib/api";
@@ -63,6 +63,32 @@ export function Sidebar() {
     areas: available.filter((area) => area.group === group),
   })).filter(({ areas }) => areas.length > 0);
 
+  // The rail shows its labels while the pointer is on it or focus is inside
+  // it. A mouse click leaves focus on the clicked item, which kept the rail
+  // open over the page; let go of that focus after a click and as soon as the
+  // page scrolls, so the rail folds back by itself.
+  const railRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const release = () => {
+      const active = document.activeElement;
+      if (active instanceof HTMLElement && railRef.current?.contains(active))
+        active.blur();
+    };
+    document.addEventListener("scroll", release, {
+      capture: true,
+      passive: true,
+    });
+    return () =>
+      document.removeEventListener("scroll", release, { capture: true });
+  }, []);
+  const releaseAfterClick = (event: {
+    detail: number;
+    currentTarget: HTMLElement;
+  }) => {
+    // detail is 0 for a keyboard Enter: keyboard users keep their place.
+    if (event.detail > 0) event.currentTarget.blur();
+  };
+
   const toggle = () => {
     const next = !collapsed;
     setCollapsed(next);
@@ -71,11 +97,17 @@ export function Sidebar() {
 
   return (
     <aside
+      ref={railRef}
       className="app-shell-sidebar max-md:hidden"
       data-collapsed={collapsed ? "true" : "false"}
     >
       <div className="rail-inner">
-        <NavLink to="/" className="sidebar-brand" aria-label="Capsule home">
+        <NavLink
+          to="/"
+          className="sidebar-brand"
+          aria-label="Capsule home"
+          onClick={releaseAfterClick}
+        >
           <span className="capsule-mark" aria-hidden="true">
             C
           </span>
@@ -92,6 +124,7 @@ export function Sidebar() {
                   end={area.path === "/"}
                   aria-label={area.label}
                   title={area.label}
+                  onClick={releaseAfterClick}
                   className={({ isActive }) =>
                     isActive &&
                     // Events stays quiet on the tracker, which has its own item.

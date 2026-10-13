@@ -20,7 +20,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
-import { StatusChip, FormSkeleton } from "../../ui/primitives";
+import { FormSkeleton, PageHeader, StatusChip } from "../../ui/primitives";
 import {
   formatDate as formatDateShared,
   formatMoneyExact,
@@ -62,7 +62,10 @@ type AttributionType =
 type AllocationMethod = "percent" | "fixed";
 
 export function RevenueAttributionDetailPage() {
-  const { id, mode } = useParams<{ id?: string; mode?: string }>();
+  const params = useParams<{ id?: string; mode?: string }>();
+  const { mode } = params;
+  // One route serves both: /finance/attribution/new opens the blank form.
+  const id = params.id === "new" ? undefined : params.id;
   const navigate = useNavigate();
   const isNew = !id;
   const isEditMode = mode === "edit";
@@ -257,23 +260,24 @@ export function RevenueAttributionDetailPage() {
 
   return (
     <div className="operations-stage supply-stage tax-stage">
-      <header className="supply-masthead tax-masthead">
-        <div>
-          <p className="eyebrow">Finance · Attribution desk</p>
-          <h1 className="display-title mt-2">
-            {isNew ? "Create revenue attribution" : "Revenue attribution"}
-          </h1>
-          {attribution && !isNew && existingEvent && (
-            <p className="mt-3 max-w-160 text-ink-2">
-              Event: {existingEvent.title} · Status:{" "}
-              <StatusChip status={attribution.status} />
-            </p>
-          )}
-        </div>
-        <Link to="/finance/attribution" className="btn btn-secondary">
-          Back to list
-        </Link>
-      </header>
+      <PageHeader
+        title={
+          <>{isNew ? "Create revenue attribution" : "Revenue attribution"}</>
+        }
+        actions={
+          <>
+            <Link to="/finance/attribution" className="btn btn-secondary">
+              Back to list
+            </Link>
+          </>
+        }
+      />
+      {attribution && !isNew && existingEvent && (
+        <p className="mt-3 max-w-160 text-ink-2">
+          Event: {existingEvent.title} · Status:{" "}
+          <StatusChip status={attribution.status} />
+        </p>
+      )}
 
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (

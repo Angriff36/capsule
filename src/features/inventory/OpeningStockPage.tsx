@@ -2,6 +2,7 @@
 // kept apart by what they are, each with its open issues in plain words. A
 // person fixes a row, sets it aside, or uses a ready food row as the opening
 // stock for that item and place. Using a row is the cutover choice.
+import { useEmbedded } from "../../ui/embedded";
 import { Fragment, useMemo, useState } from "react";
 import {
   useCreateStorageLocation,
@@ -65,6 +66,7 @@ const day = (at: number | null | undefined) =>
       }).format(at);
 
 export function OpeningStockPage() {
+  const embedded = useEmbedded();
   const ingredients = useListIngredient();
   const components = useListComponent();
   const locations = useListStorageLocation();
@@ -179,11 +181,15 @@ export function OpeningStockPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        title="Opening stock"
-        lead="Bring in a stock count sheet, fix what the sheet left unclear, then pick which counts become the stock on hand. A gap in the sheet never becomes zero or a guessed amount."
-      />
-      <InventoryWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <PageHeader
+            title="Opening stock"
+            lead="Bring in a stock count sheet, fix what the sheet left unclear, then pick which counts become the stock on hand. A gap in the sheet never becomes zero or a guessed amount."
+          />
+          <InventoryWorkspaceNav />
+        </>
+      )}
       {failure ? <SupplyFailureBanner error={failure} /> : null}
       {notice ? (
         <p className="px-4 text-xs text-ink-2" role="status">

@@ -73,10 +73,23 @@ it("carries an accepted proposal into event creation and opens an existing booki
       version: 3,
     },
   ]);
-  await mount(createElement(ProposalsPage));
+  // A lead's accepted proposal, before it has an event, opens on its own.
+  backend.values.set("useGetProposal", {
+    _id: "kd7proposalaaaaaaaaaaaaaaaaaaaa1",
+    clientId,
+    status: "accepted",
+    title: "Harborview supper",
+    version: 3,
+  });
+  await mount(
+    createElement(ProposalsPage),
+    "/clients/proposals?proposal=kd7proposalaaaaaaaaaaaaaaaaaaaa1",
+  );
   expect(
     container.querySelector('a[href^="/events/new"]')?.getAttribute("href"),
-  ).toBe(`/events/new?clientId=${clientId}&proposalId=proposal-a`);
+  ).toBe(
+    `/events/new?clientId=${clientId}&proposalId=kd7proposalaaaaaaaaaaaaaaaaaaaa1`,
+  );
   backend.values.set("useListProposal", [
     {
       _id: "proposal-a",
@@ -87,7 +100,8 @@ it("carries an accepted proposal into event creation and opens an existing booki
       eventId: "booked-event",
     },
   ]);
-  await mount(createElement(ProposalsPage));
+  // Once booked, the proposal shows on its event.
+  await mount(createElement(ProposalsPage, { eventId: "booked-event" }));
   expect(container.querySelector('a[href^="/events/new"]')).toBeNull();
   expect(
     container.querySelector('a[href="/events/booked-event?tab=overview"]')

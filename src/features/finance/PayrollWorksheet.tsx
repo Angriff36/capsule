@@ -74,7 +74,7 @@ export function PayrollWorksheet({
           <p>No open payroll inputs.</p>
           <span>
             Prepare a period rollup after time is logged in{" "}
-            <Link className="text-link" to="/staff">
+            <Link className="text-link" to="/staff/roster">
               Staff
             </Link>
             .

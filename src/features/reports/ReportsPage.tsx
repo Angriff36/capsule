@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { MergedSection } from "../../ui/MergedSection";
+import { useEmbedded } from "../../ui/embedded";
 import { useSearchParams } from "react-router-dom";
 import {
   useCreateSavedReportDefinition,
@@ -54,34 +56,37 @@ const payloadBuilder = new ReportCreatePayloadBuilder();
 
 export function ReportsPage() {
   const [searchParams] = useSearchParams();
-  // A shared link (?report=…) opens the saved report it names.
-  const [view, setView] = useState<"catalog" | "saved">(() =>
-    searchParams.has("report") ? "saved" : "catalog",
-  );
+  const sharedReport = searchParams.has("report");
+  // One page: the TPP report library, then the saved live reports. A shared
+  // link (?report=…) scrolls to the saved report it names.
+  useEffect(() => {
+    if (!sharedReport) return;
+    const timer = window.setTimeout(
+      () =>
+        document
+          .getElementById("saved-reports")
+          ?.scrollIntoView({ block: "start" }),
+      600,
+    );
+    return () => window.clearTimeout(timer);
+  }, [sharedReport]);
   return (
     <>
-      <nav className="report-view-switch" aria-label="Report views">
-        <button
-          className={view === "catalog" ? "is-active" : ""}
-          type="button"
-          onClick={() => setView("catalog")}
-        >
-          TPP report catalog
-        </button>
-        <button
-          className={view === "saved" ? "is-active" : ""}
-          type="button"
-          onClick={() => setView("saved")}
-        >
-          Saved reports
-        </button>
-      </nav>
-      {view === "catalog" ? <TppReportCatalog /> : <SavedReportsPage />}
+      <TppReportCatalog />
+      <MergedSection
+        id="saved-reports"
+        title="Saved reports"
+        summary="Your saved live reports."
+        defaultOpen
+      >
+        <SavedReportsPage />
+      </MergedSection>
     </>
   );
 }
 
 function SavedReportsPage() {
+  const embedded = useEmbedded();
   const reportQuery = useListSavedReportDefinition();
   const reports = reportQuery as SavedReportRow[] | undefined;
   const createReport = useCreateSavedReportDefinition();
@@ -282,15 +287,8 @@ function SavedReportsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <h1 className="display-title">Live reports</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Saved views of current Capsule operations. Open a report to see live
-            KPIs, a chart, and the source rows behind every number.
-          </p>
-        </div>
-        <div className="supply-row-actions">
+      {embedded ? (
+        <div className="flex flex-wrap items-center gap-2">
           <button
             className="btn btn-ghost"
             type="button"
@@ -306,7 +304,35 @@ function SavedReportsPage() {
             {showCreate ? "Close form" : "New report"}
           </button>
         </div>
-      </header>
+      ) : (
+        <>
+          <header className="supply-masthead">
+            <div>
+              <h1 className="display-title">Live reports</h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                Saved views of current Capsule operations. Open a report to see
+                live KPIs, a chart, and the source rows behind every number.
+              </p>
+            </div>
+            <div className="supply-row-actions">
+              <button
+                className="btn btn-ghost"
+                type="button"
+                onClick={() => setShowArchived((value) => !value)}
+              >
+                {showArchived ? "Hide archived" : "Show archived"}
+              </button>
+              <button
+                className="btn btn-primary"
+                type="button"
+                onClick={() => setShowCreate((value) => !value)}
+              >
+                {showCreate ? "Close form" : "New report"}
+              </button>
+            </div>
+          </header>
+        </>
+      )}
 
       {failure ? <ReportsFailureBanner error={failure} /> : null}
       {notice ? (

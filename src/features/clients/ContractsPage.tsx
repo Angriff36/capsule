@@ -10,7 +10,7 @@ import {
   useCreateContract,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
 import { SearchSelect } from "../../ui/SearchSelect";
 import { formatDate } from "../../lib/format";
@@ -199,32 +199,33 @@ export function ContractsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Clients · Contracts</p>
-          <h1 className="display-title mt-2">Contracts</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Contracts"
+        lead={
+          <>
             Written agreements for booked events. Draft one, send it to your
             client, and log the signature when it comes back.
-          </p>
-        </div>
-        <div className="supply-row-actions">
-          <button
-            className="btn btn-ghost"
-            type="button"
-            onClick={() => setShowTerminal((value) => !value)}
-          >
-            {showTerminal ? "Hide expired/voided" : "Show expired/voided"}
-          </button>
-          <button
-            className="btn btn-primary"
-            type="button"
-            onClick={() => setShowDraft((value) => !value)}
-          >
-            {showDraft ? "Close form" : "Draft contract"}
-          </button>
-        </div>
-      </header>
+          </>
+        }
+        actions={
+          <>
+            <button
+              className="btn btn-ghost"
+              type="button"
+              onClick={() => setShowTerminal((value) => !value)}
+            >
+              {showTerminal ? "Hide expired/voided" : "Show expired/voided"}
+            </button>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={() => setShowDraft((value) => !value)}
+            >
+              {showDraft ? "Close form" : "Draft contract"}
+            </button>
+          </>
+        }
+      />
       <ClientsWorkspaceNav />
       {failure ? <CrmFailureBanner error={failure} /> : null}
       {notice ? (

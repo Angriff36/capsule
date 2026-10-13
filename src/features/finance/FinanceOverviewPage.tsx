@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useEmbedded } from "../../ui/embedded";
 import { useClientDirectory } from "../../lib/useClientDirectory";
 import { useListOrganization } from "../../lib/manifest-convex-react";
 import {
@@ -57,6 +58,7 @@ const clientLabel = (row: {
 };
 
 export function FinanceOverviewPage() {
+  const embedded = useEmbedded();
   const invoices = useInvoicesInStatuses(SHOWN_STATUSES);
   const now = new Date();
   const monthStartMs = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
@@ -143,11 +145,15 @@ export function FinanceOverviewPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        title="Finance"
-        lead="Money owed, money collected, and where to act next."
-      />
-      <FinanceWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <PageHeader
+            title="Finance"
+            lead="Money owed, money collected, and where to act next."
+          />
+          <FinanceWorkspaceNav />
+        </>
+      )}
 
       {/* While queries load, tiles pulse instead of showing "—" — an em-dash
           reads as "no data", not "still fetching". */}

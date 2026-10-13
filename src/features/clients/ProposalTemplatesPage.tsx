@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { ProposalTemplateServiceStyleField } from "./ProposalTemplateServiceStyleField";
 import {
   useCreateProposalTemplate,
@@ -78,6 +79,7 @@ function formatVisibleSections(value: string[] | null | undefined): string {
 }
 
 export function ProposalTemplatesPage() {
+  const embedded = useEmbedded();
   const templates = useListProposalTemplate();
   // Creation path: the governed create hook (ProposalTemplate_createViaDefine),
   // not the entity-command hook which targets an existing doc via docId.
@@ -229,26 +231,40 @@ export function ProposalTemplatesPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Clients · Proposal templates</p>
-          <h1 className="display-title mt-2">Proposal templates</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Start new proposals from a template — your standard terms, sections,
-            and tax rates come pre-filled, so every proposal looks the same and
-            takes half the time.
-          </p>
+      {embedded ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={() => (open ? closeForm() : openForCreate())}
+          >
+            {open ? "Close" : "New template"}
+          </button>
         </div>
-        <button
-          className="btn btn-primary"
-          type="button"
-          onClick={() => (open ? closeForm() : openForCreate())}
-        >
-          {open ? "Close" : "New template"}
-        </button>
-      </header>
+      ) : (
+        <>
+          <header className="supply-masthead">
+            <div>
+              <p className="eyebrow">Clients · Proposal templates</p>
+              <h1 className="display-title mt-2">Proposal templates</h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                Start new proposals from a template — your standard terms,
+                sections, and tax rates come pre-filled, so every proposal looks
+                the same and takes half the time.
+              </p>
+            </div>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={() => (open ? closeForm() : openForCreate())}
+            >
+              {open ? "Close" : "New template"}
+            </button>
+          </header>
 
-      <ClientsWorkspaceNav />
+          <ClientsWorkspaceNav />
+        </>
+      )}
       {failure ? <CrmFailureBanner error={failure} /> : null}
       {host}
 

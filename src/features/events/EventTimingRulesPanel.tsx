@@ -116,7 +116,7 @@ export function EventTimingRulesPanel({
         <li className="text-ink-2">
           Crew briefing before loading: {rules.briefingMinutes} min · Spare
           minutes before leaving: {rules.safetyBufferMinutes} min.{" "}
-          <Link className="text-link" to="/admin/kitchens">
+          <Link className="text-link" to="/admin/branding#kitchens">
             Company timing rules
           </Link>
         </li>

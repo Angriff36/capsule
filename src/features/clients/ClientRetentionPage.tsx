@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { Link } from "react-router-dom";
 import {
   useClientOutreachTaskComplete,
@@ -104,6 +105,7 @@ function OutreachReach({ clientId }: { clientId: string }) {
 const OPEN_TASK = ["resolvedAt"];
 
 export function ClientRetentionPage() {
+  const embedded = useEmbedded();
   const clients = useClientDirectory();
   // Retention only looks at bookings in the prior year and the current year.
   const currentYear = new Date().getFullYear();
@@ -230,17 +232,8 @@ export function ClientRetentionPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Clients · Retention</p>
-          <h1 className="display-title mt-2">Client retention</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Who came back this year — and who hasn't yet. For clients who booked
-            in {priorYear} but not {currentYear}, open a follow-up task so
-            someone reaches out before they book elsewhere.
-          </p>
-        </div>
-        <div className="supply-row-actions">
+      {embedded ? (
+        <div className="flex flex-wrap items-center gap-2">
           <button
             className="btn btn-primary"
             type="button"
@@ -252,8 +245,34 @@ export function ClientRetentionPage() {
               : `Start a call task for each (${uncoveredCandidates.length})`}
           </button>
         </div>
-      </header>
-      <ClientsWorkspaceNav />
+      ) : (
+        <>
+          <header className="supply-masthead">
+            <div>
+              <p className="eyebrow">Clients · Retention</p>
+              <h1 className="display-title mt-2">Client retention</h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                Who came back this year — and who hasn't yet. For clients who
+                booked in {priorYear} but not {currentYear}, open a follow-up
+                task so someone reaches out before they book elsewhere.
+              </p>
+            </div>
+            <div className="supply-row-actions">
+              <button
+                className="btn btn-primary"
+                type="button"
+                disabled={busy || loading || uncoveredCandidates.length === 0}
+                onClick={openForAll}
+              >
+                {busy
+                  ? "Working…"
+                  : `Start a call task for each (${uncoveredCandidates.length})`}
+              </button>
+            </div>
+          </header>
+          <ClientsWorkspaceNav />
+        </>
+      )}
       {failure ? <CrmFailureBanner error={failure} /> : null}
       {notice ? (
         <p className="mt-3 text-base text-ink-2" role="status">

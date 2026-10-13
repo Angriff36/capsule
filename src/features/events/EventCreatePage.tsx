@@ -715,12 +715,12 @@ export function EventCreatePage() {
                   <p className="mt-1 text-xs leading-relaxed text-ink-3">
                     No occasions yet — open{" "}
                     <Link
-                      to="/admin/catalogs"
+                      to="/admin/branding#catalogs"
                       target="_blank"
                       rel="noopener"
                       className="underline font-medium"
                     >
-                      Admin → Catalogs
+                      Admin → Company → Pick lists
                     </Link>{" "}
                     and click “Add the standard list” (Wedding, Corporate Event,
                     …). Opens in a new tab; this form stays put and the list
@@ -986,12 +986,12 @@ export function EventCreatePage() {
                     No referral sources yet. You can leave this blank, or add
                     them in{" "}
                     <Link
-                      to="/admin/catalogs"
+                      to="/admin/branding#catalogs"
                       target="_blank"
                       rel="noopener"
                       className="underline font-medium"
                     >
-                      Admin → Catalogs
+                      Admin → Company → Pick lists
                     </Link>{" "}
                     (new tab; this form stays put and the list fills in here).
                   </span>

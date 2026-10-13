@@ -277,7 +277,7 @@ describe("scripts/deploy-production.sh", () => {
         "RESULT: PASS - frontend deployed",
       );
       expect(approved.calls()[0]).toBe(
-        'codex -c model="gpt-5.6-sol" -c model_reasoning_effort="high" review -'.replace(
+        'codex -c model="gpt-5.6-terra" -c model_reasoning_effort="medium" review -'.replace(
           /"/g,
           "",
         ),
@@ -290,7 +290,7 @@ describe("scripts/deploy-production.sh", () => {
           "--format=%s",
           await approved.mainSha(),
         ),
-      ).toBe(`[release] ${BRANCH} (reviewed by gpt-5.6-sol)`);
+      ).toBe(`[release] ${BRANCH} (reviewed by gpt-5.6-terra)`);
     },
     TIMEOUT,
   );

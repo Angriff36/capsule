@@ -427,7 +427,7 @@ export function EventTodosTab({
                   : `Add ${formatCountNoun(toAdd.length, "to-do")}`}
             </button>
           ) : null}
-          <Link className="text-link" to="/events/checklists">
+          <Link className="text-link" to="/events/setup#checklists">
             Checklists
           </Link>
         </div>

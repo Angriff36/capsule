@@ -463,7 +463,7 @@ export function EventsListPage() {
                 <Link to="/events/capacity">Capacity calendar</Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link to="/events/templates">Templates</Link>
+                <Link to="/events/setup">Event setup</Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

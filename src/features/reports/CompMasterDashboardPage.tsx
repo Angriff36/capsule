@@ -10,6 +10,7 @@ import { StatCard } from "@/ui/charts/StatCard";
 import { BarChart } from "@/ui/charts/BarChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
 import { EmptyState, PageHeader } from "@/ui/primitives";
+import { useEmbedded } from "@/ui/embedded";
 import { formatMoney } from "@/lib/format";
 import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import { calculateCommissionMetrics } from "./compMasterValues";
@@ -20,6 +21,7 @@ const LOADING = "Loading…";
 const NOT_ASKED = "Show all-time to see";
 
 export function CompMasterDashboardPage() {
+  const embedded = useEmbedded();
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).getTime();
@@ -235,10 +237,12 @@ export function CompMasterDashboardPage() {
   ];
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        title="Comp Master Dashboard"
-        lead="The sales lead's performance goals from the owner's Comp Master Status sheet, then applied sales commission allocations, taken straight from revenue attribution."
-      />
+      {embedded ? null : (
+        <PageHeader
+          title="Comp Master Dashboard"
+          lead="The sales lead's performance goals from the owner's Comp Master Status sheet, then applied sales commission allocations, taken straight from revenue attribution."
+        />
+      )}
       <CompGoalsSection />
       {showAllTime && attributions?.length === 0 ? (
         <div data-testid="dashboard-empty">

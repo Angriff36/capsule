@@ -66,9 +66,9 @@ export function EventAllergenBriefingPage() {
       <article className="briefing-document mx-auto mt-6 max-w-200 p-8">
         <header className="flex items-start justify-between">
           <div>
-            <h1 className="text-xl font-semibold">
+            <h2 className="text-xl font-semibold">
               Allergen briefing · {event.title}
-            </h1>
+            </h2>
             <p className="mt-1 text-base text-ink-2">
               {event.startsAt != null
                 ? `${formatDate(event.startsAt)} ${formatTime(event.startsAt)}`

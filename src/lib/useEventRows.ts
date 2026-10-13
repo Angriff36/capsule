@@ -35,10 +35,11 @@ export function useEventTimelineActivities(eventId: string) {
 }
 
 /** One event's proposals, never the whole company's (PL-SCALE). */
-export function useEventProposals(eventId: string) {
-  return useQuery(api.queries.listProposalByEventId, {
-    eventId: eventId as Id<"events">,
-  });
+export function useEventProposals(eventId: string | undefined) {
+  return useQuery(
+    api.queries.listProposalByEventId,
+    eventId ? { eventId: eventId as Id<"events"> } : "skip",
+  );
 }
 
 /** One event's pack lists, never the whole company's (PL-SCALE). */
@@ -95,4 +96,15 @@ export function useEventPrepTasks(eventId: string) {
   return useQuery(api.queries.listPrepTaskByEventId, {
     eventId: eventId as Id<"events">,
   });
+}
+
+/**
+ * The proposal Capsule would send for this event, built from the event and
+ * its template on the fly. Nothing is saved (convex/lib/proposalPreview.ts).
+ */
+export function useProposalPreview(eventId: string | undefined) {
+  return useQuery(
+    api.lib.proposalPreview.previewProposalFromEvent,
+    eventId ? { eventId: eventId as Id<"events"> } : "skip",
+  );
 }

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useEmbedded } from "../../ui/embedded";
 import {
   useListEquipment,
   useListVenue,
@@ -31,6 +32,7 @@ type AttentionRow = {
 };
 
 export function FacilitiesOverviewPage() {
+  const embedded = useEmbedded();
   const venues = useListVenue();
   const equipment = useListEquipment();
   // Only the tasks due soon or overdue: the attention list and the count.
@@ -102,11 +104,15 @@ export function FacilitiesOverviewPage() {
 
   return (
     <div className="space-y-4">
-      <PageHeader
-        title="Facilities"
-        lead="Venues, equipment, and the service work that keeps them event-ready."
-      />
-      <FacilitiesWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <PageHeader
+            title="Facilities"
+            lead="Venues, equipment, and the service work that keeps them event-ready."
+          />
+          <FacilitiesWorkspaceNav />
+        </>
+      )}
 
       <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-line bg-line lg:grid-cols-4">
         {kpis.map((kpi) => (

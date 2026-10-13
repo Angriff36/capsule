@@ -13,7 +13,7 @@ import {
 import { equipmentShelfMark, type ShelfIssue } from "./equipmentShelfMark";
 import { useOpenEquipmentIssues } from "./useLogisticsWindow";
 import { formatMoney } from "../../lib/format";
-import { TableSkeleton } from "../../ui/primitives";
+import { PageHeader, TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { EquipmentMaintenanceBoard } from "./EquipmentMaintenanceBoard";
@@ -250,54 +250,55 @@ export function EquipmentCatalogPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Facilities · Equipment</p>
-          <h1 className="display-title mt-2">Equipment catalog</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Equipment catalog"
+        lead={
+          <>
             Kitchen and service equipment you own or rent — chafing dishes,
             ovens, tents, linens — with tag number, count, value, and condition.
             Repairs and event check-out use this list.
-          </p>
-        </div>
-        <div className="supply-masthead-actions">
-          <button
-            className="btn btn-secondary"
-            onClick={() => {
-              setEditing(null);
-              setShowForm(false);
-              setShowGoodshuffle(false);
-              setShowBulk(true);
-            }}
-            data-testid="equipment-open-bulk"
-          >
-            Paste a pack list
-          </button>
-          <button
-            className="btn btn-secondary"
-            onClick={() => {
-              setEditing(null);
-              setShowForm(false);
-              setShowBulk(false);
-              setShowGoodshuffle(true);
-            }}
-            data-testid="equipment-open-goodshuffle"
-          >
-            Bring in an item list
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => {
-              setEditing(null);
-              setShowBulk(false);
-              setShowGoodshuffle(false);
-              setShowForm(true);
-            }}
-          >
-            Register equipment
-          </button>
-        </div>
-      </header>
+          </>
+        }
+        actions={
+          <>
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                setEditing(null);
+                setShowForm(false);
+                setShowGoodshuffle(false);
+                setShowBulk(true);
+              }}
+              data-testid="equipment-open-bulk"
+            >
+              Paste a pack list
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                setEditing(null);
+                setShowForm(false);
+                setShowBulk(false);
+                setShowGoodshuffle(true);
+              }}
+              data-testid="equipment-open-goodshuffle"
+            >
+              Bring in an item list
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={() => {
+                setEditing(null);
+                setShowBulk(false);
+                setShowGoodshuffle(false);
+                setShowForm(true);
+              }}
+            >
+              Register equipment
+            </button>
+          </>
+        }
+      />
       <FacilitiesWorkspaceNav />
       {host}
       {failure ? <SupplyFailureBanner error={failure} /> : null}

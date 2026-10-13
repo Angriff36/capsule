@@ -438,12 +438,17 @@ Screens (37): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `queries.listCreditMemoBySourceInvoiceId` - live read
 - `queries.listDateHoldByHoldDate` - live read
 - `queries.listDateWaitlistEntryByHoldDate` - live read
+- `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
 - `queries.listEventCloseoutByEventId` - live read
 - `queries.listEventCloseoutByTenantIdAndStatus` - live read
+- `queries.listEventGuestByEventId` - live read
 - `queries.listEventNumberAssignmentByEventId` - live read
+- `queries.listEventStaffNeedByEventId` - live read
 - `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIngredientDemandByEventId` - live read
 - `queries.listInvoiceByClientId` - live read
 - `queries.listInvoiceByEventId` - live read
 - `queries.listInvoiceByTenantIdAndStatus` - live read
@@ -457,6 +462,7 @@ Screens (37): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `queries.listPaymentByInvoiceId` - live read
 - `queries.listPayrollExportRecordByPersonId` - live read
 - `queries.listPayrollInputByEventId` - live read
+- `queries.listPrepTaskByEventId` - live read
 - `queries.listProposalByClientId` - live read
 - `queries.listProposalByEventId` - live read
 - `queries.listProposalDishSelectionByProposalId` - live read
@@ -465,10 +471,13 @@ Screens (37): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `queries.listProposalRevisionByProposalId` - live read
 - `queries.listProposalTemplate` - live read
 - `queries.listQuoteSubmissionByTenantIdAndStatus` - live read
+- `queries.listRentalOrderLineByEventId` - live read
 - `queries.listRevenueAttributionByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
 - `queries.listSavedReportSnapshotBySavedReportDefinitionId` - live read
 - `queries.listServiceStyle` - live read
 - `queries.listShareLinkByProposalId` - live read
+- `queries.listShiftByEventId` - live read
 - `queries.listSignatureRequestByProposalRevisionId` - live read
 - `queries.listTastingDishByTastingId` - live read
 - `queries.listVenue` - live read
@@ -655,6 +664,7 @@ Screens (37): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `lib.proposalGenerate.generateProposalDraft` - mutation; authored step; live reads update by themselves
 - `lib.proposalHistoricalAcceptance.recordImportedAcceptance` - mutation; authored step; live reads update by themselves
 - `lib.proposalPictures.forProposal` - query; live read, updates by itself
+- `lib.proposalPreview.previewProposalFromEvent` - query; live read, updates by itself
 - `lib.proposalPricing.addProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
 - `lib.proposalPricing.listRentalItems` - query; live read, updates by itself
 - `lib.proposalPricing.removeProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
@@ -681,7 +691,7 @@ Screens (37): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 
 ## 3. Event overview
 
-Screens (67): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDashboard.tsx`, `events/dashboard/eventDashFacts.ts`, `events/dashboard/EventDashHero.tsx`, `events/dashboard/EventDashNav.tsx`, `events/dashboard/EventDashOverview.tsx`, `events/dashboard/EventDashPipeline.tsx`, `events/dashboard/EventDashSheet.tsx`, `events/dashboard/EventDashSheets.tsx`, `events/dashboard/eventDashTypes.ts`, `events/dashboard/EventPhoneBrief.tsx`, `events/dashboard/eventStageGate.ts`, `events/dashboard/EventStageRail.tsx`, `events/dashboard/useEventDayForecast.ts`, `events/EventArchiveMenuItems.tsx`, `events/EventChecklistsPage.tsx`, `events/EventClientBillingPanel.tsx`, `events/EventClientContactsPanel.tsx`, `events/EventClientForm.tsx`, `events/EventClientHistoryPanel.tsx`, `events/EventClientRatingCard.tsx`, `events/EventClientTab.tsx`, `events/EventCreateInlineForms.tsx`, `events/EventCreatePage.tsx`, `events/EventCreateServiceStyleField.tsx`, `events/EventCreateServiceStyleResolver.ts`, `events/EventCreateStandardList.tsx`, `events/EventCreateWizard.tsx`, `events/EventDetailPage.tsx`, `events/EventDetailReviseContactPanels.tsx`, `events/EventDetailRevisePanels.tsx`, `events/EventDetailsCard.tsx`, `events/EventDuplicateMenuItem.tsx`, `events/EventFormCluster.tsx`, `events/EventGuestInviteForm.tsx`, `events/EventGuestMealCard.tsx`, `events/EventGuestPanel.tsx`, `events/EventGuestPolicy.ts`, `events/EventGuestRow.tsx`, `events/EventGuestSidebar.tsx`, `events/EventHistoryTab.tsx`, `events/EventIncidentCard.tsx`, `events/EventIncidentPanel.tsx`, `events/EventIncidentSummaryAside.tsx`, `events/EventOverviewCard.tsx`, `events/EventOverviewRail.tsx`, `events/EventReadinessCard.tsx`, `events/EventRequirementsPanel.tsx`, `events/EventServiceStyleForm.tsx`, `events/EventSetupNotesPanel.tsx`, `events/EventSetupProgress.tsx`, `events/EventsListPage.tsx`, `events/EventSourceProvenancePanel.tsx`, `events/EventTodosTab.tsx`, `events/EventTrackerPage.tsx`, `events/EventWeatherChip.tsx`, `events/planning/PlanningBoardPage.tsx`, `events/planning/PlanningSchedule.tsx`, `events/planning/PlanningSetupPage.tsx`, `events/planning/StageMovesSection.tsx`, `events/planning/usePlanSnapshot.ts`, `events/tracker/EventTrackerHome.tsx`, `events/tracker/EventTrackerSheet.tsx`, `events/tracker/TrackerRigCells.tsx`, `events/tracker/trackerSheet.ts`, `events/tracker/TrackerSheetRow.tsx`, `events/tracker/useTrackerRowActions.ts`
+Screens (68): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDashboard.tsx`, `events/dashboard/eventDashFacts.ts`, `events/dashboard/EventDashHero.tsx`, `events/dashboard/EventDashNav.tsx`, `events/dashboard/EventDashOverview.tsx`, `events/dashboard/EventDashPipeline.tsx`, `events/dashboard/EventDashSheet.tsx`, `events/dashboard/EventDashSheets.tsx`, `events/dashboard/eventDashTypes.ts`, `events/dashboard/EventPhoneBrief.tsx`, `events/dashboard/eventStageGate.ts`, `events/dashboard/EventStageRail.tsx`, `events/dashboard/useEventDayForecast.ts`, `events/EventArchiveMenuItems.tsx`, `events/EventChecklistsPage.tsx`, `events/EventClientBillingPanel.tsx`, `events/EventClientContactsPanel.tsx`, `events/EventClientForm.tsx`, `events/EventClientHistoryPanel.tsx`, `events/EventClientRatingCard.tsx`, `events/EventClientTab.tsx`, `events/EventCreateInlineForms.tsx`, `events/EventCreatePage.tsx`, `events/EventCreateServiceStyleField.tsx`, `events/EventCreateServiceStyleResolver.ts`, `events/EventCreateStandardList.tsx`, `events/EventCreateWizard.tsx`, `events/EventDetailPage.tsx`, `events/EventDetailReviseContactPanels.tsx`, `events/EventDetailRevisePanels.tsx`, `events/EventDetailsCard.tsx`, `events/EventDuplicateMenuItem.tsx`, `events/EventFormCluster.tsx`, `events/EventGuestInviteForm.tsx`, `events/EventGuestMealCard.tsx`, `events/EventGuestPanel.tsx`, `events/EventGuestPolicy.ts`, `events/EventGuestRow.tsx`, `events/EventGuestSidebar.tsx`, `events/EventHistoryTab.tsx`, `events/EventIncidentCard.tsx`, `events/EventIncidentPanel.tsx`, `events/EventIncidentSummaryAside.tsx`, `events/EventOverviewCard.tsx`, `events/EventOverviewRail.tsx`, `events/EventReadinessCard.tsx`, `events/EventRequirementsPanel.tsx`, `events/EventServiceStyleForm.tsx`, `events/EventSetupNotesPanel.tsx`, `events/EventSetupPage.tsx`, `events/EventSetupProgress.tsx`, `events/EventsListPage.tsx`, `events/EventSourceProvenancePanel.tsx`, `events/EventTodosTab.tsx`, `events/EventTrackerPage.tsx`, `events/EventWeatherChip.tsx`, `events/planning/PlanningBoardPage.tsx`, `events/planning/PlanningSchedule.tsx`, `events/planning/PlanningSetupPage.tsx`, `events/planning/StageMovesSection.tsx`, `events/planning/usePlanSnapshot.ts`, `events/tracker/EventTrackerHome.tsx`, `events/tracker/EventTrackerSheet.tsx`, `events/tracker/TrackerRigCells.tsx`, `events/tracker/trackerSheet.ts`, `events/tracker/TrackerSheetRow.tsx`, `events/tracker/useTrackerRowActions.ts`
 
 ### Generated reads
 
@@ -1455,6 +1465,7 @@ Screens (67): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `lib.eventPacket.commands.revisionUrl` - query; live read, updates by itself
 - `lib.eventPacket.commands.sourceUrl` - query; live read, updates by itself
 - `lib.proposalEventCreation.createEventFromAcceptedProposal` - mutation; authored step; live reads update by themselves
+- `lib.proposalPreview.previewProposalFromEvent` - query; live read, updates by itself
 - `logisticsWindow.deliveriesByStatus` - query; live read, updates by itself
 - `logisticsWindow.forEvents` - query; live read, updates by itself
 - `logisticsWindow.holdsForEquipment` - query; live read, updates by itself
@@ -2647,6 +2658,7 @@ Screens (176): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `lib.operationalTransactions.materializeEventMenuTemplate` - mutation; authored step; live reads update by themselves
 - `lib.operationalTransactions.reorderEventTimeline` - mutation; authored step; live reads update by themselves
 - `lib.operationalTransactions.scheduleEventTimeline` - mutation; authored step; live reads update by themselves
+- `lib.proposalPreview.previewProposalFromEvent` - query; live read, updates by itself
 - `lib.safeMaterialization.applyLayoutTemplate` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.applyPackTemplate` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.draftPurchaseOrder` - mutation; authored step; live reads update by themselves
@@ -2866,6 +2878,7 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 - `lib.operationalTransactions.materializeEventMenuTemplate` - mutation; authored step; live reads update by themselves
 - `lib.operationalTransactions.reorderEventTimeline` - mutation; authored step; live reads update by themselves
 - `lib.operationalTransactions.scheduleEventTimeline` - mutation; authored step; live reads update by themselves
+- `lib.proposalPreview.previewProposalFromEvent` - query; live read, updates by itself
 - `shiftTimingChanges.applyShiftTimingChange` - mutation; authored step; live reads update by themselves
 - `shiftTimingChanges.keepShiftTime` - mutation; authored step; live reads update by themselves
 - `shiftTimingChanges.listEventShiftChanges` - query; live read, updates by itself
@@ -3695,6 +3708,7 @@ Screens (75): `events/EventStaffBilling.tsx`, `events/EventStaffingAddForm.tsx`,
 - `lib.eventPacket.finalLock.myFieldForms` - query; live read, updates by itself
 - `lib.eventPacket.finalLock.prepareFieldForms` - mutation; authored step; live reads update by themselves
 - `lib.eventPriceList.forEvent` - query; live read, updates by itself
+- `lib.proposalPreview.previewProposalFromEvent` - query; live read, updates by itself
 - `lib.proposalPricing.addProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
 - `lib.proposalPricing.reviseProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
 - `personEmail.correctStaffEmail` - action; one-time call (not live); the live reads it changes update by themselves
@@ -4588,6 +4602,7 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
 - `facilitiesHistoryWindow.vehicleOdometers` - query; live read, updates by itself
 - `facilitiesHistoryWindow.venueEvents` - query; live read, updates by itself
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
+- `lib.proposalPreview.previewProposalFromEvent` - query; live read, updates by itself
 - `lib.safeMaterialization.applyLayoutTemplate` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.applyPackTemplate` - mutation; authored step; live reads update by themselves
 - `lib.safeMaterialization.draftPurchaseOrder` - mutation; authored step; live reads update by themselves
@@ -4710,6 +4725,7 @@ Screens (13): `events/packet/EventPacketPanel.tsx`, `events/packet/EventWorkbook
 - `lib.eventPacket.finalLock.myFieldForms` - query; live read, updates by itself
 - `lib.eventPacket.finalLock.overrideFinalLockAnswer` - mutation; authored step; live reads update by themselves
 - `lib.eventPacket.finalLock.prepareFieldForms` - mutation; authored step; live reads update by themselves
+- `lib.proposalPreview.previewProposalFromEvent` - query; live read, updates by itself
 
 ## 10. Billing and closeout
 
@@ -5241,6 +5257,7 @@ Screens (71): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `laborSummary.listPayRates` - query; live read, updates by itself
 - `laborSummary.payrollTimeRecords` - query; live read, updates by itself
 - `laborSummary.personPeriodLaborSummary` - query; live read, updates by itself
+- `lib.proposalPreview.previewProposalFromEvent` - query; live read, updates by itself
 - `planWindow.forEvents` - query; live read, updates by itself
 - `recipeWindow.dishTaskMaterials` - query; live read, updates by itself
 - `recipeWindow.latestPriceObservations` - query; live read, updates by itself

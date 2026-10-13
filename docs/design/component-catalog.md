@@ -25,6 +25,9 @@ the Storybook build; this checks compilation, not visual or interaction behavior
 | Event stage and readiness checks | `src/features/events/dashboard/EventStageRail.tsx` | Colocated `EventStageRail.stories.tsx` |
 | Kitchen prep checklist row | `src/features/kitchen/PrepTaskRow.tsx` | Colocated `PrepTaskRow.stories.tsx` |
 | Printable bar label and QR code for equipment, trucks and events | `src/ui/BarcodeLabel.tsx` | `src/ui/BarcodeLabel.stories.tsx` |
+| Area tab strip with one More menu for occasional tabs | `src/ui/WorkspaceTabs.tsx` | `src/ui/WorkspaceTabs.stories.tsx` |
+| A screen folded into another page (one h2, an anchor the old URL redirects to; the folded page reads `useEmbedded()` from `src/ui/embedded.ts` to drop its own title and area nav) | `src/ui/MergedSection.tsx` | `src/ui/MergedSection.stories.tsx` |
+| Redirect for a moved screen, keeping IDs, query and an optional #section | `src/app/MovedRoute.tsx` | — (route helper) |
 
 ## Dropdown usage
 

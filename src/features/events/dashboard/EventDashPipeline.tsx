@@ -123,7 +123,7 @@ function Pipeline({
             {byHand.has(nextMove.to)
               ? `${nextMove.label} is a step a person takes. `
               : `Moves to ${nextMove.label} by itself: ${lowerFirst(nextMove.when)} `}
-            <Link className="text-link" to="/events/planning/setup#stage-moves">
+            <Link className="text-link" to="/events/setup#stage-moves">
               Change
             </Link>
           </span>

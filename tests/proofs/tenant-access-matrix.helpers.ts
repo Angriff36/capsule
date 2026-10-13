@@ -190,6 +190,9 @@ const LINK_TABLE: Record<string, string> = {
   completedById: "@sign-in",
   completedByPersonId: "people",
   closedByPersonId: "people",
+  // Screen comments (PageFeedback): who left the comment.
+  leftById: "@sign-in",
+  leftByPersonId: "people",
   openedByPersonId: "people",
   setByPersonId: "people",
   confirmedByUserId: "@sign-in",

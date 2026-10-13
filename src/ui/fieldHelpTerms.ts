@@ -26,7 +26,10 @@ export const FIELD_HELP: Record<FieldHelpTerm, FieldHelpEntry> = {
     body: "How much one batch of this recipe makes, in the yield unit. Ingredient amounts are per batch, so event demand divides what a dish needs by this number to count batches.",
     example:
       "A soup that makes 5 gal per batch: a dish that needs 10 gal asks for 2 batches, so every ingredient doubles. Enter 1 gal by mistake and it asks for 10 batches.",
-    link: { href: "/inventory/demand", label: "See yield in a demand formula" },
+    link: {
+      href: "/inventory/purchasing#demand",
+      label: "See yield in a demand formula",
+    },
   },
   dishYield: {
     title: "Yield on this dish",
@@ -34,7 +37,7 @@ export const FIELD_HELP: Record<FieldHelpTerm, FieldHelpEntry> = {
     example:
       "Yield 50 with batch multiplier 1: a 100-guest event makes 2 batches of the subrecipe.",
     link: {
-      href: "/inventory/demand",
+      href: "/inventory/purchasing#demand",
       label: "See batches in a demand formula",
     },
   },
@@ -44,7 +47,7 @@ export const FIELD_HELP: Record<FieldHelpTerm, FieldHelpEntry> = {
     example:
       "Yield 50 portions with batch multiplier 2: a 100-guest event makes 4 batches. Use 1 unless one batch does not cover the yield.",
     link: {
-      href: "/inventory/demand",
+      href: "/inventory/purchasing#demand",
       label: "See the multiplier in a demand formula",
     },
   },
@@ -54,7 +57,7 @@ export const FIELD_HELP: Record<FieldHelpTerm, FieldHelpEntry> = {
     example:
       "A 100-guest event with dishes needing 20 lb of vegetables creates that ingredient demand before a buyer opens a purchase need.",
     link: {
-      href: "/inventory/demand",
+      href: "/inventory/purchasing#demand",
       label: "See the event-to-purchase cascade",
     },
   },
@@ -64,7 +67,7 @@ export const FIELD_HELP: Record<FieldHelpTerm, FieldHelpEntry> = {
     example:
       "After a menu change, supersede the old chicken demand with the regenerated line rather than deleting the original evidence.",
     link: {
-      href: "/inventory/demand",
+      href: "/inventory/purchasing#demand",
       label: "See the event-to-purchase cascade",
     },
   },
@@ -91,7 +94,7 @@ export const FIELD_HELP: Record<FieldHelpTerm, FieldHelpEntry> = {
     example:
       "A batch planned for 10 gal that produces 8 gal has a -2 gal yield variance.",
     link: {
-      href: "/kitchen/yield",
+      href: "/kitchen/plan#yield",
       label: "See the event-to-purchase cascade",
     },
   },

@@ -5,6 +5,8 @@ import {
   useState,
   type FormEvent,
 } from "react";
+import { MergedSection } from "../../ui/MergedSection";
+import { KitchenCatalogCleanupPage } from "./KitchenCatalogCleanupPage";
 import { Link, useNavigate } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import { useGenerateUploadUrl } from "../../lib/fileStorageClient";
@@ -31,7 +33,7 @@ import {
   useMenuUnpublish,
 } from "../../lib/manifest-convex-react";
 import { useDishPages, useDishSearch } from "../../lib/useDishesByIds";
-import { TableSkeleton } from "../../ui/primitives";
+import { PageHeader, TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { useSuccessToast } from "../../ui/useSuccessToast";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
@@ -499,29 +501,27 @@ function KitchenCatalogPageContent({
   };
   return (
     <div className="component-book-stage culinary-studio">
-      <header className="component-book-masthead">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight text-ink">
-            {title}
-          </h1>
-          <p className="mt-0.5 text-sm text-ink-2">{subtitle}</p>
-        </div>
-        <div className="component-book-masthead-actions">
-          {section === "components" ? (
-            <Link to={COMPONENT_IMPORT_PATH} className="btn btn-ghost">
-              Import recipe
-            </Link>
-          ) : null}
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowCreate((value) => !value)}
-          >
-            {showCreate
-              ? "Close form"
-              : `New ${KITCHEN_SECTION_SINGULAR[section]}`}
-          </button>
-        </div>
-      </header>
+      <PageHeader
+        title={<>{title}</>}
+        lead={<>{subtitle}</>}
+        actions={
+          <>
+            {section === "components" ? (
+              <Link to={COMPONENT_IMPORT_PATH} className="btn btn-ghost">
+                Import recipe
+              </Link>
+            ) : null}
+            <button
+              className="btn btn-primary"
+              onClick={() => setShowCreate((value) => !value)}
+            >
+              {showCreate
+                ? "Close form"
+                : `New ${KITCHEN_SECTION_SINGULAR[section]}`}
+            </button>
+          </>
+        }
+      />
 
       <KitchenBookNav />
       {host}
@@ -653,6 +653,15 @@ function KitchenCatalogPageContent({
           />
         )}
       </section>
+      {section === "ingredients" ? (
+        <MergedSection
+          id="cleanup"
+          title="Catalog cleanup"
+          summary="Records filed as the wrong kind, waiting for a yes or no."
+        >
+          <KitchenCatalogCleanupPage />
+        </MergedSection>
+      ) : null}
     </div>
   );
 }

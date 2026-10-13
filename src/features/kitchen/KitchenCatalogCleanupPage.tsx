@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import {
   RECLASSIFY_KIND_LABEL,
   RECLASSIFY_KINDS,
@@ -198,6 +199,7 @@ function GroupSection({
 
 /** Review and apply what each imported TPP menu row really is. */
 export function KitchenCatalogCleanupPage() {
+  const embedded = useEmbedded();
   const plan = useCatalogReclassificationPlan();
   const decide = useDecideCatalogReclassification();
   const apply = useApplyCatalogReclassification();
@@ -267,20 +269,24 @@ export function KitchenCatalogCleanupPage() {
 
   return (
     <div className="component-book-stage culinary-studio">
-      <header className="component-book-masthead">
-        <div>
-          <p className="eyebrow">Culinary book · Cleanup</p>
-          <h1 className="display-title mt-2">Catalog cleanup</h1>
-          <p className="mt-3 max-w-150 text-ink-2">
-            Imported TPP menu rows sorted into what they really are. The TPP
-            import map and the rules decided most; Jev suggested the rest.
-            Approve a group, then apply. A row that stops being a dish is
-            retired, never deleted, and its link names the new item.
-          </p>
-        </div>
-      </header>
+      {embedded ? null : (
+        <>
+          <header className="component-book-masthead">
+            <div>
+              <p className="eyebrow">Culinary book · Cleanup</p>
+              <h1 className="display-title mt-2">Catalog cleanup</h1>
+              <p className="mt-3 max-w-150 text-ink-2">
+                Imported TPP menu rows sorted into what they really are. The TPP
+                import map and the rules decided most; Jev suggested the rest.
+                Approve a group, then apply. A row that stops being a dish is
+                retired, never deleted, and its link names the new item.
+              </p>
+            </div>
+          </header>
 
-      <KitchenBookNav />
+          <KitchenBookNav />
+        </>
+      )}
       {host}
 
       {failure ? (

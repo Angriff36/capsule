@@ -1,3 +1,4 @@
+import { useEmbedded } from "../../ui/embedded";
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { formatCountNoun, formatDate } from "../../lib/format";
@@ -58,6 +59,7 @@ const show = (value: number) =>
  * them up across events.
  */
 export function ReturnsPage() {
+  const embedded = useEmbedded();
   // Loads, holds and issues of the events of the days shown (and every open
   // issue), older days only when asked; not every row the company ever had.
   const [days, setDays] = useState(RETURNS_PAGE_DAYS);
@@ -268,16 +270,8 @@ export function ReturnsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        eyebrow="Logistics · Returns"
-        title="Returns"
-        lead="What went out in the days shown, what still has to be counted back in, and what was lost or broken."
-        facts={[
-          { label: "Coming back", value: loading ? "…" : open.length },
-          { label: "Lost or broken", value: loading ? "…" : problemCount },
-          { label: "Counted", value: loading ? "…" : done.length },
-        ]}
-        actions={
+      {embedded ? (
+        <div className="flex flex-wrap items-center gap-2">
           <div className="dispatch-switch" role="tablist" aria-label="Show">
             {TABS.map((entry) => (
               <button
@@ -297,9 +291,43 @@ export function ReturnsPage() {
               </button>
             ))}
           </div>
-        }
-      />
-      <LogisticsWorkspaceNav />
+        </div>
+      ) : (
+        <>
+          <PageHeader
+            eyebrow="Logistics · Returns"
+            title="Returns"
+            lead="What went out in the days shown, what still has to be counted back in, and what was lost or broken."
+            facts={[
+              { label: "Coming back", value: loading ? "…" : open.length },
+              { label: "Lost or broken", value: loading ? "…" : problemCount },
+              { label: "Counted", value: loading ? "…" : done.length },
+            ]}
+            actions={
+              <div className="dispatch-switch" role="tablist" aria-label="Show">
+                {TABS.map((entry) => (
+                  <button
+                    key={entry.key}
+                    type="button"
+                    role="tab"
+                    aria-selected={tab === entry.key}
+                    data-active={tab === entry.key || undefined}
+                    onClick={() => {
+                      const next = new URLSearchParams(params);
+                      if (entry.key === "open") next.delete("show");
+                      else next.set("show", entry.key);
+                      setParams(next, { replace: true });
+                    }}
+                  >
+                    {entry.label}
+                  </button>
+                ))}
+              </div>
+            }
+          />
+          <LogisticsWorkspaceNav />
+        </>
+      )}
 
       {loading ? (
         <TableSkeleton rows={4} />

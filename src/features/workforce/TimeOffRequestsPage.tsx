@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import {
   useListPerson,
   useTimeOffRequestApprove,
@@ -32,6 +33,7 @@ const formatRange = (startsAt?: number | null, endsAt?: number | null) => {
 };
 
 export function TimeOffRequestsPage() {
+  const embedded = useEmbedded();
   // Every request still waiting, and only the reviewed ones listed.
   const waiting = useTimeOffRequestsWithStatus(
     useAuthStatus()?.tenantId,
@@ -104,25 +106,29 @@ export function TimeOffRequestsPage() {
   return (
     <div className="operations-stage supply-stage">
       {host}
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Staff · Time off</p>
-          <h1 className="display-title mt-2">Time-off review desk</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Review staff requests in one pass. Approval immediately protects the
-            covered dates from new shift assignments.
-          </p>
-        </div>
-        <div className="rounded-sm border border-brand/20 bg-brand-soft px-5 py-4 text-center">
-          <p className="text-3xl leading-none font-semibold text-brand">
-            {pending.length}
-          </p>
-          <p className="mt-1 text-xs font-medium tracking-wide text-ink-2 uppercase">
-            Awaiting review
-          </p>
-        </div>
-      </header>
-      <WorkforceWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <header className="supply-masthead">
+            <div>
+              <p className="eyebrow">Staff · Time off</p>
+              <h1 className="display-title mt-2">Time-off review desk</h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                Review staff requests in one pass. Approval immediately protects
+                the covered dates from new shift assignments.
+              </p>
+            </div>
+            <div className="rounded-sm border border-brand/20 bg-brand-soft px-5 py-4 text-center">
+              <p className="text-3xl leading-none font-semibold text-brand">
+                {pending.length}
+              </p>
+              <p className="mt-1 text-xs font-medium tracking-wide text-ink-2 uppercase">
+                Awaiting review
+              </p>
+            </div>
+          </header>
+          <WorkforceWorkspaceNav />
+        </>
+      )}
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
 
       <section className="working-ledger" data-testid="time-off-review-queue">

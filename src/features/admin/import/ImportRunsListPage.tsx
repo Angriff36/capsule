@@ -1,10 +1,12 @@
 import { useMemo, useState, type FormEvent } from "react";
+import { MergedSection } from "../../../ui/MergedSection";
+import { TppUploadPage } from "./TppUploadPage";
 import { Link } from "react-router-dom";
 import { useAction, useMutation, usePaginatedQuery } from "convex/react";
 import { useImportRunMarkFailed } from "../../../lib/manifest-convex-react";
 import { api } from "../../../lib/api";
 import { importRunDetailPath } from "./importRoutes";
-import { StatusChip, TableSkeleton } from "../../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../../ui/primitives";
 import { useActionPrompt } from "../../../ui/action-prompt";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionNotice, useActionFailure } from "../../../ui/action-result";
@@ -220,28 +222,30 @@ export function ImportRunsListPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Import</p>
-          <h1 className="display-title mt-2">Imports</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Bring data over from your old systems (TPP, CSV files, connected
-            apps). Follow each import's progress, review what came in, and save
-            it when it looks right.
-          </p>
-        </div>
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={() => setShowForm(!showForm)}
-            className="btn btn-primary"
-          >
-            {showForm ? "Cancel" : "New import"}
-          </button>
-        </div>
-      </header>
+      <PageHeader
+        title="Imports"
+        lead="Bring data over from your old systems (TPP, CSV files, connected apps): upload a TPP export, follow each import, review what came in, and save it."
+        actions={
+          <>
+            <button
+              type="button"
+              onClick={() => setShowForm(!showForm)}
+              className="btn btn-primary"
+            >
+              {showForm ? "Cancel" : "New import"}
+            </button>
+          </>
+        }
+      />
 
       <AdminWorkspaceNav />
+      <MergedSection
+        id="tpp"
+        title="Upload a TPP export"
+        summary="Bring in a TPP account export."
+      >
+        <TppUploadPage />
+      </MergedSection>
 
       {host}
 

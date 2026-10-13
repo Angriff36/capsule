@@ -1,4 +1,5 @@
 import { useClientsByIds } from "../../lib/useClientDirectory";
+import { useEmbedded } from "../../ui/embedded";
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { formatCount } from "../../lib/format";
@@ -55,6 +56,7 @@ function lines(value: string): string[] | undefined {
 }
 
 export function EventTemplatesPage() {
+  const embedded = useEmbedded();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const fromEventId = searchParams.get("fromEvent")?.trim() || "";
@@ -196,16 +198,8 @@ export function EventTemplatesPage() {
 
   return (
     <div className="space-y-4">
-      <Link
-        to="/events"
-        className="inline-flex items-center gap-1.5 text-sm text-ink-3 hover:text-ink"
-      >
-        <ArrowLeftIcon width={12} height={12} /> All events
-      </Link>
-      <PageHeader
-        title="Event templates"
-        lead="Starting points for the kinds of events you do often. Each one fills in the client type, guest count, menu, staff and equipment for you."
-        actions={
+      {embedded ? (
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             className="btn btn-primary"
@@ -216,8 +210,33 @@ export function EventTemplatesPage() {
           >
             <PlusIcon /> New template
           </button>
-        }
-      />
+        </div>
+      ) : (
+        <>
+          <Link
+            to="/events"
+            className="inline-flex items-center gap-1.5 text-sm text-ink-3 hover:text-ink"
+          >
+            <ArrowLeftIcon width={12} height={12} /> All events
+          </Link>
+          <PageHeader
+            title="Event templates"
+            lead="Starting points for the kinds of events you do often. Each one fills in the client type, guest count, menu, staff and equipment for you."
+            actions={
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => {
+                  setEditing(null);
+                  setShowForm(true);
+                }}
+              >
+                <PlusIcon /> New template
+              </button>
+            }
+          />
+        </>
+      )}
 
       {failure ? <FailureBanner failure={failure} /> : null}
       {host}

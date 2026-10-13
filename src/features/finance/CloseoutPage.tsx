@@ -12,7 +12,7 @@ import {
   useInvoicesForEvents,
   usePagedRows,
 } from "../../lib/financeScopedQueries";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import {
   formatCountNoun,
   formatDate,
@@ -279,36 +279,37 @@ export function CloseoutPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Finance · Closeout</p>
-          <h1 className="display-title mt-2">Event closeouts</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Event closeouts"
+        lead={
+          <>
             Capture revenue, cost, and headcount for a closed-out event, then
             finalize to freeze the folio. The numbers come from the event's
             invoices, payments, deliveries, clocked time, rentals and guest
             check-ins; you only fill in what they can't answer.
-          </p>
-        </div>
-        <div className="supply-row-actions">
-          <button
-            className="btn btn-ghost"
-            type="button"
-            onClick={() => setShowFinalized((value) => !value)}
-          >
-            {showFinalized ? "Hide finalized" : "Show finalized"}
-          </button>
-          <button
-            className="btn btn-primary"
-            type="button"
-            onClick={() =>
-              showCapture ? setShowCapture(false) : openCapture()
-            }
-          >
-            {showCapture ? "Close form" : "Capture closeout"}
-          </button>
-        </div>
-      </header>
+          </>
+        }
+        actions={
+          <>
+            <button
+              className="btn btn-ghost"
+              type="button"
+              onClick={() => setShowFinalized((value) => !value)}
+            >
+              {showFinalized ? "Hide finalized" : "Show finalized"}
+            </button>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={() =>
+                showCapture ? setShowCapture(false) : openCapture()
+              }
+            >
+              {showCapture ? "Close form" : "Capture closeout"}
+            </button>
+          </>
+        }
+      />
       <FinanceWorkspaceNav />
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (

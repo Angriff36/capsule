@@ -1,4 +1,9 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { MergedSection } from "../../ui/MergedSection";
+import { EmbeddedContext } from "../../ui/embedded";
+import { InventoryAuditLogPage } from "./InventoryAuditLogPage";
+import { InventoryOverviewPage } from "./InventoryOverviewPage";
+import { StorageLocationsPage } from "./StorageLocationsPage";
 import { SearchSelect } from "../../ui/SearchSelect";
 import { inPickerWindow } from "../facilities/usePickerAndNamedEvents";
 import {
@@ -23,7 +28,7 @@ import {
 import { useStockLines } from "../facilities/useInventoryHistory";
 import { formatQuantity, formatCountNoun, formatDate } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { StockReceiptScanner } from "./StockReceiptScanner";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
@@ -606,49 +611,48 @@ export function StockBookPage() {
   return (
     <IngredientCatalogImageProvider ingredients={ingredients}>
       <div className="operations-stage supply-stage">
-        <header className="supply-masthead">
-          <div>
-            <p className="eyebrow">Inventory · Stock book</p>
-            <h1 className="display-title mt-2">What the house holds</h1>
-            <p className="mt-3 max-w-160 text-ink-2">
-              Stock by ingredient and storage location, with event reservations
-              kept beside the quantity they claim.
-            </p>
-          </div>
-          <div className="supply-masthead-actions">
-            <button
-              className="btn btn-ghost"
-              disabled={busy != null || inventorySettings === undefined}
-              onClick={toggleStockTracking}
-              title={
-                stockLevelsTracked
-                  ? "Reservations must fit the free stock. Turn off if you do not keep stock counts up to date."
-                  : "Reservations are not checked against stock. Turn on after a fresh count."
-              }
-            >
-              {stockLevelsTracked ? "Stock checks: on" : "Stock checks: off"}
-            </button>
-            <button
-              className="btn btn-ghost"
-              onClick={() => setForm("location")}
-            >
-              New location
-            </button>
-            <button
-              className="btn btn-ghost"
-              onClick={() => setForm("reserve")}
-            >
-              Reserve
-            </button>
-            <button
-              className="btn btn-primary"
-              onClick={() => setForm("stock")}
-            >
-              Open stock line
-            </button>
-          </div>
-        </header>
+        <PageHeader
+          title="Stock"
+          lead="Stock by ingredient and storage location, with event reservations beside the quantity they claim, every change, and the storage locations themselves."
+          actions={
+            <>
+              <button
+                className="btn btn-ghost"
+                disabled={busy != null || inventorySettings === undefined}
+                onClick={toggleStockTracking}
+                title={
+                  stockLevelsTracked
+                    ? "Reservations must fit the free stock. Turn off if you do not keep stock counts up to date."
+                    : "Reservations are not checked against stock. Turn on after a fresh count."
+                }
+              >
+                {stockLevelsTracked ? "Stock checks: on" : "Stock checks: off"}
+              </button>
+              <button
+                className="btn btn-ghost"
+                onClick={() => setForm("location")}
+              >
+                New location
+              </button>
+              <button
+                className="btn btn-ghost"
+                onClick={() => setForm("reserve")}
+              >
+                Reserve
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={() => setForm("stock")}
+              >
+                Open stock line
+              </button>
+            </>
+          }
+        />
         <InventoryWorkspaceNav />
+        <EmbeddedContext.Provider value={true}>
+          <InventoryOverviewPage />
+        </EmbeddedContext.Provider>
         <aside className="supply-degraded" role="note">
           <strong>Live stock facts</strong>
           <span>
@@ -1172,6 +1176,20 @@ export function StockBookPage() {
             </div>
           ) : null}
         </section>
+        <MergedSection
+          id="locations"
+          title="Storage locations"
+          summary="Fridges, freezers and dry stores, with their target temperatures."
+        >
+          <StorageLocationsPage />
+        </MergedSection>
+        <MergedSection
+          id="history"
+          title="Stock history"
+          summary="Every change to stock: who, when, and the amount before and after."
+        >
+          <InventoryAuditLogPage />
+        </MergedSection>
       </div>
     </IngredientCatalogImageProvider>
   );

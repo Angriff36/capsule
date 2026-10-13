@@ -1,4 +1,7 @@
+import { ReturnsPage } from "./ReturnsPage";
 import { packListName } from "./packListName";
+import { MergedSection } from "../../ui/MergedSection";
+import { PackingFloorPage } from "./PackingFloorPage";
 import { SearchSelect } from "../../ui/SearchSelect";
 import { inPickerWindow } from "../facilities/usePickerAndNamedEvents";
 import { useState, type FormEvent } from "react";
@@ -14,7 +17,7 @@ import {
   usePackListStartPacking,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
@@ -182,33 +185,37 @@ export function PackListsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Logistics · Pack lists</p>
-          <h1 className="display-title mt-2">Event pack lists</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Open a pack list for an event, pack items on the load sheet, then
-            mark packed, loaded, and dispatched before scheduling delivery.
-          </p>
-        </div>
-        <div className="supply-row-actions">
-          <button
-            className="btn btn-ghost"
-            type="button"
-            onClick={() => setListState({ cancelled: !showCancelled })}
-          >
-            {showCancelled ? "Hide cancelled" : "Show cancelled"}
-          </button>
-          <button
-            className="btn btn-primary"
-            type="button"
-            onClick={() => setShowCreate((value) => !value)}
-          >
-            {showCreate ? "Close form" : "Open pack list"}
-          </button>
-        </div>
-      </header>
+      <PageHeader
+        title="Pack lists"
+        lead="Open a pack list for an event, pack items on the load sheet, then mark packed, loaded, and dispatched before scheduling delivery."
+        actions={
+          <>
+            <button
+              className="btn btn-ghost"
+              type="button"
+              onClick={() => setListState({ cancelled: !showCancelled })}
+            >
+              {showCancelled ? "Hide cancelled" : "Show cancelled"}
+            </button>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={() => setShowCreate((value) => !value)}
+            >
+              {showCreate ? "Close form" : "Open pack list"}
+            </button>
+          </>
+        }
+      />
       <LogisticsWorkspaceNav />
+      <MergedSection
+        id="floor"
+        title="On the packing floor now"
+        summary="Lists being packed or loaded right now, soonest event first."
+        defaultOpen
+      >
+        <PackingFloorPage />
+      </MergedSection>
       {failure ? <LogisticsFailureBanner error={failure} /> : null}
       {notice ? (
         <p className="mt-3 text-base text-ink-2" role="status">
@@ -376,6 +383,13 @@ export function PackListsPage() {
           </div>
         ) : null}
       </section>
+      <MergedSection
+        id="returns"
+        title="Returns"
+        summary="What still has to come back after events, and what was lost or broken."
+      >
+        <ReturnsPage />
+      </MergedSection>
     </div>
   );
 }

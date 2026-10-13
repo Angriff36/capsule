@@ -1,4 +1,6 @@
 import { useState, type CSSProperties, type FormEvent } from "react";
+import { MergedSection } from "../../ui/MergedSection";
+import { QualificationsPage } from "./QualificationsPage";
 import {
   useCreateShiftType,
   useCreateTrainingCompletion,
@@ -7,7 +9,7 @@ import {
   useListShiftType,
   useListTrainingModule,
 } from "../../lib/manifest-convex-react";
-import { TableSkeleton } from "../../ui/primitives";
+import { PageHeader, TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { reportActionOk } from "../../ui/action-result";
@@ -174,40 +176,36 @@ export function TrainingPage() {
 
   return (
     <div className="operations-stage training-stage">
-      <header className="training-masthead">
-        <div>
-          <p className="eyebrow">Staff · Training</p>
-          <h1 className="display-title mt-2">Ready crew, proven skills.</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Build the training library, record passed assessments, and connect
-            safety-sensitive shift types to the proof they require.
-          </p>
-        </div>
-        <div className="training-actions" aria-label="Training actions">
-          <button
-            className="btn btn-primary"
-            onClick={() =>
-              setEditor(editor === "completion" ? null : "completion")
-            }
-          >
-            Record completion
-          </button>
-          <button
-            className="btn btn-secondary"
-            onClick={() => setEditor(editor === "module" ? null : "module")}
-          >
-            Define module
-          </button>
-          <button
-            className="btn btn-ghost"
-            onClick={() =>
-              setEditor(editor === "shiftType" ? null : "shiftType")
-            }
-          >
-            Define shift type
-          </button>
-        </div>
-      </header>
+      <PageHeader
+        title="Skills & training"
+        lead="Build the training library, record passed assessments, grant qualifications, and connect safety-sensitive shift types to the proof they require."
+        actions={
+          <>
+            <button
+              className="btn btn-primary"
+              onClick={() =>
+                setEditor(editor === "completion" ? null : "completion")
+              }
+            >
+              Record completion
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => setEditor(editor === "module" ? null : "module")}
+            >
+              Define module
+            </button>
+            <button
+              className="btn btn-ghost"
+              onClick={() =>
+                setEditor(editor === "shiftType" ? null : "shiftType")
+              }
+            >
+              Define shift type
+            </button>
+          </>
+        }
+      />
 
       <WorkforceWorkspaceNav />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
@@ -675,6 +673,13 @@ export function TrainingPage() {
           )}
         </section>
       </div>
+      <MergedSection
+        id="qualifications"
+        title="Qualifications"
+        summary="Certificates such as food handler cards, with expiry dates."
+      >
+        <QualificationsPage />
+      </MergedSection>
     </div>
   );
 }

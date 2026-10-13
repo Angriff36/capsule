@@ -3039,6 +3039,34 @@ export const PackSectionClaimComputedSchema = PackSectionClaimSchema.extend({
 export type PackSectionClaim = z.infer<typeof PackSectionClaimSchema>;
 export type PackSectionClaimWithComputed = z.infer<typeof PackSectionClaimComputedSchema>;
 
+// Entity: PageFeedback
+export const PageFeedbackSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  pagePath: z.string().default(""),
+  pageTitle: z.string().nullable().optional(),
+  targetLabel: z.string().nullable().optional(),
+  targetSelector: z.string().nullable().optional(),
+  offsetX: z.number().nullable().optional(),
+  offsetY: z.number().nullable().optional(),
+  viewportWidth: z.number().int().nullable().optional(),
+  kind: z.enum(["improvement", "missing", "broken"]).default("improvement"),
+  body: z.string().default(""),
+  status: z.enum(["open", "resolved"]).default("open"),
+  leftAt: z.coerce.date().nullable().optional(),
+  leftById: z.string().nullable().optional(),
+  leftByPersonId: z.string().uuid().nullable().optional(),
+  leftByName: z.string().nullable().optional(),
+  issueNumber: z.number().int().nullable().optional(),
+  issueUrl: z.string().nullable().optional(),
+  resolvedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type PageFeedback = z.infer<typeof PageFeedbackSchema>;
+
 // Entity: ParallelRunComparison
 export const ParallelRunComparisonSchema = z.object({
   id: z.string().uuid(),
@@ -10621,6 +10649,44 @@ export type PackSectionClaimTakeParams = z.infer<typeof PackSectionClaimTakePara
 export const PackSectionClaimTakeOverParamsSchema = z.object({});
 
 export type PackSectionClaimTakeOverParams = z.infer<typeof PackSectionClaimTakeOverParamsSchema>;
+
+// Command: leave on PageFeedback
+export const PageFeedbackLeaveParamsSchema = z.object({
+  pagePath: z.string(),
+  kind: z.enum(["improvement", "missing", "broken"]),
+  body: z.string(),
+  pageTitle: z.string().optional(),
+  targetLabel: z.string().optional(),
+  targetSelector: z.string().optional(),
+  offsetX: z.number().optional(),
+  offsetY: z.number().optional(),
+  viewportWidth: z.number().int().optional(),
+});
+
+export type PageFeedbackLeaveParams = z.infer<typeof PageFeedbackLeaveParamsSchema>;
+
+// Command: markResolved on PageFeedback
+export const PageFeedbackMarkResolvedParamsSchema = z.object({});
+
+export type PageFeedbackMarkResolvedParams = z.infer<typeof PageFeedbackMarkResolvedParamsSchema>;
+
+// Command: recordIssue on PageFeedback
+export const PageFeedbackRecordIssueParamsSchema = z.object({
+  issueNumber: z.number().int(),
+  issueUrl: z.string(),
+});
+
+export type PageFeedbackRecordIssueParams = z.infer<typeof PageFeedbackRecordIssueParamsSchema>;
+
+// Command: remove on PageFeedback
+export const PageFeedbackRemoveParamsSchema = z.object({});
+
+export type PageFeedbackRemoveParams = z.infer<typeof PageFeedbackRemoveParamsSchema>;
+
+// Command: reopen on PageFeedback
+export const PageFeedbackReopenParamsSchema = z.object({});
+
+export type PageFeedbackReopenParams = z.infer<typeof PageFeedbackReopenParamsSchema>;
 
 // Command: assign on ParallelRunDifference
 export const ParallelRunDifferenceAssignParamsSchema = z.object({

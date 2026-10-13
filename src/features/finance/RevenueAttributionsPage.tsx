@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { MergedSection } from "../../ui/MergedSection";
+import { CompMasterDashboardPage } from "../reports/CompMasterDashboardPage";
+import { VenueCommissionTermsPage } from "./VenueCommissionTermsPage";
 import { Link } from "react-router-dom";
 import {
   useRevenueAttributionApprove,
@@ -13,7 +16,7 @@ import {
   useRowsWithEmpty,
 } from "../../lib/financeScopedQueries";
 import { useActionPrompt } from "../../ui/action-prompt";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import {
   formatDate as formatDateShared,
   formatMoneyExact,
@@ -201,32 +204,20 @@ export function RevenueAttributionsPage() {
 
   return (
     <div className="operations-stage supply-stage tax-stage">
-      <header className="supply-masthead tax-masthead">
-        <div>
-          <p className="eyebrow">Finance · Attribution desk</p>
-          <h1 className="display-title mt-2">Revenue attribution</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Review and approve revenue splits to venues, salespeople, and
-            partners. Attribution applies to event revenue after approval.
-          </p>
-          <Link to="/finance/attribution/new" className="btn btn-primary mt-3">
-            Add revenue split
-          </Link>
-        </div>
-        <div className="tax-period-stamp" aria-label="Attribution status">
-          <span>Pending approval</span>
-          <strong>
-            {
-              configuredAttributions.filter(
-                (a) => a.status === "pending_approval",
-              ).length
-            }
-          </strong>
-          <small>
-            {`${configuredAttributions.filter((a) => a.appliedAt == null).length} open · ${configuredAttributions.filter((a) => a.appliedAt != null).length} applied shown`}
-          </small>
-        </div>
-      </header>
+      <PageHeader
+        title="Revenue attribution"
+        lead="Split event revenue between salespeople and venues, set venue commission terms, and see the commission each person earned."
+        actions={
+          <>
+            <Link
+              to="/finance/attribution/new"
+              className="btn btn-primary mt-3"
+            >
+              Add revenue split
+            </Link>
+          </>
+        }
+      />
       <FinanceWorkspaceNav />
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (
@@ -380,6 +371,20 @@ export function RevenueAttributionsPage() {
           </button>
         </div>
       ) : null}
+      <MergedSection
+        id="commission-terms"
+        title="Venue commission terms"
+        summary="Commission rate each venue earns, by date."
+      >
+        <VenueCommissionTermsPage />
+      </MergedSection>
+      <MergedSection
+        id="comp-master"
+        title="Commission by salesperson"
+        summary="Commission earned by each salesperson."
+      >
+        <CompMasterDashboardPage />
+      </MergedSection>
     </div>
   );
 }

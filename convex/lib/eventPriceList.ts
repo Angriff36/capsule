@@ -28,7 +28,7 @@ const cents = (value: unknown) => Math.round(Number(value ?? 0) * 100);
  * keeps, or else the event's only draft (the one a quote request's
  * conversion priced), never a change of an earlier proposal.
  */
-async function draftPriceList(
+export async function draftPriceList(
   ctx: Pick<QueryCtx, "db">,
   event: Doc<"events">,
 ): Promise<Doc<"proposals"> | null> {

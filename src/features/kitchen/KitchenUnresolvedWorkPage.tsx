@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useEmbedded } from "../../ui/embedded";
 import { formatDate, formatMoney } from "../../lib/format";
 import {
   costConfidenceText,
@@ -66,23 +67,29 @@ function EventUnresolvedCard({ row }: { row: EventRow }) {
 /** Everything the kitchen must settle before it can cook or order: events with
  *  unresolved materials, and recipes with missing content or an unknown cost. */
 export function KitchenUnresolvedWorkPage() {
+  const embedded = useEmbedded();
   const report = useKitchenUnresolvedReport();
 
   return (
     <div className="component-book-stage culinary-studio">
-      <header className="component-book-masthead">
-        <div>
-          <p className="eyebrow">Culinary book · Unresolved</p>
-          <h1 className="display-title mt-2">Unresolved work</h1>
-          <p className="mt-3 max-w-150 text-ink-2">
-            Materials the plan cannot price or order yet, and recipes with no
-            method, no ingredients or no known cost. Nothing here stops the
-            kitchen from cooking: each line says what is not counted yet.
-          </p>
-        </div>
-      </header>
+      {embedded ? null : (
+        <>
+          <header className="component-book-masthead">
+            <div>
+              <p className="eyebrow">Culinary book · Unresolved</p>
+              <h1 className="display-title mt-2">Unresolved work</h1>
+              <p className="mt-3 max-w-150 text-ink-2">
+                Materials the plan cannot price or order yet, and recipes with
+                no method, no ingredients or no known cost. Nothing here stops
+                the kitchen from cooking: each line says what is not counted
+                yet.
+              </p>
+            </div>
+          </header>
 
-      <KitchenBookNav />
+          <KitchenBookNav />
+        </>
+      )}
 
       {report === undefined ? (
         <div className="card mt-4">

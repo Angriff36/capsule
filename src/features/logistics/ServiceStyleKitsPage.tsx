@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { Link } from "react-router-dom";
 import {
   useCreateServiceStyleKitItem,
@@ -35,6 +36,7 @@ function wholeNumber(raw: string): number | undefined {
  * list without touching the kit.
  */
 export function ServiceStyleKitsPage() {
+  const embedded = useEmbedded();
   const serviceStyles = useListServiceStyle();
   const kitLines = useListServiceStyleKitItem() as KitLine[] | undefined;
   const addLine = useCreateServiceStyleKitItem();
@@ -148,20 +150,24 @@ export function ServiceStyleKitsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        title="Service style kits"
-        lead={
-          <>
-            The default kit that goes with every event of a service style. A new
-            event gets these lines on its{" "}
-            <Link className="link" to="/logistics/packs">
-              pack list
-            </Link>{" "}
-            automatically. Change one event on its own load sheet.
-          </>
-        }
-      />
-      <LogisticsWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <PageHeader
+            title="Service style kits"
+            lead={
+              <>
+                The default kit that goes with every event of a service style. A
+                new event gets these lines on its{" "}
+                <Link className="link" to="/logistics/packs">
+                  pack list
+                </Link>{" "}
+                automatically. Change one event on its own load sheet.
+              </>
+            }
+          />
+          <LogisticsWorkspaceNav />
+        </>
+      )}
       {failure ? <LogisticsFailureBanner error={failure} /> : null}
 
       {serviceStyles === undefined || kitLines === undefined ? (
@@ -171,7 +177,7 @@ export function ServiceStyleKitsPage() {
           <p>No active service styles.</p>
           <span>
             Add service styles in{" "}
-            <Link className="link" to="/admin/catalogs">
+            <Link className="link" to="/admin/branding#catalogs">
               Admin → Catalogs
             </Link>
             .

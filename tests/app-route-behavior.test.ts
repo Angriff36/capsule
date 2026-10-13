@@ -26,25 +26,21 @@ beforeAll(async () => {
 it.each([
   ["/events", "Events"],
   ["/clients", "Clients"],
-  ["/clients/proposals", "Proposals"],
   ["/clients/contracts", "Contracts"],
-  ["/finance/invoices", "Client invoices"],
-  ["/finance/payments", "Payment collection"],
-  ["/finance/payment-methods", "Stored payment instruments"],
+  ["/finance/invoices", "Invoices"],
+  ["/finance/payments", "Payments"],
   ["/finance/closeout", "Event closeouts"],
   ["/finance/payroll", "Payroll inputs"],
-  ["/logistics/packs", "Event pack lists"],
-  ["/logistics/pack-templates", "Pack list templates"],
-  ["/logistics/deliveries", "Delivery runs"],
+  ["/logistics/packs", "Pack lists"],
+  ["/logistics/pack-templates", "Pack setup"],
+  ["/logistics/deliveries", "Deliveries"],
   ["/reports", "Reports"],
-  ["/inventory/demand", "What each event needs"],
-  ["/inventory/stock", "What the house holds"],
+  ["/inventory/stock", "Stock"],
   ["/inventory/purchasing", "Weekly purchasing drafts"],
   ["/kitchen/components", "Recipes"],
   ["/kitchen/ingredients", "Ingredients"],
   ["/kitchen/dishes", "Dishes"],
   ["/kitchen/menus", "Menus"],
-  ["/admin/catalogs", "Catalogs"],
   ["/kitchen/components/import", "Import recipe"],
 ])(
   "opens %s through the real authentication gate and shell",
@@ -78,7 +74,7 @@ it.each(["/logistics/pack-lists", "/logistics/packlists"])(
       await act(async () => {});
       expect(location).toBe("/logistics/packs");
       expect(container.querySelector("main h1")?.textContent).toBe(
-        "Event pack lists",
+        "Pack lists",
       );
     });
   },

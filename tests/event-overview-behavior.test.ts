@@ -125,7 +125,9 @@ it("prints the booked venue snapshot in the header, not a later catalog rename",
   // Scoped to the header venue chip: the edit-basics form's venue picker
   // legitimately lists live catalog names, so the whole page still contains
   // the renamed string.
-  const headerVenue = container.querySelector('a[href="/facilities"]');
+  const headerVenue = container.querySelector(
+    'a[href="/facilities/venues/venue-a"]',
+  );
   expect(headerVenue?.textContent).toBe("Garden Hall");
 });
 

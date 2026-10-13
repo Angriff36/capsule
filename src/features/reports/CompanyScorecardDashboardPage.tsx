@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useEmbedded } from "@/ui/embedded";
 import {
   useListPerson,
   useListScorecardTarget,
@@ -49,6 +50,7 @@ const STATUS_TONE: Record<ScorecardStatus, string> = {
 };
 
 export function CompanyScorecardDashboardPage() {
+  const embedded = useEmbedded();
   const refNow = useMemo(() => new Date(), []);
   const currentMonth = refNow.getMonth();
   const currentYear = refNow.getFullYear();
@@ -154,10 +156,12 @@ export function CompanyScorecardDashboardPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        title="Company Scorecard"
-        lead="The weekly scorecard reviewed at the L10: each number against its target, with its owner, status and trend, live from Capsule."
-      />
+      {embedded ? null : (
+        <PageHeader
+          title="Company Scorecard"
+          lead="The weekly scorecard reviewed at the L10: each number against its target, with its owner, status and trend, live from Capsule."
+        />
+      )}
 
       {!loading && events.length === 0 ? (
         <div data-testid="dashboard-empty">

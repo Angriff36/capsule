@@ -1,3 +1,4 @@
+import { useEmbedded } from "../../ui/embedded";
 import { Fragment, useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { formatCountNoun, formatDate } from "../../lib/format";
@@ -40,6 +41,7 @@ const DAY_MS = 86_400_000;
 const LEDGER_STEP_DAYS = 14;
 
 export function DemandLedgerPage() {
+  const embedded = useEmbedded();
   const workingId = useWorkingEventId();
   // The events of the next two weeks; earlier and later ones on request.
   // Only their demand lines and purchase needs are read.
@@ -174,7 +176,7 @@ export function DemandLedgerPage() {
         showCreate={showCreate}
         onToggleCreate={() => setShowCreate((value) => !value)}
       />
-      <InventoryWorkspaceNav />
+      {embedded ? null : <InventoryWorkspaceNav />}
 
       <aside className="supply-degraded" role="note">
         <strong>Worked out from the event, not typed</strong>

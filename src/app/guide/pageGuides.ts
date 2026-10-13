@@ -61,8 +61,8 @@ export const PAGE_GUIDES: PageGuide[] = [
     ],
   },
   {
-    prefix: "/events/templates",
-    title: "Event templates",
+    prefix: "/events/setup",
+    title: "Event setup",
     purpose:
       "Starting points for events you book again and again, so you never build the same thing twice.",
     steps: [
@@ -89,26 +89,6 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Look for full rooms and double bookings before you confirm a new event.",
       "Click a day to see what's already booked.",
-    ],
-  },
-  {
-    prefix: "/events/checklists",
-    title: "Event checklists",
-    purpose: "Lists of to-dos you use again and again.",
-    steps: [
-      "Make a checklist once for work you repeat.",
-      "Put it on an event from the event's To-dos page.",
-    ],
-  },
-  {
-    prefix: "/events/planning",
-    title: "Planning setup",
-    purpose:
-      "How the planning board checks a plan, which stages events move into by themselves, and what the board suggests.",
-    steps: [
-      "Set how loud each check is: Fix first, Worth a look, or Off.",
-      "Add planning rules for what the board should suggest.",
-      "Fill in the truck and equipment facts the checks need.",
     ],
   },
   {
@@ -190,15 +170,7 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Read one day at a time; work for the same step is pooled and each event keeps its own amount.",
       "Check Make ahead and Waits for before you start a row.",
       "Set a step's make-ahead days on the dish's prep steps.",
-    ],
-  },
-  {
-    prefix: "/kitchen/yield",
-    title: "Yield variance",
-    purpose:
-      "Planned vs. actual yield for completed production batches, grouped by recipe.",
-    steps: [
-      "Pick a 30, 90, or 365 day window.",
+      "Yield against plan shows planned vs. actual yield for completed production batches, grouped by recipe.",
       "Look for recipes that consistently under- or over-yield and fix the recipe or the prep.",
     ],
   },
@@ -226,33 +198,15 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: ["Pick the event, then adjust dishes and portions for it."],
   },
   {
-    prefix: "/inventory",
-    title: "Inventory",
-    purpose:
-      "What's on the shelf, what's running low, and what's on order from vendors.",
-    steps: [
-      "Watch the Below reorder alerts — that's what to reorder.",
-      "Use Purchasing to turn needs into vendor orders.",
-    ],
-  },
-  {
-    prefix: "/inventory/demand",
-    title: "Demand",
-    purpose:
-      "What upcoming events will consume, so you can buy ahead instead of scrambling.",
-    steps: [
-      "Review upcoming needs by ingredient.",
-      "Send shortfalls to Purchasing.",
-    ],
-  },
-  {
     prefix: "/inventory/stock",
-    title: "Stock book",
+    title: "Stock",
     purpose:
       "Current quantities of everything, by storage location, with reorder alerts.",
     steps: [
       "Adjust quantities when things come in or get used outside an event.",
       "Set PAR levels so low stock flags itself.",
+      "Watch the Below reorder alerts — that's what to reorder.",
+      "Use Purchasing to turn needs into vendor orders.",
     ],
   },
   {
@@ -263,44 +217,6 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Start a count session.",
       "Enter real quantities; differences get logged automatically.",
-    ],
-  },
-  {
-    prefix: "/inventory/opening-stock",
-    title: "Opening stock",
-    purpose:
-      "Bring in a stock count sheet and pick which counts become the stock on hand.",
-    steps: [
-      "Choose the count sheet (CSV). Every row lands here; stock on hand does not change yet.",
-      "Fix the rows that need it, or set them aside.",
-      "Press Use as opening stock on each food row you want to start from.",
-    ],
-  },
-  {
-    prefix: "/inventory/audit",
-    title: "Stock history",
-    purpose:
-      "Every stock movement and who made it — for when a number looks wrong.",
-    steps: ["Search by ingredient to trace where stock went."],
-  },
-  {
-    prefix: "/inventory/locations",
-    title: "Storage locations",
-    purpose:
-      "The walk-ins, freezers, and dry storage that stock is kept in. Edit a location or take it out of use.",
-    steps: [
-      "Edit a location's name, type, and temperature range.",
-      "Deactivate a location you no longer use; activate it again when you do.",
-    ],
-  },
-  {
-    prefix: "/kitchen/stations",
-    title: "Kitchen stations",
-    purpose:
-      "The stations that prep work and the day sheet are sorted by. Add, rename, or retire a station.",
-    steps: [
-      "Add a station with its sheet order and any other names the crew uses for it.",
-      "Retire a station you no longer run; reinstate it when it comes back.",
     ],
   },
   {
@@ -370,31 +286,10 @@ export const PAGE_GUIDES: PageGuide[] = [
   },
   {
     prefix: "/logistics/pack-templates",
-    title: "Pack templates",
+    title: "Pack setup",
     purpose:
       "Reusable load lists for event types you run often, so packing is never from memory.",
     steps: ["Build a template once; new pack lists start from it."],
-  },
-  {
-    prefix: "/logistics/pack-rules",
-    title: "Pack rules",
-    purpose:
-      "What an event puts on its pack list: a dish's tools, what a dish note asks for, napkins per guest, flooring for a grass venue, the bar kit.",
-    steps: [
-      "Pick when the rule applies, the item, and how many. Use spare % for napkins and cups.",
-      "Mark must-haves: leaving one off a list then needs a stand-in or someone who brings it.",
-      "On a pack list, open Why under a line to see which rules and facts set its amount.",
-    ],
-  },
-  {
-    prefix: "/logistics/style-kits",
-    title: "Service style kits",
-    purpose:
-      "The default kit that goes with every event of a service style, so a new event's pack list builds itself.",
-    steps: [
-      "Add the lines a style always needs. Use guests-per-unit for lines that scale with the headcount.",
-      "Change one event on its own pack list; the kit stays as it is.",
-    ],
   },
   {
     prefix: "/logistics/deliveries",
@@ -407,39 +302,10 @@ export const PAGE_GUIDES: PageGuide[] = [
     ],
   },
   {
-    prefix: "/logistics/schedule",
-    title: "Vehicle schedule",
-    purpose:
-      "Which vehicle is committed where, and when — spot conflicts early.",
-    steps: ["Check before promising a delivery window."],
-  },
-  {
-    prefix: "/logistics/route",
-    title: "Route planner",
-    purpose: "Put the day's stops in a sensible driving order.",
-    steps: ["Move stops into order, then print the route for the driver."],
-  },
-  {
     prefix: "/logistics/fleet",
     title: "Fleet",
     purpose: "Your vehicles — capacity, status, and availability.",
     steps: ["Mark a vehicle out of service when it's in the shop."],
-  },
-  {
-    prefix: "/logistics/maintenance",
-    title: "Vehicle maintenance",
-    purpose: "Service history and upcoming maintenance for each vehicle.",
-    steps: ["Log service work so nothing gets missed."],
-  },
-  {
-    prefix: "/staff",
-    title: "Staff",
-    purpose:
-      "Your team — who's working when, who's asking for time off, and who needs confirming.",
-    steps: [
-      "Clear the attention list: confirm assignments, decide requests.",
-      "Use Roster to schedule people onto events and shifts.",
-    ],
   },
   {
     prefix: "/staff/roster",
@@ -451,26 +317,13 @@ export const PAGE_GUIDES: PageGuide[] = [
     ],
   },
   {
-    prefix: "/staff/swaps",
-    title: "Shift swaps",
-    purpose:
-      "Staff arrange swaps between themselves; you give the final OK here.",
-    steps: ["Approve or decline swaps both staff members already agreed to."],
-  },
-  {
     prefix: "/staff/time",
-    title: "Time & availability",
+    title: "Time",
     purpose: "Hours worked and when people say they're available.",
     steps: [
       "Fix clock mistakes here.",
       "Check availability before building the schedule.",
     ],
-  },
-  {
-    prefix: "/staff/time-off",
-    title: "Time off",
-    purpose: "Requests for days off, waiting on your yes or no.",
-    steps: ["Decide requests promptly — the schedule depends on it."],
   },
   {
     prefix: "/staff/messages",
@@ -483,20 +336,8 @@ export const PAGE_GUIDES: PageGuide[] = [
     ],
   },
   {
-    prefix: "/staff/utilization",
-    title: "Utilization",
-    purpose: "Who's over-scheduled and who's under-used, week by week.",
-    steps: ["Balance the load before burnout or dead payroll hours."],
-  },
-  {
-    prefix: "/staff/qualifications",
-    title: "Qualifications",
-    purpose: "Certifications like food handler cards, with expiry dates.",
-    steps: ["Add each person's certs; expiring ones flag themselves."],
-  },
-  {
     prefix: "/staff/training",
-    title: "Training",
+    title: "Skills & training",
     purpose:
       "Completed trainings that unlock certain shift types, and each person's skill level per area.",
     steps: [
@@ -507,38 +348,9 @@ export const PAGE_GUIDES: PageGuide[] = [
   },
   {
     prefix: "/staff/reviews",
-    title: "Performance reviews",
+    title: "Performance",
     purpose: "Run and track reviews across the team.",
     steps: ["Start a review, fill it in together, and file it."],
-  },
-  {
-    prefix: "/staff/my-reviews",
-    title: "My reviews",
-    purpose: "Reviews written about you, in one place.",
-    steps: ["Read and acknowledge your reviews."],
-  },
-  {
-    prefix: "/staff/scorecards",
-    title: "Role scorecards",
-    purpose: 'What "good" looks like for each role, written down.',
-    steps: ["Define the measurables per role; reviews use them."],
-  },
-  {
-    prefix: "/staff/crew-templates",
-    title: "Crew templates",
-    purpose:
-      "The crew each kind of event needs, posted as open shifts when the event is approved.",
-    steps: [
-      "Make a template for a service style and guest range; list each role and how many.",
-      "Approve an event: its open shifts appear on the event's Staff tab.",
-    ],
-  },
-  {
-    prefix: "/staff/one-on-ones",
-    title: "One-on-ones",
-    purpose:
-      "Recurring check-ins with each person, with notes and action items.",
-    steps: ["Schedule the cadence; log notes each time."],
   },
   {
     prefix: "/staff/hiring",
@@ -580,30 +392,10 @@ export const PAGE_GUIDES: PageGuide[] = [
     ],
   },
   {
-    prefix: "/clients/proposals/templates",
-    title: "Proposal templates",
-    purpose: "Reusable proposal shapes so quoting takes minutes, not hours.",
-    steps: ["Save your standard offers; start new proposals from them."],
-  },
-  {
     prefix: "/clients/contracts",
     title: "Contracts",
     purpose: "Signed agreements for booked events.",
     steps: ["Draft from the event, send for signature, file the signed copy."],
-  },
-  {
-    prefix: "/clients/retention",
-    title: "Retention",
-    purpose:
-      "Clients who used to book and stopped — your easiest win-back revenue.",
-    steps: ["Reach out to lapsed clients before the season starts."],
-  },
-  {
-    prefix: "/clients/quote-requests",
-    title: "Quote requests",
-    purpose:
-      "Quotes people submitted through your website, waiting for a response.",
-    steps: ["Review each request and turn the good ones into proposals."],
   },
   {
     prefix: "/clients/inbox",
@@ -612,31 +404,13 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: ["Reply, and convert real inquiries into pipeline leads."],
   },
   {
-    prefix: "/clients/date-holds",
-    title: "Date holds",
-    purpose:
-      "Soft holds on dates for prospects, and who is waiting if a date opens.",
-    steps: [
-      "Hold a date for a prospect; it lapses on its own at the expiry.",
-      "When a held date opens, call the next client on its waitlist.",
-    ],
-  },
-  {
-    prefix: "/finance",
-    title: "Finance",
-    purpose: "Money owed, money collected, and where to act next.",
-    steps: [
-      "Clear the attention list — that's what's owed to you.",
-      "Use the tabs for invoices, payments, payroll, and reports.",
-    ],
-  },
-  {
     prefix: "/finance/invoices",
     title: "Invoices",
     purpose: "Bill clients and track what's been paid.",
     steps: [
       "Issue the invoice from the event.",
       "Send it, then log payments as they arrive.",
+      "Clear the attention list at the top — that's what's owed to you.",
     ],
   },
   {
@@ -644,12 +418,6 @@ export const PAGE_GUIDES: PageGuide[] = [
     title: "Payments",
     purpose: "Money received, matched against invoices.",
     steps: ["Log each payment and match it to its invoice."],
-  },
-  {
-    prefix: "/finance/payment-methods",
-    title: "Payment methods",
-    purpose: "Client payment details kept on file.",
-    steps: ["Store how each client pays to speed up settlement."],
   },
   {
     prefix: "/finance/closeout",
@@ -690,12 +458,6 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: ["Keep rates current; invoices apply them automatically."],
   },
   {
-    prefix: "/finance/commission-terms",
-    title: "Commission terms",
-    purpose: "What each venue takes, written down.",
-    steps: ["Log each venue's cut so event profit is honest."],
-  },
-  {
     prefix: "/finance/attribution",
     title: "Attribution",
     purpose: "Which venue, salesperson, or referral earned each dollar.",
@@ -703,45 +465,15 @@ export const PAGE_GUIDES: PageGuide[] = [
   },
   {
     prefix: "/finance/revenue",
-    title: "Revenue",
+    title: "Money reports",
     purpose: "Revenue over time, sliced by event type, client, or venue.",
     steps: ["Compare periods; spot what's growing and what's fading."],
-  },
-  {
-    prefix: "/finance/food-cost",
-    title: "Food cost",
-    purpose: "Ingredient spend measured against what you charge.",
-    steps: ["Watch the percentage; investigate months that spike."],
-  },
-  {
-    prefix: "/finance/profit-margins",
-    title: "Profit margins",
-    purpose: "What each event and service line actually makes.",
-    steps: ["Find the low-margin work and reprice or drop it."],
-  },
-  {
-    prefix: "/finance/money-check",
-    title: "Money check",
-    purpose:
-      "Old-system payments next to Capsule payments, by month, with every row that does not agree.",
-    steps: [
-      "Pick the dates, read each month's difference, and save a copy when it is right.",
-    ],
   },
   {
     prefix: "/reports",
     title: "Reports",
     purpose: "The business dashboards — KPIs, scorecards, and trends.",
     steps: ["Pick a dashboard; each answers one owner-level question."],
-  },
-  {
-    prefix: "/facilities",
-    title: "Facilities",
-    purpose: "Your venues, equipment, and the upkeep that keeps them ready.",
-    steps: [
-      "Keep venue details current — events pull from them.",
-      "Watch maintenance-due so nothing fails on event day.",
-    ],
   },
   {
     prefix: "/facilities/venues",
@@ -755,12 +487,6 @@ export const PAGE_GUIDES: PageGuide[] = [
     title: "Equipment",
     purpose: "Chafers, tents, linens — what you own, its condition, and value.",
     steps: ["Log condition changes; flag anything needing repair."],
-  },
-  {
-    prefix: "/facilities/vendor-relationships",
-    title: "Venue vendors",
-    purpose: "Which vendors each venue prefers, allows, or bans.",
-    steps: ["Check before booking outside vendors at a venue."],
   },
   {
     prefix: "/admin",

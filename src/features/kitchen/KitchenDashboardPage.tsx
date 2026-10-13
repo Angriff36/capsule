@@ -1,4 +1,6 @@
 import { useActionPrompt } from "../../ui/action-prompt";
+import { MergedSection } from "../../ui/MergedSection";
+import { KitchenUnresolvedWorkPage } from "./KitchenUnresolvedWorkPage";
 import {
   prepTaskDependencyLabel,
   prepTaskDependencySummary,
@@ -1422,7 +1424,7 @@ export function KitchenDashboardPage() {
             ))}
           </select>
           <ActionMenu>
-            <Link to="/kitchen/yield">Yield variance</Link>
+            <Link to="/kitchen/plan#yield">Yield variance</Link>
             <Link to="/kitchen">Recipes</Link>
             <Link to="/kitchen/ingredients">Ingredients</Link>
             <Link to="/kitchen/dishes">Dishes</Link>
@@ -1804,7 +1806,7 @@ export function KitchenDashboardPage() {
               </span>
             </div>
           </div>
-          <Link to="/kitchen/yield" className="btn btn-ghost">
+          <Link to="/kitchen/plan#yield" className="btn btn-ghost">
             Yield variance
           </Link>
         </div>
@@ -2233,6 +2235,13 @@ export function KitchenDashboardPage() {
           </div>
         )}
       </div>
+      <MergedSection
+        id="unresolved"
+        title="Unresolved work"
+        summary="Ingredients the plan cannot price or order, and recipes missing a method, ingredients or cost."
+      >
+        <KitchenUnresolvedWorkPage />
+      </MergedSection>
     </div>
   );
 }

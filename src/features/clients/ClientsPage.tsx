@@ -3,6 +3,8 @@ import {
   useClientContactsPage,
   useClientSearch,
 } from "../../lib/useClientDirectory";
+import { MergedSection } from "../../ui/MergedSection";
+import { ClientRetentionPage } from "./ClientRetentionPage";
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -630,6 +632,13 @@ export function ClientsPage() {
           {paged.loadingMore ? "Loading…" : "Load more clients"}
         </button>
       ) : null}
+      <MergedSection
+        id="retention"
+        title="Retention"
+        summary="Clients who booked last year but not this year, and the calls to win them back."
+      >
+        <ClientRetentionPage />
+      </MergedSection>
     </div>
   );
 }

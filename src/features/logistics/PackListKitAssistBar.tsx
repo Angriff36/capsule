@@ -46,7 +46,7 @@ export function PackListKitAssistBar({
           {busy === "list:applyKit" ? "Working…" : "Add style kit"}
         </button>
       ) : null}
-      <Link className="text-link" to="/logistics/style-kits">
+      <Link className="text-link" to="/logistics/pack-templates#style-kits">
         Edit kits
       </Link>
       {assistanceRequestedAt != null ? (

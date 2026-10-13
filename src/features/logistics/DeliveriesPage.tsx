@@ -1,4 +1,7 @@
+import { RoutePlannerPage } from "./RoutePlannerPage";
 import { useOverdueVehicleService } from "./vehicleServiceDue";
+import { MergedSection } from "../../ui/MergedSection";
+import { VehicleSchedulePage } from "./VehicleSchedulePage";
 import { Fragment, useMemo, useState, type FormEvent } from "react";
 import { useEventTimingPlan } from "../../lib/operational-transactions";
 import { localDateTime } from "../events/eventDetailFormHelpers";
@@ -34,7 +37,7 @@ import {
 } from "../facilities/vehicleAssignment";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { RecordPhotoCapture } from "../attachments/RecordPhotoCapture";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
@@ -439,32 +442,28 @@ export function DeliveriesPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Logistics · Deliveries</p>
-          <h1 className="display-title mt-2">Delivery runs</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Schedule a delivery from a packed pack list, assign a driver, then
-            start transit and confirm delivery, or mark it failed.
-          </p>
-        </div>
-        <div className="supply-row-actions">
-          <button
-            className="btn btn-ghost"
-            type="button"
-            onClick={() => setShowTerminal((value) => !value)}
-          >
-            {showTerminal ? "Hide completed" : "Show completed"}
-          </button>
-          <button
-            className="btn btn-primary"
-            type="button"
-            onClick={() => (showCreate ? setShowCreate(false) : openCreate())}
-          >
-            {showCreate ? "Close form" : "Schedule delivery"}
-          </button>
-        </div>
-      </header>
+      <PageHeader
+        title="Deliveries"
+        lead="Schedule a delivery from a packed pack list, assign a driver and vehicle, then start transit and confirm delivery."
+        actions={
+          <>
+            <button
+              className="btn btn-ghost"
+              type="button"
+              onClick={() => setShowTerminal((value) => !value)}
+            >
+              {showTerminal ? "Hide completed" : "Show completed"}
+            </button>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={() => (showCreate ? setShowCreate(false) : openCreate())}
+            >
+              {showCreate ? "Close form" : "Schedule delivery"}
+            </button>
+          </>
+        }
+      />
       <LogisticsWorkspaceNav />
       {failure ? <LogisticsFailureBanner error={failure} /> : null}
       {notice ? (
@@ -787,6 +786,20 @@ export function DeliveriesPage() {
           </div>
         ) : null}
       </section>
+      <MergedSection
+        id="vehicles"
+        title="Vehicles by day"
+        summary="Each vehicle's runs for one day, and runs with no vehicle yet."
+      >
+        <VehicleSchedulePage />
+      </MergedSection>
+      <MergedSection
+        id="route"
+        title="Route order"
+        summary="Suggested stop order for one day and vehicle, ready to print."
+      >
+        <RoutePlannerPage />
+      </MergedSection>
     </div>
   );
 }

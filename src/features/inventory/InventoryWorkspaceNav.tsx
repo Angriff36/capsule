@@ -1,12 +1,8 @@
 import { NavLink, useLocation } from "react-router-dom";
 
 const sections = [
-  { label: "Demand", path: "/inventory/demand" },
-  { label: "Stock book", path: "/inventory/stock" },
-  { label: "Locations", path: "/inventory/locations" },
+  { label: "Stock", path: "/inventory/stock" },
   { label: "Counts", path: "/inventory/counts" },
-  { label: "Opening stock", path: "/inventory/opening-stock" },
-  { label: "Stock history", path: "/inventory/audit" },
   { label: "Waste", path: "/inventory/waste" },
   { label: "Lot trace", path: "/inventory/traceability" },
   { label: "Purchasing", path: "/inventory/purchasing" },

@@ -1,5 +1,12 @@
 import { Component, lazy, Suspense, type ReactNode } from "react";
-import { Navigate, Route, Routes, useMatch, useParams } from "react-router-dom";
+import {
+  Navigate,
+  Route,
+  Routes,
+  useMatch,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { ReportsWorkspaceNav } from "../features/reports/ReportsWorkspaceNav";
 import { ClientPortalPage } from "../features/clientPortal/ClientPortalPage";
 import { ProposalAcceptancePage } from "../features/clients/ProposalAcceptancePage";
@@ -17,23 +24,19 @@ import { EventImportPage } from "../features/events/import/EventImportPage";
 import { EventWorkbooksPage } from "../features/events/packet/EventWorkbooksPage";
 import { EventsListPage } from "../features/events/EventsListPage";
 import { EventTrackerHome } from "../features/events/tracker/EventTrackerHome";
-import { EventChecklistsPage } from "../features/events/EventChecklistsPage";
-import { PlanningSetupPage } from "../features/events/planning/PlanningSetupPage";
-import { EventTemplatesPage } from "../features/events/EventTemplatesPage";
+import { EventSetupPage } from "../features/events/EventSetupPage";
+import { EventProposalPreviewPage } from "../features/events/EventProposalPreviewPage";
 import { eventMenuRedirectPath } from "../features/events/eventRoutes";
 import { WorkingEventRouteSync } from "../features/events/workingEvent";
 import { ReviewerToolbar } from "./shell/ReviewerToolbar";
+import { MovedRoute } from "./MovedRoute";
 import { HomeCalendarPage } from "../features/home/HomeCalendarPage";
-import { HomePage } from "../features/home/HomePage";
 import { AllergenMatrixPage } from "../features/kitchen/AllergenMatrixPage";
 import { DishDetailPage } from "../features/kitchen/DishDetailPage";
 import { IngredientDetailPage } from "../features/kitchen/IngredientDetailPage";
 import { ComponentImportPage } from "../features/kitchen/import/ComponentImportPage";
 import { KitchenCatalogPage } from "../features/kitchen/KitchenCatalogPage";
 import { KitchenDashboardPage } from "../features/kitchen/KitchenDashboardPage";
-import { KitchenUnresolvedWorkPage } from "../features/kitchen/KitchenUnresolvedWorkPage";
-import { KitchenCatalogCleanupPage } from "../features/kitchen/KitchenCatalogCleanupPage";
-import { KitchenStationsPage } from "../features/kitchen/KitchenStationsPage";
 import { MenuDetailPage } from "../features/kitchen/MenuDetailPage";
 import { ComponentDetailPage } from "../features/kitchen/ComponentDetailPage";
 import { ErrorState, TableSkeleton } from "../ui/primitives";
@@ -42,11 +45,6 @@ import { AuthGate } from "./AuthGate";
 import { AppShell } from "./shell/AppShell";
 import { RouteErrorBoundary } from "./shell/RouteErrorBoundary";
 
-const DemandLedgerPage = lazy(() =>
-  import("../features/inventory/DemandLedgerPage").then((module) => ({
-    default: module.DemandLedgerPage,
-  })),
-);
 const StockBookPage = lazy(() =>
   import("../features/inventory/StockBookPage").then((module) => ({
     default: module.StockBookPage,
@@ -55,21 +53,6 @@ const StockBookPage = lazy(() =>
 const StockCountPage = lazy(() =>
   import("../features/inventory/StockCountPage").then((module) => ({
     default: module.StockCountPage,
-  })),
-);
-const OpeningStockPage = lazy(() =>
-  import("../features/inventory/OpeningStockPage").then((module) => ({
-    default: module.OpeningStockPage,
-  })),
-);
-const InventoryAuditLogPage = lazy(() =>
-  import("../features/inventory/InventoryAuditLogPage").then((module) => ({
-    default: module.InventoryAuditLogPage,
-  })),
-);
-const StorageLocationsPage = lazy(() =>
-  import("../features/inventory/StorageLocationsPage").then((module) => ({
-    default: module.StorageLocationsPage,
   })),
 );
 const WasteCostReportPage = lazy(() =>
@@ -97,19 +80,27 @@ const VendorContractsPage = lazy(() =>
     default: module.VendorContractsPage,
   })),
 );
-const InventoryOverviewPage = lazy(() =>
-  import("../features/inventory/InventoryOverviewPage").then((module) => ({
-    default: module.InventoryOverviewPage,
-  })),
-);
-const StaffOverviewPage = lazy(() =>
-  import("../features/workforce/StaffOverviewPage").then((module) => ({
-    default: module.StaffOverviewPage,
-  })),
-);
 function RedirectEventMenuAlias() {
   const { id } = useParams();
   return <Navigate to={id ? eventMenuRedirectPath(id) : "/events"} replace />;
+}
+/**
+ * Proposals live on their event (Money tab); there is no list of them.
+ * ?event= opens that event's proposal, ?proposal= opens one proposal (an
+ * event's proposal moves on to its event), anything else goes to Pipeline.
+ */
+function ProposalsRoute() {
+  const [params] = useSearchParams();
+  const eventId = params.get("event");
+  if (eventId)
+    return <Navigate to={`/events/${eventId}?tab=margin#proposal`} replace />;
+  if (!params.get("proposal"))
+    return <Navigate to="/clients/pipeline" replace />;
+  return (
+    <SupplyRoute>
+      <ProposalsPage />
+    </SupplyRoute>
+  );
 }
 function RedirectPackListAlias() {
   const { id } = useParams();
@@ -118,30 +109,10 @@ function RedirectPackListAlias() {
   );
 }
 
-const LogisticsOverviewPage = lazy(() =>
-  import("../features/logistics/LogisticsOverviewPage").then((module) => ({
-    default: module.LogisticsOverviewPage,
-  })),
-);
-const FinanceOverviewPage = lazy(() =>
-  import("../features/finance/FinanceOverviewPage").then((module) => ({
-    default: module.FinanceOverviewPage,
-  })),
-);
-const FacilitiesOverviewPage = lazy(() =>
-  import("../features/facilities/FacilitiesOverviewPage").then((module) => ({
-    default: module.FacilitiesOverviewPage,
-  })),
-);
 const KitchenDisplayPage = lazy(() =>
   import("../features/production/KitchenDisplayPage").then((module) => ({
     default: module.KitchenDisplayPage,
   })),
-);
-const ProductionYieldDashboardPage = lazy(() =>
-  import("../features/production/ProductionYieldDashboardPage").then(
-    (module) => ({ default: module.ProductionYieldDashboardPage }),
-  ),
 );
 const ProductionPlanPage = lazy(() =>
   import("../features/production/ProductionPlanPage").then((module) => ({
@@ -153,19 +124,9 @@ const RosterPage = lazy(() =>
     default: module.RosterPage,
   })),
 );
-const ShiftSwapRequestsPage = lazy(() =>
-  import("../features/workforce/ShiftSwapRequestsPage").then((module) => ({
-    default: module.ShiftSwapRequestsPage,
-  })),
-);
 const TimeSheetPage = lazy(() =>
   import("../features/workforce/TimeSheetPage").then((module) => ({
     default: module.TimeSheetPage,
-  })),
-);
-const TimeOffRequestsPage = lazy(() =>
-  import("../features/workforce/TimeOffRequestsPage").then((module) => ({
-    default: module.TimeOffRequestsPage,
   })),
 );
 const MessagesPage = lazy(() =>
@@ -173,44 +134,14 @@ const MessagesPage = lazy(() =>
     default: module.MessagesPage,
   })),
 );
-const QualificationsPage = lazy(() =>
-  import("../features/workforce/QualificationsPage").then((module) => ({
-    default: module.QualificationsPage,
-  })),
-);
 const TrainingPage = lazy(() =>
   import("../features/workforce/TrainingPage").then((module) => ({
     default: module.TrainingPage,
   })),
 );
-const StaffUtilizationPage = lazy(() =>
-  import("../features/workforce/StaffUtilizationPage").then((module) => ({
-    default: module.StaffUtilizationPage,
-  })),
-);
 const PerformanceReviewsPage = lazy(() =>
   import("../features/workforce/PerformanceReviewsPage").then((module) => ({
     default: module.PerformanceReviewsPage,
-  })),
-);
-const MyReviewsPage = lazy(() =>
-  import("../features/workforce/MyReviewsPage").then((module) => ({
-    default: module.MyReviewsPage,
-  })),
-);
-const RoleScorecardsPage = lazy(() =>
-  import("../features/workforce/RoleScorecardsPage").then((module) => ({
-    default: module.RoleScorecardsPage,
-  })),
-);
-const StaffingTemplatesPage = lazy(() =>
-  import("../features/workforce/StaffingTemplatesPage").then((module) => ({
-    default: module.StaffingTemplatesPage,
-  })),
-);
-const OneOnOnesPage = lazy(() =>
-  import("../features/workforce/OneOnOnesPage").then((module) => ({
-    default: module.OneOnOnesPage,
   })),
 );
 const CandidatesPage = lazy(() =>
@@ -226,16 +157,6 @@ const PackListsPage = lazy(() =>
 const PackListDetailPage = lazy(() =>
   import("../features/logistics/PackListDetailPage").then((module) => ({
     default: module.PackListDetailPage,
-  })),
-);
-const PackRulesPage = lazy(() =>
-  import("../features/logistics/PackRulesPage").then((module) => ({
-    default: module.PackRulesPage,
-  })),
-);
-const ServiceStyleKitsPage = lazy(() =>
-  import("../features/logistics/ServiceStyleKitsPage").then((module) => ({
-    default: module.ServiceStyleKitsPage,
   })),
 );
 const PackListTemplatesPage = lazy(() =>
@@ -258,31 +179,6 @@ const DispatchBoardPage = lazy(() =>
     default: module.DispatchBoardPage,
   })),
 );
-const ReturnsPage = lazy(() =>
-  import("../features/logistics/ReturnsPage").then((module) => ({
-    default: module.ReturnsPage,
-  })),
-);
-const PackingFloorPage = lazy(() =>
-  import("../features/logistics/PackingFloorPage").then((module) => ({
-    default: module.PackingFloorPage,
-  })),
-);
-const VehicleSchedulePage = lazy(() =>
-  import("../features/logistics/VehicleSchedulePage").then((module) => ({
-    default: module.VehicleSchedulePage,
-  })),
-);
-const VehicleMaintenancePage = lazy(() =>
-  import("../features/logistics/VehicleMaintenancePage").then((module) => ({
-    default: module.VehicleMaintenancePage,
-  })),
-);
-const RoutePlannerPage = lazy(() =>
-  import("../features/logistics/RoutePlannerPage").then((module) => ({
-    default: module.RoutePlannerPage,
-  })),
-);
 const InvoicesPage = lazy(() =>
   import("../features/finance/InvoicesPage").then((module) => ({
     default: module.InvoicesPage,
@@ -298,29 +194,9 @@ const RevenueTrendsPage = lazy(() =>
     default: module.RevenueTrendsPage,
   })),
 );
-const FoodCostPercentagePage = lazy(() =>
-  import("../features/finance/FoodCostPercentagePage").then((module) => ({
-    default: module.FoodCostPercentagePage,
-  })),
-);
-const FinanceReconciliationPage = lazy(() =>
-  import("../features/finance/FinanceReconciliationPage").then((module) => ({
-    default: module.FinanceReconciliationPage,
-  })),
-);
-const ProfitMarginReportsPage = lazy(() =>
-  import("../features/finance/ProfitMarginReportsPage").then((module) => ({
-    default: module.ProfitMarginReportsPage,
-  })),
-);
 const TaxRatesPage = lazy(() =>
   import("../features/finance/TaxRatesPage").then((module) => ({
     default: module.TaxRatesPage,
-  })),
-);
-const VenueCommissionTermsPage = lazy(() =>
-  import("../features/finance/VenueCommissionTermsPage").then((module) => ({
-    default: module.VenueCommissionTermsPage,
   })),
 );
 const RevenueAttributionsPage = lazy(() =>
@@ -336,11 +212,6 @@ const RevenueAttributionDetailPage = lazy(() =>
 const PaymentsPage = lazy(() =>
   import("../features/finance/PaymentsPage").then((module) => ({
     default: module.PaymentsPage,
-  })),
-);
-const PaymentMethodsPage = lazy(() =>
-  import("../features/finance/PaymentMethodsPage").then((module) => ({
-    default: module.PaymentMethodsPage,
   })),
 );
 const CloseoutPage = lazy(() =>
@@ -378,28 +249,9 @@ const TimsKPIsDashboardPage = lazy(() =>
     default: module.TimsKPIsDashboardPage,
   })),
 );
-const CompanyScorecardDashboardPage = lazy(() =>
-  import("../features/reports/CompanyScorecardDashboardPage").then(
-    (module) => ({
-      default: module.CompanyScorecardDashboardPage,
-    }),
-  ),
-);
 const L10DashboardPage = lazy(() =>
   import("../features/reports/L10DashboardPage").then((module) => ({
     default: module.L10DashboardPage,
-  })),
-);
-const AvgEventValueGrowthDashboardPage = lazy(() =>
-  import("../features/reports/AvgEventValueGrowthDashboardPage").then(
-    (module) => ({
-      default: module.AvgEventValueGrowthDashboardPage,
-    }),
-  ),
-);
-const CompMasterDashboardPage = lazy(() =>
-  import("../features/reports/CompMasterDashboardPage").then((module) => ({
-    default: module.CompMasterDashboardPage,
   })),
 );
 const MangiaDashboardPage = lazy(() =>
@@ -417,19 +269,9 @@ const ClientDetailPage = lazy(() =>
     default: module.ClientDetailPage,
   })),
 );
-const TastingsPage = lazy(() =>
-  import("../features/clients/TastingsPage").then((module) => ({
-    default: module.TastingsPage,
-  })),
-);
 const ProposalsPage = lazy(() =>
   import("../features/clients/ProposalsPage").then((module) => ({
     default: module.ProposalsPage,
-  })),
-);
-const ProposalTemplatesPage = lazy(() =>
-  import("../features/clients/ProposalTemplatesPage").then((module) => ({
-    default: module.ProposalTemplatesPage,
   })),
 );
 const ContractsPage = lazy(() =>
@@ -442,16 +284,6 @@ const LeadPipelinePage = lazy(() =>
     default: module.LeadPipelinePage,
   })),
 );
-const DateHoldsPage = lazy(() =>
-  import("../features/sales/DateHoldsPage").then((module) => ({
-    default: module.DateHoldsPage,
-  })),
-);
-const QuoteSubmissionsReviewPage = lazy(() =>
-  import("../features/sales/QuoteSubmissionsReviewPage").then((module) => ({
-    default: module.QuoteSubmissionsReviewPage,
-  })),
-);
 const MessageInboxPage = lazy(() =>
   import("../features/sales/MessageInboxPage").then((module) => ({
     default: module.MessageInboxPage,
@@ -462,11 +294,6 @@ const ContractDocumentPage = lazy(() =>
     default: module.ContractDocumentPage,
   })),
 );
-const ClientRetentionPage = lazy(() =>
-  import("../features/clients/ClientRetentionPage").then((module) => ({
-    default: module.ClientRetentionPage,
-  })),
-);
 const EquipmentCatalogPage = lazy(() =>
   import("../features/facilities/EquipmentCatalogPage").then((module) => ({
     default: module.EquipmentCatalogPage,
@@ -475,11 +302,6 @@ const EquipmentCatalogPage = lazy(() =>
 const VenuesPage = lazy(() =>
   import("../features/facilities/VenuesPage").then((module) => ({
     default: module.VenuesPage,
-  })),
-);
-const VenuePartnersPage = lazy(() =>
-  import("../features/facilities/VenuePartnersPage").then((module) => ({
-    default: module.VenuePartnersPage,
   })),
 );
 const VenueDetailPage = lazy(() =>
@@ -497,28 +319,6 @@ const VenueInfoPacketPage = lazy(() =>
     default: module.VenueInfoPacketPage,
   })),
 );
-const VenueVendorRelationshipsPage = lazy(() =>
-  import("../features/facilities/VenueVendorRelationshipsPage").then(
-    (module) => ({
-      default: module.VenueVendorRelationshipsPage,
-    }),
-  ),
-);
-const VenueLayoutTemplatesPage = lazy(() =>
-  import("../features/facilities/VenueLayoutTemplatesPage").then((module) => ({
-    default: module.VenueLayoutTemplatesPage,
-  })),
-);
-const ApiKeysPage = lazy(() =>
-  import("../features/admin/ApiKeysPage").then((module) => ({
-    default: module.ApiKeysPage,
-  })),
-);
-const AssistantSettingsPage = lazy(() =>
-  import("../features/admin/AssistantSettingsPage").then((module) => ({
-    default: module.AssistantSettingsPage,
-  })),
-);
 const PermissionsPage = lazy(() =>
   import("../features/admin/PermissionsPage").then((module) => ({
     default: module.PermissionsPage,
@@ -532,16 +332,6 @@ const AnnouncementsPage = lazy(() =>
 const BrandingPage = lazy(() =>
   import("../features/admin/BrandingPage").then((module) => ({
     default: module.BrandingPage,
-  })),
-);
-const KitchensPage = lazy(() =>
-  import("../features/admin/KitchensPage").then((module) => ({
-    default: module.KitchensPage,
-  })),
-);
-const CatalogsPage = lazy(() =>
-  import("../features/admin/CatalogsPage").then((module) => ({
-    default: module.CatalogsPage,
   })),
 );
 const PersonalDataExportPage = lazy(() =>
@@ -564,11 +354,6 @@ const ExternalRecordsReconcilePage = lazy(() =>
 const ImportRunsListPage = lazy(() =>
   import("../features/admin/import/ImportRunsListPage").then((module) => ({
     default: module.ImportRunsListPage,
-  })),
-);
-const TppUploadPage = lazy(() =>
-  import("../features/admin/import/TppUploadPage").then((module) => ({
-    default: module.TppUploadPage,
   })),
 );
 const ImportRunDetailPage = lazy(() =>
@@ -793,20 +578,24 @@ export function App() {
           />
           <Route element={<AppShell />}>
             <Route index element={<HomeCalendarPage />} />
-            <Route path="/today" element={<HomePage />} />
+            <Route path="/today" element={<MovedRoute to="/" />} />
             <Route path="/events" element={<EventsListPage />} />
             <Route path="/workbooks" element={<EventWorkbooksPage />} />
             <Route path="/events/tracker" element={<EventTrackerHome />} />
             <Route path="/events/new" element={<EventCreatePage />} />
             <Route path="/events/import" element={<EventImportPage />} />
-            <Route path="/events/templates" element={<EventTemplatesPage />} />
+            <Route path="/events/setup" element={<EventSetupPage />} />
+            <Route
+              path="/events/templates"
+              element={<MovedRoute to="/events/setup" hash="templates" />}
+            />
             <Route
               path="/events/checklists"
-              element={<EventChecklistsPage />}
+              element={<MovedRoute to="/events/setup" hash="checklists" />}
             />
             <Route
               path="/events/planning/setup"
-              element={<PlanningSetupPage />}
+              element={<MovedRoute to="/events/setup" hash="planning" />}
             />
             <Route
               path="/events/capacity"
@@ -818,6 +607,14 @@ export function App() {
               element={<EventAllergenBriefingPage />}
             />
             <Route path="/events/:id/map" element={<EventRouteMapPage />} />
+            <Route
+              path="/events/:id/proposal"
+              element={
+                <SupplyRoute>
+                  <EventProposalPreviewPage />
+                </SupplyRoute>
+              }
+            />
             <Route
               path="/events/:id/menu"
               element={<RedirectEventMenuAlias />}
@@ -881,37 +678,28 @@ export function App() {
             <Route path="/kitchen/prep" element={<KitchenDashboardPage />} />
             <Route
               path="/kitchen/unresolved"
-              element={<KitchenUnresolvedWorkPage />}
+              element={<MovedRoute to="/kitchen/prep" hash="unresolved" />}
             />
             <Route
               path="/kitchen/cleanup"
-              element={<KitchenCatalogCleanupPage />}
+              element={<MovedRoute to="/kitchen/ingredients" hash="cleanup" />}
             />
-            <Route path="/kitchen/stations" element={<KitchenStationsPage />} />
+            <Route
+              path="/kitchen/stations"
+              element={<MovedRoute to="/kitchen/plan" hash="stations" />}
+            />
             <Route path="/kitchen/plan" element={<ProductionPlanPage />} />
             <Route
               path="/kitchen/yield"
-              element={
-                <SupplyRoute>
-                  <ProductionYieldDashboardPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/kitchen/plan" hash="yield" />}
             />
             <Route
               path="/inventory"
-              element={
-                <SupplyRoute>
-                  <InventoryOverviewPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/inventory/stock" />}
             />
             <Route
               path="/inventory/demand"
-              element={
-                <SupplyRoute>
-                  <DemandLedgerPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/inventory/purchasing" hash="demand" />}
             />
             <Route
               path="/inventory/stock"
@@ -932,18 +720,12 @@ export function App() {
             <Route
               path="/inventory/opening-stock"
               element={
-                <SupplyRoute>
-                  <OpeningStockPage />
-                </SupplyRoute>
+                <MovedRoute to="/inventory/counts" hash="opening-stock" />
               }
             />
             <Route
               path="/inventory/audit"
-              element={
-                <SupplyRoute>
-                  <InventoryAuditLogPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/inventory/stock" hash="history" />}
             />
             <Route
               path="/inventory/waste"
@@ -955,11 +737,7 @@ export function App() {
             />
             <Route
               path="/inventory/locations"
-              element={
-                <SupplyRoute>
-                  <StorageLocationsPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/inventory/stock" hash="locations" />}
             />
             <Route
               path="/inventory/traceability"
@@ -997,14 +775,7 @@ export function App() {
                 </SupplyRoute>
               }
             />
-            <Route
-              path="/staff"
-              element={
-                <SupplyRoute>
-                  <StaffOverviewPage />
-                </SupplyRoute>
-              }
-            />
+            <Route path="/staff" element={<MovedRoute to="/staff/roster" />} />
             <Route
               path="/staff/roster"
               element={
@@ -1015,11 +786,7 @@ export function App() {
             />
             <Route
               path="/staff/swaps"
-              element={
-                <SupplyRoute>
-                  <ShiftSwapRequestsPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/staff/roster" hash="swaps" />}
             />
             <Route
               path="/staff/time"
@@ -1031,11 +798,7 @@ export function App() {
             />
             <Route
               path="/staff/time-off"
-              element={
-                <SupplyRoute>
-                  <TimeOffRequestsPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/staff/time" hash="time-off" />}
             />
             <Route
               path="/staff/messages"
@@ -1048,9 +811,7 @@ export function App() {
             <Route
               path="/staff/qualifications"
               element={
-                <SupplyRoute>
-                  <QualificationsPage />
-                </SupplyRoute>
+                <MovedRoute to="/staff/training" hash="qualifications" />
               }
             />
             <Route
@@ -1071,35 +832,19 @@ export function App() {
             />
             <Route
               path="/staff/my-reviews"
-              element={
-                <SupplyRoute>
-                  <MyReviewsPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/my" hash="my-feedback" />}
             />
             <Route
               path="/staff/scorecards"
-              element={
-                <SupplyRoute>
-                  <RoleScorecardsPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/staff/reviews" hash="scorecards" />}
             />
             <Route
               path="/staff/crew-templates"
-              element={
-                <SupplyRoute>
-                  <StaffingTemplatesPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/staff/roster" hash="crew-templates" />}
             />
             <Route
               path="/staff/one-on-ones"
-              element={
-                <SupplyRoute>
-                  <OneOnOnesPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/staff/reviews" hash="one-on-ones" />}
             />
             <Route
               path="/staff/hiring"
@@ -1111,19 +856,11 @@ export function App() {
             />
             <Route
               path="/staff/utilization"
-              element={
-                <SupplyRoute>
-                  <StaffUtilizationPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/staff/time" hash="utilization" />}
             />
             <Route
               path="/logistics"
-              element={
-                <SupplyRoute>
-                  <LogisticsOverviewPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/logistics/dispatch" />}
             />
             <Route
               path="/logistics/pack-lists"
@@ -1168,17 +905,13 @@ export function App() {
             <Route
               path="/logistics/style-kits"
               element={
-                <SupplyRoute>
-                  <ServiceStyleKitsPage />
-                </SupplyRoute>
+                <MovedRoute to="/logistics/pack-templates" hash="style-kits" />
               }
             />
             <Route
               path="/logistics/pack-rules"
               element={
-                <SupplyRoute>
-                  <PackRulesPage />
-                </SupplyRoute>
+                <MovedRoute to="/logistics/pack-templates" hash="pack-rules" />
               }
             />
             <Route
@@ -1199,35 +932,21 @@ export function App() {
             />
             <Route
               path="/logistics/returns"
-              element={
-                <SupplyRoute>
-                  <ReturnsPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/logistics/packs" hash="returns" />}
             />
             <Route
               path="/logistics/floor"
-              element={
-                <SupplyRoute>
-                  <PackingFloorPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/logistics/packs" hash="floor" />}
             />
             <Route
               path="/logistics/schedule"
               element={
-                <SupplyRoute>
-                  <VehicleSchedulePage />
-                </SupplyRoute>
+                <MovedRoute to="/logistics/deliveries" hash="vehicles" />
               }
             />
             <Route
               path="/logistics/route"
-              element={
-                <SupplyRoute>
-                  <RoutePlannerPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/logistics/deliveries" hash="route" />}
             />
             <Route
               path="/logistics/fleet"
@@ -1239,19 +958,11 @@ export function App() {
             />
             <Route
               path="/logistics/maintenance"
-              element={
-                <SupplyRoute>
-                  <VehicleMaintenancePage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/logistics/fleet" hash="maintenance" />}
             />
             <Route
               path="/finance"
-              element={
-                <SupplyRoute>
-                  <FinanceOverviewPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/finance/invoices" />}
             />
             <Route
               path="/finance/invoices"
@@ -1279,27 +990,17 @@ export function App() {
             />
             <Route
               path="/finance/food-cost"
-              element={
-                <SupplyRoute>
-                  <FoodCostPercentagePage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/finance/revenue" hash="food-cost" />}
             />
             <Route
               path="/finance/profit-margins"
               element={
-                <SupplyRoute>
-                  <ProfitMarginReportsPage />
-                </SupplyRoute>
+                <MovedRoute to="/finance/revenue" hash="profit-margins" />
               }
             />
             <Route
               path="/finance/money-check"
-              element={
-                <SupplyRoute>
-                  <FinanceReconciliationPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/admin/parallel-run" hash="payments" />}
             />
             <Route
               path="/finance/taxes"
@@ -1312,9 +1013,7 @@ export function App() {
             <Route
               path="/finance/commission-terms"
               element={
-                <SupplyRoute>
-                  <VenueCommissionTermsPage />
-                </SupplyRoute>
+                <MovedRoute to="/finance/attribution" hash="commission-terms" />
               }
             />
             <Route
@@ -1322,14 +1021,6 @@ export function App() {
               element={
                 <SupplyRoute>
                   <RevenueAttributionsPage />
-                </SupplyRoute>
-              }
-            />
-            <Route
-              path="/finance/attribution/new"
-              element={
-                <SupplyRoute>
-                  <RevenueAttributionDetailPage />
                 </SupplyRoute>
               }
             />
@@ -1352,9 +1043,7 @@ export function App() {
             <Route
               path="/finance/payment-methods"
               element={
-                <SupplyRoute>
-                  <PaymentMethodsPage />
-                </SupplyRoute>
+                <MovedRoute to="/finance/payments" hash="payment-methods" />
               }
             />
             <Route
@@ -1418,12 +1107,7 @@ export function App() {
             />
             <Route
               path="/reports/scorecard"
-              element={
-                <SupplyRoute>
-                  <ReportsWorkspaceNav />
-                  <CompanyScorecardDashboardPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/reports/l10" hash="scorecard" />}
             />
             <Route
               path="/reports/l10"
@@ -1437,19 +1121,13 @@ export function App() {
             <Route
               path="/reports/avg-event-value"
               element={
-                <SupplyRoute>
-                  <ReportsWorkspaceNav />
-                  <AvgEventValueGrowthDashboardPage />
-                </SupplyRoute>
+                <MovedRoute to="/reports/sales" hash="avg-event-value" />
               }
             />
             <Route
               path="/reports/comp-master"
               element={
-                <SupplyRoute>
-                  <ReportsWorkspaceNav />
-                  <CompMasterDashboardPage />
-                </SupplyRoute>
+                <MovedRoute to="/finance/attribution" hash="comp-master" />
               }
             />
             <Route
@@ -1477,29 +1155,16 @@ export function App() {
                 </SupplyRoute>
               }
             />
-            <Route
-              path="/clients/proposals"
-              element={
-                <SupplyRoute>
-                  <ProposalsPage />
-                </SupplyRoute>
-              }
-            />
+            <Route path="/clients/proposals" element={<ProposalsRoute />} />
             <Route
               path="/clients/proposals/templates"
               element={
-                <SupplyRoute>
-                  <ProposalTemplatesPage />
-                </SupplyRoute>
+                <MovedRoute to="/events/setup" hash="proposal-templates" />
               }
             />
             <Route
               path="/clients/tastings"
-              element={
-                <SupplyRoute>
-                  <TastingsPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/clients/pipeline" hash="tastings" />}
             />
             <Route
               path="/clients/contracts"
@@ -1519,27 +1184,17 @@ export function App() {
             />
             <Route
               path="/clients/retention"
-              element={
-                <SupplyRoute>
-                  <ClientRetentionPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/clients" hash="retention" />}
             />
             <Route
               path="/clients/quote-requests"
               element={
-                <SupplyRoute>
-                  <QuoteSubmissionsReviewPage />
-                </SupplyRoute>
+                <MovedRoute to="/clients/pipeline" hash="quote-requests" />
               }
             />
             <Route
               path="/clients/date-holds"
-              element={
-                <SupplyRoute>
-                  <DateHoldsPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/clients/pipeline" hash="date-holds" />}
             />
             <Route
               path="/clients/inbox"
@@ -1559,11 +1214,7 @@ export function App() {
             />
             <Route
               path="/facilities"
-              element={
-                <SupplyRoute>
-                  <FacilitiesOverviewPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/facilities/venues" />}
             />
             <Route
               path="/facilities/equipment"
@@ -1584,18 +1235,12 @@ export function App() {
             <Route
               path="/facilities/venues/templates"
               element={
-                <SupplyRoute>
-                  <VenueLayoutTemplatesPage />
-                </SupplyRoute>
+                <MovedRoute to="/facilities/venues" hash="layout-templates" />
               }
             />
             <Route
               path="/facilities/venues/partners"
-              element={
-                <SupplyRoute>
-                  <VenuePartnersPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/facilities/venues" hash="partners" />}
             />
             <Route
               path="/facilities/venues/:id"
@@ -1624,25 +1269,30 @@ export function App() {
             <Route
               path="/facilities/vendor-relationships"
               element={
-                <SupplyRoute>
-                  <VenueVendorRelationshipsPage />
-                </SupplyRoute>
+                <MovedRoute
+                  to="/facilities/venues"
+                  hash="vendor-relationships"
+                />
               }
             />
             <Route
               path="/facilities/venues/:venueId/vendor-relationships"
               element={
-                <SupplyRoute>
-                  <VenueVendorRelationshipsPage />
-                </SupplyRoute>
+                <MovedRoute
+                  to="/facilities/venues"
+                  hash="vendor-relationships"
+                  paramsToQuery={{ venueId: "venue" }}
+                />
               }
             />
             <Route
               path="/facilities/venues/:venueId/templates"
               element={
-                <SupplyRoute>
-                  <VenueLayoutTemplatesPage />
-                </SupplyRoute>
+                <MovedRoute
+                  to="/facilities/venues"
+                  hash="layout-templates"
+                  paramsToQuery={{ venueId: "venue" }}
+                />
               }
             />
             <Route
@@ -1655,19 +1305,11 @@ export function App() {
             />
             <Route
               path="/admin/assistant"
-              element={
-                <SupplyRoute>
-                  <AssistantSettingsPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/admin/integrations" hash="assistant" />}
             />
             <Route
               path="/admin/api-keys"
-              element={
-                <SupplyRoute>
-                  <ApiKeysPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/admin/integrations" hash="api-keys" />}
             />
             <Route
               path="/admin/branding"
@@ -1679,19 +1321,11 @@ export function App() {
             />
             <Route
               path="/admin/kitchens"
-              element={
-                <SupplyRoute>
-                  <KitchensPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/admin/branding" hash="kitchens" />}
             />
             <Route
               path="/admin/catalogs"
-              element={
-                <SupplyRoute>
-                  <CatalogsPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/admin/branding" hash="catalogs" />}
             />
             <Route
               path="/admin/announcements"
@@ -1735,11 +1369,7 @@ export function App() {
             />
             <Route
               path="/admin/imports/tpp"
-              element={
-                <SupplyRoute>
-                  <TppUploadPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/admin/imports" hash="tpp" />}
             />
             <Route
               path="/admin/parallel-run"

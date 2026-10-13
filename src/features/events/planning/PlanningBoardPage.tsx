@@ -793,7 +793,7 @@ export function PlanningBoardPage() {
             against every other event before it saves.
           </p>
         </div>
-        <Link to="/events/planning/setup" className="btn btn-ghost">
+        <Link to="/events/setup#planning" className="btn btn-ghost">
           Planning setup
         </Link>
       </div>

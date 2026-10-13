@@ -6,6 +6,7 @@ import {
   type FocusEvent,
   type MouseEvent,
 } from "react";
+import { HomePage } from "./HomePage";
 import { useQuery } from "convex/react";
 import { Link, useNavigate } from "react-router-dom";
 import { api, type Id } from "../../lib/api";
@@ -574,12 +575,18 @@ export function HomeCalendarPage() {
 
   return (
     <div className="home-cal">
-      <div className="flex flex-wrap items-end justify-between gap-6">
+      {/* Today's service sits on Home: the day's decisions and services
+          first, the month underneath (docs/design/screen-map.md). */}
+      <HomePage />
+      <div
+        id="calendar"
+        className="mt-2 flex flex-wrap items-end justify-between gap-6 border-t-[1.5px] border-ink pt-4"
+      >
         <div>
-          <p className="eyebrow">Home · Calendar</p>
-          <h1 className="font-display mt-1 text-4xl leading-none tracking-tight text-ink">
+          <p className="eyebrow">Calendar</p>
+          <h2 className="font-display mt-1 text-3xl leading-none tracking-tight text-ink">
             {monthLabel(cursor.year, cursor.month)}
-          </h1>
+          </h2>
           <div className="fact-row mt-3">
             <span className="fact">
               <b>This month:</b>
@@ -609,9 +616,6 @@ export function HomeCalendarPage() {
         <div className="flex flex-wrap items-center gap-2">
           <Link to="/events/tracker" className="btn btn-ghost">
             Event tracker
-          </Link>
-          <Link to="/today" className="btn btn-ghost">
-            Today’s service
           </Link>
           <Link to={eventsIndexPath()} className="btn btn-ghost">
             All events

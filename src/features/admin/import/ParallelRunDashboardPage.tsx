@@ -4,6 +4,8 @@
 // TPP's side is read from the import's own saved rows, Capsule's from the
 // events, and every field difference is listed for a person to settle.
 
+import { MergedSection } from "../../../ui/MergedSection";
+import { FinanceReconciliationPage } from "../../finance/FinanceReconciliationPage";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/lib/api";
@@ -14,7 +16,7 @@ import {
 } from "../../../lib/useExternalRecordLinkLists";
 import { formatCountNoun, formatDateTime } from "../../../lib/format";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
-import { StatusChip, TableSkeleton } from "../../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../../ui/primitives";
 import { Link } from "react-router-dom";
 import { importRunDetailPath } from "./importRoutes";
 import { eventDetailPath } from "../../../features/events/eventRoutes";
@@ -354,35 +356,39 @@ export function ParallelRunDashboardPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <h1 className="display-title">Compare with TPP</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Compare with TPP"
+        lead={
+          <>
             A daily side-by-side of TPP and Capsule events from 30 days back
             onward, so you can confirm everything came over correctly before
             switching for good. Dig into any differences below.
-          </p>
-          <p className="mt-2 text-xs text-ink-3">
-            {comparison
-              ? `Last compared ${formatDateTime(comparison.comparedAt)}${
-                  comparison.nextRunAt
-                    ? ` · next check ${formatDateTime(comparison.nextRunAt)}`
-                    : " · daily checks are off"
-                }`
-              : "Not compared yet. Compare now starts the daily check."}
-          </p>
-        </div>
-        {overview !== null && (
-          <button
-            type="button"
-            className="btn btn-primary btn-sm"
-            disabled={comparing}
-            onClick={() => void handleCompareNow()}
-          >
-            {comparing ? "Comparing…" : "Compare now"}
-          </button>
-        )}
-      </header>
+          </>
+        }
+        actions={
+          <>
+            {overview !== null && (
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                disabled={comparing}
+                onClick={() => void handleCompareNow()}
+              >
+                {comparing ? "Comparing…" : "Compare now"}
+              </button>
+            )}
+          </>
+        }
+      />
+      <p className="mt-2 text-xs text-ink-3">
+        {comparison
+          ? `Last compared ${formatDateTime(comparison.comparedAt)}${
+              comparison.nextRunAt
+                ? ` · next check ${formatDateTime(comparison.nextRunAt)}`
+                : " · daily checks are off"
+            }`
+          : "Not compared yet. Compare now starts the daily check."}
+      </p>
       {compareError && (
         <FailureBanner
           failure={classifyCommandFailure(new Error(compareError))}
@@ -1082,6 +1088,13 @@ export function ParallelRunDashboardPage() {
           </section>
         </>
       )}
+      <MergedSection
+        id="payments"
+        title="Payments: old system against Capsule"
+        summary="Money rows from TPP checked against Capsule payments."
+      >
+        <FinanceReconciliationPage />
+      </MergedSection>
     </div>
   );
 }

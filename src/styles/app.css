@@ -1129,6 +1129,81 @@
     color: var(--color-brand);
     font-weight: 600;
   }
+  .kitchen-book-nav .workspace-tabs-more {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+    border-radius: 5px;
+    padding: 5px 10px;
+    color: var(--color-ink-2);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .kitchen-book-nav .workspace-tabs-more:hover {
+    background: var(--color-panel);
+    color: var(--color-ink);
+  }
+  .kitchen-book-nav .workspace-tabs-more.active {
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+    font-weight: 600;
+  }
+  /* Pinned jump strip on pages that hold folded screens (OnThisPage). */
+  .on-this-page-pin {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    height: 0;
+    margin-top: -24px;
+    margin-bottom: 24px;
+  }
+  .on-this-page {
+    position: absolute;
+    inset: 0 -32px auto;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--color-line);
+    background: var(--color-panel);
+    padding: 6px 32px;
+    box-shadow: 0 6px 12px -10px rgb(30 40 36 / 0.25);
+    scrollbar-width: thin;
+  }
+  @media (max-width: 767px) {
+    .on-this-page-pin {
+      margin-top: -12px;
+      margin-bottom: 12px;
+    }
+    .on-this-page {
+      inset: 0 -16px auto;
+      padding: 6px 16px;
+    }
+  }
+  .on-this-page-label {
+    flex: none;
+    padding-right: 6px;
+    color: var(--color-ink-3);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .on-this-page button {
+    flex: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    color: var(--color-ink-2);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .on-this-page button:hover {
+    background: var(--color-inset);
+    color: var(--color-ink);
+  }
   .component-index-heading {
     display: flex;
     align-items: flex-end;
@@ -2919,30 +2994,6 @@
 }
 
 /* Reports — a narrow saved index beside one dominant, ruled live result. */
-.report-view-switch {
-  display: flex;
-  gap: 0;
-  margin-bottom: 1.5rem;
-  border-bottom: 1px solid var(--color-line-2);
-  background: var(--color-panel);
-}
-
-.report-view-switch button {
-  border: 0;
-  border-right: 1px solid var(--color-line);
-  background: transparent;
-  padding: 0.75rem 1rem;
-  color: var(--color-ink-3);
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.report-view-switch button.is-active {
-  box-shadow: inset 0 -3px 0 var(--color-brand);
-  color: var(--color-ink);
-}
 
 .tpp-report-page {
   gap: 2rem;
@@ -5394,4 +5445,117 @@ div.tpp-parameter-wide {
   font-family: var(--font-mono);
   font-size: 13px;
   line-height: 1.4;
+}
+
+/* Unlayered so it beats the unlayered ledger heading sizes. */
+/* A folded screen is one row of its host page (MergedSection): title,
+   one line of purpose, arrow. Open, its content sits in the same panel
+   with headings one step smaller than the row title. */
+.merged-section {
+  min-width: 0;
+}
+.merged-section + .merged-section {
+  margin-top: -0.25rem;
+}
+.merged-section-head button {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 12px;
+  row-gap: 2px;
+  padding: 14px 16px;
+  text-align: left;
+}
+.merged-section-head button:hover {
+  background: var(--color-inset);
+}
+.merged-section-title {
+  color: var(--color-ink);
+  font-size: 16px;
+  font-weight: 600;
+}
+.merged-section-summary {
+  flex: 1 1 16rem;
+  min-width: 0;
+  color: var(--color-ink-2);
+  font-size: 13px;
+  font-weight: 400;
+}
+.merged-section-chevron {
+  flex: none;
+  align-self: center;
+  margin-left: auto;
+  color: var(--color-ink-3);
+  transition: transform 150ms ease;
+}
+.merged-section[data-open] .merged-section-chevron {
+  transform: rotate(180deg);
+}
+.merged-section-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+  border-top: 1px solid var(--color-line);
+  padding: 16px;
+}
+.merged-section-body .operations-stage,
+.merged-section-body .supply-stage {
+  padding: 0;
+}
+.merged-section-body .working-ledger {
+  border-top-color: var(--color-line);
+}
+.merged-section-body .ledger-heading h2,
+.merged-section-body .vendor-index h2,
+.merged-section-body h2.display-title {
+  font-size: 18px;
+}
+@media (max-width: 767px) {
+  .merged-section-head button {
+    padding: 12px;
+  }
+  .merged-section-body {
+    padding: 12px;
+  }
+}
+
+/* Contained work areas (owner, 2026-10-13: "screens need more distinct
+   coloring to clearly define boundaries" — like the Skills & training module
+   cards). The page is a pale ground; every working list, queue and table sits
+   on its own white panel with a coloured rule on top, so each part of a page
+   reads as one thing to look at. */
+.app-canvas {
+  background: var(--color-inset);
+}
+.dark .app-canvas {
+  background: var(--color-canvas);
+}
+.working-ledger,
+section.card {
+  border: 1px solid var(--color-line);
+  border-top: 3px solid var(--color-accent);
+  border-radius: var(--radius-md);
+  background: var(--color-panel);
+}
+.working-ledger > .ledger-heading {
+  padding: 0.85rem 1rem;
+}
+.working-ledger
+  > :not(.ledger-heading):not(.supply-table-wrap):not(table):not(form):not(
+    section
+  ) {
+  padding-inline: 1rem;
+}
+.working-ledger > :last-child:not(.supply-table-wrap):not(table) {
+  padding-bottom: 1rem;
+}
+/* A folded part's panel already is the boundary: its inner lists stay flat. */
+.merged-section {
+  border-top-color: var(--color-ink-3);
+}
+.merged-section-body .working-ledger,
+.merged-section-body section.card {
+  border-top-width: 1px;
+  border-top-color: var(--color-line);
 }

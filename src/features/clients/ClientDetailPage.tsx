@@ -29,6 +29,7 @@ import {
   PageHeader,
   Section,
   TableSkeleton,
+  StatusChip,
 } from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
 import { ReturnToListLink } from "../list-state/listOrigin";
@@ -311,19 +312,37 @@ export function ClientDetailPage() {
       {host}
 
       <Section title="Proposals & contracts" count={clientProposals.length}>
-        <p className="px-3 py-3 text-base text-ink-2">
-          {clientProposals.length} proposal
-          {clientProposals.length === 1 ? "" : "s"} · {clientContracts.length}{" "}
-          contract{clientContracts.length === 1 ? "" : "s"} for this client.
-          Open{" "}
-          <Link className="text-link" to={CLIENTS_ROUTES.proposals}>
-            Proposals
-          </Link>{" "}
-          or{" "}
+        {/* Each proposal opens on its event (or on its own, for a lead with
+            no event yet); there is no separate list of proposals. */}
+        {clientProposals.length === 0 ? (
+          <p className="px-3 py-3 text-base text-ink-2">
+            No proposals yet. Build one from an event with one click.
+          </p>
+        ) : (
+          <ul className="divide-y divide-line">
+            {[...clientProposals]
+              .sort((a, b) => b._creationTime - a._creationTime)
+              .map((proposal) => (
+                <li key={proposal._id}>
+                  <Link
+                    className="flex items-center justify-between gap-3 px-3 py-2.5 hover:bg-inset"
+                    to={CLIENTS_ROUTES.proposal(proposal._id)}
+                  >
+                    <span className="min-w-0 truncate font-medium text-ink">
+                      {proposal.title || "Proposal"}
+                    </span>
+                    <StatusChip status={String(proposal.status)} />
+                  </Link>
+                </li>
+              ))}
+          </ul>
+        )}
+        <p className="border-t border-line px-3 py-3 text-base text-ink-2">
+          {clientContracts.length} contract
+          {clientContracts.length === 1 ? "" : "s"} for this client.{" "}
           <Link className="text-link" to={CLIENTS_ROUTES.contracts}>
-            Contracts
-          </Link>{" "}
-          to send, accept, or sign.
+            Open contracts
+          </Link>
         </p>
       </Section>
 

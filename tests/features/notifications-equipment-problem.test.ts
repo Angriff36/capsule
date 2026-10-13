@@ -117,7 +117,7 @@ describe("quote request notifications", () => {
     expect(out).toEqual([
       expect.objectContaining({
         message: "Marcus Lee asked for a quote · 45 guests",
-        link: "/clients/quote-requests",
+        link: "/clients/pipeline#quote-requests",
       }),
     ]);
   });
@@ -154,7 +154,7 @@ describe("shift swap notifications", () => {
       }),
     ).filter((row) => row.kind === "shift_swap");
     expect(toApprove).toEqual([
-      expect.objectContaining({ link: "/staff/swaps" }),
+      expect.objectContaining({ link: "/staff/roster#swaps" }),
     ]);
 
     // The person who asked is not told about their own request.

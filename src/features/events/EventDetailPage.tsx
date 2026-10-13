@@ -1,4 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { MergedSection } from "../../ui/MergedSection";
+import { ProposalsPage } from "../clients/ProposalsPage";
+import { venueDetailPath } from "../facilities/facilitiesRoutes";
 import { useClientsByIds } from "../../lib/useClientDirectory";
 import { AllergenBriefingButton } from "./AllergenBriefingButton";
 import {
@@ -152,6 +155,19 @@ function EventDetailContent({
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = parseEventDetailTab(searchParams.get("tab"));
+  // An old tab key (?tab=guests) or a #part opens its host tab and scrolls
+  // to that part (docs/design/screen-map.md).
+  const rawTab = searchParams.get("tab");
+  const tabPart =
+    location.hash.slice(1) || (rawTab && rawTab !== activeTab ? rawTab : "");
+  useEffect(() => {
+    if (!tabPart) return;
+    const scroll = () =>
+      document.getElementById(tabPart)?.scrollIntoView({ block: "start" });
+    scroll();
+    const timers = [400, 1200].map((ms) => window.setTimeout(scroll, ms));
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [tabPart, activeTab]);
   const mobile = useMobileViewport();
   const identity = useChatIdentity();
   // The walkie receiver lives at the dossier level, not inside the chat tab:
@@ -483,17 +499,19 @@ function EventDetailContent({
           {action.label}
         </button>
       ))}
-      <Link
+      <a
         key="create-proposal"
         className="btn btn-ghost"
-        to={`/clients/proposals?event=${event._id}`}
+        href={`/events/${event._id}/proposal`}
+        target="_blank"
+        rel="noopener"
       >
-        Create proposal
-      </Link>
+        Proposal
+      </a>
       <Link
         key="save-as-template"
         className="btn btn-ghost"
-        to={`/events/templates?fromEvent=${event._id}`}
+        to={`/events/setup?fromEvent=${event._id}#templates`}
       >
         Save as template
       </Link>
@@ -705,61 +723,72 @@ function EventDetailContent({
               endsAt={event.endsAt}
             />
             <EventRentalOrdersPanel eventId={event._id} />
+            <section id="layouts" className="scroll-mt-20">
+              <EventLayoutsTab eventId={event._id} />
+            </section>
           </div>
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "client" ? (
-        <EventTabErrorBoundary tabLabel="Client Information" key="client">
-          <EventClientTab
-            eventId={event._id}
-            eventTitle={event.title}
-            clientId={event.clientId}
-            primaryContactName={event.primaryContactName}
-            primaryContactEmail={event.primaryContactEmail}
-            primaryContactPhone={event.primaryContactPhone}
-            accessibilityNeeds={event.accessibilityNeeds?.join(", ")}
-            serviceRequirements={event.serviceRequirements}
-            operationalRequirements={event.operationalRequirements}
-          />
-        </EventTabErrorBoundary>
-      ) : null}
-      {activeTab === "guests" ? (
-        <EventTabErrorBoundary tabLabel="Guests" key="guests">
-          <section className="space-y-4" data-testid="event-guests-tab">
-            <EventTabIntro
-              title="Guests"
-              description="Invite guests, track RSVPs, tables, seats and entrée picks, and note dietary needs so they show up on the allergen briefing."
-            />
-            <EventGuestPanel
+        <EventTabErrorBoundary tabLabel="Client & guests" key="client">
+          <div className="space-y-6">
+            <EventClientTab
               eventId={event._id}
-              expectedHeadcount={event.expectedHeadcount}
+              eventTitle={event.title}
+              clientId={event.clientId}
+              primaryContactName={event.primaryContactName}
+              primaryContactEmail={event.primaryContactEmail}
+              primaryContactPhone={event.primaryContactPhone}
+              accessibilityNeeds={event.accessibilityNeeds?.join(", ")}
+              serviceRequirements={event.serviceRequirements}
+              operationalRequirements={event.operationalRequirements}
             />
-          </section>
+            <section
+              id="guests"
+              className="scroll-mt-20 space-y-4"
+              data-testid="event-guests-tab"
+            >
+              <EventTabIntro
+                title="Guests"
+                description="Invite guests, track RSVPs, tables, seats and entrée picks, and note dietary needs so they show up on the allergen briefing."
+              />
+              <EventGuestPanel
+                eventId={event._id}
+                expectedHeadcount={event.expectedHeadcount}
+              />
+            </section>
+          </div>
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "photos" ? (
-        <EventTabErrorBoundary tabLabel="Event Photo Gallery" key="photos">
-          <EventPhotosTab eventId={event._id} />
+        <EventTabErrorBoundary tabLabel="Photos & incidents" key="photos">
+          <div className="space-y-6">
+            <EventPhotosTab eventId={event._id} />
+            <section
+              id="incidents"
+              className="scroll-mt-20 space-y-4"
+              data-testid="event-incidents-tab"
+            >
+              <EventTabIntro
+                title="Incidents"
+                description="Report and resolve safety, allergen, and service incidents for this event. Allergen incidents open a required corrective action."
+              />
+              <EventIncidentPanel eventId={event._id} />
+            </section>
+            <section id="history" className="scroll-mt-20">
+              <EventHistoryTab eventId={event._id} />
+            </section>
+          </div>
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "timeline" ? (
         <EventTabErrorBoundary tabLabel="Timeline" key="timeline">
-          <EventTimelineTab eventId={event._id} startsAt={event.startsAt} />
-        </EventTabErrorBoundary>
-      ) : null}
-      {activeTab === "todos" ? (
-        <EventTabErrorBoundary tabLabel="To-dos" key="todos">
-          <EventTodosTab eventId={event._id} startsAt={event.startsAt} />
-        </EventTabErrorBoundary>
-      ) : null}
-      {activeTab === "history" ? (
-        <EventTabErrorBoundary tabLabel="History" key="history">
-          <EventHistoryTab eventId={event._id} />
-        </EventTabErrorBoundary>
-      ) : null}
-      {activeTab === "layouts" ? (
-        <EventTabErrorBoundary tabLabel="Layouts" key="layouts">
-          <EventLayoutsTab eventId={event._id} />
+          <div className="space-y-6">
+            <EventTimelineTab eventId={event._id} startsAt={event.startsAt} />
+            <section id="todos" className="scroll-mt-20">
+              <EventTodosTab eventId={event._id} startsAt={event.startsAt} />
+            </section>
+          </div>
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "staffing" ? (
@@ -790,20 +819,21 @@ function EventDetailContent({
           </section>
         </EventTabErrorBoundary>
       ) : null}
-      {activeTab === "incidents" ? (
-        <EventTabErrorBoundary tabLabel="Incidents" key="incidents">
-          <section className="space-y-4" data-testid="event-incidents-tab">
-            <EventTabIntro
-              title="Incidents"
-              description="Report and resolve safety, allergen, and service incidents for this event. Allergen incidents open a required corrective action."
-            />
-            <EventIncidentPanel eventId={event._id} />
-          </section>
-        </EventTabErrorBoundary>
-      ) : null}
       {activeTab === "margin" ? (
-        <EventTabErrorBoundary tabLabel="Margin" key="margin">
-          <EventMarginTab eventId={event._id} />
+        <EventTabErrorBoundary tabLabel="Proposal & margin" key="margin">
+          <div className="space-y-6">
+            {/* The proposal lives on its event: built from the event in one
+                click, every earlier version listed under it. */}
+            <MergedSection
+              id="proposal"
+              title="Proposal"
+              summary="Proposals sent to the client for this event. Open Proposal at the top to print one or send it."
+              defaultOpen
+            >
+              <ProposalsPage eventId={event._id} />
+            </MergedSection>
+            <EventMarginTab eventId={event._id} />
+          </div>
         </EventTabErrorBoundary>
       ) : null}
     </>
@@ -858,7 +888,9 @@ function EventDetailContent({
         })()}
         venue={
           event.venueId ? (
-            <Link to="/facilities">{venueLabel}</Link>
+            <Link to={venueDetailPath(String(event.venueId))}>
+              {venueLabel}
+            </Link>
           ) : (
             venueLabel
           )

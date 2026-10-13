@@ -22,7 +22,7 @@ import {
   useBulkRun,
   useBulkSelection,
 } from "../../ui/bulk-select";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useOptimisticStatus } from "../../ui/useOptimisticStatus";
 import { useEventsById, useEventsInRange } from "../facilities/useEventsById";
 import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
@@ -464,31 +464,32 @@ export function PrepBoardPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Kitchen · Service production</p>
-          <h1 className="display-title mt-2">Production prep sheet</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Production prep sheet"
+        lead={
+          <>
             Organize event prep by finish station, quantity, instruction, and
             quality gate. Claim a line when you take it, then carry it through
             service-ready completion.
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Link to="/kitchen/display" className="btn btn-ghost">
-            Kitchen display
-          </Link>
-          <button
-            type="button"
-            className="btn btn-primary"
-            aria-expanded={showCreate}
-            aria-controls="prep-task-form"
-            onClick={() => setShowCreate((value) => !value)}
-          >
-            {showCreate ? "Close task form" : "Add prep task"}
-          </button>
-        </div>
-      </header>
+          </>
+        }
+        actions={
+          <>
+            <Link to="/kitchen/display" className="btn btn-ghost">
+              Kitchen display
+            </Link>
+            <button
+              type="button"
+              className="btn btn-primary"
+              aria-expanded={showCreate}
+              aria-controls="prep-task-form"
+              onClick={() => setShowCreate((value) => !value)}
+            >
+              {showCreate ? "Close task form" : "Add prep task"}
+            </button>
+          </>
+        }
+      />
       <KitchenBookNav />
       <ProductionWorkspaceNav />
 

@@ -1,4 +1,9 @@
 import { useMemo, useState, type CSSProperties, type FormEvent } from "react";
+import { OpenProposalFollowUps } from "./OpenProposalFollowUps";
+import { MergedSection } from "../../ui/MergedSection";
+import { DateHoldsPage } from "../sales/DateHoldsPage";
+import { QuoteSubmissionsReviewPage } from "../sales/QuoteSubmissionsReviewPage";
+import { TastingsPage } from "./TastingsPage";
 import { Link } from "react-router-dom";
 import {
   useCreateClient,
@@ -18,7 +23,7 @@ import {
 import { type Id } from "../../lib/api";
 import { formatDate } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
-import { TableSkeleton } from "../../ui/primitives";
+import { PageHeader, TableSkeleton } from "../../ui/primitives";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
@@ -457,28 +462,39 @@ export function LeadPipelinePage() {
 
   return (
     <div className="operations-stage supply-stage lead-pipeline-stage">
-      <header className="supply-masthead lead-pipeline-masthead">
-        <div>
-          <p className="eyebrow">Clients · Pipeline</p>
-          <h1 className="display-title mt-2">Lead pipeline</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Every inquiry in one place, from first call to booked business. Jot
-            it down when the phone rings, then move it across the board as the
-            conversation progresses.
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            className="btn btn-primary"
-            type="button"
-            onClick={() => setShowCapture((value) => !value)}
-          >
-            {showCapture ? "Close form" : "Capture lead"}
-          </button>
-        </div>
-      </header>
+      <PageHeader
+        title="Pipeline"
+        lead="Every inquiry from first call to booked business: website quote requests, the lead board, date holds and tastings."
+        actions={
+          <>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={() => setShowCapture((value) => !value)}
+            >
+              {showCapture ? "Close form" : "Capture lead"}
+            </button>
+          </>
+        }
+      />
 
       <ClientsWorkspaceNav />
+      <MergedSection
+        id="proposal-follow-ups"
+        title="Proposals to follow up"
+        summary="Sent proposals due a reminder, a call or a price check."
+        defaultOpen
+      >
+        <OpenProposalFollowUps onNotice={setNotice} onFailure={setFailure} />
+      </MergedSection>
+      <MergedSection
+        id="quote-requests"
+        title="Website quote requests"
+        summary="Requests from your website waiting to become a lead, event and proposal."
+        defaultOpen
+      >
+        <QuoteSubmissionsReviewPage />
+      </MergedSection>
 
       <section className="lead-pipeline-metrics" aria-label="Pipeline summary">
         <article>
@@ -1070,6 +1086,20 @@ export function LeadPipelinePage() {
           Show lead sources (all time)
         </button>
       )}
+      <MergedSection
+        id="date-holds"
+        title="Date holds"
+        summary="Dates held for prospects, and who is waiting for each date."
+      >
+        <DateHoldsPage />
+      </MergedSection>
+      <MergedSection
+        id="tastings"
+        title="Tastings"
+        summary="Booked tastings and what the client liked."
+      >
+        <TastingsPage />
+      </MergedSection>
     </div>
   );
 }

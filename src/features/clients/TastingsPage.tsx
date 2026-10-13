@@ -1,4 +1,5 @@
 import { type FormEvent, useMemo, useState } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { useCreateTasting } from "../../lib/manifest-convex-react";
 import {
   useLeadsByIds,
@@ -42,6 +43,7 @@ export function leadLabel(lead: {
  * dish, then put the approved dishes on the proposal menu.
  */
 export function TastingsPage() {
+  const embedded = useEmbedded();
   // Every open tasting (through the status index), the newest finished ones
   // a page at a time; open leads for the booking form; and only the
   // proposals and leads those name.
@@ -163,17 +165,22 @@ export function TastingsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Clients · Tastings</p>
-          <h1 className="display-title mt-2">Client tastings</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Book a tasting, choose the sample dishes, and write down what the
-            client liked. Approved dishes go straight onto the proposal menu.
-          </p>
-        </div>
-      </header>
-      <ClientsWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <header className="supply-masthead">
+            <div>
+              <p className="eyebrow">Clients · Tastings</p>
+              <h1 className="display-title mt-2">Client tastings</h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                Book a tasting, choose the sample dishes, and write down what
+                the client liked. Approved dishes go straight onto the proposal
+                menu.
+              </p>
+            </div>
+          </header>
+          <ClientsWorkspaceNav />
+        </>
+      )}
       {failure ? <CrmFailureBanner error={failure} /> : null}
 
       <form

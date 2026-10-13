@@ -1,0 +1,166 @@
+// Capsule admin — comments pinned on a spot of any screen.
+//
+// Ryan 2026-10-13: "allow any admins in capsule to comment on anything on the
+// page with feedback for improvements or to point out missing functionality.
+// bypass vercel automatically. have it set up to ping you every time feedback
+// is given". An admin clicks a spot on any screen and writes what to change.
+// The comment stays pinned to that spot for every admin, and each new comment
+// becomes a GitHub issue (convex/pageFeedback.ts) that starts a Claude run.
+
+use "../foundation/base.manifest"
+
+enum PageFeedbackKind {
+  improvement
+  missing
+  broken
+}
+
+enum PageFeedbackStatus {
+  open
+  resolved
+}
+
+entity PageFeedback mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // The address of the screen, e.g. "/events/abc/money".
+  property indexed required pagePath: string = ""
+  property pageTitle: string?
+  // What was clicked, in words ("Save button", "Guest count").
+  property targetLabel: string?
+  // Where the pin sits: a CSS path to the clicked element, and the click
+  // point inside it as a share of its width and height (0 to 1).
+  property targetSelector: string?
+  property offsetX: float?
+  property offsetY: float?
+  property viewportWidth: int?
+  property required kind: PageFeedbackKind = "improvement"
+  property required body: string = ""
+  property required status: PageFeedbackStatus = "open"
+  property leftAt: datetime?
+  property leftById: string?
+  property leftByPersonId: uuid?
+  property leftByName: string?
+  property issueNumber: int?
+  property issueUrl: string?
+  property resolvedAt: datetime?
+
+  constraint pageFeedbackBodyPresent: self.leftAt == null or length(trim(self.body)) > 0 "Write what should change."
+
+  default policy pageFeedbackRead read: roleAllows(user.role, "adminAccess") "Admins may see screen comments"
+  default policy pageFeedbackWrite write: roleAllows(user.role, "adminAccess") "Admins may leave screen comments"
+  default policy pageFeedbackExecute execute: roleAllows(user.role, "adminAccess") "Admins may leave screen comments"
+
+  command leave(
+    pagePath: string,
+    kind: PageFeedbackKind,
+    body: string,
+    optional pageTitle: string,
+    optional targetLabel: string,
+    optional targetSelector: string,
+    optional offsetX: float,
+    optional offsetY: float,
+    optional viewportWidth: int
+  ) {
+    guard self.leftAt == null
+    guard self.deletedAt == null
+    constraint leaveFeedbackBody: length(trim(body)) > 0 "Write what should change."
+    constraint leaveFeedbackPage: length(trim(pagePath)) > 0 "Pick a spot on a screen first."
+    mutate pagePath = pagePath
+    mutate kind = kind
+    mutate body = trim(body)
+    mutate pageTitle = pageTitle
+    mutate targetLabel = targetLabel
+    mutate targetSelector = targetSelector
+    mutate offsetX = offsetX
+    mutate offsetY = offsetY
+    mutate viewportWidth = viewportWidth
+    mutate status = "open"
+    mutate leftAt = now()
+    mutate leftById = user.id
+    mutate leftByPersonId = user.personId
+    mutate leftByName = user.personName
+    emit PageFeedbackLeft {
+      pageFeedbackId: self.id
+      tenantId: self.tenantId
+      pagePath: pagePath
+    }
+  }
+
+  // The GitHub issue that carries this comment to Claude.
+  command recordIssue(issueNumber: int, issueUrl: string) {
+    guard self.leftAt != null
+    guard self.deletedAt == null
+    mutate issueNumber = issueNumber
+    mutate issueUrl = issueUrl
+    emit PageFeedbackIssueRecorded {
+      pageFeedbackId: self.id
+      tenantId: self.tenantId
+      issueNumber: issueNumber
+    }
+  }
+
+  command markResolved() {
+    guard self.leftAt != null
+    guard self.deletedAt == null
+    guard self.status == "open"
+    mutate status = "resolved"
+    mutate resolvedAt = now()
+    emit PageFeedbackResolved {
+      pageFeedbackId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reopen() {
+    guard self.leftAt != null
+    guard self.deletedAt == null
+    guard self.status == "resolved"
+    mutate status = "open"
+    mutate resolvedAt = null
+    emit PageFeedbackReopened {
+      pageFeedbackId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command remove() {
+    guard self.deletedAt == null
+    mutate deletedAt = now()
+    emit PageFeedbackRemoved {
+      pageFeedbackId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store PageFeedback in durable
+}
+
+event PageFeedbackLeft: "page_feedback.left" {
+  pageFeedbackId: string
+  tenantId: string
+  pagePath: string
+}
+
+event PageFeedbackIssueRecorded: "page_feedback.issue_recorded" {
+  pageFeedbackId: string
+  tenantId: string
+  issueNumber: number
+}
+
+event PageFeedbackResolved: "page_feedback.resolved" {
+  pageFeedbackId: string
+  tenantId: string
+}
+
+event PageFeedbackReopened: "page_feedback.reopened" {
+  pageFeedbackId: string
+  tenantId: string
+}
+
+event PageFeedbackRemoved: "page_feedback.removed" {
+  pageFeedbackId: string
+  tenantId: string
+}

@@ -61,13 +61,13 @@ function fixture() {
   ]);
 }
 it("tells operators to reorder actual shortages rather than every below-PAR item", async () => {
-  await mount(createElement(PageGuide), "/inventory");
+  await mount(createElement(PageGuide), "/inventory/stock");
   expect(container.textContent).toContain(
     "Watch the Below reorder alerts — that's what to reorder.",
   );
   expect(container.textContent).not.toContain("Below PAR list");
   await click(button("Dismiss"));
-  await click(button("About Inventory"));
+  await click(button("About Stock"));
   expect(container.textContent).toContain("Below reorder alerts");
 });
 it("shows only actual reorder shortages in the stock book and overview, using catalog units", async () => {

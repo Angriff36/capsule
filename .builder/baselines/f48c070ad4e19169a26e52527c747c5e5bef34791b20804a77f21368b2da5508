@@ -601,6 +601,11 @@ import {
   PackSectionClaimReleaseParamsSchema,
   PackSectionClaimTakeOverParamsSchema,
   PackSectionClaimTakeParamsSchema,
+  PageFeedbackLeaveParamsSchema,
+  PageFeedbackMarkResolvedParamsSchema,
+  PageFeedbackRecordIssueParamsSchema,
+  PageFeedbackRemoveParamsSchema,
+  PageFeedbackReopenParamsSchema,
   ParallelRunDifferenceAssignParamsSchema,
   ParallelRunDifferenceReopenParamsSchema,
   ParallelRunDifferenceSettleParamsSchema,
@@ -9134,6 +9139,77 @@ export function useCreatePackSectionClaim() {
   };
 }
 
+/** Reactive list for PageFeedback. */
+export function useListPageFeedback() {
+  return useQuery(api.queries.listPageFeedback);
+}
+
+/** Reactive get-by-id for PageFeedback. Pass "skip" to suspend. */
+export function useGetPageFeedback(id: string | "skip") {
+  return useQuery(api.queries.getPageFeedback, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for PageFeedback.leave. */
+export function usePageFeedbackLeave() {
+  const mutate = useMutation(api.mutations.PageFeedback_leave);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PageFeedbackLeaveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PageFeedback.markResolved. */
+export function usePageFeedbackMarkResolved() {
+  const mutate = useMutation(api.mutations.PageFeedback_markResolved);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PageFeedbackMarkResolvedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PageFeedback.recordIssue. */
+export function usePageFeedbackRecordIssue() {
+  const mutate = useMutation(api.mutations.PageFeedback_recordIssue);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PageFeedbackRecordIssueParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PageFeedback.remove. */
+export function usePageFeedbackRemove() {
+  const mutate = useMutation(api.mutations.PageFeedback_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PageFeedbackRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PageFeedback.reopen. */
+export function usePageFeedbackReopen() {
+  const mutate = useMutation(api.mutations.PageFeedback_reopen);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PageFeedbackReopenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for PageFeedback.leave. */
+export function useCreatePageFeedback() {
+  const mutate = useMutation(api.mutations.PageFeedback_createViaLeave);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = PageFeedbackLeaveParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for ParallelRunComparison. */
 export function useListParallelRunComparison() {
   return useQuery(api.queries.listParallelRunComparison);
@@ -15066,4 +15142,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1590 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1598 as const;
