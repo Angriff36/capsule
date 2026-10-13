@@ -157,6 +157,7 @@ import type * as lib_eventPacket_dishCosts from "../lib/eventPacket/dishCosts.js
 import type * as lib_eventPacket_finalLock from "../lib/eventPacket/finalLock.js";
 import type * as lib_eventPacket_finalLockInput from "../lib/eventPacket/finalLockInput.js";
 import type * as lib_eventPacket_reconcileNative from "../lib/eventPacket/reconcileNative.js";
+import type * as lib_eventPriceList from "../lib/eventPriceList.js";
 import type * as lib_eventReadinessProjection from "../lib/eventReadinessProjection.js";
 import type * as lib_eventRouteLegRead from "../lib/eventRouteLegRead.js";
 import type * as lib_eventStaffingOperations from "../lib/eventStaffingOperations.js";
@@ -285,6 +286,7 @@ import type * as lib_vehicleDeliveryAvailability from "../lib/vehicleDeliveryAva
 import type * as lib_vendorItemPriceHistory from "../lib/vendorItemPriceHistory.js";
 import type * as lib_venueFactsSnapshot from "../lib/venueFactsSnapshot.js";
 import type * as lib_venueReconciliation from "../lib/venueReconciliation.js";
+import type * as lib_venueTaxRates from "../lib/venueTaxRates.js";
 import type * as lib_volumeUnitMl from "../lib/volumeUnitMl.js";
 import type * as logisticsWindow from "../logisticsWindow.js";
 import type * as menuRecipeLookup from "../menuRecipeLookup.js";
@@ -308,6 +310,7 @@ import type * as planWindow from "../planWindow.js";
 import type * as productionWindow from "../productionWindow.js";
 import type * as proposalEmail from "../proposalEmail.js";
 import type * as publicMenu from "../publicMenu.js";
+import type * as purchasingRepair from "../purchasingRepair.js";
 import type * as pushDeviceHealth from "../pushDeviceHealth.js";
 import type * as pushSubscriptions from "../pushSubscriptions.js";
 import type * as qboSync from "../qboSync.js";
@@ -372,6 +375,7 @@ import type * as vendorNames from "../vendorNames.js";
 import type * as vendorOrderEmail from "../vendorOrderEmail.js";
 import type * as vendorPriceList from "../vendorPriceList.js";
 import type * as venueGallery from "../venueGallery.js";
+import type * as venueMerge from "../venueMerge.js";
 import type * as venueVendorPolicy from "../venueVendorPolicy.js";
 import type * as webhookDeliveries from "../webhookDeliveries.js";
 import type * as webhookIntegrations from "../webhookIntegrations.js";
@@ -535,6 +539,7 @@ declare const fullApi: ApiFromModules<{
   "lib/eventPacket/finalLock": typeof lib_eventPacket_finalLock;
   "lib/eventPacket/finalLockInput": typeof lib_eventPacket_finalLockInput;
   "lib/eventPacket/reconcileNative": typeof lib_eventPacket_reconcileNative;
+  "lib/eventPriceList": typeof lib_eventPriceList;
   "lib/eventReadinessProjection": typeof lib_eventReadinessProjection;
   "lib/eventRouteLegRead": typeof lib_eventRouteLegRead;
   "lib/eventStaffingOperations": typeof lib_eventStaffingOperations;
@@ -663,6 +668,7 @@ declare const fullApi: ApiFromModules<{
   "lib/vendorItemPriceHistory": typeof lib_vendorItemPriceHistory;
   "lib/venueFactsSnapshot": typeof lib_venueFactsSnapshot;
   "lib/venueReconciliation": typeof lib_venueReconciliation;
+  "lib/venueTaxRates": typeof lib_venueTaxRates;
   "lib/volumeUnitMl": typeof lib_volumeUnitMl;
   logisticsWindow: typeof logisticsWindow;
   menuRecipeLookup: typeof menuRecipeLookup;
@@ -686,6 +692,7 @@ declare const fullApi: ApiFromModules<{
   productionWindow: typeof productionWindow;
   proposalEmail: typeof proposalEmail;
   publicMenu: typeof publicMenu;
+  purchasingRepair: typeof purchasingRepair;
   pushDeviceHealth: typeof pushDeviceHealth;
   pushSubscriptions: typeof pushSubscriptions;
   qboSync: typeof qboSync;
@@ -750,6 +757,7 @@ declare const fullApi: ApiFromModules<{
   vendorOrderEmail: typeof vendorOrderEmail;
   vendorPriceList: typeof vendorPriceList;
   venueGallery: typeof venueGallery;
+  venueMerge: typeof venueMerge;
   venueVendorPolicy: typeof venueVendorPolicy;
   webhookDeliveries: typeof webhookDeliveries;
   webhookIntegrations: typeof webhookIntegrations;

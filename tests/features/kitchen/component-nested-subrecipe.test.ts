@@ -119,6 +119,23 @@ function setValue(
   });
 }
 
+/** Picks a recipe in the sub-recipe search box by its name. */
+async function pickRecipe(form: Element, name: string) {
+  const search = form.querySelector<HTMLInputElement>(
+    'input[aria-label="Recipe"]',
+  )!;
+  await act(async () => {
+    search.focus();
+    search.dispatchEvent(new FocusEvent("focusin", { bubbles: true }));
+  });
+  const option = Array.from(
+    form.querySelectorAll<HTMLElement>('[role="option"]'),
+  ).find((row) => row.textContent?.includes(name))!;
+  await act(async () => {
+    option.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+  });
+}
+
 async function click(label: string, index = 0) {
   await act(async () => {
     Array.from(container.querySelectorAll("button"))
@@ -132,7 +149,7 @@ describe("recipe book sub-recipes", () => {
     harness.addLine.mockResolvedValueOnce({ docId: "nested-1" });
     await render(createElement(ComponentSubRecipesPanel, { componentId: MAC }));
     const form = container.querySelector("form.culinary-line-form")!;
-    setValue(form.querySelector("select[name=childComponentId]")!, ALFREDO);
+    await pickRecipe(form, "Alfredo sauce");
     setValue(form.querySelector("input[name=quantity]")!, "2 gallon");
     await act(async () => {
       form.dispatchEvent(
@@ -155,7 +172,7 @@ describe("recipe book sub-recipes", () => {
         "Alfredo sauce already uses Mac sauce (Alfredo sauce → Mac sauce), so it cannot go inside Mac sauce. That would make a loop. Pick a different recipe.",
       ),
     );
-    setValue(form.querySelector("select[name=childComponentId]")!, ALFREDO);
+    await pickRecipe(form, "Alfredo sauce");
     await act(async () => {
       form.dispatchEvent(
         new Event("submit", { bubbles: true, cancelable: true }),

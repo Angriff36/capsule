@@ -118,11 +118,16 @@ it("keeps unreconciled costs and profit unknown and carries the event into invoi
       (cell) => cell.textContent,
     );
   expect(cells().slice(1, 6)).toEqual(["$900.00", "—", "—", "—", "—/40"]);
+  // The event has a draft invoice already: closeout opens it rather than
+  // starting a second bill.
+  expect(
+    container.querySelector('a[href="/finance/invoices/draft-a"]')?.textContent,
+  ).toBe("Open draft invoice");
   expect(
     container.querySelector(
       'a[href="/finance/invoices?issue=1&clientId=client-a&eventId=event-a"]',
-    )?.textContent,
-  ).toBe("Issue invoice");
+    ),
+  ).toBeNull();
   backend.values.set("useListEventCloseout", [
     {
       ...closeout,

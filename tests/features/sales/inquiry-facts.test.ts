@@ -36,4 +36,14 @@ describe("an inquiry's own words become lead facts", () => {
     expect(senderName("@hannah.okafor.weds")).toBe("hannah.okafor.weds");
     expect(senderName("509 555 0101")).toBe("509 555 0101");
   });
+
+  it("reads a bare count after 'for' but not money, times or days", () => {
+    const say = (text: string) => readInquiryFacts(text, NOW).guestCount;
+    expect(say("We need lunch for 35 on Nov 20 at our office.")).toBe(35);
+    expect(say("Dinner, a party of 12, next month")).toBe(12);
+    expect(say("Budget is $20 for 2 hours")).toBeUndefined();
+    expect(say("Can you hold it for 3 days?")).toBeUndefined();
+    expect(say("Start for 5pm please")).toBeUndefined();
+    expect(say("Lunch for 40 people for 2 hours")).toBe(40);
+  });
 });

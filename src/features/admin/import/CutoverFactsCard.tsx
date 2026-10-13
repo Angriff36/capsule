@@ -83,6 +83,7 @@ export function CutoverFactsCard({
       <label className="block space-y-1 text-xs">
         <span className="font-medium">TPP stopped taking new entries at</span>
         <BoundedDateTimeLocalInput
+          naturalDateDirection="any"
           className="w-full border rounded-sm p-2"
           value={frozenValue}
           onChange={(e) => setFrozenAt(e.target.value)}
@@ -95,6 +96,7 @@ export function CutoverFactsCard({
       <label className="block space-y-1 text-xs">
         <span className="font-medium">Opening stock counted as of</span>
         <BoundedDateTimeLocalInput
+          naturalDateDirection="any"
           className="w-full border rounded-sm p-2"
           value={stockValue}
           onChange={(e) => setStockAsOf(e.target.value)}

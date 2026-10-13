@@ -119,6 +119,7 @@ export function FinanceReconciliationPage() {
         <label className="flex flex-col gap-1 text-xs text-ink-2">
           From
           <BoundedDateInput
+            naturalDateDirection="any"
             value={fromValue}
             onChange={(event) => setFrom(event.target.value)}
             className="px-2 py-1 border border-line-2 rounded-sm"
@@ -127,6 +128,7 @@ export function FinanceReconciliationPage() {
         <label className="flex flex-col gap-1 text-xs text-ink-2">
           To
           <BoundedDateInput
+            naturalDateDirection="any"
             value={toValue}
             onChange={(event) => setTo(event.target.value)}
             className="px-2 py-1 border border-line-2 rounded-sm"

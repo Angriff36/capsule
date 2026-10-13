@@ -77,6 +77,12 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
   // added it (convex/lib/proposalDishPricing.ts). The proposal menu panel
   // flags it once every dish of that menu is taken off.
   property menuId: uuid?
+  // A fee taken as a percent of only some lines (TPP's "other fee", e.g. 3%
+  // breakage on rentals): feePercent of the lines in feeAppliesTo ("food",
+  // "rental" or "staff"). The line is stored as a flat amount, which the
+  // price restamp (convex/lib/proposalPricing.ts) keeps at that percent.
+  property feePercent: decimal(5, 2)?
+  property feeAppliesTo: string?
   property addedAt: datetime?
   property removedAt: datetime?
 
@@ -106,7 +112,9 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     optional overrideReason: string,
     optional equipmentId: uuid,
     optional travelFee: boolean,
-    optional menuId: uuid
+    optional menuId: uuid,
+    optional feePercent: decimal(5, 2),
+    optional feeAppliesTo: string
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
@@ -129,6 +137,8 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     mutate equipmentId = equipmentId
     mutate travelFee = travelFee
     mutate menuId = menuId
+    mutate feePercent = feePercent
+    mutate feeAppliesTo = feeAppliesTo
     mutate addedAt = now()
     emit ProposalLineItemAdded {
       lineItemId: self.id
@@ -152,7 +162,9 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     optional notes: string,
     optional menuDishId: uuid,
     optional overrideReason: string,
-    optional equipmentId: uuid
+    optional equipmentId: uuid,
+    optional feePercent: decimal(5, 2),
+    optional feeAppliesTo: string
   ) {
     guard self.addedAt != null
     guard self.deletedAt == null
@@ -171,6 +183,8 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     mutate menuDishId = menuDishId
     mutate overrideReason = overrideReason
     mutate equipmentId = equipmentId
+    mutate feePercent = feePercent
+    mutate feeAppliesTo = feeAppliesTo
     emit ProposalLineItemRevised {
       lineItemId: self.id
       tenantId: self.tenantId

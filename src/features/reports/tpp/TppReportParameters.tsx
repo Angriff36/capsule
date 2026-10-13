@@ -89,6 +89,7 @@ export function TppReportParameters({
                   <label>
                     <span>From</span>
                     <BoundedDateInput
+                      naturalDateDirection="any"
                       className="input"
                       name={`${parameter.key}Start`}
                       defaultValue={dateValue(
@@ -99,6 +100,7 @@ export function TppReportParameters({
                   <label>
                     <span>Through</span>
                     <BoundedDateInput
+                      naturalDateDirection="any"
                       className="input"
                       name={`${parameter.key}End`}
                       defaultValue={dateValue(
@@ -125,6 +127,7 @@ export function TppReportParameters({
                 <label key={parameter.key}>
                   <span>{parameter.label}</span>
                   <BoundedDateInput
+                    naturalDateDirection="any"
                     className="input"
                     name={parameter.key}
                     defaultValue={dateValue(defaultDate)}

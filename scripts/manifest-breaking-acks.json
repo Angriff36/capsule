@@ -3378,6 +3378,42 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-10",
       "reason": "Optional text (string?): the company's Instagram account id clients message. Old companies have none, so no Instagram messages come in until it is set. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Proposal.discountPercent",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "Optional number (decimal?): a discount kept as a percent of the subtotal. Old proposals have none and keep their dollar discount. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "ProposalLineItem.feePercent",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "Optional number (decimal?): the percent of a fee taken from only part of the bill. Old lines have none. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "ProposalLineItem.feeAppliesTo",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "Optional text (string?): which part of the bill (food, rentals or staff) a fee is taken from. Old lines have none. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "reviseLine.parameters.feePercent",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "Optional input: a fee on part of the bill can be changed. Callers that leave it out change nothing."
+    },
+    {
+      "path": "reviseLine.parameters.feeAppliesTo",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "Optional input: a fee on part of the bill can be changed. Callers that leave it out change nothing."
+    },
+    {
+      "path": "Venue.taxRateIds",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "Optional list (list<string>?): the tax rates charged at a venue. Old venues have none and use every active rate, as before. The checker reads a nullable field with no default as required."
     }
   ]
 }

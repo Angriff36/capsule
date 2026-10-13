@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { reportActionOk } from "../../ui/action-result";
 import { useCreateTimeOffRequest } from "../../lib/manifest-convex-react";
 import { usePersonTimeOffRequests } from "../../lib/workforceScopedQueries";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -53,6 +54,7 @@ export function TimeOffRequestCard({
     const reason = String(data.get("reason") || "").trim();
     run("submit-time-off", async () => {
       await submitRequest({ personId, startsAt, endsAt, reason });
+      reportActionOk("Request sent. Your manager will see it.");
       form.reset();
       setShowForm(false);
     });

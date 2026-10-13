@@ -532,6 +532,13 @@ describe("runtime proof: event dishes → shared weekly VendorOrder draft", () =
     expect(
       await linkedEventIds(roles.procurement, tenantId, after!._id),
     ).toEqual([...eventIds].sort());
+    // A correct draft has nothing for the purchasing-page recount to change.
+    expect(
+      await roles.procurement.query(
+        api.purchasingRepair.staleDraftLineCount,
+        {},
+      ),
+    ).toBe(0);
   });
   it("a finished event's bought needs stop counting toward the week", async () => {
     const proof = harness();
@@ -590,6 +597,13 @@ describe("runtime proof: event dishes → shared weekly VendorOrder draft", () =
       )
     ).filter((row) => row.eventId === unbought);
     expect(second.map((need) => need.status)).toEqual(["cancelled"]);
+    // A correct draft has nothing for the purchasing-page recount to change.
+    expect(
+      await roles.procurement.query(
+        api.purchasingRepair.staleDraftLineCount,
+        {},
+      ),
+    ).toBe(0);
   });
 });
 
@@ -705,6 +719,13 @@ describe("runtime proof: stock given to an event is not bought again", () => {
     // on the shelf and the first event's 4 kg is gone: buy 2 kg, not 6.
     const line = await w.secondEventLine();
     expect(Number((await line()).orderedQuantity)).toBeCloseTo(2, 4);
+    // A correct draft has nothing for the purchasing-page recount to change.
+    expect(
+      await w.roles.procurement.query(
+        api.purchasingRepair.staleDraftLineCount,
+        {},
+      ),
+    ).toBe(0);
   });
 
   it("an open draft line drops the finished event's amount when that event completes", async () => {
@@ -733,5 +754,70 @@ describe("runtime proof: stock given to an event is not bought again", () => {
     // The finished event no longer counts, so the draft drops to 2 kg.
     expect(Number((await line()).orderedQuantity)).toBeCloseTo(2, 4);
     expect(Number((await line()).plannedQuantity)).toBeCloseTo(2, 4);
+    // A correct draft has nothing for the purchasing-page recount to change.
+    expect(
+      await w.roles.procurement.query(
+        api.purchasingRepair.staleDraftLineCount,
+        {},
+      ),
+    ).toBe(0);
+  });
+
+  it("an event that finished before the settle rule is cleared from the draft from the purchasing page", async () => {
+    const tenantId = "tenant-legacy-finished-repair";
+    const w = await deliveredFirstEvent(tenantId);
+    const item = await w.stockRow();
+    await runner(w.proof, w.roles.inventory)(
+      api.mutations.InventoryItem_recount,
+      { docId: item._id, version: item.version, actualQuantity: 0 },
+    );
+    const line = await w.secondEventLine();
+    expect(Number((await line()).orderedQuantity)).toBeCloseTo(6, 4);
+    // Finished the old way: the stage moved, nothing settled its buying.
+    await w.roles.events.run(async (ctx) =>
+      ctx.db.patch(w.first as never, { stage: "closed_out" } as never),
+    );
+    expect(Number((await line()).orderedQuantity)).toBeCloseTo(6, 4);
+
+    // And the older code had left a wrong amount on the line.
+    const stale = await line();
+    await w.roles.events.run(async (ctx) =>
+      ctx.db.patch(
+        stale._id as never,
+        {
+          orderedQuantity: 123.875,
+          plannedQuantity: 123.875,
+        } as never,
+      ),
+    );
+    expect(
+      await w.roles.procurement.query(
+        api.purchasingRepair.staleDraftLineCount,
+        {},
+      ),
+    ).toBeGreaterThan(0);
+    const waiting = (await w.roles.procurement.query(
+      api.purchasingRepair.finishedEventsStillBuying,
+      {},
+    )) as Array<{ eventId: string }>;
+    expect(waiting.map((row) => row.eventId)).toEqual([w.first]);
+
+    await w.roles.procurement.mutation(
+      api.purchasingRepair.settleFinishedEvents,
+      {},
+    );
+    expect(Number((await line()).orderedQuantity)).toBeCloseTo(2, 4);
+    expect(
+      await w.roles.procurement.query(
+        api.purchasingRepair.finishedEventsStillBuying,
+        {},
+      ),
+    ).toEqual([]);
+    expect(
+      await w.roles.procurement.query(
+        api.purchasingRepair.staleDraftLineCount,
+        {},
+      ),
+    ).toBe(0);
   });
 });

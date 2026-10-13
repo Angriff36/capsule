@@ -157,3 +157,57 @@ export function byLineDisplayOrder(
   const pb = b.pricingBasis === "percentage" ? 1 : 0;
   return pa - pb || Number(a.sortOrder ?? 0) - Number(b.sortOrder ?? 0);
 }
+
+// --- Fees on part of the bill -------------------------------------------
+// TPP's "other fee": a percent of only some lines (3% breakage on rentals).
+// Such a fee is stored as a flat line; the server restamp keeps its price at
+// feePercent of its group's lines, so every reader adds it up as a flat fee.
+
+export type FeeScope = "food" | "rental" | "staff";
+
+export const FEE_SCOPES: FeeScope[] = ["food", "rental", "staff"];
+
+export const FEE_SCOPE_LABELS: Record<FeeScope, string> = {
+  food: "food",
+  rental: "rentals",
+  staff: "staff",
+};
+
+export interface GroupedPricingLine extends PricingLineInput {
+  description?: string | null;
+  equipmentId?: string | null;
+  menuDishId?: string | null;
+  menuId?: string | null;
+  feeAppliesTo?: string | null;
+}
+
+/** Which part of the bill a line is: rentals, staff, food, or something else. */
+export function feeScopeOf(line: GroupedPricingLine): FeeScope | null {
+  if (line.feeAppliesTo) return null; // a scoped fee is never its own base
+  if (line.pricingBasis === "percentage") return null;
+  if (line.equipmentId) return "rental";
+  if ((line.description ?? "").startsWith("Staff:")) return "staff";
+  if (line.menuDishId || line.menuId || line.pricingBasis === "per_person")
+    return "food";
+  return null;
+}
+
+/** A scoped fee's amount: its percent of the lines in its group. */
+export function scopedFeeAmount(
+  percent: number,
+  scope: string,
+  lines: GroupedPricingLine[],
+  guestCount: number,
+): number {
+  const baseCents = lines
+    .filter((line) => feeScopeOf(line) === scope)
+    .reduce(
+      (sum, line) =>
+        sum +
+        LedgerMoney.fromDollars(computeLineAmount(line, guestCount)).toCents(),
+      0,
+    );
+  return LedgerMoney.fromCents(baseCents)
+    .percent(nonNegative(percent))
+    .toDollars();
+}

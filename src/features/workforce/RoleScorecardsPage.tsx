@@ -377,10 +377,15 @@ export function RoleScorecardsPage() {
                               : "—"}
                           </td>
                           <td className="text-ink-2" data-label="Effective">
-                            {formatDate(row.effectiveFrom)}
-                            {row.effectiveTo
-                              ? ` → ${formatDate(row.effectiveTo)}`
-                              : ""}
+                            {row.effectiveFrom && row.effectiveTo
+                              ? `${formatDate(row.effectiveFrom)} → ${formatDate(row.effectiveTo)}`
+                              : row.effectiveTo
+                                ? `Until ${formatDate(row.effectiveTo)}`
+                                : row.effectiveFrom
+                                  ? `From ${formatDate(row.effectiveFrom)}`
+                                  : String(row.status) === "active"
+                                    ? "Current"
+                                    : "—"}
                           </td>
                           <td className="text-ink-2" data-label="Version">
                             v{editionOf(row)}

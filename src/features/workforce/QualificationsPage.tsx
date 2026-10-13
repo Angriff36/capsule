@@ -25,6 +25,10 @@ const certificationTypes = [
   ["drivers_license_class_c", "Driver's license — Class C"],
 ] as const;
 
+const typeLabel = (type: string | null | undefined) =>
+  certificationTypes.find(([value]) => value === type)?.[1] ??
+  (type ? type.replace(/_/g, " ") : "Unclassified");
+
 function expiryLabel(expiresAt: number | undefined, now: number) {
   if (expiresAt == null) return null;
   if (expiresAt < now) {
@@ -271,14 +275,10 @@ export function QualificationsPage() {
                     </td>
                     <td data-label="Qualification">
                       {row.name}
-                      <small>
-                        {certificationTypes.find(
-                          ([value]) => value === row.certificationType,
-                        )?.[1] ??
-                          (row.certificationType
-                            ? row.certificationType.replace(/_/g, " ")
-                            : "Unclassified")}
-                      </small>
+                      {/* The type line only when it says more than the name. */}
+                      {typeLabel(row.certificationType) === row.name ? null : (
+                        <small>{typeLabel(row.certificationType)}</small>
+                      )}
                     </td>
                     <td data-label="Issuing body">{row.issuingBody || "—"}</td>
                     <td data-label="Issued">
@@ -288,7 +288,7 @@ export function QualificationsPage() {
                       {row.expiresAt ? formatDate(row.expiresAt) : "—"}
                       {(() => {
                         if (isRenewed(row, activeRows))
-                          return <small>Renewed</small>;
+                          return <small>Renewed — see the newer card</small>;
                         const expiry = expiryLabel(row.expiresAt, now);
                         return expiry ? (
                           <small className={expiry.className}>
@@ -298,12 +298,22 @@ export function QualificationsPage() {
                       })()}
                     </td>
                     <td data-label="State">
-                      <StatusChip status={String(row.status)} />
+                      {/* A renewed card is replaced by the newer one, not a
+                          second live credential. */}
+                      {isRenewed(row, activeRows) ? (
+                        <span className="text-ink-3">Replaced</span>
+                      ) : (
+                        <StatusChip status={String(row.status)} />
+                      )}
                     </td>
                     <td>
                       <div className="supply-row-actions">
-                        {policy
-                          .qualificationActions(String(row.status))
+                        {/* A replaced card needs no revoke or expire: the
+                            newer card is the live one. */}
+                        {(isRenewed(row, activeRows)
+                          ? []
+                          : policy.qualificationActions(String(row.status))
+                        )
                           // Generated expire guards `expiresAt != null`; do
                           // not offer an action that can never succeed.
                           .filter(

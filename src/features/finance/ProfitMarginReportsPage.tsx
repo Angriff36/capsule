@@ -24,6 +24,16 @@ const compactMoney = new Intl.NumberFormat(undefined, {
   notation: "compact",
   maximumFractionDigits: 1,
 });
+const wholeMoney = new Intl.NumberFormat(undefined, {
+  style: "currency",
+  currency: "USD",
+  maximumFractionDigits: 0,
+});
+/** "$1.2K" from a thousand up; whole dollars below, never "$519.6". */
+const compact = (value: number) =>
+  Math.abs(value) < 1000
+    ? wholeMoney.format(value)
+    : compactMoney.format(value);
 
 function percent(value: number | null): string {
   return value == null ? "—" : `${value.toFixed(1)}%`;
@@ -254,6 +264,7 @@ export function ProfitMarginDashboard({
         <label>
           From
           <BoundedDateInput
+            naturalDateDirection="any"
             className="input"
             value={rangeStart}
             max={rangeEnd}
@@ -263,6 +274,7 @@ export function ProfitMarginDashboard({
         <label>
           Through
           <BoundedDateInput
+            naturalDateDirection="any"
             className="input"
             value={rangeEnd}
             min={rangeStart}
@@ -313,7 +325,7 @@ export function ProfitMarginDashboard({
             <div>
               <span>Revenue</span>
               <strong data-testid="profit-total-revenue">
-                {compactMoney.format(report.summary.revenue)}
+                {compact(report.summary.revenue)}
               </strong>
               <small>{report.summary.eventCount} finalized events</small>
             </div>
@@ -329,7 +341,7 @@ export function ProfitMarginDashboard({
             <div>
               <span>Total costs</span>
               <strong data-testid="profit-total-cost">
-                {compactMoney.format(report.summary.totalCost)}
+                {compact(report.summary.totalCost)}
               </strong>
               <small>all four cost buckets</small>
             </div>

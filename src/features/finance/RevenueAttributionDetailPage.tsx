@@ -417,11 +417,19 @@ export function RevenueAttributionDetailPage() {
           {isNew ? (
             <label className="field-label">
               Event
-              <select
-                className="input"
+              <SearchSelect
                 value={eventId}
-                onChange={(e) => {
-                  const next = e.target.value;
+                required
+                aria-label="Event"
+                placeholder="Search for the event this split is for…"
+                options={eventChoices.map((choice) => ({
+                  id: choice._id,
+                  label: choice.title,
+                  hint: choice.startsAt
+                    ? formatDate(Number(choice.startsAt))
+                    : null,
+                }))}
+                onChange={(next) => {
                   setEventId(next);
                   // The event's venue, and that venue's commission on the
                   // event date, so the split needs no lookup by hand.
@@ -443,18 +451,7 @@ export function RevenueAttributionDetailPage() {
                     setPercentBasis(Number(term.commissionPercent));
                   }
                 }}
-                required
-              >
-                <option value="">Pick the event this split is for</option>
-                {eventChoices.map((choice) => (
-                  <option key={choice._id} value={choice._id}>
-                    {choice.title}
-                    {choice.startsAt
-                      ? ` · ${formatDate(Number(choice.startsAt))}`
-                      : ""}
-                  </option>
-                ))}
-              </select>
+              />
             </label>
           ) : null}
 

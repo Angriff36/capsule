@@ -1800,7 +1800,7 @@ export const commitImportRun = action({
           sameMoneyAs
             ? `Same money as payment ${sameMoneyAs} (same accounting transaction ${payment.providerTransactionId}) — counted once, kept for the record`
             : waitsForMatch
-              ? `Imported ${source} ${label} — reconciliation reference (match via markMatched on a Capsule payment)`
+              ? `Imported ${source} ${label} — match it to a Capsule payment`
               : `Imported ${source} ${label} — reference only, not money of its own, not counted`,
           payment.invoiceId
             ? `external invoice ${payment.invoiceId} (no invoice import)`
@@ -1808,7 +1808,7 @@ export const commitImportRun = action({
           resolvedEventNote ??
             (payment.eventId ? `external event ${payment.eventId}` : null),
           payment.recordedAt
-            ? `recorded ${new Date(payment.recordedAt).toISOString()}`
+            ? `recorded ${new Date(payment.recordedAt).toISOString().slice(0, 10)}`
             : null,
         ]
           .filter(Boolean)

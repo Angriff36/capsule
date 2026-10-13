@@ -1,8 +1,10 @@
 import { packListName } from "./packListName";
+import { SearchSelect } from "../../ui/SearchSelect";
+import { inPickerWindow } from "../facilities/usePickerAndNamedEvents";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { listOriginState, useListOrigin } from "../list-state/listOrigin";
-import { formatCountNoun } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import {
   useCreatePackList,
   usePackListCancel,
@@ -50,6 +52,7 @@ export function PackListsPage() {
   const packListLines = usePackListItemsLookup();
   const events = usePickerAndNamedEvents(
     packLists ? [workingId, ...packLists.map((row) => row.eventId)] : undefined,
+    "upcoming",
   );
   const createPackList = useCreatePackList();
   const startPacking = usePackListStartPacking();
@@ -228,22 +231,31 @@ export function PackListsPage() {
           <div className="supply-form-grid">
             <label className="field-label">
               Event
-              <select
-                key={events?.length ? "events-ready" : "events-loading"}
+              <SearchSelect
                 name="eventId"
-                className="input"
+                aria-label="Event"
                 defaultValue={workingId ?? ""}
+                placeholder="Search upcoming events…"
                 required
-              >
-                <option value="">Select event</option>
-                {(events ?? [])
-                  .filter((item) => item.deletedAt == null)
-                  .map((item) => (
-                    <option key={item._id} value={item._id}>
-                      {item.title}
-                    </option>
-                  ))}
-              </select>
+                options={[
+                  ...(events ?? [])
+                    .filter(
+                      (item) =>
+                        item.deletedAt == null &&
+                        (item._id === workingId ||
+                          inPickerWindow(item, "upcoming")),
+                    )
+                    .sort(
+                      (a, b) =>
+                        Number(a.startsAt ?? 0) - Number(b.startsAt ?? 0),
+                    )
+                    .map((item) => ({
+                      id: item._id as string,
+                      label: item.title || "Untitled event",
+                      hint: item.startsAt ? formatDate(item.startsAt) : null,
+                    })),
+                ]}
+              />
             </label>
             <label className="field-label">
               Name

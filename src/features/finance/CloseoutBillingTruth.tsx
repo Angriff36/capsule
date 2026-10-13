@@ -1,14 +1,15 @@
 import { formatMoneyExact } from "../../lib/format";
-import { isUnreconciledCloseout } from "./eventCostSummary";
+import {
+  isCloseoutListProfitPending,
+  isUnreconciledCloseout,
+} from "./eventCostSummary";
 import type { EventBillingRollup } from "./invoiceBilling";
 
 // Single reconciliation predicate lives in eventCostSummary.ts; re-exported
 // here so closeout display components share one import site.
 export { isUnreconciledCloseout } from "./eventCostSummary";
 
-type CloseoutMoneyRow = {
-  status?: string | null;
-  actualRevenue?: number | null;
+type CloseoutMoneyRow = Parameters<typeof isCloseoutListProfitPending>[0] & {
   capturedAt?: number | null;
 };
 
@@ -55,12 +56,18 @@ export function CloseoutRevenueNote({
   }
   // Reconciled and saved, just not finalized yet: say that, not the opposite.
   const owed = billing.billedTotal - billing.collectedTotal;
+  // Billing can match while no costs are in yet; finalizing then freezes
+  // $0 cost, so the line says so instead of "ready to finalize".
   const label =
     row.capturedAt == null
       ? "Not reconciled"
       : owed > 0.005
         ? "Reconciled, waiting on payment"
-        : "Reconciled, ready to finalize";
+        : billing.draftCount > 0 && billing.billedTotal === 0
+          ? "Invoice not issued yet — issue it, then press Reconcile"
+          : isCloseoutListProfitPending(row)
+            ? "Billing settled, costs not brought in yet — press Reconcile"
+            : "Reconciled, ready to finalize";
   return (
     <small>
       {label}

@@ -433,6 +433,11 @@ entity Venue mixin TenantScoped, SoftDeletable {
   // IANA time zone name, for example America/New_York. Unset: the drive-time
   // read uses the kitchen's zone and says so (PL-ROUTES).
   property timeZone: string?
+  // The sales tax rates that apply at this venue (TPP's tax location): ids
+  // of the workspace's tax rates. Empty or unset: every active workspace rate.
+  // Set only through convex/lib/venueTaxRates.ts setForVenue (role, Finance
+  // switch and each rate checked).
+  property taxRateIds: list<string>?
   property encrypted contactName: string?
   property encrypted contactEmail: string?
   property encrypted contactPhone: string?

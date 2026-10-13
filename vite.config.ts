@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
+import { vercelToolbar } from "@vercel/toolbar/plugins/vite";
 import { loadEnv, normalizePath, type Plugin } from "vite";
 import { configDefaults, defineConfig } from "vitest/config";
 
@@ -239,6 +240,8 @@ export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
     tailwindcss(),
+    // Vercel Toolbar config for the reviewer toolbar (src/app/shell/ReviewerToolbar.tsx).
+    vercelToolbar(),
     apiKeyGatewayDev(loadEnv(mode, process.cwd(), "")),
     markItDownDev(),
     // The build says which commit it is: <site>/version.json. A Vercel build

@@ -311,6 +311,17 @@ export function VendorOrderPage() {
     })();
   };
 
+  // Ordered amounts can carry more decimals than the screen shows
+  // (29.64375 shown as 29.64). An amount within half a cent of what is left
+  // receives exactly what is left, so the line completes and never goes over.
+  const receiptQuantity = (
+    typed: number,
+    line: { orderedQuantity: unknown; receivedQuantity: unknown },
+  ) => {
+    const left = Number(line.orderedQuantity) - Number(line.receivedQuantity);
+    return Math.abs(typed - left) < 0.005 ? left : typed;
+  };
+
   const submitReceipt = (event: FormEvent<HTMLFormElement>, line: any) => {
     event.preventDefault();
     const element = event.currentTarget;
@@ -336,7 +347,7 @@ export function VendorOrderPage() {
       await recordReceipt({
         docId: line._id,
         version: line.version,
-        quantity: Number(data.get("quantity")),
+        quantity: receiptQuantity(Number(data.get("quantity")), line),
         locationId,
         unitPrice: Number(data.get("unitPrice")),
         supplierLotNumber: String(data.get("supplierLotNumber") ?? "").trim(),
@@ -506,6 +517,9 @@ export function VendorOrderPage() {
         <span>
           Record each delivery against its order line with the supplier lot
           number. Mark the order received once receiving is complete.
+          {!isOpenForReceiving && String(order.status) === "submitted"
+            ? " Press Confirm when the vendor confirms the order; then each line can be received."
+            : ""}
         </span>
       </aside>
       {failure ? <SupplyFailureBanner error={failure} /> : null}
@@ -989,6 +1003,9 @@ export function VendorOrderPage() {
                     >
                       <label className="field-label">
                         Receipt quantity
+                        {/* The rest of the line and the item's own shelf,
+                            as Receive all uses; change them for a short or
+                            split delivery. */}
                         <input
                           name="quantity"
                           type="number"
@@ -996,11 +1013,29 @@ export function VendorOrderPage() {
                           step="any"
                           className="input"
                           required
+                          // Shown as on the line; saving receives exactly
+                          // what is left (receiptQuantity).
+                          defaultValue={
+                            Math.round(
+                              Math.max(
+                                0,
+                                Number(line.orderedQuantity) -
+                                  Number(line.receivedQuantity),
+                              ) * 100,
+                            ) / 100
+                          }
                         />
                       </label>
                       <ReceiptLocationField
                         locations={locations}
-                        defaultLocationId={line.locationId}
+                        defaultLocationId={
+                          line.locationId ??
+                          (stockLines ?? []).find(
+                            (item) =>
+                              item.deletedAt == null &&
+                              item.ingredientId === line.ingredientId,
+                          )?.locationId
+                        }
                       />
                       <label className="field-label">
                         Confirmed unit price

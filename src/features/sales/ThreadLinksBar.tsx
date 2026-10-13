@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { SearchSelect } from "../../ui/SearchSelect";
 import type { Doc } from "../../lib/api";
 import {
   useMessageThreadLinkEvent,
@@ -15,15 +16,6 @@ const dateFormat = new Intl.DateTimeFormat(undefined, {
   day: "numeric",
   year: "numeric",
 });
-
-export function eventChoiceLabel(
-  event: Pick<EventRow, "title" | "eventNumber" | "startsAt">,
-): string {
-  const title = event.title?.trim() || "Untitled event";
-  const number = event.eventNumber ? `#${event.eventNumber} ` : "";
-  const when = event.startsAt ? ` · ${dateFormat.format(event.startsAt)}` : "";
-  return `${number}${title}${when}`;
-}
 
 /**
  * PL-INBOX (AC-106, AC-248, AC-249): what this conversation is about and
@@ -75,31 +67,36 @@ export function ThreadLinksBar({
       data-testid="thread-links"
     >
       <span className="text-ink-3">Event</span>
-      <select
-        className="input max-w-64"
-        aria-label="Link event"
-        value={thread.eventId ?? ""}
-        onChange={(e) => {
-          const eventId = e.target.value;
-          void run(
-            () =>
-              linkEvent({
-                docId: thread._id,
-                ...(eventId ? { eventId: eventId as EventRow["_id"] } : {}),
-              }),
-            eventId
-              ? "Linked this conversation to the event."
-              : "Removed the event link.",
-          );
-        }}
-      >
-        <option value="">No event</option>
-        {liveEvents.map((e) => (
-          <option key={e._id} value={e._id}>
-            {eventChoiceLabel(e)}
-          </option>
-        ))}
-      </select>
+      <div className="w-80 max-w-full">
+        <SearchSelect
+          aria-label="Link event"
+          value={thread.eventId ?? ""}
+          placeholder="Search events…"
+          options={[
+            ...(thread.eventId ? [{ id: "", label: "No event" }] : []),
+            ...liveEvents.map((e) => ({
+              id: e._id as string,
+              label: `${e.eventNumber ? `#${e.eventNumber} ` : ""}${
+                e.title?.trim() || "Untitled event"
+              }`,
+              hint: e.startsAt ? dateFormat.format(e.startsAt) : null,
+            })),
+          ]}
+          onChange={(eventId) => {
+            if (eventId === (thread.eventId ?? "")) return;
+            void run(
+              () =>
+                linkEvent({
+                  docId: thread._id,
+                  ...(eventId ? { eventId: eventId as EventRow["_id"] } : {}),
+                }),
+              eventId
+                ? "Linked this conversation to the event."
+                : "Removed the event link.",
+            );
+          }}
+        />
+      </div>
       {linkedEvent ? (
         <Link
           className="text-brand underline"

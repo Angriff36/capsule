@@ -6,6 +6,7 @@ import { useMenuRecipeRows } from "../../lib/useMenuRecipeRows";
 import { isPlausibleConvexId } from "../../lib/routeRecord";
 import { TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate } from "../../lib/format";
+import { SearchSelect } from "../../ui/SearchSelect";
 import {
   CULINARY_ALLERGENS,
   type CulinaryAllergenCode,
@@ -15,6 +16,7 @@ import { KitchenBookNav } from "./KitchenBookNav";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
 import { useDishesByIds } from "../../lib/useDishesByIds";
+import { useWorkingEventId } from "../events/workingEvent";
 
 const ALLERGENS = CULINARY_ALLERGENS;
 
@@ -74,8 +76,10 @@ export function AllergenMatrixPage() {
   const [params, setParams] = useSearchParams();
   const menus = useListMenu();
 
+  const workingId = useWorkingEventId();
   const menuId = params.get("menu") ?? "";
-  const eventId = params.get("event") ?? "";
+  // No pick yet: start on the event being worked on.
+  const eventId = params.get("event") ?? (menuId ? "" : (workingId ?? ""));
   // The chosen menu's lines only; no menu chosen reads none.
   const chosenMenuDishes = useMenuDishRows(
     menuId && isPlausibleConvexId(menuId) ? menuId : null,
@@ -193,29 +197,30 @@ export function AllergenMatrixPage() {
       <div className="allergen-matrix-toolbar">
         <label className="field-label">
           Menu or event
-          <select
-            className="input"
+          <SearchSelect
+            aria-label="Menu or event"
             value={scopeValue}
-            onChange={(event) => selectScope(event.target.value)}
-          >
-            <option value="">Select a menu or event…</option>
-            <optgroup label="Menus">
-              {liveMenus.map((menu) => (
-                <option key={menu._id} value={`menu:${menu._id}`}>
-                  {menu.name}
-                </option>
-              ))}
-            </optgroup>
-            <optgroup label="Events">
-              {liveEvents.map((event) => (
-                <option key={event._id} value={`event:${event._id}`}>
-                  {event.title}
-                  {event.startsAt ? ` · ${formatDate(event.startsAt)}` : ""}
-                  {String(event.stage) === "cancelled" ? " · cancelled" : ""}
-                </option>
-              ))}
-            </optgroup>
-          </select>
+            onChange={selectScope}
+            placeholder="Search menus and events…"
+            options={[
+              ...liveMenus.map((menu) => ({
+                id: `menu:${menu._id}`,
+                label: menu.name,
+                hint: "Menu",
+              })),
+              ...liveEvents.map((event) => ({
+                id: `event:${event._id}`,
+                label: event.title,
+                hint: [
+                  "Event",
+                  event.startsAt ? formatDate(event.startsAt) : null,
+                  String(event.stage) === "cancelled" ? "cancelled" : null,
+                ]
+                  .filter(Boolean)
+                  .join(" · "),
+              })),
+            ]}
+          />
         </label>
       </div>
 

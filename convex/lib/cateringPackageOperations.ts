@@ -80,33 +80,10 @@ export async function materializeCateringPackage(
 
   for (const line of args.selections) {
     const recipe = cateringRecipes.get(line.recipeId)!;
-    const marker = `[catering-recipe:${recipe.id}]`;
-    let dish: Doc<"dishes"> | undefined = liveDishes.find((row) => row.description?.includes(marker));
-    if (!dish) {
-      const matches = liveDishes.filter((row) =>
-        cateringRecipeNameKeys(recipe).includes(cateringNameKey(row.name)) &&
-        (!row.description?.includes("[catering-recipe:") ||
-          row.description.startsWith(`${recipe.description || recipe.name}\n\nSource:`)));
-      // Prefer the restored house recipe. Duplicate imported service variants
-      // must not cause another empty dish to be created.
-      matches.sort((a,b)=>Number(Boolean(b.recipeSourceFingerprint))-Number(Boolean(a.recipeSourceFingerprint)) ||
-        Number(b.serviceStyle===pack.serviceStyle)-Number(a.serviceStyle===pack.serviceStyle) ||
-        a._creationTime-b._creationTime);
-      dish = matches[0];
-    }
-    if (!dish) {
-      const created: { docId: Id<"dishes"> } = await ctx.runMutation(api.mutations.Dish_createViaIntroduce, {
-        name: recipe.name,
-        description: `${recipe.description || recipe.name}\n\nSource: ${cateringSource(recipe)}\n${marker}`,
-        category: "Catering books", course: recipe.course,
-        serviceStyle: pack.serviceStyle, portionSize: 1, portionUnit: "portion",
-      });
-      const row = await ctx.db.get(created.docId);
-      if (!row || row.tenantId !== tenantId) throw new Error("Dish could not be created");
-      dish = row;
-      liveDishes.push(dish);
-      result.createdRecipes++;
-    } else result.reusedRecipes++;
+    const found = await bookDish(ctx, tenantId, recipe.id, pack.serviceStyle, liveDishes);
+    const dish = found.dish;
+    if (found.created) result.createdRecipes++;
+    else result.reusedRecipes++;
 
     const tasks = await ctx.db.query("dishTasks")
       .withIndex("by_dishId", (q) => q.eq("dishId", dish!._id)).collect();
@@ -162,4 +139,44 @@ export async function materializeCateringPackage(
   result.savedDemandVersions = Object.fromEntries(demands.filter((row) => row.tenantId === tenantId && row.deletedAt == null).map((row) => [String(row._id), row.version]));
   await writeMaterializationReceipt(ctx, tenantId, "cateringPackage", args.operationKey, args, result);
   return result;
+}
+
+/**
+ * The catalog dish for a catering-book recipe: the one made from it before,
+ * else a house dish of the same name, else a new one made from the book.
+ * `liveDishes` is the workspace's active dishes; a new dish joins it.
+ */
+export async function bookDish(
+  ctx: MutationCtx,
+  tenantId: string,
+  recipeId: string,
+  serviceStyle: string,
+  liveDishes: Doc<"dishes">[],
+): Promise<{ dish: Doc<"dishes">; created: boolean }> {
+  const recipe = cateringRecipes.get(recipeId)!;
+  const marker = `[catering-recipe:${recipe.id}]`;
+  let dish: Doc<"dishes"> | undefined = liveDishes.find((row) => row.description?.includes(marker));
+  if (!dish) {
+    const matches = liveDishes.filter((row) =>
+      cateringRecipeNameKeys(recipe).includes(cateringNameKey(row.name)) &&
+      (!row.description?.includes("[catering-recipe:") ||
+        row.description.startsWith(`${recipe.description || recipe.name}\n\nSource:`)));
+    // Prefer the restored house recipe. Duplicate imported service variants
+    // must not cause another empty dish to be created.
+    matches.sort((a,b)=>Number(Boolean(b.recipeSourceFingerprint))-Number(Boolean(a.recipeSourceFingerprint)) ||
+      Number(b.serviceStyle===serviceStyle)-Number(a.serviceStyle===serviceStyle) ||
+      a._creationTime-b._creationTime);
+    dish = matches[0];
+  }
+  if (dish) return { dish, created: false };
+  const created: { docId: Id<"dishes"> } = await ctx.runMutation(api.mutations.Dish_createViaIntroduce, {
+    name: recipe.name,
+    description: `${recipe.description || recipe.name}\n\nSource: ${cateringSource(recipe)}\n${marker}`,
+    category: "Catering books", course: recipe.course,
+    serviceStyle, portionSize: 1, portionUnit: "portion",
+  });
+  const row = await ctx.db.get(created.docId);
+  if (!row || row.tenantId !== tenantId) throw new Error("Dish could not be created");
+  liveDishes.push(row);
+  return { dish: row, created: true };
 }

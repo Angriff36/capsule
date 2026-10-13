@@ -17,6 +17,7 @@ import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { readableRecipeAmount } from "./RecipeNotes";
 import { RecordedUnitMappings } from "../../lib/recordedUnitMappings";
 import { QuantityUnitInput } from "../../ui/QuantityUnitInput";
+import { SearchSelect } from "../../ui/SearchSelect";
 import {
   describeLineConversion,
   fallbackUnitFor,
@@ -325,20 +326,18 @@ export function ComponentSubRecipesPanel({
       <form className="culinary-line-form" onSubmit={onAdd}>
         <label className="field-label sm:col-span-2">
           Recipe
-          <select
+          <SearchSelect
             name="childComponentId"
-            className="input"
+            aria-label="Recipe"
             required
             value={childComponentId}
-            onChange={(event) => setChildComponentId(event.target.value)}
-          >
-            <option value="">Select a recipe</option>
-            {choices.map((recipe) => (
-              <option key={recipe._id} value={recipe._id}>
-                {recipe.name}
-              </option>
-            ))}
-          </select>
+            onChange={setChildComponentId}
+            placeholder="Search recipes…"
+            options={choices.map((recipe) => ({
+              id: recipe._id as string,
+              label: recipe.name,
+            }))}
+          />
         </label>
         <label className="field-label">
           Quantity

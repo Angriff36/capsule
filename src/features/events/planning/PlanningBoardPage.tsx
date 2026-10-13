@@ -853,6 +853,7 @@ export function PlanningBoardPage() {
               ))}
             </div>
             <BoundedDateInput
+              naturalDateDirection="any"
               className="input w-auto"
               aria-label="Go to date"
               value={dateInputValue(anchor)}

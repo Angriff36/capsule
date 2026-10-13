@@ -1,4 +1,6 @@
 import { useState, type FormEvent } from "react";
+import { useClientsByIds } from "../../lib/useClientDirectory";
+import { clientDisplayName } from "../events/clientName";
 import { Link } from "react-router-dom";
 import {
   useCreatePayment,
@@ -92,6 +94,10 @@ export function PaymentsPage() {
       row.deletedAt == null &&
       ["sent", "viewed", "overdue", "partial"].includes(String(row.status)) &&
       Number(row.amountDue ?? 0) > 0,
+  );
+  // Each invoice choice names its client, so INV-11 is not a bare number.
+  const invoiceClients = useClientsByIds(
+    payableInvoices.map((row) => (row.clientId ? String(row.clientId) : null)),
   );
   const activeRows = (payments ?? []).filter((row) => row.deletedAt == null);
   const openRows = ledger.openRows(activeRows);
@@ -364,7 +370,10 @@ export function PaymentsPage() {
                       {formatInvoiceNumber(
                         invoice.invoiceNumber,
                         invoice._id,
-                      ) || invoice.invoiceNumber}{" "}
+                      ) || invoice.invoiceNumber}
+                      {invoice.clientId
+                        ? ` · ${clientDisplayName(String(invoice.clientId), invoiceClients as never)}`
+                        : ""}{" "}
                       · due {formatMoneyExact(Number(invoice.amountDue ?? 0))}
                     </option>
                   ))}

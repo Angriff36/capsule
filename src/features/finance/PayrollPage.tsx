@@ -54,7 +54,7 @@ const initialPeriod = () => {
 function PrepareFormWithEvents(
   props: Omit<Parameters<typeof PayrollPrepareForm>[0], "events">,
 ) {
-  const events = usePickerAndNamedEvents([]);
+  const events = usePickerAndNamedEvents([], "past");
   return <PayrollPrepareForm {...props} events={events ?? []} />;
 }
 

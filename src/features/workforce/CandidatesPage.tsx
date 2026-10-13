@@ -17,7 +17,7 @@ import {
   useProvisionStaffSignIn,
 } from "../../lib/hiringPipeline";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatCountNoun, formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate, formatDateTime } from "../../lib/format";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
   CandidateEmailMismatchNotice,
@@ -26,7 +26,7 @@ import {
 import { CandidateRevokeHireControl } from "./CandidateRevokeHireControl";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
-import { BoundedDateInput } from "../../ui/BoundedDateInputs";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { SearchSelect } from "../../ui/SearchSelect";
 
 import "./TrainingPage.css";
@@ -77,6 +77,23 @@ function localDateEpoch(value: FormDataEntryValue | null): number | undefined {
   const text = String(value ?? "");
   if (!text) return undefined;
   return new Date(`${text}T12:00:00`).getTime();
+}
+
+/** A date-and-time pick; a bare date keeps the old midday placeholder. */
+function interviewEpoch(value: FormDataEntryValue | null): number | undefined {
+  const text = String(value ?? "");
+  if (!text.includes("T")) return localDateEpoch(value);
+  const time = new Date(text).getTime();
+  return Number.isNaN(time) ? undefined : time;
+}
+
+/** Date-only interviews are stored at midday; show their date alone. */
+function interviewWhen(at: number | null | undefined) {
+  if (at == null) return "—";
+  const d = new Date(at);
+  return d.getHours() === 12 && d.getMinutes() === 0
+    ? formatDate(at)
+    : formatDateTime(at);
 }
 
 export function CandidatesPage() {
@@ -323,7 +340,7 @@ export function CandidatesPage() {
       try {
         await scheduleInterview({
           candidateId,
-          scheduledFor: localDateEpoch(data.get("scheduledFor")),
+          scheduledFor: interviewEpoch(data.get("scheduledFor")),
           interviewerPersonId:
             String(data.get("interviewerPersonId") || "") || undefined,
         });
@@ -425,35 +442,6 @@ export function CandidatesPage() {
           }}
         />
       ) : null}
-
-      {/* KM interview-tool import (spec §9.3 "map the KM JSON into the model"). */}
-      <section className="working-ledger mt-4">
-        <div className="ledger-heading">
-          <div>
-            <p className="eyebrow">KM import</p>
-            <h2>Import from KM interview tool</h2>
-          </div>
-          {ingestReport ? <span>{ingestReport}</span> : null}
-        </div>
-        <textarea
-          className="input"
-          aria-label="KM export to import"
-          rows={4}
-          placeholder='Paste KM export JSON, e.g. { "Candidates": [{ "CandidateId": "KM-1", "FullName": "Jane Doe", "Stage": "interview", "Interviews": [] }] }'
-          value={kmJson}
-          onChange={(e) => setKmJson(e.target.value)}
-        />
-        <div className="supply-form-actions mt-2">
-          <button
-            type="button"
-            className="btn btn-secondary"
-            disabled={busy || !kmJson.trim()}
-            onClick={runIngest}
-          >
-            {busy ? "Importing…" : "Import KM export"}
-          </button>
-        </div>
-      </section>
 
       {adding ? (
         <form className="supply-form mt-4" onSubmit={submit}>
@@ -584,14 +572,20 @@ export function CandidatesPage() {
                       <label className="field-label">
                         Move to stage
                         <select
+                          key={candidate.stage}
                           name="toStage"
                           className="input"
+                          // The step after this one: moving to the stage the
+                          // candidate is already in does nothing.
                           defaultValue={
-                            (STAGES_MOVE as readonly string[]).includes(
-                              candidate.stage,
-                            )
-                              ? candidate.stage
-                              : "screening"
+                            STAGES_MOVE[
+                              Math.min(
+                                (STAGES_MOVE as readonly string[]).indexOf(
+                                  candidate.stage,
+                                ) + 1,
+                                STAGES_MOVE.length - 1,
+                              )
+                            ]
                           }
                         >
                           {STAGES_MOVE.map((stage) => (
@@ -728,69 +722,83 @@ export function CandidatesPage() {
                         </tr>
                       </thead>
                       <tbody>
-                        {candidateInterviews.map((row) => (
-                          <tr key={row._id}>
-                            <td>{formatDate(row.scheduledFor)}</td>
-                            <td>{personName(row.interviewerPersonId)}</td>
-                            <td>
-                              <StatusChip status={String(row.outcome)} />
-                            </td>
-                            <td>
-                              {row.outcome === "pending" ? (
-                                <input
-                                  className="input"
-                                  aria-label="Interview note"
-                                  placeholder="How did it go? (optional)"
-                                  value={interviewNotes[row._id] ?? ""}
-                                  onChange={(e) =>
-                                    setInterviewNotes((notes) => ({
-                                      ...notes,
-                                      [row._id]: e.target.value,
-                                    }))
-                                  }
-                                />
-                              ) : (
-                                row.notes || "—"
-                              )}
-                            </td>
-                            <td className="text-right">
-                              {row.outcome === "pending" ? (
-                                <span className="inline-flex items-center gap-3">
-                                  <button
-                                    className="btn-link btn-link-compact"
-                                    onClick={() =>
-                                      void recordInterviewOutcome(
-                                        row._id,
-                                        row.version,
-                                        "passed",
-                                        candidate._id,
-                                      )
+                        {candidateInterviews.map((row) => {
+                          // A turned-down candidate's open interviews are not
+                          // held; they are shown as such, without outcomes.
+                          const notNeeded =
+                            row.outcome === "pending" &&
+                            candidate.stage === "rejected";
+                          return (
+                            <tr key={row._id}>
+                              <td>{interviewWhen(row.scheduledFor)}</td>
+                              <td>{personName(row.interviewerPersonId)}</td>
+                              <td>
+                                {notNeeded ? (
+                                  <span className="text-ink-3">Not needed</span>
+                                ) : (
+                                  <StatusChip status={String(row.outcome)} />
+                                )}
+                              </td>
+                              <td>
+                                {notNeeded ? (
+                                  "Candidate turned down"
+                                ) : row.outcome === "pending" ? (
+                                  <input
+                                    className="input"
+                                    aria-label="Interview note"
+                                    placeholder="How did it go? (optional)"
+                                    value={interviewNotes[row._id] ?? ""}
+                                    onChange={(e) =>
+                                      setInterviewNotes((notes) => ({
+                                        ...notes,
+                                        [row._id]: e.target.value,
+                                      }))
                                     }
-                                  >
-                                    Passed
-                                  </button>
-                                  <button
-                                    className="btn-link btn-link-compact"
-                                    onClick={() =>
-                                      void recordInterviewOutcome(
-                                        row._id,
-                                        row.version,
-                                        "failed",
-                                        candidate._id,
-                                      )
-                                    }
-                                  >
-                                    Failed
-                                  </button>
-                                </span>
-                              ) : (
-                                <span className="text-ink-2">
-                                  {formatDate(row.conductedAt)}
-                                </span>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
+                                  />
+                                ) : (
+                                  row.notes || "—"
+                                )}
+                              </td>
+                              <td className="text-right">
+                                {notNeeded ? null : row.outcome ===
+                                  "pending" ? (
+                                  <span className="inline-flex items-center gap-3">
+                                    <button
+                                      className="btn-link btn-link-compact"
+                                      onClick={() =>
+                                        void recordInterviewOutcome(
+                                          row._id,
+                                          row.version,
+                                          "passed",
+                                          candidate._id,
+                                        )
+                                      }
+                                    >
+                                      Passed
+                                    </button>
+                                    <button
+                                      className="btn-link btn-link-compact"
+                                      onClick={() =>
+                                        void recordInterviewOutcome(
+                                          row._id,
+                                          row.version,
+                                          "failed",
+                                          candidate._id,
+                                        )
+                                      }
+                                    >
+                                      Failed
+                                    </button>
+                                  </span>
+                                ) : (
+                                  <span className="text-ink-2">
+                                    Recorded {formatDate(row.conductedAt)}
+                                  </span>
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -815,7 +823,10 @@ export function CandidatesPage() {
                     </label>
                     <label className="field-label">
                       Scheduled for (optional)
-                      <BoundedDateInput name="scheduledFor" className="input" />
+                      <BoundedDateTimeLocalInput
+                        name="scheduledFor"
+                        className="input"
+                      />
                     </label>
                     <div className="field-label">
                       <span>&nbsp;</span>
@@ -841,6 +852,35 @@ export function CandidatesPage() {
           ) : null}
         </section>
       )}
+
+      {/* KM interview-tool import (spec §9.3 "map the KM JSON into the model"). */}
+      <section className="working-ledger mt-4">
+        <div className="ledger-heading">
+          <div>
+            <p className="eyebrow">KM import</p>
+            <h2>Import from KM interview tool</h2>
+          </div>
+          {ingestReport ? <span>{ingestReport}</span> : null}
+        </div>
+        <textarea
+          className="input"
+          aria-label="KM export to import"
+          rows={4}
+          placeholder='Paste KM export JSON, e.g. { "Candidates": [{ "CandidateId": "KM-1", "FullName": "Jane Doe", "Stage": "interview", "Interviews": [] }] }'
+          value={kmJson}
+          onChange={(e) => setKmJson(e.target.value)}
+        />
+        <div className="supply-form-actions mt-2">
+          <button
+            type="button"
+            className="btn btn-secondary"
+            disabled={busy || !kmJson.trim()}
+            onClick={runIngest}
+          >
+            {busy ? "Importing…" : "Import KM export"}
+          </button>
+        </div>
+      </section>
     </div>
   );
 }

@@ -332,8 +332,16 @@ export function VendorContractsPage() {
                       </small>
                     </div>
                     <div>
-                      <StatusChip status={String(contract.status)} />
                       {/* Signed, but its prices do not apply yet. */}
+                      <StatusChip
+                        status={
+                          isActive &&
+                          contract.startsAt != null &&
+                          Number(contract.startsAt) > Date.now()
+                            ? "upcoming"
+                            : String(contract.status)
+                        }
+                      />
                       {isActive &&
                       contract.startsAt != null &&
                       Number(contract.startsAt) > Date.now() ? (

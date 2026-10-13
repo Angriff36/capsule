@@ -49,7 +49,14 @@ function defaultRange() {
   };
 }
 
-function CapacityTile({ card }: { card: CapacityEventCard }) {
+function CapacityTile({
+  card,
+  venueName,
+}: {
+  card: CapacityEventCard;
+  /** The venue's own name, for an event whose copy of it is blank. */
+  venueName?: string;
+}) {
   const { event } = card;
   const occupancy =
     card.capacity == null
@@ -73,7 +80,7 @@ function CapacityTile({ card }: { card: CapacityEventCard }) {
       <span className="capacity-event-time">{formatTime(event.startsAt)}</span>
       <strong>{event.title}</strong>
       <span className="capacity-event-venue">
-        {event.venueName || "Venue not assigned"}
+        {event.venueName || venueName || "Venue not assigned"}
       </span>
       <span className="capacity-event-meter" aria-hidden="true">
         <span
@@ -166,6 +173,7 @@ export function EventCapacityPlannerPage() {
           <label>
             From
             <BoundedDateInput
+              naturalDateDirection="any"
               value={startDate}
               max={endDate}
               onChange={(event) => setStartDate(event.target.value)}
@@ -176,6 +184,7 @@ export function EventCapacityPlannerPage() {
           <label>
             Through
             <BoundedDateInput
+              naturalDateDirection="any"
               value={endDate}
               min={startDate}
               onChange={(event) => setEndDate(event.target.value)}
@@ -278,7 +287,15 @@ export function EventCapacityPlannerPage() {
                   </header>
                   <div className="capacity-day-events">
                     {day.events.map((card) => (
-                      <CapacityTile key={card.event._id} card={card} />
+                      <CapacityTile
+                        key={card.event._id}
+                        card={card}
+                        venueName={
+                          venues?.find(
+                            (venue) => venue._id === card.event.venueId,
+                          )?.name
+                        }
+                      />
                     ))}
                   </div>
                 </article>

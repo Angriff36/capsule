@@ -16,7 +16,13 @@ export function readInquiryFacts(
   const guests = text.match(
     /(?:about|around|~)?\s*(\d{1,4})\s*(?:people|guests|persons|pax|ppl|attendees)/i,
   );
-  if (guests) facts.guestCount = Number(guests[1]);
+  // "lunch for 35", "a party of 35": a bare count, but not money or a time.
+  const bare = guests
+    ? null
+    : text.match(
+        /(?<![$\d])\b(?:for|party of|group of|headcount(?: of)?)\s+(\d{1,4})\b(?![.,:]\d|\s*(?:%|\$|dollars|am|pm|a\.m|p\.m|o'?clock|hours?|hrs?|minutes?|mins?|days?|weeks?|months?|years?|st|nd|rd|th)\b)/i,
+      );
+  if (guests ?? bare) facts.guestCount = Number((guests ?? bare)![1]);
   const day = text.match(
     new RegExp(
       `(?:${MONTH})\\.?\\s+\\d{1,2}(?:st|nd|rd|th)?(?:,?\\s+\\d{4})?`,

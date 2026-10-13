@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
+import { FinishedEventsBuyingNotice } from "./FinishedEventsBuyingNotice";
 import { Link } from "react-router-dom";
 import {
   useCreateVendor,
@@ -200,6 +201,7 @@ export function PurchasingPage() {
           ...draftRows.filled.demands.map((row) => row.eventId),
         ]
       : undefined,
+    "upcoming",
   );
   const ingredientName = (id: string) =>
     ingredients?.find((item) => item._id === id)?.name ?? "Unknown ingredient";
@@ -545,6 +547,7 @@ export function PurchasingPage() {
           send it your own way).
         </span>
       </aside>
+      <FinishedEventsBuyingNotice />
       {failure ? <SupplyFailureBanner error={failure} /> : null}
       {host}
       {form ? (

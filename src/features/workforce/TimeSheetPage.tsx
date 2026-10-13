@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { inPickerWindow } from "../facilities/usePickerAndNamedEvents";
 import {
   useAvailabilityWindowWithdraw,
   useCreateAvailabilityWindow,
@@ -119,7 +120,16 @@ export function TimeSheetClockInForm({
             key={events.length ? "events-ready" : "events-loading"}
             name="eventId"
             className="input"
-            defaultValue={workingId ?? ""}
+            // The open event is the default only once its day has come.
+            defaultValue={
+              workingId &&
+              events.some(
+                (item) =>
+                  item._id === workingId && inPickerWindow(item, "past"),
+              )
+                ? workingId
+                : ""
+            }
             data-testid="clock-in-event"
           >
             <option value="">No event · unassigned</option>
@@ -329,6 +339,7 @@ export function TimeSheetPage() {
   const workingId = useWorkingEventId();
   const events = usePickerAndNamedEvents(
     records ? [workingId, ...records.map((row) => row.eventId)] : undefined,
+    "past",
   );
   // The planned shifts of the entries shown, and today's shifts for a new
   // clock-in.
@@ -372,7 +383,12 @@ export function TimeSheetPage() {
   // newest first, then what is coming; cancelled events stay out.
   const cutoff = Date.now() + 86_400_000;
   const activeEvents = (events ?? [])
-    .filter((event) => event.deletedAt == null && event.stage !== "cancelled")
+    .filter(
+      (event) =>
+        event.deletedAt == null &&
+        event.stage !== "cancelled" &&
+        (event._id === workingId || inPickerWindow(event, "past")),
+    )
     .sort((a, b) => {
       const aStart = a.startsAt ?? 0;
       const bStart = b.startsAt ?? 0;

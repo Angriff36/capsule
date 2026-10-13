@@ -1852,6 +1852,7 @@ export function KitchenDashboardPage() {
                 Later
               </button>
               <BoundedDateInput
+                naturalDateDirection="any"
                 aria-label="Jump to date"
                 title="Jump to date"
                 value={horizon.startDateValue()}

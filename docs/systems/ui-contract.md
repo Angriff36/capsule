@@ -35,6 +35,7 @@ Screens (25): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 - `queries.listClientCommunicationByClientId` - live read
 - `queries.listClientCommunicationByEventId` - live read
 - `queries.listClientContactByClientId` - live read
+- `queries.listClientOutreachTaskByClientId` - live read
 - `queries.listContractByClientId` - live read
 - `queries.listCreditMemoByClientId` - live read
 - `queries.listCreditMemoBySourceInvoiceId` - live read
@@ -417,7 +418,7 @@ Screens (25): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 
 ## 2. Proposal
 
-Screens (36): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposalSourceCard.tsx`, `clients/ProposalAcceptancePage.tsx`, `clients/ProposalBrandRow.tsx`, `clients/ProposalChangeAction.tsx`, `clients/ProposalChangeLabel.tsx`, `clients/ProposalCreateForm.tsx`, `clients/ProposalDraftCheck.tsx`, `clients/ProposalEmailHistory.tsx`, `clients/ProposalEnhancementsPanel.tsx`, `clients/ProposalFollowUps.tsx`, `clients/ProposalHistoricalAcceptance.tsx`, `clients/ProposalMenuSelectionPanel.tsx`, `clients/ProposalPaymentScheduleList.tsx`, `clients/ProposalPaymentSchedulePanel.tsx`, `clients/proposalPdf.ts`, `clients/proposalPdfProjection.ts`, `clients/ProposalPricingPanel.tsx`, `clients/ProposalReadinessNotice.tsx`, `clients/proposalSignatureRequest.ts`, `clients/ProposalsPage.tsx`, `clients/proposalTemplateDefaults.ts`, `clients/ProposalTemplateServiceStyleField.tsx`, `clients/ProposalTemplatesPage.tsx`, `clients/ProposalTermsPanel.tsx`, `clients/ProposalTravelFee.tsx`, `clients/SharedProposalPage.tsx`, `clients/useCatalogDishes.ts`, `clients/useCreateEventFromProposal.ts`, `clients/useSendProposalWithRevisionCapture.ts`, `clients/useStartProposalChange.ts`, `sales/ProposalSignatureRevokeAction.tsx`, `sales/PublicMenuPage.tsx`, `sales/QuoteEstimatePanel.tsx`, `sales/QuoteMenuChoice.tsx`, `sales/QuoteRequestPicks.tsx`
+Screens (37): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposalSourceCard.tsx`, `clients/ProposalAcceptancePage.tsx`, `clients/ProposalBrandRow.tsx`, `clients/ProposalChangeAction.tsx`, `clients/ProposalChangeLabel.tsx`, `clients/ProposalCreateForm.tsx`, `clients/ProposalDiscount.tsx`, `clients/ProposalDraftCheck.tsx`, `clients/ProposalEmailHistory.tsx`, `clients/ProposalEnhancementsPanel.tsx`, `clients/ProposalFollowUps.tsx`, `clients/ProposalHistoricalAcceptance.tsx`, `clients/ProposalMenuSelectionPanel.tsx`, `clients/ProposalPaymentScheduleList.tsx`, `clients/ProposalPaymentSchedulePanel.tsx`, `clients/proposalPdf.ts`, `clients/proposalPdfProjection.ts`, `clients/ProposalPricingPanel.tsx`, `clients/ProposalReadinessNotice.tsx`, `clients/proposalSignatureRequest.ts`, `clients/ProposalsPage.tsx`, `clients/proposalTemplateDefaults.ts`, `clients/ProposalTemplateServiceStyleField.tsx`, `clients/ProposalTemplatesPage.tsx`, `clients/ProposalTermsPanel.tsx`, `clients/ProposalTravelFee.tsx`, `clients/SharedProposalPage.tsx`, `clients/useCatalogDishes.ts`, `clients/useCreateEventFromProposal.ts`, `clients/useSendProposalWithRevisionCapture.ts`, `clients/useStartProposalChange.ts`, `sales/ProposalSignatureRevokeAction.tsx`, `sales/PublicMenuPage.tsx`, `sales/QuoteEstimatePanel.tsx`, `sales/QuoteMenuChoice.tsx`, `sales/QuoteRequestPicks.tsx`
 
 ### Generated reads
 
@@ -431,6 +432,7 @@ Screens (36): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `queries.listClientCommunicationByClientId` - live read
 - `queries.listClientCommunicationByEventId` - live read
 - `queries.listClientContactByClientId` - live read
+- `queries.listClientOutreachTaskByClientId` - live read
 - `queries.listContractByClientId` - live read
 - `queries.listCreditMemoByClientId` - live read
 - `queries.listCreditMemoBySourceInvoiceId` - live read
@@ -657,6 +659,7 @@ Screens (36): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `lib.proposalPricing.listRentalItems` - query; live read, updates by itself
 - `lib.proposalPricing.removeProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
 - `lib.proposalPricing.reviseProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
+- `lib.proposalPricing.setProposalDiscount` - mutation; authored step; live reads update by themselves
 - `lib.proposalRevision.sendProposalWithRevisionCapture` - mutation; authored step; live reads update by themselves
 - `lib.quoteSelections.estimateQuote` - query; live read, updates by itself
 - `proposalEmail.getHistory` - action; one-time call (not live); the live reads it changes update by themselves
@@ -2638,6 +2641,7 @@ Screens (176): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `lib.culinaryOperations.restoreComponentSnapshot` - mutation; authored step; live reads update by themselves
 - `lib.culinaryOperations.saveComponentImportReview` - mutation; authored step; live reads update by themselves
 - `lib.operationalTransactions.applyCateringPackage` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.cateringPackageAsMenu` - mutation; authored step; live reads update by themselves
 - `lib.operationalTransactions.eventTimingPlan` - query; live read, updates by itself
 - `lib.operationalTransactions.issueEventStock` - mutation; authored step; live reads update by themselves
 - `lib.operationalTransactions.materializeEventMenuTemplate` - mutation; authored step; live reads update by themselves
@@ -2874,51 +2878,85 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 
 ## 6. Staffing and My Day
 
-Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageView.tsx`, `events/EventStaffingRoleSelect.tsx`, `events/EventStaffingSummaryAside.tsx`, `events/EventStaffingTab.tsx`, `events/EventStaffTimingForm.tsx`, `events/EventStaffTravelSelect.tsx`, `events/StaffNeedSuggestions.tsx`, `events/StaffNeedWaitlist.tsx`, `staff/clockLocation.ts`, `staff/MyDayDashboard.tsx`, `staff/MyDayFieldForms.tsx`, `staff/MyDayFrame.tsx`, `staff/MyDayIdentityResolver.ts`, `staff/MyDayPage.tsx`, `staff/MyDayPrepList.tsx`, `staff/MyDayProfileLink.tsx`, `staff/MyPastShiftsCard.tsx`, `staff/MyShiftWorkDetails.tsx`, `staff/offlineStore.ts`, `staff/OpenShiftsCard.tsx`, `staff/resolveMyDayAccount.ts`, `staff/ShiftSwapCard.tsx`, `staff/SwapCandidateExclusions.tsx`, `staff/TimeOffRequestCard.tsx`, `staff/WeeklyAvailabilityCard.tsx`, `staff/workedShifts.ts`, `workforce/availabilityGrid.ts`, `workforce/AvailabilityGridSection.tsx`, `workforce/CandidateEmailMismatchNotice.tsx`, `workforce/CandidateRevokeHireControl.tsx`, `workforce/CandidatesPage.tsx`, `workforce/MessagesPage.tsx`, `workforce/MyReviewsPage.tsx`, `workforce/oneOnOneCarryOver.ts`, `workforce/OneOnOnesPage.tsx`, `workforce/overtimeProjection.ts`, `workforce/PerformanceReviewsPage.tsx`, `workforce/QualificationsPage.tsx`, `workforce/ReviewFeedback.tsx`, `workforce/RoleScorecardsPage.tsx`, `workforce/RosterAttentionSection.tsx`, `workforce/rosterConflicts.ts`, `workforce/RosterPage.tsx`, `workforce/scorecardVersions.ts`, `workforce/ShiftRescheduleAction.tsx`, `workforce/shiftSwapEligibility.ts`, `workforce/ShiftSwapRequestsPage.tsx`, `workforce/skillLevels.ts`, `workforce/SkillsMatrixPanel.tsx`, `workforce/SmsAlertOptInSection.tsx`, `workforce/StaffingTemplateForm.tsx`, `workforce/StaffingTemplatesPage.tsx`, `workforce/StaffOverviewPage.tsx`, `workforce/StaffPayRatesSection.tsx`, `workforce/StaffSchedulingSection.tsx`, `workforce/staffUtilization.ts`, `workforce/StaffUtilizationPage.tsx`, `workforce/TimeAttentionPanel.tsx`, `workforce/TimeOffRequestsPage.tsx`, `workforce/timePay.ts`, `workforce/timeRecordEntry.ts`, `workforce/TimeSheetPage.tsx`, `workforce/trainingDoc.ts`, `workforce/TrainingDocAction.tsx`, `workforce/TrainingLifecycleActions.tsx`, `workforce/TrainingPage.tsx`, `workforce/TrainingSignOffPanel.tsx`, `workforce/trainingStarters.ts`, `workforce/weeklySchedule.ts`, `workforce/WorkforceFailureBanner.tsx`, `workforce/WorkforceLifecyclePolicy.ts`, `workforce/workforceRoutes.ts`, `workforce/WorkforceWorkspaceNav.tsx`
+Screens (75): `events/EventStaffBilling.tsx`, `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageView.tsx`, `events/EventStaffingRoleSelect.tsx`, `events/EventStaffingSummaryAside.tsx`, `events/EventStaffingTab.tsx`, `events/EventStaffTimingForm.tsx`, `events/EventStaffTravelSelect.tsx`, `events/StaffNeedSuggestions.tsx`, `events/StaffNeedWaitlist.tsx`, `staff/clockLocation.ts`, `staff/MyDayDashboard.tsx`, `staff/MyDayFieldForms.tsx`, `staff/MyDayFrame.tsx`, `staff/MyDayIdentityResolver.ts`, `staff/MyDayPage.tsx`, `staff/MyDayPrepList.tsx`, `staff/MyDayProfileLink.tsx`, `staff/MyPastShiftsCard.tsx`, `staff/MyShiftWorkDetails.tsx`, `staff/offlineStore.ts`, `staff/OpenShiftsCard.tsx`, `staff/resolveMyDayAccount.ts`, `staff/ShiftSwapCard.tsx`, `staff/SwapCandidateExclusions.tsx`, `staff/TimeOffRequestCard.tsx`, `staff/WeeklyAvailabilityCard.tsx`, `staff/workedShifts.ts`, `workforce/availabilityGrid.ts`, `workforce/AvailabilityGridSection.tsx`, `workforce/CandidateEmailMismatchNotice.tsx`, `workforce/CandidateRevokeHireControl.tsx`, `workforce/CandidatesPage.tsx`, `workforce/MessagesPage.tsx`, `workforce/MyReviewsPage.tsx`, `workforce/oneOnOneCarryOver.ts`, `workforce/OneOnOnesPage.tsx`, `workforce/overtimeProjection.ts`, `workforce/PerformanceReviewsPage.tsx`, `workforce/QualificationsPage.tsx`, `workforce/ReviewFeedback.tsx`, `workforce/RoleScorecardsPage.tsx`, `workforce/RosterAttentionSection.tsx`, `workforce/rosterConflicts.ts`, `workforce/RosterPage.tsx`, `workforce/scorecardVersions.ts`, `workforce/ShiftRescheduleAction.tsx`, `workforce/shiftSwapEligibility.ts`, `workforce/ShiftSwapRequestsPage.tsx`, `workforce/skillLevels.ts`, `workforce/SkillsMatrixPanel.tsx`, `workforce/SmsAlertOptInSection.tsx`, `workforce/StaffingTemplateForm.tsx`, `workforce/StaffingTemplatesPage.tsx`, `workforce/StaffOverviewPage.tsx`, `workforce/StaffPayRatesSection.tsx`, `workforce/StaffSchedulingSection.tsx`, `workforce/staffUtilization.ts`, `workforce/StaffUtilizationPage.tsx`, `workforce/TimeAttentionPanel.tsx`, `workforce/TimeOffRequestsPage.tsx`, `workforce/timePay.ts`, `workforce/timeRecordEntry.ts`, `workforce/TimeSheetPage.tsx`, `workforce/trainingDoc.ts`, `workforce/TrainingDocAction.tsx`, `workforce/TrainingLifecycleActions.tsx`, `workforce/TrainingPage.tsx`, `workforce/TrainingSignOffPanel.tsx`, `workforce/trainingStarters.ts`, `workforce/weeklySchedule.ts`, `workforce/WorkforceFailureBanner.tsx`, `workforce/WorkforceLifecyclePolicy.ts`, `workforce/workforceRoutes.ts`, `workforce/WorkforceWorkspaceNav.tsx`
 
 ### Generated reads
 
+- `queries.getClientContact` - live read
 - `queries.getEvent` - live read
+- `queries.getInvoice` - live read
+- `queries.getLead` - live read
+- `queries.getProposal` - live read
+- `queries.listClientCommunicationByClientContactId` - live read
+- `queries.listClientCommunicationByClientId` - live read
+- `queries.listClientCommunicationByEventId` - live read
 - `queries.listClientContactByClientId` - live read
+- `queries.listClientOutreachTaskByClientId` - live read
+- `queries.listContractByClientId` - live read
 - `queries.listCorrectiveActionByEventId` - live read
+- `queries.listCreditMemoByClientId` - live read
+- `queries.listCreditMemoBySourceInvoiceId` - live read
+- `queries.listDateHoldByHoldDate` - live read
+- `queries.listDateWaitlistEntryByHoldDate` - live read
 - `queries.listDishComponentByDishId` - live read
 - `queries.listDishIngredientByDishId` - live read
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
 - `queries.listEventCloseoutByEventId` - live read
+- `queries.listEventCloseoutByTenantIdAndStatus` - live read
 - `queries.listEventDishLineOverrideByEventDishId` - live read
 - `queries.listEventGuestByEventId` - live read
 - `queries.listEventLayoutSectionByEventId` - live read
+- `queries.listEventNumberAssignmentByEventId` - live read
 - `queries.listEventStaffNeed` - live read
 - `queries.listEventStaffNeedByEventId` - live read
+- `queries.listEventTaskByEventId` - live read
 - `queries.listEventTimelineActivityByEventId` - live read
 - `queries.listEventTimelineCommentByEventId` - live read
 - `queries.listIncidentByEventId` - live read
 - `queries.listIngredientDemandByEventId` - live read
+- `queries.listInvoiceByClientId` - live read
 - `queries.listInvoiceByEventId` - live read
 - `queries.listInvoiceByTenantIdAndInvoiceNumber` - live read
+- `queries.listInvoiceByTenantIdAndStatus` - live read
+- `queries.listLeadByClientId` - live read
+- `queries.listLeftoverDispositionByEventId` - live read
+- `queries.listMessageByThreadId` - live read
 - `queries.listPackListByEventId` - live read
+- `queries.listPaymentByInvoiceId` - live read
+- `queries.listPayrollExportRecordByPersonId` - live read
 - `queries.listPayrollInputByEventId` - live read
 - `queries.listPerson` - live read
+- `queries.listPlanningOverrideByEventId` - live read
+- `queries.listPlanningReceiptByEventId` - live read
 - `queries.listPrepTaskByEventId` - live read
+- `queries.listProposalByClientId` - live read
 - `queries.listProposalByEventId` - live read
 - `queries.listProposalDishSelectionByProposalId` - live read
 - `queries.listProposalEnhancementByProposalId` - live read
+- `queries.listProposalLineItemByProposalId` - live read
+- `queries.listProposalRevisionByProposalId` - live read
 - `queries.listQualification` - live read
+- `queries.listQuoteSubmissionByTenantIdAndStatus` - live read
 - `queries.listRecurringAvailability` - live read
 - `queries.listRecurringAvailabilityByPersonId` - live read
 - `queries.listRentalOrderLineByEventId` - live read
+- `queries.listRevenueAttributionByEventId` - live read
 - `queries.listReviewFlagByEventId` - live read
 - `queries.listRoleScorecard` - live read
+- `queries.listSavedReportSnapshotBySavedReportDefinitionId` - live read
 - `queries.listServiceStyle` - live read
+- `queries.listShareLinkByProposalId` - live read
 - `queries.listShiftByEventId` - live read
 - `queries.listShiftSwapRequestByRecipientPersonIdAndStatus` - live read
 - `queries.listShiftSwapRequestByRequesterPersonId` - live read
 - `queries.listShiftSwapRequestByTenantIdAndStatus` - live read
 - `queries.listShiftType` - live read
+- `queries.listSignatureRequestByProposalRevisionId` - live read
 - `queries.listSkillLevel` - live read
 - `queries.listStaffingTemplate` - live read
+- `queries.listTastingDishByTastingId` - live read
 - `queries.listTimeOffRequestByPersonId` - live read
 - `queries.listTimeOffRequestByTenantIdAndStatus` - live read
 - `queries.listTimeRecordByPersonId` - live read
@@ -3638,6 +3676,11 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `eventsAreaWindow.waitlistForEvent` - query; live read, updates by itself
 - `fileStorage.discardOrphanUploads` - mutation; authored step; live reads update by themselves
 - `fileStorage.generateUploadUrl` - mutation; authored step; live reads update by themselves
+- `financeWindow.canReadTable` - query; live read, updates by itself
+- `financeWindow.datesFrom` - query; live read, updates by itself
+- `financeWindow.leftoversInYear` - query; live read, updates by itself
+- `financeWindow.page` - query; live read, updates by itself
+- `financeWindow.threadLastMessageAt` - query; live read, updates by itself
 - `hiringPipeline.ingestKmCandidates` - mutation; authored step; live reads update by themselves
 - `historyWindow.awayForPeople` - query; live read, updates by itself
 - `historyWindow.dishTasksByIds` - query; live read, updates by itself
@@ -3651,7 +3694,12 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `lib.eventPacket.finalLock.listEventFieldForms` - query; live read, updates by itself
 - `lib.eventPacket.finalLock.myFieldForms` - query; live read, updates by itself
 - `lib.eventPacket.finalLock.prepareFieldForms` - mutation; authored step; live reads update by themselves
+- `lib.eventPriceList.forEvent` - query; live read, updates by itself
+- `lib.proposalPricing.addProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
+- `lib.proposalPricing.reviseProposalLineAndRecompute` - mutation; authored step; live reads update by themselves
 - `personEmail.correctStaffEmail` - action; one-time call (not live); the live reads it changes update by themselves
+- `planWindow.forEvents` - query; live read, updates by itself
+- `scorecardEventScores.forWindow` - query; live read, updates by itself
 - `staffSelfReviews.listMyReviews` - query; live read, updates by itself
 - `staffShiftSwaps.getCandidates` - query; live read, updates by itself
 - `staffShiftSwaps.listRelatedShifts` - query; live read, updates by itself
@@ -3670,6 +3718,7 @@ Screens (74): `events/EventStaffingAddForm.tsx`, `events/EventStaffingCoverageVi
 - `workforceHistoryWindow.oneOnOnePage` - query; live read, updates by itself
 - `workforceHistoryWindow.pendingImportConflicts` - query; live read, updates by itself
 - `workforceHistoryWindow.performanceReviewPage` - query; live read, updates by itself
+- `workforceHistoryWindow.reviewEventsForPerson` - query; live read, updates by itself
 - `workforceHistoryWindow.trainingCompletionCounts` - query; live read, updates by itself
 - `workforceHistoryWindow.trainingCompletionPage` - query; live read, updates by itself
 - `workforceHistoryWindow.trainingSignOffPage` - query; live read, updates by itself
@@ -4675,10 +4724,12 @@ Screens (71): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `queries.getLead` - live read
 - `queries.getProposal` - live read
 - `queries.getRevenueAttribution` - live read
+- `queries.getVenue` - live read
 - `queries.listClientCommunicationByClientContactId` - live read
 - `queries.listClientCommunicationByClientId` - live read
 - `queries.listClientCommunicationByEventId` - live read
 - `queries.listClientContactByClientId` - live read
+- `queries.listClientOutreachTaskByClientId` - live read
 - `queries.listComponent` - live read
 - `queries.listComponentComponentByComponentId` - live read
 - `queries.listComponentEquipmentByComponentId` - live read

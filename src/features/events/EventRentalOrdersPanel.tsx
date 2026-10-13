@@ -484,7 +484,9 @@ export function EventRentalOrdersPanel({ eventId }: { eventId: Id<"events"> }) {
                     setPickedVendor(event.target.value);
                   }}
                 >
-                  <option value="">The list item's vendor</option>
+                  <option value="">
+                    Pick a vendor (list items use their own)
+                  </option>
                   {vendors.map((vendor) => {
                     const rule = venueRules.get(String(vendor.vendorId));
                     return (

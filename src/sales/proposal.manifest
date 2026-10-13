@@ -63,6 +63,9 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   property required subtotal: money(12, 2) = 0
   property required taxAmount: money(12, 2) = 0
   property required discountAmount: money(12, 2) = 0
+  // A discount set as a percent of the subtotal (null: a dollar amount). The
+  // price restamp keeps discountAmount at this percent as lines change.
+  property discountPercent: decimal(5, 2)?
   property required total: money(12, 2) = 0
   property expiresAt: datetime?
   property notes: string?
@@ -299,6 +302,30 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     mutate notes = notes
     mutate expiresAt = expiresAt
     emit ProposalDraftRevised {
+      proposalId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
+  // The discount on a draft: a percent of the subtotal, or a dollar amount
+  // (discountPercent left out). The authored seam works out the amount and
+  // total from the current lines (convex/lib/proposalPricing.ts).
+  command setDiscount(
+    optional discountPercent: decimal(5, 2),
+    discountAmount: money(12, 2),
+    total: money(12, 2)
+  ) {
+    guard self.status == "draft"
+    guard self.draftedAt != null
+    guard self.deletedAt == null
+    constraint setDiscountPercentRange: discountPercent == null or (discountPercent >= 0 and discountPercent <= 100) "A discount percent is between 0 and 100."
+    constraint setDiscountAmountRange: discountAmount >= 0 and discountAmount <= self.subtotal "A discount can't be negative or more than the subtotal."
+    constraint setDiscountTotalMatch: total == self.subtotal + self.taxAmount - discountAmount "Proposal total must equal subtotal plus tax minus discount"
+    mutate discountPercent = discountPercent
+    mutate discountAmount = discountAmount
+    mutate total = total
+    emit ProposalDiscountSet {
       proposalId: self.id
       tenantId: self.tenantId
       clientId: self.clientId
@@ -621,6 +648,12 @@ event ProposalEventHeadcountFollowed: "proposal.event_headcount_followed" {
 }
 
 event ProposalDraftRevised: "proposal.draft_revised" {
+  proposalId: string
+  tenantId: string
+  clientId: string
+}
+
+event ProposalDiscountSet: "proposal.discount_set" {
   proposalId: string
   tenantId: string
   clientId: string

@@ -47,7 +47,18 @@ export function WeeklyDraftPanel({
             {order.sourceRangeStart ? formatDate(order.sourceRangeStart) : "—"}{" "}
             · {vendorName}
           </p>
-          <h2>This week's draft order</h2>
+          <h2>
+            {(() => {
+              // Named for its week: the next draft is not "this week's".
+              const start = Number(order.sourceRangeStart ?? 0);
+              const now = Date.now();
+              return start <= now && now < start + 7 * 86_400_000
+                ? "This week's draft order"
+                : start > now
+                  ? "Next draft order"
+                  : "Draft order";
+            })()}
+          </h2>
           <p className="text-ink-2" data-testid="draft-commitment">
             {draftCommitmentLabel(String(order.status))}
           </p>

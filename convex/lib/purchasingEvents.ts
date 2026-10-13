@@ -3,6 +3,7 @@ import type { MutationCtx } from "../_generated/server";
 import { api } from "../_generated/api";
 import { getAuthContext, requireTenant } from "./authContext";
 import { recipeUnitRatio } from "../../src/lib/recipeUnitConversion";
+import { recountDraftLines } from "../purchasingRepair";
 
 export async function retireUnusedAutomaticDraft(
   ctx: MutationCtx,
@@ -378,6 +379,14 @@ export async function settleEventPurchasing(
   for (const need of needs) {
     if (need.tenantId !== tenantId || need.deletedAt != null) continue;
     await settleNeed(ctx, need);
+  }
+  // Shelf stock this event no longer needs goes back to the week's other
+  // draft lines. This never stops the event from finishing: if it cannot
+  // run here, the purchasing page offers to work the drafts out again.
+  try {
+    await recountDraftLines(ctx, tenantId);
+  } catch {
+    // Left for the purchasing page's notice.
   }
 }
 

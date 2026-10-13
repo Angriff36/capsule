@@ -7,6 +7,7 @@ import {
   type InvoiceLineDraft,
 } from "../../src/features/finance/invoiceTax";
 import { LedgerMoney } from "../../src/lib/ledgerMoney";
+import { taxRatesFor } from "./venueTaxRates";
 
 /**
  * PL-AUTH (AC-372): an invoice issued with lines must carry the money the
@@ -39,10 +40,8 @@ export async function assertInvoiceIssueTotals(
   const client = await ctx.db.get(invoice.clientId as Id<"clients">);
   const taxExempt =
     client?.tenantId === invoice.tenantId && client.taxExempt === true;
-  const rates = await ctx.db
-    .query("taxRates")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", invoice.tenantId))
-    .collect();
+  // The event's venue may charge its own rates.
+  const rates = await taxRatesFor(ctx, invoice.tenantId, invoice.eventId);
   const worked = calculateInvoiceTax(
     drafts,
     rates,

@@ -269,3 +269,23 @@ export function calculateTaxRemittance(
         b.collectedAmount - a.collectedAmount || a.name.localeCompare(b.name),
     );
 }
+
+/**
+ * The rates charged at a venue (TPP's tax location): the venue's own list
+ * when it has one, else every rate. One rule for the invoice form and the
+ * server, so they always tax a bill the same way.
+ */
+export function ratesForVenue<T extends TaxRateRecord>(
+  rates: readonly T[],
+  venue: { taxRateIds?: readonly (string | null)[] | null } | null | undefined,
+): T[] {
+  const ids = venue?.taxRateIds;
+  if (!ids || ids.length === 0) return [...rates];
+  const chosen = rates.filter((rate) => ids.includes(String(rate._id)));
+  // A list whose rates are all removed or paused never leaves a bill
+  // untaxed: it falls back to every rate.
+  const usable = chosen.some(
+    (rate) => rate.active === true && rate.deletedAt == null,
+  );
+  return usable ? chosen : [...rates];
+}

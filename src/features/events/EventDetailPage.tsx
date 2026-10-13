@@ -68,6 +68,7 @@ import { ClientPreviewCard } from "../clients/ClientPreviewCard";
 import { HoverPreview } from "../../ui/HoverPreview";
 import { downloadBeoPdf } from "./beoPdf";
 import { venueLogisticsLines } from "../facilities/venueLogistics";
+import { venueAddressLine } from "../../lib/tppReports/reportValues";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { clientDisplayName } from "./clientName";
 import { EventClientTab } from "./EventClientTab";
@@ -366,7 +367,22 @@ function EventDetailContent({
   const exportBeo = () => {
     setPdfNotice(null);
     void downloadBeoPdf({
-      event,
+      // An event booked to a venue can have a blank copy of its name and
+      // address; the printed BEO then uses the venue's own.
+      event: {
+        ...event,
+        venueName: event.venueName || venue?.name,
+        venueAddress:
+          event.venueAddress ||
+          (venue
+            ? venueAddressLine({
+                addressLine1: venue.addressLine1 ?? undefined,
+                city: venue.city ?? undefined,
+                region: venue.region ?? undefined,
+                postalCode: venue.postalCode ?? undefined,
+              })
+            : undefined),
+      },
       clientName: clientDisplayName(event.clientId, clients),
       dishes: (eventDishes ?? [])
         .filter(

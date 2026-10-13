@@ -488,17 +488,39 @@ export function CloseoutPage() {
                                     : action.label}
                                 </button>
                               ))}
-                            {event?.clientId ? (
-                              <Link
-                                className="btn btn-ghost btn-sm"
-                                to={FINANCE_ROUTES.issueInvoice({
-                                  clientId: String(event.clientId),
-                                  eventId: String(row.eventId),
-                                })}
-                              >
-                                Issue invoice
-                              </Link>
-                            ) : null}
+                            {(() => {
+                              // An event with a draft invoice already: open
+                              // that one, never start a second bill.
+                              const draftInvoice = (invoices ?? []).find(
+                                (invoice) =>
+                                  String(invoice.eventId) ===
+                                    String(row.eventId) &&
+                                  invoice.deletedAt == null &&
+                                  String(invoice.status) === "draft",
+                              );
+                              if (draftInvoice)
+                                return (
+                                  <Link
+                                    className="btn btn-ghost btn-sm"
+                                    to={FINANCE_ROUTES.invoiceDetail(
+                                      String(draftInvoice._id),
+                                    )}
+                                  >
+                                    Open draft invoice
+                                  </Link>
+                                );
+                              return event?.clientId ? (
+                                <Link
+                                  className="btn btn-ghost btn-sm"
+                                  to={FINANCE_ROUTES.issueInvoice({
+                                    clientId: String(event.clientId),
+                                    eventId: String(row.eventId),
+                                  })}
+                                >
+                                  Issue invoice
+                                </Link>
+                              ) : null;
+                            })()}
                             <button
                               className="btn btn-ghost btn-sm"
                               type="button"

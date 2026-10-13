@@ -28,9 +28,18 @@ import { internalMutation, mutation, query } from "../_generated/server";
 import { api, internal } from "../_generated/api";
 import { v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
-import { computeProposalPricing, type PricingBasis } from "../../src/lib/pricing";
+import {
+  computeProposalPricing,
+  FEE_SCOPES,
+  scopedFeeAmount,
+  type FeeScope,
+  type GroupedPricingLine,
+  type PricingBasis,
+} from "../../src/lib/pricing";
 import { effectiveSellingPrice } from "../../src/lib/catalogEligibility";
 import { getAuthContext } from "./authContext";
+import { followEventPriceList } from "./eventPriceList";
+import { proposalSalesTax } from "./invoicePricingReconciliation";
 
 // Active, non-deleted priced lines for a proposal. JS loose-equality filter
 // (governed-creation omits deletedAt at insert → fresh active rows have it
@@ -226,8 +235,8 @@ async function authoritativeAmountForTarget(
 // op), so it does no auth check of its own; the wrapper's guarded runMutation
 // already established salesAccess + draft status.
 //
-// tax/discount are operator fields (set on Proposal.draft), carried through
-// unchanged; subtotal derives from the lines, and total = subtotal + tax -
+// discount is an operator field (set on Proposal.draft); tax is the sales tax
+// the invoice will charge (the typed tax when the workspace has no rate); subtotal derives from the lines, and total = subtotal + tax -
 // discount (the proposalTotalsConsistent invariant). All four values are 2dp, so
 // the invariant holds exactly — the same arithmetic path the draft command uses.
 export const recomputeProposalTotals = internalMutation({
@@ -241,16 +250,46 @@ export const recomputeProposalTotals = internalMutation({
       throw new Error("Proposal pricing can only be recomputed while draft");
     }
     const lines = await activeLines(ctx, args.proposalId);
+    const guestCount = Number(proposal.guestCount) || 0;
 
-    const result = computeProposalPricing({
-      lines: lines.map((l) => ({
-        pricingBasis: l.pricingBasis as PricingBasis,
-        unitPrice: Number(l.unitPrice) || 0,
-        quantity: Number(l.quantity) || 0,
-      })),
-      guestCount: Number(proposal.guestCount) || 0,
-      discountAmount: Number(proposal.discountAmount) || 0,
-      taxAmount: Number(proposal.taxAmount) || 0,
+    // A fee on part of the bill stays its percent of that part.
+    for (const line of lines) {
+      if (!line.feeAppliesTo || line.feePercent == null) continue;
+      const fee = scopedFeeAmount(
+        Number(line.feePercent),
+        line.feeAppliesTo,
+        lines.map(groupedLine),
+        guestCount,
+      );
+      if (fee !== Number(line.unitPrice)) {
+        await ctx.db.patch(line._id, { unitPrice: fee });
+        line.unitPrice = fee;
+      }
+    }
+
+    const inputs = lines.map((l) => ({
+      pricingBasis: l.pricingBasis as PricingBasis,
+      unitPrice: Number(l.unitPrice) || 0,
+      quantity: Number(l.quantity) || 0,
+    }));
+    // A percent discount stays that percent of the new subtotal.
+    const percent = proposal.discountPercent;
+    const undiscounted = computeProposalPricing({
+      lines: inputs,
+      guestCount,
+      discountAmount: 0,
+      taxAmount: 0,
+    }).subtotal;
+    // A dollar discount never takes the total below zero when lines go away.
+    const discountAmount =
+      percent != null
+        ? roundCents((undiscounted * Number(percent)) / 100)
+        : Math.min(Number(proposal.discountAmount) || 0, undiscounted);
+    const lineAmounts = computeProposalPricing({
+      lines: inputs,
+      guestCount,
+      discountAmount,
+      taxAmount: 0,
     });
 
     // Restamp each line's authoritative amount (positional —
@@ -258,13 +297,29 @@ export const recomputeProposalTotals = internalMutation({
     // against the new base), then the parent totals.
     await Promise.all(
       lines.map((l, i) =>
-        ctx.db.patch(l._id, { amount: result.lines[i].amount }),
+        ctx.db.patch(l._id, { amount: lineAmounts.lines[i].amount }),
       ),
     );
+    // Sales tax is added by itself: the tax the invoice will charge.
+    const taxAmount =
+      (await proposalSalesTax(ctx, { ...proposal, discountAmount })) ??
+      (Number(proposal.taxAmount) || 0);
+    const result = computeProposalPricing({
+      lines: inputs,
+      guestCount,
+      discountAmount,
+      taxAmount,
+    });
     await ctx.db.patch(args.proposalId, {
       subtotal: result.subtotal,
+      taxAmount,
       total: result.total,
+      ...(discountAmount !== (Number(proposal.discountAmount) || 0)
+        ? { discountAmount }
+        : {}),
     });
+    // The event this list prices follows its new total while it is planned.
+    await followEventPriceList(ctx, args.proposalId);
   },
 });
 
@@ -288,15 +343,22 @@ export const addProposalLineAndRecompute = mutation({
     travelFee: v.optional(v.boolean()),
     // The menu a per-guest or base price line belongs to (proposalDishPricing).
     menuId: v.optional(v.string()),
+    // A fee on part of the bill: feePercent of the lines in feeAppliesTo.
+    feePercent: v.optional(v.number()),
+    feeAppliesTo: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
     const auth = await getAuthContext(ctx);
-    const proposal = await ctx.db.get(args.proposalId);
+    const proposal = await ctx.db.get(rawArgs.proposalId);
     // Tenant-check before any catalog read so a foreign proposal id yields only
     // "not found" (no existence / catalog-validation oracle). codex review A.
     if (!proposal || !auth.tenantId || proposal.tenantId !== auth.tenantId) {
       throw new Error("Proposal not found");
     }
+    const args = {
+      ...rawArgs,
+      ...(await asScopedFee(ctx, rawArgs, rawArgs.proposalId, proposal)),
+    };
     await assertValidCatalogLink(ctx, args.menuDishId, proposal.tenantId);
     await assertValidRentalLink(ctx, args.equipmentId, proposal.tenantId);
     await assertOwnMenuLink(ctx, args.menuId, proposal.tenantId);
@@ -326,6 +388,8 @@ export const addProposalLineAndRecompute = mutation({
       equipmentId: args.equipmentId,
       travelFee: args.travelFee,
       menuId: args.menuId,
+      feePercent: args.feePercent,
+      feeAppliesTo: args.feeAppliesTo,
     });
     await ctx.runMutation(internal.lib.proposalPricing.recomputeProposalTotals, {
       proposalId: args.proposalId,
@@ -350,15 +414,21 @@ export const reviseProposalLineAndRecompute = mutation({
     menuDishId: v.optional(v.id("menuDishes")),
     overrideReason: v.optional(v.string()),
     equipmentId: v.optional(v.id("equipments")),
+    feePercent: v.optional(v.number()),
+    feeAppliesTo: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, rawArgs) => {
     const auth = await getAuthContext(ctx);
-    const line = await ctx.db.get(args.docId);
+    const line = await ctx.db.get(rawArgs.docId);
     if (!line || !auth.tenantId || line.tenantId !== auth.tenantId) {
       throw new Error("Proposal line not found");
     }
     const proposal = await ctx.db.get(line.proposalId);
     if (!proposal) throw new Error("Proposal not found");
+    const args = {
+      ...rawArgs,
+      ...(await asScopedFee(ctx, rawArgs, line.proposalId, proposal, rawArgs.docId)),
+    };
     await assertValidCatalogLink(ctx, args.menuDishId, proposal.tenantId);
     await assertValidRentalLink(ctx, args.equipmentId, proposal.tenantId);
     const amount = await authoritativeAmountForTarget(
@@ -387,6 +457,8 @@ export const reviseProposalLineAndRecompute = mutation({
       menuDishId: args.menuDishId,
       overrideReason: args.overrideReason,
       equipmentId: args.equipmentId,
+      feePercent: args.feePercent,
+      feeAppliesTo: args.feeAppliesTo,
     });
     await ctx.runMutation(internal.lib.proposalPricing.recomputeProposalTotals, {
       proposalId: line.proposalId,
@@ -417,3 +489,96 @@ export const removeProposalLineAndRecompute = mutation({
     });
   },
 });
+
+const roundCents = (value: number) => Math.round(value * 100) / 100;
+
+/**
+ * The discount on a draft: a percent of the subtotal (it stays that percent as
+ * lines change) or a dollar amount. The event's price follows the new total.
+ */
+export const setProposalDiscount = mutation({
+  args: {
+    proposalId: v.id("proposals"),
+    percent: v.optional(v.number()),
+    amount: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    const auth = await getAuthContext(ctx);
+    const proposal = await ctx.db.get(args.proposalId);
+    if (!proposal || !auth.tenantId || proposal.tenantId !== auth.tenantId) {
+      throw new Error("Proposal not found");
+    }
+    const subtotal = Number(proposal.subtotal) || 0;
+    const taxAmount = Number(proposal.taxAmount) || 0;
+    const discountAmount =
+      args.percent != null
+        ? roundCents((subtotal * args.percent) / 100)
+        : roundCents(Number(args.amount ?? 0));
+    await ctx.runMutation(api.mutations.Proposal_setDiscount, {
+      docId: args.proposalId,
+      discountPercent: args.percent ?? undefined,
+      discountAmount,
+      total: subtotal + taxAmount - discountAmount,
+    });
+    await ctx.runMutation(internal.lib.proposalPricing.recomputeProposalTotals, {
+      proposalId: args.proposalId,
+    });
+  },
+});
+
+const groupedLine = (line: Doc<"proposalLineItems">): GroupedPricingLine => ({
+  pricingBasis: line.pricingBasis as PricingBasis,
+  unitPrice: Number(line.unitPrice) || 0,
+  quantity: Number(line.quantity) || 0,
+  description: line.description,
+  equipmentId: line.equipmentId ? String(line.equipmentId) : null,
+  menuDishId: line.menuDishId ? String(line.menuDishId) : null,
+  menuId: line.menuId ? String(line.menuId) : null,
+  feeAppliesTo: line.feeAppliesTo ?? null,
+});
+
+/**
+ * A percent line asked to apply to only part of the bill becomes a flat fee
+ * at that percent of the part (the restamp keeps it there). Any other line
+ * is left as it is and carries no fee fields.
+ */
+async function asScopedFee(
+  ctx: { db: any },
+  args: {
+    pricingBasis: string;
+    unitPrice: number;
+    feePercent?: number;
+    feeAppliesTo?: string;
+  },
+  proposalId: Id<"proposals">,
+  proposal: Doc<"proposals">,
+  excludeLineId?: Id<"proposalLineItems">,
+): Promise<{
+  pricingBasis: string;
+  unitPrice: number;
+  feePercent?: number;
+  feeAppliesTo?: string;
+}> {
+  if (!args.feeAppliesTo) {
+    return { pricingBasis: args.pricingBasis, unitPrice: args.unitPrice, feePercent: undefined, feeAppliesTo: undefined };
+  }
+  if (!FEE_SCOPES.includes(args.feeAppliesTo as FeeScope))
+    throw new Error("Pick what this fee applies to: food, rentals or staff.");
+  const percent = Number(args.feePercent ?? args.unitPrice);
+  if (!(percent >= 0 && percent <= 100))
+    throw new Error("A fee percent is between 0 and 100.");
+  const others = (await activeLines(ctx, proposalId)).filter(
+    (row) => String(row._id) !== String(excludeLineId ?? ""),
+  );
+  return {
+    pricingBasis: "flat",
+    unitPrice: scopedFeeAmount(
+      percent,
+      args.feeAppliesTo,
+      others.map(groupedLine),
+      Number(proposal.guestCount) || 0,
+    ),
+    feePercent: percent,
+    feeAppliesTo: args.feeAppliesTo,
+  };
+}

@@ -12,6 +12,8 @@ import {
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
+import { SearchSelect } from "../../ui/SearchSelect";
+import { formatDate } from "../../lib/format";
 import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
@@ -256,24 +258,27 @@ export function ContractsPage() {
             <>
               <label>
                 Event
-                <select
+                <SearchSelect
                   key={
                     draftableEvents.length ? "events-ready" : "events-loading"
                   }
                   name="eventId"
                   required
                   defaultValue={workingId ?? ""}
-                >
-                  <option value="" disabled>
-                    Select event
-                  </option>
-                  {draftableEvents.map((row) => (
-                    <option key={row._id} value={row._id}>
-                      {row.title || row._id} (
-                      {clientDisplayName(row.clientId, clients)})
-                    </option>
-                  ))}
-                </select>
+                  placeholder="Search events by name or client…"
+                  options={draftableEvents.map((row) => ({
+                    id: row._id,
+                    label: row.title || "Untitled event",
+                    hint:
+                      [
+                        row.startsAt ? formatDate(row.startsAt) : null,
+                        clientDisplayName(row.clientId, clients),
+                      ]
+                        .filter(Boolean)
+                        .join(" · ") || null,
+                    keywords: clientDisplayName(row.clientId, clients),
+                  }))}
+                />
               </label>
               <label>
                 Title

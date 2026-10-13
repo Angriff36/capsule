@@ -113,7 +113,15 @@ export function LotTraceabilityPage() {
   const affectedClients = new Set(
     rows.map((row) => row.clientId).filter(Boolean),
   ).size;
-  const matchingLots = new Set(rows.map((row) => row.lotId)).size;
+  // Every received lot the trace matched, used or not: a lot nobody has used
+  // yet is still an answer in a recall.
+  const matchingLots =
+    hasFilter && !invalidRange
+      ? new Set([
+          ...(lots ?? []).map((lot) => String(lot._id)),
+          ...rows.map((row) => String(row.lotId)),
+        ]).size
+      : 0;
   const issueFacts = rows.reduce((sum, row) => sum + row.consumptionCount, 0);
 
   const clearFilters = () => {
@@ -234,11 +242,27 @@ export function LotTraceabilityPage() {
           </div>
         ) : rows.length === 0 && !invalidRange ? (
           <div className="document-empty">
-            <p>No affected events matched this trace.</p>
-            <span>
-              Check the supplier label, widen the date range, or confirm that
-              the stock reservation recorded a lot.
-            </span>
+            {matchingLots > 0 ? (
+              <>
+                <p>
+                  {matchingLots === 1
+                    ? "The lot was received, but none of it was used at an event yet."
+                    : `${matchingLots} lots were received, but none of them was used at an event yet.`}
+                </p>
+                <span>
+                  No client was served from {matchingLots === 1 ? "it" : "them"}
+                  .
+                </span>
+              </>
+            ) : (
+              <>
+                <p>No affected events matched this trace.</p>
+                <span>
+                  Check the supplier label, widen the date range, or confirm
+                  that the stock reservation recorded a lot.
+                </span>
+              </>
+            )}
           </div>
         ) : rows.length > 0 ? (
           <div className="supply-table-wrap">

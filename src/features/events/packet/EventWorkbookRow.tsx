@@ -86,8 +86,12 @@ export function EventWorkbookRow({ row }: { row: PacketWorkbookSummary }) {
       {row.openIssues.length > 0 ? (
         <details className="mt-2">
           <summary className="cursor-pointer text-sm font-semibold text-ink-2">
-            {row.openIssues.length} open{" "}
-            {row.openIssues.length === 1 ? "issue" : "issues"}
+            {/* Info notes are not problems: name them as notes when they are
+                all there is, so the row does not say "No open issues" and
+                "4 open issues" at once. */}
+            {openTotal === 0
+              ? `${row.openIssues.length} ${row.openIssues.length === 1 ? "note" : "notes"} to check`
+              : `${row.openIssues.length} open ${row.openIssues.length === 1 ? "issue" : "issues"}`}
           </summary>
           <ul className="mt-2 space-y-1.5">
             {row.openIssues.map((issue) => (
@@ -99,10 +103,12 @@ export function EventWorkbookRow({ row }: { row: PacketWorkbookSummary }) {
                   className={`chip ${
                     issue.severity === "blocking"
                       ? "chip-tone-danger"
-                      : "chip-tone-warn"
+                      : issue.severity === "warning"
+                        ? "chip-tone-warn"
+                        : ""
                   }`}
                 >
-                  {issue.severity}
+                  {issue.severity === "info" ? "note" : issue.severity}
                 </span>
                 <span className="text-ink">{issue.message}</span>
                 <span className="text-ink-3">

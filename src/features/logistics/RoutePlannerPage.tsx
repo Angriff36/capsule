@@ -255,12 +255,13 @@ export function RoutePlannerPage() {
             {roadConfigured === false
               ? "Stops in the shortest straight-line order. Drive times are a rough guess at 25 mph until the map service is switched on."
               : "Stops in the shortest order, with real road times from the map service."}{" "}
-            Move a stop up or down if you need to; your order is kept on this
-            screen only and is not saved.
+            Move a stop up or down if you need to, then print the route for the
+            driver; the order is kept on this screen only and is not saved.
           </p>
         </div>
         <div className="supply-row-actions">
           <BoundedDateInput
+            naturalDateDirection="any"
             className="input"
             aria-label="Route day"
             value={day}
@@ -285,11 +286,20 @@ export function RoutePlannerPage() {
               </option>
             ))}
           </select>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={() => window.print()}
+          >
+            Print route
+          </button>
         </div>
       </header>
       <LogisticsWorkspaceNav />
 
-      <section className="working-ledger">
+      {/* The printed stop list is what the driver takes: the order on screen
+          is not saved, so print it once it is right. */}
+      <section className="working-ledger print-sheet">
         <div className="ledger-heading">
           <div>
             <p className="eyebrow">
@@ -394,6 +404,29 @@ export function RoutePlannerPage() {
                 })}
               </tbody>
             </table>
+            {/* A stop that closes before the stop ahead of it opens is missed. */}
+            {orderedStops.map((stop, index) => {
+              const before = orderedStops[index - 1];
+              if (
+                !before ||
+                stop.windowEndsAt == null ||
+                before.windowStartsAt == null ||
+                stop.windowEndsAt > before.windowStartsAt
+              )
+                return null;
+              return (
+                <p
+                  key={`late-${stop._id}`}
+                  className="mt-3 text-base text-warn"
+                  role="status"
+                >
+                  Stop {index + 1} has to be done by{" "}
+                  {formatTime(stop.windowEndsAt)}, but stop {index} doesn't open
+                  until {formatTime(before.windowStartsAt)}. This order misses
+                  stop {index + 1}.
+                </p>
+              );
+            })}
             {manualOrder ? (
               <p className="mt-3 text-base text-ink-2">
                 Your own order (kept on this screen only).{" "}

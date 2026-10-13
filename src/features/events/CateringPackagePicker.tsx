@@ -15,12 +15,16 @@ import type { CateringPackageResult } from "../../../convex/lib/cateringPackageO
 import { classifyCommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import { Link } from "react-router-dom";
+import { useCateringPackageAsMenu } from "../../lib/cateringPackageMenu";
 
 export type CateringPackageInput = {
   packageId: string;
   selections: CateringSelection[];
   operationKey: string;
   serviceStartsAt?: number;
+  /** Goes on the event's price list as one per-guest line. */
+  pricePerGuest?: number;
 };
 
 type Props = {
@@ -52,6 +56,12 @@ export function CateringPackagePicker({
   const [guests, setGuests] = useState(headcount ?? Number.NaN);
   const [selections, setSelections] = useState<CateringSelection[]>([]);
   const [serviceTime, setServiceTime] = useState(localDateTime(startsAt));
+  const [price, setPrice] = useState("");
+  const asMenu = useCateringPackageAsMenu();
+  const [menuLink, setMenuLink] = useState<{
+    packageId: string;
+    menuId: string;
+  } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState<ReturnType<
     typeof classifyCommandFailure
@@ -112,6 +122,7 @@ export function CateringPackagePicker({
         ...(pack.serviceTasks?.length && serviceTime
           ? { serviceStartsAt: new Date(serviceTime).getTime() }
           : {}),
+        ...(Number(price) > 0 ? { pricePerGuest: Number(price) } : {}),
       });
       const saved = await onApply({
         ...pending.payload,
@@ -121,6 +132,7 @@ export function CateringPackagePicker({
       setResult(saved);
       setPackageId("");
       setSelections([]);
+      setPrice("");
     } catch (error) {
       setFailure(classifyCommandFailure(error));
     } finally {
@@ -150,7 +162,7 @@ export function CateringPackagePicker({
               adding them to this event.
             </p>
           </div>
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-4">
             <label className="grid gap-1 text-base text-ink">
               Menu book
               <select
@@ -222,6 +234,22 @@ export function CateringPackagePicker({
                 }}
               />
             </label>
+            <label className="grid gap-1 text-base text-ink">
+              Price per guest
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                className="input min-h-10 w-full"
+                value={price}
+                placeholder="From the book"
+                disabled={disabled}
+                onChange={(event) => setPrice(event.target.value)}
+              />
+              <small className="text-sm text-ink-3">
+                Goes on the event's price list; change it there any time.
+              </small>
+            </label>
           </div>
           {pack && (
             <>
@@ -234,6 +262,36 @@ export function CateringPackagePicker({
               <div className="border-l-2 border-line-2 pl-3 text-base text-ink-2">
                 <p>{cateringSource(pack)}</p>
                 <p className="mt-1">{pack.notes}</p>
+                {menuLink?.packageId === pack.id ? (
+                  <p className="mt-2">
+                    <Link
+                      className="text-link"
+                      to={`/kitchen/menus/${menuLink.menuId}`}
+                    >
+                      Open the {pack.name} menu to set its price per guest
+                    </Link>
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm mt-2"
+                    disabled={disabled}
+                    onClick={() =>
+                      void asMenu({ packageId: pack.id })
+                        .then((made) =>
+                          setMenuLink({
+                            packageId: pack.id,
+                            menuId: String(made.menuId),
+                          }),
+                        )
+                        .catch((error) =>
+                          setFailure(classifyCommandFailure(error)),
+                        )
+                    }
+                  >
+                    Keep a price for this package
+                  </button>
+                )}
               </div>
               {pack.groups.length > 0 && (
                 <p className="text-base text-ink-2">

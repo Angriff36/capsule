@@ -379,10 +379,13 @@ export function MessageInboxPage() {
     setFailure(null);
     const sender = selected.senderIdentity?.trim() || threadTitle(selected);
     const firstInbound = threadMessages.find((m) => m.direction === "inbound");
+    // "Maria Lopez" from an email address: first and last name apart.
+    const [givenName, ...rest] = senderName(sender).split(" ");
     try {
       const created = (await createLead({
         leadType: "person",
-        givenName: senderName(sender),
+        givenName,
+        familyName: rest.join(" ") || undefined,
         email: /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(sender) ? sender : undefined,
         phone: /^[+\d][\d\s().-]{6,}$/.test(sender) ? sender : undefined,
         source: PROVIDER_LABEL[selected.provider] ?? selected.provider,

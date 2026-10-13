@@ -5,6 +5,7 @@ import {
   type EventDayEventSummary,
 } from "../../lib/eventDayBriefing";
 import { formatStatusLabel } from "../../lib/statusLabels";
+import { formatCountNoun } from "../../lib/format";
 import { useWorkingEventId } from "../events/workingEvent";
 
 function dayStart(at: number): number {
@@ -24,7 +25,9 @@ function EventCard({
     typeof event.startsAt === "number" ? new Date(event.startsAt) : null;
   const place = String(event.venueName ?? "").trim();
   const guests =
-    event.expectedHeadcount != null ? `${event.expectedHeadcount} guests` : "";
+    event.expectedHeadcount != null
+      ? formatCountNoun(event.expectedHeadcount, "guest", "guests")
+      : "";
   return (
     <Link
       to={`/event-day/${event._id}`}

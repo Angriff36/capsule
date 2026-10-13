@@ -355,7 +355,8 @@ export function MessagesPage() {
                   people={people}
                   searchRecords={searchRecords}
                   onSubmit={onSubmit}
-                  sending={sending}
+                  // Until the sender is known, Enter keeps the text instead of dropping it.
+                  sending={sending || !identity.sender}
                   focusSignal={focusSignal}
                 />
               </div>

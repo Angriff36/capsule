@@ -40,7 +40,7 @@ const STAGE_NOTE: Record<EventStage, string> = {
   planning: "Your catering team is shaping the event details.",
   pending_approval: "The plan is in its final confirmation pass.",
   approved: "The event plan is confirmed and moving into preparation.",
-  sales_lock: "Event is locked for sales coordination.",
+  sales_lock: "Your menu and details are confirmed. The team is preparing.",
   executing: "Your event is in service now.",
   final: "Service is complete. The team is finalizing details.",
   completed: "Service is complete. The team is wrapping up.",
@@ -165,8 +165,21 @@ export function ClientPortalView({
     "--portal-primary": primary,
     "--portal-accent": accent,
   };
-  const currentStageIndex = PORTAL_STAGES.indexOf(portal.event.stage);
-  const statusLabel = STAGE_LABEL[portal.event.stage];
+  // Stages with no step of their own sit on the client's nearest step, so
+  // the steps already done still show as done.
+  const portalStep: EventStage =
+    portal.event.stage === "quote"
+      ? "planning"
+      : portal.event.stage === "sales_lock"
+        ? "approved"
+        : portal.event.stage === "final"
+          ? "completed"
+          : portal.event.stage;
+  const currentStageIndex = PORTAL_STAGES.indexOf(portalStep);
+  const statusLabel =
+    portal.event.stage === "sales_lock"
+      ? "Details confirmed"
+      : STAGE_LABEL[portal.event.stage];
   // Date and count are "confirmed" only once the event is approved.
   const confirmed = !["quote", "planning", "pending_approval"].includes(
     portal.event.stage,

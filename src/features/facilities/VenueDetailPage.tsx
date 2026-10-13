@@ -23,6 +23,8 @@ import { useRouteRecord } from "../../lib/routeRecord";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { ReturnToListLink } from "../list-state/listOrigin";
 import { VenueNotesPanel } from "./VenueNotesPanel";
+import { VenueMergePanel } from "./VenueMergePanel";
+import { VenueTaxRatesPanel } from "./VenueTaxRatesPanel";
 import { VenueRoomsPanel } from "./VenueRoomsPanel";
 import { VenueScorecardPanel } from "./VenueScorecardPanel";
 import { VenuePartnershipPanel } from "./VenuePartnershipPanel";
@@ -905,6 +907,10 @@ export function VenueDetailPage() {
 
       {/* Photos, floor plans, insurance papers */}
       <AttachmentsSection parentType="venue" parentId={venue._id} />
+
+      <VenueTaxRatesPanel key={venue._id} venue={venue} />
+
+      <VenueMergePanel venue={venue} />
 
       {/* Danger Zone */}
       {venue.status === "active" && (

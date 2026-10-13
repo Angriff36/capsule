@@ -1,3 +1,4 @@
+import { reportActionOk } from "../../ui/action-result";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -11,10 +12,13 @@ import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { useAuthStatus } from "../../lib/useAuthStatus";
-import { usePerformanceReviewPages } from "../../lib/workforceHistoryQueries";
+import {
+  usePerformanceReviewPages,
+  useReviewEventsForPerson,
+} from "../../lib/workforceHistoryQueries";
 import { SearchSelect } from "../../ui/SearchSelect";
 import { useWorkingEventId } from "../events/workingEvent";
-import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
+import { useEventsById } from "../facilities/useEventsById";
 import { ReviewFeedback } from "./ReviewFeedback";
 import { effectiveScorecard } from "./scorecardVersions";
 
@@ -35,8 +39,9 @@ export function PerformanceReviewsPage() {
   const reviewPages = usePerformanceReviewPages();
   const reviews = reviewPages.rows;
   const people = useListPerson();
-  const events = usePickerAndNamedEvents(
-    reviews ? [workingId, ...reviews.map((row) => row.eventId)] : undefined,
+  // Names for the events the review rows point at.
+  const events = useEventsById(
+    reviews ? reviews.map((row) => row.eventId) : undefined,
   );
   const scorecards = useListRoleScorecard();
   const createReview = useCreatePerformanceReview();
@@ -44,6 +49,8 @@ export function PerformanceReviewsPage() {
   const [personId, setPersonId] = useState("");
   const authStatus = useAuthStatus();
   const [scorecardId, setScorecardId] = useState("");
+  // The event picker offers only events the person worked.
+  const workedEvents = useReviewEventsForPerson(personId);
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
 
@@ -108,6 +115,7 @@ export function PerformanceReviewsPage() {
           followUp: text("followUp"),
           followUpDue: followUpDue ? localDateEpoch(followUpDue) : undefined,
         });
+        reportActionOk("Review saved.");
         form.reset();
         setPersonId("");
         setScorecardId("");
@@ -190,31 +198,31 @@ export function PerformanceReviewsPage() {
             <label className="field-label">
               Event (optional)
               <select
-                key={events?.length ? "events-ready" : "events-loading"}
+                key={`${personId}:${workedEvents?.length ?? "loading"}`}
                 name="eventId"
                 className="input"
-                defaultValue={workingId ?? ""}
+                disabled={!personId}
+                defaultValue={
+                  workedEvents?.some((event) => event._id === workingId)
+                    ? (workingId ?? "")
+                    : ""
+                }
               >
-                <option value="">No specific event</option>
-                {/* Reviews follow work: events already held come first, the
-                    latest at the top, then upcoming ones; cancelled are left
-                    out. */}
-                {[...(events ?? [])]
-                  .filter((event) => event.stage !== "cancelled")
-                  .sort((a, b) => {
-                    const now = Date.now();
-                    const aStart = Number(a.startsAt ?? 0);
-                    const bStart = Number(b.startsAt ?? 0);
-                    const aPast = aStart <= now;
-                    const bPast = bStart <= now;
-                    if (aPast !== bPast) return aPast ? -1 : 1;
-                    return aPast ? bStart - aStart : aStart - bStart;
-                  })
-                  .map((event) => (
-                    <option key={event._id} value={event._id}>
-                      {event.title} — {formatDate(event.startsAt ?? 0)}
-                    </option>
-                  ))}
+                <option value="">
+                  {!personId
+                    ? "Pick a person first"
+                    : workedEvents === undefined
+                      ? "Loading their events…"
+                      : workedEvents.length === 0
+                        ? "No events worked in the last 6 months"
+                        : "No specific event"}
+                </option>
+                {/* Only events the person worked, newest first. */}
+                {(workedEvents ?? []).map((event) => (
+                  <option key={event._id} value={event._id}>
+                    {event.title} — {formatDate(event.startsAt ?? 0)}
+                  </option>
+                ))}
               </select>
             </label>
             <label className="field-label">

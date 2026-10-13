@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { inPickerWindow } from "../facilities/usePickerAndNamedEvents";
 import {
   useCreateWasteRecord,
   useListIngredient,
@@ -29,7 +30,7 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
   const items = useStockLines("none");
   const ingredients = useListIngredient();
   const locations = useListStorageLocation();
-  const events = usePickerAndNamedEvents([workingId]);
+  const events = usePickerAndNamedEvents([workingId], "past");
   const createWasteRecord = useCreateWasteRecord();
   const { notifySuccess } = useSuccessToast();
   const [inventoryItemId, setInventoryItemId] = useState("");
@@ -151,10 +152,24 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
           <SearchSelect
             key={events?.length ? "events-ready" : "events-loading"}
             name="eventId"
-            defaultValue={workingId ?? ""}
+            // The open event is the default only when its day has come:
+            // waste is logged as it happens, not against next month's party.
+            defaultValue={
+              workingId &&
+              (events ?? []).some(
+                (item) =>
+                  item._id === workingId && inPickerWindow(item, "past"),
+              )
+                ? workingId
+                : ""
+            }
             placeholder="No event · kitchen operations — or search…"
             options={(events ?? [])
-              .filter((item) => item.deletedAt == null)
+              .filter(
+                (item) =>
+                  item.deletedAt == null &&
+                  (item._id === workingId || inPickerWindow(item, "past")),
+              )
               .map((item) => ({
                 id: item._id,
                 label: item.title,

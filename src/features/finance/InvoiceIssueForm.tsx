@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import {
   calculateInvoiceTax,
   INVOICE_LINE_CATEGORIES,
+  ratesForVenue,
   roundMoney,
   type InvoiceLineCategory,
   type InvoiceLineDraft,
@@ -30,9 +31,12 @@ import { FINANCE_ROUTES } from "./financeRoutes";
 import { InvoiceEquipmentCharges } from "./InvoiceEquipmentCharges";
 import { InvoiceTravelFee } from "./InvoiceTravelFee";
 import "./taxWorkspace.css";
+import { useGetVenue } from "../../lib/manifest-convex-react";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { useClientsByIds } from "../../lib/useClientDirectory";
 import { ClientSearchSelect } from "../clients/ClientSearchSelect";
+import { SearchSelect } from "../../ui/SearchSelect";
+import { formatDate } from "../../lib/format";
 
 type ClientOption = {
   _id: string;
@@ -51,7 +55,9 @@ type EventOption = {
   title?: string | null;
   quotedPrice?: number | null;
   clientId?: string | null;
+  startsAt?: number | null;
   deletedAt?: number | null;
+  venueId?: string | null;
 };
 
 /**
@@ -154,12 +160,21 @@ export function InvoiceIssueForm({
     pickedRows?.find((row) => row._id === selectedClientId) ??
     clients.find((row) => row._id === selectedClientId);
   const taxExempt = selectedClient?.taxExempt === true;
-  const activeTaxRates = taxRates.filter(
+  // The event's venue may charge its own rates (the same rule the server
+  // checks the issued bill with).
+  const venueId =
+    events.find((row) => row._id === selectedEventId)?.venueId ?? null;
+  const venue = useGetVenue(venueId ? String(venueId) : "skip");
+  const billRates = useMemo(
+    () => ratesForVenue(taxRates, venueId ? venue : null),
+    [taxRates, venue, venueId],
+  );
+  const activeTaxRates = billRates.filter(
     (rate) => rate.active === true && rate.deletedAt == null,
   );
   const calculation = useMemo(
-    () => calculateInvoiceTax(lines, taxRates, taxExempt, discountAmount),
-    [lines, taxExempt, taxRates, discountAmount],
+    () => calculateInvoiceTax(lines, billRates, taxExempt, discountAmount),
+    [lines, taxExempt, billRates, discountAmount],
   );
   const total = roundMoney(
     Math.max(0, calculation.total - Math.max(0, discountAmount)),
@@ -259,30 +274,31 @@ export function InvoiceIssueForm({
         </label>
         <label className="field-label">
           Event (optional)
-          <select
-            className="input"
+          <SearchSelect
             name="eventId"
+            aria-label="Event"
             value={selectedEventId}
-            onChange={(event) => {
-              choosePriceLine(event.target.value);
-              setSelectedEventId(event.target.value);
-              if (!selectedClientId)
-                setSelectedClientId(eventClient(event.target.value));
+            placeholder="No linked event — or search…"
+            onChange={(eventId) => {
+              choosePriceLine(eventId);
+              setSelectedEventId(eventId);
+              if (!selectedClientId) setSelectedClientId(eventClient(eventId));
             }}
-          >
-            <option value="">No linked event</option>
-            {events
-              .filter(
-                (row) =>
-                  row.deletedAt == null &&
-                  (!selectedClientId || row.clientId === selectedClientId),
-              )
-              .map((event) => (
-                <option key={event._id} value={event._id}>
-                  {event.title}
-                </option>
-              ))}
-          </select>
+            options={[
+              { id: "", label: "No linked event" },
+              ...events
+                .filter(
+                  (row) =>
+                    row.deletedAt == null &&
+                    (!selectedClientId || row.clientId === selectedClientId),
+                )
+                .map((event) => ({
+                  id: event._id,
+                  label: event.title || "Untitled event",
+                  hint: event.startsAt ? formatDate(event.startsAt) : null,
+                })),
+            ]}
+          />
         </label>
         <InvoiceEquipmentCharges
           eventId={selectedEventId}

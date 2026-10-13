@@ -325,7 +325,7 @@ export const reportPage = query({
   },
 });
 
-function lookupRow(e: Doc<"events">): EventLookupRow {
+export function lookupRow(e: Doc<"events">): EventLookupRow {
   return {
     _id: e._id,
     title: e.title,

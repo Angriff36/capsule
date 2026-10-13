@@ -20,7 +20,7 @@ export function LookAlikeNote({
   capsuleEntity: string;
 }) {
   const page = RECORD_PAGES[capsuleEntity];
-  const parts = note.split(/ \(([a-z0-9]{31,32})\)/);
+  const parts = plainNote(note).split(/ \(([a-z0-9]{31,32})\)/);
   return (
     <>
       {parts.map((part, index) =>
@@ -38,4 +38,20 @@ export function LookAlikeNote({
       )}
     </>
   );
+}
+
+/**
+ * Older imports wrote programmer wording and a raw timestamp into the note:
+ * show them in plain words and a local date.
+ */
+function plainNote(note: string): string {
+  return note
+    .replace(
+      " — reconciliation reference (match via markMatched on a Capsule payment)",
+      " — match it to a Capsule payment",
+    )
+    .replace(
+      /recorded (\d{4}-\d{2}-\d{2}T[\d:.]+Z)/g,
+      (_, iso: string) => `recorded ${new Date(iso).toLocaleDateString()}`,
+    );
 }

@@ -192,7 +192,8 @@ export function EventChatTab({ eventId, eventTitle }: Props) {
             people={people}
             searchRecords={searchRecords}
             onSubmit={onSubmit}
-            sending={sending}
+            // Until the sender is known, Enter keeps the text instead of dropping it.
+            sending={sending || !identity.sender}
           />
         </div>
       )}

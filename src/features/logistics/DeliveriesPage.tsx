@@ -59,7 +59,8 @@ const FINISHED_DELIVERY_STATUSES = [
 ] as const;
 const DELIVERY_PARTS = ["deliveries"] as const;
 const PACK_PARTS = ["packLists"] as const;
-const READY_PACK_STATUSES = ["packed", "loaded"] as const;
+// A list sent out before its run was booked still needs that run.
+const READY_PACK_STATUSES = ["packed", "loaded", "dispatched"] as const;
 
 const toEpoch = (value: FormDataEntryValue | null) => {
   const time = new Date(String(value)).getTime();
@@ -171,10 +172,17 @@ export function DeliveriesPage() {
           String(row.status) !== "delivered" &&
           String(row.status) !== "failed",
       );
+  // Finished events need no new run; their lists stay on the board only
+  // through the runs they already have.
+  const finishedEvent = (id: unknown) =>
+    ["completed", "closed_out", "cancelled"].includes(
+      String(events?.find((event) => event._id === String(id))?.stage ?? ""),
+    );
   const schedulablePacks = (packLists ?? []).filter(
     (row) =>
       row.deletedAt == null &&
-      ["packed", "loaded", "dispatched"].includes(String(row.status)),
+      ["packed", "loaded", "dispatched"].includes(String(row.status)) &&
+      !finishedEvent(row.eventId),
   );
   const drivers = (people ?? []).filter(
     (person) => person.deletedAt == null && person.status === "active",
@@ -286,13 +294,16 @@ export function DeliveriesPage() {
       driverId: String(data.get("driverId") || "") || undefined,
       notes: String(data.get("notes") || "") || undefined,
     };
-    // Reuse a run of this list that is still waiting to go out; a cancelled,
-    // failed or finished run can't be scheduled again, so that makes a new one.
+    // Fill in a run of this list that has no time yet; a run already on the
+    // schedule keeps its place and time, so a second trip (a pickup, a
+    // second drop) is a new run. Cancelled, failed or finished runs can't be
+    // scheduled again either.
     const existing = [...activeRows, ...(pickedPackRuns ?? [])].find(
       (row) =>
         row.deletedAt == null &&
         row.packListId === packListId &&
-        row.status === "scheduled",
+        row.status === "scheduled" &&
+        row.scheduledAt == null,
     );
     void run("create-delivery", async () => {
       if (existing) {
@@ -690,7 +701,7 @@ export function DeliveriesPage() {
                         ) : null}
                         {row.departedByPersonId ? (
                           <small>
-                            Left with {personName(row.departedByPersonId)}
+                            Sent out by {personName(row.departedByPersonId)}
                           </small>
                         ) : null}
                         {row.deliveredAt ? (

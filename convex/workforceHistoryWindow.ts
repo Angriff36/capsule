@@ -15,6 +15,7 @@ import { getAuthContext, type AppAuthContext } from "./lib/authContext";
 import { decrypt } from "./lib/encryption";
 import { orgCapabilityDeniesAction } from "./lib/orgCapabilityGate";
 import { canRead } from "./search";
+import { lookupRow } from "./eventLookup";
 
 const IDS_CAP = 1000;
 /**
@@ -323,5 +324,79 @@ export const pendingImportConflicts = query({
         .take(NEWEST_CAP),
       tenantId,
     ).filter((row) => row.status === "pending");
+  },
+});
+
+const WORKED_WINDOW_MS = 183 * 86_400_000;
+
+/**
+ * The events this person worked in the last six months (a shift, or a
+ * roster assignment they did not decline), newest first, for the event a
+ * review is about. Not the company's every event.
+ */
+export const reviewEventsForPerson = query({
+  args: { personId: v.string() },
+  handler: async (ctx, { personId: raw }) => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || !managesWorkforce(auth)) return [];
+    const tenantId = auth.tenantId;
+    const personId = ctx.db.normalizeId("people", raw);
+    if (!personId) return [];
+    const now = Date.now();
+    const from = now - WORKED_WINDOW_MS;
+    const shifts = live(
+      await ctx.db
+        .query("shifts")
+        .withIndex("by_personId_and_endsAt", (q) =>
+          q.eq("personId", personId).gt("endsAt", from),
+        )
+        .collect(),
+      tenantId,
+    ).filter((row) => row.eventId != null && row.status !== "cancelled");
+    // Assignments that follow the event's timing carry no times of their
+    // own; the event's date decides for those below.
+    const assignments = live(
+      [
+        ...(await ctx.db
+          .query("eventAssignments")
+          .withIndex("by_personId_and_endsAt", (q) =>
+            q.eq("personId", personId).gt("endsAt", from),
+          )
+          .collect()),
+        ...(
+          await Promise.all(
+            [null, undefined].map((endsAt) =>
+              ctx.db
+                .query("eventAssignments")
+                .withIndex("by_personId_and_endsAt", (q) =>
+                  q.eq("personId", personId).eq("endsAt", endsAt),
+                )
+                .collect(),
+            ),
+          )
+        ).flat(),
+      ],
+      tenantId,
+    ).filter((row) => row.status !== "unassigned" && row.declinedAt == null);
+    const ids = [
+      ...new Set([
+        ...shifts.map((row) => row.eventId!),
+        ...assignments.map((row) => row.eventId),
+      ]),
+    ];
+    const events = await Promise.all(ids.map((id) => ctx.db.get(id)));
+    return live(
+      events.filter((row): row is Doc<"events"> => row != null),
+      tenantId,
+    )
+      .filter(
+        (row) =>
+          row.stage !== "cancelled" &&
+          row.startsAt != null &&
+          row.startsAt > from &&
+          row.startsAt <= now,
+      )
+      .sort((a, b) => (b.startsAt ?? 0) - (a.startsAt ?? 0))
+      .map(lookupRow);
   },
 });

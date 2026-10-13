@@ -111,6 +111,7 @@ export function PayrollExportPanel({
         <label className="field-label">
           Period start
           <BoundedDateInput
+            naturalDateDirection="any"
             className="input"
             aria-label="Payroll period start"
             value={periodStart}
@@ -120,6 +121,7 @@ export function PayrollExportPanel({
         <label className="field-label">
           Period end
           <BoundedDateInput
+            naturalDateDirection="any"
             className="input"
             aria-label="Payroll period end"
             value={periodEnd}
@@ -228,10 +230,17 @@ function PayrollExportPreview({
             </thead>
             <tbody>
               {document.rows.map((row) => {
-                const gross = estimatedGross(
+                // Hourly pay at the rate on file, plus the fixed amounts the
+                // file carries (tips and other finalized inputs).
+                const hourly = estimatedGross(
                   row.personId,
                   row.regularHours + row.overtimeHours,
                 );
+                const fixed = row.grossAmount ?? 0;
+                const gross =
+                  hourly == null && row.grossAmount == null
+                    ? null
+                    : (hourly ?? 0) + fixed;
                 return (
                   <tr key={row.personId}>
                     <td>

@@ -239,7 +239,7 @@ export function QuickFileImport() {
       const failure = classifyCommandFailure(cause);
       setError(
         failure.detail && failure.detail !== failure.title
-          ? `${failure.title} ${failure.detail}`
+          ? `${failure.title}: ${failure.detail}`
           : failure.title,
       );
       setProgress("");

@@ -5,7 +5,10 @@ import {
   useClientOutreachTaskDismiss,
   useGetClient,
 } from "../../lib/manifest-convex-react";
-import { useRowsWithEmpty } from "../../lib/financeScopedQueries";
+import {
+  useOutreachTasksForClients,
+  useRowsWithEmpty,
+} from "../../lib/financeScopedQueries";
 import { useEventsInRange } from "../facilities/useEventsById";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -146,8 +149,28 @@ export function ClientRetentionPage() {
   const openTaskClientIds = new Set(
     openTasks.map((task) => String(task.clientId)),
   );
+  // A call made in the last 90 days counts: the client is not offered for
+  // another call straight after one was completed or dismissed.
+  const candidateTasks = useOutreachTasksForClients(
+    loading ? undefined : churnCandidates.map((row) => row.clientId),
+  );
+  const recentlyReached = new Map<string, { at: number; status: string }>();
+  for (const task of candidateTasks ?? []) {
+    const resolvedAt = Number(task.resolvedAt ?? 0);
+    const clientId = String(task.clientId);
+    if (
+      resolvedAt > Date.now() - 90 * 86_400_000 &&
+      resolvedAt > (recentlyReached.get(clientId)?.at ?? 0)
+    )
+      recentlyReached.set(clientId, {
+        at: resolvedAt,
+        status: String(task.status),
+      });
+  }
   const uncoveredCandidates = churnCandidates.filter(
-    (row) => !openTaskClientIds.has(row.clientId),
+    (row) =>
+      !openTaskClientIds.has(row.clientId) &&
+      !recentlyReached.has(row.clientId),
   );
 
   const run = (work: () => Promise<void>) => {
@@ -306,6 +329,24 @@ export function ClientRetentionPage() {
                   <td>
                     {openTaskClientIds.has(row.clientId) ? (
                       <StatusChip status="open" />
+                    ) : recentlyReached.has(row.clientId) ? (
+                      <span className="flex flex-wrap items-center gap-2">
+                        <span className="text-ink-3">
+                          {recentlyReached.get(row.clientId)!.status ===
+                          "dismissed"
+                            ? "Skipped"
+                            : "Called"}{" "}
+                          {formatDate(recentlyReached.get(row.clientId)!.at)}
+                        </span>
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          type="button"
+                          disabled={busy}
+                          onClick={() => openForCandidate(row)}
+                        >
+                          Call again
+                        </button>
+                      </span>
                     ) : (
                       <button
                         className="btn btn-ghost"

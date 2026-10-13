@@ -531,6 +531,17 @@ export function useRowsWithEmpty<T extends PagedTable>(
   );
 }
 
+/** Each listed client's outreach tasks, open and resolved. */
+export function useOutreachTasksForClients(
+  clientIds: readonly MaybeId[] | undefined,
+) {
+  return useRowsForEachId<Doc<"clientOutreachTasks">>(
+    api.queries.listClientOutreachTaskByClientId,
+    "clientId",
+    clientIds,
+  );
+}
+
 /** Each listed client's leads. */
 export function useLeadsForClients(clientIds: readonly MaybeId[] | undefined) {
   return useRowsForEachId<Doc<"leads">>(

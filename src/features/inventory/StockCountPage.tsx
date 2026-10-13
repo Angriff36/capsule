@@ -195,8 +195,11 @@ export function StockCountPage() {
     );
     setCountNote(activeLine.countNote ?? "");
     setReason(
+      // A session named "Stock count · Oct 12" is not prefixed twice.
       selectedSession
-        ? `Stock count · ${selectedSession.label}`
+        ? /^stock count/i.test(selectedSession.label)
+          ? selectedSession.label
+          : `Stock count · ${selectedSession.label}`
         : "Stock count",
     );
   }, [activeLine?._id, activeLine?.version, selectedSession?.label]);
