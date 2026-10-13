@@ -432,27 +432,36 @@ it's actually sent out to a client via a manually triggered action."
 - Area overview counts did not get a page of their own any more; they sit at
   the top of the area's main page.
 
-## Real-app check (2026-10-13)
+## Real-app check (2026-10-13, final layout, commit b9ea39277)
 
 Every remaining route was opened in Chrome against the running app at
-`localhost:7811`, signed in, at 1280, 390 and 360 px wide (300 page loads; the
-event page once per tab). Each load was checked for: exactly one visible page
-heading, no sideways page scroll, no crash or "not found" screen, no script
-error, and real content. Detail pages used real records (an event, recipe,
-ingredient, dish, menu, vendor order, pack list, invoice, revenue split,
-client, contract, venue, import run).
+`localhost:7811`, signed in, at 1280, 390 and 360 px wide: 98 addresses (every
+route, each event tab, the new proposal tab) x 3 widths = 294 page loads. Each
+load was checked for: exactly one visible page heading, no sideways page
+scroll, no crash or "not found" screen, no script error, and real content.
+Detail pages used real records (an event, recipe, ingredient, dish, menu,
+vendor order, pack list, invoice, revenue split, client, contract, venue,
+import run). **294 of 294 passed.** (An earlier full run found and fixed two
+problems: two headings on the contract document, and kitchen display controls
+off a phone screen.)
 
-- 295 of 300 passed on the first full run. The 5 failures were found and fixed:
-  the contract document showed two page headings (desktop and both phones),
-  and the kitchen display's controls ran off a phone screen (390 and 360).
-  Both were re-checked at all three widths and pass.
-- All 69 old URLs in the redirect list (including old event tab keys and old
-  links that carried their own `#part` or query) landed on the right page,
-  kept their IDs and query values, and the named section was on screen.
-- Not checked in this pass: clicking through every create or save action on
-  every page (the merges reuse the same components, so those actions are the
-  same code), and sign-in as each staff role (permissions code was not
-  changed).
+All 69 old URLs were opened again: each landed on its new home with its IDs
+and query values, the right heading, and the named section on screen.
+
+Key actions tried by hand: Finance More menu (opens Tax, More shows Tax),
+Register trailer opens the trailer form, New crew template opens its form
+inside the Roster, a closed part opens from the On this page strip, the rail
+folds back after a click and after scrolling, the proposal tab shows the
+event's price list with tax and total.
+
+Gate on the final commit: format, types, manifest checks and 3048 tests
+passed in the release copy; the access matrix (14/14), production build,
+Storybook build and baseline check passed separately (the release run was
+stopped by low memory after the tests).
+
+Not checked: sign-in as each staff role (permission code was not changed),
+and pressing Send to client on a real proposal (it writes to the client's
+record; it reuses the existing send action).
 
 ## Redirect inventory
 
