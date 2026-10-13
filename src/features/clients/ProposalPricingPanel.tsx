@@ -17,7 +17,6 @@ import {
 import { useCatalogDishes } from "./useCatalogDishes";
 import { ProposalTravelFee } from "./ProposalTravelFee";
 import { ProposalDiscount } from "./ProposalDiscount";
-import { useListTaxRate } from "../../lib/manifest-convex-react";
 
 interface ProposalPricingPanelProps {
   proposalId: string;
@@ -86,10 +85,6 @@ export function ProposalPricingPanel({
 }: ProposalPricingPanelProps) {
   // Only this proposal's price lines.
   const lineItems = useProposalLineItems(proposalId);
-  // The invoice adds these on top when the proposal carries no tax.
-  const activeTaxRates = (useListTaxRate() ?? []).filter(
-    (rate) => rate.deletedAt == null && rate.active === true,
-  );
   // Published-catalog dishes a line can be priced from (spec §5.4 L276).
   const catalog = useCatalogDishes();
   // AC-547: rental/decor items a line can price.
@@ -566,16 +561,6 @@ export function ProposalPricingPanel({
           {formatMoneyExact(recomputed.total)}
         </span>
       </p>
-      {taxAmount === 0 && activeTaxRates.length > 0 ? (
-        <p className="mt-1 text-sm text-ink-2">
-          Sales tax is not in this total. Unless the client is tax exempt, the
-          invoice adds{" "}
-          {activeTaxRates
-            .map((rate) => `${rate.name} (${Number(rate.percentage)}%)`)
-            .join(", ")}{" "}
-          on top.
-        </p>
-      ) : null}
     </div>
   );
 }

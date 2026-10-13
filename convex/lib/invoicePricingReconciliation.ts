@@ -490,6 +490,21 @@ async function itemizedFromProposal(
 }
 
 /**
+ * The sales tax a draft proposal shows: the tax its invoice will charge for
+ * the same lines, discount, venue and client, so the two always agree. A
+ * workspace with no active tax rate keeps the tax typed on the proposal (null).
+ */
+export async function proposalSalesTax(
+  ctx: MutationCtx,
+  proposal: Doc<"proposals">,
+): Promise<number | null> {
+  const rates = await taxRatesFor(ctx, proposal.tenantId, proposal.eventId);
+  if (!rates.some((rate) => rate.active === true && rate.deletedAt == null)) return null;
+  const worked = await itemizedFromProposal(ctx, proposal, Number(proposal.guestCount ?? 0));
+  return worked?.taxAmount ?? 0;
+}
+
+/**
  * The guest count changed: the untouched draft made from the accepted
  * proposal bills the new count with the proposal's own prices, through the
  * governed Invoice.followEventHeadcount. While the event's price can still

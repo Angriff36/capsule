@@ -197,4 +197,35 @@ describe("event price list", () => {
     expect(after.amount).toBe(30);
     expect((await proposalRow(w, built.proposalId)).total).toBe(1845);
   });
+
+  it("adds sales tax by itself, the same tax the invoice will charge", async () => {
+    const w = await seedWorld("tenant-event-price-list-tax");
+    await w.runOwner(api.mutations.TaxRate_createViaDefine, {
+      name: "City tax",
+      percentage: 8,
+      appliesToFood: true,
+      appliesToService: false,
+      appliesToRental: false,
+    });
+    const built = await generate(w);
+    // $1,515 of food at 8%.
+    expect(await proposalRow(w, built.proposalId)).toMatchObject({
+      subtotal: 1515,
+      taxAmount: 121.2,
+      total: 1636.2,
+    });
+    expect(await quoted(w)).toBe(1636.2);
+
+    // Tax is on the price after the discount: 8% of $1,363.50.
+    await w.sales.mutation(
+      (api.lib as any).proposalPricing.setProposalDiscount,
+      { proposalId: built.proposalId, percent: 10 },
+    );
+    expect(await proposalRow(w, built.proposalId)).toMatchObject({
+      subtotal: 1515,
+      discountAmount: 151.5,
+      taxAmount: 109.08,
+      total: 1472.58,
+    });
+  });
 });

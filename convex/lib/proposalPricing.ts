@@ -39,6 +39,7 @@ import {
 import { effectiveSellingPrice } from "../../src/lib/catalogEligibility";
 import { getAuthContext } from "./authContext";
 import { followEventPriceList } from "./eventPriceList";
+import { proposalSalesTax } from "./invoicePricingReconciliation";
 
 // Active, non-deleted priced lines for a proposal. JS loose-equality filter
 // (governed-creation omits deletedAt at insert → fresh active rows have it
@@ -234,8 +235,8 @@ async function authoritativeAmountForTarget(
 // op), so it does no auth check of its own; the wrapper's guarded runMutation
 // already established salesAccess + draft status.
 //
-// tax/discount are operator fields (set on Proposal.draft), carried through
-// unchanged; subtotal derives from the lines, and total = subtotal + tax -
+// discount is an operator field (set on Proposal.draft); tax is the sales tax
+// the invoice will charge (the typed tax when the workspace has no rate); subtotal derives from the lines, and total = subtotal + tax -
 // discount (the proposalTotalsConsistent invariant). All four values are 2dp, so
 // the invariant holds exactly — the same arithmetic path the draft command uses.
 export const recomputeProposalTotals = internalMutation({
@@ -284,11 +285,11 @@ export const recomputeProposalTotals = internalMutation({
       percent != null
         ? roundCents((undiscounted * Number(percent)) / 100)
         : Math.min(Number(proposal.discountAmount) || 0, undiscounted);
-    const result = computeProposalPricing({
+    const lineAmounts = computeProposalPricing({
       lines: inputs,
       guestCount,
       discountAmount,
-      taxAmount: Number(proposal.taxAmount) || 0,
+      taxAmount: 0,
     });
 
     // Restamp each line's authoritative amount (positional —
@@ -296,11 +297,22 @@ export const recomputeProposalTotals = internalMutation({
     // against the new base), then the parent totals.
     await Promise.all(
       lines.map((l, i) =>
-        ctx.db.patch(l._id, { amount: result.lines[i].amount }),
+        ctx.db.patch(l._id, { amount: lineAmounts.lines[i].amount }),
       ),
     );
+    // Sales tax is added by itself: the tax the invoice will charge.
+    const taxAmount =
+      (await proposalSalesTax(ctx, { ...proposal, discountAmount })) ??
+      (Number(proposal.taxAmount) || 0);
+    const result = computeProposalPricing({
+      lines: inputs,
+      guestCount,
+      discountAmount,
+      taxAmount,
+    });
     await ctx.db.patch(args.proposalId, {
       subtotal: result.subtotal,
+      taxAmount,
       total: result.total,
       ...(discountAmount !== (Number(proposal.discountAmount) || 0)
         ? { discountAmount }
