@@ -5245,6 +5245,7 @@ export const VenueSchema = z.object({
   partnerSince: z.coerce.date().nullable().optional(),
   opsEaseScore: z.number().int().nullable().optional(),
   relationshipScore: z.number().int().nullable().optional(),
+  exclusiveContract: z.boolean().nullable().optional(),
   logoStorageId: z.string().nullable().optional(),
   brandColor: z.string().nullable().optional(),
   socialHandle: z.string().nullable().optional(),
@@ -13894,6 +13895,13 @@ export const VenueSetBrandParamsSchema = z.object({
 });
 
 export type VenueSetBrandParams = z.infer<typeof VenueSetBrandParamsSchema>;
+
+// Command: setExclusiveContract on Venue
+export const VenueSetExclusiveContractParamsSchema = z.object({
+  exclusiveContract: z.boolean(),
+});
+
+export type VenueSetExclusiveContractParams = z.infer<typeof VenueSetExclusiveContractParamsSchema>;
 
 // Command: setGalleryToken on Venue
 export const VenueSetGalleryTokenParamsSchema = z.object({

@@ -4963,6 +4963,7 @@ export default defineSchema({
     partnerSince: v.optional(v.union(v.number(), v.null())),
     opsEaseScore: v.optional(v.union(v.number(), v.null())),
     relationshipScore: v.optional(v.union(v.number(), v.null())),
+    exclusiveContract: v.optional(v.union(v.boolean(), v.null())),
     logoStorageId: v.optional(v.union(v.string(), v.null())),
     brandColor: v.optional(v.union(v.string(), v.null())),
     socialHandle: v.optional(v.union(v.string(), v.null())),

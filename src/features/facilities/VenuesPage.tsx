@@ -10,6 +10,7 @@ import {
   useCreateVenue,
   useVenueDeactivate,
   useVenueActivate,
+  useVenueSetExclusiveContract,
   useListVenue,
 } from "../../lib/manifest-convex-react";
 import { venueDetailPath } from "./facilitiesRoutes";
@@ -21,6 +22,7 @@ import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { VenueCoordinatesFields } from "./VenueCoordinatesFields";
 import { coordinatesFromFields } from "./venueCoordinates";
 import { VenueListFilter } from "./VenueListFilter";
+import { isRegularVenue } from "./venuePartnership";
 import {
   NO_VENUE_FILTER,
   largestKnownCapacity,
@@ -93,6 +95,16 @@ const venuesState = new ListStateManager<VenueFilter>({
   },
 });
 
+// Off by default: the list shows partner and exclusive-contract venues only.
+const venueScopeState = new ListStateManager<{ showAll: boolean }>({
+  showAll: {
+    key: "all",
+    defaultValue: false,
+    parse: (value) => value === "1",
+    serialize: (value) => (value ? "1" : null),
+  },
+});
+
 // Tri-state logistics booleans: "" = Unknown (unset), "true" = Yes, "false" = No.
 // A binary checkbox cannot express "unknown" vs "confirmed no", which mismarks
 // venues created before a field existed. A select gives the operator all three.
@@ -107,6 +119,7 @@ export function VenuesPage() {
   const createVenue = useCreateVenue();
   const deactivate = useVenueDeactivate();
   const activate = useVenueActivate();
+  const setExclusiveContract = useVenueSetExclusiveContract();
 
   const [showForm, setShowForm] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -114,8 +127,13 @@ export function VenuesPage() {
   const { prompt, host } = useActionPrompt();
 
   const [filter, setFilter] = useListViewState(venuesState);
+  const [{ showAll }, setScope] = useListViewState(venueScopeState);
   const rows = (venues ?? []).filter((item) => item.deletedAt == null);
-  const shownRows = rows.filter((item) => venueMatchesFilter(item, filter));
+  const regularRows = rows.filter(isRegularVenue);
+  const listedRows = showAll ? rows : regularRows;
+  const shownRows = listedRows.filter((item) =>
+    venueMatchesFilter(item, filter),
+  );
   const activeRows = rows.filter(
     (item) => item.status === "active" || item.status === "inactive",
   );
@@ -207,6 +225,15 @@ export function VenuesPage() {
       }
     });
   };
+
+  const handleToggleExclusive = (venue: (typeof rows)[number]) =>
+    void run(`${venue._id}:exclusive`, async () => {
+      await setExclusiveContract({
+        docId: venue._id,
+        version: venue.version,
+        exclusiveContract: venue.exclusiveContract !== true,
+      });
+    });
 
   if (venues === undefined) return <TableSkeleton rows={8} />;
 
@@ -498,11 +525,30 @@ export function VenuesPage() {
         </div>
       ) : (
         <>
+          <div
+            className="flex flex-wrap items-center gap-3 text-xs text-ink-2"
+            data-testid="venue-list-scope"
+          >
+            <span>
+              {showAll
+                ? `Showing all ${rows.length} venues on file, including places you have only had an event once.`
+                : `Showing your ${regularRows.length} partner and exclusive-contract venue${regularRows.length === 1 ? "" : "s"}. ${rows.length - regularRows.length} other venue${rows.length - regularRows.length === 1 ? " is" : "s are"} saved from past events.`}
+            </span>
+            <button
+              type="button"
+              className="btn btn-ghost text-xs"
+              onClick={() => setScope({ showAll: !showAll })}
+            >
+              {showAll
+                ? "Show only partner and exclusive venues"
+                : "Show all venues"}
+            </button>
+          </div>
           <VenueListFilter
             filter={filter}
             onChange={setFilter}
             shown={shownRows.length}
-            total={rows.length}
+            total={listedRows.length}
           />
           <div className="overflow-hidden rounded-sm border border-line">
             <table className="phone-cards min-w-full divide-y divide-line">
@@ -535,8 +581,9 @@ export function VenuesPage() {
                       colSpan={6}
                       className="px-4 py-6 text-center text-xs text-ink-3"
                     >
-                      No venue on file fits. Clear a box, or add the missing
-                      facts on a venue's page.
+                      {listedRows.length === 0
+                        ? "No partner or exclusive-contract venues yet. Show all venues, then mark the ones you have a contract with."
+                        : "No venue on file fits. Clear a box, or add the missing facts on a venue's page."}
                     </td>
                   </tr>
                 )}
@@ -550,6 +597,16 @@ export function VenuesPage() {
                       >
                         {venue.name}
                       </Link>
+                      {(venue.partnerTier || venue.exclusiveContract) && (
+                        <div className="text-2xs text-ink-3">
+                          {[
+                            venue.partnerTier && "Partner",
+                            venue.exclusiveContract && "Exclusive contract",
+                          ]
+                            .filter(Boolean)
+                            .join(" · ")}
+                        </div>
+                      )}
                       {venue.contactName && (
                         <div className="text-2xs text-ink-3">
                           {venue.contactName}
@@ -585,6 +642,18 @@ export function VenuesPage() {
                       />
                     </td>
                     <td className="px-4 py-3 text-right">
+                      <button
+                        className="btn btn-ghost text-xs"
+                        type="button"
+                        onClick={() => handleToggleExclusive(venue)}
+                        disabled={busy === `${venue._id}:exclusive`}
+                      >
+                        {busy === `${venue._id}:exclusive`
+                          ? "..."
+                          : venue.exclusiveContract
+                            ? "Not exclusive"
+                            : "Mark exclusive"}
+                      </button>
                       <button
                         className="btn btn-ghost text-xs"
                         type="button"

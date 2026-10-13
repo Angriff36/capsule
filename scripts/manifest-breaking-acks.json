@@ -3414,6 +3414,12 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-13",
       "reason": "Optional list (list<string>?): the tax rates charged at a venue. Old venues have none and use every active rate, as before. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "Venue.exclusiveContract",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "Optional flag (boolean?): the company holds an exclusive contract at this venue (issue #442). Old venues have none and read as not exclusive. The checker reads a nullable field with no default as required."
     }
   ]
 }

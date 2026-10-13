@@ -488,6 +488,11 @@ entity Venue mixin TenantScoped, SoftDeletable {
   property partnerSince: datetime?
   property opsEaseScore: int?
   property relationshipScore: int?
+  // The company holds an exclusive catering contract here. Partner and
+  // exclusive venues are the ones the venue list shows by default; every
+  // other venue is just a place an event once happened. Set by
+  // setExclusiveContract only.
+  property exclusiveContract: boolean?
   // Co-branded proposals (playbook section 06): the venue's logo (Convex
   // storage id) and its brand colour, shown next to the company's on a
   // proposal for an event at a partner venue. Set by setBrand only.
@@ -789,6 +794,15 @@ entity Venue mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate logoStorageId = logoStorageId != null and length(trim(logoStorageId)) > 0 ? trim(logoStorageId) : null
     mutate brandColor = brandColor != null and length(trim(brandColor)) > 0 ? trim(brandColor) : null
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command setExclusiveContract(exclusiveContract: boolean) {
+    guard self.deletedAt == null
+    mutate exclusiveContract = exclusiveContract
     emit VenueDetailsUpdated {
       venueId: self.id
       tenantId: self.tenantId

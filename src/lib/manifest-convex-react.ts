@@ -997,6 +997,7 @@ import {
   VenueRoomRemoveParamsSchema,
   VenueRoomReviseParamsSchema,
   VenueSetBrandParamsSchema,
+  VenueSetExclusiveContractParamsSchema,
   VenueSetGalleryTokenParamsSchema,
   VenueSetLogisticsProfileParamsSchema,
   VenueSetPartnershipParamsSchema,
@@ -14603,6 +14604,16 @@ export function useVenueSetBrand() {
   };
 }
 
+/** Mutation hook for Venue.setExclusiveContract. */
+export function useVenueSetExclusiveContract() {
+  const mutate = useMutation(api.mutations.Venue_setExclusiveContract);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VenueSetExclusiveContractParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Venue.setGalleryToken. */
 export function useVenueSetGalleryToken() {
   const mutate = useMutation(api.mutations.Venue_setGalleryToken);
@@ -15142,4 +15153,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1598 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1599 as const;
