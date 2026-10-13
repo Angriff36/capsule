@@ -338,17 +338,15 @@ export const addProposalLineAndRecompute = mutation({
   handler: async (ctx, rawArgs) => {
     const auth = await getAuthContext(ctx);
     const proposal = await ctx.db.get(rawArgs.proposalId);
-    const args = {
-      ...rawArgs,
-      ...(proposal
-        ? await asScopedFee(ctx, rawArgs, rawArgs.proposalId, proposal)
-        : {}),
-    };
     // Tenant-check before any catalog read so a foreign proposal id yields only
     // "not found" (no existence / catalog-validation oracle). codex review A.
     if (!proposal || !auth.tenantId || proposal.tenantId !== auth.tenantId) {
       throw new Error("Proposal not found");
     }
+    const args = {
+      ...rawArgs,
+      ...(await asScopedFee(ctx, rawArgs, rawArgs.proposalId, proposal)),
+    };
     await assertValidCatalogLink(ctx, args.menuDishId, proposal.tenantId);
     await assertValidRentalLink(ctx, args.equipmentId, proposal.tenantId);
     await assertOwnMenuLink(ctx, args.menuId, proposal.tenantId);
