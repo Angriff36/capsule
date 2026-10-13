@@ -316,21 +316,32 @@ export const settleFinishedEvents = mutation({
       throw new ConvexError("Purchasing access is needed to do this.");
     const events = await finishedWithUnsettledNeeds(ctx, auth.tenantId);
     for (const event of events) await settleEventPurchasing(ctx, event.eventId);
-    // Line by line from the current records, until a pass changes nothing:
-    // a line that gives back shelf stock can let another line buy less.
-    const lines = await draftLines(ctx, auth.tenantId);
-    const changed = new Set<string>();
-    for (let pass = 0; pass < 5; pass++) {
-      let any = false;
-      for (const { lineId, week } of lines) {
-        const recount = await recountLine(ctx, auth.tenantId, lineId, week);
-        if (!recount) continue;
-        await applyRecount(ctx, recount);
-        changed.add(String(lineId));
-        any = true;
-      }
-      if (!any) break;
-    }
-    return { events: events.length, lines: changed.size };
+    const lines = await recountDraftLines(ctx, auth.tenantId);
+    return { events: events.length, lines };
   },
 });
+
+/**
+ * Every automatic draft line worked out again, line by line from the current
+ * records, until a pass changes nothing: a line that gives back shelf stock
+ * can let another line buy less. Returns how many lines changed.
+ */
+export async function recountDraftLines(
+  ctx: MutationCtx,
+  tenantId: string,
+): Promise<number> {
+  const lines = await draftLines(ctx, tenantId);
+  const changed = new Set<string>();
+  for (let pass = 0; pass < 5; pass++) {
+    let any = false;
+    for (const { lineId, week } of lines) {
+      const recount = await recountLine(ctx, tenantId, lineId, week);
+      if (!recount) continue;
+      await applyRecount(ctx, recount);
+      changed.add(String(lineId));
+      any = true;
+    }
+    if (!any) break;
+  }
+  return changed.size;
+}
