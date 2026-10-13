@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
-import { formatCount, formatMoney } from "../../lib/format";
+import { formatCount, formatMoney, formatMoneyExact } from "../../lib/format";
 import { useEventPriceList } from "../../lib/eventPriceListQueries";
+import { useEventChangePricing } from "../../lib/manifest-convex-react";
 import { reportActionFail, reportActionOk } from "../../ui/action-result";
 import { useGenerateProposalDraft } from "../clients/ProposalDraftCheck";
 import { ProposalPricingPanel } from "../clients/ProposalPricingPanel";
@@ -18,19 +19,59 @@ export function EventPriceListCard({
   eventId,
   guestCount,
   quotedPrice,
+  budgetAmount,
+  version,
   startsAt,
   endsAt,
 }: {
   eventId: Id<"events">;
   guestCount: number;
   quotedPrice: number;
+  budgetAmount: number | null;
+  version: number | undefined;
   startsAt: number | null;
   endsAt: number | null;
 }) {
   const list = useEventPriceList(eventId);
   const build = useGenerateProposalDraft();
+  const changePricing = useEventChangePricing();
   const [busy, setBusy] = useState(false);
   if (list === undefined) return null;
+
+  // A list priced before the event followed it (an older quote request)
+  // catches the event's price up in one press.
+  const behind =
+    list != null &&
+    // The price command also writes the budget; one never recorded stays so.
+    budgetAmount != null &&
+    list.followsEvent &&
+    list.total > 0 &&
+    Math.round(list.total * 100) !== Math.round(quotedPrice * 100);
+  const useListTotal = async () => {
+    if (!list || budgetAmount == null) return;
+    setBusy(true);
+    try {
+      await changePricing({
+        docId: eventId,
+        budgetAmount,
+        quotedPrice: list.total,
+        version,
+      });
+      reportActionOk(
+        `The event's price is now ${formatMoneyExact(list.total)}.`,
+      );
+    } catch (error) {
+      reportActionFail(
+        error instanceof Error
+          ? error.message
+              .replace(/^.*(ConvexError|Uncaught Error): /, "")
+              .split("\n")[0]!
+          : "Couldn't change the event's price.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
 
   const buildFromMenu = async () => {
     setBusy(true);
@@ -94,6 +135,22 @@ export function EventPriceListCard({
                 ? "The client accepted these prices. To change them, start a change from the proposal."
                 : "These prices are on the proposal sent to the client. To change them, start a change from the proposal."}
           </p>
+          {behind ? (
+            <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
+              <span className="text-warn">
+                The event's price is {formatMoneyExact(quotedPrice)}, not this
+                list's {formatMoneyExact(list.total)}.
+              </span>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                disabled={busy}
+                onClick={() => void useListTotal()}
+              >
+                Use {formatMoneyExact(list.total)}
+              </button>
+            </div>
+          ) : null}
           <ProposalPricingPanel
             proposalId={list.proposalId}
             guestCount={guestCount}
