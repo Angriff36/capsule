@@ -1088,7 +1088,11 @@ export function ParallelRunDashboardPage() {
           </section>
         </>
       )}
-      <MergedSection id="payments" title="Payments: old system against Capsule">
+      <MergedSection
+        id="payments"
+        title="Payments: old system against Capsule"
+        summary="Money rows from TPP checked against Capsule payments."
+      >
         <FinanceReconciliationPage />
       </MergedSection>
     </div>

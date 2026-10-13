@@ -68,12 +68,6 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Create a template from your most common event shape.",
       "When booking, start from the template and adjust the details.",
-      "Event checklists: Lists of to-dos you use again and again.",
-      "Event checklists: Make a checklist once for work you repeat.",
-      "Event checklists: Put it on an event from the event's To-dos page.",
-      "Planning setup: Set how loud each check is: Fix first, Worth a look, or Off.",
-      "Planning setup: Add planning rules for what the board should suggest.",
-      "Planning setup: Fill in the truck and equipment facts the checks need.",
     ],
   },
   {
@@ -106,7 +100,6 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Clock in when you start.",
       "Claim a prep task, do it, mark it done.",
       "Check your upcoming shifts and request swaps or time off.",
-      "My reviews: Reviews written about you, in one place.",
     ],
   },
   {
@@ -177,12 +170,8 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Read one day at a time; work for the same step is pooled and each event keeps its own amount.",
       "Check Make ahead and Waits for before you start a row.",
       "Set a step's make-ahead days on the dish's prep steps.",
-      "Yield variance: Planned vs. actual yield for completed production batches, grouped by recipe.",
-      "Yield variance: Pick a 30, 90, or 365 day window.",
-      "Yield variance: Look for recipes that consistently under- or over-yield and fix the recipe or the prep.",
-      "Kitchen stations: The stations that prep work and the day sheet are sorted by. Add, rename, or retire a station.",
-      "Kitchen stations: Add a station with its sheet order and any other names the crew uses for it.",
-      "Kitchen stations: Retire a station you no longer run; reinstate it when it comes back.",
+      "Yield against plan shows planned vs. actual yield for completed production batches, grouped by recipe.",
+      "Look for recipes that consistently under- or over-yield and fix the recipe or the prep.",
     ],
   },
   {
@@ -218,12 +207,6 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Set PAR levels so low stock flags itself.",
       "Watch the Below reorder alerts — that's what to reorder.",
       "Use Purchasing to turn needs into vendor orders.",
-      "Stock history: Every stock movement and who made it — for when a number looks wrong.",
-      "Stock history: Search by ingredient to trace where stock went.",
-      "Storage locations: The walk-ins, freezers, and dry storage that stock is kept in. Edit a location or take it out of use.",
-      "Storage locations: Edit a location's name, type, and temperature range.",
-      "Storage locations: Deactivate a location you no longer use; activate it again when you do.",
-      "Inventory: What's on the shelf, what's running low, and what's on order from vendors.",
     ],
   },
   {
@@ -234,10 +217,6 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Start a count session.",
       "Enter real quantities; differences get logged automatically.",
-      "Opening stock: Bring in a stock count sheet and pick which counts become the stock on hand.",
-      "Opening stock: Choose the count sheet (CSV). Every row lands here; stock on hand does not change yet.",
-      "Opening stock: Fix the rows that need it, or set them aside.",
-      "Opening stock: Press Use as opening stock on each food row you want to start from.",
     ],
   },
   {
@@ -266,9 +245,6 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Review this week's draft order.",
       "Adjust quantities, pick vendors, and send.",
       "Mark orders received when deliveries arrive.",
-      "Demand: What upcoming events will consume, so you can buy ahead instead of scrambling.",
-      "Demand: Review upcoming needs by ingredient.",
-      "Demand: Send shortfalls to Purchasing.",
     ],
   },
   {
@@ -313,16 +289,7 @@ export const PAGE_GUIDES: PageGuide[] = [
     title: "Pack setup",
     purpose:
       "Reusable load lists for event types you run often, so packing is never from memory.",
-    steps: [
-      "Build a template once; new pack lists start from it.",
-      "Service style kits: The default kit that goes with every event of a service style, so a new event's pack list builds itself.",
-      "Service style kits: Add the lines a style always needs. Use guests-per-unit for lines that scale with the headcount.",
-      "Service style kits: Change one event on its own pack list; the kit stays as it is.",
-      "Pack rules: What an event puts on its pack list: a dish's tools, what a dish note asks for, napkins per guest, flooring for a grass venue, the bar kit.",
-      "Pack rules: Pick when the rule applies, the item, and how many. Use spare % for napkins and cups.",
-      "Pack rules: Mark must-haves: leaving one off a list then needs a stand-in or someone who brings it.",
-      "Pack rules: On a pack list, open Why under a line to see which rules and facts set its amount.",
-    ],
+    steps: ["Build a template once; new pack lists start from it."],
   },
   {
     prefix: "/logistics/deliveries",
@@ -332,21 +299,13 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Assign a driver and vehicle to each run.",
       "Start transit when the van leaves; mark delivered on arrival.",
-      "Vehicle schedule: Which vehicle is committed where, and when — spot conflicts early.",
-      "Vehicle schedule: Check before promising a delivery window.",
-      "Route planner: Put the day's stops in a sensible driving order.",
-      "Route planner: Move stops into order, then print the route for the driver.",
     ],
   },
   {
     prefix: "/logistics/fleet",
     title: "Fleet",
     purpose: "Your vehicles — capacity, status, and availability.",
-    steps: [
-      "Mark a vehicle out of service when it's in the shop.",
-      "Vehicle maintenance: Service history and upcoming maintenance for each vehicle.",
-      "Vehicle maintenance: Log service work so nothing gets missed.",
-    ],
+    steps: ["Mark a vehicle out of service when it's in the shop."],
   },
   {
     prefix: "/staff/roster",
@@ -355,13 +314,6 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Add assignments for upcoming events.",
       "Build the week's shifts, then publish so staff see them.",
-      "Needs attention: Clear the list: confirm assignments, decide requests.",
-      "Shift swaps: Staff arrange swaps between themselves; you give the final OK here.",
-      "Shift swaps: Approve or decline swaps both staff members already agreed to.",
-      "Crew templates: The crew each kind of event needs, posted as open shifts when the event is approved.",
-      "Crew templates: Make a template for a service style and guest range; list each role and how many.",
-      "Crew templates: Approve an event: its open shifts appear on the event's Staff tab.",
-      "Staff: Your team — who's working when, who's asking for time off, and who needs confirming.",
     ],
   },
   {
@@ -371,10 +323,6 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Fix clock mistakes here.",
       "Check availability before building the schedule.",
-      "Time off: Requests for days off, waiting on your yes or no.",
-      "Time off: Decide requests promptly — the schedule depends on it.",
-      "Utilization: Who's over-scheduled and who's under-used, week by week.",
-      "Utilization: Balance the load before burnout or dead payroll hours.",
     ],
   },
   {
@@ -396,21 +344,13 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Note who's finished training so they can be scheduled for those roles.",
       "In the skills matrix, rate each person 0 to 4 per area; level 4 people are the trainers.",
       "Start training to keep the trainer, the dates and each step the trainer initials; finish it when the quiz is done.",
-      "Qualifications: Certifications like food handler cards, with expiry dates.",
-      "Qualifications: Add each person's certs; expiring ones flag themselves.",
     ],
   },
   {
     prefix: "/staff/reviews",
     title: "Performance",
     purpose: "Run and track reviews across the team.",
-    steps: [
-      "Start a review, fill it in together, and file it.",
-      "My reviews: Read and acknowledge your reviews.",
-      "Role scorecards: Define the measurables per role; reviews use them.",
-      "One-on-ones: Recurring check-ins with each person, with notes and action items.",
-      "One-on-ones: Schedule the cadence; log notes each time.",
-    ],
+    steps: ["Start a review, fill it in together, and file it."],
   },
   {
     prefix: "/staff/hiring",
@@ -427,8 +367,6 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Use Pipeline for people who haven't booked yet.",
       "Open a client to see their whole history with you.",
       "Send proposals from here; accepted ones become events.",
-      "Retention: Clients who used to book and stopped — your easiest win-back revenue.",
-      "Retention: Reach out to lapsed clients before the season starts.",
     ],
   },
   {
@@ -440,11 +378,6 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Add every inquiry the moment it arrives.",
       "Move cards along as conversations progress.",
       "Convert to a client when they're ready to book.",
-      "Quote requests: Quotes people submitted through your website, waiting for a response.",
-      "Quote requests: Review each request and turn the good ones into proposals.",
-      "Date holds: Soft holds on dates for prospects, and who is waiting if a date opens.",
-      "Date holds: Hold a date for a prospect; it lapses on its own at the expiry.",
-      "Date holds: When a held date opens, call the next client on its waitlist.",
     ],
   },
   {
@@ -456,8 +389,6 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Draft a proposal with menu and pricing.",
       "Send it; the client gets a link to accept.",
       "When accepted, create the event from it.",
-      "Proposal templates: Reusable proposal shapes so quoting takes minutes, not hours.",
-      "Proposal templates: Save your standard offers; start new proposals from them.",
     ],
   },
   {
@@ -480,18 +411,13 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Issue the invoice from the event.",
       "Send it, then log payments as they arrive.",
       "Clear the attention list at the top — that's what's owed to you.",
-      "Finance: Money owed, money collected, and where to act next.",
     ],
   },
   {
     prefix: "/finance/payments",
     title: "Payments",
     purpose: "Money received, matched against invoices.",
-    steps: [
-      "Log each payment and match it to its invoice.",
-      "Payment methods: Client payment details kept on file.",
-      "Payment methods: Store how each client pays to speed up settlement.",
-    ],
+    steps: ["Log each payment and match it to its invoice."],
   },
   {
     prefix: "/finance/closeout",
@@ -535,23 +461,13 @@ export const PAGE_GUIDES: PageGuide[] = [
     prefix: "/finance/attribution",
     title: "Attribution",
     purpose: "Which venue, salesperson, or referral earned each dollar.",
-    steps: [
-      "Review how revenue traces back to its source.",
-      "Commission terms: What each venue takes, written down.",
-      "Commission terms: Log each venue's cut so event profit is honest.",
-    ],
+    steps: ["Review how revenue traces back to its source."],
   },
   {
     prefix: "/finance/revenue",
     title: "Money reports",
     purpose: "Revenue over time, sliced by event type, client, or venue.",
-    steps: [
-      "Compare periods; spot what's growing and what's fading.",
-      "Food cost: Ingredient spend measured against what you charge.",
-      "Food cost: Watch the percentage; investigate months that spike.",
-      "Profit margins: What each event and service line actually makes.",
-      "Profit margins: Find the low-margin work and reprice or drop it.",
-    ],
+    steps: ["Compare periods; spot what's growing and what's fading."],
   },
   {
     prefix: "/reports",
@@ -564,24 +480,13 @@ export const PAGE_GUIDES: PageGuide[] = [
     title: "Venues",
     purpose:
       "Every place you serve — capacity, load-in notes, contacts, and rules.",
-    steps: [
-      "Fill in logistics notes once; every event there benefits.",
-      "Facilities: Your venues, equipment, and the upkeep that keeps them ready.",
-      "Facilities: Keep venue details current — events pull from them.",
-      "Facilities: Watch maintenance-due so nothing fails on event day.",
-    ],
+    steps: ["Fill in logistics notes once; every event there benefits."],
   },
   {
     prefix: "/facilities/equipment",
     title: "Equipment",
     purpose: "Chafers, tents, linens — what you own, its condition, and value.",
     steps: ["Log condition changes; flag anything needing repair."],
-  },
-  {
-    prefix: "/facilities/vendor-relationships",
-    title: "Venue vendors",
-    purpose: "Which vendors each venue prefers, allows, or bans.",
-    steps: ["Check before booking outside vendors at a venue."],
   },
   {
     prefix: "/admin",
@@ -591,7 +496,6 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Most days you won't need this page.",
       "Come here to add team members or connect outside tools.",
-      "Money check: Pick the dates, read each month's difference, and save a copy when it is right.",
     ],
   },
   {

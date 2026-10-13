@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { MergedSection } from "../../ui/MergedSection";
+import { ProposalsPage } from "../clients/ProposalsPage";
 import { venueDetailPath } from "../facilities/facilitiesRoutes";
 import { useClientsByIds } from "../../lib/useClientDirectory";
 import { AllergenBriefingButton } from "./AllergenBriefingButton";
@@ -497,13 +499,15 @@ function EventDetailContent({
           {action.label}
         </button>
       ))}
-      <Link
+      <a
         key="create-proposal"
         className="btn btn-ghost"
-        to={`/clients/proposals?event=${event._id}`}
+        href={`/events/${event._id}/proposal`}
+        target="_blank"
+        rel="noopener"
       >
-        Create proposal
-      </Link>
+        Proposal
+      </a>
       <Link
         key="save-as-template"
         className="btn btn-ghost"
@@ -816,8 +820,20 @@ function EventDetailContent({
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "margin" ? (
-        <EventTabErrorBoundary tabLabel="Margin" key="margin">
-          <EventMarginTab eventId={event._id} />
+        <EventTabErrorBoundary tabLabel="Proposal & margin" key="margin">
+          <div className="space-y-6">
+            {/* The proposal lives on its event: built from the event in one
+                click, every earlier version listed under it. */}
+            <MergedSection
+              id="proposal"
+              title="Proposal"
+              summary="Proposals sent to the client for this event. Open Proposal at the top to print one or send it."
+              defaultOpen
+            >
+              <ProposalsPage eventId={event._id} />
+            </MergedSection>
+            <EventMarginTab eventId={event._id} />
+          </div>
         </EventTabErrorBoundary>
       ) : null}
     </>

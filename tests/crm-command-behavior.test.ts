@@ -118,6 +118,7 @@ it("shares, copies, revokes and replaces a proposal link", async () => {
     status: "sent",
     version: 2,
     clientId: "client-a",
+    eventId: "event-p",
   };
   backend.values.set("useListProposal", [sent]);
   backend.values.set("useListProposalRevision", [
@@ -127,7 +128,7 @@ it("shares, copies, revokes and replaces a proposal link", async () => {
   const revoke = command("useShareLinkRevoke");
 
   // Share: a new link pinned to the published revision, copied at once.
-  await mount(createElement(ProposalsPage));
+  await mount(createElement(ProposalsPage, { eventId: "event-p" }));
   await openProposalRows();
   await click(button("Share link"));
   expect(create).toHaveBeenCalledTimes(1);
@@ -148,7 +149,7 @@ it("shares, copies, revokes and replaces a proposal link", async () => {
     createdAt: 1,
   };
   backend.values.set("useListShareLink", [active]);
-  await mount(createElement(ProposalsPage));
+  await mount(createElement(ProposalsPage, { eventId: "event-p" }));
   await openProposalRows();
   await click(button("Copy link"));
   expect(create).toHaveBeenCalledTimes(1);
@@ -172,7 +173,7 @@ it("shares, copies, revokes and replaces a proposal link", async () => {
   // Replace: with the old link revoked, sharing makes a new one.
   backend.values.set("useListShareLink", [{ ...active, status: "revoked" }]);
   create.mockResolvedValue({ _id: "link-2" });
-  await mount(createElement(ProposalsPage));
+  await mount(createElement(ProposalsPage, { eventId: "event-p" }));
   await openProposalRows();
   await click(button("Share link"));
   expect(create).toHaveBeenCalledTimes(2);
@@ -181,23 +182,27 @@ it("shares, copies, revokes and replaces a proposal link", async () => {
   );
 });
 it("reports proposal publication and contract sent-recording as internal status changes", async () => {
-  backend.values.set("useListProposal", [
-    {
-      _id: "proposal-a",
-      title: "Supper",
-      status: "draft",
-      version: 3,
-      total: 1200,
-    },
-  ]);
+  // A lead's draft (no event yet) is published from its own proposal view;
+  // an event's proposal is sent from the event's proposal tab instead.
+  const draft = {
+    _id: "kd7draftproposalaaaaaaaaaaaaaa1",
+    title: "Supper",
+    status: "draft",
+    version: 3,
+    total: 1200,
+  };
+  backend.values.set("useGetProposal", draft);
   const publish = command(
     "lib/proposalRevision:sendProposalWithRevisionCapture",
   );
-  await mount(createElement(ProposalsPage));
+  await mount(
+    createElement(ProposalsPage, {}),
+    "/clients/proposals?proposal=kd7draftproposalaaaaaaaaaaaaaa1",
+  );
   await openProposalRows();
   await click(button("Publish proposal"));
   expect(publish).toHaveBeenCalledExactlyOnceWith({
-    docId: "proposal-a",
+    docId: "kd7draftproposalaaaaaaaaaaaaaa1",
     version: 3,
   });
   expect(container.textContent).toContain("Proposal published.");

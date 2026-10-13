@@ -208,7 +208,12 @@ export function PackListsPage() {
         }
       />
       <LogisticsWorkspaceNav />
-      <MergedSection id="floor" title="On the packing floor now">
+      <MergedSection
+        id="floor"
+        title="On the packing floor now"
+        summary="Lists being packed or loaded right now, soonest event first."
+        defaultOpen
+      >
         <PackingFloorPage />
       </MergedSection>
       {failure ? <LogisticsFailureBanner error={failure} /> : null}
@@ -378,7 +383,11 @@ export function PackListsPage() {
           </div>
         ) : null}
       </section>
-      <MergedSection id="returns" title="Returns">
+      <MergedSection
+        id="returns"
+        title="Returns"
+        summary="What still has to come back after events, and what was lost or broken."
+      >
         <ReturnsPage />
       </MergedSection>
     </div>

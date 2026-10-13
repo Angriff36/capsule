@@ -498,13 +498,16 @@ Capsule is primarily flat. Depth comes from the botanical frame, working-paper s
 
 | Level    | Treatment                                          | Use                                                     |
 | -------- | -------------------------------------------------- | ------------------------------------------------------- |
-| Flat     | No shadow, panel or transparent surface            | Titles, lists, tables, and document sections            |
+| Flat     | No shadow, panel or transparent surface            | Titles and document sections                            |
+| Panel    | `panel` fill, 1px `line` border, 3px `accent` top rule, `radius-md`, on the pale `inset` page ground | Every working list, queue and table (`.working-ledger`, `Section`) and each folded part (`MergedSection`) |
 | Ruled    | 1px `line` or `line-2`                             | Ledgers, catalog rows, metadata, and section boundaries |
 | Inset    | Pale sage or `inset` fill                          | Attention areas, hover rows, and quiet empty regions    |
 | Sheet    | 22px radius, subtle green border, broad low shadow | Primary route surface                                   |
 | Floating | 10px radius and restrained shadow                  | Command palette, module drawer, and menus               |
 
 Heavy drop shadows, glass panels, glow, and layered floating cards are not part of the system.
+
+Owner, 2026-10-13: "the screens need more distinct coloring to clearly define boundaries" — like the Skills & training module cards. So the page ground is `inset` and each working area sits on its own Panel with an accent top rule; a page reads as a few clear boxes, not lines on white.
 
 ## Shapes
 

@@ -1,3 +1,4 @@
+import { useEmbedded } from "../../ui/embedded";
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import {
@@ -69,6 +70,7 @@ type EditState =
 
 /** Venue layout templates — reusable layout/logistics templates owned by a venue (spec §8.2). */
 export function VenueLayoutTemplatesPage() {
+  const embedded = useEmbedded();
   // One page for every venue; ?venue= narrows it to one.
   const { venueId: routeVenueId } = useParams<{ venueId: string }>();
   const [searchParams] = useSearchParams();
@@ -227,35 +229,52 @@ export function VenueLayoutTemplatesPage() {
   const loading = templates === undefined || venues === undefined;
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-6">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold text-ink">Layout Templates</h1>
-          <p className="text-base text-ink-3">
-            {venueId ? (
-              <>
-                Reusable layouts for{" "}
-                <Link className="link" to={venueDetailPath(venueId)}>
-                  {venueName(venueId)}
-                </Link>
-                .
-              </>
-            ) : (
-              <>Reusable venue layouts an event can copy into its setup.</>
-            )}
-          </p>
+    <div className={embedded ? "" : "mx-auto w-full max-w-5xl px-4 py-6"}>
+      {embedded ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            className="btn btn-primary min-h-10"
+            disabled={busy != null}
+            onClick={formOpen ? resetForm : openCreate}
+          >
+            {formOpen ? "Close" : "+ New template"}
+          </button>
         </div>
-        <button
-          type="button"
-          className="btn btn-primary min-h-10"
-          disabled={busy != null}
-          onClick={formOpen ? resetForm : openCreate}
-        >
-          {formOpen ? "Close" : "+ New template"}
-        </button>
-      </div>
+      ) : (
+        <>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h1 className="text-xl font-semibold text-ink">
+                Layout Templates
+              </h1>
+              <p className="text-base text-ink-3">
+                {venueId ? (
+                  <>
+                    Reusable layouts for{" "}
+                    <Link className="link" to={venueDetailPath(venueId)}>
+                      {venueName(venueId)}
+                    </Link>
+                    .
+                  </>
+                ) : (
+                  <>Reusable venue layouts an event can copy into its setup.</>
+                )}
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn btn-primary min-h-10"
+              disabled={busy != null}
+              onClick={formOpen ? resetForm : openCreate}
+            >
+              {formOpen ? "Close" : "+ New template"}
+            </button>
+          </div>
 
-      <FacilitiesWorkspaceNav />
+          <FacilitiesWorkspaceNav />
+        </>
+      )}
       {host}
 
       {failure ? <FailureBanner failure={failure} /> : null}

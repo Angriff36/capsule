@@ -622,10 +622,18 @@ export function RevenueTrendsPage() {
         granularity={granularity}
         onGranularityChange={setGranularity}
       />
-      <MergedSection id="food-cost" title="Food cost">
+      <MergedSection
+        id="food-cost"
+        title="Food cost"
+        summary="Ingredient cost as a share of revenue, by period."
+      >
         <FoodCostPercentagePage />
       </MergedSection>
-      <MergedSection id="profit-margins" title="Profit margins">
+      <MergedSection
+        id="profit-margins"
+        title="Profit margins"
+        summary="What each event, client and period earned after costs."
+      >
         <ProfitMarginReportsPage />
       </MergedSection>
     </div>

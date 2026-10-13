@@ -52,7 +52,7 @@ export const DASH_TAB_LABEL: Record<EventDetailTab, string> = {
   photos: "Photos & incidents",
   incidents: "Incidents",
   history: "History",
-  margin: "Margin",
+  margin: "Proposal & margin",
 };
 
 function startOfDay(ms: number): number {

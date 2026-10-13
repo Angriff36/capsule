@@ -673,7 +673,11 @@ export function TrainingPage() {
           )}
         </section>
       </div>
-      <MergedSection id="qualifications" title="Qualifications">
+      <MergedSection
+        id="qualifications"
+        title="Qualifications"
+        summary="Certificates such as food handler cards, with expiry dates."
+      >
         <QualificationsPage />
       </MergedSection>
     </div>

@@ -453,7 +453,11 @@ export function L10DashboardPage() {
           "dashboard.food_cost_percent",
         ]}
       />
-      <MergedSection id="scorecard" title="Company scorecard and targets">
+      <MergedSection
+        id="scorecard"
+        title="Company scorecard and targets"
+        summary="Each company number against its target, with owner and trend."
+      >
         <CompanyScorecardDashboardPage />
       </MergedSection>
     </div>

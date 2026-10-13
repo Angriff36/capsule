@@ -73,7 +73,12 @@ export function ReportsPage() {
   return (
     <>
       <TppReportCatalog />
-      <MergedSection id="saved-reports" title="Saved reports">
+      <MergedSection
+        id="saved-reports"
+        title="Saved reports"
+        summary="Your saved live reports."
+        defaultOpen
+      >
         <SavedReportsPage />
       </MergedSection>
     </>

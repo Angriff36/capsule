@@ -611,7 +611,12 @@ export function RosterPage() {
       <EmbeddedContext.Provider value={true}>
         <StaffOverviewPage />
       </EmbeddedContext.Provider>
-      <MergedSection id="swaps" title="Shift swaps">
+      <MergedSection
+        id="swaps"
+        title="Shift swaps"
+        summary="Swaps both staff agreed to, waiting for your OK."
+        defaultOpen
+      >
         <ShiftSwapRequestsPage />
       </MergedSection>
 
@@ -1207,7 +1212,11 @@ export function RosterPage() {
         )}
       </section>
       <StaffPayRatesSection people={people} />
-      <MergedSection id="crew-templates" title="Crew templates">
+      <MergedSection
+        id="crew-templates"
+        title="Crew templates"
+        summary="The crew each kind of event needs, posted as open shifts on approval."
+      >
         <StaffingTemplatesPage />
       </MergedSection>
     </div>

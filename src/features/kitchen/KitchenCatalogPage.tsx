@@ -654,7 +654,11 @@ function KitchenCatalogPageContent({
         )}
       </section>
       {section === "ingredients" ? (
-        <MergedSection id="cleanup" title="Catalog cleanup">
+        <MergedSection
+          id="cleanup"
+          title="Catalog cleanup"
+          summary="Records filed as the wrong kind, waiting for a yes or no."
+        >
           <KitchenCatalogCleanupPage />
         </MergedSection>
       ) : null}

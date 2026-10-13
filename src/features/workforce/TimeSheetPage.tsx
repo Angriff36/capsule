@@ -631,7 +631,12 @@ export function TimeSheetPage() {
       <WorkforceWorkspaceNav />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
       <TimeAttentionPanel shifts={shifts} onFailure={setFailure} />
-      <MergedSection id="time-off" title="Time off">
+      <MergedSection
+        id="time-off"
+        title="Time off"
+        summary="Requests waiting for a yes or no."
+        defaultOpen
+      >
         <TimeOffRequestsPage />
       </MergedSection>
 
@@ -969,7 +974,11 @@ export function TimeSheetPage() {
           </button>
         ) : null}
       </section>
-      <MergedSection id="utilization" title="Hours used">
+      <MergedSection
+        id="utilization"
+        title="Hours used"
+        summary="Planned against worked hours for each person."
+      >
         <StaffUtilizationPage />
       </MergedSection>
     </div>

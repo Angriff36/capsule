@@ -211,7 +211,7 @@ export function EventPhoneBrief({
             ) : (
               <Link
                 className="evd-btn sm"
-                to={`/clients/proposals?event=${eventId}`}
+                to={`/events/${eventId}?tab=margin#proposal`}
               >
                 Create
               </Link>

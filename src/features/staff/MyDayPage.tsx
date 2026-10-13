@@ -1484,7 +1484,11 @@ export function MyDayPage() {
               </Section>
             </div>
           </div>
-          <MergedSection id="my-feedback" title="My feedback">
+          <MergedSection
+            id="my-feedback"
+            title="My feedback"
+            summary="Reviews of your work from your manager."
+          >
             <MyReviewsPage />
           </MergedSection>
         </>

@@ -1176,10 +1176,18 @@ export function StockBookPage() {
             </div>
           ) : null}
         </section>
-        <MergedSection id="locations" title="Storage locations">
+        <MergedSection
+          id="locations"
+          title="Storage locations"
+          summary="Fridges, freezers and dry stores, with their target temperatures."
+        >
           <StorageLocationsPage />
         </MergedSection>
-        <MergedSection id="history" title="Stock history">
+        <MergedSection
+          id="history"
+          title="Stock history"
+          summary="Every change to stock: who, when, and the amount before and after."
+        >
           <InventoryAuditLogPage />
         </MergedSection>
       </div>

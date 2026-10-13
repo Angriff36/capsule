@@ -1,4 +1,5 @@
 import { useMemo, useState, type CSSProperties, type FormEvent } from "react";
+import { OpenProposalFollowUps } from "./OpenProposalFollowUps";
 import { MergedSection } from "../../ui/MergedSection";
 import { DateHoldsPage } from "../sales/DateHoldsPage";
 import { QuoteSubmissionsReviewPage } from "../sales/QuoteSubmissionsReviewPage";
@@ -478,7 +479,20 @@ export function LeadPipelinePage() {
       />
 
       <ClientsWorkspaceNav />
-      <MergedSection id="quote-requests" title="Website quote requests">
+      <MergedSection
+        id="proposal-follow-ups"
+        title="Proposals to follow up"
+        summary="Sent proposals due a reminder, a call or a price check."
+        defaultOpen
+      >
+        <OpenProposalFollowUps onNotice={setNotice} onFailure={setFailure} />
+      </MergedSection>
+      <MergedSection
+        id="quote-requests"
+        title="Website quote requests"
+        summary="Requests from your website waiting to become a lead, event and proposal."
+        defaultOpen
+      >
         <QuoteSubmissionsReviewPage />
       </MergedSection>
 
@@ -1072,10 +1086,18 @@ export function LeadPipelinePage() {
           Show lead sources (all time)
         </button>
       )}
-      <MergedSection id="date-holds" title="Date holds">
+      <MergedSection
+        id="date-holds"
+        title="Date holds"
+        summary="Dates held for prospects, and who is waiting for each date."
+      >
         <DateHoldsPage />
       </MergedSection>
-      <MergedSection id="tastings" title="Tastings">
+      <MergedSection
+        id="tastings"
+        title="Tastings"
+        summary="Booked tastings and what the client liked."
+      >
         <TastingsPage />
       </MergedSection>
     </div>

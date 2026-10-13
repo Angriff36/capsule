@@ -786,10 +786,18 @@ export function DeliveriesPage() {
           </div>
         ) : null}
       </section>
-      <MergedSection id="vehicles" title="Vehicles by day">
+      <MergedSection
+        id="vehicles"
+        title="Vehicles by day"
+        summary="Each vehicle's runs for one day, and runs with no vehicle yet."
+      >
         <VehicleSchedulePage />
       </MergedSection>
-      <MergedSection id="route" title="Route order">
+      <MergedSection
+        id="route"
+        title="Route order"
+        summary="Suggested stop order for one day and vehicle, ready to print."
+      >
         <RoutePlannerPage />
       </MergedSection>
     </div>

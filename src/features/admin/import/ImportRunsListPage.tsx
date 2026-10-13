@@ -239,7 +239,11 @@ export function ImportRunsListPage() {
       />
 
       <AdminWorkspaceNav />
-      <MergedSection id="tpp" title="Upload a TPP export">
+      <MergedSection
+        id="tpp"
+        title="Upload a TPP export"
+        summary="Bring in a TPP account export."
+      >
         <TppUploadPage />
       </MergedSection>
 

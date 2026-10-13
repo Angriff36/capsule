@@ -419,10 +419,18 @@ export function IntegrationsPage() {
       <OutsideMessagesSection />
 
       <StepHistorySection />
-      <MergedSection id="assistant" title="Assistant">
+      <MergedSection
+        id="assistant"
+        title="Assistant"
+        summary="The in-app assistant's model and key."
+      >
         <AssistantSettingsPage />
       </MergedSection>
-      <MergedSection id="api-keys" title="API keys">
+      <MergedSection
+        id="api-keys"
+        title="API keys"
+        summary="Keys that let a remote agent act as you."
+      >
         <ApiKeysPage />
       </MergedSection>
     </div>

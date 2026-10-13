@@ -1,4 +1,6 @@
 import { useState, type FormEvent } from "react";
+import { VenueLayoutTemplatesPage } from "./VenueLayoutTemplatesPage";
+import { VenueVendorRelationshipsPage } from "./VenueVendorRelationshipsPage";
 import { EmbeddedContext } from "../../ui/embedded";
 import { MergedSection } from "../../ui/MergedSection";
 import { FacilitiesOverviewPage } from "./FacilitiesOverviewPage";
@@ -603,8 +605,26 @@ export function VenuesPage() {
           </div>
         </>
       )}
-      <MergedSection id="partners" title="Partner venues">
+      <MergedSection
+        id="partners"
+        title="Partner venues"
+        summary="Partner venues, their owner and when someone last checked in."
+      >
         <VenuePartnersPage />
+      </MergedSection>
+      <MergedSection
+        id="layout-templates"
+        title="Layout templates"
+        summary="Reusable room layouts an event can copy into its setup."
+      >
+        <VenueLayoutTemplatesPage />
+      </MergedSection>
+      <MergedSection
+        id="vendor-relationships"
+        title="Vendor relationships"
+        summary="Which vendors each venue prefers or limits, and on what terms."
+      >
+        <VenueVendorRelationshipsPage />
       </MergedSection>
     </div>
   );

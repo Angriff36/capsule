@@ -1,7 +1,7 @@
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { useEmbedded } from "../../ui/embedded";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { MergedSection } from "../../ui/MergedSection";
-import { ProposalTemplatesPage } from "./ProposalTemplatesPage";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   useGetEvent,
   useGetProposal,
@@ -18,16 +18,15 @@ import { useDishesByIds } from "../../lib/useDishesByIds";
 import { useProposalPictureUrls } from "../../lib/useProposalPictureUrls";
 import { useClientsByIds, useReadClient } from "../../lib/useClientDirectory";
 import { type Id } from "../../lib/api";
+import { useEventProposals } from "../../lib/useEventRows";
 import {
   useEventTimelineActivities,
-  usePagedRows,
   useProposalDishSelections,
   useProposalEnhancements,
   useProposalLineItems,
   useProposalRevisions,
   useProposalShareLinks,
   useReadClientEvents,
-  useRowsInStatuses,
 } from "../../lib/financeScopedQueries";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { useActionPrompt } from "../../ui/action-prompt";
@@ -40,8 +39,6 @@ import {
 import { formatDate, formatMoneyExact, formatTime } from "../../lib/format";
 import { useEmailProposal } from "../../lib/proposalEmailActions";
 import { ProposalEmailHistory } from "./ProposalEmailHistory";
-import { ProposalFollowUps } from "./ProposalFollowUps";
-import { SalesHabits } from "./SalesHabits";
 import { clientDisplayName } from "../events/clientName";
 import { useEventRecordsById } from "../facilities/useEventsById";
 import { eventCreatePath, eventDetailPath } from "../events/eventRoutes";
@@ -69,10 +66,7 @@ import { ProposalTermsPanel } from "./ProposalTermsPanel";
 import { ProposalPaymentSchedulePanel } from "./ProposalPaymentSchedulePanel";
 import { proposalPaymentSchedule } from "../../lib/proposalPaymentSchedule";
 import { ProposalReadinessNotice } from "./ProposalReadinessNotice";
-import {
-  ProposalDraftCheck,
-  useGenerateProposalDraft,
-} from "./ProposalDraftCheck";
+import { ProposalDraftCheck } from "./ProposalDraftCheck";
 import { generateAcceptanceUrl } from "./proposalSignatureRequest";
 import "./ProposalsPage.css";
 import { useSendProposalWithRevisionCapture } from "./useSendProposalWithRevisionCapture";
@@ -106,26 +100,34 @@ const policy = new CrmLifecyclePolicy();
 // Proposal money math lives in the shared pricing engine (src/lib/pricing.ts).
 // The draft form (state, pricing preview, submit) lives in ProposalCreateForm.
 
-export function ProposalsPage() {
+/**
+ * With `eventId`, this is the event's Proposal part (Money tab): only that
+ * event's proposals, newest first, built from the event in one click. Without
+ * it, the page edits one linked proposal (`?proposal=`) or builds one for an
+ * event link (`?event=`).
+ */
+export function ProposalsPage({ eventId }: { eventId?: string }) {
+  const embedded = useEmbedded();
   const { branding } = useTenantBranding();
   const withPictureUrls = useProposalPictureUrls();
   // Every open proposal (through the status index), and the newest finished
-  // ones a page at a time ("Load more" reads older ones).
-  const openProposals = useRowsInStatuses("proposals", OPEN_STATUSES);
-  const proposalPages = usePagedRows("proposals");
+  // ones a page at a time ("Load more" reads older ones). On an event only
+  // that event's proposals are read.
+  const eventProposals = useEventProposals(eventId);
+  // On an event: that event's proposals, newest first. On its own: none
+  // listed; the linked proposal (?proposal=) is read by itself below.
   const proposals = useMemo(
     () =>
-      openProposals === undefined || proposalPages.rows === undefined
-        ? undefined
-        : [
-            ...new Map(
-              [...openProposals, ...proposalPages.rows].map((row) => [
-                row._id,
-                row,
-              ]),
-            ).values(),
-          ],
-    [openProposals, proposalPages.rows],
+      eventId
+        ? eventProposals === undefined
+          ? undefined
+          : // Only proposals sent to a client are tracked; an unsent build
+            // is a printout, not a record.
+            eventProposals
+              .filter((row) => String(row.status) !== "draft")
+              .sort((a, b) => b._creationTime - a._creationTime)
+        : [],
+    [eventId, eventProposals],
   );
   const readClient = useReadClient();
   const readClientEvents = useReadClientEvents();
@@ -176,8 +178,6 @@ export function ProposalsPage() {
   const revokeShareLink = useShareLinkRevoke();
   const emailProposal = useEmailProposal();
   const [showDraft, setShowDraft] = useState(false);
-  const [showTerminal, setShowTerminal] = useState(false);
-  const [find, setFind] = useState("");
   const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -210,30 +210,15 @@ export function ProposalsPage() {
       .catch(() => undefined);
   };
   const [searchParams, setSearchParams] = useSearchParams();
-  // One button builds the draft from the event, or brings the draft it built
-  // before up to date (convex/lib/proposalGenerate.ts); staff edits are kept.
-  const generateDraft = useGenerateProposalDraft();
-  const buildFromEvent = async (eventId: Id<"events">) => {
-    setBusy("build-from-event");
-    setFailure(null);
-    try {
-      const result = await generateDraft({ eventId });
-      setShowDraft(false);
-      setNotice(
-        result.created
-          ? "Proposal built from the event. Check it, then send it."
-          : result.changed
-            ? "Proposal brought up to date with the event. Staff changes were kept."
-            : "This event's proposal already matches the event.",
-      );
-      setSearchParams({ proposal: result.proposalId });
-    } catch (error) {
-      setFailure(error);
-    } finally {
-      setBusy(null);
-    }
-  };
-  const fromEventId = searchParams.get("event");
+  // Opens one proposal's panels and keeps the rest of the URL (on an event
+  // page that is the open tab).
+  const focusProposal = (proposalId: string) =>
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.set("proposal", proposalId);
+      return next;
+    });
+  const fromEventId = eventId ?? searchParams.get("event");
   // The event a "build from event" link names, read on its own.
   const singleFromEvent = useGetEvent(fromEventId ? fromEventId : "skip");
   const fromEvent =
@@ -268,6 +253,15 @@ export function ProposalsPage() {
       : undefined,
   );
   const proposalsLoaded = proposals !== undefined;
+  // A linked proposal that belongs to an event opens on that event.
+  const navigateTo = useNavigate();
+  useEffect(() => {
+    if (eventId || !focusedProposal?.eventId) return;
+    navigateTo(
+      `/events/${focusedProposal.eventId}?tab=margin&proposal=${focusedProposal._id}#proposal`,
+      { replace: true },
+    );
+  }, [eventId, focusedProposal?._id, focusedProposal?.eventId]);
   useEffect(() => {
     if (!focusedProposalId || !proposalsLoaded) return;
     setOpenRowId(focusedProposalId);
@@ -279,44 +273,18 @@ export function ProposalsPage() {
       ?.scrollIntoView({ block: "start" });
   }, [focusedProposalId, proposalsLoaded]);
 
-  // "Create proposal" on an event navigates here with ?event=<id>: one click
-  // builds the proposal from the event (menu, prices, date, venue) and opens
-  // it (issue #415). Building again is safe: an unchanged event writes
-  // nothing. Only an event with no client yet falls back to the form.
-  const builtFor = useRef<string | null>(null);
-  useEffect(() => {
-    if (!fromEvent || builtFor.current === fromEvent._id) return;
-    builtFor.current = fromEvent._id;
-    if (fromEvent.clientId) {
-      void buildFromEvent(fromEvent._id as Id<"events">);
-    } else {
-      setShowDraft(true);
-    }
-  }, [fromEvent?._id]);
-
   const activeRows = [
     ...(proposals ?? []),
-    ...(focusedProposal ? [focusedProposal] : []),
+    // On an event, only that event's proposals: a ?proposal= for another
+    // event is not shown here.
+    ...(focusedProposal &&
+    (!eventId || String(focusedProposal.eventId) === eventId)
+      ? [focusedProposal]
+      : []),
   ].filter((row) => row.deletedAt == null);
-  // Keep accepted proposals visible — operators create the Event from them.
-  const openRows = showTerminal
-    ? activeRows
-    : activeRows.filter(
-        (row) => !["declined", "expired"].includes(String(row.status)),
-      );
-  // Find by title or client; a proposal opened by link always stays listed.
-  const needle = find.trim().toLowerCase();
-  const visibleRows = needle
-    ? openRows.filter(
-        (row) =>
-          row._id === focusedProposalId ||
-          [row.title, clientDisplayName(row.clientId, clients)].some((value) =>
-            String(value ?? "")
-              .toLowerCase()
-              .includes(needle),
-          ),
-      )
-    : openRows;
+  // One event's proposals, or one linked proposal: every version shows,
+  // declined or expired included.
+  const visibleRows = activeRows;
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -780,57 +748,69 @@ export function ProposalsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        title="Proposals"
-        lead={
-          <>
-            Priced offers your clients can accept with one click. When a
-            proposal is accepted, turn it into a booked event.
-          </>
-        }
-        actions={
-          <>
-            <button
-              className="btn btn-ghost"
-              type="button"
-              onClick={() => setShowTerminal((value) => !value)}
+      {embedded ? (
+        <div className="flex flex-wrap items-center gap-2">
+          {fromEvent ? (
+            <a
+              className="btn btn-primary"
+              href={`/events/${fromEvent._id}/proposal`}
+              target="_blank"
             >
-              {showTerminal ? "Hide declined/expired" : "Show declined/expired"}
-            </button>
-            {fromEvent ? (
-              <button
-                className="btn btn-primary"
-                type="button"
-                disabled={busy != null}
-                onClick={() => void buildFromEvent(fromEvent._id)}
-              >
-                Build from event
-              </button>
-            ) : null}
-            {fromEvent ? (
-              <RecordAcceptedBeforeCapsule
-                event={fromEvent}
-                prompt={prompt}
-                busy={busy}
-                run={run}
-                onNotice={setNotice}
-                onOpen={(proposalId) => {
-                  setShowDraft(false);
-                  setSearchParams({ proposal: proposalId });
-                }}
-              />
-            ) : null}
-            <button
-              className={fromEvent ? "btn btn-ghost" : "btn btn-primary"}
-              type="button"
-              onClick={() => setShowDraft((value) => !value)}
-            >
-              {showDraft ? "Close form" : "New proposal"}
-            </button>
-          </>
-        }
-      />
-      <ClientsWorkspaceNav />
+              Open proposal
+            </a>
+          ) : null}
+          {fromEvent ? (
+            <RecordAcceptedBeforeCapsule
+              event={fromEvent}
+              prompt={prompt}
+              busy={busy}
+              run={run}
+              onNotice={setNotice}
+              onOpen={(proposalId) => {
+                setShowDraft(false);
+                focusProposal(proposalId);
+              }}
+            />
+          ) : null}
+        </div>
+      ) : (
+        <>
+          <PageHeader
+            title="Proposals"
+            lead={
+              <>
+                Priced offers your clients can accept with one click. When a
+                proposal is accepted, turn it into a booked event.
+              </>
+            }
+            actions={
+              <>
+                {fromEvent ? (
+                  <RecordAcceptedBeforeCapsule
+                    event={fromEvent}
+                    prompt={prompt}
+                    busy={busy}
+                    run={run}
+                    onNotice={setNotice}
+                    onOpen={(proposalId) => {
+                      setShowDraft(false);
+                      focusProposal(proposalId);
+                    }}
+                  />
+                ) : null}
+                <button
+                  className={fromEvent ? "btn btn-ghost" : "btn btn-primary"}
+                  type="button"
+                  onClick={() => setShowDraft((value) => !value)}
+                >
+                  {showDraft ? "Close form" : "New proposal"}
+                </button>
+              </>
+            }
+          />
+          <ClientsWorkspaceNav />
+        </>
+      )}
       {failure ? <CrmFailureBanner error={failure} /> : null}
       {notice ? (
         <p className="mt-3 text-base text-ink-2" role="status">
@@ -840,7 +820,7 @@ export function ProposalsPage() {
       {host}
 
       <ProposalCreateForm
-        open={showDraft}
+        open={showDraft && !eventId}
         fromEvent={fromEvent}
         clients={clients}
         busy={busy}
@@ -850,57 +830,25 @@ export function ProposalsPage() {
         onClose={() => setShowDraft(false)}
       />
 
-      <ProposalFollowUps
-        proposals={openProposals}
-        clients={clients}
-        onOpen={(proposalId) => setSearchParams({ proposal: proposalId })}
-        onNotice={setNotice}
-        onFailure={setFailure}
-      />
-
-      <SalesHabits
-        clients={clients}
-        onOpen={(proposalId) => setSearchParams({ proposal: proposalId })}
-      />
-
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
             <p className="eyebrow">Offers</p>
-            <h2>Proposals</h2>
+            <h2>{eventId ? "This event's proposals" : "Proposal"}</h2>
           </div>
           <span>
             {`${visibleRows.filter((row) => OPEN_STATUSES.includes(String(row.status))).length} open · ${visibleRows.filter((row) => !OPEN_STATUSES.includes(String(row.status))).length} closed shown`}
           </span>
         </div>
-        {openRows.length > 0 ? (
-          <input
-            type="search"
-            className="input my-3 min-h-10 w-full max-w-sm"
-            placeholder="Find loaded proposals by title or client"
-            aria-label="Find a proposal"
-            value={find}
-            onChange={(event) => setFind(event.target.value)}
-          />
-        ) : null}
         {loading ? (
           <TableSkeleton rows={5} />
-        ) : visibleRows.length === 0 && needle ? (
-          <p className="p-4 text-base text-ink-2">Nothing matches.</p>
         ) : visibleRows.length === 0 ? (
           <EmptyState
-            title="No open proposals."
-            hint="Draft an offer to start the sales conversation."
-            action={
-              showDraft ? undefined : (
-                <button
-                  className="btn btn-primary"
-                  type="button"
-                  onClick={() => setShowDraft(true)}
-                >
-                  New proposal
-                </button>
-              )
+            title={eventId ? "No proposal sent yet." : "No proposal here."}
+            hint={
+              eventId
+                ? "Open the proposal to print it or send it. Capsule keeps a proposal only once it is sent to the client."
+                : "This link names no proposal Capsule can show."
             }
           />
         ) : (
@@ -1311,22 +1259,7 @@ export function ProposalsPage() {
             </table>
           </div>
         )}
-        {!loading && proposalPages.canLoadMore ? (
-          <div className="px-4 py-3">
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm"
-              disabled={proposalPages.loadingMore}
-              onClick={proposalPages.loadMore}
-            >
-              {proposalPages.loadingMore ? "Loading…" : "Load older proposals"}
-            </button>
-          </div>
-        ) : null}
       </section>
-      <MergedSection id="templates" title="Proposal templates">
-        <ProposalTemplatesPage />
-      </MergedSection>
     </div>
   );
 }

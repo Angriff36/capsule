@@ -893,7 +893,11 @@ export function StockCountPage() {
           ) : null}
         </div>
       )}
-      <MergedSection id="opening-stock" title="Opening stock">
+      <MergedSection
+        id="opening-stock"
+        title="Opening stock"
+        summary="Turn a count sheet into the first stock on hand."
+      >
         <OpeningStockPage />
       </MergedSection>
     </div>

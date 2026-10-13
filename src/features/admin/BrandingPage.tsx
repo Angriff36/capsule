@@ -544,10 +544,18 @@ export function BrandingPage() {
           </article>
         </section>
       </div>
-      <MergedSection id="kitchens" title="Kitchens and drive times">
+      <MergedSection
+        id="kitchens"
+        title="Kitchens and drive times"
+        summary="Where crews leave from and the rules for drive times and event timing."
+      >
         <KitchensPage />
       </MergedSection>
-      <MergedSection id="catalogs" title="Pick lists">
+      <MergedSection
+        id="catalogs"
+        title="Pick lists"
+        summary="Service styles, occasions and referral sources that every form offers."
+      >
         <CatalogsPage />
       </MergedSection>
     </div>

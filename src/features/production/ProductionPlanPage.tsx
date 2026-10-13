@@ -278,10 +278,18 @@ export function ProductionPlanPage() {
         loading={loading}
         today={planDayKey(Date.now())}
       />
-      <MergedSection id="stations" title="Stations">
+      <MergedSection
+        id="stations"
+        title="Stations"
+        summary="Station names and the order prep sheets print in."
+      >
         <KitchenStationsPage />
       </MergedSection>
-      <MergedSection id="yield" title="Yield against plan">
+      <MergedSection
+        id="yield"
+        title="Yield against plan"
+        summary="Recipes producing less or more than planned."
+      >
         <ProductionYieldDashboardPage />
       </MergedSection>
     </div>

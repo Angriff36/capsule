@@ -6,7 +6,6 @@ export const CLIENTS_PIPELINE_SECTION = {
 
 export const CLIENTS_SECTIONS = [
   { key: "accounts", label: "Accounts", path: "/clients" },
-  { key: "proposals", label: "Proposals", path: "/clients/proposals" },
   { key: "contracts", label: "Contracts", path: "/clients/contracts" },
   { key: "inbox", label: "Inbox", path: "/clients/inbox" },
 ] as const;
@@ -21,7 +20,7 @@ export const CLIENTS_ROUTES = {
   // Deep link into the proposals page's focused row: ?proposal=<id> opens
   // that proposal's detail panels and scrolls the row into view.
   proposal: (id: string) => `/clients/proposals?proposal=${id}`,
-  proposalTemplates: "/clients/proposals#templates",
+  proposalTemplates: "/events/setup#proposal-templates",
   tastings: "/clients/pipeline#tastings",
   contracts: "/clients/contracts",
   retention: "/clients#retention",

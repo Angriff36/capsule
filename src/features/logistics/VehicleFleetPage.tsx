@@ -719,7 +719,11 @@ export function VehicleFleetPage() {
         )}
       </section>
 
-      <MergedSection id="maintenance" title="Service and fuel">
+      <MergedSection
+        id="maintenance"
+        title="Service and fuel"
+        summary="Service schedules, fuel and repairs for each vehicle."
+      >
         <VehicleMaintenancePage />
       </MergedSection>
     </div>

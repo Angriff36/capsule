@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
 import { formatCount, formatMoney, formatMoneyExact } from "../../lib/format";
 import { useEventPriceList } from "../../lib/eventPriceListQueries";
@@ -117,12 +116,13 @@ export function EventPriceListCard({
                 {busy ? "Working…" : "Bring in menu changes"}
               </button>
             ) : null}
-            <Link
+            <a
               className="btn btn-ghost btn-sm"
-              to={`/clients/proposals?proposal=${list.proposalId}`}
+              href={`/events/${eventId}/proposal`}
+              target="_blank"
             >
               Open the proposal
-            </Link>
+            </a>
           </div>
         ) : null}
       </div>

@@ -68,7 +68,11 @@ export function SalesDashboardPage() {
   const [requested, setRequested] = useState(false);
   // Average event value is its own all-time report, folded in here.
   const avgEventValue = (
-    <MergedSection id="avg-event-value" title="Average event value">
+    <MergedSection
+      id="avg-event-value"
+      title="Average event value"
+      summary="Average event value over time and what drives it."
+    >
       <AvgEventValueGrowthDashboardPage />
     </MergedSection>
   );

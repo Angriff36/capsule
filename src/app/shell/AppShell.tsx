@@ -7,6 +7,7 @@ import { AssistantPanel } from "../../features/assistant/AssistantPanel";
 import { WorkingEventErrorBoundary } from "../../features/events/WorkingEventErrorBoundary";
 import { WorkingEventReports } from "../../features/home/WorkingEventReports";
 import { ActionResultHost } from "../../ui/action-result";
+import { OnThisPage } from "../../ui/OnThisPage";
 import { CommandPalette } from "./CommandPalette";
 import { NewVersionBanner } from "./NewVersionBanner";
 import { RouteErrorBoundary } from "./RouteErrorBoundary";
@@ -107,6 +108,10 @@ export function AppShell() {
               ref={workspaceSheetRef}
               className="workspace-sheet px-8 py-6 max-md:px-4 max-md:py-3"
             >
+              <OnThisPage
+                rootRef={workspaceSheetRef}
+                scrollRef={mainScrollRef}
+              />
               <PageGuide />
               <RouteErrorBoundary>
                 <SwitchedOffAreaGuard>

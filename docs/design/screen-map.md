@@ -333,22 +333,23 @@ State on `dev` after the merge batches (commits `b0abf8a3d`, `dcc248195`,
 
 | | Before | After | Change |
 | --- | ---: | ---: | ---: |
-| Routes (pages) | 142 | 89 | -53 |
+| Routes (pages) | 142 | 88 | -54 |
 | Tabs | 64 | 55 | -9 |
-| **Routes + tabs** | **206** | **144** | **-62 (-30.1%)** |
+| **Routes + tabs** | **206** | **143** | **-63 (-30.6%)** |
 
 Tabs removed: the event page went from 16 to 11 (guests, layouts, to-dos,
 incidents and history are now parts of the Client, Equipment, Timeline and
 Photos tabs). Fleet shows vehicles and trailers one under the other (-2).
-Reports shows the TPP library and saved reports on one page (-2). One route
-was added: `/events/setup`.
+Reports shows the TPP library and saved reports on one page (-2). Two routes
+were added: `/events/setup` and `/events/:id/proposal`.
 
 ### Where things went
 
 | Home page (after) | What it now holds |
 | --- | --- |
 | `/` Home | Today's service (decisions, today's services, coming up), then the month calendar |
-| `/events/setup` Event setup | Event templates, checklists, planning rules |
+| `/events/setup` Event setup | Event templates, checklists, planning rules, proposal templates |
+| `/events/:id/proposal` | One-click proposal built from the event and its price list, printable; nothing saved until Send to client |
 | `/events/:id` | 11 tabs; Client & guests, Equipment & layouts, Timeline & to-dos, Photos & incidents (with history) |
 | `/kitchen/ingredients` | Ingredient list + catalog cleanup |
 | `/kitchen/prep` Prep board | Prep board + unresolved work |
@@ -375,8 +376,8 @@ was added: `/events/setup`.
 | `/reports/l10` | L10 board + company scorecard and targets |
 | `/clients` | Client list + retention |
 | `/clients/pipeline` Pipeline | Website quote requests, lead board, date holds, tastings |
-| `/clients/proposals` | Proposals + proposal templates |
-| `/facilities/venues` | Venue summary, venue list, partner venues |
+| `/clients/pipeline` (also) | Proposals to follow up, sales habits |
+| `/facilities/venues` | Venue summary, venue list, partner venues, layout templates, vendor relationships |
 | `/admin/branding` Company | Branding, kitchens and drive times, pick lists |
 | `/admin/integrations` | QuickBooks, text alerts, assistant, API keys |
 | `/admin/imports` | TPP upload + import runs |
@@ -390,11 +391,36 @@ was added: `/events/setup`.
 - Inventory: Stock · Counts · Waste · Lot trace · Purchasing · Contracts
 - Kitchen: Recipes · Ingredients · Dishes · Menus · Prep board · Production plan
 - Reports: Saved reports · Money · Sales · Tim's KPIs · L10 · Mangia
-- Clients: Pipeline · Accounts · Proposals · Contracts · Inbox
-- Facilities: Venues · Equipment · Layout templates · Vendor relationships
+- Clients: Pipeline · Accounts · Contracts · Inbox
+- Facilities: Venues · Equipment
 - Admin: Permissions · Company · Integrations · Announcements · More (Data exports, Imports, Compare with TPP, Match leftover items, Switch from TPP)
 
-### Kept on purpose (exceptions)
+#### Proposals (owner, 2026-10-13)
+
+"A proposal is generated in a single click pop out report style tab that you
+can save or print … NOT SAVED TO CAPSULE. Only save and track a proposal if
+it's actually sent out to a client via a manually triggered action."
+
+- The event header's **Proposal** button opens `/events/:id/proposal` in a new
+  tab: the proposal built from the event (its price list when it has one, else
+  its priced dishes and the service-style template), with Print / Save PDF.
+  The read-only query `convex/lib/proposalPreview.ts` builds it and writes
+  nothing.
+- **Send to client** is the only action that saves: it sends the event's price
+  list as it stands (or builds it from the event first), records the sent
+  version, and opens the event's Money tab on it, where email, share link and
+  signature live.
+- The event's Money tab lists only proposals that were sent. There is no list
+  of all proposals. `/clients/proposals?proposal=` still opens one proposal
+  (a lead's, before it has an event); an event's proposal moves to its event.
+- Follow-ups and sales habits moved to the Pipeline; proposal templates to
+  Event setup.
+- Exception: the event's price list is stored as an unsent draft proposal (it
+  sets the event's price). It is not shown as a proposal. A lead's proposal
+  made from the Pipeline before any event exists is still saved when made,
+  because there is no event to build it from.
+
+## Kept on purpose (exceptions)
 
 - Printable documents keep their own URL, because a print must show one
   document: battle board, allergen briefing, route map, contract document,
@@ -470,15 +496,21 @@ that now holds the old screen (`src/ui/MergedSection.tsx`).
 | `/kitchen/cleanup` | `/kitchen/ingredients#cleanup` |
 | `/kitchen/stations` | `/kitchen/plan#stations` |
 | `/kitchen/yield` | `/kitchen/plan#yield` |
-| `/clients/proposals/templates` | `/clients/proposals#templates` |
+| `/clients/proposals/templates` | `/events/setup#proposal-templates` |
+| `/clients/proposals` (no proposal named) | `/clients/pipeline` |
+| `/clients/proposals?event=:id` | `/events/:id?tab=margin#proposal` |
+| `/clients/proposals?proposal=:id` (of an event) | `/events/:eventId?tab=margin&proposal=:id#proposal` |
+| `/facilities/venues/templates` | `/facilities/venues#layout-templates` |
+| `/facilities/vendor-relationships` | `/facilities/venues#vendor-relationships` |
+
 | `/clients/tastings` | `/clients/pipeline#tastings` |
 | `/clients/retention` | `/clients#retention` |
 | `/clients/quote-requests` | `/clients/pipeline#quote-requests` |
 | `/clients/date-holds` | `/clients/pipeline#date-holds` |
 | `/facilities` | `/facilities/venues` |
 | `/facilities/venues/partners` | `/facilities/venues#partners` |
-| `/facilities/venues/:venueId/templates` | `/facilities/venues/templates?venue=:venueId` |
-| `/facilities/venues/:venueId/vendor-relationships` | `/facilities/vendor-relationships?venue=:venueId` |
+| `/facilities/venues/:venueId/templates` | `/facilities/venues?venue=:venueId#layout-templates` |
+| `/facilities/venues/:venueId/vendor-relationships` | `/facilities/venues?venue=:venueId#vendor-relationships` |
 | `/admin/kitchens` | `/admin/branding#kitchens` |
 | `/admin/catalogs` | `/admin/branding#catalogs` |
 | `/admin/assistant` | `/admin/integrations#assistant` |

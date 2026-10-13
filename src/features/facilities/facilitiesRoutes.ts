@@ -1,16 +1,6 @@
 export const FACILITIES_SECTIONS = [
   { key: "venues", label: "Venues", path: "/facilities/venues" },
   { key: "equipment", label: "Equipment", path: "/facilities/equipment" },
-  {
-    key: "layout-templates",
-    label: "Layout templates",
-    path: "/facilities/venues/templates",
-  },
-  {
-    key: "vendor-relationships",
-    label: "Vendor relationships",
-    path: "/facilities/vendor-relationships",
-  },
 ] as const;
 
 export type FacilitiesSection = (typeof FACILITIES_SECTIONS)[number]["key"];
@@ -33,8 +23,8 @@ export function venueListPath(): string {
 
 export function venueLayoutTemplatesListPath(venueId?: string): string {
   return venueId
-    ? `/facilities/venues/templates?venue=${venueId}`
-    : `/facilities/venues/templates`;
+    ? `/facilities/venues?venue=${venueId}#layout-templates`
+    : `/facilities/venues#layout-templates`;
 }
 
 export function venueLayoutTemplateDetailPath(id: string): string {
@@ -43,8 +33,8 @@ export function venueLayoutTemplateDetailPath(id: string): string {
 
 export function venueVendorRelationshipsListPath(venueId?: string): string {
   return venueId
-    ? `/facilities/vendor-relationships?venue=${venueId}`
-    : `/facilities/vendor-relationships`;
+    ? `/facilities/venues?venue=${venueId}#vendor-relationships`
+    : `/facilities/venues#vendor-relationships`;
 }
 
 export function venueVendorRelationshipDetailPath(id: string): string {

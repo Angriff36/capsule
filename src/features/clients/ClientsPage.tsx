@@ -632,7 +632,11 @@ export function ClientsPage() {
           {paged.loadingMore ? "Loading…" : "Load more clients"}
         </button>
       ) : null}
-      <MergedSection id="retention" title="Retention">
+      <MergedSection
+        id="retention"
+        title="Retention"
+        summary="Clients who booked last year but not this year, and the calls to win them back."
+      >
         <ClientRetentionPage />
       </MergedSection>
     </div>

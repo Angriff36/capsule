@@ -2235,7 +2235,11 @@ export function KitchenDashboardPage() {
           </div>
         )}
       </div>
-      <MergedSection id="unresolved" title="Unresolved work">
+      <MergedSection
+        id="unresolved"
+        title="Unresolved work"
+        summary="Ingredients the plan cannot price or order, and recipes missing a method, ingredients or cost."
+      >
         <KitchenUnresolvedWorkPage />
       </MergedSection>
     </div>

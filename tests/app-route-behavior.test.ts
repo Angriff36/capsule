@@ -26,7 +26,6 @@ beforeAll(async () => {
 it.each([
   ["/events", "Events"],
   ["/clients", "Clients"],
-  ["/clients/proposals", "Proposals"],
   ["/clients/contracts", "Contracts"],
   ["/finance/invoices", "Invoices"],
   ["/finance/payments", "Payments"],

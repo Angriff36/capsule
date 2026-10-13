@@ -394,10 +394,18 @@ export function PerformanceReviewsPage() {
           </div>
         ) : null}
       </section>
-      <MergedSection id="scorecards" title="Role expectations">
+      <MergedSection
+        id="scorecards"
+        title="Role expectations"
+        summary="What good looks like for each role."
+      >
         <RoleScorecardsPage />
       </MergedSection>
-      <MergedSection id="one-on-ones" title="One-on-ones">
+      <MergedSection
+        id="one-on-ones"
+        title="One-on-ones"
+        summary="Regular check-ins and the actions agreed."
+      >
         <OneOnOnesPage />
       </MergedSection>
     </div>

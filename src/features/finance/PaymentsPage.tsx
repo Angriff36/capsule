@@ -611,7 +611,11 @@ export function PaymentsPage() {
           </div>
         ) : null}
       </section>
-      <MergedSection id="payment-methods" title="Payment methods">
+      <MergedSection
+        id="payment-methods"
+        title="Payment methods"
+        summary="Cards and accounts stored for clients."
+      >
         <PaymentMethodsPage />
       </MergedSection>
     </div>

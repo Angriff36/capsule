@@ -847,7 +847,11 @@ export function PurchasingPage() {
           Cancel ({selection.selected.filter(needCanCancel).length})
         </button>
       </BulkActionBar>
-      <MergedSection id="demand" title="What each event needs">
+      <MergedSection
+        id="demand"
+        title="What each event needs"
+        summary="Ingredient amounts each event needs; purchasing draws from this."
+      >
         <DemandLedgerPage />
       </MergedSection>
     </div>

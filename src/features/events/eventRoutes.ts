@@ -36,7 +36,7 @@ export const EVENT_DETAIL_TABS: readonly {
   { key: "timeline", label: "Timeline & to-dos" },
   { key: "staffing", label: "Staffing" },
   { key: "inventory", label: "Inventory" },
-  { key: "margin", label: "Margin" },
+  { key: "margin", label: "Proposal & margin" },
 ] as const;
 
 /**

@@ -149,7 +149,7 @@ function buildSalesReport(
     sourceLabel: "Proposals",
     sourceDescription:
       "Current proposals supply pipeline status, guest counts, and proposed value.",
-    sourcePath: "/clients/proposals",
+    sourcePath: "/clients/pipeline",
     effectiveWindow: dateWindow.window,
     kpis: [
       kpi("sales.proposals", formatCount(rows.length)),

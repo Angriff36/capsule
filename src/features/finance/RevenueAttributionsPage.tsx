@@ -371,10 +371,18 @@ export function RevenueAttributionsPage() {
           </button>
         </div>
       ) : null}
-      <MergedSection id="commission-terms" title="Venue commission terms">
+      <MergedSection
+        id="commission-terms"
+        title="Venue commission terms"
+        summary="Commission rate each venue earns, by date."
+      >
         <VenueCommissionTermsPage />
       </MergedSection>
-      <MergedSection id="comp-master" title="Commission by salesperson">
+      <MergedSection
+        id="comp-master"
+        title="Commission by salesperson"
+        summary="Commission earned by each salesperson."
+      >
         <CompMasterDashboardPage />
       </MergedSection>
     </div>

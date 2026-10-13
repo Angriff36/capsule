@@ -1,3 +1,4 @@
+import { useEmbedded } from "../../ui/embedded";
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import {
@@ -88,6 +89,7 @@ const toOptionalNumber = (value: string | undefined): number | undefined => {
 
 /** Venue vendor relationships page — manage venue-specific vendor policies. */
 export function VenueVendorRelationshipsPage() {
+  const embedded = useEmbedded();
   // One page for every venue; ?venue= narrows it to one.
   const { venueId: routeVenueId } = useParams<{ venueId: string }>();
   const [searchParams] = useSearchParams();
@@ -357,14 +359,8 @@ export function VenueVendorRelationshipsPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Venue vendor relationships"
-        lead={
-          venue
-            ? `Which vendors ${venue.name} prefers or limits, and on what terms`
-            : "Which vendors each venue prefers or limits, and on what terms"
-        }
-        actions={
+      {embedded ? (
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => setShowForm(!showForm)}
@@ -372,9 +368,29 @@ export function VenueVendorRelationshipsPage() {
           >
             {showForm ? "Cancel" : "New relationship"}
           </button>
-        }
-      />
-      <FacilitiesWorkspaceNav />
+        </div>
+      ) : (
+        <>
+          <PageHeader
+            title="Venue vendor relationships"
+            lead={
+              venue
+                ? `Which vendors ${venue.name} prefers or limits, and on what terms`
+                : "Which vendors each venue prefers or limits, and on what terms"
+            }
+            actions={
+              <button
+                type="button"
+                onClick={() => setShowForm(!showForm)}
+                className="btn btn-primary"
+              >
+                {showForm ? "Cancel" : "New relationship"}
+              </button>
+            }
+          />
+          <FacilitiesWorkspaceNav />
+        </>
+      )}
       {host}
 
       {failure && (

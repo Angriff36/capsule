@@ -664,10 +664,18 @@ export function PackListTemplatesPage() {
           </table>
         </div>
       )}
-      <MergedSection id="style-kits" title="Service style kits">
+      <MergedSection
+        id="style-kits"
+        title="Service style kits"
+        summary="Lines every event of a service style gets on its pack list."
+      >
         <ServiceStyleKitsPage />
       </MergedSection>
-      <MergedSection id="pack-rules" title="Pack rules">
+      <MergedSection
+        id="pack-rules"
+        title="Pack rules"
+        summary="Rules that add items to pack lists from dishes, notes and guest counts."
+      >
         <PackRulesPage />
       </MergedSection>
     </div>

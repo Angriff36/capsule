@@ -5,6 +5,7 @@ import { EventChecklistsPage } from "./EventChecklistsPage";
 import { EventTemplatesPage } from "./EventTemplatesPage";
 import { eventsIndexPath } from "./eventRoutes";
 import { PlanningSetupPage } from "./planning/PlanningSetupPage";
+import { ProposalTemplatesPage } from "../clients/ProposalTemplatesPage";
 
 /**
  * The event setup library: templates, checklists and the planning board's
@@ -15,7 +16,7 @@ export function EventSetupPage() {
     <div className="operations-stage space-y-8">
       <PageHeader
         title="Event setup"
-        lead="Starting points and rules every event uses: event templates, reusable checklists, and how the planning board checks a plan."
+        lead="Starting points and rules every event uses: event templates, reusable checklists, how the planning board checks a plan, and proposal templates."
         actions={
           <>
             <Link className="btn btn-ghost" to={eventsIndexPath()}>
@@ -27,14 +28,36 @@ export function EventSetupPage() {
           </>
         }
       />
-      <MergedSection id="templates" title="Event templates">
+      <MergedSection
+        id="templates"
+        title="Event templates"
+        summary="Starting points for the events you do often."
+        defaultOpen
+      >
         <EventTemplatesPage />
       </MergedSection>
-      <MergedSection id="checklists" title="Checklists">
+      <MergedSection
+        id="checklists"
+        title="Checklists"
+        summary="Reusable to-do lists you put on an event."
+        defaultOpen
+      >
         <EventChecklistsPage />
       </MergedSection>
-      <MergedSection id="planning" title="Planning rules">
+      <MergedSection
+        id="planning"
+        title="Planning rules"
+        summary="How the planning board checks a plan and moves stages."
+        defaultOpen
+      >
         <PlanningSetupPage />
+      </MergedSection>
+      <MergedSection
+        id="proposal-templates"
+        title="Proposal templates"
+        summary="Standard sections, terms and tax that every built proposal starts from."
+      >
+        <ProposalTemplatesPage />
       </MergedSection>
     </div>
   );

@@ -1,5 +1,12 @@
 import { Component, lazy, Suspense, type ReactNode } from "react";
-import { Navigate, Route, Routes, useMatch, useParams } from "react-router-dom";
+import {
+  Navigate,
+  Route,
+  Routes,
+  useMatch,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { ReportsWorkspaceNav } from "../features/reports/ReportsWorkspaceNav";
 import { ClientPortalPage } from "../features/clientPortal/ClientPortalPage";
 import { ProposalAcceptancePage } from "../features/clients/ProposalAcceptancePage";
@@ -18,6 +25,7 @@ import { EventWorkbooksPage } from "../features/events/packet/EventWorkbooksPage
 import { EventsListPage } from "../features/events/EventsListPage";
 import { EventTrackerHome } from "../features/events/tracker/EventTrackerHome";
 import { EventSetupPage } from "../features/events/EventSetupPage";
+import { EventProposalPreviewPage } from "../features/events/EventProposalPreviewPage";
 import { eventMenuRedirectPath } from "../features/events/eventRoutes";
 import { WorkingEventRouteSync } from "../features/events/workingEvent";
 import { ReviewerToolbar } from "./shell/ReviewerToolbar";
@@ -75,6 +83,24 @@ const VendorContractsPage = lazy(() =>
 function RedirectEventMenuAlias() {
   const { id } = useParams();
   return <Navigate to={id ? eventMenuRedirectPath(id) : "/events"} replace />;
+}
+/**
+ * Proposals live on their event (Money tab); there is no list of them.
+ * ?event= opens that event's proposal, ?proposal= opens one proposal (an
+ * event's proposal moves on to its event), anything else goes to Pipeline.
+ */
+function ProposalsRoute() {
+  const [params] = useSearchParams();
+  const eventId = params.get("event");
+  if (eventId)
+    return <Navigate to={`/events/${eventId}?tab=margin#proposal`} replace />;
+  if (!params.get("proposal"))
+    return <Navigate to="/clients/pipeline" replace />;
+  return (
+    <SupplyRoute>
+      <ProposalsPage />
+    </SupplyRoute>
+  );
 }
 function RedirectPackListAlias() {
   const { id } = useParams();
@@ -291,18 +317,6 @@ const VenueMenuCardPage = lazy(() =>
 const VenueInfoPacketPage = lazy(() =>
   import("../features/facilities/VenueInfoPacketPage").then((module) => ({
     default: module.VenueInfoPacketPage,
-  })),
-);
-const VenueVendorRelationshipsPage = lazy(() =>
-  import("../features/facilities/VenueVendorRelationshipsPage").then(
-    (module) => ({
-      default: module.VenueVendorRelationshipsPage,
-    }),
-  ),
-);
-const VenueLayoutTemplatesPage = lazy(() =>
-  import("../features/facilities/VenueLayoutTemplatesPage").then((module) => ({
-    default: module.VenueLayoutTemplatesPage,
   })),
 );
 const PermissionsPage = lazy(() =>
@@ -593,6 +607,14 @@ export function App() {
               element={<EventAllergenBriefingPage />}
             />
             <Route path="/events/:id/map" element={<EventRouteMapPage />} />
+            <Route
+              path="/events/:id/proposal"
+              element={
+                <SupplyRoute>
+                  <EventProposalPreviewPage />
+                </SupplyRoute>
+              }
+            />
             <Route
               path="/events/:id/menu"
               element={<RedirectEventMenuAlias />}
@@ -1133,17 +1155,12 @@ export function App() {
                 </SupplyRoute>
               }
             />
-            <Route
-              path="/clients/proposals"
-              element={
-                <SupplyRoute>
-                  <ProposalsPage />
-                </SupplyRoute>
-              }
-            />
+            <Route path="/clients/proposals" element={<ProposalsRoute />} />
             <Route
               path="/clients/proposals/templates"
-              element={<MovedRoute to="/clients/proposals" hash="templates" />}
+              element={
+                <MovedRoute to="/events/setup" hash="proposal-templates" />
+              }
             />
             <Route
               path="/clients/tastings"
@@ -1218,9 +1235,7 @@ export function App() {
             <Route
               path="/facilities/venues/templates"
               element={
-                <SupplyRoute>
-                  <VenueLayoutTemplatesPage />
-                </SupplyRoute>
+                <MovedRoute to="/facilities/venues" hash="layout-templates" />
               }
             />
             <Route
@@ -1254,16 +1269,18 @@ export function App() {
             <Route
               path="/facilities/vendor-relationships"
               element={
-                <SupplyRoute>
-                  <VenueVendorRelationshipsPage />
-                </SupplyRoute>
+                <MovedRoute
+                  to="/facilities/venues"
+                  hash="vendor-relationships"
+                />
               }
             />
             <Route
               path="/facilities/venues/:venueId/vendor-relationships"
               element={
                 <MovedRoute
-                  to="/facilities/vendor-relationships"
+                  to="/facilities/venues"
+                  hash="vendor-relationships"
                   paramsToQuery={{ venueId: "venue" }}
                 />
               }
@@ -1272,7 +1289,8 @@ export function App() {
               path="/facilities/venues/:venueId/templates"
               element={
                 <MovedRoute
-                  to="/facilities/venues/templates"
+                  to="/facilities/venues"
+                  hash="layout-templates"
                   paramsToQuery={{ venueId: "venue" }}
                 />
               }
