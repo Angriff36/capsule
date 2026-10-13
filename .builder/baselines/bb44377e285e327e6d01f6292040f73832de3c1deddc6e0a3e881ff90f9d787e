@@ -998,7 +998,6 @@ import {
   VenueSetSellingProfileParamsSchema,
   VenueSetSiteFactsParamsSchema,
   VenueSetSocialHandleParamsSchema,
-  VenueSetTaxRatesParamsSchema,
   VenueSetTimeZoneParamsSchema,
   VenueUpdateDetailsParamsSchema,
   VenueVendorRelationshipEstablishParamsSchema,
@@ -14588,16 +14587,6 @@ export function useVenueSetSocialHandle() {
   };
 }
 
-/** Mutation hook for Venue.setTaxRates. */
-export function useVenueSetTaxRates() {
-  const mutate = useMutation(api.mutations.Venue_setTaxRates);
-  return (args: any) => {
-    const { docId, version, idempotencyKey, ...params } = args ?? {};
-    const parsed = VenueSetTaxRatesParamsSchema.parse(params) as Record<string, unknown>;
-    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
-  };
-}
-
 /** Mutation hook for Venue.setTimeZone. */
 export function useVenueSetTimeZone() {
   const mutate = useMutation(api.mutations.Venue_setTimeZone);
@@ -15077,4 +15066,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1591 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1590 as const;

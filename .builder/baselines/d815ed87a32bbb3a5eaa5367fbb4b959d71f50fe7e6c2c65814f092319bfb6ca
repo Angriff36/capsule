@@ -13893,13 +13893,6 @@ export const VenueSetSocialHandleParamsSchema = z.object({
 
 export type VenueSetSocialHandleParams = z.infer<typeof VenueSetSocialHandleParamsSchema>;
 
-// Command: setTaxRates on Venue
-export const VenueSetTaxRatesParamsSchema = z.object({
-  taxRateIds: z.array(z.string()),
-});
-
-export type VenueSetTaxRatesParams = z.infer<typeof VenueSetTaxRatesParamsSchema>;
-
 // Command: setTimeZone on Venue
 export const VenueSetTimeZoneParamsSchema = z.object({
   timeZone: z.string().optional(),
