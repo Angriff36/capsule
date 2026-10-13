@@ -644,6 +644,12 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
           rule: "generated-writes-only",
           reason: "Culinary planning seam (carried over from the Event guard)",
         },
+        {
+          pathIncludes: "convex/lib/venueTaxRates.ts",
+          rule: "generated-writes-only",
+          reason:
+            "A venue's tax-rate list: only this workspace's own rates, only finance staff or a manager, and the Finance switch, which a generated command cannot check (reviewed 2026-10-13)",
+        },
         tppAccountImportException,
       ],
     },
