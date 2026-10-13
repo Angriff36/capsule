@@ -11,7 +11,7 @@
 # 1. Review, then scripts/release.sh. With --reviewer <model> an independent
 #    review ALREADY approved this branch (AGENTS.md merge gate) and the name is
 #    passed on. With no --reviewer this script runs the documented primary
-#    review (Codex gpt-5.6-sol) and continues only on `VERDICT: APPROVE`.
+#    review (Codex gpt-5.6-terra by default) and continues only on `VERDICT: APPROVE`.
 # 2. Takes the [release] commit on origin/main and waits until the production
 #    address serves the Vercel build OF that commit (<site>/version.json).
 # 3. scripts/release-backend-scope.ts decides if anything since the previous
@@ -99,14 +99,17 @@ run_review() {
     echo ""
     echo "A rejection must identify a concrete problem in the changed code and a plausible user or production failure. End with exactly one line: \`VERDICT: APPROVE\` or \`VERDICT: REJECT\`."
   } > "$prompt"
-  echo "deploy-production: independent review by Codex gpt-5.6-sol (log: $log)"
-  # "high", not the config default "xhigh": the owner (2026-09-22) does not
-  # want the release review at the highest reasoning level. It took 20-40
-  # minutes a pass; the verdicts do not need it.
+  # Owner, 2026-10-13: "the review should take 5 minutes, not 50 ... you dont
+  # need to use sol you can use terra or whatever since its faster". Terra at
+  # medium reasoning; DEPLOY_REVIEW_MODEL / DEPLOY_REVIEW_EFFORT override.
+  # (Owner, 2026-09-22: never the config default "xhigh".)
+  local review_model="${DEPLOY_REVIEW_MODEL:-gpt-5.6-terra}"
+  local review_effort="${DEPLOY_REVIEW_EFFORT:-medium}"
+  echo "deploy-production: independent review by Codex $review_model (log: $log)"
   # The review can take 20+ minutes (it may run the test suite itself): print
   # a progress line every minute with the last command the reviewer ran, so a
   # long review is visibly working, never a silent wait.
-  codex -c model="gpt-5.6-sol" -c model_reasoning_effort="high" review - < "$prompt" > "$log" 2>&1 &
+  codex -c model="$review_model" -c model_reasoning_effort="$review_effort" review - < "$prompt" > "$log" 2>&1 &
   local review_pid=$! started=$SECONDS last=$SECONDS every="${DEPLOY_REVIEW_PROGRESS_SECONDS:-60}"
   while kill -0 "$review_pid" 2>/dev/null; do
     sleep 1
@@ -122,8 +125,8 @@ run_review() {
   answer="$(awk '/^codex$/ { buffer = "" ; next } { buffer = buffer "\n" $0 } END { print buffer }' "$log")"
   case "$answer" in
     *"VERDICT: REJECT"*) fail "the review REJECTED $branch. Read $log, fix the blocker, run this again" ;;
-    *"VERDICT: APPROVE"*) reviewer="gpt-5.6-sol" ;;
-    *) fail "the review gave no verdict. Read $log. If it approved, run this again with --reviewer gpt-5.6-sol" ;;
+    *"VERDICT: APPROVE"*) reviewer="$review_model" ;;
+    *) fail "the review gave no verdict. Read $log. If it approved, run this again with --reviewer $review_model" ;;
   esac
 }
 
