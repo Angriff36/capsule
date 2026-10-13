@@ -25,6 +25,10 @@ const certificationTypes = [
   ["drivers_license_class_c", "Driver's license — Class C"],
 ] as const;
 
+const typeLabel = (type: string | null | undefined) =>
+  certificationTypes.find(([value]) => value === type)?.[1] ??
+  (type ? type.replace(/_/g, " ") : "Unclassified");
+
 function expiryLabel(expiresAt: number | undefined, now: number) {
   if (expiresAt == null) return null;
   if (expiresAt < now) {
@@ -271,14 +275,10 @@ export function QualificationsPage() {
                     </td>
                     <td data-label="Qualification">
                       {row.name}
-                      <small>
-                        {certificationTypes.find(
-                          ([value]) => value === row.certificationType,
-                        )?.[1] ??
-                          (row.certificationType
-                            ? row.certificationType.replace(/_/g, " ")
-                            : "Unclassified")}
-                      </small>
+                      {/* The type line only when it says more than the name. */}
+                      {typeLabel(row.certificationType) === row.name ? null : (
+                        <small>{typeLabel(row.certificationType)}</small>
+                      )}
                     </td>
                     <td data-label="Issuing body">{row.issuingBody || "—"}</td>
                     <td data-label="Issued">
