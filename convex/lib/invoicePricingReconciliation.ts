@@ -21,6 +21,7 @@ import { TenantSystemCommandRunner } from "./tenantSystemCommandRunner";
 import { calculateInvoiceTax, type InvoiceLineDraft } from "../../src/features/finance/invoiceTax";
 import { LedgerMoney } from "../../src/lib/ledgerMoney";
 import { applyAcceptedDeposit } from "./proposalDepositSeed";
+import { taxRatesFor } from "./venueTaxRates";
 import { eventReconciliationReceipt } from "./reconciliationReceipt";import type { ReconciliationReceiptOutput, TimingWindow } from "./reconciliationReceipt";
 
 /** Which ledger command triggered this reconcile — recorded on the receipt. */
@@ -105,10 +106,7 @@ async function eventPriceTotals(
   const client = event.clientId ? await ctx.db.get(event.clientId) : null;
   const taxExempt =
     client?.tenantId === event.tenantId && client.taxExempt === true;
-  const rates = await ctx.db
-    .query("taxRates")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", event.tenantId))
-    .collect();
+  const rates = await taxRatesFor(ctx, event.tenantId, event._id);
   const worked = calculateInvoiceTax(
     [
       {
@@ -473,10 +471,7 @@ async function itemizedFromProposal(
   });
   const client = await ctx.db.get(proposal.clientId as Id<"clients">);
   const taxExempt = client?.tenantId === proposal.tenantId && client.taxExempt === true;
-  const rates = await ctx.db
-    .query("taxRates")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", proposal.tenantId))
-    .collect();
+  const rates = await taxRatesFor(ctx, proposal.tenantId, proposal.eventId);
   // Tax is due on the price after the discount (invoiceTax.ts), the same
   // way the server checks an issued bill.
   const discount = Number(proposal.discountAmount ?? 0);
@@ -627,10 +622,7 @@ export async function retaxDraftForClient(
           unitPrice: Number(line.unitPrice),
         }))
       : [{ id: "0", description: "Catering", category: "food", quantity: 1, unitPrice: current.subtotal }];
-  const rates = await ctx.db
-    .query("taxRates")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", invoice.tenantId))
-    .collect();
+  const rates = await taxRatesFor(ctx, invoice.tenantId, invoice.eventId);
   const discount = Number(invoice.discountAmount ?? 0);
   const worked = calculateInvoiceTax(drafts, rates, taxExempt, discount);
   return {

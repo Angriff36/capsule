@@ -5178,6 +5178,7 @@ export const VenueSchema = z.object({
   latitude: z.number().nullable().optional(),
   longitude: z.number().nullable().optional(),
   timeZone: z.string().nullable().optional(),
+  taxRateIds: z.array(z.string()).nullable().optional(),
   contactName: z.string().nullable().optional(),
   contactEmail: z.string().nullable().optional(),
   contactPhone: z.string().nullable().optional(),
@@ -13891,6 +13892,13 @@ export const VenueSetSocialHandleParamsSchema = z.object({
 });
 
 export type VenueSetSocialHandleParams = z.infer<typeof VenueSetSocialHandleParamsSchema>;
+
+// Command: setTaxRates on Venue
+export const VenueSetTaxRatesParamsSchema = z.object({
+  taxRateIds: z.array(z.string()),
+});
+
+export type VenueSetTaxRatesParams = z.infer<typeof VenueSetTaxRatesParamsSchema>;
 
 // Command: setTimeZone on Venue
 export const VenueSetTimeZoneParamsSchema = z.object({

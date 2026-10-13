@@ -4725,6 +4725,7 @@ Screens (71): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `queries.getLead` - live read
 - `queries.getProposal` - live read
 - `queries.getRevenueAttribution` - live read
+- `queries.getVenue` - live read
 - `queries.listClientCommunicationByClientContactId` - live read
 - `queries.listClientCommunicationByClientId` - live read
 - `queries.listClientCommunicationByEventId` - live read

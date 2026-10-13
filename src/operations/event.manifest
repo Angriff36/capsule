@@ -433,6 +433,9 @@ entity Venue mixin TenantScoped, SoftDeletable {
   // IANA time zone name, for example America/New_York. Unset: the drive-time
   // read uses the kitchen's zone and says so (PL-ROUTES).
   property timeZone: string?
+  // The sales tax rates that apply at this venue (TPP's tax location): ids
+  // of the workspace's tax rates. Empty or unset: every active workspace rate.
+  property taxRateIds: list<string>?
   property encrypted contactName: string?
   property encrypted contactEmail: string?
   property encrypted contactPhone: string?
@@ -691,6 +694,17 @@ entity Venue mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       previousCapacity: previousCapacity
       capacity: capacity
+    }
+  }
+
+  // The tax rates charged at this venue. An empty list goes back to every
+  // active workspace rate.
+  command setTaxRates(taxRateIds: list<string>) {
+    guard self.deletedAt == null
+    mutate taxRateIds = taxRateIds
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
     }
   }
 

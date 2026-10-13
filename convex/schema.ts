@@ -4898,6 +4898,7 @@ export default defineSchema({
     latitude: v.optional(v.union(v.number(), v.null())),
     longitude: v.optional(v.union(v.number(), v.null())),
     timeZone: v.optional(v.union(v.string(), v.null())),
+    taxRateIds: v.optional(v.array(v.union(v.string(), v.null()))),
     contactName: v.optional(v.union(v.string(), v.null())),
     contactEmail: v.optional(v.union(v.string(), v.null())),
     contactPhone: v.optional(v.union(v.string(), v.null())),

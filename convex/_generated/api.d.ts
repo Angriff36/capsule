@@ -286,6 +286,7 @@ import type * as lib_vehicleDeliveryAvailability from "../lib/vehicleDeliveryAva
 import type * as lib_vendorItemPriceHistory from "../lib/vendorItemPriceHistory.js";
 import type * as lib_venueFactsSnapshot from "../lib/venueFactsSnapshot.js";
 import type * as lib_venueReconciliation from "../lib/venueReconciliation.js";
+import type * as lib_venueTaxRates from "../lib/venueTaxRates.js";
 import type * as lib_volumeUnitMl from "../lib/volumeUnitMl.js";
 import type * as logisticsWindow from "../logisticsWindow.js";
 import type * as menuRecipeLookup from "../menuRecipeLookup.js";
@@ -667,6 +668,7 @@ declare const fullApi: ApiFromModules<{
   "lib/vendorItemPriceHistory": typeof lib_vendorItemPriceHistory;
   "lib/venueFactsSnapshot": typeof lib_venueFactsSnapshot;
   "lib/venueReconciliation": typeof lib_venueReconciliation;
+  "lib/venueTaxRates": typeof lib_venueTaxRates;
   "lib/volumeUnitMl": typeof lib_volumeUnitMl;
   logisticsWindow: typeof logisticsWindow;
   menuRecipeLookup: typeof menuRecipeLookup;

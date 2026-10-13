@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import {
   calculateInvoiceTax,
   INVOICE_LINE_CATEGORIES,
+  ratesForVenue,
   roundMoney,
   type InvoiceLineCategory,
   type InvoiceLineDraft,
@@ -30,6 +31,7 @@ import { FINANCE_ROUTES } from "./financeRoutes";
 import { InvoiceEquipmentCharges } from "./InvoiceEquipmentCharges";
 import { InvoiceTravelFee } from "./InvoiceTravelFee";
 import "./taxWorkspace.css";
+import { useGetVenue } from "../../lib/manifest-convex-react";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { useClientsByIds } from "../../lib/useClientDirectory";
 import { ClientSearchSelect } from "../clients/ClientSearchSelect";
@@ -55,6 +57,7 @@ type EventOption = {
   clientId?: string | null;
   startsAt?: number | null;
   deletedAt?: number | null;
+  venueId?: string | null;
 };
 
 /**
@@ -157,12 +160,21 @@ export function InvoiceIssueForm({
     pickedRows?.find((row) => row._id === selectedClientId) ??
     clients.find((row) => row._id === selectedClientId);
   const taxExempt = selectedClient?.taxExempt === true;
-  const activeTaxRates = taxRates.filter(
+  // The event's venue may charge its own rates (the same rule the server
+  // checks the issued bill with).
+  const venueId =
+    events.find((row) => row._id === selectedEventId)?.venueId ?? null;
+  const venue = useGetVenue(venueId ? String(venueId) : "skip");
+  const billRates = useMemo(
+    () => ratesForVenue(taxRates, venueId ? venue : null),
+    [taxRates, venue, venueId],
+  );
+  const activeTaxRates = billRates.filter(
     (rate) => rate.active === true && rate.deletedAt == null,
   );
   const calculation = useMemo(
-    () => calculateInvoiceTax(lines, taxRates, taxExempt, discountAmount),
-    [lines, taxExempt, taxRates, discountAmount],
+    () => calculateInvoiceTax(lines, billRates, taxExempt, discountAmount),
+    [lines, taxExempt, billRates, discountAmount],
   );
   const total = roundMoney(
     Math.max(0, calculation.total - Math.max(0, discountAmount)),
