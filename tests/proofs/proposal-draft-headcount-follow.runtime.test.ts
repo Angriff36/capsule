@@ -106,7 +106,16 @@ async function seedDraft(
 }
 
 async function changeHeadcount(s: Setup, newHeadcount: number): Promise<void> {
-  const version = await readEventVersion(s.events, s.eventId);
+  // The last change's follow-up (the draft's new total moving the event's
+  // price) runs just after it; the page always holds the live version, so
+  // read it once the event has settled.
+  let version = await readEventVersion(s.events, s.eventId);
+  for (let tries = 0; tries < 20; tries++) {
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    const next = await readEventVersion(s.events, s.eventId);
+    if (next === version) break;
+    version = next;
+  }
   await s.runEvent(M.Event_changeHeadcount, {
     docId: s.eventId,
     version,

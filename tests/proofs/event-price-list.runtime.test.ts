@@ -228,4 +228,42 @@ describe("event price list", () => {
       total: 1472.58,
     });
   });
+
+  it("a quote request's priced draft is the event's price list too", async () => {
+    const w = await seedWorld("tenant-event-price-list-quote");
+    // The quote conversion: one draft on the event, priced line by line.
+    const draft = (await w.runSales(api.mutations.Proposal_createViaDraft, {
+      clientId: w.clientId,
+      title: "Proposal for the quote",
+      eventDate: Date.UTC(2026, 11, 5, 18),
+      eventType: "Christmas Party",
+      guestCount: 40,
+      subtotal: 0,
+      taxAmount: 0,
+      discountAmount: 0,
+      total: 0,
+      eventId: w.eventId,
+    })) as { docId: string };
+    await w.sales.mutation(
+      (api.lib as any).proposalPricing.addProposalLineAndRecompute,
+      {
+        proposalId: draft.docId,
+        description: "Traditional Buffet (per person)",
+        pricingBasis: "per_person",
+        unitPrice: 38,
+        quantity: 1,
+      },
+    );
+    // 40 guests × $38
+    expect(await quoted(w)).toBe(1520);
+    const list = (await w.sales.query(
+      (api.lib as any).eventPriceList.forEvent,
+      { eventId: w.eventId },
+    )) as { proposalId: string; generated: boolean; followsEvent: boolean };
+    expect(list).toMatchObject({
+      proposalId: draft.docId,
+      generated: false,
+      followsEvent: true,
+    });
+  });
 });

@@ -23,12 +23,38 @@ const PRICEABLE = new Set(["quote", "planning", "pending_approval", "approved"])
 
 const cents = (value: unknown) => Math.round(Number(value ?? 0) * 100);
 
+/**
+ * The draft that holds this event's price lines: the one "build from event"
+ * keeps, or else the event's only draft (the one a quote request's
+ * conversion priced), never a change of an earlier proposal.
+ */
+async function draftPriceList(
+  ctx: Pick<QueryCtx, "db">,
+  event: Doc<"events">,
+): Promise<Doc<"proposals"> | null> {
+  const generated = await findGeneratedDraft(ctx, event);
+  if (generated?.generationJson != null) return generated;
+  const drafts = (
+    await ctx.db
+      .query("proposals")
+      .withIndex("by_eventId", (q) => q.eq("eventId", event._id))
+      .collect()
+  ).filter(
+    (row) =>
+      row.tenantId === event.tenantId &&
+      row.deletedAt == null &&
+      row.status === "draft",
+  );
+  if (drafts.length !== 1 || drafts[0].replacesProposalId != null) return null;
+  return drafts[0];
+}
+
 /** The proposal that holds this event's price lines, if there is one. */
 async function priceListFor(
   ctx: Pick<QueryCtx, "db">,
   event: Doc<"events">,
 ): Promise<Doc<"proposals"> | null> {
-  const draft = await findGeneratedDraft(ctx, event);
+  const draft = await draftPriceList(ctx, event);
   if (draft) return draft;
   const proposals = (
     await ctx.db
@@ -62,6 +88,8 @@ export const forEvent = query({
       discountPercent:
         list.discountPercent == null ? null : Number(list.discountPercent),
       total: Number(list.total ?? 0),
+      // Built from the event's menu, so "bring in menu changes" can refresh it.
+      generated: list.generationJson != null,
       // The event's price follows the list only while both can still change.
       followsEvent: list.status === "draft" && PRICEABLE.has(String(event.stage)),
     };
@@ -71,8 +99,7 @@ export const forEvent = query({
 /**
  * After the list's totals are worked out again: the event's quoted price
  * becomes the list's total, while the event is still being planned. Only the
- * event's own price list counts, never a second proposal someone drafted by
- * hand for the same event.
+ * event's own price list counts, never a second proposal drafted beside it.
  */
 export async function followEventPriceList(
   ctx: MutationCtx,
@@ -88,8 +115,8 @@ export async function followEventPriceList(
     !PRICEABLE.has(String(event.stage))
   )
     return;
-  const list = await findGeneratedDraft(ctx, event);
-  if (!list || list._id !== proposal._id || list.generationJson == null) return;
+  const list = await draftPriceList(ctx, event);
+  if (!list || list._id !== proposal._id) return;
   const total = Number(proposal.total ?? 0);
   if (cents(event.quotedPrice) === cents(total)) return;
   // A list with no lines yet (a menu with no prices) never wipes the event's

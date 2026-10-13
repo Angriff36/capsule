@@ -65,7 +65,8 @@ export function EventPriceListCard({
         <h3 className="font-display text-xl text-ink">Price list</h3>
         {list ? (
           <div className="flex flex-wrap gap-2">
-            {list.status === "draft" ? (
+            {/* Only a list built from the menu can take in menu changes. */}
+            {list.status === "draft" && list.generated ? (
               <button
                 type="button"
                 className="btn btn-ghost btn-sm"
