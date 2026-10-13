@@ -17,7 +17,8 @@ export function VenueTaxRatesPanel({
     taxRateIds?: (string | null)[] | null;
   };
 }) {
-  const rates = (useListTaxRate() ?? []).filter(
+  const allRates = useListTaxRate();
+  const rates = (allRates ?? []).filter(
     (rate) => rate.deletedAt == null && rate.active === true,
   );
   const setTaxRates = useSetVenueTaxRates();
@@ -26,9 +27,15 @@ export function VenueTaxRatesPanel({
   );
   const [picked, setPicked] = useState<string[]>(saved);
   const [busy, setBusy] = useState(false);
+  // Only rates shown here can be saved: a paused or removed rate left on the
+  // venue is dropped by the next save instead of riding along unseen.
+  const shown = new Set(rates.map((rate) => String(rate._id)));
+  const toSave = picked.filter((id) => shown.has(id));
   const changed =
-    picked.length !== saved.length || picked.some((id) => !saved.includes(id));
+    toSave.length !== saved.length || saved.some((id) => !toSave.includes(id));
 
+  // Nothing to save until the rates are known.
+  if (allRates === undefined) return null;
   return (
     <section className="mt-6 rounded-sm border border-line bg-panel p-4">
       <h2 className="text-lg font-semibold text-ink">
@@ -75,11 +82,11 @@ export function VenueTaxRatesPanel({
             setBusy(true);
             void setTaxRates({
               venueId: venue._id as Id<"venues">,
-              taxRateIds: picked as Id<"taxRates">[],
+              taxRateIds: toSave as Id<"taxRates">[],
             })
               .then(() =>
                 reportActionOk(
-                  picked.length === 0
+                  toSave.length === 0
                     ? "This venue uses every active company tax rate again."
                     : "Tax rates for this venue saved.",
                 ),
