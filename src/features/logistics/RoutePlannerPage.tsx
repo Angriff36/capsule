@@ -404,6 +404,29 @@ export function RoutePlannerPage() {
                 })}
               </tbody>
             </table>
+            {/* A stop that closes before the stop ahead of it opens is missed. */}
+            {orderedStops.map((stop, index) => {
+              const before = orderedStops[index - 1];
+              if (
+                !before ||
+                stop.windowEndsAt == null ||
+                before.windowStartsAt == null ||
+                stop.windowEndsAt > before.windowStartsAt
+              )
+                return null;
+              return (
+                <p
+                  key={`late-${stop._id}`}
+                  className="mt-3 text-base text-warn"
+                  role="status"
+                >
+                  Stop {index + 1} has to be done by{" "}
+                  {formatTime(stop.windowEndsAt)}, but stop {index} doesn't open
+                  until {formatTime(before.windowStartsAt)}. This order misses
+                  stop {index + 1}.
+                </p>
+              );
+            })}
             {manualOrder ? (
               <p className="mt-3 text-base text-ink-2">
                 Your own order (kept on this screen only).{" "}

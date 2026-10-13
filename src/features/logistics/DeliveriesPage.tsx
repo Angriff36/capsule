@@ -294,13 +294,16 @@ export function DeliveriesPage() {
       driverId: String(data.get("driverId") || "") || undefined,
       notes: String(data.get("notes") || "") || undefined,
     };
-    // Reuse a run of this list that is still waiting to go out; a cancelled,
-    // failed or finished run can't be scheduled again, so that makes a new one.
+    // Fill in a run of this list that has no time yet; a run already on the
+    // schedule keeps its place and time, so a second trip (a pickup, a
+    // second drop) is a new run. Cancelled, failed or finished runs can't be
+    // scheduled again either.
     const existing = [...activeRows, ...(pickedPackRuns ?? [])].find(
       (row) =>
         row.deletedAt == null &&
         row.packListId === packListId &&
-        row.status === "scheduled",
+        row.status === "scheduled" &&
+        row.scheduledAt == null,
     );
     void run("create-delivery", async () => {
       if (existing) {
