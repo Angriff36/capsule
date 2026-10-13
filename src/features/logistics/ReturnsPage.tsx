@@ -529,7 +529,10 @@ export function ReturnsPage() {
         </ul>
       )}
       {loading ? null : (
-        <div className="mt-3 flex justify-center">
+        <div className="mt-3 flex items-center justify-center gap-3">
+          <span className="text-sm text-ink-2">
+            Showing events from the last {days} days.
+          </span>
           <button
             type="button"
             className="btn btn-ghost btn-sm"
