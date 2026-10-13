@@ -448,6 +448,22 @@ off a phone screen.)
 All 69 old URLs were opened again: each landed on its new home with its IDs
 and query values, the right heading, and the named section on screen.
 
+Key actions on every working route (87 routes, desktop): on 69, the page's main
+non-destructive button (New…, Add…, Register…, Record…, Issue…, Schedule…,
+Show…) was pressed and a form, panel, dialog or new view opened with no
+script error. The other 18 were checked with their own action: Event Day map
+(open a section sheet, dialog), Event Day picker (open an event), run of show
+(settings sheet), Event setup (New template form), room capacity and lot trace
+(date change re-reads), recipe page (Add ingredient line form), ingredient
+page (Add vendor item), dish page (Edit), team chat (open a channel),
+dispatch (Tomorrow), invoice page (Add payment), invoices (Show closed),
+allergen matrix and import run (read pages, content shown), donation summary
+(year picker; only 2026 has donations). Not pressed on purpose: actions that
+send, approve, delete, publish, void, finalize, merge, compare, or switch
+from TPP — they write real records; Send to client was tested on a test event.
+Print pages (battle board, briefing, map, contract, venue card and packet,
+proposal) were checked for content; their action is the browser's print.
+
 Key actions tried by hand: Finance More menu (opens Tax, More shows Tax),
 Register trailer opens the trailer form, New crew template opens its form
 inside the Roster, a closed part opens from the On this page strip, the rail
