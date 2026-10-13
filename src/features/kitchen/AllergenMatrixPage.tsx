@@ -16,6 +16,7 @@ import { KitchenBookNav } from "./KitchenBookNav";
 import { usePickerAndNamedEvents } from "../facilities/usePickerAndNamedEvents";
 import { useMenuLinesForEvents } from "../facilities/useMenuLinesFor";
 import { useDishesByIds } from "../../lib/useDishesByIds";
+import { useWorkingEventId } from "../events/workingEvent";
 
 const ALLERGENS = CULINARY_ALLERGENS;
 
@@ -75,8 +76,10 @@ export function AllergenMatrixPage() {
   const [params, setParams] = useSearchParams();
   const menus = useListMenu();
 
+  const workingId = useWorkingEventId();
   const menuId = params.get("menu") ?? "";
-  const eventId = params.get("event") ?? "";
+  // No pick yet: start on the event being worked on.
+  const eventId = params.get("event") ?? (menuId ? "" : (workingId ?? ""));
   // The chosen menu's lines only; no menu chosen reads none.
   const chosenMenuDishes = useMenuDishRows(
     menuId && isPlausibleConvexId(menuId) ? menuId : null,
