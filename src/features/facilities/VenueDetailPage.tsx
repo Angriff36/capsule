@@ -908,7 +908,7 @@ export function VenueDetailPage() {
       {/* Photos, floor plans, insurance papers */}
       <AttachmentsSection parentType="venue" parentId={venue._id} />
 
-      <VenueTaxRatesPanel venue={venue} />
+      <VenueTaxRatesPanel key={venue._id} venue={venue} />
 
       <VenueMergePanel venue={venue} />
 

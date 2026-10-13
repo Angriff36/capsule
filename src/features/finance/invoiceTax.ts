@@ -281,5 +281,8 @@ export function ratesForVenue<T extends TaxRateRecord>(
 ): T[] {
   const ids = venue?.taxRateIds;
   if (!ids || ids.length === 0) return [...rates];
-  return rates.filter((rate) => ids.includes(String(rate._id)));
+  const chosen = rates.filter((rate) => ids.includes(String(rate._id)));
+  // A list that names no rate this workspace has (a removed rate) never
+  // leaves a bill untaxed: it falls back to every rate.
+  return chosen.length > 0 ? chosen : [...rates];
 }

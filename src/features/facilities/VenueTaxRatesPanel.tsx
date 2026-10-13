@@ -1,9 +1,8 @@
 import { useState } from "react";
-import {
-  useListTaxRate,
-  useVenueSetTaxRates,
-} from "../../lib/manifest-convex-react";
+import { useListTaxRate } from "../../lib/manifest-convex-react";
+import { useSetVenueTaxRates } from "../../lib/venueTaxRateQueries";
 import { reportActionFail, reportActionOk } from "../../ui/action-result";
+import type { Id } from "../../lib/api";
 
 /**
  * The sales tax charged at this venue (TPP's tax location). With none
@@ -21,7 +20,7 @@ export function VenueTaxRatesPanel({
   const rates = (useListTaxRate() ?? []).filter(
     (rate) => rate.deletedAt == null && rate.active === true,
   );
-  const setTaxRates = useVenueSetTaxRates();
+  const setTaxRates = useSetVenueTaxRates();
   const saved = (venue.taxRateIds ?? []).filter(
     (id): id is string => typeof id === "string",
   );
@@ -75,10 +74,9 @@ export function VenueTaxRatesPanel({
           onClick={() => {
             setBusy(true);
             void setTaxRates({
-              docId: venue._id,
-              version: venue.version,
-              taxRateIds: picked,
-            } as never)
+              venueId: venue._id as Id<"venues">,
+              taxRateIds: picked as Id<"taxRates">[],
+            })
               .then(() =>
                 reportActionOk(
                   picked.length === 0

@@ -74,15 +74,23 @@ describe("runtime proof: tax rates by venue", () => {
       venueType: "banquet_hall",
       capacity: 100,
     });
-    const version = (
-      await owner.run(
-        async (ctx) =>
-          (await ctx.db.get(venue.docId as never)) as { version: number },
-      )
-    ).version;
-    await owner.mutation(M.Venue_setTaxRates, {
-      docId: venue.docId,
-      version,
+    const setForVenue = (
+      api.lib as never as Record<string, Record<string, never>>
+    ).venueTaxRates.setForVenue;
+    // Kitchen staff do not set tax.
+    const cook = proof.asRole({
+      subject: "cook-venue-tax",
+      role: "kitchen_staff",
+      tenantId: TENANT,
+    });
+    await expect(
+      cook.mutation(setForVenue, {
+        venueId: venue.docId,
+        taxRateIds: [String(city._id)],
+      } as never),
+    ).rejects.toThrow(/Finance staff or a manager/);
+    await owner.mutation(setForVenue, {
+      venueId: venue.docId,
       taxRateIds: [String(city._id)],
     } as never);
     const client = await run(M.Client_createViaRegister, {
@@ -129,5 +137,22 @@ describe("runtime proof: tax rates by venue", () => {
     // Taxed with the venue's own rate: issued.
     const issued = await issue("INV-V-2", atVenue);
     expect(issued.docId).toBeTruthy();
+  });
+});
+
+describe("ratesForVenue", () => {
+  it("a venue list that names no real rate never leaves a bill untaxed", () => {
+    const rates = [
+      {
+        _id: "a",
+        name: "City",
+        percentage: 8,
+        appliesToFood: true,
+        active: true,
+      },
+    ];
+    expect(ratesForVenue(rates, { taxRateIds: ["gone"] })).toEqual(rates);
+    expect(ratesForVenue(rates, { taxRateIds: [] })).toEqual(rates);
+    expect(ratesForVenue(rates, { taxRateIds: ["a"] })).toEqual(rates);
   });
 });

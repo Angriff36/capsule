@@ -76465,6 +76465,7 @@ async function __runVenueSetTaxRates(ctx: MutationCtx, { docId, taxRateIds, vers
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may update venues");
     if (!(checkRole(user, "eventAccess"))) throw new Error("Event staff may change venues");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
+    if (!((checkRole(user, "financeAccess") || checkRole(user, "manageAccess")))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }

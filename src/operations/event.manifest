@@ -701,6 +701,8 @@ entity Venue mixin TenantScoped, SoftDeletable {
   // active workspace rate.
   command setTaxRates(taxRateIds: list<string>) {
     guard self.deletedAt == null
+    // Tax is money: finance staff and managers set it, not event staff.
+    guard roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess")
     mutate taxRateIds = taxRateIds
     emit VenueDetailsUpdated {
       venueId: self.id
