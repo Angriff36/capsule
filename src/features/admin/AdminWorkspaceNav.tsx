@@ -1,36 +1,23 @@
-import { NavLink } from "react-router-dom";
-import { useActiveNavLinkInView } from "../../lib/useActiveNavLinkInView";
+import { WorkspaceTabs } from "../../ui/WorkspaceTabs";
 
-const sections = [
-  { label: "Permissions", path: "/admin" },
-  { label: "Announcements", path: "/admin/announcements" },
+const tabs = [
+  { label: "Permissions", path: "/admin", end: true },
   { label: "Company", path: "/admin/branding" },
-  { label: "Data exports", path: "/admin/data-export" },
   { label: "Integrations", path: "/admin/integrations" },
+  { label: "Announcements", path: "/admin/announcements" },
+];
+
+/** The one-time move from TPP and rare admin jobs sit under More. */
+const more = [
+  { label: "Data exports", path: "/admin/data-export" },
   { label: "Imports", path: "/admin/imports" },
   { label: "Compare with TPP", path: "/admin/parallel-run" },
   { label: "Match leftover items", path: "/admin/reconcile" },
   { label: "Switch from TPP", path: "/admin/cutover" },
-] as const;
+];
 
 export function AdminWorkspaceNav() {
-  const navRef = useActiveNavLinkInView<HTMLElement>();
   return (
-    <nav
-      className="kitchen-book-nav"
-      ref={navRef}
-      aria-label="Administration workspace"
-    >
-      {sections.map((section) => (
-        <NavLink
-          key={section.path}
-          to={section.path}
-          end={section.path === "/admin"}
-          className={({ isActive }) => (isActive ? "active" : undefined)}
-        >
-          {section.label}
-        </NavLink>
-      ))}
-    </nav>
+    <WorkspaceTabs label="Administration workspace" tabs={tabs} more={more} />
   );
 }

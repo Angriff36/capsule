@@ -1,36 +1,20 @@
-import { NavLink } from "react-router-dom";
-import { useActiveNavLinkInView } from "../../lib/useActiveNavLinkInView";
+import { WorkspaceTabs } from "../../ui/WorkspaceTabs";
 import { FINANCE_ROUTES, FINANCE_SECTIONS } from "./financeRoutes";
 
-const financeNavigation = [
-  ...FINANCE_SECTIONS,
-  { key: "tips", label: "Tips", path: FINANCE_ROUTES.tips },
-  { key: "taxes", label: "Tax", path: FINANCE_ROUTES.taxes },
-  {
-    key: "revenueAttribution",
-    label: "Attribution",
-    path: FINANCE_ROUTES.revenueAttribution,
-  },
-  { key: "donations", label: "Donations", path: FINANCE_ROUTES.donations },
-] as const;
+/** Daily money work up front; the occasional books under More. */
+const more = [
+  { label: "Tips", path: FINANCE_ROUTES.tips },
+  { label: "Tax", path: FINANCE_ROUTES.taxes },
+  { label: "Attribution", path: FINANCE_ROUTES.revenueAttribution },
+  { label: "Donations", path: FINANCE_ROUTES.donations },
+];
 
 export function FinanceWorkspaceNav() {
-  const navRef = useActiveNavLinkInView<HTMLElement>();
   return (
-    <nav
-      className="kitchen-book-nav"
-      ref={navRef}
-      aria-label="Finance workspace"
-    >
-      {financeNavigation.map((section) => (
-        <NavLink
-          key={section.key}
-          to={section.path}
-          className={({ isActive }) => (isActive ? "active" : undefined)}
-        >
-          {section.label}
-        </NavLink>
-      ))}
-    </nav>
+    <WorkspaceTabs
+      label="Finance workspace"
+      tabs={FINANCE_SECTIONS.map(({ label, path }) => ({ label, path }))}
+      more={more}
+    />
   );
 }

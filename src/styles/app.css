@@ -1129,6 +1129,27 @@
     color: var(--color-brand);
     font-weight: 600;
   }
+  .kitchen-book-nav .workspace-tabs-more {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+    border-radius: 5px;
+    padding: 5px 10px;
+    color: var(--color-ink-2);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+  .kitchen-book-nav .workspace-tabs-more:hover {
+    background: var(--color-panel);
+    color: var(--color-ink);
+  }
+  .kitchen-book-nav .workspace-tabs-more.active {
+    background: var(--color-brand-soft);
+    color: var(--color-brand);
+    font-weight: 600;
+  }
   .component-index-heading {
     display: flex;
     align-items: flex-end;
