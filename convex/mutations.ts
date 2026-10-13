@@ -55190,7 +55190,7 @@ export const ProposalEnhancement_withdraw = mutation({
   },
 });
 
-async function __runProposalLineItemAddLine(ctx: MutationCtx, { docId, proposalId, description, pricingBasis, unitPrice, amount, quantity, unit, sortOrder, notes, menuDishId, overrideReason, equipmentId, travelFee, menuId, version }: any, __creation = false) {
+async function __runProposalLineItemAddLine(ctx: MutationCtx, { docId, proposalId, description, pricingBasis, unitPrice, amount, quantity, unit, sortOrder, notes, menuDishId, overrideReason, equipmentId, travelFee, menuId, feePercent, feeAppliesTo, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -55226,6 +55226,8 @@ async function __runProposalLineItemAddLine(ctx: MutationCtx, { docId, proposalI
       equipmentId: equipmentId,
       travelFee: travelFee,
       menuId: menuId,
+      feePercent: feePercent,
+      feeAppliesTo: feeAppliesTo,
       addedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -55256,6 +55258,8 @@ export const ProposalLineItem_addLine = mutation({
     equipmentId: v.optional(v.string()),
     travelFee: v.optional(v.boolean()),
     menuId: v.optional(v.string()),
+    feePercent: v.optional(v.number()),
+    feeAppliesTo: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },
@@ -55291,6 +55295,8 @@ export const ProposalLineItem_createViaAddLine = mutation({
     equipmentId: v.optional(v.string()),
     travelFee: v.optional(v.boolean()),
     menuId: v.optional(v.string()),
+    feePercent: v.optional(v.number()),
+    feeAppliesTo: v.optional(v.string()),
     idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
@@ -55303,7 +55309,7 @@ export const ProposalLineItem_createViaAddLine = mutation({
     await __assertOwnWorkspaceLinks(ctx, args, [{"name":"proposalId","table":"proposals"},{"name":"menuDishId","table":null},{"name":"equipmentId","table":null},{"name":"menuId","table":null}]);
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { proposalId, description, pricingBasis, unitPrice, amount, quantity, unit, sortOrder, notes, menuDishId, overrideReason, equipmentId, travelFee, menuId } = args;
+    const { proposalId, description, pricingBasis, unitPrice, amount, quantity, unit, sortOrder, notes, menuDishId, overrideReason, equipmentId, travelFee, menuId, feePercent, feeAppliesTo } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       quantity: args.quantity !== undefined ? args.quantity : 1,
@@ -55313,6 +55319,8 @@ export const ProposalLineItem_createViaAddLine = mutation({
       amount: args.amount,
       description: args.description,
       equipmentId: args.equipmentId,
+      feeAppliesTo: args.feeAppliesTo,
+      feePercent: args.feePercent,
       menuDishId: args.menuDishId,
       menuId: args.menuId,
       notes: args.notes,
@@ -55352,6 +55360,8 @@ export const ProposalLineItem_createViaAddLine = mutation({
     doc.equipmentId = equipmentId;
     doc.travelFee = travelFee;
     doc.menuId = menuId;
+    doc.feePercent = feePercent;
+    doc.feeAppliesTo = feeAppliesTo;
     doc.addedAt = Date.now();
     const docId = await ctx.db.insert("proposalLineItems", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, lineItemId: docId, tenantId: doc.tenantId, proposalId: proposalId, description: description, pricingBasis: pricingBasis, unitPrice: unitPrice, amount: amount, _subject: { entity: "ProposalLineItem", command: "addLine", id: docId } };
@@ -55419,7 +55429,7 @@ export const ProposalLineItem_removeLine = mutation({
   },
 });
 
-async function __runProposalLineItemReviseLine(ctx: MutationCtx, { docId, description, pricingBasis, unitPrice, amount, quantity, unit, sortOrder, notes, menuDishId, overrideReason, equipmentId, version }: any, __creation = false) {
+async function __runProposalLineItemReviseLine(ctx: MutationCtx, { docId, description, pricingBasis, unitPrice, amount, quantity, unit, sortOrder, notes, menuDishId, overrideReason, equipmentId, feePercent, feeAppliesTo, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -55451,6 +55461,8 @@ async function __runProposalLineItemReviseLine(ctx: MutationCtx, { docId, descri
       menuDishId: menuDishId,
       overrideReason: overrideReason,
       equipmentId: equipmentId,
+      feePercent: feePercent,
+      feeAppliesTo: feeAppliesTo,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -55476,6 +55488,8 @@ export const ProposalLineItem_reviseLine = mutation({
     menuDishId: v.optional(v.string()),
     overrideReason: v.optional(v.string()),
     equipmentId: v.optional(v.string()),
+    feePercent: v.optional(v.number()),
+    feeAppliesTo: v.optional(v.string()),
     version: v.optional(v.number()),
     idempotencyKey: v.optional(v.string())
   },

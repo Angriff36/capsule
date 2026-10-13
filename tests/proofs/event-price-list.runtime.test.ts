@@ -140,4 +140,61 @@ describe("event price list", () => {
     });
     expect(await quoted(w)).toBe(0);
   });
+
+  it("a fee on part of the bill stays its percent of that part", async () => {
+    const w = await seedWorld("tenant-event-price-list-fee");
+    const built = await generate(w);
+    const add = (args: Record<string, unknown>) =>
+      w.sales.mutation(
+        (api.lib as any).proposalPricing.addProposalLineAndRecompute,
+        { proposalId: built.proposalId, ...args },
+      );
+    // A staff line ($200) and a 10% fee on staff only.
+    await add({
+      description: "Staff: Server (2 × 4 hr)",
+      pricingBasis: "per_unit",
+      unitPrice: 25,
+      quantity: 8,
+      unit: "hr",
+    });
+    await add({
+      description: "Staff admin fee",
+      pricingBasis: "percentage",
+      unitPrice: 10,
+      feePercent: 10,
+      feeAppliesTo: "staff",
+    });
+    const fee = (await liveLines(w, built.proposalId)).find(
+      (line) => line.description === "Staff admin fee",
+    )!;
+    expect(fee).toMatchObject({
+      pricingBasis: "flat",
+      unitPrice: 20,
+      amount: 20,
+    });
+    // $1,515 of food + $200 staff + $20 fee
+    expect((await proposalRow(w, built.proposalId)).total).toBe(1735);
+
+    // More staff hours: the fee follows.
+    const staff = (await liveLines(w, built.proposalId)).find((line) =>
+      line.description.startsWith("Staff:"),
+    )!;
+    await w.sales.mutation(
+      (api.lib as any).proposalPricing.reviseProposalLineAndRecompute,
+      {
+        docId: staff._id,
+        version: staff.version,
+        description: staff.description,
+        pricingBasis: "per_unit",
+        unitPrice: 25,
+        quantity: 12,
+        unit: "hr",
+      },
+    );
+    const after = (await liveLines(w, built.proposalId)).find(
+      (line) => line.description === "Staff admin fee",
+    )!;
+    expect(after.amount).toBe(30);
+    expect((await proposalRow(w, built.proposalId)).total).toBe(1845);
+  });
 });

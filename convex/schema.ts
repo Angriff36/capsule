@@ -3434,6 +3434,8 @@ export default defineSchema({
     equipmentId: v.optional(v.union(v.string(), v.null())),
     travelFee: v.optional(v.union(v.boolean(), v.null())),
     menuId: v.optional(v.union(v.string(), v.null())),
+    feePercent: v.optional(v.union(v.number(), v.null())),
+    feeAppliesTo: v.optional(v.union(v.string(), v.null())),
     addedAt: v.optional(v.union(v.number(), v.null())),
     removedAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),

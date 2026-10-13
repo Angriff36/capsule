@@ -9,6 +9,9 @@ import {
   computeProposalPricing,
   PRICING_BASES,
   PRICING_BASIS_LABELS,
+  FEE_SCOPES,
+  FEE_SCOPE_LABELS,
+  type FeeScope,
   type PricingBasis,
 } from "../../lib/pricing";
 import { useCatalogDishes } from "./useCatalogDishes";
@@ -43,6 +46,8 @@ interface LineEditor {
   menuDishId: string;
   overrideReason: string;
   equipmentId: string;
+  /** For a percent line: "" (the whole bill) or the part it applies to. */
+  feeAppliesTo: string;
 }
 
 const emptyEditor = (id: string | "new"): LineEditor => ({
@@ -55,6 +60,7 @@ const emptyEditor = (id: string | "new"): LineEditor => ({
   menuDishId: "",
   overrideReason: "",
   equipmentId: "",
+  feeAppliesTo: "",
 });
 
 /**
@@ -152,6 +158,12 @@ export function ProposalPricingPanel({
     const overrideReason = editor.overrideReason.trim() || undefined;
     const equipmentId = (editor.equipmentId || undefined) as
       Id<"equipments"> | undefined;
+    // A percent of only part of the bill: the server stores it as a fee that
+    // follows that part.
+    const fee =
+      pricingBasis === "percentage" && editor.feeAppliesTo
+        ? { feePercent: unitPrice, feeAppliesTo: editor.feeAppliesTo }
+        : {};
 
     if (editor.id === "new") {
       const nextSortOrder =
@@ -168,6 +180,7 @@ export function ProposalPricingPanel({
           menuDishId,
           overrideReason,
           equipmentId,
+          ...fee,
         }),
       );
     } else {
@@ -185,6 +198,7 @@ export function ProposalPricingPanel({
           menuDishId,
           overrideReason,
           equipmentId,
+          ...fee,
         }),
       );
     }
@@ -263,12 +277,16 @@ export function ProposalPricingPanel({
                   ) : null}
                 </td>
                 <td data-label="Basis">
-                  {PRICING_BASIS_LABELS[row.pricingBasis as PricingBasis]}
+                  {row.feeAppliesTo
+                    ? `% of ${FEE_SCOPE_LABELS[row.feeAppliesTo as FeeScope] ?? row.feeAppliesTo}`
+                    : PRICING_BASIS_LABELS[row.pricingBasis as PricingBasis]}
                 </td>
                 <td className="tabular-nums" data-label="Price / %">
-                  {row.pricingBasis === "percentage"
-                    ? `${Number(row.unitPrice)}%`
-                    : formatMoneyExact(Number(row.unitPrice))}
+                  {row.feeAppliesTo
+                    ? `${Number(row.feePercent)}%`
+                    : row.pricingBasis === "percentage"
+                      ? `${Number(row.unitPrice)}%`
+                      : formatMoneyExact(Number(row.unitPrice))}
                 </td>
                 <td className="tabular-nums" data-label="Qty">
                   {row.pricingBasis === "per_unit"
@@ -290,13 +308,18 @@ export function ProposalPricingPanel({
                         setEditor({
                           id: row._id,
                           description: row.description,
-                          pricingBasis: row.pricingBasis as PricingBasis,
-                          unitPrice: String(row.unitPrice),
+                          pricingBasis: row.feeAppliesTo
+                            ? "percentage"
+                            : (row.pricingBasis as PricingBasis),
+                          unitPrice: String(
+                            row.feeAppliesTo ? row.feePercent : row.unitPrice,
+                          ),
                           quantity: String(row.quantity),
                           unit: row.unit ?? "",
                           menuDishId: row.menuDishId ?? "",
                           overrideReason: row.overrideReason ?? "",
                           equipmentId: row.equipmentId ?? "",
+                          feeAppliesTo: row.feeAppliesTo ?? "",
                         })
                       }
                     >
@@ -358,6 +381,26 @@ export function ProposalPricingPanel({
               ))}
             </select>
           </label>
+          {editor.pricingBasis === "percentage" ? (
+            <label>
+              <span className="field-label">Applies to</span>
+              <select
+                className="input"
+                aria-label="Applies to"
+                value={editor.feeAppliesTo}
+                onChange={(e) =>
+                  setEditor({ ...editor, feeAppliesTo: e.target.value })
+                }
+              >
+                <option value="">The whole bill</option>
+                {FEE_SCOPES.map((scope) => (
+                  <option key={scope} value={scope}>
+                    Only {FEE_SCOPE_LABELS[scope]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
           <label className="min-w-[12rem]">
             <span className="field-label">Catalog dish</span>
             <select
