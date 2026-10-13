@@ -10,6 +10,7 @@ import {
 import { TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { reportActionOk } from "../../ui/action-result";
 import {
   ShiftTypeLifecycleAction,
   TrainingModuleLifecycleAction,
@@ -140,6 +141,9 @@ export function TrainingPage() {
         assessmentScore: Number(data.get("assessmentScore")),
         notes: String(data.get("notes") || "") || undefined,
       });
+      reportActionOk(
+        `Pass recorded for ${personName(String(data.get("personId")))} (${Number(data.get("assessmentScore"))}%).`,
+      );
       form.reset();
       setEditor(null);
     });
