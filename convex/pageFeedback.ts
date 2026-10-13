@@ -96,6 +96,32 @@ export const fileIssue = action({
       issueNumber: issue.number,
       issueUrl: issue.html_url,
     });
+    // GitHub can start a Claude routine only on pull requests and releases,
+    // not on new issues, so Capsule starts the screen-comment routine itself.
+    // A failed start leaves the issue filed; the routine also picks up any
+    // open capsule-feedback issue it has not worked on yet.
+    const routineUrl = process.env.CAPSULE_FEEDBACK_ROUTINE_URL?.trim();
+    const routineToken = process.env.CAPSULE_FEEDBACK_ROUTINE_TOKEN?.trim();
+    if (routineUrl && routineToken) {
+      const started = await fetch(routineUrl, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${routineToken}`,
+          "anthropic-beta": "experimental-cc-routine-2026-04-01",
+          "anthropic-version": "2023-06-01",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: `New screen comment: issue #${issue.number} in ${repo} (${issue.html_url}). Work on this issue.`,
+        }),
+      }).catch((error: unknown) => error);
+      if (!(started instanceof Response) || !started.ok) {
+        console.error(
+          "Screen-comment routine did not start",
+          started instanceof Response ? started.status : started,
+        );
+      }
+    }
     return { issueUrl: issue.html_url };
   },
 });
