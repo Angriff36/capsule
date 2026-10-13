@@ -156,3 +156,35 @@ describe("ratesForVenue", () => {
     expect(ratesForVenue(rates, { taxRateIds: ["a"] })).toEqual(rates);
   });
 });
+
+describe("ratesForVenue with a paused or removed pick", () => {
+  it("falls back to every rate when the venue's rates are all paused or removed", () => {
+    const rates = [
+      {
+        _id: "a",
+        name: "City",
+        percentage: 8,
+        appliesToFood: true,
+        active: false,
+      },
+      {
+        _id: "b",
+        name: "County",
+        percentage: 2,
+        appliesToFood: true,
+        active: true,
+      },
+      {
+        _id: "c",
+        name: "Old",
+        percentage: 1,
+        appliesToFood: true,
+        active: true,
+        deletedAt: 1,
+      },
+    ];
+    expect(ratesForVenue(rates, { taxRateIds: ["a"] })).toEqual(rates);
+    expect(ratesForVenue(rates, { taxRateIds: ["c"] })).toEqual(rates);
+    expect(ratesForVenue(rates, { taxRateIds: ["b"] })).toEqual([rates[1]]);
+  });
+});

@@ -282,7 +282,10 @@ export function ratesForVenue<T extends TaxRateRecord>(
   const ids = venue?.taxRateIds;
   if (!ids || ids.length === 0) return [...rates];
   const chosen = rates.filter((rate) => ids.includes(String(rate._id)));
-  // A list that names no rate this workspace has (a removed rate) never
-  // leaves a bill untaxed: it falls back to every rate.
-  return chosen.length > 0 ? chosen : [...rates];
+  // A list whose rates are all removed or paused never leaves a bill
+  // untaxed: it falls back to every rate.
+  const usable = chosen.some(
+    (rate) => rate.active === true && rate.deletedAt == null,
+  );
+  return usable ? chosen : [...rates];
 }
