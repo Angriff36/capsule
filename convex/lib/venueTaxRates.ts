@@ -53,18 +53,11 @@ export const setForVenue = mutation({
   handler: async (ctx, { venueId, taxRateIds }) => {
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
-    // The workspace's area switches count too: finance staff only while
-    // Finance is on; managers while Manage or Finance is on.
-    const financeOff = orgCapabilityDeniesAction(
-      "financeAccess",
-      auth.disabledCapabilities,
-    );
-    const manageOff = orgCapabilityDeniesAction(
-      "manageAccess",
-      auth.disabledCapabilities,
-    );
+    // Tax is part of the Finance area: when the workspace switches Finance
+    // off, only an owner or admin still sets it.
     const switchedOff =
-      auth.role === "finance_staff" ? financeOff : manageOff && financeOff;
+      orgCapabilityDeniesAction("financeAccess", auth.disabledCapabilities) &&
+      !["owner", "admin", "system"].includes(auth.role);
     if (!TAX_SETTER_ROLES.has(auth.role) || switchedOff)
       throw new ConvexError("Finance staff or a manager sets a venue's tax.");
     const venue = await ctx.db.get(venueId);
