@@ -8,6 +8,8 @@
 
 .kds-header {
   display: flex;
+  /* On a phone the controls drop under the title instead of off the edge. */
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
@@ -26,11 +28,14 @@
 
 .kds-header-controls {
   display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
   gap: 10px;
   align-items: center;
 }
 
 .kds-filter {
+  max-width: 100%;
   background: #2a3733;
   color: #f4f1e8;
   border: 1px solid #45564f;

@@ -206,7 +206,7 @@ export function ContractDocumentPage() {
             <p className="text-2xs font-semibold tracking-[0.16em] text-[var(--document-accent)] uppercase">
               Catering agreement
             </p>
-            <h1 className="mt-2 text-xl font-semibold">{contract.title}</h1>
+            <h2 className="mt-2 text-xl font-semibold">{contract.title}</h2>
             <p className="mt-1 text-base text-ink-2">
               Contract{" "}
               {contract.contractNumber
