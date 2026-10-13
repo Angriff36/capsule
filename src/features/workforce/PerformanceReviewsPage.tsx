@@ -1,3 +1,4 @@
+import { reportActionOk } from "../../ui/action-result";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -114,6 +115,7 @@ export function PerformanceReviewsPage() {
           followUp: text("followUp"),
           followUpDue: followUpDue ? localDateEpoch(followUpDue) : undefined,
         });
+        reportActionOk("Review saved.");
         form.reset();
         setPersonId("");
         setScorecardId("");
