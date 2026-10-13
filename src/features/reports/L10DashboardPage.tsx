@@ -1,4 +1,6 @@
 import { useMemo } from "react";
+import { MergedSection } from "@/ui/MergedSection";
+import { CompanyScorecardDashboardPage } from "./CompanyScorecardDashboardPage";
 import { Link } from "react-router-dom";
 import {
   useListLeadershipItem,
@@ -451,6 +453,9 @@ export function L10DashboardPage() {
           "dashboard.food_cost_percent",
         ]}
       />
+      <MergedSection id="scorecard" title="Company scorecard and targets">
+        <CompanyScorecardDashboardPage />
+      </MergedSection>
     </div>
   );
 }

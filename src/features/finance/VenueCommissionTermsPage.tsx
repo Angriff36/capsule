@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import {
   useCreateVenueCommissionTerm,
   useListVenueCommissionTerm,
@@ -43,6 +44,7 @@ const termStatus = (term: {
 };
 
 export function VenueCommissionTermsPage() {
+  const embedded = useEmbedded();
   const venueTerms = useListVenueCommissionTerm();
   const venues = useListVenue();
   // Creation path: the governed create hook (VenueCommissionTerm_createViaDefine),
@@ -168,22 +170,29 @@ export function VenueCommissionTermsPage() {
 
   return (
     <div className="operations-stage supply-stage tax-stage">
-      <header className="supply-masthead tax-masthead">
-        <div>
-          <p className="eyebrow">Finance · Commission desk</p>
-          <h1 className="display-title mt-2">Venue commission terms</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Define venue commission rates with effective dating. Commissions
-            calculate automatically when attributing event revenue.
-          </p>
-        </div>
-        <div className="tax-period-stamp" aria-label="Commission terms status">
-          <span>Active terms</span>
-          <strong>{activeCount}</strong>
-          <small>{configuredTerms.length} configured</small>
-        </div>
-      </header>
-      <FinanceWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <header className="supply-masthead tax-masthead">
+            <div>
+              <p className="eyebrow">Finance · Commission desk</p>
+              <h1 className="display-title mt-2">Venue commission terms</h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                Define venue commission rates with effective dating. Commissions
+                calculate automatically when attributing event revenue.
+              </p>
+            </div>
+            <div
+              className="tax-period-stamp"
+              aria-label="Commission terms status"
+            >
+              <span>Active terms</span>
+              <strong>{activeCount}</strong>
+              <small>{configuredTerms.length} configured</small>
+            </div>
+          </header>
+          <FinanceWorkspaceNav />
+        </>
+      )}
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (
         <p className="mt-3 text-base text-ink-2" role="status">

@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { Link } from "react-router-dom";
 import {
   useCreatePackRule,
@@ -32,6 +33,7 @@ import {
  * keeps its amount.
  */
 export function PackRulesPage() {
+  const embedded = useEmbedded();
   const rules = useListPackRule() as PackRuleRow[] | undefined;
   // Only the dishes these rules name; the rule form's picker searches.
   const dishes = useDishesByIds(
@@ -124,21 +126,26 @@ export function PackRulesPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        title="Pack rules"
-        lead={
-          <>
-            What an event puts on its{" "}
-            <Link className="link" to="/logistics/packs">
-              pack list
-            </Link>
-            : a dish's tools, what a dish note asks for, napkins per guest,
-            flooring for a grass venue, the bar kit. Every pack list still being
-            packed follows these; an amount set by hand on a list stays.
-          </>
-        }
-      />
-      <LogisticsWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <PageHeader
+            title="Pack rules"
+            lead={
+              <>
+                What an event puts on its{" "}
+                <Link className="link" to="/logistics/packs">
+                  pack list
+                </Link>
+                : a dish's tools, what a dish note asks for, napkins per guest,
+                flooring for a grass venue, the bar kit. Every pack list still
+                being packed follows these; an amount set by hand on a list
+                stays.
+              </>
+            }
+          />
+          <LogisticsWorkspaceNav />
+        </>
+      )}
       {failure ? <LogisticsFailureBanner error={failure} /> : null}
 
       {rules === undefined ? (

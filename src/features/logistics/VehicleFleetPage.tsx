@@ -1,4 +1,6 @@
 import { useState, type FormEvent } from "react";
+import { MergedSection } from "../../ui/MergedSection";
+import { VehicleMaintenancePage } from "./VehicleMaintenancePage";
 import {
   useCreateTrailer,
   useCreateVehicle,
@@ -15,7 +17,7 @@ import {
   useVehicleUpdateRegistration,
 } from "../../lib/manifest-convex-react";
 import { formatStatusLabel } from "../../lib/statusLabels";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
@@ -404,25 +406,21 @@ export function VehicleFleetPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Logistics · Fleet</p>
-          <h1 className="display-title mt-2">Vehicle fleet</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Your own and leased vans, trucks and trailers: plates, insurance,
-            how much each can carry, and whether it is free to go out.
-          </p>
-        </div>
-        <div className="supply-masthead-actions">
-          <button
-            className="btn btn-primary"
-            type="button"
-            onClick={() => setFormMode("create")}
-          >
-            Register {assetLabel}
-          </button>
-        </div>
-      </header>
+      <PageHeader
+        title="Fleet"
+        lead="Vans, trucks and trailers: plates, insurance, what each can carry, whether it is free to go out, and its service and fuel log."
+        actions={
+          <>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={() => setFormMode("create")}
+            >
+              Register {assetLabel}
+            </button>
+          </>
+        }
+      />
 
       <LogisticsWorkspaceNav />
 
@@ -731,6 +729,9 @@ export function VehicleFleetPage() {
           )}
         </section>
       )}
+      <MergedSection id="maintenance" title="Service and fuel">
+        <VehicleMaintenancePage />
+      </MergedSection>
     </div>
   );
 }

@@ -14,18 +14,13 @@ import {
 describe("Logistics routes and lifecycle bindings", () => {
   it("exposes pack list and delivery sections", () => {
     expect(LOGISTICS_SECTIONS.map((section) => section.path)).toEqual([
-      "/logistics/packs",
-      "/logistics/pack-templates",
-      "/logistics/style-kits",
-      "/logistics/pack-rules",
-      "/logistics/floor",
       "/logistics/dispatch",
-      "/logistics/returns",
+      "/logistics/packs",
       "/logistics/deliveries",
-      "/logistics/schedule",
       "/logistics/route",
+      "/logistics/returns",
       "/logistics/fleet",
-      "/logistics/maintenance",
+      "/logistics/pack-templates",
     ]);
   });
 

@@ -1,4 +1,7 @@
 import { useMemo, useState } from "react";
+import { MergedSection } from "../../ui/MergedSection";
+import { FoodCostPercentagePage } from "./FoodCostPercentagePage";
+import { ProfitMarginReportsPage } from "./ProfitMarginReportsPage";
 import { useClientDirectory } from "../../lib/useClientDirectory";
 import {
   useListOrganization,
@@ -7,7 +10,7 @@ import {
 import { useEventsById } from "../facilities/useEventsById";
 import { normalizeCurrencyCode } from "../../lib/format";
 import { formatCurrencyLabel } from "../../lib/currency";
-import { TableSkeleton } from "../../ui/primitives";
+import { PageHeader, TableSkeleton } from "../../ui/primitives";
 import { PieChart } from "../../ui/charts/PieChart";
 import { ReportsWorkspaceNav } from "../reports/ReportsWorkspaceNav";
 import {
@@ -406,22 +409,10 @@ export function RevenueTrendsDashboard({
 
   return (
     <div className="operations-stage supply-stage revenue-stage">
-      <header className="supply-masthead revenue-masthead">
-        <div>
-          <p className="eyebrow">Finance · Revenue intelligence</p>
-          <h1 className="display-title mt-2">Revenue, in season.</h1>
-          <p className="mt-3 max-w-180 text-ink-2">
-            Follow billed invoice revenue through the calendar, see who and what
-            drives it, and compare every period with the same time last year.
-          </p>
-        </div>
-        <div className="revenue-period-stamp" aria-label="Displayed date range">
-          <span>Rolling window</span>
-          <strong>
-            {dateRange.format(trend.rangeStart)} — {dateRange.format(rangeEnd)}
-          </strong>
-        </div>
-      </header>
+      <PageHeader
+        title="Money reports"
+        lead="Billed revenue against last year, food cost as a share of revenue, and what each event, client and period earned."
+      />
       <ReportsWorkspaceNav />
 
       <section className="revenue-controls" aria-label="Revenue chart controls">
@@ -613,22 +604,30 @@ export function RevenueTrendsPage() {
   );
 
   return (
-    <RevenueTrendsDashboard
-      invoices={invoices ?? []}
-      clients={clients ?? []}
-      events={events ?? []}
-      venues={venues}
-      functionalCurrencyCode={functionalCurrencyCode}
-      loading={
-        invoices === undefined ||
-        clients === undefined ||
-        events === undefined ||
-        venueRows === undefined ||
-        organizations === undefined
-      }
-      now={now}
-      granularity={granularity}
-      onGranularityChange={setGranularity}
-    />
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-8">
+      <RevenueTrendsDashboard
+        invoices={invoices ?? []}
+        clients={clients ?? []}
+        events={events ?? []}
+        venues={venues}
+        functionalCurrencyCode={functionalCurrencyCode}
+        loading={
+          invoices === undefined ||
+          clients === undefined ||
+          events === undefined ||
+          venueRows === undefined ||
+          organizations === undefined
+        }
+        now={now}
+        granularity={granularity}
+        onGranularityChange={setGranularity}
+      />
+      <MergedSection id="food-cost" title="Food cost">
+        <FoodCostPercentagePage />
+      </MergedSection>
+      <MergedSection id="profit-margins" title="Profit margins">
+        <ProfitMarginReportsPage />
+      </MergedSection>
+    </div>
   );
 }

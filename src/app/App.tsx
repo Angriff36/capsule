@@ -23,6 +23,7 @@ import { EventTemplatesPage } from "../features/events/EventTemplatesPage";
 import { eventMenuRedirectPath } from "../features/events/eventRoutes";
 import { WorkingEventRouteSync } from "../features/events/workingEvent";
 import { ReviewerToolbar } from "./shell/ReviewerToolbar";
+import { MovedRoute } from "./MovedRoute";
 import { HomeCalendarPage } from "../features/home/HomeCalendarPage";
 import { HomePage } from "../features/home/HomePage";
 import { AllergenMatrixPage } from "../features/kitchen/AllergenMatrixPage";
@@ -102,11 +103,6 @@ const InventoryOverviewPage = lazy(() =>
     default: module.InventoryOverviewPage,
   })),
 );
-const StaffOverviewPage = lazy(() =>
-  import("../features/workforce/StaffOverviewPage").then((module) => ({
-    default: module.StaffOverviewPage,
-  })),
-);
 function RedirectEventMenuAlias() {
   const { id } = useParams();
   return <Navigate to={id ? eventMenuRedirectPath(id) : "/events"} replace />;
@@ -118,16 +114,6 @@ function RedirectPackListAlias() {
   );
 }
 
-const LogisticsOverviewPage = lazy(() =>
-  import("../features/logistics/LogisticsOverviewPage").then((module) => ({
-    default: module.LogisticsOverviewPage,
-  })),
-);
-const FinanceOverviewPage = lazy(() =>
-  import("../features/finance/FinanceOverviewPage").then((module) => ({
-    default: module.FinanceOverviewPage,
-  })),
-);
 const FacilitiesOverviewPage = lazy(() =>
   import("../features/facilities/FacilitiesOverviewPage").then((module) => ({
     default: module.FacilitiesOverviewPage,
@@ -153,19 +139,9 @@ const RosterPage = lazy(() =>
     default: module.RosterPage,
   })),
 );
-const ShiftSwapRequestsPage = lazy(() =>
-  import("../features/workforce/ShiftSwapRequestsPage").then((module) => ({
-    default: module.ShiftSwapRequestsPage,
-  })),
-);
 const TimeSheetPage = lazy(() =>
   import("../features/workforce/TimeSheetPage").then((module) => ({
     default: module.TimeSheetPage,
-  })),
-);
-const TimeOffRequestsPage = lazy(() =>
-  import("../features/workforce/TimeOffRequestsPage").then((module) => ({
-    default: module.TimeOffRequestsPage,
   })),
 );
 const MessagesPage = lazy(() =>
@@ -173,44 +149,14 @@ const MessagesPage = lazy(() =>
     default: module.MessagesPage,
   })),
 );
-const QualificationsPage = lazy(() =>
-  import("../features/workforce/QualificationsPage").then((module) => ({
-    default: module.QualificationsPage,
-  })),
-);
 const TrainingPage = lazy(() =>
   import("../features/workforce/TrainingPage").then((module) => ({
     default: module.TrainingPage,
   })),
 );
-const StaffUtilizationPage = lazy(() =>
-  import("../features/workforce/StaffUtilizationPage").then((module) => ({
-    default: module.StaffUtilizationPage,
-  })),
-);
 const PerformanceReviewsPage = lazy(() =>
   import("../features/workforce/PerformanceReviewsPage").then((module) => ({
     default: module.PerformanceReviewsPage,
-  })),
-);
-const MyReviewsPage = lazy(() =>
-  import("../features/workforce/MyReviewsPage").then((module) => ({
-    default: module.MyReviewsPage,
-  })),
-);
-const RoleScorecardsPage = lazy(() =>
-  import("../features/workforce/RoleScorecardsPage").then((module) => ({
-    default: module.RoleScorecardsPage,
-  })),
-);
-const StaffingTemplatesPage = lazy(() =>
-  import("../features/workforce/StaffingTemplatesPage").then((module) => ({
-    default: module.StaffingTemplatesPage,
-  })),
-);
-const OneOnOnesPage = lazy(() =>
-  import("../features/workforce/OneOnOnesPage").then((module) => ({
-    default: module.OneOnOnesPage,
   })),
 );
 const CandidatesPage = lazy(() =>
@@ -226,16 +172,6 @@ const PackListsPage = lazy(() =>
 const PackListDetailPage = lazy(() =>
   import("../features/logistics/PackListDetailPage").then((module) => ({
     default: module.PackListDetailPage,
-  })),
-);
-const PackRulesPage = lazy(() =>
-  import("../features/logistics/PackRulesPage").then((module) => ({
-    default: module.PackRulesPage,
-  })),
-);
-const ServiceStyleKitsPage = lazy(() =>
-  import("../features/logistics/ServiceStyleKitsPage").then((module) => ({
-    default: module.ServiceStyleKitsPage,
   })),
 );
 const PackListTemplatesPage = lazy(() =>
@@ -263,21 +199,6 @@ const ReturnsPage = lazy(() =>
     default: module.ReturnsPage,
   })),
 );
-const PackingFloorPage = lazy(() =>
-  import("../features/logistics/PackingFloorPage").then((module) => ({
-    default: module.PackingFloorPage,
-  })),
-);
-const VehicleSchedulePage = lazy(() =>
-  import("../features/logistics/VehicleSchedulePage").then((module) => ({
-    default: module.VehicleSchedulePage,
-  })),
-);
-const VehicleMaintenancePage = lazy(() =>
-  import("../features/logistics/VehicleMaintenancePage").then((module) => ({
-    default: module.VehicleMaintenancePage,
-  })),
-);
 const RoutePlannerPage = lazy(() =>
   import("../features/logistics/RoutePlannerPage").then((module) => ({
     default: module.RoutePlannerPage,
@@ -298,29 +219,9 @@ const RevenueTrendsPage = lazy(() =>
     default: module.RevenueTrendsPage,
   })),
 );
-const FoodCostPercentagePage = lazy(() =>
-  import("../features/finance/FoodCostPercentagePage").then((module) => ({
-    default: module.FoodCostPercentagePage,
-  })),
-);
-const FinanceReconciliationPage = lazy(() =>
-  import("../features/finance/FinanceReconciliationPage").then((module) => ({
-    default: module.FinanceReconciliationPage,
-  })),
-);
-const ProfitMarginReportsPage = lazy(() =>
-  import("../features/finance/ProfitMarginReportsPage").then((module) => ({
-    default: module.ProfitMarginReportsPage,
-  })),
-);
 const TaxRatesPage = lazy(() =>
   import("../features/finance/TaxRatesPage").then((module) => ({
     default: module.TaxRatesPage,
-  })),
-);
-const VenueCommissionTermsPage = lazy(() =>
-  import("../features/finance/VenueCommissionTermsPage").then((module) => ({
-    default: module.VenueCommissionTermsPage,
   })),
 );
 const RevenueAttributionsPage = lazy(() =>
@@ -336,11 +237,6 @@ const RevenueAttributionDetailPage = lazy(() =>
 const PaymentsPage = lazy(() =>
   import("../features/finance/PaymentsPage").then((module) => ({
     default: module.PaymentsPage,
-  })),
-);
-const PaymentMethodsPage = lazy(() =>
-  import("../features/finance/PaymentMethodsPage").then((module) => ({
-    default: module.PaymentMethodsPage,
   })),
 );
 const CloseoutPage = lazy(() =>
@@ -378,28 +274,9 @@ const TimsKPIsDashboardPage = lazy(() =>
     default: module.TimsKPIsDashboardPage,
   })),
 );
-const CompanyScorecardDashboardPage = lazy(() =>
-  import("../features/reports/CompanyScorecardDashboardPage").then(
-    (module) => ({
-      default: module.CompanyScorecardDashboardPage,
-    }),
-  ),
-);
 const L10DashboardPage = lazy(() =>
   import("../features/reports/L10DashboardPage").then((module) => ({
     default: module.L10DashboardPage,
-  })),
-);
-const AvgEventValueGrowthDashboardPage = lazy(() =>
-  import("../features/reports/AvgEventValueGrowthDashboardPage").then(
-    (module) => ({
-      default: module.AvgEventValueGrowthDashboardPage,
-    }),
-  ),
-);
-const CompMasterDashboardPage = lazy(() =>
-  import("../features/reports/CompMasterDashboardPage").then((module) => ({
-    default: module.CompMasterDashboardPage,
   })),
 );
 const MangiaDashboardPage = lazy(() =>
@@ -997,14 +874,7 @@ export function App() {
                 </SupplyRoute>
               }
             />
-            <Route
-              path="/staff"
-              element={
-                <SupplyRoute>
-                  <StaffOverviewPage />
-                </SupplyRoute>
-              }
-            />
+            <Route path="/staff" element={<MovedRoute to="/staff/roster" />} />
             <Route
               path="/staff/roster"
               element={
@@ -1015,11 +885,7 @@ export function App() {
             />
             <Route
               path="/staff/swaps"
-              element={
-                <SupplyRoute>
-                  <ShiftSwapRequestsPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/staff/roster" hash="swaps" />}
             />
             <Route
               path="/staff/time"
@@ -1031,11 +897,7 @@ export function App() {
             />
             <Route
               path="/staff/time-off"
-              element={
-                <SupplyRoute>
-                  <TimeOffRequestsPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/staff/time" hash="time-off" />}
             />
             <Route
               path="/staff/messages"
@@ -1048,9 +910,7 @@ export function App() {
             <Route
               path="/staff/qualifications"
               element={
-                <SupplyRoute>
-                  <QualificationsPage />
-                </SupplyRoute>
+                <MovedRoute to="/staff/training" hash="qualifications" />
               }
             />
             <Route
@@ -1071,35 +931,19 @@ export function App() {
             />
             <Route
               path="/staff/my-reviews"
-              element={
-                <SupplyRoute>
-                  <MyReviewsPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/my" hash="my-feedback" />}
             />
             <Route
               path="/staff/scorecards"
-              element={
-                <SupplyRoute>
-                  <RoleScorecardsPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/staff/reviews" hash="scorecards" />}
             />
             <Route
               path="/staff/crew-templates"
-              element={
-                <SupplyRoute>
-                  <StaffingTemplatesPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/staff/roster" hash="crew-templates" />}
             />
             <Route
               path="/staff/one-on-ones"
-              element={
-                <SupplyRoute>
-                  <OneOnOnesPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/staff/reviews" hash="one-on-ones" />}
             />
             <Route
               path="/staff/hiring"
@@ -1111,19 +955,11 @@ export function App() {
             />
             <Route
               path="/staff/utilization"
-              element={
-                <SupplyRoute>
-                  <StaffUtilizationPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/staff/time" hash="utilization" />}
             />
             <Route
               path="/logistics"
-              element={
-                <SupplyRoute>
-                  <LogisticsOverviewPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/logistics/dispatch" />}
             />
             <Route
               path="/logistics/pack-lists"
@@ -1168,17 +1004,13 @@ export function App() {
             <Route
               path="/logistics/style-kits"
               element={
-                <SupplyRoute>
-                  <ServiceStyleKitsPage />
-                </SupplyRoute>
+                <MovedRoute to="/logistics/pack-templates" hash="style-kits" />
               }
             />
             <Route
               path="/logistics/pack-rules"
               element={
-                <SupplyRoute>
-                  <PackRulesPage />
-                </SupplyRoute>
+                <MovedRoute to="/logistics/pack-templates" hash="pack-rules" />
               }
             />
             <Route
@@ -1207,18 +1039,12 @@ export function App() {
             />
             <Route
               path="/logistics/floor"
-              element={
-                <SupplyRoute>
-                  <PackingFloorPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/logistics/packs" hash="floor" />}
             />
             <Route
               path="/logistics/schedule"
               element={
-                <SupplyRoute>
-                  <VehicleSchedulePage />
-                </SupplyRoute>
+                <MovedRoute to="/logistics/deliveries" hash="vehicles" />
               }
             />
             <Route
@@ -1239,19 +1065,11 @@ export function App() {
             />
             <Route
               path="/logistics/maintenance"
-              element={
-                <SupplyRoute>
-                  <VehicleMaintenancePage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/logistics/fleet" hash="maintenance" />}
             />
             <Route
               path="/finance"
-              element={
-                <SupplyRoute>
-                  <FinanceOverviewPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/finance/invoices" />}
             />
             <Route
               path="/finance/invoices"
@@ -1279,27 +1097,17 @@ export function App() {
             />
             <Route
               path="/finance/food-cost"
-              element={
-                <SupplyRoute>
-                  <FoodCostPercentagePage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/finance/revenue" hash="food-cost" />}
             />
             <Route
               path="/finance/profit-margins"
               element={
-                <SupplyRoute>
-                  <ProfitMarginReportsPage />
-                </SupplyRoute>
+                <MovedRoute to="/finance/revenue" hash="profit-margins" />
               }
             />
             <Route
               path="/finance/money-check"
-              element={
-                <SupplyRoute>
-                  <FinanceReconciliationPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/admin/parallel-run" hash="payments" />}
             />
             <Route
               path="/finance/taxes"
@@ -1312,9 +1120,7 @@ export function App() {
             <Route
               path="/finance/commission-terms"
               element={
-                <SupplyRoute>
-                  <VenueCommissionTermsPage />
-                </SupplyRoute>
+                <MovedRoute to="/finance/attribution" hash="commission-terms" />
               }
             />
             <Route
@@ -1322,14 +1128,6 @@ export function App() {
               element={
                 <SupplyRoute>
                   <RevenueAttributionsPage />
-                </SupplyRoute>
-              }
-            />
-            <Route
-              path="/finance/attribution/new"
-              element={
-                <SupplyRoute>
-                  <RevenueAttributionDetailPage />
                 </SupplyRoute>
               }
             />
@@ -1352,9 +1150,7 @@ export function App() {
             <Route
               path="/finance/payment-methods"
               element={
-                <SupplyRoute>
-                  <PaymentMethodsPage />
-                </SupplyRoute>
+                <MovedRoute to="/finance/payments" hash="payment-methods" />
               }
             />
             <Route
@@ -1418,12 +1214,7 @@ export function App() {
             />
             <Route
               path="/reports/scorecard"
-              element={
-                <SupplyRoute>
-                  <ReportsWorkspaceNav />
-                  <CompanyScorecardDashboardPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/reports/l10" hash="scorecard" />}
             />
             <Route
               path="/reports/l10"
@@ -1437,19 +1228,13 @@ export function App() {
             <Route
               path="/reports/avg-event-value"
               element={
-                <SupplyRoute>
-                  <ReportsWorkspaceNav />
-                  <AvgEventValueGrowthDashboardPage />
-                </SupplyRoute>
+                <MovedRoute to="/reports/sales" hash="avg-event-value" />
               }
             />
             <Route
               path="/reports/comp-master"
               element={
-                <SupplyRoute>
-                  <ReportsWorkspaceNav />
-                  <CompMasterDashboardPage />
-                </SupplyRoute>
+                <MovedRoute to="/finance/attribution" hash="comp-master" />
               }
             />
             <Route

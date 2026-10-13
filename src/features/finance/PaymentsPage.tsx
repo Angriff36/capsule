@@ -1,4 +1,6 @@
 import { useState, type FormEvent } from "react";
+import { MergedSection } from "../../ui/MergedSection";
+import { PaymentMethodsPage } from "./PaymentMethodsPage";
 import { useClientsByIds } from "../../lib/useClientDirectory";
 import { clientDisplayName } from "../events/clientName";
 import { Link } from "react-router-dom";
@@ -20,7 +22,7 @@ import {
 import { paymentBreakdown } from "./paymentBreakdown";
 import { formatMoneyExact } from "../../lib/format";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { CommercialLifecyclePolicy } from "./CommercialLifecyclePolicy";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
@@ -300,32 +302,28 @@ export function PaymentsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Finance · Payments</p>
-          <h1 className="display-title mt-2">Payment collection</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Add a payment against a sent invoice, then settle it so the invoice
-            balance applies automatically.
-          </p>
-        </div>
-        <div className="supply-row-actions">
-          <button
-            className="btn btn-ghost"
-            type="button"
-            onClick={() => setShowTerminal((value) => !value)}
-          >
-            {showTerminal ? "Hide settled" : "Show settled"}
-          </button>
-          <button
-            className="btn btn-primary"
-            type="button"
-            onClick={() => setShowRecord((value) => !value)}
-          >
-            {showRecord ? "Close form" : "Add payment"}
-          </button>
-        </div>
-      </header>
+      <PageHeader
+        title="Payments"
+        lead="Record client payments and keep the stored payment methods they use."
+        actions={
+          <>
+            <button
+              className="btn btn-ghost"
+              type="button"
+              onClick={() => setShowTerminal((value) => !value)}
+            >
+              {showTerminal ? "Hide settled" : "Show settled"}
+            </button>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={() => setShowRecord((value) => !value)}
+            >
+              {showRecord ? "Close form" : "Add payment"}
+            </button>
+          </>
+        }
+      />
       <FinanceWorkspaceNav />
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (
@@ -613,6 +611,9 @@ export function PaymentsPage() {
           </div>
         ) : null}
       </section>
+      <MergedSection id="payment-methods" title="Payment methods">
+        <PaymentMethodsPage />
+      </MergedSection>
     </div>
   );
 }

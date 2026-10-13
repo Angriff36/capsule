@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { formatCountNoun } from "../../lib/format";
 import {
   useListPerson,
@@ -32,6 +33,7 @@ const dateTime = new Intl.DateTimeFormat([], {
 });
 
 export function ShiftSwapRequestsPage() {
+  const embedded = useEmbedded();
   // The queue in full; history a page at a time. Shifts, training and
   // time off only for the swaps shown.
   const waiting = useSwapRequestsWithStatus(
@@ -115,13 +117,16 @@ export function ShiftSwapRequestsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        title="Shift swap approvals"
-        lead="Review swaps only after both staff members agree. Approval moves the scheduled shift to its new owner in the same transaction."
-        facts={[{ label: "Ready for review", value: pending.length }]}
-      />
-
-      <WorkforceWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <PageHeader
+            title="Shift swap approvals"
+            lead="Review swaps only after both staff members agree. Approval moves the scheduled shift to its new owner in the same transaction."
+            facts={[{ label: "Ready for review", value: pending.length }]}
+          />
+          <WorkforceWorkspaceNav />
+        </>
+      )}
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
 
       <section className="working-ledger" data-testid="shift-swap-approvals">

@@ -1,4 +1,5 @@
 import { packListName } from "./packListName";
+import { useEmbedded } from "../../ui/embedded";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
@@ -36,6 +37,7 @@ const show = (value: number) =>
  * counting itself happens on the load sheet.
  */
 export function PackingFloorPage() {
+  const embedded = useEmbedded();
   const authStatus = useAuthStatus();
   // Only the open lists and their lines, read by status.
   const floor = usePackListsByStatus(FLOOR_STATUSES, true);
@@ -159,17 +161,21 @@ export function PackingFloorPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        eyebrow="Logistics · Packing"
-        title="Packing floor"
-        lead="Every pack list still to pack or load, soonest event first."
-        facts={[
-          { label: "Lists", value: loading ? "…" : rows.length },
-          { label: "Being packed", value: loading ? "…" : packing },
-          { label: "Needs help", value: loading ? "…" : stuck },
-        ]}
-      />
-      <LogisticsWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <PageHeader
+            eyebrow="Logistics · Packing"
+            title="Packing floor"
+            lead="Every pack list still to pack or load, soonest event first."
+            facts={[
+              { label: "Lists", value: loading ? "…" : rows.length },
+              { label: "Being packed", value: loading ? "…" : packing },
+              { label: "Needs help", value: loading ? "…" : stuck },
+            ]}
+          />
+          <LogisticsWorkspaceNav />
+        </>
+      )}
       {failure ? <LogisticsFailureBanner error={failure} /> : null}
       {notice ? (
         <p className="mt-3 text-base text-ink-2" role="status">

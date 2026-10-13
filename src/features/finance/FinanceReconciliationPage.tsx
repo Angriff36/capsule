@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { useCreateSavedReportDefinition } from "../../lib/manifest-convex-react";
 import { useAllRowsOnRequest } from "../../lib/financeScopedQueries";
 import { useExternalRecordLinksFor } from "../../lib/useExternalRecordLinkLists";
@@ -34,6 +35,7 @@ function endOfDay(value: string): number | null {
  * made, under Reports.
  */
 export function FinanceReconciliationPage() {
+  const embedded = useEmbedded();
   // Only payment rows: the full link list is too long for one read.
   const links = useExternalRecordLinksFor({ recordTypes: ["payment"] });
   // The check covers every Capsule payment ever recorded, so the ledger is
@@ -92,19 +94,23 @@ export function FinanceReconciliationPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Finance · Money check</p>
-          <h1 className="display-title mt-2">Old system against Capsule</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Every payment brought in from the old system next to the Capsule
-            payment it matches, by month. Rows that do not agree are listed with
-            the reason. The same money seen twice and record-only rows are shown
-            but never counted.
-          </p>
-        </div>
-      </header>
-      <AdminWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <header className="supply-masthead">
+            <div>
+              <p className="eyebrow">Finance · Money check</p>
+              <h1 className="display-title mt-2">Old system against Capsule</h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                Every payment brought in from the old system next to the Capsule
+                payment it matches, by month. Rows that do not agree are listed
+                with the reason. The same money seen twice and record-only rows
+                are shown but never counted.
+              </p>
+            </div>
+          </header>
+          <AdminWorkspaceNav />
+        </>
+      )}
       {error ? (
         <p className="mt-3 text-base text-danger" role="alert">
           {error}

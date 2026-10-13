@@ -83,7 +83,10 @@ export function EventTrackerHome() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Link to="/logistics/style-kits" className="btn btn-ghost">
+          <Link
+            to="/logistics/pack-templates#style-kits"
+            className="btn btn-ghost"
+          >
             Style kits
           </Link>
           <Link to="/" className="btn btn-ghost">

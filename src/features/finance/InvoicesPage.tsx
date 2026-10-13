@@ -1,4 +1,7 @@
 import { useClientsByIds } from "../../lib/useClientDirectory";
+import { MergedSection } from "../../ui/MergedSection";
+import { EmbeddedContext } from "../../ui/embedded";
+import { FinanceOverviewPage } from "./FinanceOverviewPage";
 import { useState, type FormEvent } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
@@ -17,7 +20,7 @@ import {
   useBulkRun,
   useBulkSelection,
 } from "../../ui/bulk-select";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import {
   formatCountNoun,
   formatMoney,
@@ -370,39 +373,38 @@ export function InvoicesPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Finance · Invoices</p>
-          <h1 className="display-title mt-2">Client invoices</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Issue an invoice against a client (and optional event), send it for
-            payment, then add and settle payments on the Payments board.
-          </p>
-        </div>
-        <div className="supply-row-actions">
-          <Link className="btn btn-ghost" to={FINANCE_ROUTES.revenue}>
-            Revenue trends
-          </Link>
-          <button
-            className="btn btn-ghost"
-            type="button"
-            onClick={() => setListState({ closed: !showClosed })}
-          >
-            {showClosed ? "Hide closed" : "Show closed"}
-          </button>
-          <button
-            className="btn btn-primary"
-            type="button"
-            onClick={() => {
-              if (showIssue) clearIssuePrefill();
-              setShowIssue((value) => !value);
-            }}
-          >
-            {showIssue ? "Close form" : "Issue invoice"}
-          </button>
-        </div>
-      </header>
+      <PageHeader
+        title="Invoices"
+        lead="What clients owe, what they paid, and where to act next."
+        actions={
+          <>
+            <button
+              className="btn btn-ghost"
+              type="button"
+              onClick={() => setListState({ closed: !showClosed })}
+            >
+              {showClosed ? "Hide closed" : "Show closed"}
+            </button>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={() => {
+                if (showIssue) clearIssuePrefill();
+                setShowIssue((value) => !value);
+              }}
+            >
+              {showIssue ? "Close form" : "Issue invoice"}
+            </button>
+            <Link className="btn btn-ghost" to={FINANCE_ROUTES.revenue}>
+              Revenue trends
+            </Link>
+          </>
+        }
+      />
       <FinanceWorkspaceNav />
+      <EmbeddedContext.Provider value={true}>
+        <FinanceOverviewPage />
+      </EmbeddedContext.Provider>
       {prefillClientId || prefillEventId ? (
         <p className="mt-3 text-base text-ink-2" role="status">
           Showing invoices

@@ -30,7 +30,12 @@ import {
   useWeekNotices,
 } from "../../lib/workforceScopedQueries";
 import { useEventsInRange } from "../facilities/useEventsById";
-import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
+import {
+  EmptyState,
+  PageHeader,
+  StatusChip,
+  TableSkeleton,
+} from "../../ui/primitives";
 import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { reportActionOk } from "../../ui/action-result";
@@ -55,6 +60,12 @@ import { StaffSchedulingSection } from "./StaffSchedulingSection";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
+import { EmbeddedContext } from "../../ui/embedded";
+import { MergedSection } from "../../ui/MergedSection";
+import { ShiftSwapRequestsPage } from "./ShiftSwapRequestsPage";
+import { StaffingTemplatesPage } from "./StaffingTemplatesPage";
+import { StaffOverviewPage } from "./StaffOverviewPage";
+import { StaffPayRatesSection } from "./StaffPayRatesSection";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { addLocalDateTimeHours } from "../../ui/naturalDate";
 import {
@@ -590,19 +601,19 @@ export function RosterPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Staff · Roster</p>
-          <h1 className="display-title mt-2">Event staffing roster</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Assign people to events and schedule shifts. Staff confirm, check in
-            and out of their own work; managers control the rest.
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        title="Staff roster"
+        lead="Assign people to events and schedule shifts. Staff confirm, check in and out of their own work; managers control the rest."
+      />
       <WorkforceWorkspaceNav />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
       {host}
+      <EmbeddedContext.Provider value={true}>
+        <StaffOverviewPage />
+      </EmbeddedContext.Provider>
+      <MergedSection id="swaps" title="Shift swaps">
+        <ShiftSwapRequestsPage />
+      </MergedSection>
 
       {loading ? null : (
         <RosterAttentionSection
@@ -1195,6 +1206,10 @@ export function RosterPage() {
           </div>
         )}
       </section>
+      <StaffPayRatesSection people={people} />
+      <MergedSection id="crew-templates" title="Crew templates">
+        <StaffingTemplatesPage />
+      </MergedSection>
     </div>
   );
 }

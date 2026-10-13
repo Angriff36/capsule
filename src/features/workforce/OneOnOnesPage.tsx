@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import {
   useCreateOneOnOne,
   useCreateOneOnOneAction,
@@ -44,6 +45,7 @@ function localDateEpoch(value: FormDataEntryValue | null): number | undefined {
 }
 
 export function OneOnOnesPage() {
+  const embedded = useEmbedded();
   // The newest meetings, more on request, and only their actions.
   const meetingPages = useOneOnOnePages();
   const meetings = meetingPages.rows;
@@ -187,20 +189,8 @@ export function OneOnOnesPage() {
 
   return (
     <div className="operations-stage">
-      <header className="training-masthead">
-        <div>
-          <p className="eyebrow">Staff · One-on-Ones</p>
-          <h1 className="display-title mt-2">
-            Recurring conversations, captured and carried forward.
-          </h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Record each one-on-one — agenda, goals, wins, opportunities, and
-            decisions — then track follow-up actions by owner and due date. Open
-            actions roll into the next meeting, and closing one never rewrites
-            the one before it.
-          </p>
-        </div>
-        <div aria-label="One-on-one actions">
+      {embedded ? (
+        <div className="flex flex-wrap gap-2">
           <button
             className="btn btn-primary"
             onClick={() => (open ? setOpen(false) : startNew())}
@@ -208,9 +198,34 @@ export function OneOnOnesPage() {
             {open ? "Close" : "New one-on-one"}
           </button>
         </div>
-      </header>
+      ) : (
+        <>
+          <header className="training-masthead">
+            <div>
+              <p className="eyebrow">Staff · One-on-Ones</p>
+              <h1 className="display-title mt-2">
+                Recurring conversations, captured and carried forward.
+              </h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                Record each one-on-one — agenda, goals, wins, opportunities, and
+                decisions — then track follow-up actions by owner and due date.
+                Open actions roll into the next meeting, and closing one never
+                rewrites the one before it.
+              </p>
+            </div>
+            <div aria-label="One-on-one actions">
+              <button
+                className="btn btn-primary"
+                onClick={() => (open ? setOpen(false) : startNew())}
+              >
+                {open ? "Close" : "New one-on-one"}
+              </button>
+            </div>
+          </header>
 
-      <WorkforceWorkspaceNav />
+          <WorkforceWorkspaceNav />
+        </>
+      )}
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
 
       {open ? (

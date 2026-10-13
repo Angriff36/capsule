@@ -1,25 +1,9 @@
 export const WORKFORCE_SECTIONS = [
   { key: "roster", label: "Roster", path: "/staff/roster" },
-  {
-    key: "crew-templates",
-    label: "Crew templates",
-    path: "/staff/crew-templates",
-  },
-  { key: "swaps", label: "Shift swaps", path: "/staff/swaps" },
-  { key: "time", label: "Time & availability", path: "/staff/time" },
-  { key: "time-off", label: "Time off", path: "/staff/time-off" },
+  { key: "time", label: "Time", path: "/staff/time" },
   { key: "messages", label: "Team chat", path: "/staff/messages" },
-  { key: "utilization", label: "Utilization", path: "/staff/utilization" },
-  {
-    key: "qualifications",
-    label: "Qualifications",
-    path: "/staff/qualifications",
-  },
-  { key: "training", label: "Training", path: "/staff/training" },
-  { key: "reviews", label: "Reviews", path: "/staff/reviews" },
-  { key: "my-reviews", label: "My reviews", path: "/staff/my-reviews" },
-  { key: "scorecards", label: "Scorecards", path: "/staff/scorecards" },
-  { key: "one-on-ones", label: "One-on-ones", path: "/staff/one-on-ones" },
+  { key: "training", label: "Skills & training", path: "/staff/training" },
+  { key: "reviews", label: "Performance", path: "/staff/reviews" },
   { key: "hiring", label: "Hiring", path: "/staff/hiring" },
 ] as const;
 

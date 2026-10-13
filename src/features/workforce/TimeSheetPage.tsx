@@ -1,4 +1,7 @@
 import { useState, type FormEvent } from "react";
+import { MergedSection } from "../../ui/MergedSection";
+import { StaffUtilizationPage } from "./StaffUtilizationPage";
+import { TimeOffRequestsPage } from "./TimeOffRequestsPage";
 import { inPickerWindow } from "../facilities/usePickerAndNamedEvents";
 import {
   useAvailabilityWindowWithdraw,
@@ -18,7 +21,7 @@ import {
   useShiftsInWindow,
   useTimeRecordPages,
 } from "../../lib/workforceScopedQueries";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import {
   formatCountNoun,
@@ -601,37 +604,36 @@ export function TimeSheetPage() {
   return (
     <div className="operations-stage supply-stage">
       {host}
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Staff · Time</p>
-          <h1 className="display-title mt-2">Time sheet & availability</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Clock your team in and out, attach the hours to an event, and keep
-            everyone&apos;s availability up to date.
-          </p>
-        </div>
-        <div className="supply-row-actions">
-          <button
-            className="btn btn-primary"
-            onClick={() =>
-              setShowForm((value) => (value === "clockIn" ? null : "clockIn"))
-            }
-          >
-            {showForm === "clockIn" ? "Close form" : "Clock in"}
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() =>
-              setShowForm((value) => (value === "declare" ? null : "declare"))
-            }
-          >
-            {showForm === "declare" ? "Close form" : "Declare availability"}
-          </button>
-        </div>
-      </header>
+      <PageHeader
+        title="Time"
+        lead="Clock your team in and out, attach the hours to an event, keep availability current, and decide time-off requests."
+        actions={
+          <>
+            <button
+              className="btn btn-primary"
+              onClick={() =>
+                setShowForm((value) => (value === "clockIn" ? null : "clockIn"))
+              }
+            >
+              {showForm === "clockIn" ? "Close form" : "Clock in"}
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={() =>
+                setShowForm((value) => (value === "declare" ? null : "declare"))
+              }
+            >
+              {showForm === "declare" ? "Close form" : "Declare availability"}
+            </button>
+          </>
+        }
+      />
       <WorkforceWorkspaceNav />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
       <TimeAttentionPanel shifts={shifts} onFailure={setFailure} />
+      <MergedSection id="time-off" title="Time off">
+        <TimeOffRequestsPage />
+      </MergedSection>
 
       {showForm === "clockIn" ? (
         <TimeSheetClockInForm
@@ -967,6 +969,9 @@ export function TimeSheetPage() {
           </button>
         ) : null}
       </section>
+      <MergedSection id="utilization" title="Hours used">
+        <StaffUtilizationPage />
+      </MergedSection>
     </div>
   );
 }

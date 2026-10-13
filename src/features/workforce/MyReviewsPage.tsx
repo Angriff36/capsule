@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useEmbedded } from "../../ui/embedded";
 import { useMyReviews } from "../../lib/staffSelfReviews";
 import { TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate } from "../../lib/format";
@@ -11,23 +12,28 @@ import "./TrainingPage.css";
 // ratings/date/reviewer/event the reviewed staff member is meant to see; the
 // manager-private `notes` never reach this view.
 export function MyReviewsPage() {
+  const embedded = useEmbedded();
   const reviews = useMyReviews();
 
   return (
     <div className="operations-stage">
-      <header className="training-masthead">
-        <div>
-          <p className="eyebrow">Staff · My reviews</p>
-          <h1 className="display-title mt-2">Your performance feedback.</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            The recorded reviews of your work — reliability, quality, and
-            teamwork — as context for your growth. Your manager may keep written
-            notes private to management.
-          </p>
-        </div>
-      </header>
+      {embedded ? null : (
+        <>
+          <header className="training-masthead">
+            <div>
+              <p className="eyebrow">Staff · My reviews</p>
+              <h1 className="display-title mt-2">Your performance feedback.</h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                The recorded reviews of your work — reliability, quality, and
+                teamwork — as context for your growth. Your manager may keep
+                written notes private to management.
+              </p>
+            </div>
+          </header>
 
-      <WorkforceWorkspaceNav />
+          <WorkforceWorkspaceNav />
+        </>
+      )}
 
       <section className="working-ledger">
         <div className="ledger-heading">

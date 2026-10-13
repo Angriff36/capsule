@@ -1,4 +1,6 @@
 import { packListName } from "./packListName";
+import { EmbeddedContext } from "../../ui/embedded";
+import { LogisticsOverviewPage } from "./LogisticsOverviewPage";
 import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
@@ -272,6 +274,9 @@ export function DispatchBoardPage() {
         }
       />
       <LogisticsWorkspaceNav />
+      <EmbeddedContext.Provider value={true}>
+        <LogisticsOverviewPage />
+      </EmbeddedContext.Provider>
       {failure ? <LogisticsFailureBanner error={failure} /> : null}
       {notice ? (
         <p className="mt-3 text-base text-ink-2" role="status">

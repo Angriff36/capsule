@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { useListVenue } from "../../lib/manifest-convex-react";
 import { useCloseoutsForEventWindow } from "../../lib/financeScopedQueries";
 import { TableSkeleton } from "../../ui/primitives";
@@ -168,6 +169,7 @@ export function FoodCostPercentageDashboard({
   /** The page reads only the closeouts of the periods shown. */
   onGranularityChange?: (granularity: FoodCostGranularity) => void;
 }) {
+  const embedded = useEmbedded();
   const [granularity, setGranularity] = useState<FoodCostGranularity>("month");
   useEffect(() => {
     onGranularityChange?.(granularity);
@@ -223,28 +225,33 @@ export function FoodCostPercentageDashboard({
 
   return (
     <div className="operations-stage supply-stage food-cost-stage">
-      <header className="supply-masthead food-cost-masthead">
-        <div>
-          <p className="eyebrow">Finance · Cost intelligence</p>
-          <h1 className="display-title mt-2">Keep the plate in balance.</h1>
-          <p className="mt-3 max-w-180 text-ink-2">
-            See ingredient cost as a share of reconciled event revenue, follow
-            the ratio over time, and spot periods drifting above target.
-          </p>
-        </div>
-        <div
-          className="food-cost-range-stamp"
-          aria-label="Displayed date range"
-        >
-          <span>Service window</span>
-          <strong>
-            {formatDate(report.rangeStart.getTime())} —{" "}
-            {formatDate(inclusiveRangeEnd.getTime())}
-          </strong>
-          <small>finalized closeouts only</small>
-        </div>
-      </header>
-      <ReportsWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <header className="supply-masthead food-cost-masthead">
+            <div>
+              <p className="eyebrow">Finance · Cost intelligence</p>
+              <h1 className="display-title mt-2">Keep the plate in balance.</h1>
+              <p className="mt-3 max-w-180 text-ink-2">
+                See ingredient cost as a share of reconciled event revenue,
+                follow the ratio over time, and spot periods drifting above
+                target.
+              </p>
+            </div>
+            <div
+              className="food-cost-range-stamp"
+              aria-label="Displayed date range"
+            >
+              <span>Service window</span>
+              <strong>
+                {formatDate(report.rangeStart.getTime())} —{" "}
+                {formatDate(inclusiveRangeEnd.getTime())}
+              </strong>
+              <small>finalized closeouts only</small>
+            </div>
+          </header>
+          <ReportsWorkspaceNav />
+        </>
+      )}
 
       <section
         className="food-cost-controls"

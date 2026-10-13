@@ -1,11 +1,6 @@
 export const FINANCE_SECTIONS = [
   { key: "invoices", label: "Invoices", path: "/finance/invoices" },
   { key: "payments", label: "Payments", path: "/finance/payments" },
-  {
-    key: "paymentMethods",
-    label: "Payment methods",
-    path: "/finance/payment-methods",
-  },
   { key: "closeout", label: "Closeout", path: "/finance/closeout" },
   { key: "payroll", label: "Payroll", path: "/finance/payroll" },
 ] as const;
@@ -33,31 +28,31 @@ export class InvoiceIssueLinkBuilder {
 export const invoiceIssueLinkBuilder = new InvoiceIssueLinkBuilder();
 
 export const FINANCE_ROUTES = {
-  root: "/finance",
+  root: "/finance/invoices",
   invoices: INVOICES_PATH,
   invoiceDetail: (id: string) => `${INVOICES_PATH}/${id}`,
   issueInvoice: (prefill: InvoiceIssuePrefill = {}) =>
     invoiceIssueLinkBuilder.build(prefill),
   taxes: "/finance/taxes",
   payments: "/finance/payments",
-  paymentMethods: "/finance/payment-methods",
+  paymentMethods: "/finance/payments#payment-methods",
   revenue: "/finance/revenue",
-  foodCost: "/finance/food-cost",
-  profitMargins: "/finance/profit-margins",
-  reconciliation: "/finance/money-check",
+  foodCost: "/finance/revenue#food-cost",
+  profitMargins: "/finance/revenue#profit-margins",
+  reconciliation: "/admin/parallel-run#payments",
   closeout: "/finance/closeout",
   donations: "/finance/donations",
   payroll: "/finance/payroll",
   tips: "/finance/tips",
-  venueCommissionTerms: "/finance/commission-terms",
+  venueCommissionTerms: "/finance/attribution#commission-terms",
   revenueAttribution: "/finance/attribution",
   revenueAttributionDetail: (id: string, mode?: string) =>
     mode ? `/finance/attribution/${id}/${mode}` : `/finance/attribution/${id}`,
   salesDashboard: "/reports/sales",
   timsKpis: "/reports/tims-kpis",
-  scorecard: "/reports/scorecard",
+  scorecard: "/reports/l10#scorecard",
   l10: "/reports/l10",
-  avgEventValue: "/reports/avg-event-value",
-  compMaster: "/reports/comp-master",
+  avgEventValue: "/reports/sales#avg-event-value",
+  compMaster: "/finance/attribution#comp-master",
   mangia: "/reports/mangia",
 } as const;

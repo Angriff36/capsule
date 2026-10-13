@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { Link } from "react-router-dom";
 import { useListVehicle } from "../../lib/manifest-convex-react";
 import { useEventsById, useEventsInRange } from "../facilities/useEventsById";
@@ -35,6 +36,7 @@ type AttentionRow = {
 };
 
 export function LogisticsOverviewPage() {
+  const embedded = useEmbedded();
   // What the cards count: runs still on the road, open pack lists, and the
   // runs of today's events and of those lists' events. Not every row the
   // company ever had.
@@ -176,11 +178,15 @@ export function LogisticsOverviewPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        title="Logistics"
-        lead="What's moving today, what's ready to roll, and what's stuck."
-      />
-      <LogisticsWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <PageHeader
+            title="Logistics"
+            lead="What's moving today, what's ready to roll, and what's stuck."
+          />
+          <LogisticsWorkspaceNav />
+        </>
+      )}
 
       <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-line bg-line lg:grid-cols-4">
         <div className="bg-panel px-4 py-3">

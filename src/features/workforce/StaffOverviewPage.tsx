@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useEmbedded } from "../../ui/embedded";
 import { useState } from "react";
 import { useListPerson } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
@@ -34,6 +35,7 @@ interface AttentionRow {
 }
 
 export function StaffOverviewPage() {
+  const embedded = useEmbedded();
   const people = useListPerson();
   const tenantId = useAuthStatus()?.tenantId;
   // Only what the page counts: shifts in the coming week, requests waiting
@@ -108,7 +110,7 @@ export function StaffOverviewPage() {
         request.endsAt,
       )}`,
       status: String(request.status),
-      to: "/staff/time-off",
+      to: "/staff/time#time-off",
       at: request.createdAt ?? 0,
     })),
     ...pendingSwaps.map((request) => ({
@@ -116,7 +118,7 @@ export function StaffOverviewPage() {
       title: personName(request.requesterPersonId),
       detail: `Shift swap with ${personName(request.recipientPersonId)}`,
       status: String(request.status),
-      to: "/staff/swaps",
+      to: "/staff/roster#swaps",
       at: request.createdAt ?? 0,
     })),
     ...unconfirmedAssignments.map((assignment) => ({
@@ -135,11 +137,15 @@ export function StaffOverviewPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        title="Staff"
-        lead="What needs your attention about staffing today."
-      />
-      <WorkforceWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <PageHeader
+            title="Staff"
+            lead="What needs your attention about staffing today."
+          />
+          <WorkforceWorkspaceNav />
+        </>
+      )}
 
       <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-line bg-line lg:grid-cols-4">
         <div className="bg-panel px-4 py-3">
@@ -216,7 +222,7 @@ export function StaffOverviewPage() {
         )}
       </Section>
 
-      <StaffPayRatesSection people={people} />
+      {embedded ? null : <StaffPayRatesSection people={people} />}
     </div>
   );
 }

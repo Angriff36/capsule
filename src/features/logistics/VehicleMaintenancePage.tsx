@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { formatDate } from "../../lib/format";
 import {
   useCreateVehicleFuelLog,
@@ -88,6 +89,7 @@ function localDateTime(value: number): string {
 }
 
 export function VehicleMaintenancePage() {
+  const embedded = useEmbedded();
   const vehicles = useListVehicle() as VehicleRow[] | undefined;
   const schedules = useListVehicleMaintenanceSchedule() as
     ScheduleRow[] | undefined;
@@ -307,17 +309,8 @@ export function VehicleMaintenancePage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Logistics · Maintenance</p>
-          <h1 className="display-title mt-2">Vehicle maintenance log</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Log mileage, fuel costs, and service events per vehicle. Set time-
-            or mileage-based service intervals and keep compliance current with
-            due alerts.
-          </p>
-        </div>
-        <div className="supply-masthead-actions">
+      {embedded ? (
+        <div className="flex flex-wrap items-center gap-2">
           <button
             className="btn btn-ghost"
             type="button"
@@ -333,9 +326,43 @@ export function VehicleMaintenancePage() {
             {panel === "schedule" ? "Close scheduler" : "Schedule maintenance"}
           </button>
         </div>
-      </header>
+      ) : (
+        <>
+          <header className="supply-masthead">
+            <div>
+              <p className="eyebrow">Logistics · Maintenance</p>
+              <h1 className="display-title mt-2">Vehicle maintenance log</h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                Log mileage, fuel costs, and service events per vehicle. Set
+                time- or mileage-based service intervals and keep compliance
+                current with due alerts.
+              </p>
+            </div>
+            <div className="supply-masthead-actions">
+              <button
+                className="btn btn-ghost"
+                type="button"
+                onClick={() => setPanel(panel === "fuel" ? "none" : "fuel")}
+              >
+                {panel === "fuel" ? "Close fuel log" : "Log fuel"}
+              </button>
+              <button
+                className="btn btn-primary"
+                type="button"
+                onClick={() =>
+                  setPanel(panel === "schedule" ? "none" : "schedule")
+                }
+              >
+                {panel === "schedule"
+                  ? "Close scheduler"
+                  : "Schedule maintenance"}
+              </button>
+            </div>
+          </header>
 
-      <LogisticsWorkspaceNav />
+          <LogisticsWorkspaceNav />
+        </>
+      )}
 
       <div
         className="mt-3 flex gap-4 text-base text-ink-2"

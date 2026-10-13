@@ -5,15 +5,10 @@ import { useActiveNavLinkInView } from "../../lib/useActiveNavLinkInView";
  *  work (invoices, payments, closeout); reading the numbers lives here. */
 const sections = [
   { label: "Saved reports", path: "/reports" },
-  { label: "Revenue", path: "/finance/revenue" },
-  { label: "Food cost", path: "/finance/food-cost" },
-  { label: "Profit margins", path: "/finance/profit-margins" },
+  { label: "Money", path: "/finance/revenue" },
   { label: "Sales", path: "/reports/sales" },
-  { label: "Avg event value", path: "/reports/avg-event-value" },
   { label: "Tim's KPIs", path: "/reports/tims-kpis" },
   { label: "L10", path: "/reports/l10" },
-  { label: "Scorecard", path: "/reports/scorecard" },
-  { label: "Comp Master", path: "/reports/comp-master" },
   { label: "Mangia", path: "/reports/mangia" },
 ] as const;
 

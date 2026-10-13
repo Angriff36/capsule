@@ -1,20 +1,15 @@
 export const LOGISTICS_SECTIONS = [
+  { key: "dispatch", label: "Dispatch board", path: "/logistics/dispatch" },
   { key: "packs", label: "Pack lists", path: "/logistics/packs" },
+  { key: "deliveries", label: "Deliveries", path: "/logistics/deliveries" },
+  { key: "route", label: "Route planner", path: "/logistics/route" },
+  { key: "returns", label: "Returns", path: "/logistics/returns" },
+  { key: "fleet", label: "Fleet", path: "/logistics/fleet" },
   {
     key: "pack-templates",
-    label: "Pack templates",
+    label: "Pack setup",
     path: "/logistics/pack-templates",
   },
-  { key: "style-kits", label: "Style kits", path: "/logistics/style-kits" },
-  { key: "pack-rules", label: "Pack rules", path: "/logistics/pack-rules" },
-  { key: "floor", label: "Packing floor", path: "/logistics/floor" },
-  { key: "dispatch", label: "Dispatch board", path: "/logistics/dispatch" },
-  { key: "returns", label: "Returns", path: "/logistics/returns" },
-  { key: "deliveries", label: "Deliveries", path: "/logistics/deliveries" },
-  { key: "schedule", label: "Vehicle schedule", path: "/logistics/schedule" },
-  { key: "route", label: "Route planner", path: "/logistics/route" },
-  { key: "fleet", label: "Fleet", path: "/logistics/fleet" },
-  { key: "maintenance", label: "Maintenance", path: "/logistics/maintenance" },
 ] as const;
 
 export type LogisticsSection = (typeof LOGISTICS_SECTIONS)[number]["key"];

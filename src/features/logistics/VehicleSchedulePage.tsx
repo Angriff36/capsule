@@ -1,4 +1,5 @@
 import { useOverdueVehicleService } from "./vehicleServiceDue";
+import { useEmbedded } from "../../ui/embedded";
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
@@ -51,6 +52,7 @@ type VehicleRow = {
 };
 
 export function VehicleSchedulePage() {
+  const embedded = useEmbedded();
   const vehicles = useListVehicle() as VehicleRow[] | undefined;
   const overdueService = useOverdueVehicleService();
   // Only runs still to drive are planned here: read by status.
@@ -119,16 +121,8 @@ export function VehicleSchedulePage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Logistics · Vehicle schedule</p>
-          <h1 className="display-title mt-2">Vehicle availability</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Day view of every fleet vehicle and its delivery windows. Open gaps
-            are available; overlapping requests are rejected at assignment.
-          </p>
-        </div>
-        <div className="supply-row-actions">
+      {embedded ? (
+        <div className="flex flex-wrap items-center gap-2">
           <button
             className="btn btn-ghost"
             type="button"
@@ -151,8 +145,45 @@ export function VehicleSchedulePage() {
             Next →
           </button>
         </div>
-      </header>
-      <LogisticsWorkspaceNav />
+      ) : (
+        <>
+          <header className="supply-masthead">
+            <div>
+              <p className="eyebrow">Logistics · Vehicle schedule</p>
+              <h1 className="display-title mt-2">Vehicle availability</h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                Day view of every fleet vehicle and its delivery windows. Open
+                gaps are available; overlapping requests are rejected at
+                assignment.
+              </p>
+            </div>
+            <div className="supply-row-actions">
+              <button
+                className="btn btn-ghost"
+                type="button"
+                onClick={() => shiftDay(-1)}
+              >
+                ← Previous
+              </button>
+              <BoundedDateInput
+                naturalDateDirection="any"
+                className="input"
+                aria-label="Schedule day"
+                value={day}
+                onChange={(event) => setDay(event.currentTarget.value)}
+              />
+              <button
+                className="btn btn-ghost"
+                type="button"
+                onClick={() => shiftDay(1)}
+              >
+                Next →
+              </button>
+            </div>
+          </header>
+          <LogisticsWorkspaceNav />
+        </>
+      )}
       {failure ? <LogisticsFailureBanner error={failure} /> : null}
       {notice ? (
         <p className="mt-3 text-base text-ink-2" role="status">

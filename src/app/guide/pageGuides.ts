@@ -370,30 +370,16 @@ export const PAGE_GUIDES: PageGuide[] = [
   },
   {
     prefix: "/logistics/pack-templates",
-    title: "Pack templates",
+    title: "Pack setup",
     purpose:
       "Reusable load lists for event types you run often, so packing is never from memory.",
-    steps: ["Build a template once; new pack lists start from it."],
-  },
-  {
-    prefix: "/logistics/pack-rules",
-    title: "Pack rules",
-    purpose:
-      "What an event puts on its pack list: a dish's tools, what a dish note asks for, napkins per guest, flooring for a grass venue, the bar kit.",
     steps: [
-      "Pick when the rule applies, the item, and how many. Use spare % for napkins and cups.",
-      "Mark must-haves: leaving one off a list then needs a stand-in or someone who brings it.",
-      "On a pack list, open Why under a line to see which rules and facts set its amount.",
-    ],
-  },
-  {
-    prefix: "/logistics/style-kits",
-    title: "Service style kits",
-    purpose:
-      "The default kit that goes with every event of a service style, so a new event's pack list builds itself.",
-    steps: [
-      "Add the lines a style always needs. Use guests-per-unit for lines that scale with the headcount.",
-      "Change one event on its own pack list; the kit stays as it is.",
+      "Build a template once; new pack lists start from it.",
+      "Service style kits: Add the lines a style always needs. Use guests-per-unit for lines that scale with the headcount.",
+      "Service style kits: Change one event on its own pack list; the kit stays as it is.",
+      "Pack rules: Pick when the rule applies, the item, and how many. Use spare % for napkins and cups.",
+      "Pack rules: Mark must-haves: leaving one off a list then needs a stand-in or someone who brings it.",
+      "Pack rules: On a pack list, open Why under a line to see which rules and facts set its amount.",
     ],
   },
   {
@@ -404,14 +390,8 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Assign a driver and vehicle to each run.",
       "Start transit when the van leaves; mark delivered on arrival.",
+      "Vehicle schedule: Check before promising a delivery window.",
     ],
-  },
-  {
-    prefix: "/logistics/schedule",
-    title: "Vehicle schedule",
-    purpose:
-      "Which vehicle is committed where, and when — spot conflicts early.",
-    steps: ["Check before promising a delivery window."],
   },
   {
     prefix: "/logistics/route",
@@ -423,22 +403,9 @@ export const PAGE_GUIDES: PageGuide[] = [
     prefix: "/logistics/fleet",
     title: "Fleet",
     purpose: "Your vehicles — capacity, status, and availability.",
-    steps: ["Mark a vehicle out of service when it's in the shop."],
-  },
-  {
-    prefix: "/logistics/maintenance",
-    title: "Vehicle maintenance",
-    purpose: "Service history and upcoming maintenance for each vehicle.",
-    steps: ["Log service work so nothing gets missed."],
-  },
-  {
-    prefix: "/staff",
-    title: "Staff",
-    purpose:
-      "Your team — who's working when, who's asking for time off, and who needs confirming.",
     steps: [
-      "Clear the attention list: confirm assignments, decide requests.",
-      "Use Roster to schedule people onto events and shifts.",
+      "Mark a vehicle out of service when it's in the shop.",
+      "Vehicle maintenance: Log service work so nothing gets missed.",
     ],
   },
   {
@@ -448,29 +415,22 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Add assignments for upcoming events.",
       "Build the week's shifts, then publish so staff see them.",
+      "Needs attention: Clear the list: confirm assignments, decide requests.",
+      "Shift swaps: Approve or decline swaps both staff members already agreed to.",
+      "Crew templates: Make a template for a service style and guest range; list each role and how many.",
+      "Crew templates: Approve an event: its open shifts appear on the event's Staff tab.",
     ],
   },
   {
-    prefix: "/staff/swaps",
-    title: "Shift swaps",
-    purpose:
-      "Staff arrange swaps between themselves; you give the final OK here.",
-    steps: ["Approve or decline swaps both staff members already agreed to."],
-  },
-  {
     prefix: "/staff/time",
-    title: "Time & availability",
+    title: "Time",
     purpose: "Hours worked and when people say they're available.",
     steps: [
       "Fix clock mistakes here.",
       "Check availability before building the schedule.",
+      "Time off: Decide requests promptly — the schedule depends on it.",
+      "Utilization: Balance the load before burnout or dead payroll hours.",
     ],
-  },
-  {
-    prefix: "/staff/time-off",
-    title: "Time off",
-    purpose: "Requests for days off, waiting on your yes or no.",
-    steps: ["Decide requests promptly — the schedule depends on it."],
   },
   {
     prefix: "/staff/messages",
@@ -483,62 +443,27 @@ export const PAGE_GUIDES: PageGuide[] = [
     ],
   },
   {
-    prefix: "/staff/utilization",
-    title: "Utilization",
-    purpose: "Who's over-scheduled and who's under-used, week by week.",
-    steps: ["Balance the load before burnout or dead payroll hours."],
-  },
-  {
-    prefix: "/staff/qualifications",
-    title: "Qualifications",
-    purpose: "Certifications like food handler cards, with expiry dates.",
-    steps: ["Add each person's certs; expiring ones flag themselves."],
-  },
-  {
     prefix: "/staff/training",
-    title: "Training",
+    title: "Skills & training",
     purpose:
       "Completed trainings that unlock certain shift types, and each person's skill level per area.",
     steps: [
       "Note who's finished training so they can be scheduled for those roles.",
       "In the skills matrix, rate each person 0 to 4 per area; level 4 people are the trainers.",
       "Start training to keep the trainer, the dates and each step the trainer initials; finish it when the quiz is done.",
+      "Qualifications: Add each person's certs; expiring ones flag themselves.",
     ],
   },
   {
     prefix: "/staff/reviews",
-    title: "Performance reviews",
+    title: "Performance",
     purpose: "Run and track reviews across the team.",
-    steps: ["Start a review, fill it in together, and file it."],
-  },
-  {
-    prefix: "/staff/my-reviews",
-    title: "My reviews",
-    purpose: "Reviews written about you, in one place.",
-    steps: ["Read and acknowledge your reviews."],
-  },
-  {
-    prefix: "/staff/scorecards",
-    title: "Role scorecards",
-    purpose: 'What "good" looks like for each role, written down.',
-    steps: ["Define the measurables per role; reviews use them."],
-  },
-  {
-    prefix: "/staff/crew-templates",
-    title: "Crew templates",
-    purpose:
-      "The crew each kind of event needs, posted as open shifts when the event is approved.",
     steps: [
-      "Make a template for a service style and guest range; list each role and how many.",
-      "Approve an event: its open shifts appear on the event's Staff tab.",
+      "Start a review, fill it in together, and file it.",
+      "My reviews: Read and acknowledge your reviews.",
+      "Role scorecards: Define the measurables per role; reviews use them.",
+      "One-on-ones: Schedule the cadence; log notes each time.",
     ],
-  },
-  {
-    prefix: "/staff/one-on-ones",
-    title: "One-on-ones",
-    purpose:
-      "Recurring check-ins with each person, with notes and action items.",
-    steps: ["Schedule the cadence; log notes each time."],
   },
   {
     prefix: "/staff/hiring",
@@ -622,34 +547,23 @@ export const PAGE_GUIDES: PageGuide[] = [
     ],
   },
   {
-    prefix: "/finance",
-    title: "Finance",
-    purpose: "Money owed, money collected, and where to act next.",
-    steps: [
-      "Clear the attention list — that's what's owed to you.",
-      "Use the tabs for invoices, payments, payroll, and reports.",
-    ],
-  },
-  {
     prefix: "/finance/invoices",
     title: "Invoices",
     purpose: "Bill clients and track what's been paid.",
     steps: [
       "Issue the invoice from the event.",
       "Send it, then log payments as they arrive.",
+      "Clear the attention list at the top — that's what's owed to you.",
     ],
   },
   {
     prefix: "/finance/payments",
     title: "Payments",
     purpose: "Money received, matched against invoices.",
-    steps: ["Log each payment and match it to its invoice."],
-  },
-  {
-    prefix: "/finance/payment-methods",
-    title: "Payment methods",
-    purpose: "Client payment details kept on file.",
-    steps: ["Store how each client pays to speed up settlement."],
+    steps: [
+      "Log each payment and match it to its invoice.",
+      "Payment methods: Store how each client pays to speed up settlement.",
+    ],
   },
   {
     prefix: "/finance/closeout",
@@ -690,42 +604,22 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: ["Keep rates current; invoices apply them automatically."],
   },
   {
-    prefix: "/finance/commission-terms",
-    title: "Commission terms",
-    purpose: "What each venue takes, written down.",
-    steps: ["Log each venue's cut so event profit is honest."],
-  },
-  {
     prefix: "/finance/attribution",
     title: "Attribution",
     purpose: "Which venue, salesperson, or referral earned each dollar.",
-    steps: ["Review how revenue traces back to its source."],
+    steps: [
+      "Review how revenue traces back to its source.",
+      "Commission terms: Log each venue's cut so event profit is honest.",
+    ],
   },
   {
     prefix: "/finance/revenue",
-    title: "Revenue",
+    title: "Money reports",
     purpose: "Revenue over time, sliced by event type, client, or venue.",
-    steps: ["Compare periods; spot what's growing and what's fading."],
-  },
-  {
-    prefix: "/finance/food-cost",
-    title: "Food cost",
-    purpose: "Ingredient spend measured against what you charge.",
-    steps: ["Watch the percentage; investigate months that spike."],
-  },
-  {
-    prefix: "/finance/profit-margins",
-    title: "Profit margins",
-    purpose: "What each event and service line actually makes.",
-    steps: ["Find the low-margin work and reprice or drop it."],
-  },
-  {
-    prefix: "/finance/money-check",
-    title: "Money check",
-    purpose:
-      "Old-system payments next to Capsule payments, by month, with every row that does not agree.",
     steps: [
-      "Pick the dates, read each month's difference, and save a copy when it is right.",
+      "Compare periods; spot what's growing and what's fading.",
+      "Food cost: Watch the percentage; investigate months that spike.",
+      "Profit margins: Find the low-margin work and reprice or drop it.",
     ],
   },
   {
@@ -770,6 +664,7 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Most days you won't need this page.",
       "Come here to add team members or connect outside tools.",
+      "Money check: Pick the dates, read each month's difference, and save a copy when it is right.",
     ],
   },
   {

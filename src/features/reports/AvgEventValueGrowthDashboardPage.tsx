@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useEmbedded } from "@/ui/embedded";
 import {
   useListServiceStyle,
   useListOccasion,
@@ -59,11 +60,12 @@ const LEAD =
  * is read until the user asks for the dashboard.
  */
 export function AvgEventValueGrowthDashboardPage() {
+  const embedded = useEmbedded();
   const [requested, setRequested] = useState(false);
   if (requested) return <AvgEventValueGrowthBody />;
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader title={TITLE} lead={LEAD} />
+      {embedded ? null : <PageHeader title={TITLE} lead={LEAD} />}
       <p className="mt-3 max-w-160 text-ink-2">
         These figures add up every event on file.
       </p>
@@ -79,6 +81,7 @@ export function AvgEventValueGrowthDashboardPage() {
 }
 
 function AvgEventValueGrowthBody() {
+  const embedded = useEmbedded();
   const events = useAllEventReportRows();
   const now = useMemo(() => new Date(), []);
   const serviceStyles = useListServiceStyle();
@@ -554,7 +557,7 @@ function AvgEventValueGrowthBody() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader title={TITLE} lead={LEAD} />
+      {embedded ? null : <PageHeader title={TITLE} lead={LEAD} />}
 
       {events?.length === 0 ? (
         <div data-testid="dashboard-empty">

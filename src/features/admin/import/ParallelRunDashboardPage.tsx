@@ -4,6 +4,8 @@
 // TPP's side is read from the import's own saved rows, Capsule's from the
 // events, and every field difference is listed for a person to settle.
 
+import { MergedSection } from "../../../ui/MergedSection";
+import { FinanceReconciliationPage } from "../../finance/FinanceReconciliationPage";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/lib/api";
@@ -1082,6 +1084,9 @@ export function ParallelRunDashboardPage() {
           </section>
         </>
       )}
+      <MergedSection id="payments" title="Payments: old system against Capsule">
+        <FinanceReconciliationPage />
+      </MergedSection>
     </div>
   );
 }

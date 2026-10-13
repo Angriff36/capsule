@@ -333,7 +333,33 @@ Filled in as batches ship.
 ## Redirect inventory
 
 Every removed URL keeps working. It goes to its new home, with the same IDs and
-query values.
+query values (`src/app/MovedRoute.tsx`). The `#anchor` scrolls to the section
+that now holds the old screen (`src/ui/MergedSection.tsx`).
 
 | Old URL | New URL |
 | --- | --- |
+| `/staff` | `/staff/roster` |
+| `/staff/swaps` | `/staff/roster#swaps` |
+| `/staff/crew-templates` | `/staff/roster#crew-templates` |
+| `/staff/time-off` | `/staff/time#time-off` |
+| `/staff/utilization` | `/staff/time#utilization` |
+| `/staff/qualifications` | `/staff/training#qualifications` |
+| `/staff/my-reviews` | `/my#my-feedback` |
+| `/staff/scorecards` | `/staff/reviews#scorecards` |
+| `/staff/one-on-ones` | `/staff/reviews#one-on-ones` |
+| `/finance` | `/finance/invoices` |
+| `/finance/payment-methods` | `/finance/payments#payment-methods` |
+| `/finance/commission-terms` | `/finance/attribution#commission-terms` |
+| `/finance/food-cost` | `/finance/revenue#food-cost` |
+| `/finance/profit-margins` | `/finance/revenue#profit-margins` |
+| `/finance/money-check` | `/admin/parallel-run#payments` |
+| `/finance/attribution/new` | same URL, now served by `/finance/attribution/:id` |
+| `/reports/comp-master` | `/finance/attribution#comp-master` |
+| `/reports/scorecard` | `/reports/l10#scorecard` |
+| `/reports/avg-event-value` | `/reports/sales#avg-event-value` |
+| `/logistics` | `/logistics/dispatch` |
+| `/logistics/floor` | `/logistics/packs#floor` |
+| `/logistics/style-kits` | `/logistics/pack-templates#style-kits` |
+| `/logistics/pack-rules` | `/logistics/pack-templates#pack-rules` |
+| `/logistics/maintenance` | `/logistics/fleet#maintenance` |
+| `/logistics/schedule` | `/logistics/deliveries#vehicles` |

@@ -1,4 +1,7 @@
 import { useMemo, useState, type FormEvent } from "react";
+import { MergedSection } from "../../ui/MergedSection";
+import { PackRulesPage } from "./PackRulesPage";
+import { ServiceStyleKitsPage } from "./ServiceStyleKitsPage";
 import { Link } from "react-router-dom";
 import {
   useCreatePackListTemplate,
@@ -274,11 +277,11 @@ export function PackListTemplatesPage() {
   return (
     <div className="operations-stage supply-stage">
       <PageHeader
-        title="Pack list templates"
+        title="Pack setup"
         lead={
           <>
-            Reusable equipment pack lists an event can generate into its load
-            sheet.{" "}
+            Templates, service style kits and pack rules: everything that fills
+            an event's load sheet.{" "}
             <Link className="link" to="/logistics/packs">
               Pack lists
             </Link>
@@ -661,6 +664,12 @@ export function PackListTemplatesPage() {
           </table>
         </div>
       )}
+      <MergedSection id="style-kits" title="Service style kits">
+        <ServiceStyleKitsPage />
+      </MergedSection>
+      <MergedSection id="pack-rules" title="Pack rules">
+        <PackRulesPage />
+      </MergedSection>
     </div>
   );
 }

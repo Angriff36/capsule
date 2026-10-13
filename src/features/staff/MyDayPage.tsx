@@ -1,4 +1,6 @@
 import { useUser } from "@clerk/react";
+import { MergedSection } from "../../ui/MergedSection";
+import { MyReviewsPage } from "../workforce/MyReviewsPage";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   useAvailabilityWindowWithdraw,
@@ -1482,6 +1484,9 @@ export function MyDayPage() {
               </Section>
             </div>
           </div>
+          <MergedSection id="my-feedback" title="My feedback">
+            <MyReviewsPage />
+          </MergedSection>
         </>
       )}
     </MyDayFrame>

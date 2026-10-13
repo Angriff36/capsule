@@ -334,7 +334,7 @@ export function RoutePlannerPage() {
                 Deliveries
               </Link>
               , then assign this vehicle from the{" "}
-              <Link className="text-link" to="/logistics/schedule">
+              <Link className="text-link" to="/logistics/deliveries#vehicles">
                 vehicle schedule
               </Link>
               .

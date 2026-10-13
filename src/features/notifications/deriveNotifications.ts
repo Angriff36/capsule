@@ -291,7 +291,7 @@ export function deriveNotifications(
       id: `time-off-request:${request._id}`,
       kind: "time_off_request",
       message: `${who} requested time off · ${range}`,
-      link: "/staff/time-off",
+      link: "/staff/time#time-off",
       at: request.submittedAt,
     });
   }
@@ -356,7 +356,7 @@ export function deriveNotifications(
         id: `shift-swap:${swap._id}`,
         kind: "shift_swap",
         message: `Shift swap to approve: ${who}${taker ? ` to ${taker}` : ""}${when}`,
-        link: "/staff/swaps",
+        link: "/staff/roster#swaps",
         at: Number(
           swap.recipientConfirmedAt ?? swap.createdAt ?? swap._creationTime,
         ),
@@ -519,7 +519,7 @@ export function deriveNotifications(
       message: expired
         ? `${who}'s ${qualification.name} expired on ${formatDate(qualification.expiresAt)}`
         : `${who}'s ${qualification.name} expires ${formatDate(qualification.expiresAt)}`,
-      link: "/staff/qualifications",
+      link: "/staff/training#qualifications",
       at: qualification.expiresAt,
     });
   }

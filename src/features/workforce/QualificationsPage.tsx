@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { isRenewed } from "../../lib/qualificationRenewal";
 import { reportActionOk } from "../../ui/action-result";
 import {
@@ -45,6 +46,7 @@ function expiryLabel(expiresAt: number | undefined, now: number) {
 }
 
 export function QualificationsPage() {
+  const embedded = useEmbedded();
   const qualifications = useListQualification();
   const people = useListPerson();
   const grant = useCreateQualification();
@@ -138,23 +140,37 @@ export function QualificationsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Staff · Qualifications</p>
-          <h1 className="display-title mt-2">Qualification ledger</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Record professional certifications by person, issuer, issue date,
-            and expiry. Credentials nearing expiry appear in HR notifications.
-          </p>
+      {embedded ? (
+        <div className="flex flex-wrap gap-2">
+          <button
+            className="btn btn-primary"
+            onClick={() => setShowCreate((value) => !value)}
+          >
+            {showCreate ? "Close form" : "Grant qualification"}
+          </button>
         </div>
-        <button
-          className="btn btn-primary"
-          onClick={() => setShowCreate((value) => !value)}
-        >
-          {showCreate ? "Close form" : "Grant qualification"}
-        </button>
-      </header>
-      <WorkforceWorkspaceNav />
+      ) : (
+        <>
+          <header className="supply-masthead">
+            <div>
+              <p className="eyebrow">Staff · Qualifications</p>
+              <h1 className="display-title mt-2">Qualification ledger</h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                Record professional certifications by person, issuer, issue
+                date, and expiry. Credentials nearing expiry appear in HR
+                notifications.
+              </p>
+            </div>
+            <button
+              className="btn btn-primary"
+              onClick={() => setShowCreate((value) => !value)}
+            >
+              {showCreate ? "Close form" : "Grant qualification"}
+            </button>
+          </header>
+          <WorkforceWorkspaceNav />
+        </>
+      )}
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
 
       {showCreate ? (

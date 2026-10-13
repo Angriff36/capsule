@@ -62,7 +62,10 @@ type AttributionType =
 type AllocationMethod = "percent" | "fixed";
 
 export function RevenueAttributionDetailPage() {
-  const { id, mode } = useParams<{ id?: string; mode?: string }>();
+  const params = useParams<{ id?: string; mode?: string }>();
+  const { mode } = params;
+  // One route serves both: /finance/attribution/new opens the blank form.
+  const id = params.id === "new" ? undefined : params.id;
   const navigate = useNavigate();
   const isNew = !id;
   const isEditMode = mode === "edit";

@@ -7,11 +7,6 @@ const financeNavigation = [
   { key: "tips", label: "Tips", path: FINANCE_ROUTES.tips },
   { key: "taxes", label: "Tax", path: FINANCE_ROUTES.taxes },
   {
-    key: "venueCommissionTerms",
-    label: "Commission terms",
-    path: FINANCE_ROUTES.venueCommissionTerms,
-  },
-  {
     key: "revenueAttribution",
     label: "Attribution",
     path: FINANCE_ROUTES.revenueAttribution,
