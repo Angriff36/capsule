@@ -16,7 +16,7 @@ import {
   useIngestKmCandidates,
   useProvisionStaffSignIn,
 } from "../../lib/hiringPipeline";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate, formatDateTime } from "../../lib/format";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
@@ -383,28 +383,29 @@ export function CandidatesPage() {
 
   return (
     <div className="operations-stage">
-      <header className="training-masthead">
-        <div>
-          <p className="eyebrow">Staff · Hiring pipeline</p>
-          <h1 className="display-title mt-2">
-            Track candidates from application to hire.
-          </h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Track candidates from application to hire."
+        lead={
+          <>
             Add candidates and move them through application, screening,
             interview, and decision — then hire or reject. Paste a KM
             interview-tool export to bring candidates in; re-importing the same
             export updates the existing candidates instead of duplicating them.
-          </p>
-        </div>
-        <div aria-label="Candidate actions">
-          <button
-            className="btn btn-primary"
-            onClick={() => (adding ? setAdding(false) : setAdding(true))}
-          >
-            {adding ? "Close" : "New candidate"}
-          </button>
-        </div>
-      </header>
+          </>
+        }
+        actions={
+          <>
+            <div aria-label="Candidate actions">
+              <button
+                className="btn btn-primary"
+                onClick={() => (adding ? setAdding(false) : setAdding(true))}
+              >
+                {adding ? "Close" : "New candidate"}
+              </button>
+            </div>
+          </>
+        }
+      />
 
       <WorkforceWorkspaceNav />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}

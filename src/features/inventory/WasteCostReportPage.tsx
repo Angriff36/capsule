@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { formatCountNoun, formatMoney } from "../../lib/format";
 import { useListIngredient } from "../../lib/manifest-convex-react";
-import { TableSkeleton } from "../../ui/primitives";
+import { PageHeader, TableSkeleton } from "../../ui/primitives";
 import { useEventsById } from "../facilities/useEventsById";
 import { useWasteForPeriod } from "../facilities/useInventoryWindow";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
@@ -112,44 +112,46 @@ export function WasteCostReportPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Inventory · Cost impact</p>
-          <h1 className="display-title mt-2">Waste cost report</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Waste cost report"
+        lead={
+          <>
             Recorded waste priced at its captured unit cost, ranked so the most
             expensive ingredients and events surface first for purchasing,
             portioning, or storage fixes.
-          </p>
-        </div>
-        <div className="supply-masthead-actions">
-          <label className="field-label" htmlFor="waste-report-period">
-            Period
-            <select
-              id="waste-report-period"
-              className="input"
-              value={periodKey}
-              onChange={(event) =>
-                setPeriodKey(
-                  event.currentTarget.value as (typeof PERIODS)[number]["key"],
-                )
-              }
+          </>
+        }
+        actions={
+          <>
+            <label className="field-label" htmlFor="waste-report-period">
+              Period
+              <select
+                id="waste-report-period"
+                className="input"
+                value={periodKey}
+                onChange={(event) =>
+                  setPeriodKey(
+                    event.currentTarget
+                      .value as (typeof PERIODS)[number]["key"],
+                  )
+                }
+              >
+                {PERIODS.map((option) => (
+                  <option key={option.key} value={option.key}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              className="btn btn-primary"
+              onClick={() => setRecording(true)}
             >
-              {PERIODS.map((option) => (
-                <option key={option.key} value={option.key}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            className="btn btn-primary"
-            onClick={() => setRecording(true)}
-          >
-            Record waste
-          </button>
-        </div>
-      </header>
+              Record waste
+            </button>
+          </>
+        }
+      />
       <InventoryWorkspaceNav />
       {recording ? (
         <WasteRecordForm onClose={() => setRecording(false)} />

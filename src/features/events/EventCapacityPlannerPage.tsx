@@ -5,7 +5,7 @@ import { useListVenue } from "../../lib/manifest-convex-react";
 import { useGuestsForEvents } from "../../lib/useEventAreaRows";
 import { useEventRecordsInRange } from "../facilities/useEventsById";
 import { ArrowLeftIcon } from "../../ui/icons";
-import { TableSkeleton } from "../../ui/primitives";
+import { PageHeader, TableSkeleton } from "../../ui/primitives";
 import {
   addLocalDays,
   buildCapacityPlan,
@@ -157,42 +157,43 @@ export function EventCapacityPlannerPage() {
         <ArrowLeftIcon width={12} height={12} /> All events
       </Link>
 
-      <header className="capacity-masthead">
-        <div>
-          <p className="eyebrow">Events · Room sizes</p>
-          <h1>See the room before it fills.</h1>
-          <p>
-            Guests who said yes, set against how many the venue holds, and rooms
-            booked for two events at once.
-          </p>
-        </div>
-        <div
-          className="capacity-range-controls"
-          aria-label="Calendar date range"
-        >
-          <label>
-            From
-            <BoundedDateInput
-              naturalDateDirection="any"
-              value={startDate}
-              max={endDate}
-              onChange={(event) => setStartDate(event.target.value)}
-              data-testid="capacity-range-start"
-            />
-          </label>
-          <span aria-hidden="true">→</span>
-          <label>
-            Through
-            <BoundedDateInput
-              naturalDateDirection="any"
-              value={endDate}
-              min={startDate}
-              onChange={(event) => setEndDate(event.target.value)}
-              data-testid="capacity-range-end"
-            />
-          </label>
-        </div>
-      </header>
+      <PageHeader
+        title="See the room before it fills."
+        actions={
+          <>
+            <div
+              className="capacity-range-controls"
+              aria-label="Calendar date range"
+            >
+              <label>
+                From
+                <BoundedDateInput
+                  naturalDateDirection="any"
+                  value={startDate}
+                  max={endDate}
+                  onChange={(event) => setStartDate(event.target.value)}
+                  data-testid="capacity-range-start"
+                />
+              </label>
+              <span aria-hidden="true">→</span>
+              <label>
+                Through
+                <BoundedDateInput
+                  naturalDateDirection="any"
+                  value={endDate}
+                  min={startDate}
+                  onChange={(event) => setEndDate(event.target.value)}
+                  data-testid="capacity-range-end"
+                />
+              </label>
+            </div>
+          </>
+        }
+      />
+      <p>
+        Guests who said yes, set against how many the venue holds, and rooms
+        booked for two events at once.
+      </p>
 
       {!plan.valid ? (
         <div className="capacity-range-error" role="alert">

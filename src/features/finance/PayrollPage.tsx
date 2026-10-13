@@ -1,3 +1,4 @@
+import { PageHeader } from "../../ui/primitives";
 import { useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -266,32 +267,33 @@ export function PayrollPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Finance · Payroll</p>
-          <h1 className="display-title mt-2">Payroll inputs</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Payroll inputs"
+        lead={
+          <>
             Prepare a period rollup for a person, then finalize for export or
             void if the numbers are wrong. Finance managers only.
-          </p>
-        </div>
-        <div className="supply-row-actions">
-          <button
-            className="btn btn-ghost"
-            type="button"
-            onClick={() => setShowTerminal((value) => !value)}
-          >
-            {showTerminal ? "Hide closed" : "Show closed"}
-          </button>
-          <button
-            className="btn btn-primary"
-            type="button"
-            onClick={() => setShowPrepare((value) => !value)}
-          >
-            {showPrepare ? "Close form" : "Prepare input"}
-          </button>
-        </div>
-      </header>
+          </>
+        }
+        actions={
+          <>
+            <button
+              className="btn btn-ghost"
+              type="button"
+              onClick={() => setShowTerminal((value) => !value)}
+            >
+              {showTerminal ? "Hide closed" : "Show closed"}
+            </button>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={() => setShowPrepare((value) => !value)}
+            >
+              {showPrepare ? "Close form" : "Prepare input"}
+            </button>
+          </>
+        }
+      />
       <FinanceWorkspaceNav />
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (

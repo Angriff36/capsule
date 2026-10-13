@@ -6,7 +6,12 @@ import {
   useExternalRecordLinkVerifyLink,
 } from "../../../lib/manifest-convex-react";
 import { useExternalRecordLinksFor } from "../../../lib/useExternalRecordLinkLists";
-import { ErrorState, StatusChip, TableSkeleton } from "../../../ui/primitives";
+import {
+  ErrorState,
+  PageHeader,
+  StatusChip,
+  TableSkeleton,
+} from "../../../ui/primitives";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionNotice, useActionFailure } from "../../../ui/action-result";
 import { ImportedPaymentMatch } from "./ImportedPaymentMatch";
@@ -274,26 +279,24 @@ export function ExternalRecordsReconcilePage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Import · Matching</p>
-          <h1 className="display-title mt-2">Match leftover items</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Match leftover items"
+        lead={
+          <>
             Check what came over from your old system and confirm each item
             matches the right thing in Capsule. Anything still waiting shows
             here.
-          </p>
-          {referenceOnly > 0 ? (
-            <p className="mt-2 max-w-160 text-sm text-ink-3">
-              {referenceOnly} old money{" "}
-              {referenceOnly === 1 ? "line is" : "lines are"} kept for the
-              record only (quotes, invoices, report totals, balances, credits,
-              $0 lines and the same money seen twice). They are not counted in
-              any total.
-            </p>
-          ) : null}
-        </div>
-      </header>
+          </>
+        }
+      />
+      {referenceOnly > 0 ? (
+        <p className="mt-2 max-w-160 text-sm text-ink-3">
+          {referenceOnly} old money{" "}
+          {referenceOnly === 1 ? "line is" : "lines are"} kept for the record
+          only (quotes, invoices, report totals, balances, credits, $0 lines and
+          the same money seen twice). They are not counted in any total.
+        </p>
+      ) : null}
 
       <AdminWorkspaceNav />
 

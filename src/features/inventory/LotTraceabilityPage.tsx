@@ -8,7 +8,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useStockLines } from "../facilities/useInventoryHistory";
 import { formatDate, formatTime } from "../../lib/format";
-import { TableSkeleton } from "../../ui/primitives";
+import { PageHeader, TableSkeleton } from "../../ui/primitives";
 import { useEventsById } from "../facilities/useEventsById";
 import { useLotTrace } from "../facilities/useInventoryWindow";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
@@ -132,35 +132,36 @@ export function LotTraceabilityPage() {
 
   return (
     <div className="operations-stage supply-stage lot-trace-page">
-      <header className="supply-masthead lot-trace-masthead">
-        <div>
-          <p className="eyebrow">Inventory · Recall response</p>
-          <h1 className="display-title mt-2">Lot-to-event trace</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Lot-to-event trace"
+        lead={
+          <>
             Identify every event and client served from a supplier lot, with a
             durable issue-time trail ready to print or share with the response
             team.
-          </p>
-        </div>
-        <div className="lot-trace-actions">
-          <button
-            type="button"
-            className="btn btn-ghost"
-            disabled={!hasFilter}
-            onClick={clearFilters}
-          >
-            Clear
-          </button>
-          <button
-            type="button"
-            className="btn btn-primary"
-            disabled={rows.length === 0}
-            onClick={() => window.print()}
-          >
-            Print report
-          </button>
-        </div>
-      </header>
+          </>
+        }
+        actions={
+          <>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              disabled={!hasFilter}
+              onClick={clearFilters}
+            >
+              Clear
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              disabled={rows.length === 0}
+              onClick={() => window.print()}
+            >
+              Print report
+            </button>
+          </>
+        }
+      />
       <InventoryWorkspaceNav />
 
       <section className="lot-trace-filter" aria-label="Trace filters">

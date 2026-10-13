@@ -5,7 +5,7 @@ import {
   useTaxRateRevise,
   useTaxRateSetActive,
 } from "../../lib/manifest-convex-react";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatMoneyExact } from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
@@ -197,21 +197,27 @@ export function TaxRatesPage() {
 
   return (
     <div className="operations-stage supply-stage tax-stage">
-      <header className="supply-masthead tax-masthead">
-        <div>
-          <p className="eyebrow">Finance · Tax desk</p>
-          <h1 className="display-title mt-2">Rates &amp; remittance</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Rates &amp; remittance"
+        lead={
+          <>
             Name each jurisdictional rate once, mark what it applies to, and let
             invoice lines calculate the charge automatically.
-          </p>
-        </div>
-        <div className="tax-period-stamp" aria-label="Tax configuration status">
-          <span>Active rates</span>
-          <strong>{activeRates.length}</strong>
-          <small>{configuredRates.length} configured</small>
-        </div>
-      </header>
+          </>
+        }
+        actions={
+          <>
+            <div
+              className="tax-period-stamp"
+              aria-label="Tax configuration status"
+            >
+              <span>Active rates</span>
+              <strong>{activeRates.length}</strong>
+              <small>{configuredRates.length} configured</small>
+            </div>
+          </>
+        }
+      />
       <FinanceWorkspaceNav />
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (

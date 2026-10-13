@@ -1,3 +1,4 @@
+import { PageHeader } from "../../../ui/primitives";
 import { Component, useMemo, useState, type ReactNode } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../lib/api";
@@ -107,17 +108,20 @@ export function TppReportCatalog() {
   };
   return (
     <div className="operations-stage supply-stage tpp-report-page">
-      <header className="supply-masthead">
-        <div>
-          <p className="live-report-eyebrow">Total Party Planner reports</p>
-          <h1 className="display-title">Reports</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Reports"
+        lead={
+          <>
             The complete TPP report library, using current Capsule data. Choose
             a report, set its filters, then print or export the result.
-          </p>
-        </div>
-        <span className="tpp-report-count">89 reports</span>
-      </header>
+          </>
+        }
+        actions={
+          <>
+            <span className="tpp-report-count">89 reports</span>
+          </>
+        }
+      />
       {selected ? (
         <TppReportRunnerBoundary
           resetKey={selected.id}

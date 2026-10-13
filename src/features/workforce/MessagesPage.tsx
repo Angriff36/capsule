@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
 import { formatDate } from "../../lib/format";
-import { EmptyState, TableSkeleton } from "../../ui/primitives";
+import { EmptyState, PageHeader, TableSkeleton } from "../../ui/primitives";
 import { ChatAppearanceMenu } from "../chat/ChatAppearanceMenu";
 import { ChatComposer, type ChatComposerSubmit } from "../chat/ChatComposer";
 import { ChatPushToggle } from "../chat/ChatPushToggle";
@@ -215,28 +215,29 @@ export function MessagesPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Staff · Team chat</p>
-          <h1 className="display-title mt-2">Team chat</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Team chat"
+        lead={
+          <>
             Event channels and direct messages for your team. Share photos,
             files, and links to events and dishes. Threads stay available for 90
             days.
-          </p>
-        </div>
-        <div className="flex flex-col items-end gap-3">
-          <div className="rounded-sm border border-brand/20 bg-brand-soft px-5 py-4 text-center">
-            <p className="text-3xl leading-none font-semibold text-brand">
-              {totalUnread}
-            </p>
-            <p className="mt-1 text-xs font-medium tracking-wide text-ink-2 uppercase">
-              Unread
-            </p>
-          </div>
-          <ChatPushToggle />
-        </div>
-      </header>
+          </>
+        }
+        actions={
+          <>
+            <div className="rounded-sm border border-brand/20 bg-brand-soft px-5 py-4 text-center">
+              <p className="text-3xl leading-none font-semibold text-brand">
+                {totalUnread}
+              </p>
+              <p className="mt-1 text-xs font-medium tracking-wide text-ink-2 uppercase">
+                Unread
+              </p>
+            </div>
+            <ChatPushToggle />
+          </>
+        }
+      />
       <WorkforceWorkspaceNav />
 
       {identity.loading || conversations === undefined ? (

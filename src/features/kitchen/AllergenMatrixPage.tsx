@@ -4,7 +4,7 @@ import { useListMenu } from "../../lib/manifest-convex-react";
 import { useMenuDishRows } from "../../lib/recipeScopedQueries";
 import { useMenuRecipeRows } from "../../lib/useMenuRecipeRows";
 import { isPlausibleConvexId } from "../../lib/routeRecord";
-import { TableSkeleton } from "../../ui/primitives";
+import { PageHeader, TableSkeleton } from "../../ui/primitives";
 import { formatCountNoun, formatDate } from "../../lib/format";
 import { SearchSelect } from "../../ui/SearchSelect";
 import {
@@ -171,26 +171,27 @@ export function AllergenMatrixPage() {
 
   return (
     <div className="component-book-stage culinary-studio">
-      <header className="component-book-masthead">
-        <div>
-          <p className="eyebrow">Culinary book · Allergens</p>
-          <h1 className="display-title mt-2">Allergen matrix</h1>
-          <p className="mt-3 max-w-150 text-ink-2">
+      <PageHeader
+        title="Allergen matrix"
+        lead={
+          <>
             Every dish on a menu or event against the major food allergens,
             auto-populated from the allergen flags of every recipe ingredient.
             Print for client disclosure or health inspection.
-          </p>
-        </div>
-        <div className="component-book-masthead-actions">
-          <button
-            className="btn btn-primary"
-            disabled={!scopeValue || rows.length === 0}
-            onClick={() => window.print()}
-          >
-            Export PDF
-          </button>
-        </div>
-      </header>
+          </>
+        }
+        actions={
+          <>
+            <button
+              className="btn btn-primary"
+              disabled={!scopeValue || rows.length === 0}
+              onClick={() => window.print()}
+            >
+              Export PDF
+            </button>
+          </>
+        }
+      />
 
       <KitchenBookNav />
 

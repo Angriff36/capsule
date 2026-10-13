@@ -18,7 +18,7 @@ import { classifyCommandFailure } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
 import { formatTime } from "../../lib/format";
 import { readInquiryFacts, senderName } from "./inquiryFacts";
-import { TableSkeleton } from "../../ui/primitives";
+import { PageHeader, TableSkeleton } from "../../ui/primitives";
 import { ClientsWorkspaceNav } from "../clients/ClientsWorkspaceNav";
 import { PasteIncomingMessageForm } from "./PasteIncomingMessageForm";
 import { SyncErrorsPanel } from "./SyncErrorsPanel";
@@ -435,39 +435,40 @@ export function MessageInboxPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Clients · Inbox</p>
-          <h1 className="display-title mt-2">Message inbox</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Message inbox"
+        lead={
+          <>
             Client conversations by email, text, social media and notes, one
             thread each. Staff chat stays in Team chat. A lead made from a
             thread shows next to it.
-          </p>
-        </div>
-        <div className="supply-row-actions">
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={() => {
-              setShowPaste((v) => !v);
-              setShowNew(false);
-            }}
-          >
-            {showPaste ? "Cancel paste" : "Paste incoming message"}
-          </button>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => {
-              setShowNew((v) => !v);
-              setShowPaste(false);
-            }}
-          >
-            {showNew ? "Cancel" : "New thread"}
-          </button>
-        </div>
-      </header>
+          </>
+        }
+        actions={
+          <>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => {
+                setShowPaste((v) => !v);
+                setShowNew(false);
+              }}
+            >
+              {showPaste ? "Cancel paste" : "Paste incoming message"}
+            </button>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => {
+                setShowNew((v) => !v);
+                setShowPaste(false);
+              }}
+            >
+              {showNew ? "Cancel" : "New thread"}
+            </button>
+          </>
+        }
+      />
       <ClientsWorkspaceNav />
       {failure ? <FailureBanner failure={failure} /> : null}
       {notice ? (

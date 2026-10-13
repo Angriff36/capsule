@@ -36,7 +36,12 @@ import { useStockLines } from "../facilities/useInventoryHistory";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
-import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
+import {
+  ErrorState,
+  PageHeader,
+  StatusChip,
+  TableSkeleton,
+} from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { VendorOrderBillMatch } from "./VendorOrderBillMatch";
 import { VendorOrderEmailSection } from "./VendorOrderEmailSection";
@@ -490,27 +495,30 @@ export function VendorOrderPage() {
       <ReturnToListLink fallback="/inventory/purchasing" className="text-link">
         ← Purchase queue
       </ReturnToListLink>
-      <header className="order-folio-masthead">
-        <div>
-          <p className="eyebrow">Vendor order</p>
-          <h1 className="display-title mt-2">{vendorOrderTitle(order)}</h1>
-          <p className="mt-3 text-ink-2">
+      <PageHeader
+        title={<>{vendorOrderTitle(order)}</>}
+        lead={
+          <>
             {vendor?.name ?? "Unknown vendor"} ·{" "}
             {order.eventId
               ? "Event order"
               : order.sourceRangeStart != null
                 ? `Weekly order · week of ${new Date(Number(order.sourceRangeStart)).toLocaleDateString(undefined, { month: "short", day: "numeric", timeZone: "UTC" })}`
                 : "General stock"}
-          </p>
-        </div>
-        <div className="order-state">
-          <StatusChip status={String(order.status)} />
-          <strong>
-            {formatMoneyExact(vendorOrderHeaderTotal(order, lines))}
-          </strong>
-          <span>Order total</span>
-        </div>
-      </header>
+          </>
+        }
+        actions={
+          <>
+            <div className="order-state">
+              <StatusChip status={String(order.status)} />
+              <strong>
+                {formatMoneyExact(vendorOrderHeaderTotal(order, lines))}
+              </strong>
+              <span>Order total</span>
+            </div>
+          </>
+        }
+      />
       <InventoryWorkspaceNav />
       <aside className="supply-degraded" role="note">
         <strong>Line receipts update stock</strong>

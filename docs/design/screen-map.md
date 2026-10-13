@@ -328,7 +328,83 @@ updated after each batch.
 
 ## After
 
-Filled in as batches ship.
+State on `dev` after the merge batches (commits `b0abf8a3d`, `dcc248195`,
+`48db7a24d`). Same counting rule as the baseline.
+
+| | Before | After | Change |
+| --- | ---: | ---: | ---: |
+| Routes (pages) | 142 | 89 | -53 |
+| Tabs | 64 | 55 | -9 |
+| **Routes + tabs** | **206** | **144** | **-62 (-30.1%)** |
+
+Tabs removed: the event page went from 16 to 11 (guests, layouts, to-dos,
+incidents and history are now parts of the Client, Equipment, Timeline and
+Photos tabs). Fleet shows vehicles and trailers one under the other (-2).
+Reports shows the TPP library and saved reports on one page (-2). One route
+was added: `/events/setup`.
+
+### Where things went
+
+| Home page (after) | What it now holds |
+| --- | --- |
+| `/` Home | Today's service (decisions, today's services, coming up), then the month calendar |
+| `/events/setup` Event setup | Event templates, checklists, planning rules |
+| `/events/:id` | 11 tabs; Client & guests, Equipment & layouts, Timeline & to-dos, Photos & incidents (with history) |
+| `/kitchen/ingredients` | Ingredient list + catalog cleanup |
+| `/kitchen/prep` Prep board | Prep board + unresolved work |
+| `/kitchen/plan` Production plan | Plan + stations + yield against plan |
+| `/inventory/stock` Stock | Overview counts, stock book, storage locations, stock history |
+| `/inventory/counts` Counts | Count sessions + opening stock |
+| `/inventory/purchasing` | Weekly drafts and orders + what each event needs (demand) |
+| `/logistics/dispatch` | Overview counts + dispatch board |
+| `/logistics/packs` Pack lists | On the packing floor now, all pack lists, returns |
+| `/logistics/pack-templates` Pack setup | Templates, service style kits, pack rules |
+| `/logistics/deliveries` | Delivery runs, vehicles by day, route order (prints only the route sheet) |
+| `/logistics/fleet` | Vehicles, trailers, service and fuel |
+| `/staff/roster` | Needs attention, shift swaps, roster, pay rates, crew templates |
+| `/staff/time` Time | Time sheet and availability, time off, hours used |
+| `/staff/training` Skills & training | Training + qualifications |
+| `/staff/reviews` Performance | Reviews, role expectations, one-on-ones |
+| `/my` My Day | Own day + my feedback |
+| `/finance/invoices` | Money overview + invoices |
+| `/finance/payments` | Payments + payment methods |
+| `/finance/attribution` | Revenue splits, venue commission terms, commission by salesperson |
+| `/finance/revenue` Money reports | Revenue, food cost, profit margins |
+| `/reports` | TPP report library + saved reports |
+| `/reports/sales` | Sales + average event value |
+| `/reports/l10` | L10 board + company scorecard and targets |
+| `/clients` | Client list + retention |
+| `/clients/pipeline` Pipeline | Website quote requests, lead board, date holds, tastings |
+| `/clients/proposals` | Proposals + proposal templates |
+| `/facilities/venues` | Venue summary, venue list, partner venues |
+| `/admin/branding` Company | Branding, kitchens and drive times, pick lists |
+| `/admin/integrations` | QuickBooks, text alerts, assistant, API keys |
+| `/admin/imports` | TPP upload + import runs |
+| `/admin/parallel-run` Compare with TPP | Events and payments against the old system |
+
+### Area tab strips (after)
+
+- Staff: Roster · Time · Team chat · Skills & training · Performance · Hiring
+- Finance: Invoices · Payments · Closeout · Payroll · More (Tips, Tax, Attribution, Donations)
+- Logistics: Dispatch board · Pack lists · Deliveries · Fleet · Pack setup
+- Inventory: Stock · Counts · Waste · Lot trace · Purchasing · Contracts
+- Kitchen: Recipes · Ingredients · Dishes · Menus · Prep board · Production plan
+- Reports: Saved reports · Money · Sales · Tim's KPIs · L10 · Mangia
+- Clients: Pipeline · Accounts · Proposals · Contracts · Inbox
+- Facilities: Venues · Equipment · Layout templates · Vendor relationships
+- Admin: Permissions · Company · Integrations · Announcements · More (Data exports, Imports, Compare with TPP, Match leftover items, Switch from TPP)
+
+### Kept on purpose (exceptions)
+
+- Printable documents keep their own URL, because a print must show one
+  document: battle board, allergen briefing, route map, contract document,
+  venue menu card, venue info packet, donation summary, tip ledger.
+- Phone and kiosk screens outside the main frame stay: My Day, Event Day,
+  kitchen display.
+- Event Workbooks stays in the main menu (a test written for that page asks
+  for it).
+- Area overview counts did not get a page of their own any more; they sit at
+  the top of the area's main page.
 
 ## Redirect inventory
 
@@ -363,3 +439,37 @@ that now holds the old screen (`src/ui/MergedSection.tsx`).
 | `/logistics/pack-rules` | `/logistics/pack-templates#pack-rules` |
 | `/logistics/maintenance` | `/logistics/fleet#maintenance` |
 | `/logistics/schedule` | `/logistics/deliveries#vehicles` |
+| `/inventory` | `/inventory/stock` |
+| `/inventory/opening-stock` | `/inventory/counts#opening-stock` |
+| `/inventory/audit` | `/inventory/stock#history` |
+| `/inventory/locations` | `/inventory/stock#locations` |
+| `/inventory/demand` | `/inventory/purchasing#demand` |
+| `/kitchen/unresolved` | `/kitchen/prep#unresolved` |
+| `/kitchen/cleanup` | `/kitchen/ingredients#cleanup` |
+| `/kitchen/stations` | `/kitchen/plan#stations` |
+| `/kitchen/yield` | `/kitchen/plan#yield` |
+| `/clients/proposals/templates` | `/clients/proposals#templates` |
+| `/clients/tastings` | `/clients/pipeline#tastings` |
+| `/clients/retention` | `/clients#retention` |
+| `/clients/quote-requests` | `/clients/pipeline#quote-requests` |
+| `/clients/date-holds` | `/clients/pipeline#date-holds` |
+| `/facilities` | `/facilities/venues` |
+| `/facilities/venues/partners` | `/facilities/venues#partners` |
+| `/facilities/venues/:venueId/templates` | `/facilities/venues/templates?venue=:venueId` |
+| `/facilities/venues/:venueId/vendor-relationships` | `/facilities/vendor-relationships?venue=:venueId` |
+| `/admin/kitchens` | `/admin/branding#kitchens` |
+| `/admin/catalogs` | `/admin/branding#catalogs` |
+| `/admin/assistant` | `/admin/integrations#assistant` |
+| `/admin/api-keys` | `/admin/integrations#api-keys` |
+| `/admin/imports/tpp` | `/admin/imports#tpp` |
+| `/today` | `/` |
+| `/events/templates` | `/events/setup#templates` (keeps `?fromEvent=`) |
+| `/events/checklists` | `/events/setup#checklists` |
+| `/events/planning/setup` | `/events/setup#planning` (`#stage-moves` still lands) |
+| `/logistics/returns` | `/logistics/packs#returns` (keeps `?show=`) |
+| `/logistics/route` | `/logistics/deliveries#route` |
+| `/events/:id?tab=guests` | `?tab=client#guests` |
+| `/events/:id?tab=layouts` | `?tab=equipment#layouts` |
+| `/events/:id?tab=todos` | `?tab=timeline#todos` |
+| `/events/:id?tab=incidents` | `?tab=photos#incidents` |
+| `/events/:id?tab=history` | `?tab=photos#history` |

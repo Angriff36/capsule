@@ -200,7 +200,7 @@ export function EventRouteMapPage() {
       </header>
 
       <article className="briefing-document mx-auto mt-6 max-w-200 p-8">
-        <h1 className="text-xl font-semibold">Map · {event.title}</h1>
+        <h2 className="text-xl font-semibold">Map · {event.title}</h2>
         <p className="mt-1 text-base text-ink-2">
           {event.startsAt != null
             ? `${formatDate(event.startsAt)} ${formatTime(event.startsAt)}`

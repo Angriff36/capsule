@@ -31,7 +31,12 @@ import {
 } from "../../lib/financeScopedQueries";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { useActionPrompt } from "../../ui/action-prompt";
-import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
+import {
+  EmptyState,
+  PageHeader,
+  StatusChip,
+  TableSkeleton,
+} from "../../ui/primitives";
 import { formatDate, formatMoneyExact, formatTime } from "../../lib/format";
 import { useEmailProposal } from "../../lib/proposalEmailActions";
 import { ProposalEmailHistory } from "./ProposalEmailHistory";
@@ -775,55 +780,56 @@ export function ProposalsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Clients · Proposals</p>
-          <h1 className="display-title mt-2">Proposals</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
+      <PageHeader
+        title="Proposals"
+        lead={
+          <>
             Priced offers your clients can accept with one click. When a
             proposal is accepted, turn it into a booked event.
-          </p>
-        </div>
-        <div className="supply-row-actions">
-          <button
-            className="btn btn-ghost"
-            type="button"
-            onClick={() => setShowTerminal((value) => !value)}
-          >
-            {showTerminal ? "Hide declined/expired" : "Show declined/expired"}
-          </button>
-          {fromEvent ? (
+          </>
+        }
+        actions={
+          <>
             <button
-              className="btn btn-primary"
+              className="btn btn-ghost"
               type="button"
-              disabled={busy != null}
-              onClick={() => void buildFromEvent(fromEvent._id)}
+              onClick={() => setShowTerminal((value) => !value)}
             >
-              Build from event
+              {showTerminal ? "Hide declined/expired" : "Show declined/expired"}
             </button>
-          ) : null}
-          {fromEvent ? (
-            <RecordAcceptedBeforeCapsule
-              event={fromEvent}
-              prompt={prompt}
-              busy={busy}
-              run={run}
-              onNotice={setNotice}
-              onOpen={(proposalId) => {
-                setShowDraft(false);
-                setSearchParams({ proposal: proposalId });
-              }}
-            />
-          ) : null}
-          <button
-            className={fromEvent ? "btn btn-ghost" : "btn btn-primary"}
-            type="button"
-            onClick={() => setShowDraft((value) => !value)}
-          >
-            {showDraft ? "Close form" : "New proposal"}
-          </button>
-        </div>
-      </header>
+            {fromEvent ? (
+              <button
+                className="btn btn-primary"
+                type="button"
+                disabled={busy != null}
+                onClick={() => void buildFromEvent(fromEvent._id)}
+              >
+                Build from event
+              </button>
+            ) : null}
+            {fromEvent ? (
+              <RecordAcceptedBeforeCapsule
+                event={fromEvent}
+                prompt={prompt}
+                busy={busy}
+                run={run}
+                onNotice={setNotice}
+                onOpen={(proposalId) => {
+                  setShowDraft(false);
+                  setSearchParams({ proposal: proposalId });
+                }}
+              />
+            ) : null}
+            <button
+              className={fromEvent ? "btn btn-ghost" : "btn btn-primary"}
+              type="button"
+              onClick={() => setShowDraft((value) => !value)}
+            >
+              {showDraft ? "Close form" : "New proposal"}
+            </button>
+          </>
+        }
+      />
       <ClientsWorkspaceNav />
       {failure ? <CrmFailureBanner error={failure} /> : null}
       {notice ? (
