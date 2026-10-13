@@ -546,6 +546,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.PackSectionClaim_createViaTake, { "packListId": "packListId-pack-section-claim-1", "sectionKey": "demo-sectionKey-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.PackSectionClaim_createViaTake, { "packListId": "packListId-pack-section-claim-2", "sectionKey": "demo-sectionKey-2" } as any);
+  // PageFeedback has multiple initialization commands (leave, remove); using the selected initialization command: leave.
+  // PageFeedback → api.mutations.PageFeedback_createViaLeave
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PageFeedback_createViaLeave, { "pagePath": "demo-pagePath-1", "pageTitle": "demo-pageTitle-1", "targetLabel": "demo-targetLabel-1", "targetSelector": "demo-targetSelector-1", "offsetX": 1, "offsetY": 1, "viewportWidth": 1, "kind": "demo-kind-1", "body": "demo-body-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PageFeedback_createViaLeave, { "pagePath": "demo-pagePath-2", "pageTitle": "demo-pageTitle-2", "targetLabel": "demo-targetLabel-2", "targetSelector": "demo-targetSelector-2", "offsetX": 2, "offsetY": 2, "viewportWidth": 2, "kind": "demo-kind-2", "body": "demo-body-2" } as any);
   // skip ParallelRunComparison: no creation command in IR (2 rows unused)
   // skip ParallelRunDifference: no creation command in IR (2 rows unused)
   // Payment → api.mutations.Payment_createViaRecord
@@ -1568,6 +1574,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "PackSectionClaim",
       "createMutation": "PackSectionClaim_createViaTake",
+      "rowCount": 2
+    },
+    {
+      "entity": "PageFeedback",
+      "createMutation": "PageFeedback_createViaLeave",
       "rowCount": 2
     },
     {

@@ -301,6 +301,7 @@ import type * as openingStock from "../openingStock.js";
 import type * as outboundEmailThread from "../outboundEmailThread.js";
 import type * as packScans from "../packScans.js";
 import type * as packSections from "../packSections.js";
+import type * as pageFeedback from "../pageFeedback.js";
 import type * as parallelRun from "../parallelRun.js";
 import type * as personEmail from "../personEmail.js";
 import type * as personEmployeeNumber from "../personEmployeeNumber.js";
@@ -683,6 +684,7 @@ declare const fullApi: ApiFromModules<{
   outboundEmailThread: typeof outboundEmailThread;
   packScans: typeof packScans;
   packSections: typeof packSections;
+  pageFeedback: typeof pageFeedback;
   parallelRun: typeof parallelRun;
   personEmail: typeof personEmail;
   personEmployeeNumber: typeof personEmployeeNumber;
