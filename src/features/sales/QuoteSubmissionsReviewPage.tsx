@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import {
   usePagedRows,
   useQuoteSubmissionsInStatuses,
@@ -79,6 +80,7 @@ const OPEN_STATUSES = ["pending", "processing", "failed"] as const;
 const DISMISSED = ["dismissed"] as const;
 
 export function QuoteSubmissionsReviewPage() {
+  const embedded = useEmbedded();
   const [showDismissed, setShowDismissed] = useState(false);
   // Requests still waiting on staff, through the status index; finished
   // (and, when shown, dismissed) ones the newest page at a time.
@@ -195,11 +197,15 @@ export function QuoteSubmissionsReviewPage() {
 
   if (submissions === undefined) {
     return (
-      <div className="p-6 max-w-6xl mx-auto">
-        <div className="mb-4">
-          <PageHeader title="Quote requests" />
-        </div>
-        <ClientsWorkspaceNav />
+      <div className={embedded ? "" : "p-6 max-w-6xl mx-auto"}>
+        {embedded ? null : (
+          <>
+            <div className="mb-4">
+              <PageHeader title="Quote requests" />
+            </div>
+            <ClientsWorkspaceNav />
+          </>
+        )}
         <TableSkeleton />
       </div>
     );
@@ -232,44 +238,65 @@ export function QuoteSubmissionsReviewPage() {
     !organizations.some((org) => org.status === "active");
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
-      <div className="mb-4">
-        <PageHeader
-          title="Quote requests"
-          lead={
-            <>
-              Quotes people asked for through your website.{" "}
-              {pendingCount > 0 ? (
-                <span className="text-warn font-medium">
-                  {pendingCount} awaiting conversion
-                </span>
-              ) : (
-                <span>All caught up.</span>
-              )}
-            </>
-          }
-          actions={
-            <>
-              <button
-                type="button"
-                className="btn btn-ghost btn-sm"
-                onClick={() => setShowDismissed((value) => !value)}
-              >
-                {showDismissed
-                  ? `Hide dismissed (${dismissedCount})`
-                  : "Show dismissed"}
-              </button>
-              <Link
-                to="/clients/pipeline"
-                className="text-xs text-ink-2 hover:text-ink underline"
-              >
-                View lead pipeline →
-              </Link>
-            </>
-          }
-        />
-      </div>
-      <ClientsWorkspaceNav />
+    <div className={embedded ? "" : "p-6 max-w-6xl mx-auto"}>
+      {embedded ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm text-ink-2">
+            {pendingCount > 0
+              ? `${pendingCount} awaiting conversion`
+              : "All caught up."}
+          </span>
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={() => setShowDismissed((value) => !value)}
+          >
+            {showDismissed
+              ? `Hide dismissed (${dismissedCount})`
+              : "Show dismissed"}
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="mb-4">
+            <PageHeader
+              title="Quote requests"
+              lead={
+                <>
+                  Quotes people asked for through your website.{" "}
+                  {pendingCount > 0 ? (
+                    <span className="text-warn font-medium">
+                      {pendingCount} awaiting conversion
+                    </span>
+                  ) : (
+                    <span>All caught up.</span>
+                  )}
+                </>
+              }
+              actions={
+                <>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => setShowDismissed((value) => !value)}
+                  >
+                    {showDismissed
+                      ? `Hide dismissed (${dismissedCount})`
+                      : "Show dismissed"}
+                  </button>
+                  <Link
+                    to="/clients/pipeline"
+                    className="text-xs text-ink-2 hover:text-ink underline"
+                  >
+                    View lead pipeline →
+                  </Link>
+                </>
+              }
+            />
+          </div>
+          <ClientsWorkspaceNav />
+        </>
+      )}
 
       {publicFormOffline && (
         <div className="mb-4 p-3 bg-warn-soft border border-warn/40 rounded-sm text-xs text-warn">

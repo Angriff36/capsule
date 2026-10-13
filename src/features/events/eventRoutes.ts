@@ -30,19 +30,29 @@ export const EVENT_DETAIL_TABS: readonly {
   { key: "chat", label: "Team Chat" },
   { key: "menu", label: "Menu" },
   { key: "prep", label: "Prep" },
-  { key: "equipment", label: "Equipment" },
-  { key: "client", label: "Client Information" },
-  { key: "guests", label: "Guests" },
-  { key: "photos", label: "Event Photo Gallery" },
-  { key: "timeline", label: "Timeline" },
-  { key: "todos", label: "To-dos" },
-  { key: "layouts", label: "Layouts" },
+  { key: "equipment", label: "Equipment & layouts" },
+  { key: "client", label: "Client & guests" },
+  { key: "photos", label: "Photos & incidents" },
+  { key: "timeline", label: "Timeline & to-dos" },
   { key: "staffing", label: "Staffing" },
   { key: "inventory", label: "Inventory" },
-  { key: "incidents", label: "Incidents" },
-  { key: "history", label: "History" },
   { key: "margin", label: "Margin" },
 ] as const;
+
+/**
+ * Old tab keys that now live as a part of another tab
+ * (docs/design/screen-map.md). `?tab=guests` opens Client & guests and
+ * scrolls to the guest list.
+ */
+export const EVENT_TAB_PARTS: Readonly<
+  Partial<Record<EventDetailTab, EventDetailTab>>
+> = {
+  guests: "client",
+  layouts: "equipment",
+  todos: "timeline",
+  incidents: "photos",
+  history: "photos",
+};
 
 /**
  * Workflow grouping for the event detail navigation. Tab keys (and the
@@ -54,22 +64,14 @@ export const EVENT_TAB_GROUPS: readonly {
   label: string;
   tabs: readonly EventDetailTab[];
 }[] = [
-  {
-    key: "plan",
-    label: "Plan",
-    tabs: ["overview", "chat", "client", "guests"],
-  },
+  { key: "plan", label: "Plan", tabs: ["overview", "chat", "client"] },
   { key: "food", label: "Food", tabs: ["menu", "prep", "inventory"] },
   {
     key: "dayof",
     label: "Day-of",
-    tabs: ["timeline", "todos", "staffing", "equipment", "layouts"],
+    tabs: ["timeline", "staffing", "equipment"],
   },
-  {
-    key: "records",
-    label: "Photos & incidents",
-    tabs: ["photos", "incidents", "history"],
-  },
+  { key: "records", label: "Photos & incidents", tabs: ["photos"] },
   { key: "money", label: "Money", tabs: ["margin"] },
 ] as const;
 
@@ -94,7 +96,10 @@ export function eventImportPath(): string {
   return EVENTS_IMPORT_PATH;
 }
 
-const TAB_KEYS = new Set<string>(EVENT_DETAIL_TABS.map((tab) => tab.key));
+const TAB_KEYS = new Set<string>([
+  ...EVENT_DETAIL_TABS.map((tab) => tab.key),
+  ...Object.keys(EVENT_TAB_PARTS),
+]);
 
 /** Builds /events/new?clientId=&proposalId= deep links from CRM (e.g. accepted Proposal). */
 export class EventCreateLinkBuilder {
@@ -111,6 +116,8 @@ export const eventCreateLinkBuilder = new EventCreateLinkBuilder();
 
 export function eventDetailPath(id: string, tab?: EventDetailTab): string {
   if (!tab || tab === "overview") return `/events/${id}?tab=overview`;
+  const host = EVENT_TAB_PARTS[tab];
+  if (host) return `/events/${id}?tab=${host}#${tab}`;
   return `/events/${id}?tab=${tab}`;
 }
 
@@ -123,7 +130,10 @@ export function eventWorkbookReviewPath(id: string, section: string): string {
 export function parseEventDetailTab(
   value: string | null | undefined,
 ): EventDetailTab {
-  if (value && TAB_KEYS.has(value)) return value as EventDetailTab;
+  if (value && TAB_KEYS.has(value)) {
+    const tab = value as EventDetailTab;
+    return EVENT_TAB_PARTS[tab] ?? tab;
+  }
   return "overview";
 }
 

@@ -1,3 +1,4 @@
+import { useEmbedded } from "../../ui/embedded";
 import { useEffect, useMemo, useState } from "react";
 import { formatDate } from "../../lib/format";
 import { Link } from "react-router-dom";
@@ -63,6 +64,7 @@ type VehicleRow = {
 };
 
 export function RoutePlannerPage() {
+  const embedded = useEmbedded();
   const vehicles = useListVehicle() as VehicleRow[] | undefined;
   // Only runs still to drive are planned here: read by status.
   const deliveries = useDeliveriesByStatus(ACTIVE_RUN_STATUSES) as
@@ -247,19 +249,8 @@ export function RoutePlannerPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Logistics · Route planner</p>
-          <h1 className="display-title mt-2">Suggested visit order</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            {roadConfigured === false
-              ? "Stops in the shortest straight-line order. Drive times are a rough guess at 25 mph until the map service is switched on."
-              : "Stops in the shortest order, with real road times from the map service."}{" "}
-            Move a stop up or down if you need to, then print the route for the
-            driver; the order is kept on this screen only and is not saved.
-          </p>
-        </div>
-        <div className="supply-row-actions">
+      {embedded ? (
+        <div className="flex flex-wrap items-center gap-2">
           <BoundedDateInput
             naturalDateDirection="any"
             className="input"
@@ -294,8 +285,62 @@ export function RoutePlannerPage() {
             Print route
           </button>
         </div>
-      </header>
-      <LogisticsWorkspaceNav />
+      ) : (
+        <>
+          <header className="supply-masthead">
+            <div>
+              <p className="eyebrow">Logistics · Route planner</p>
+              <h1 className="display-title mt-2">Suggested visit order</h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                {roadConfigured === false
+                  ? "Stops in the shortest straight-line order. Drive times are a rough guess at 25 mph until the map service is switched on."
+                  : "Stops in the shortest order, with real road times from the map service."}{" "}
+                Move a stop up or down if you need to, then print the route for
+                the driver; the order is kept on this screen only and is not
+                saved.
+              </p>
+            </div>
+            <div className="supply-row-actions">
+              <BoundedDateInput
+                naturalDateDirection="any"
+                className="input"
+                aria-label="Route day"
+                value={day}
+                onChange={(event) => {
+                  setDay(event.currentTarget.value);
+                  setManualOrder(null);
+                }}
+              />
+              <select
+                className="input"
+                aria-label="Route vehicle"
+                value={vehicleId}
+                onChange={(event) => {
+                  setVehicleId(event.currentTarget.value);
+                  setManualOrder(null);
+                }}
+              >
+                {fleet.length === 0 ? (
+                  <option value="">No vehicles</option>
+                ) : null}
+                {fleet.map((vehicle) => (
+                  <option key={vehicle._id} value={vehicle._id}>
+                    {vehicle.registration} · {vehicle.make} {vehicle.model}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => window.print()}
+              >
+                Print route
+              </button>
+            </div>
+          </header>
+          <LogisticsWorkspaceNav />
+        </>
+      )}
 
       {/* The printed stop list is what the driver takes: the order on screen
           is not saved, so print it once it is right. */}

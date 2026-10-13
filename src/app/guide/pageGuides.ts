@@ -61,13 +61,18 @@ export const PAGE_GUIDES: PageGuide[] = [
     ],
   },
   {
-    prefix: "/events/templates",
-    title: "Event templates",
+    prefix: "/events/setup",
+    title: "Event setup",
     purpose:
       "Starting points for events you book again and again, so you never build the same thing twice.",
     steps: [
       "Create a template from your most common event shape.",
       "When booking, start from the template and adjust the details.",
+      "Event checklists: Make a checklist once for work you repeat.",
+      "Event checklists: Put it on an event from the event's To-dos page.",
+      "Planning setup: Set how loud each check is: Fix first, Worth a look, or Off.",
+      "Planning setup: Add planning rules for what the board should suggest.",
+      "Planning setup: Fill in the truck and equipment facts the checks need.",
     ],
   },
   {
@@ -89,26 +94,6 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Look for full rooms and double bookings before you confirm a new event.",
       "Click a day to see what's already booked.",
-    ],
-  },
-  {
-    prefix: "/events/checklists",
-    title: "Event checklists",
-    purpose: "Lists of to-dos you use again and again.",
-    steps: [
-      "Make a checklist once for work you repeat.",
-      "Put it on an event from the event's To-dos page.",
-    ],
-  },
-  {
-    prefix: "/events/planning",
-    title: "Planning setup",
-    purpose:
-      "How the planning board checks a plan, which stages events move into by themselves, and what the board suggests.",
-    steps: [
-      "Set how loud each check is: Fix first, Worth a look, or Off.",
-      "Add planning rules for what the board should suggest.",
-      "Fill in the truck and equipment facts the checks need.",
     ],
   },
   {
@@ -190,16 +175,10 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Read one day at a time; work for the same step is pooled and each event keeps its own amount.",
       "Check Make ahead and Waits for before you start a row.",
       "Set a step's make-ahead days on the dish's prep steps.",
-    ],
-  },
-  {
-    prefix: "/kitchen/yield",
-    title: "Yield variance",
-    purpose:
-      "Planned vs. actual yield for completed production batches, grouped by recipe.",
-    steps: [
-      "Pick a 30, 90, or 365 day window.",
-      "Look for recipes that consistently under- or over-yield and fix the recipe or the prep.",
+      "Yield variance: Pick a 30, 90, or 365 day window.",
+      "Yield variance: Look for recipes that consistently under- or over-yield and fix the recipe or the prep.",
+      "Kitchen stations: Add a station with its sheet order and any other names the crew uses for it.",
+      "Kitchen stations: Retire a station you no longer run; reinstate it when it comes back.",
     ],
   },
   {
@@ -226,33 +205,18 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: ["Pick the event, then adjust dishes and portions for it."],
   },
   {
-    prefix: "/inventory",
-    title: "Inventory",
-    purpose:
-      "What's on the shelf, what's running low, and what's on order from vendors.",
-    steps: [
-      "Watch the Below reorder alerts — that's what to reorder.",
-      "Use Purchasing to turn needs into vendor orders.",
-    ],
-  },
-  {
-    prefix: "/inventory/demand",
-    title: "Demand",
-    purpose:
-      "What upcoming events will consume, so you can buy ahead instead of scrambling.",
-    steps: [
-      "Review upcoming needs by ingredient.",
-      "Send shortfalls to Purchasing.",
-    ],
-  },
-  {
     prefix: "/inventory/stock",
-    title: "Stock book",
+    title: "Stock",
     purpose:
       "Current quantities of everything, by storage location, with reorder alerts.",
     steps: [
       "Adjust quantities when things come in or get used outside an event.",
       "Set PAR levels so low stock flags itself.",
+      "Watch the Below reorder alerts — that's what to reorder.",
+      "Use Purchasing to turn needs into vendor orders.",
+      "Stock history: Search by ingredient to trace where stock went.",
+      "Storage locations: Edit a location's name, type, and temperature range.",
+      "Storage locations: Deactivate a location you no longer use; activate it again when you do.",
     ],
   },
   {
@@ -263,44 +227,9 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: [
       "Start a count session.",
       "Enter real quantities; differences get logged automatically.",
-    ],
-  },
-  {
-    prefix: "/inventory/opening-stock",
-    title: "Opening stock",
-    purpose:
-      "Bring in a stock count sheet and pick which counts become the stock on hand.",
-    steps: [
-      "Choose the count sheet (CSV). Every row lands here; stock on hand does not change yet.",
-      "Fix the rows that need it, or set them aside.",
-      "Press Use as opening stock on each food row you want to start from.",
-    ],
-  },
-  {
-    prefix: "/inventory/audit",
-    title: "Stock history",
-    purpose:
-      "Every stock movement and who made it — for when a number looks wrong.",
-    steps: ["Search by ingredient to trace where stock went."],
-  },
-  {
-    prefix: "/inventory/locations",
-    title: "Storage locations",
-    purpose:
-      "The walk-ins, freezers, and dry storage that stock is kept in. Edit a location or take it out of use.",
-    steps: [
-      "Edit a location's name, type, and temperature range.",
-      "Deactivate a location you no longer use; activate it again when you do.",
-    ],
-  },
-  {
-    prefix: "/kitchen/stations",
-    title: "Kitchen stations",
-    purpose:
-      "The stations that prep work and the day sheet are sorted by. Add, rename, or retire a station.",
-    steps: [
-      "Add a station with its sheet order and any other names the crew uses for it.",
-      "Retire a station you no longer run; reinstate it when it comes back.",
+      "Opening stock: Choose the count sheet (CSV). Every row lands here; stock on hand does not change yet.",
+      "Opening stock: Fix the rows that need it, or set them aside.",
+      "Opening stock: Press Use as opening stock on each food row you want to start from.",
     ],
   },
   {
@@ -329,6 +258,8 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Review this week's draft order.",
       "Adjust quantities, pick vendors, and send.",
       "Mark orders received when deliveries arrive.",
+      "Demand: Review upcoming needs by ingredient.",
+      "Demand: Send shortfalls to Purchasing.",
     ],
   },
   {
@@ -391,13 +322,8 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Assign a driver and vehicle to each run.",
       "Start transit when the van leaves; mark delivered on arrival.",
       "Vehicle schedule: Check before promising a delivery window.",
+      "Route planner: Move stops into order, then print the route for the driver.",
     ],
-  },
-  {
-    prefix: "/logistics/route",
-    title: "Route planner",
-    purpose: "Put the day's stops in a sensible driving order.",
-    steps: ["Move stops into order, then print the route for the driver."],
   },
   {
     prefix: "/logistics/fleet",
@@ -480,6 +406,7 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Use Pipeline for people who haven't booked yet.",
       "Open a client to see their whole history with you.",
       "Send proposals from here; accepted ones become events.",
+      "Retention: Reach out to lapsed clients before the season starts.",
     ],
   },
   {
@@ -491,6 +418,9 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Add every inquiry the moment it arrives.",
       "Move cards along as conversations progress.",
       "Convert to a client when they're ready to book.",
+      "Quote requests: Review each request and turn the good ones into proposals.",
+      "Date holds: Hold a date for a prospect; it lapses on its own at the expiry.",
+      "Date holds: When a held date opens, call the next client on its waitlist.",
     ],
   },
   {
@@ -502,13 +432,8 @@ export const PAGE_GUIDES: PageGuide[] = [
       "Draft a proposal with menu and pricing.",
       "Send it; the client gets a link to accept.",
       "When accepted, create the event from it.",
+      "Proposal templates: Save your standard offers; start new proposals from them.",
     ],
-  },
-  {
-    prefix: "/clients/proposals/templates",
-    title: "Proposal templates",
-    purpose: "Reusable proposal shapes so quoting takes minutes, not hours.",
-    steps: ["Save your standard offers; start new proposals from them."],
   },
   {
     prefix: "/clients/contracts",
@@ -517,34 +442,10 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: ["Draft from the event, send for signature, file the signed copy."],
   },
   {
-    prefix: "/clients/retention",
-    title: "Retention",
-    purpose:
-      "Clients who used to book and stopped — your easiest win-back revenue.",
-    steps: ["Reach out to lapsed clients before the season starts."],
-  },
-  {
-    prefix: "/clients/quote-requests",
-    title: "Quote requests",
-    purpose:
-      "Quotes people submitted through your website, waiting for a response.",
-    steps: ["Review each request and turn the good ones into proposals."],
-  },
-  {
     prefix: "/clients/inbox",
     title: "Inbox",
     purpose: "Messages from social and web channels, turned into leads.",
     steps: ["Reply, and convert real inquiries into pipeline leads."],
-  },
-  {
-    prefix: "/clients/date-holds",
-    title: "Date holds",
-    purpose:
-      "Soft holds on dates for prospects, and who is waiting if a date opens.",
-    steps: [
-      "Hold a date for a prospect; it lapses on its own at the expiry.",
-      "When a held date opens, call the next client on its waitlist.",
-    ],
   },
   {
     prefix: "/finance/invoices",
@@ -629,20 +530,15 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: ["Pick a dashboard; each answers one owner-level question."],
   },
   {
-    prefix: "/facilities",
-    title: "Facilities",
-    purpose: "Your venues, equipment, and the upkeep that keeps them ready.",
-    steps: [
-      "Keep venue details current — events pull from them.",
-      "Watch maintenance-due so nothing fails on event day.",
-    ],
-  },
-  {
     prefix: "/facilities/venues",
     title: "Venues",
     purpose:
       "Every place you serve — capacity, load-in notes, contacts, and rules.",
-    steps: ["Fill in logistics notes once; every event there benefits."],
+    steps: [
+      "Fill in logistics notes once; every event there benefits.",
+      "Facilities: Keep venue details current — events pull from them.",
+      "Facilities: Watch maintenance-due so nothing fails on event day.",
+    ],
   },
   {
     prefix: "/facilities/equipment",

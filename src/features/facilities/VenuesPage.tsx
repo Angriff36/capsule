@@ -1,4 +1,8 @@
 import { useState, type FormEvent } from "react";
+import { EmbeddedContext } from "../../ui/embedded";
+import { MergedSection } from "../../ui/MergedSection";
+import { FacilitiesOverviewPage } from "./FacilitiesOverviewPage";
+import { VenuePartnersPage } from "./VenuePartnersPage";
 import { Link } from "react-router-dom";
 import {
   useCreateVenue,
@@ -220,6 +224,9 @@ export function VenuesPage() {
         }
       />
       <FacilitiesWorkspaceNav />
+      <EmbeddedContext.Provider value={true}>
+        <FacilitiesOverviewPage />
+      </EmbeddedContext.Provider>
       {host}
 
       {failure != null && <SupplyFailureBanner error={failure} />}
@@ -596,6 +603,9 @@ export function VenuesPage() {
           </div>
         </>
       )}
+      <MergedSection id="partners" title="Partner venues">
+        <VenuePartnersPage />
+      </MergedSection>
     </div>
   );
 }

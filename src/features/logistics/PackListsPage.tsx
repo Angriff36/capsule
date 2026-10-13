@@ -1,3 +1,4 @@
+import { ReturnsPage } from "./ReturnsPage";
 import { packListName } from "./packListName";
 import { MergedSection } from "../../ui/MergedSection";
 import { PackingFloorPage } from "./PackingFloorPage";
@@ -377,6 +378,9 @@ export function PackListsPage() {
           </div>
         ) : null}
       </section>
+      <MergedSection id="returns" title="Returns">
+        <ReturnsPage />
+      </MergedSection>
     </div>
   );
 }

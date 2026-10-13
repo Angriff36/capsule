@@ -215,7 +215,7 @@ function buildInventoryReport(
     sourceLabel: "Ingredient demand",
     sourceDescription:
       "Demand lines supply quantities and purchasing status. Units stay separate, and the ingredient and event they belong to only show what you're allowed to see.",
-    sourcePath: "/inventory/demand",
+    sourcePath: "/inventory/purchasing#demand",
     effectiveWindow: dateWindow.window,
     kpis: [
       kpi("inventory.demand_lines", formatCount(rows.length)),

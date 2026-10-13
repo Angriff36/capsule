@@ -133,7 +133,10 @@ export function PurchasingQueueSplit({
               <Link to="/events" className="btn btn-primary btn-sm">
                 Events
               </Link>
-              <Link to="/inventory/demand" className="btn btn-ghost btn-sm">
+              <Link
+                to="/inventory/purchasing#demand"
+                className="btn btn-ghost btn-sm"
+              >
                 Demand ledger
               </Link>
             </div>

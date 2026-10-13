@@ -4,7 +4,8 @@ import { Navigate, useLocation, useParams } from "react-router-dom";
  * Redirect for a screen that moved (docs/design/screen-map.md, "Redirect
  * inventory"). `:name` tokens in `to` take the old route's params. Params
  * named in `paramsToQuery` move into the query string. The old query string
- * is kept, and `hash` points at the section that now holds the screen.
+ * is kept, and `hash` points at the section that now holds the screen
+ * (unless the old link carried its own #part).
  */
 export function MovedRoute({
   to,
@@ -32,7 +33,8 @@ export function MovedRoute({
       to={{
         pathname,
         search: query ? `?${query}` : "",
-        hash: hash ? `#${hash}` : location.hash,
+        // A deep link's own #part wins over the section anchor.
+        hash: location.hash || (hash ? `#${hash}` : ""),
       }}
     />
   );

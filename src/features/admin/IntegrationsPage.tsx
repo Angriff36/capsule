@@ -1,4 +1,7 @@
 import { useAction, useQuery } from "convex/react";
+import { MergedSection } from "../../ui/MergedSection";
+import { ApiKeysPage } from "./ApiKeysPage";
+import { AssistantSettingsPage } from "./AssistantSettingsPage";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { api } from "../../lib/api";
@@ -192,7 +195,7 @@ export function IntegrationsPage() {
     <div className="operations-stage space-y-6">
       <PageHeader
         title="Integrations"
-        lead="Connect the services that keep event operations moving without duplicate entry."
+        lead="Connect the services that keep event operations moving without duplicate entry: QuickBooks, text alerts, the in-app assistant, and API keys for remote agents."
       />
       <AdminWorkspaceNav />
 
@@ -416,6 +419,12 @@ export function IntegrationsPage() {
       <OutsideMessagesSection />
 
       <StepHistorySection />
+      <MergedSection id="assistant" title="Assistant">
+        <AssistantSettingsPage />
+      </MergedSection>
+      <MergedSection id="api-keys" title="API keys">
+        <ApiKeysPage />
+      </MergedSection>
     </div>
   );
 }

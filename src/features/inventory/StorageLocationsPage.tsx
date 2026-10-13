@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { Link } from "react-router-dom";
 import {
   useListIngredient,
@@ -39,6 +40,7 @@ const temperatureLabel = (location: {
 };
 
 export function StorageLocationsPage() {
+  const embedded = useEmbedded();
   const locations = useListStorageLocation();
   const stockItems = useStockLines("none");
   const ingredients = useListIngredient();
@@ -193,16 +195,29 @@ export function StorageLocationsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        title="Storage locations"
-        lead="Every fridge, freezer and dry store, what sits in each one, and the temperature it should keep. Capsule does not read a thermometer: the range here is the target you set."
-        actions={
+      {embedded ? (
+        <div className="flex flex-wrap items-center gap-2">
           <Link to="/inventory/stock?new=location" className="btn btn-primary">
             Register a location
           </Link>
-        }
-      />
-      <InventoryWorkspaceNav />
+        </div>
+      ) : (
+        <>
+          <PageHeader
+            title="Storage locations"
+            lead="Every fridge, freezer and dry store, what sits in each one, and the temperature it should keep. Capsule does not read a thermometer: the range here is the target you set."
+            actions={
+              <Link
+                to="/inventory/stock?new=location"
+                className="btn btn-primary"
+              >
+                Register a location
+              </Link>
+            }
+          />
+          <InventoryWorkspaceNav />
+        </>
+      )}
       {failure ? <SupplyFailureBanner error={failure} /> : null}
       {host}
 

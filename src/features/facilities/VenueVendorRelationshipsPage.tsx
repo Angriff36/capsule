@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import {
   useCreateVenueVendorRelationship,
   useVenueVendorRelationshipReviseDetails,
@@ -88,7 +88,10 @@ const toOptionalNumber = (value: string | undefined): number | undefined => {
 
 /** Venue vendor relationships page — manage venue-specific vendor policies. */
 export function VenueVendorRelationshipsPage() {
-  const { venueId } = useParams<{ venueId: string }>();
+  // One page for every venue; ?venue= narrows it to one.
+  const { venueId: routeVenueId } = useParams<{ venueId: string }>();
+  const [searchParams] = useSearchParams();
+  const venueId = routeVenueId ?? searchParams.get("venue") ?? undefined;
   const relationships = useListVenueVendorRelationship();
   const venues = useListVenue();
   const vendors = useListVendor();

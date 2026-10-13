@@ -401,7 +401,6 @@ export function VehicleFleetPage() {
     });
   };
 
-  const assetLabel = assetTab === "vehicles" ? "vehicle" : "trailer";
   const editing = editingVehicle ?? editingTrailer;
 
   return (
@@ -414,36 +413,28 @@ export function VehicleFleetPage() {
             <button
               className="btn btn-primary"
               type="button"
-              onClick={() => setFormMode("create")}
+              onClick={() => {
+                setAssetTab("vehicles");
+                setFormMode("create");
+              }}
             >
-              Register {assetLabel}
+              Register vehicle
+            </button>
+            <button
+              className="btn btn-ghost"
+              type="button"
+              onClick={() => {
+                setAssetTab("trailers");
+                setFormMode("create");
+              }}
+            >
+              Register trailer
             </button>
           </>
         }
       />
 
       <LogisticsWorkspaceNav />
-
-      <div className="supply-row-actions mt-3" role="tablist">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={assetTab === "vehicles"}
-          className={`btn btn-sm ${assetTab === "vehicles" ? "btn-primary" : "btn-ghost"}`}
-          onClick={() => setAssetTab("vehicles")}
-        >
-          Vehicles ({vehicleRows.length})
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={assetTab === "trailers"}
-          className={`btn btn-sm ${assetTab === "trailers" ? "btn-primary" : "btn-ghost"}`}
-          onClick={() => setAssetTab("trailers")}
-        >
-          Trailers ({trailerRows.length})
-        </button>
-      </div>
 
       {failure ? <LogisticsFailureBanner error={failure} /> : null}
       {notice ? (
@@ -483,252 +474,251 @@ export function VehicleFleetPage() {
         />
       ) : null}
 
-      {assetTab === "vehicles" ? (
-        <section className="working-ledger">
-          <div className="ledger-heading">
-            <div>
-              <p className="eyebrow">What can go out</p>
-              <h2>Vehicle catalog</h2>
-            </div>
-            <span>
-              {availableVehicles.length} available ·{" "}
-              {activeVehicleCapacity.toLocaleString()} kg they can carry
-            </span>
+      {/* Vehicles and trailers sit one under the other: no switch to find the other list. */}
+      <section className="working-ledger">
+        <div className="ledger-heading">
+          <div>
+            <p className="eyebrow">What can go out</p>
+            <h2>Vehicle catalog</h2>
           </div>
+          <span>
+            {availableVehicles.length} available ·{" "}
+            {activeVehicleCapacity.toLocaleString()} kg they can carry
+          </span>
+        </div>
 
-          {vehicles === undefined ? (
-            <TableSkeleton rows={6} />
-          ) : vehicleRows.length === 0 ? (
-            <div className="document-empty">
-              <p>No vehicles are registered.</p>
-              <span>
-                Add the first delivery vehicle to make fleet capacity visible to
-                dispatch.
-              </span>
-              <div className="mt-3 flex justify-center">
-                <button
-                  type="button"
-                  className="btn btn-primary btn-sm"
-                  onClick={() => setFormMode("create")}
-                >
-                  Register vehicle
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="supply-table-wrap">
-              <table className="supply-table phone-cards">
-                <thead>
-                  <tr>
-                    <th>Vehicle</th>
-                    <th>Registration</th>
-                    <th>Ownership</th>
-                    <th>Payload capacity</th>
-                    <th>Operational status</th>
-                    <th>Compliance</th>
-                    <th aria-label="Actions" />
-                  </tr>
-                </thead>
-                <tbody>
-                  {vehicleRows.map((vehicle) => (
-                    <tr key={vehicle._id}>
-                      <td>
-                        <strong>
-                          {vehicle.make} {vehicle.model}
-                        </strong>
-                        {vehicle.statusNote ? (
-                          <small>{vehicle.statusNote}</small>
-                        ) : null}
-                      </td>
-                      <td data-label="Registration">{vehicle.registration}</td>
-                      <td data-label="Ownership">
-                        <StatusChip status={vehicle.ownership} />
-                      </td>
-                      <td className="supply-number" data-label="Payload">
-                        {vehicle.payloadCapacityKg.toLocaleString()} kg
-                        {vehicle.towCapacityKg === 0 ? (
-                          <small>No trailer</small>
-                        ) : vehicle.towCapacityKg != null ? (
-                          <small>
-                            Tows {vehicle.towCapacityKg.toLocaleString()} kg
-                          </small>
-                        ) : null}
-                      </td>
-                      <td data-label="Status">
-                        <StatusChip status={vehicle.operationalStatus} />
-                      </td>
-                      <td data-label="Compliance">
-                        <ComplianceChips row={vehicle} />
-                      </td>
-                      <td>
-                        <div className="supply-row-actions">
-                          <select
-                            className="input"
-                            aria-label={`Status for ${vehicle.registration}`}
-                            value={vehicle.operationalStatus}
-                            disabled={busy != null}
-                            onChange={(event) =>
-                              changeVehicleStatus(
-                                vehicle,
-                                event.currentTarget.value as OperationalStatus,
-                              )
-                            }
-                          >
-                            {OPERATIONAL_STATUSES.map((status) => (
-                              <option key={status} value={status}>
-                                {formatStatusLabel(status)}
-                              </option>
-                            ))}
-                          </select>
-                          <button
-                            type="button"
-                            className="btn btn-ghost btn-sm"
-                            disabled={busy != null}
-                            onClick={() => setFormMode(vehicle._id)}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-ghost btn-sm"
-                            disabled={busy != null}
-                            onClick={() =>
-                              setComplianceFor({
-                                kind: "vehicle",
-                                id: vehicle._id,
-                                current: complianceOf(vehicle),
-                              })
-                            }
-                          >
-                            Registration / insurance
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
-      ) : (
-        <section className="working-ledger">
-          <div className="ledger-heading">
-            <div>
-              <p className="eyebrow">What can go out</p>
-              <h2>Trailer catalog</h2>
-            </div>
+        {vehicles === undefined ? (
+          <TableSkeleton rows={6} />
+        ) : vehicleRows.length === 0 ? (
+          <div className="document-empty">
+            <p>No vehicles are registered.</p>
             <span>
-              {availableTrailers.length} available ·{" "}
-              {activeTrailerCapacity.toLocaleString()} kg they can carry
+              Add the first delivery vehicle to make fleet capacity visible to
+              dispatch.
             </span>
+            <div className="mt-3 flex justify-center">
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={() => setFormMode("create")}
+              >
+                Register vehicle
+              </button>
+            </div>
           </div>
-
-          {trailers === undefined ? (
-            <TableSkeleton rows={4} />
-          ) : trailerRows.length === 0 ? (
-            <div className="document-empty">
-              <p>No trailers are registered.</p>
-              <span>
-                Add the first trailer to make towed capacity visible to
-                dispatch.
-              </span>
-              <div className="mt-3 flex justify-center">
-                <button
-                  type="button"
-                  className="btn btn-primary btn-sm"
-                  onClick={() => setFormMode("create")}
-                >
-                  Register trailer
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div className="supply-table-wrap">
-              <table className="supply-table phone-cards">
-                <thead>
-                  <tr>
-                    <th>Trailer</th>
-                    <th>Registration</th>
-                    <th>Payload capacity</th>
-                    <th>Operational status</th>
-                    <th>Compliance</th>
-                    <th aria-label="Actions" />
+        ) : (
+          <div className="supply-table-wrap">
+            <table className="supply-table phone-cards">
+              <thead>
+                <tr>
+                  <th>Vehicle</th>
+                  <th>Registration</th>
+                  <th>Ownership</th>
+                  <th>Payload capacity</th>
+                  <th>Operational status</th>
+                  <th>Compliance</th>
+                  <th aria-label="Actions" />
+                </tr>
+              </thead>
+              <tbody>
+                {vehicleRows.map((vehicle) => (
+                  <tr key={vehicle._id}>
+                    <td>
+                      <strong>
+                        {vehicle.make} {vehicle.model}
+                      </strong>
+                      {vehicle.statusNote ? (
+                        <small>{vehicle.statusNote}</small>
+                      ) : null}
+                    </td>
+                    <td data-label="Registration">{vehicle.registration}</td>
+                    <td data-label="Ownership">
+                      <StatusChip status={vehicle.ownership} />
+                    </td>
+                    <td className="supply-number" data-label="Payload">
+                      {vehicle.payloadCapacityKg.toLocaleString()} kg
+                      {vehicle.towCapacityKg === 0 ? (
+                        <small>No trailer</small>
+                      ) : vehicle.towCapacityKg != null ? (
+                        <small>
+                          Tows {vehicle.towCapacityKg.toLocaleString()} kg
+                        </small>
+                      ) : null}
+                    </td>
+                    <td data-label="Status">
+                      <StatusChip status={vehicle.operationalStatus} />
+                    </td>
+                    <td data-label="Compliance">
+                      <ComplianceChips row={vehicle} />
+                    </td>
+                    <td>
+                      <div className="supply-row-actions">
+                        <select
+                          className="input"
+                          aria-label={`Status for ${vehicle.registration}`}
+                          value={vehicle.operationalStatus}
+                          disabled={busy != null}
+                          onChange={(event) =>
+                            changeVehicleStatus(
+                              vehicle,
+                              event.currentTarget.value as OperationalStatus,
+                            )
+                          }
+                        >
+                          {OPERATIONAL_STATUSES.map((status) => (
+                            <option key={status} value={status}>
+                              {formatStatusLabel(status)}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          disabled={busy != null}
+                          onClick={() => setFormMode(vehicle._id)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          disabled={busy != null}
+                          onClick={() =>
+                            setComplianceFor({
+                              kind: "vehicle",
+                              id: vehicle._id,
+                              current: complianceOf(vehicle),
+                            })
+                          }
+                        >
+                          Registration / insurance
+                        </button>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {trailerRows.map((trailer) => (
-                    <tr key={trailer._id}>
-                      <td>
-                        <strong>
-                          {trailer.make} {trailer.model}
-                        </strong>
-                        {trailer.statusNote ? (
-                          <small>{trailer.statusNote}</small>
-                        ) : null}
-                      </td>
-                      <td data-label="Registration">{trailer.registration}</td>
-                      <td className="supply-number" data-label="Payload">
-                        {trailer.payloadCapacityKg.toLocaleString()} kg
-                      </td>
-                      <td data-label="Status">
-                        <StatusChip status={trailer.operationalStatus} />
-                      </td>
-                      <td data-label="Compliance">
-                        <ComplianceChips row={trailer} />
-                      </td>
-                      <td>
-                        <div className="supply-row-actions">
-                          <select
-                            className="input"
-                            aria-label={`Status for ${trailer.registration}`}
-                            value={trailer.operationalStatus}
-                            disabled={busy != null}
-                            onChange={(event) =>
-                              changeTrailerStatus(
-                                trailer,
-                                event.currentTarget.value as OperationalStatus,
-                              )
-                            }
-                          >
-                            {OPERATIONAL_STATUSES.map((status) => (
-                              <option key={status} value={status}>
-                                {formatStatusLabel(status)}
-                              </option>
-                            ))}
-                          </select>
-                          <button
-                            type="button"
-                            className="btn btn-ghost btn-sm"
-                            disabled={busy != null}
-                            onClick={() => setFormMode(trailer._id)}
-                          >
-                            Edit
-                          </button>
-                          <button
-                            type="button"
-                            className="btn btn-ghost btn-sm"
-                            disabled={busy != null}
-                            onClick={() =>
-                              setComplianceFor({
-                                kind: "trailer",
-                                id: trailer._id,
-                                current: complianceOf(trailer),
-                              })
-                            }
-                          >
-                            Registration / insurance
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <section className="working-ledger">
+        <div className="ledger-heading">
+          <div>
+            <p className="eyebrow">What can go out</p>
+            <h2>Trailer catalog</h2>
+          </div>
+          <span>
+            {availableTrailers.length} available ·{" "}
+            {activeTrailerCapacity.toLocaleString()} kg they can carry
+          </span>
+        </div>
+
+        {trailers === undefined ? (
+          <TableSkeleton rows={4} />
+        ) : trailerRows.length === 0 ? (
+          <div className="document-empty">
+            <p>No trailers are registered.</p>
+            <span>
+              Add the first trailer to make towed capacity visible to dispatch.
+            </span>
+            <div className="mt-3 flex justify-center">
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={() => setFormMode("create")}
+              >
+                Register trailer
+              </button>
             </div>
-          )}
-        </section>
-      )}
+          </div>
+        ) : (
+          <div className="supply-table-wrap">
+            <table className="supply-table phone-cards">
+              <thead>
+                <tr>
+                  <th>Trailer</th>
+                  <th>Registration</th>
+                  <th>Payload capacity</th>
+                  <th>Operational status</th>
+                  <th>Compliance</th>
+                  <th aria-label="Actions" />
+                </tr>
+              </thead>
+              <tbody>
+                {trailerRows.map((trailer) => (
+                  <tr key={trailer._id}>
+                    <td>
+                      <strong>
+                        {trailer.make} {trailer.model}
+                      </strong>
+                      {trailer.statusNote ? (
+                        <small>{trailer.statusNote}</small>
+                      ) : null}
+                    </td>
+                    <td data-label="Registration">{trailer.registration}</td>
+                    <td className="supply-number" data-label="Payload">
+                      {trailer.payloadCapacityKg.toLocaleString()} kg
+                    </td>
+                    <td data-label="Status">
+                      <StatusChip status={trailer.operationalStatus} />
+                    </td>
+                    <td data-label="Compliance">
+                      <ComplianceChips row={trailer} />
+                    </td>
+                    <td>
+                      <div className="supply-row-actions">
+                        <select
+                          className="input"
+                          aria-label={`Status for ${trailer.registration}`}
+                          value={trailer.operationalStatus}
+                          disabled={busy != null}
+                          onChange={(event) =>
+                            changeTrailerStatus(
+                              trailer,
+                              event.currentTarget.value as OperationalStatus,
+                            )
+                          }
+                        >
+                          {OPERATIONAL_STATUSES.map((status) => (
+                            <option key={status} value={status}>
+                              {formatStatusLabel(status)}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          disabled={busy != null}
+                          onClick={() => setFormMode(trailer._id)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          disabled={busy != null}
+                          onClick={() =>
+                            setComplianceFor({
+                              kind: "trailer",
+                              id: trailer._id,
+                              current: complianceOf(trailer),
+                            })
+                          }
+                        >
+                          Registration / insurance
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
       <MergedSection id="maintenance" title="Service and fuel">
         <VehicleMaintenancePage />
       </MergedSection>

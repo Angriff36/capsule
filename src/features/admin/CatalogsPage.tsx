@@ -1,3 +1,4 @@
+import { useEmbedded } from "../../ui/embedded";
 import {
   useCreateOccasion,
   useCreateReferralSource,
@@ -30,6 +31,7 @@ import {
 // same live query, so an add, rename or retire here reaches them without a
 // redeploy or reload.
 export function CatalogsPage() {
+  const embedded = useEmbedded();
   const serviceStyles = useListServiceStyle() as CatalogRow[] | undefined;
   const occasions = useListOccasion() as CatalogRow[] | undefined;
   const referralSources = useListReferralSource() as CatalogRow[] | undefined;
@@ -48,11 +50,15 @@ export function CatalogsPage() {
 
   return (
     <div className="operations-stage space-y-6">
-      <PageHeader
-        title="Catalogs"
-        lead="Manage the lists behind event and lead dropdowns. Changes reach every selector immediately."
-      />
-      <AdminWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <PageHeader
+            title="Catalogs"
+            lead="Manage the lists behind event and lead dropdowns. Changes reach every selector immediately."
+          />
+          <AdminWorkspaceNav />
+        </>
+      )}
       <CatalogsSection
         title="Service styles"
         singular="service style"

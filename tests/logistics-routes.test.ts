@@ -17,8 +17,6 @@ describe("Logistics routes and lifecycle bindings", () => {
       "/logistics/dispatch",
       "/logistics/packs",
       "/logistics/deliveries",
-      "/logistics/route",
-      "/logistics/returns",
       "/logistics/fleet",
       "/logistics/pack-templates",
     ]);

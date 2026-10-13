@@ -1,4 +1,5 @@
 import { useAction } from "convex/react";
+import { useEmbedded } from "../../ui/embedded";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { api } from "../../lib/api";
 import { ErrorState, PageHeader, Section } from "../../ui/primitives";
@@ -22,6 +23,7 @@ const when = (ms: number | null) => (ms ? formatDateTime(ms) : "never");
  * Keys live in Clerk; convex/apiKeys.ts talks to it for the signed-in user.
  */
 export function ApiKeysPage() {
+  const embedded = useEmbedded();
   const listMine = useAction(api.apiKeys.listMine);
   const createMine = useAction(api.apiKeys.createMine);
   const revokeMine = useAction(api.apiKeys.revokeMine);
@@ -92,11 +94,15 @@ export function ApiKeysPage() {
 
   return (
     <div className="page">
-      <PageHeader
-        title="API keys"
-        lead="Give a remote agent one key. It then acts as you when it calls the API — same business, same permissions — until you revoke the key here."
-      />
-      <AdminWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <PageHeader
+            title="API keys"
+            lead="Give a remote agent one key. It then acts as you when it calls the API — same business, same permissions — until you revoke the key here."
+          />
+          <AdminWorkspaceNav />
+        </>
+      )}
       {error ? <ErrorState title="API keys" detail={error} /> : null}
 
       {fresh ? (

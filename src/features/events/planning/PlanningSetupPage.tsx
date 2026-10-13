@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useEmbedded } from "../../../ui/embedded";
 import { Link } from "react-router-dom";
 import {
   fieldSetsFromText,
@@ -111,6 +112,7 @@ const emptyRule = (): RuleDraft => ({
  * own fields for each equipment category.
  */
 export function PlanningSetupPage() {
+  const embedded = useEmbedded();
   const authStatus = useAuthStatus();
   const organizations = useListOrganization();
   const organization = organizations?.find((row) => row.deletedAt == null);
@@ -294,14 +296,18 @@ export function PlanningSetupPage() {
 
   return (
     <div className="operations-stage">
-      <Link className="text-link" to="/events/tracker?view=plan">
-        ← Planning board
-      </Link>
-      <PageHeader
-        eyebrow="Events · Planning"
-        title="Planning setup"
-        lead="How the planning board checks a plan, which stages events move into by themselves, what the board suggests, and the facts it needs about trucks and equipment."
-      />
+      {embedded ? null : (
+        <>
+          <Link className="text-link" to="/events/tracker?view=plan">
+            ← Planning board
+          </Link>
+          <PageHeader
+            eyebrow="Events · Planning"
+            title="Planning setup"
+            lead="How the planning board checks a plan, which stages events move into by themselves, what the board suggests, and the facts it needs about trucks and equipment."
+          />
+        </>
+      )}
       {savedToast}
       {failure ? <FailureBanner failure={failure} /> : null}
 

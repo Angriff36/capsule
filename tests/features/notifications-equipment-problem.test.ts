@@ -117,7 +117,7 @@ describe("quote request notifications", () => {
     expect(out).toEqual([
       expect.objectContaining({
         message: "Marcus Lee asked for a quote · 45 guests",
-        link: "/clients/quote-requests",
+        link: "/clients/pipeline#quote-requests",
       }),
     ]);
   });

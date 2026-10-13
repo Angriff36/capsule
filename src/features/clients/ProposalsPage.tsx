@@ -1,4 +1,6 @@
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { MergedSection } from "../../ui/MergedSection";
+import { ProposalTemplatesPage } from "./ProposalTemplatesPage";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   useGetEvent,
@@ -1316,6 +1318,9 @@ export function ProposalsPage() {
           </div>
         ) : null}
       </section>
+      <MergedSection id="templates" title="Proposal templates">
+        <ProposalTemplatesPage />
+      </MergedSection>
     </div>
   );
 }

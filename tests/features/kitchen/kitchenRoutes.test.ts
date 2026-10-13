@@ -6,11 +6,11 @@ import {
 } from "../../../src/features/kitchen/kitchenRoutes";
 
 describe("kitchenRoutes nav cleanup", () => {
-  it("keeps the prep board, plan and yield in one menu and drops allergen/event-menu keys", () => {
+  it("keeps the prep board and plan in one menu (yield lives on the plan) and drops allergen/event-menu keys", () => {
     const keys = KITCHEN_SECTIONS.map((section) => section.key);
     expect(keys).toContain("prep");
     expect(keys).toContain("plan");
-    expect(keys).toContain("yield");
+    expect(keys).not.toContain("yield");
     expect(keys).not.toContain("allergens");
     expect(keys).not.toContain("event-menu");
   });

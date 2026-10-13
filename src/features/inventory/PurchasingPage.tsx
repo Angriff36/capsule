@@ -1,3 +1,5 @@
+import { MergedSection } from "../../ui/MergedSection";
+import { DemandLedgerPage } from "./DemandLedgerPage";
 import { useMemo, useState, type FormEvent } from "react";
 import { FinishedEventsBuyingNotice } from "./FinishedEventsBuyingNotice";
 import { Link } from "react-router-dom";
@@ -598,7 +600,10 @@ export function PurchasingPage() {
               <Link to="/events" className="btn btn-primary btn-sm">
                 Go to events
               </Link>
-              <Link to="/inventory/demand" className="btn btn-ghost btn-sm">
+              <Link
+                to="/inventory/purchasing#demand"
+                className="btn btn-ghost btn-sm"
+              >
                 Demand ledger
               </Link>
             </div>
@@ -841,6 +846,9 @@ export function PurchasingPage() {
           Cancel ({selection.selected.filter(needCanCancel).length})
         </button>
       </BulkActionBar>
+      <MergedSection id="demand" title="What each event needs">
+        <DemandLedgerPage />
+      </MergedSection>
     </div>
   );
 }

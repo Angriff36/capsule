@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { Link } from "react-router-dom";
 import { useListComponent } from "../../lib/manifest-convex-react";
 import { useBatchesSince } from "../../lib/productionScopedQueries";
@@ -110,6 +111,7 @@ export function ProductionYieldDashboard({
   windowDays?: ProductionYieldWindow;
   onWindowDaysChange?: (days: ProductionYieldWindow) => void;
 }) {
+  const embedded = useEmbedded();
   const [ownWindow, setOwnWindow] = useState<ProductionYieldWindow>(30);
   const windowDays = chosenWindow ?? ownWindow;
   const setWindowDays = onWindowDaysChange ?? setOwnWindow;
@@ -123,21 +125,8 @@ export function ProductionYieldDashboard({
 
   return (
     <div className="operations-stage supply-stage production-yield-stage">
-      <header className="supply-masthead production-yield-masthead">
-        <div>
-          <p className="eyebrow">Production · Yield intelligence</p>
-          <h1 className="display-title mt-2">
-            <span className="field-label-row">
-              Production yield variance
-              <FieldHelp term="yieldVariance" />
-            </span>
-          </h1>
-          <p className="mt-3 max-w-180 text-ink-2">
-            Compare the kitchen&apos;s planned output with what each component
-            actually produced, then start coaching where the shortfall repeats.
-          </p>
-        </div>
-        <div className="production-yield-range" aria-label="Reporting window">
+      {embedded ? (
+        <div className="flex flex-wrap items-center gap-2">
           <span>Completion window</span>
           <strong>
             {reportDate.format(report.rangeStart)} —{" "}
@@ -145,9 +134,39 @@ export function ProductionYieldDashboard({
           </strong>
           <small>completed batches with an actual yield on file</small>
         </div>
-      </header>
+      ) : (
+        <>
+          <header className="supply-masthead production-yield-masthead">
+            <div>
+              <p className="eyebrow">Production · Yield intelligence</p>
+              <h1 className="display-title mt-2">
+                <span className="field-label-row">
+                  Production yield variance
+                  <FieldHelp term="yieldVariance" />
+                </span>
+              </h1>
+              <p className="mt-3 max-w-180 text-ink-2">
+                Compare the kitchen&apos;s planned output with what each
+                component actually produced, then start coaching where the
+                shortfall repeats.
+              </p>
+            </div>
+            <div
+              className="production-yield-range"
+              aria-label="Reporting window"
+            >
+              <span>Completion window</span>
+              <strong>
+                {reportDate.format(report.rangeStart)} —{" "}
+                {reportDate.format(report.rangeEnd)}
+              </strong>
+              <small>completed batches with an actual yield on file</small>
+            </div>
+          </header>
 
-      <KitchenBookNav />
+          <KitchenBookNav />
+        </>
+      )}
 
       <section
         className="production-yield-controls"

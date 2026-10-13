@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { MergedSection } from "../../ui/MergedSection";
+import { OpeningStockPage } from "./OpeningStockPage";
 import { Link } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import {
@@ -13,7 +15,7 @@ import {
   useStockCountSessionClose,
 } from "../../lib/manifest-convex-react";
 import { useStockLines } from "../facilities/useInventoryHistory";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { StatusChip, TableSkeleton, PageHeader } from "../../ui/primitives";
 import {
   useCountLinesFor,
   useCountSessionPages,
@@ -405,31 +407,27 @@ export function StockCountPage() {
       className="operations-stage supply-stage stock-count-page"
       data-testid="stock-count-page"
     >
-      <header className="supply-masthead stock-count-masthead">
-        <div>
-          <p className="eyebrow">Inventory · Physical control</p>
-          <h1 className="display-title mt-2">Stock count sessions</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Freeze the book by storage area, move item by item, then post only
-            the adjustments needed to bring the ledger back to the shelf.
-          </p>
-        </div>
-        {noLocations ? (
-          <Link className="btn btn-primary" to="/inventory/stock">
-            Add a storage location
-          </Link>
-        ) : (
-          <button
-            type="button"
-            className="btn btn-primary"
-            data-testid="start-stock-count"
-            disabled={busy != null || activeLocations.length === 0}
-            onClick={() => setShowStart((value) => !value)}
-          >
-            {showStart ? "Close setup" : "Start stock count"}
-          </button>
-        )}
-      </header>
+      <PageHeader
+        title="Counts"
+        lead="Freeze the book by storage area, count item by item, then post only the adjustments that bring the ledger back to the shelf. Opening stock from a count sheet is set up here too."
+        actions={
+          noLocations ? (
+            <Link className="btn btn-primary" to="/inventory/stock">
+              Add a storage location
+            </Link>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-primary"
+              data-testid="start-stock-count"
+              disabled={busy != null || activeLocations.length === 0}
+              onClick={() => setShowStart((value) => !value)}
+            >
+              {showStart ? "Close setup" : "Start stock count"}
+            </button>
+          )
+        }
+      />
       <InventoryWorkspaceNav />
 
       {failure ? <SupplyFailureBanner error={failure} /> : null}
@@ -895,6 +893,9 @@ export function StockCountPage() {
           ) : null}
         </div>
       )}
+      <MergedSection id="opening-stock" title="Opening stock">
+        <OpeningStockPage />
+      </MergedSection>
     </div>
   );
 }

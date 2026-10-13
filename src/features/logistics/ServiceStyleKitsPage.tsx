@@ -177,7 +177,7 @@ export function ServiceStyleKitsPage() {
           <p>No active service styles.</p>
           <span>
             Add service styles in{" "}
-            <Link className="link" to="/admin/catalogs">
+            <Link className="link" to="/admin/branding#catalogs">
               Admin → Catalogs
             </Link>
             .

@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import {
   useCreateVenueLayoutTemplate,
   useListVenue,
@@ -69,7 +69,10 @@ type EditState =
 
 /** Venue layout templates — reusable layout/logistics templates owned by a venue (spec §8.2). */
 export function VenueLayoutTemplatesPage() {
-  const { venueId } = useParams<{ venueId: string }>();
+  // One page for every venue; ?venue= narrows it to one.
+  const { venueId: routeVenueId } = useParams<{ venueId: string }>();
+  const [searchParams] = useSearchParams();
+  const venueId = routeVenueId ?? searchParams.get("venue") ?? undefined;
   const templates = useListVenueLayoutTemplate();
   const venues = useListVenue();
 

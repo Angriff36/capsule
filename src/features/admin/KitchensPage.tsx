@@ -1,4 +1,5 @@
 import { useQuery } from "convex/react";
+import { useEmbedded } from "../../ui/embedded";
 import { useState, type FormEvent } from "react";
 import { api, type Doc } from "../../lib/api";
 import {
@@ -120,6 +121,7 @@ function KitchenFields({
  * addresses, never from a fixed address.
  */
 export function KitchensPage() {
+  const embedded = useEmbedded();
   const authStatus = useQuery(api.authStatus.getAuthStatus, {});
   const kitchens = useListOperatingLocation();
   const { record, loading } = useTenantBranding();
@@ -220,11 +222,15 @@ export function KitchensPage() {
 
   return (
     <div className="operations-stage space-y-6">
-      <PageHeader
-        title="Kitchens & drive times"
-        lead="Where your crews leave from, the rules Capsule uses to work out drive times to each venue, and the setup, load and briefing times it plans for each event."
-      />
-      <AdminWorkspaceNav />
+      {embedded ? null : (
+        <>
+          <PageHeader
+            title="Kitchens & drive times"
+            lead="Where your crews leave from, the rules Capsule uses to work out drive times to each venue, and the setup, load and briefing times it plans for each event."
+          />
+          <AdminWorkspaceNav />
+        </>
+      )}
       {!canEdit ? (
         <div className="card border-warn/30 bg-warn-soft px-4 py-3 text-base text-warn">
           Only a manager can change kitchens and drive-time rules.

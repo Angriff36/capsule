@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { Link } from "react-router-dom";
 import {
   checklistLinesFromText,
@@ -49,6 +50,7 @@ Count the linen back in | 1 day after`;
  * page; changing a checklist here does not change to-dos already on events.
  */
 export function EventChecklistsPage() {
+  const embedded = useEmbedded();
   const authStatus = useAuthStatus();
   const checklists = useListEventChecklist() as ChecklistRow[] | undefined;
   const define = useCreateEventChecklist();
@@ -134,15 +136,9 @@ export function EventChecklistsPage() {
 
   return (
     <div className="operations-stage">
-      <Link className="text-link" to={eventsIndexPath()}>
-        ← Events
-      </Link>
-      <PageHeader
-        eyebrow="Events · Checklists"
-        title="Event checklists"
-        lead="Reusable lists of to-dos. Put one on an event from the event's To-dos page."
-        actions={
-          canManage ? (
+      {embedded ? (
+        canManage ? (
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               className="btn btn-primary"
@@ -150,9 +146,31 @@ export function EventChecklistsPage() {
             >
               {editing === "new" ? "Close form" : "New checklist"}
             </button>
-          ) : null
-        }
-      />
+          </div>
+        ) : null
+      ) : (
+        <>
+          <Link className="text-link" to={eventsIndexPath()}>
+            ← Events
+          </Link>
+          <PageHeader
+            eyebrow="Events · Checklists"
+            title="Event checklists"
+            lead="Reusable lists of to-dos. Put one on an event from the event's To-dos page."
+            actions={
+              canManage ? (
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => setEditing(editing === "new" ? null : "new")}
+                >
+                  {editing === "new" ? "Close form" : "New checklist"}
+                </button>
+              ) : null
+            }
+          />
+        </>
+      )}
       {savedToast}
       {failure ? <FailureBanner failure={failure} /> : null}
 

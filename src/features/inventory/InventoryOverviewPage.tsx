@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { Link } from "react-router-dom";
 import {
   useListIngredient,
@@ -53,6 +54,7 @@ const URGENCY_CHIP: Record<Urgency, string> = {
 };
 
 export function InventoryOverviewPage() {
+  const embedded = useEmbedded();
   const items = useStockLines("none");
   // Only the orders still open (all this page counts), with their lines.
   const orders = useVendorOrdersInStatuses(OPEN_ORDER_STATUSES);
@@ -193,16 +195,26 @@ export function InventoryOverviewPage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader
-        title="Inventory"
-        lead="What is low, on order, or waiting to be received."
-        actions={
+      {embedded ? (
+        <div className="flex flex-wrap items-center gap-2">
           <Link to="/inventory/purchasing" className="btn btn-primary">
             Review purchasing
           </Link>
-        }
-      />
-      <InventoryWorkspaceNav />
+        </div>
+      ) : (
+        <>
+          <PageHeader
+            title="Inventory"
+            lead="What is low, on order, or waiting to be received."
+            actions={
+              <Link to="/inventory/purchasing" className="btn btn-primary">
+                Review purchasing
+              </Link>
+            }
+          />
+          <InventoryWorkspaceNav />
+        </>
+      )}
 
       <dl className="grid grid-cols-2 gap-4 xl:grid-cols-4">
         {metrics.map((metric) => (

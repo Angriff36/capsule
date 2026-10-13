@@ -557,7 +557,7 @@ export function deriveNotifications(
       id: `date-opened:${dateKey}:${next._id}`,
       kind: "date_opened",
       message: `${formatDate(dateKeyToMs(dateKey))} is open again — ${who} is next on the waitlist`,
-      link: "/clients/date-holds",
+      link: "/clients/pipeline#date-holds",
       at: openedAt,
     });
   }
@@ -624,7 +624,7 @@ export function deriveNotifications(
       id: `quote-request:${quote._id}`,
       kind: "quote_request",
       message: `${quote.clientName || "Someone"} asked for a quote${guests}`,
-      link: "/clients/quote-requests",
+      link: "/clients/pipeline#quote-requests",
       at: quote.submittedAt,
     });
   }

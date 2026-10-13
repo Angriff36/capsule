@@ -22,10 +22,18 @@ export function MergedSection({
   const ref = useRef<HTMLElement>(null);
   const { hash } = useLocation();
   useEffect(() => {
-    if (hash !== `#${id}`) return;
+    if (!hash) return;
+    // The hash names this section, or a part inside it (an old deep link
+    // such as #stage-moves keeps working after its page was folded in).
+    const target = () =>
+      hash === `#${id}`
+        ? ref.current
+        : (ref.current?.querySelector(`[id="${CSS.escape(hash.slice(1))}"]`) ??
+          null);
+    if (!target()) return;
     // Content above loads after the first paint and pushes this section
     // down, so scroll again once it has settled.
-    const scroll = () => ref.current?.scrollIntoView({ block: "start" });
+    const scroll = () => target()?.scrollIntoView({ block: "start" });
     scroll();
     const timers = [400, 1200, 2500].map((ms) => window.setTimeout(scroll, ms));
     return () => timers.forEach((timer) => window.clearTimeout(timer));

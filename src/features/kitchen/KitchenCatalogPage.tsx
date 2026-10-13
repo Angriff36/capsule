@@ -5,6 +5,8 @@ import {
   useState,
   type FormEvent,
 } from "react";
+import { MergedSection } from "../../ui/MergedSection";
+import { KitchenCatalogCleanupPage } from "./KitchenCatalogCleanupPage";
 import { Link, useNavigate } from "react-router-dom";
 import { formatCountNoun } from "../../lib/format";
 import { useGenerateUploadUrl } from "../../lib/fileStorageClient";
@@ -653,6 +655,11 @@ function KitchenCatalogPageContent({
           />
         )}
       </section>
+      {section === "ingredients" ? (
+        <MergedSection id="cleanup" title="Catalog cleanup">
+          <KitchenCatalogCleanupPage />
+        </MergedSection>
+      ) : null}
     </div>
   );
 }

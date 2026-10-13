@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { type Id } from "../../lib/api";
 import { useInventoryAuditForItem } from "../../lib/inventoryAuditClient";
 import {
@@ -17,6 +18,7 @@ import { checkStockLedger } from "../../lib/stockBalance";
 import "./InventoryAuditLogPage.css";
 
 export function InventoryAuditLogPage() {
+  const embedded = useEmbedded();
   const items = useStockLines("none");
   const ingredients = useListIngredient();
   const locations = useListStorageLocation();
@@ -123,25 +125,40 @@ export function InventoryAuditLogPage() {
 
   return (
     <div className="operations-stage supply-stage inventory-audit-page">
-      <header className="supply-masthead inventory-audit-masthead">
-        <div>
-          <p className="eyebrow">Inventory · Stock history</p>
-          <h1 className="display-title mt-2">Stock history</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Every change to what is on the shelf or held for an event: who made
-            it, when, and the amount before and after.
-          </p>
+      {embedded ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            className="btn btn-ghost"
+            disabled={!selectedId || loading}
+            onClick={() => setRefreshKey((value) => value + 1)}
+          >
+            {loading ? "Loading…" : "Refresh"}
+          </button>
         </div>
-        <button
-          type="button"
-          className="btn btn-ghost"
-          disabled={!selectedId || loading}
-          onClick={() => setRefreshKey((value) => value + 1)}
-        >
-          {loading ? "Loading…" : "Refresh"}
-        </button>
-      </header>
-      <InventoryWorkspaceNav />
+      ) : (
+        <>
+          <header className="supply-masthead inventory-audit-masthead">
+            <div>
+              <p className="eyebrow">Inventory · Stock history</p>
+              <h1 className="display-title mt-2">Stock history</h1>
+              <p className="mt-3 max-w-160 text-ink-2">
+                Every change to what is on the shelf or held for an event: who
+                made it, when, and the amount before and after.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              disabled={!selectedId || loading}
+              onClick={() => setRefreshKey((value) => value + 1)}
+            >
+              {loading ? "Loading…" : "Refresh"}
+            </button>
+          </header>
+          <InventoryWorkspaceNav />
+        </>
+      )}
 
       <section className="inventory-audit-selector" aria-label="Audit subject">
         <label className="field-label" htmlFor="inventory-audit-item">

@@ -1,4 +1,7 @@
+import { CatalogsPage } from "./CatalogsPage";
 import { useQuery } from "convex/react";
+import { MergedSection } from "../../ui/MergedSection";
+import { KitchensPage } from "./KitchensPage";
 import { useEffect, useState, type CSSProperties, type FormEvent } from "react";
 import { api } from "../../lib/api";
 import {
@@ -227,8 +230,8 @@ export function BrandingPage() {
   return (
     <div className="operations-stage space-y-6">
       <PageHeader
-        title="Brand studio"
-        lead="Set the identity printed on every proposal, invoice, contract, banquet event order, and menu."
+        title="Company"
+        lead="The identity printed on every proposal, invoice, contract, banquet event order, and menu, the kitchens your crews leave from, and the pick lists (service styles, occasions, referral sources) every form uses."
       />
       <AdminWorkspaceNav />
       {!canEdit ? (
@@ -541,6 +544,12 @@ export function BrandingPage() {
           </article>
         </section>
       </div>
+      <MergedSection id="kitchens" title="Kitchens and drive times">
+        <KitchensPage />
+      </MergedSection>
+      <MergedSection id="catalogs" title="Pick lists">
+        <CatalogsPage />
+      </MergedSection>
     </div>
   );
 }

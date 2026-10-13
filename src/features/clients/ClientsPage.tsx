@@ -3,6 +3,8 @@ import {
   useClientContactsPage,
   useClientSearch,
 } from "../../lib/useClientDirectory";
+import { MergedSection } from "../../ui/MergedSection";
+import { ClientRetentionPage } from "./ClientRetentionPage";
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -630,6 +632,9 @@ export function ClientsPage() {
           {paged.loadingMore ? "Loading…" : "Load more clients"}
         </button>
       ) : null}
+      <MergedSection id="retention" title="Retention">
+        <ClientRetentionPage />
+      </MergedSection>
     </div>
   );
 }

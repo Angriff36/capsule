@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import { useClientsByIds } from "../../lib/useClientDirectory";
 import { Link } from "react-router-dom";
 import type { Doc } from "../../lib/api";
@@ -49,6 +50,7 @@ const DAY_MS = 86_400_000;
  * Holds only warn; a date may carry several holds and bookings.
  */
 export function DateHoldsPage() {
+  const embedded = useEmbedded();
   // Only dates from today on (what the board shows), and the leads of the
   // clients holding them.
   const board = useDatesFrom(localDateKey(Date.now()));
@@ -151,9 +153,9 @@ export function DateHoldsPage() {
 
   if (holds === undefined || waitlist === undefined) {
     return (
-      <div className="p-6 max-w-6xl mx-auto">
-        {header}
-        <ClientsWorkspaceNav />
+      <div className={embedded ? "" : "p-6 max-w-6xl mx-auto"}>
+        {embedded ? null : header}
+        {embedded ? null : <ClientsWorkspaceNav />}
         <TableSkeleton />
       </div>
     );
@@ -181,9 +183,9 @@ export function DateHoldsPage() {
   ].sort();
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-4">
-      {header}
-      <ClientsWorkspaceNav />
+    <div className={embedded ? "space-y-4" : "p-6 max-w-6xl mx-auto space-y-4"}>
+      {embedded ? null : header}
+      {embedded ? null : <ClientsWorkspaceNav />}
       {failure && (
         <FailureBanner failure={failure} onDismiss={() => setFailure(null)} />
       )}

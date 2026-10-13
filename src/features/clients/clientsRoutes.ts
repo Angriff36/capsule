@@ -7,21 +7,8 @@ export const CLIENTS_PIPELINE_SECTION = {
 export const CLIENTS_SECTIONS = [
   { key: "accounts", label: "Accounts", path: "/clients" },
   { key: "proposals", label: "Proposals", path: "/clients/proposals" },
-  {
-    key: "proposalTemplates",
-    label: "Proposal Templates",
-    path: "/clients/proposals/templates",
-  },
-  { key: "tastings", label: "Tastings", path: "/clients/tastings" },
   { key: "contracts", label: "Contracts", path: "/clients/contracts" },
-  { key: "retention", label: "Retention", path: "/clients/retention" },
-  {
-    key: "quoteRequests",
-    label: "Quote Requests",
-    path: "/clients/quote-requests",
-  },
   { key: "inbox", label: "Inbox", path: "/clients/inbox" },
-  { key: "dateHolds", label: "Date Holds", path: "/clients/date-holds" },
 ] as const;
 
 export type ClientsSection = (typeof CLIENTS_SECTIONS)[number]["key"];
@@ -34,12 +21,12 @@ export const CLIENTS_ROUTES = {
   // Deep link into the proposals page's focused row: ?proposal=<id> opens
   // that proposal's detail panels and scrolls the row into view.
   proposal: (id: string) => `/clients/proposals?proposal=${id}`,
-  proposalTemplates: "/clients/proposals/templates",
-  tastings: "/clients/tastings",
+  proposalTemplates: "/clients/proposals#templates",
+  tastings: "/clients/pipeline#tastings",
   contracts: "/clients/contracts",
-  retention: "/clients/retention",
-  quoteRequests: "/clients/quote-requests",
+  retention: "/clients#retention",
+  quoteRequests: "/clients/pipeline#quote-requests",
   inbox: "/clients/inbox",
-  dateHolds: "/clients/date-holds",
+  dateHolds: "/clients/pipeline#date-holds",
   contractDocument: (id: string) => `/clients/contracts/${id}/document`,
 } as const;

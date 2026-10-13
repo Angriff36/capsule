@@ -207,6 +207,8 @@ export function financeScopedMock(tableRows: TableRows) {
     useEventRowsInRange: (range: Range | null) => eventsIn(range),
     usePackListsForEvents: (list: readonly MaybeId[] | undefined) =>
       whereIn("packLists", "eventId", list),
+    useOutreachTasksForClients: (list: readonly MaybeId[] | undefined) =>
+      whereIn("clientOutreachTasks", "clientId", list),
     useLeadsForClients: (list: readonly MaybeId[] | undefined) =>
       whereIn("leads", "clientId", list),
     useDatesFrom: (today: string) => ({

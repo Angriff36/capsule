@@ -1,3 +1,4 @@
+import { RoutePlannerPage } from "./RoutePlannerPage";
 import { useOverdueVehicleService } from "./vehicleServiceDue";
 import { MergedSection } from "../../ui/MergedSection";
 import { VehicleSchedulePage } from "./VehicleSchedulePage";
@@ -787,6 +788,9 @@ export function DeliveriesPage() {
       </section>
       <MergedSection id="vehicles" title="Vehicles by day">
         <VehicleSchedulePage />
+      </MergedSection>
+      <MergedSection id="route" title="Route order">
+        <RoutePlannerPage />
       </MergedSection>
     </div>
   );

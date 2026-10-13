@@ -1,4 +1,7 @@
 import { useMemo, useState } from "react";
+import { MergedSection } from "../../ui/MergedSection";
+import { KitchenStationsPage } from "../kitchen/KitchenStationsPage";
+import { ProductionYieldDashboardPage } from "./ProductionYieldDashboardPage";
 import { Link } from "react-router-dom";
 import {
   useListComponent,
@@ -6,7 +9,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { usePlanWork } from "../../lib/productionScopedQueries";
 import { useDishTasksByIds } from "../../lib/eventHistoryQueries";
-import { TableSkeleton } from "../../ui/primitives";
+import { PageHeader, TableSkeleton } from "../../ui/primitives";
 import { useEventsById } from "../facilities/useEventsById";
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
 import { prepQuantityLabel } from "../kitchen/prepQuantityLabel";
@@ -81,17 +84,10 @@ export function ProductionPlanView({
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Production</p>
-          <h1 className="display-title mt-2">Production plan</h1>
-          <p className="mt-3 max-w-180 text-ink-2">
-            What the kitchen makes each day, by station and recipe. Work for the
-            same step on the same day is pooled, and each event keeps its own
-            amount.
-          </p>
-        </div>
-      </header>
+      <PageHeader
+        title="Production plan"
+        lead="What the kitchen makes each day, by station and recipe, the stations that group the prep sheets, and how actual yield compares with plan."
+      />
 
       <KitchenBookNav />
 
@@ -276,10 +272,18 @@ export function ProductionPlanPage() {
     ],
   );
   return (
-    <ProductionPlanView
-      days={days}
-      loading={loading}
-      today={planDayKey(Date.now())}
-    />
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-8">
+      <ProductionPlanView
+        days={days}
+        loading={loading}
+        today={planDayKey(Date.now())}
+      />
+      <MergedSection id="stations" title="Stations">
+        <KitchenStationsPage />
+      </MergedSection>
+      <MergedSection id="yield" title="Yield against plan">
+        <ProductionYieldDashboardPage />
+      </MergedSection>
+    </div>
   );
 }

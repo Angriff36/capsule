@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { useEmbedded } from "../../ui/embedded";
 import {
   useAssistantLlmConfigConfigure,
   useCreateAssistantLlmConfig,
@@ -16,6 +17,7 @@ import { formatDateTime } from "../../lib/format";
  * action ever sees it.
  */
 export function AssistantSettingsPage() {
+  const embedded = useEmbedded();
   const configs = useListAssistantLlmConfig();
   const createConfig = useCreateAssistantLlmConfig();
   const configureConfig = useAssistantLlmConfigConfigure();
@@ -62,11 +64,15 @@ export function AssistantSettingsPage() {
 
   return (
     <div className="mx-auto w-full max-w-3xl">
-      <AdminWorkspaceNav />
-      <PageHeader
-        title="Assistant"
-        lead="Configure the in-app AI assistant. It can look things up and make changes for your staff — as the signed-in user."
-      />
+      {embedded ? null : (
+        <>
+          <AdminWorkspaceNav />
+          <PageHeader
+            title="Assistant"
+            lead="Configure the in-app AI assistant. It can look things up and make changes for your staff — as the signed-in user."
+          />
+        </>
+      )}
       <Section title="Model endpoint">
         {configs === undefined ? null : (
           <form onSubmit={onSubmit} className="grid gap-3">
