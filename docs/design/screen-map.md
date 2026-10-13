@@ -491,7 +491,20 @@ the test). Home, My Day, Administration and Facilities are never switched off
 by design. The full-screen Event Day and kitchen display sit outside the main
 frame and its area check, as before this work.
 
-Blocked: signing in as each staff role in the browser. Capsule has one
+Role check in Chrome (2026-10-13, local data only): the test login's own staff
+record was set to the plain `staff` role through the app's admin command
+(Person.assignRole, run as another local admin), every remaining route (88)
+was opened, and the record was set back to `admin`. As staff: no route
+crashed; Event Workbooks, Integrations and Switch from TPP said the role has
+no access; the nine record pages (recipe, ingredient, dish, menu, vendor order,
+invoice, contract document, client, import run) showed "… not found / you may
+not have access" because staff cannot read those records; the rest showed
+their staff-visible content. The side menu is filtered by company area
+switches, not by role (unchanged by this work). A second role (finance staff)
+was set but not browsed: the safety system stopped further role changes, and
+the login was restored to admin straight away.
+
+Not done: signing in as other real people. Capsule has one
 sign-in service shared with production, so a sign-in link for another role
 would sign in as a real staff member; that was not done. Role access is
 covered instead by the tenant and role access matrix (every backend function
