@@ -63,6 +63,15 @@ export function QuoteMenuChoice({
 
   if (!menus || menus.length === 0) return null;
   const menu = menus.find((m) => m.menuId === menuId);
+  // In a course where guests pick one dish, only the first starts ticked.
+  const startsOn = (
+    current: (typeof menus)[number],
+    dish: (typeof menus)[number]["dishes"][number],
+  ) =>
+    !dish.course ||
+    !current.pickOneCourses.includes(dish.course) ||
+    current.dishes.find((row) => row.course === dish.course)?.menuDishId ===
+      dish.menuDishId;
   const others = menus.filter(
     (m) => m.menuId !== menuId && m.notAvailableBecause.length === 0,
   );
@@ -73,7 +82,7 @@ export function QuoteMenuChoice({
     const chosen: Chosen = {};
     for (const dish of current.dishes) {
       const state = nextUnticked[dish.menuDishId] ?? {
-        on: true,
+        on: startsOn(current, dish),
         portions: "",
       };
       chosen[dish.menuDishId] = state;
@@ -94,10 +103,14 @@ export function QuoteMenuChoice({
     menuDishId: string,
     change: Partial<{ on: boolean; portions: string }>,
   ) => {
+    const dish = menu?.dishes.find((row) => row.menuDishId === menuDishId);
     const next = {
       ...unticked,
       [menuDishId]: {
-        ...(unticked[menuDishId] ?? { on: true, portions: "" }),
+        ...(unticked[menuDishId] ?? {
+          on: menu && dish ? startsOn(menu, dish) : true,
+          portions: "",
+        }),
         ...change,
       },
     };
@@ -195,10 +208,16 @@ export function QuoteMenuChoice({
           <p className="text-xs text-ink-3 mb-2">
             Untick what you don't want. Leave portions blank for one per guest.
           </p>
+          {menu.pickOneCourses.length > 0 ? (
+            <p className="text-xs text-ink-3 mb-2">
+              Guests pick one {menu.pickOneCourses.join(", ").toLowerCase()}:
+              the first is ticked; tick another to swap or add one.
+            </p>
+          ) : null}
           <ul className="divide-y divide-line border border-line rounded-sm">
             {menu.dishes.map((dish) => {
               const state = unticked[dish.menuDishId] ?? {
-                on: true,
+                on: startsOn(menu, dish),
                 portions: "",
               };
               return (
