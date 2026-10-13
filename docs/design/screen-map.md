@@ -481,6 +481,16 @@ had no saved proposal; after it, the proposal was saved, marked Sent, and
 listed on the event's Money tab with Download PDF, Email, Request signature
 and Share link.
 
+Permissions checked in Chrome (area switches, Admin > Permissions, local test
+app): each switchable area — Kitchen, Inventory, Events, Sales (Clients),
+Logistics, Workforce (Staff), Finance, Reports — was switched off, every one of
+its remaining routes (62 in all, merged pages and detail pages included) was
+opened, and each showed "This area is switched off" with the area gone from the
+menu; each area was switched back on at once (all ten switches back on after
+the test). Home, My Day, Administration and Facilities are never switched off
+by design. The full-screen Event Day and kitchen display sit outside the main
+frame and its area check, as before this work.
+
 Blocked: signing in as each staff role in the browser. Capsule has one
 sign-in service shared with production, so a sign-in link for another role
 would sign in as a real staff member; that was not done. Role access is
