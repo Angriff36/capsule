@@ -459,9 +459,18 @@ passed in the release copy; the access matrix (14/14), production build,
 Storybook build and baseline check passed separately (the release run was
 stopped by low memory after the tests).
 
-Not checked: sign-in as each staff role (permission code was not changed),
-and pressing Send to client on a real proposal (it writes to the client's
-record; it reuses the existing send action).
+Send to client was pressed on a throw-away test event ("UI check proposal
+send (test)", test client and test venue, local data): before it, the event
+had no saved proposal; after it, the proposal was saved, marked Sent, and
+listed on the event's Money tab with Download PDF, Email, Request signature
+and Share link.
+
+Blocked: signing in as each staff role in the browser. Capsule has one
+sign-in service shared with production, so a sign-in link for another role
+would sign in as a real staff member; that was not done. Role access is
+covered instead by the tenant and role access matrix (every backend function
+run as every role, other workspaces, signed-out and removed people: 14/14
+pass), and no permission or navigation-gating code was changed.
 
 ## Redirect inventory
 
