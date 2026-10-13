@@ -17,6 +17,15 @@ export const PARTNER_TIER_LABELS: Record<PartnerTier, string> = {
 
 /** Playbook section 03: never more than 14 days without contact. */
 export const CONTACT_DAYS = 14;
+
+/** A venue the company works with regularly: a partner or an exclusive
+ * contract. The venue list shows only these unless asked for every venue. */
+export function isRegularVenue(venue: {
+  readonly partnerTier?: string | null;
+  readonly exclusiveContract?: boolean | null;
+}): boolean {
+  return venue.partnerTier != null || venue.exclusiveContract === true;
+}
 const DAY = 86_400_000;
 const YEAR = 365 * DAY;
 const HALF_YEAR = 182 * DAY;

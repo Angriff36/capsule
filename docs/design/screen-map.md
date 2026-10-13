@@ -448,6 +448,22 @@ off a phone screen.)
 All 69 old URLs were opened again: each landed on its new home with its IDs
 and query values, the right heading, and the named section on screen.
 
+Key actions on every working route (87 routes, desktop): on 69, the page's main
+non-destructive button (New…, Add…, Register…, Record…, Issue…, Schedule…,
+Show…) was pressed and a form, panel, dialog or new view opened with no
+script error. The other 18 were checked with their own action: Event Day map
+(open a section sheet, dialog), Event Day picker (open an event), run of show
+(settings sheet), Event setup (New template form), room capacity and lot trace
+(date change re-reads), recipe page (Add ingredient line form), ingredient
+page (Add vendor item), dish page (Edit), team chat (open a channel),
+dispatch (Tomorrow), invoice page (Add payment), invoices (Show closed),
+allergen matrix and import run (read pages, content shown), donation summary
+(year picker; only 2026 has donations). Not pressed on purpose: actions that
+send, approve, delete, publish, void, finalize, merge, compare, or switch
+from TPP — they write real records; Send to client was tested on a test event.
+Print pages (battle board, briefing, map, contract, venue card and packet,
+proposal) were checked for content; their action is the browser's print.
+
 Key actions tried by hand: Finance More menu (opens Tax, More shows Tax),
 Register trailer opens the trailer form, New crew template opens its form
 inside the Roster, a closed part opens from the On this page strip, the rail
@@ -465,7 +481,30 @@ had no saved proposal; after it, the proposal was saved, marked Sent, and
 listed on the event's Money tab with Download PDF, Email, Request signature
 and Share link.
 
-Blocked: signing in as each staff role in the browser. Capsule has one
+Permissions checked in Chrome (area switches, Admin > Permissions, local test
+app): each switchable area — Kitchen, Inventory, Events, Sales (Clients),
+Logistics, Workforce (Staff), Finance, Reports — was switched off, every one of
+its remaining routes (62 in all, merged pages and detail pages included) was
+opened, and each showed "This area is switched off" with the area gone from the
+menu; each area was switched back on at once (all ten switches back on after
+the test). Home, My Day, Administration and Facilities are never switched off
+by design. The full-screen Event Day and kitchen display sit outside the main
+frame and its area check, as before this work.
+
+Role check in Chrome (2026-10-13, local data only): the test login's own staff
+record was set to the plain `staff` role through the app's admin command
+(Person.assignRole, run as another local admin), every remaining route (88)
+was opened, and the record was set back to `admin`. As staff: no route
+crashed; Event Workbooks, Integrations and Switch from TPP said the role has
+no access; the nine record pages (recipe, ingredient, dish, menu, vendor order,
+invoice, contract document, client, import run) showed "… not found / you may
+not have access" because staff cannot read those records; the rest showed
+their staff-visible content. The side menu is filtered by company area
+switches, not by role (unchanged by this work). A second role (finance staff)
+was set but not browsed: the safety system stopped further role changes, and
+the login was restored to admin straight away.
+
+Not done: signing in as other real people. Capsule has one
 sign-in service shared with production, so a sign-in link for another role
 would sign in as a real staff member; that was not done. Role access is
 covered instead by the tenant and role access matrix (every backend function
