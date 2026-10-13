@@ -69,7 +69,7 @@ export function QuoteMenuChoice({
     dish: (typeof menus)[number]["dishes"][number],
   ) =>
     !dish.course ||
-    !current.pickOneCourses.includes(dish.course) ||
+    !(current.pickOneCourses ?? []).includes(dish.course) ||
     current.dishes.find((row) => row.course === dish.course)?.menuDishId ===
       dish.menuDishId;
   const others = menus.filter(
@@ -208,10 +208,11 @@ export function QuoteMenuChoice({
           <p className="text-xs text-ink-3 mb-2">
             Untick what you don't want. Leave portions blank for one per guest.
           </p>
-          {menu.pickOneCourses.length > 0 ? (
+          {(menu.pickOneCourses ?? []).length > 0 ? (
             <p className="text-xs text-ink-3 mb-2">
-              Guests pick one {menu.pickOneCourses.join(", ").toLowerCase()}:
-              the first is ticked; tick another to swap or add one.
+              Guests pick one{" "}
+              {(menu.pickOneCourses ?? []).join(", ").toLowerCase()}: the first
+              is ticked; tick another to swap or add one.
             </p>
           ) : null}
           <ul className="divide-y divide-line border border-line rounded-sm">
