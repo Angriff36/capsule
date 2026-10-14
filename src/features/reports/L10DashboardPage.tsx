@@ -39,6 +39,7 @@ import {
   useLeadsInRange,
 } from "@/lib/financeScopedQueries";
 import { LeadershipItemsPanel } from "./LeadershipItemsPanel";
+import { SalesFunnelSection } from "./SalesFunnelSection";
 import { L10AgendaSection } from "./L10AgendaSection";
 import { L10MeetingRating } from "./L10MeetingRating";
 import { useScorecardSources } from "./useScorecardSources";
@@ -373,6 +374,19 @@ export function L10DashboardPage() {
             </table>
           </div>
         </EosPanel>
+      </div>
+
+      {/* The sales funnel, reviewed in the meeting with the scorecard (owner,
+          2026-10-14: "i wanted this screen in for the production meetings"). */}
+      <div id="sales-funnel" className="mt-5 scroll-mt-48">
+        <MergedSection
+          id="l10-sales-funnel"
+          title="Sales funnel"
+          summary="Inquiries to won and lost, goals, deals to close and why we lose, for the whole company or one salesperson."
+          defaultOpen
+        >
+          <SalesFunnelSection />
+        </MergedSection>
       </div>
 
       <LeadershipItemsPanel

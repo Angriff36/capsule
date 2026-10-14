@@ -25,6 +25,7 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
   const list = (name: string) => () => seed[name] ?? [];
   return {
     useListEvent: list("events"),
+    useListReferralSource: list("referralSources"),
     useListLead: list("leads"),
     useListProposal: list("proposals"),
     useListEventCloseout: list("closeouts"),
@@ -63,6 +64,8 @@ vi.mock("../../src/lib/financeScopedQueries", async () =>
 
 vi.mock("../../src/features/facilities/useEventsById", () => ({
   useEventsInRange: () => seed.events ?? [],
+  // The sales funnel under the scorecard reads whole records by date.
+  useEventRecordsInRange: () => seed.events ?? [],
 }));
 
 import { L10DashboardPage } from "../../src/features/reports/L10DashboardPage";
