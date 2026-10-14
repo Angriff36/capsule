@@ -156,7 +156,7 @@ export function ApiKeysPage() {
                 <th className="th">Name</th>
                 <th className="th">Created</th>
                 <th className="th">Last used</th>
-                <th className="th" />
+                <th className="th text-right" />
               </tr>
             </thead>
             <tbody>

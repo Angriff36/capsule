@@ -2644,6 +2644,9 @@
     th:nth-child(12) {
     text-align: right;
   }
+  :is(.supply-table, .data-table) :is(td, th).text-center {
+    text-align: center;
+  }
 }
 
 .supply-split {

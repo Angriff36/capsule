@@ -528,7 +528,7 @@ export function PackListTemplatesPage() {
               <tr>
                 <th className="py-2 pr-3">Name</th>
                 <th className="py-2 pr-3">Scope</th>
-                <th className="py-2 pr-3">Items</th>
+                <th className="py-2 pr-3 text-right">Items</th>
                 <th className="py-2 pr-3">Status</th>
                 <th className="py-2 pr-3">Actions</th>
               </tr>
@@ -574,7 +574,10 @@ export function PackListTemplatesPage() {
                         ? "Any event"
                         : null}
                     </td>
-                    <td className="py-2 pr-3 text-ink-2 num" data-label="Items">
+                    <td
+                      className="py-2 pr-3 text-right text-ink-2"
+                      data-label="Items"
+                    >
                       {count}
                     </td>
                     <td className="py-2 pr-3" data-label="Status">
