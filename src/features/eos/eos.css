@@ -20,7 +20,8 @@
 .eos-tone-traction {
   --tone: var(--color-chat-teal);
 }
-[class*="eos-tone-"] {
+[class*="eos-tone-"],
+[class*="eos-tile-"] {
   --tone-soft: color-mix(in srgb, var(--tone) 9%, var(--color-panel));
   --tone-line: color-mix(in srgb, var(--tone) 35%, var(--color-line));
 }
@@ -607,7 +608,14 @@
   padding: 0.7rem 0.85rem;
   background: var(--tone-soft);
 }
-.eos-stat strong {
+.eos-stat h3 {
+  margin: 0;
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+.eos-stat strong,
+.eos-stat .eos-stat-value {
   display: block;
   color: var(--tone);
   font-family: var(--font-mono);
@@ -618,6 +626,31 @@
 .eos-stat span {
   color: var(--color-ink-2);
   font-size: var(--text-sm);
+}
+
+.eos-stat-label {
+  display: block;
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.eos-stat small {
+  display: block;
+  color: var(--color-ink-3);
+  font-size: var(--text-xs);
+}
+.eos-tile-brand {
+  --tone: var(--color-accent);
+}
+.eos-tile-ok {
+  --tone: var(--color-ok);
+}
+.eos-tile-info {
+  --tone: var(--color-info);
+}
+.eos-tile-warn {
+  --tone: var(--color-warn);
+  --tone-line: color-mix(in srgb, var(--color-warn) 35%, var(--color-line));
+  --tone-soft: color-mix(in srgb, var(--color-warn) 9%, var(--color-panel));
 }
 
 /* L10 agenda tiles */

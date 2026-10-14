@@ -457,8 +457,8 @@ export function L10DashboardPage() {
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <div className="eos-stat">
-      <strong>{value}</strong>
-      <span>{label}</span>
+      <span className="eos-stat-value font-mono">{value}</span>
+      <h3>{label}</h3>
     </div>
   );
 }

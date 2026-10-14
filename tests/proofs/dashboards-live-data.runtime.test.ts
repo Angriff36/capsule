@@ -217,7 +217,7 @@ const PAGES: PageCase[] = [
     name: "L10",
     file: "L10DashboardPage.tsx",
     Page: L10DashboardPage,
-    card: "Monthly Revenue",
+    card: "Revenue booked this month",
     expected: "$3,200",
   },
   {
