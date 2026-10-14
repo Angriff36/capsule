@@ -1,0 +1,13 @@
+/* Slides the logo strip left by its own width, forever (ui-layouts: --animate-infinite-scroll). */
+@keyframes uil-infinite-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-infinite-scroll {
+  animation: uil-infinite-scroll 25s linear infinite;
+}

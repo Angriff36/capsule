@@ -1,0 +1,132 @@
+import { AnimatePresence, motion } from "motion/react";
+import React, { useEffect, useState } from "react";
+import { type GalleryItem, itemsArr } from "./gallery-modal-items";
+
+export { itemsArr };
+
+function Gallery({
+  items,
+  setIndex,
+  setOpen,
+  index,
+}: {
+  items: GalleryItem[];
+  setIndex: (index: number) => void;
+  setOpen: (open: boolean) => void;
+  index: number;
+}) {
+  return (
+    <div className="rounded-md w-fit mx-auto md:gap-2 gap-1 flex pb-20 pt-10 ">
+      {items.slice(0, 11).map((item, i) => {
+        return (
+          <motion.img
+            key={item.id}
+            whileTap={{ scale: 0.95 }}
+            className={`rounded-2xl ${
+              index === i
+                ? "w-[250px] "
+                : "xl:w-[50px] md:w-[30px] sm:w-[20px] w-[14px]"
+            } h-[200px] shrink-0  object-cover transition-[width] ease-in-out duration-300`}
+            onMouseEnter={() => {
+              setIndex(i);
+            }}
+            onMouseLeave={() => {
+              setIndex(i);
+            }}
+            onClick={() => {
+              setIndex(i);
+              setOpen(true);
+            }}
+            src={item.url}
+            alt={item.title}
+            layoutId={String(item.id)}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
+export default function AccordionModal() {
+  const [index, setIndex] = useState(5);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (open) {
+      document.body.classList.add("overflow-hidden");
+    } else {
+      document.body.classList.remove("overflow-hidden");
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+  const current = itemsArr[index];
+  return (
+    <div className="relative">
+      <Gallery
+        items={itemsArr}
+        index={index}
+        setIndex={setIndex}
+        setOpen={setOpen}
+      />
+      <AnimatePresence>
+        {open !== false && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            key="overlay"
+            className="dark:bg-black/40 bg-white/40 backdrop-blur-lg fixed inset-0 z-50 top-0 left-0 bottom-0 right-0 w-full h-full grid place-content-center"
+            onClick={() => {
+              setOpen(false);
+            }}
+          >
+            <div onClick={(e) => e.stopPropagation()}>
+              <motion.div
+                layoutId={String(current.id)}
+                className="w-[400px] h-[400px] rounded-2xl relative cursor-default overflow-hidden"
+              >
+                <img
+                  src={current.url}
+                  width={400}
+                  height={400}
+                  alt="single-image"
+                  className="rounded-2xl h-full w-full object-cover"
+                />
+                <article className="dark:bg-black/40 bg-white/40 backdrop-blur-md absolute -bottom-1 left-0 w-full rounded-md p-2">
+                  <motion.h1
+                    initial={{ scaleY: 0.2 }}
+                    animate={{ scaleY: 1 }}
+                    exit={{ scaleY: 0.2 }}
+                    transition={{ duration: 0.2, delay: 0.2 }}
+                    className="text-xl font-semibold"
+                  >
+                    {current.title}
+                  </motion.h1>
+                  <motion.p
+                    initial={{ y: -10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ scaleY: -10, opacity: 0 }}
+                    transition={{ duration: 0.2, delay: 0.2 }}
+                    className="text-sm leading-[100%] py-2"
+                  >
+                    {current.description}
+                  </motion.p>
+                </article>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}

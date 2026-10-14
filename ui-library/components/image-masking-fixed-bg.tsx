@@ -1,0 +1,21 @@
+function FixedBgImageMasking() {
+  return (
+    <>
+      <section className="w-full gap-2 dark:bg-black bg-white border rounded-lg p-5">
+        <figure
+          className="relative h-[70vh] bg-fixed bg-cover bg-center "
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1523612192437-66de9804ac3c?q=80&w=2070&auto=format&fit=crop')",
+            maskImage: "url('https://ui-layouts.com/splash-center.svg')",
+            maskSize: "contain",
+            maskRepeat: "no-repeat",
+            maskPosition: "center",
+          }}
+        ></figure>
+      </section>
+    </>
+  );
+}
+
+export default FixedBgImageMasking;

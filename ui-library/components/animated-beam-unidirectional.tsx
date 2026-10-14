@@ -1,0 +1,35 @@
+import { AnimatedBeam, Circle, Icons } from "./animated-beam";
+import { useRef } from "react";
+
+export default function AnimatedBeamUnidirectional() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const div1Ref = useRef<HTMLDivElement>(null);
+  const div2Ref = useRef<HTMLDivElement>(null);
+
+  return (
+    <div
+      className="relative flex w-full max-w-[500px] mx-auto items-center justify-center overflow-hidden rounded-lg border dark:bg-neutral-800 bg-neutral-50 lg:p-10 sm:p-4 p-2 md:shadow-xl"
+      ref={containerRef}
+    >
+      <div className="flex h-full w-full flex-col items-stretch justify-between gap-10">
+        <div className="flex flex-row justify-between">
+          <Circle className="p-2" ref={div1Ref}>
+            <Icons.logo />
+          </Circle>
+          <Circle ref={div2Ref}>
+            <Icons.user />
+          </Circle>
+        </div>
+      </div>
+
+      <AnimatedBeam
+        duration={3}
+        containerRef={containerRef}
+        fromRef={div1Ref}
+        toRef={div2Ref}
+        dotted
+        dotSpacing={5}
+      />
+    </div>
+  );
+}

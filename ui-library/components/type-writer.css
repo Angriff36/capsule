@@ -1,0 +1,10 @@
+/* Blinking caret used by the Type Writer (ui-layouts: animate-[blink_1s_step-end_infinite]). */
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}

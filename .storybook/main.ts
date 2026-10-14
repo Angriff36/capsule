@@ -32,7 +32,12 @@ const NOT_WATCHED = [
  * copy of the design system to drift.
  */
 const config: StorybookConfig = {
-  stories: ["../src/**/*.mdx", "../src/**/*.stories.@(ts|tsx)"],
+  stories: [
+    "../src/**/*.mdx",
+    "../src/**/*.stories.@(ts|tsx)",
+    // ui-layouts library previews; the app never imports these.
+    "../ui-library/**/*.stories.@(ts|tsx)",
+  ],
   addons: ["@storybook/addon-docs"],
   framework: { name: "@storybook/react-vite", options: {} },
   core: { disableTelemetry: true },

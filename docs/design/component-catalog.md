@@ -85,6 +85,28 @@ Their styles live in `src/ui/ui-layouts.css` and use only app.css tokens. Use
 them in place of new hand-made filter strips, scrim-and-sheet pairs, bare
 `<details>` folds, bare file inputs and `<select multiple>` boxes.
 
+## UI Layouts Library (try-out previews)
+
+Every ui-layouts part that runs on the packages Capsule already has is in
+Storybook under **UI Layouts Library**, grouped as on ui-layouts.com. The
+sources live in `ui-library/` (outside `src/`): the app never imports them and
+the design-vocab gate does not scan them. `ui-library/library.css` points the
+library's shadcn color names at Capsule tokens, so previews follow light/dark.
+To use a part in the app, adapt it into `src/ui/` with Capsule tokens, as was
+done for SegmentedTabs, Dialog, Accordion, FileDrop and MultiSelect.
+
+Not previewed yet, because each needs a package that is not installed:
+responsive-modal, directional-drawer, responsive-header (vaul); magnified-doc
+(@radix-ui/react-tooltip); swapy (swapy); smooth-scroll (lenis); sparkles,
+sparkles-title (@tsparticles/react, @tsparticles/slim); mac-genie
+(html-to-image); carousel, framer-carousel (embla-carousel*); globe (cobe);
+r3f-blob, image-ripple-effect, mesh-gradients (three, @react-three/*);
+color-picker (react-colorful); motion-number, range-slider (@number-flow/react,
+@radix-ui/react-slider); phone-input (react-phone-number-input, cmdk);
+datetime-picker (chrono-node, react-day-picker); multi-selector (cmdk,
+@radix-ui/react-popover); file-upload (react-dropzone, sonner); code-tabs,
+code-block, tree-code-viewer (shiki).
+
 ## Adding to the catalog
 
 Search `src/**/*.stories.tsx` and the shared UI first. Extend an existing component

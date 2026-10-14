@@ -1,0 +1,31 @@
+import { BlurVignette, BlurVignetteArticle } from "./blur-vignette";
+
+function Blurvignettevideo() {
+  return (
+    <>
+      <BlurVignette
+        radius="24px"
+        inset="10px"
+        transitionLength="100px"
+        blur="15px"
+        classname="h-96 w-full overflow-hidden"
+      >
+        <video
+          autoPlay={true}
+          muted
+          loop
+          content="true"
+          className="w-full  h-full object-cover  transition-all hover:scale-110"
+        >
+          <source
+            src="https://cdn.pixabay.com/video/2023/10/19/185726-876210695_large.mp4"
+            type="video/mp4"
+          />
+        </video>
+        <BlurVignetteArticle />
+      </BlurVignette>
+    </>
+  );
+}
+
+export default Blurvignettevideo;

@@ -1,0 +1,34 @@
+/* Marquee keyframes (ui-layouts: tailwind.config marquee animations). */
+@keyframes uil-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+
+@keyframes uil-marquee-vertical {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}
+
+.animate-marquee {
+  animation: uil-marquee var(--duration) infinite linear;
+}
+
+.animate-marquee-reverse {
+  animation: uil-marquee var(--duration) infinite linear reverse;
+}
+
+.animate-marquee-vertical {
+  animation: uil-marquee-vertical var(--duration) infinite linear;
+}
+
+.animate-marquee-vertical-reverse {
+  animation: uil-marquee-vertical var(--duration) infinite linear reverse;
+}
