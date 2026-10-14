@@ -430,7 +430,7 @@ Reports; the old address redirects.
 
 | Route | Purpose | Edits |
 | --- | --- | --- |
-| `/eos` | The six key components with live numbers; Organizational Checkup; the EOS rhythm | Checkup results |
+| `/eos` | The six key components with live numbers; Organizational Checkup; the EOS rhythm; quarterly and annual planning sessions (agenda, live facts, timer) | Checkup results |
 | `/eos/vision` | Vision/Traction Organizer, two pages, edited in place; Rocks (read, live from the L10); long-term issues list | Company vision, core values, uniques, 3-year picture, 1-year goals, parked issues |
 | `/eos/people` | Accountability Chart, People Analyzer, Delegate and Elevate | Seats, people marks, the bar, activities |
 | `/eos/process` | Core processes: named → documented → simplified → followed by all | Core processes and their steps |

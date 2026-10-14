@@ -752,6 +752,111 @@
   color: var(--color-danger);
 }
 
+/* Quarterly and annual planning sessions (PlanningSession.tsx) */
+.eos-switch {
+  display: inline-flex;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-panel);
+  padding: 0.125rem;
+}
+.eos-switch > button {
+  min-height: 2.25rem;
+  padding: 0.25rem 1rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-ink-2);
+}
+.eos-switch > button[aria-pressed="true"] {
+  background: var(--tone);
+  color: var(--color-panel);
+}
+.eos-switch > button:disabled:not([aria-pressed="true"]) {
+  opacity: 0.45;
+}
+.eos-session-now {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--tone-line);
+  border-left: 4px solid var(--tone);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  background: var(--tone-soft);
+}
+.eos-session-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.eos-session-steps > li {
+  display: grid;
+  align-content: space-between;
+  gap: 0.4rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.75rem;
+  background: var(--color-panel);
+}
+.eos-session-steps > li.is-now {
+  border-color: var(--tone);
+  box-shadow: 0 0 0 1px var(--tone);
+}
+.eos-session-steps > li.is-past {
+  opacity: 0.6;
+}
+.eos-session-fact a {
+  margin-left: auto;
+}
+.eos-session-step {
+  display: flex;
+  gap: 0.6rem;
+  width: 100%;
+  text-align: left;
+  color: var(--color-ink);
+}
+.eos-session-step:disabled {
+  cursor: default;
+}
+.eos-session-num {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--tone-soft);
+  color: var(--tone);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+.eos-session-time {
+  margin-left: 0.5rem;
+  color: var(--color-ink-3);
+  font-size: var(--text-sm);
+}
+.eos-session-fact {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0 0 0 2.2rem;
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+}
+@media (max-width: 640px) {
+  .eos-session-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 @media (max-width: 900px) {
   .eos-stats,
   .eos-agenda {

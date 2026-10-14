@@ -30,6 +30,7 @@ import {
   type EosComponent,
 } from "./eosModel";
 import { OrganizationalCheckup } from "./OrganizationalCheckup";
+import { PlanningSession } from "./PlanningSession";
 import { useCompanyVision, useEosViewer, useVisionItems } from "./useEosData";
 
 type Stat = {
@@ -246,17 +247,26 @@ export function EosOverviewPage() {
             <Rhythm
               when="Every 90 days"
               what="Close out the Rocks, set new ones, work the long-term issues, retake the checkup."
-              to={EOS_PATHS.vision}
-              action="Open the V/TO"
+              to="?session=quarterly#planning-session"
+              action="Plan the quarterly session"
             />
             <Rhythm
               when="Every year"
               what="Review the V/TO, set the 1-year plan and goals, check the People Analyzer."
-              to={EOS_PATHS.people}
-              action="Open People"
+              to="?session=annual#planning-session"
+              action="Plan the annual session"
             />
           </div>
         </section>
+        <PlanningSession
+          rows={leadership ?? []}
+          visionWritten={stats.vision.progress! / 10}
+          oneYearGoals={
+            (items ?? []).filter((row) => row.section === "one_year_goal")
+              .length
+          }
+          now={now}
+        />
       </div>
     </div>
   );
