@@ -6,7 +6,11 @@ import { Section } from "@/ui/primitives";
  * this one on the L10 page follow the same order.
  */
 
-const AGENDA: ReadonlyArray<{ minutes: number; name: string; what: string }> = [
+export const AGENDA: ReadonlyArray<{
+  minutes: number;
+  name: string;
+  what: string;
+}> = [
   {
     minutes: 5,
     name: "Good news",

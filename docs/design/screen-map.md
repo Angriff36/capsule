@@ -420,6 +420,27 @@ it's actually sent out to a client via a manually triggered action."
   made from the Pipeline before any event exists is still saved when made,
   because there is no event to build it from.
 
+#### EOS area (owner, 2026-10-13)
+
+"lets get the rest of the books ideas in there ... so that he can incorporate
+that methodology into mangia via capsule seamlessly". A new side-menu area,
+EOS, holds Gino Wickman's *Traction* tools. The L10 page moved here from
+Reports; the old address redirects.
+
+| Route | Purpose | Edits |
+| --- | --- | --- |
+| `/eos` | The six key components with live numbers; Organizational Checkup; the EOS rhythm | Checkup results |
+| `/eos/vision` | Vision/Traction Organizer, two pages, edited in place; Rocks (read, live from the L10); long-term issues list | Company vision, core values, uniques, 3-year picture, 1-year goals, parked issues |
+| `/eos/people` | Accountability Chart, People Analyzer, Delegate and Elevate | Seats, people marks, the bar, activities |
+| `/eos/process` | Core processes: named → documented → simplified → followed by all | Core processes and their steps |
+| `/eos/l10` | L10 meeting with meeting mode (timer, agenda strip), top-three issues, Park, to-do completion | Rocks, issues, to-dos, headlines, meeting rating, scorecard targets |
+
+Editing homes: Rocks, issues and to-dos stay edited on the L10; the V/TO
+shows the quarter's Rocks read-only and links there. Long-term issues are
+L10 issues parked out of the week; "To this week's L10" brings one back.
+Count: 5 routes added, 1 route (`/reports/l10`) became a redirect, the
+Reports tab strip lost its L10 tab.
+
 ## Kept on purpose (exceptions)
 
 - Printable documents keep their own URL, because a print must show one
@@ -536,7 +557,8 @@ that now holds the old screen (`src/ui/MergedSection.tsx`).
 | `/finance/money-check` | `/admin/parallel-run#payments` |
 | `/finance/attribution/new` | same URL, now served by `/finance/attribution/:id` |
 | `/reports/comp-master` | `/finance/attribution#comp-master` |
-| `/reports/scorecard` | `/reports/l10#scorecard` |
+| `/reports/scorecard` | `/eos/l10#scorecard` |
+| `/reports/l10` | `/eos/l10` (EOS area, 2026-10-13) |
 | `/reports/avg-event-value` | `/reports/sales#avg-event-value` |
 | `/logistics` | `/logistics/dispatch` |
 | `/logistics/floor` | `/logistics/packs#floor` |

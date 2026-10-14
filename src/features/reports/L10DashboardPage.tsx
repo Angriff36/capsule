@@ -1,7 +1,8 @@
 import { useMemo } from "react";
 import { MergedSection } from "@/ui/MergedSection";
 import { CompanyScorecardDashboardPage } from "./CompanyScorecardDashboardPage";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { L10MeetingRunner, useL10Meeting } from "../eos/L10MeetingRunner";
 import {
   useListLeadershipItem,
   useListLeadershipMeeting,
@@ -61,6 +62,8 @@ import type { ScorecardPerson } from "./ScorecardTargetEditor";
 
 export function L10DashboardPage() {
   const now = useMemo(() => new Date(), []);
+  const [params, setParams] = useSearchParams();
+  const meeting = useL10Meeting(params.get("meeting") === "1");
   // Every figure here is this month or one of the last eight weeks.
   const eventWindow = useMemo(() => {
     const week = weekStartOf(now);
@@ -308,11 +311,40 @@ export function L10DashboardPage() {
   return (
     <div className="operations-stage supply-stage">
       <PageHeader
-        title="L10 Meeting Dashboard"
-        lead="Your weekly leadership meeting: this week's wins, the scorecard against its targets, priorities, headlines, issues, to-dos, the meeting's rating, and the last eight weeks."
+        eyebrow="EOS · Traction"
+        title="L10 meeting"
+        lead="The weekly leadership meeting, in agenda order: wins, scorecard, Rocks, headlines, issues, to-dos and the rating. Start meeting mode to run it with a timer."
+        actions={
+          meeting.state ? null : (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={meeting.start}
+            >
+              Start meeting
+            </button>
+          )
+        }
       />
 
-      <L10AgendaSection />
+      {meeting.state ? (
+        <L10MeetingRunner
+          state={meeting.state}
+          go={meeting.go}
+          end={() => {
+            meeting.end();
+            setParams(
+              (current) => {
+                current.delete("meeting");
+                return current;
+              },
+              { replace: true },
+            );
+          }}
+        />
+      ) : (
+        <L10AgendaSection />
+      )}
 
       {events?.length === 0 ? (
         <div data-testid="dashboard-empty">
@@ -323,9 +355,11 @@ export function L10DashboardPage() {
         </div>
       ) : null}
 
-      <DashboardGrid items={dashboardItems} />
+      <div id="wins" className="scroll-mt-48">
+        <DashboardGrid items={dashboardItems} />
+      </div>
 
-      <div className="mt-6">
+      <div id="l10-scorecard" className="mt-6 scroll-mt-48">
         <Section title="Scorecard">
           <div className="supply-table-wrap">
             <table className="supply-table" data-testid="l10-scorecard">
@@ -387,11 +421,13 @@ export function L10DashboardPage() {
         now={now}
       />
 
-      <L10MeetingRating
-        meetings={(meetings ?? []) as LeadershipMeetingRow[]}
-        people={activePeople}
-        now={now}
-      />
+      <div id="rating" className="scroll-mt-48">
+        <L10MeetingRating
+          meetings={(meetings ?? []) as LeadershipMeetingRow[]}
+          people={activePeople}
+          now={now}
+        />
+      </div>
 
       <div className="mt-6">
         <Section title="Meeting history (last 8 weeks)">

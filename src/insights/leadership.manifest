@@ -151,6 +151,11 @@ entity LeadershipItem mixin TenantScoped, SoftDeletable {
   property openedByPersonId: uuid?
   property closedAt: datetime?
   property closedByPersonId: uuid?
+  // EOS: an issue parked on the long-term (V/TO) issues list, out of the
+  // weekly meeting until it is brought back; and its place in this week's
+  // top three to solve (1 first).
+  property parkedAt: datetime?
+  property priority: int?
 
   ref owner: Person fields [tenantId, ownerPersonId] references [tenantId, id]
   ref openedBy: Person fields [tenantId, openedByPersonId] references [tenantId, id]
@@ -264,6 +269,44 @@ entity LeadershipItem mixin TenantScoped, SoftDeletable {
     mutate closedAt = now()
     mutate closedByPersonId = user.personId
     emit LeadershipItemDropped {
+      leadershipItemId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command park() {
+    guard self.kind == "issue"
+    guard self.status == "open"
+    guard self.parkedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate parkedAt = now()
+    mutate priority = null
+    emit LeadershipItemParked {
+      leadershipItemId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command bringBack() {
+    guard self.kind == "issue"
+    guard self.parkedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate parkedAt = null
+    emit LeadershipItemBroughtBack {
+      leadershipItemId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command prioritize(optional priority: int) {
+    guard self.kind == "issue"
+    guard self.status == "open"
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate priority = priority
+    emit LeadershipItemPrioritized {
       leadershipItemId: self.id
       tenantId: self.tenantId
     }
@@ -410,6 +453,21 @@ event LeadershipItemTrackMarked: "leadership_item.track_marked" {
 }
 
 event LeadershipItemSolved: "leadership_item.solved" {
+  leadershipItemId: string
+  tenantId: string
+}
+
+event LeadershipItemParked: "leadership_item.parked" {
+  leadershipItemId: string
+  tenantId: string
+}
+
+event LeadershipItemBroughtBack: "leadership_item.brought_back" {
+  leadershipItemId: string
+  tenantId: string
+}
+
+event LeadershipItemPrioritized: "leadership_item.prioritized" {
   leadershipItemId: string
   tenantId: string
 }

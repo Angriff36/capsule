@@ -40,6 +40,8 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
     useLeadershipItemReopen: () => vi.fn(),
     useLeadershipItemMarkTrack: () => markTrack,
     useLeadershipItemSolve: () => solve,
+    useLeadershipItemPark: () => vi.fn(),
+    useLeadershipItemPrioritize: () => vi.fn(),
     useListLeadershipMeeting: list("meetings"),
     useCreateLeadershipMeeting: () => recordMeeting,
     useLeadershipMeetingRevise: () => reviseMeeting,

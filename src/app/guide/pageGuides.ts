@@ -470,6 +470,49 @@ export const PAGE_GUIDES: PageGuide[] = [
     steps: ["Compare periods; spot what's growing and what's fading."],
   },
   {
+    prefix: "/eos/vision",
+    title: "Vision/Traction Organizer",
+    purpose: "Where the company is going and how it gets there, on two pages.",
+    steps: [
+      "Click any part to write it; share the printed V/TO with everyone.",
+    ],
+  },
+  {
+    prefix: "/eos/people",
+    title: "Right people, right seats",
+    purpose:
+      "The Accountability Chart, the People Analyzer and Delegate and Elevate.",
+    steps: [
+      "Draw the seats first, then put people in them.",
+      "Score each person against the core values and their seat.",
+    ],
+  },
+  {
+    prefix: "/eos/process",
+    title: "Core processes",
+    purpose:
+      "The handful of ways Mangia works, written down and followed by all.",
+    steps: [
+      "Name each process, write its major steps, move it along the four stages.",
+    ],
+  },
+  {
+    prefix: "/eos/l10",
+    title: "L10 meeting",
+    purpose:
+      "The weekly leadership meeting: scorecard, Rocks, headlines, to-dos and issues.",
+    steps: ["Press Start meeting; Next moves through the agenda with a timer."],
+  },
+  {
+    prefix: "/eos",
+    title: "EOS",
+    purpose:
+      "The six parts of the business from Traction, each with its live number.",
+    steps: [
+      "Take the Organizational Checkup, then open the weakest part first.",
+    ],
+  },
+  {
     prefix: "/reports",
     title: "Reports",
     purpose: "The business dashboards — KPIs, scorecards, and trends.",

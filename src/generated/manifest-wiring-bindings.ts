@@ -8,7 +8,7 @@
  * the success type of each command, and whether a person should be offered it.
  */
 
-export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:07bfc375e50745729ec6bc7072d8cedc51b11bc15548cd5d227376b343ff0653:0bc5edbdf245f323731a2efca440c17f99693d86a7de6f1baa5c9b48ffd6af31:0be6b50b59cb4405ceec66107fb813b3bef06b9640be7c651ef86466b34050d3:0bf13f59241289071080edca1701be1ee65385d093d2667e22ea5574fadd7bbd:0d9c6cf13f50ded1b7b367aa67e536076d46b94650c32ca02feaa6bd7cf8e174:0de9704fea65de3dd0507201f452122ffe8da95472a64f22516f2c1a35cdfef8:116ed979f565c2bb19e7d952cd9628d358b18513b0edf6f1c21ecdcc48763235:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17d02f4d4e295fc7c46310b54ca5be0fcaa9f9fc960bff4fa30a80f8d873c093:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:207fcacb78874615cc2a27d7f37434068cf91ba8ce66df0646e82532eaef6909:2588db758736cb6ae2b4c15c4b4993f99b09608ed1ca7b6a5c26d1ff8b1b12dd:25d0c7c3d002bb87a0a38777285355e09065ab44f7aea1daed190ee52c4c9e42:260d9aced49b550eb0679d41f8881514d3147536671c4b064117be415f2b2b97:279499f46cb1cd8c860416cfdb5ca18875afc3b3ee061e829bfff7f2d8399371:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2a9e9f22438a06938d96b7be8056b9f3177aa04f6e1994a8cf53c710d34b668f:2b2fe452d33e54136f07e5aa4d408edd4ac6af34eb3b331c2a3dcb85d09264fa:2d7ba8e0bfdec341e11638edb8b0ea7a9a1477bd6b1a3f030c4d1f9b434e02d9:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:3306ebabf219c0cc21ad6e7bba1de138890a236c04f809451dbce4023259c19c:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:35b3f7ee206b67fe00580ba99b068a73fdf75a10a31affb8c402237556fc5bea:3b3ffdd70fd17ae2a9465b52ea6fb977865da12e73b6a089e2a36d0f8222c0f6:3f0f59de8bce6b9e251cb60742736ed4a5457ee8c5f0331b2451205ff033446c:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:44ac6b71cf78704f7a507af4b5dd18615adcc5461a8b69552b33f3a6c8289e0d:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:486499d7e4a1a3a077d703f398d4e7563afbafee52e12532734e279290a04d4e:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:4b6b1ac2b81ba328bfd08ea25f013956a8a59fbd6847faa906fd2a008fc0f847:4eb17c1f004199fa77252cfb159f427235907fd88023a1c2a6845bf3d0e3526a:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:5596f820716ad9ea502ff771902f0ed450c21f88551ec4b00fd85156f3e1fe13:55cb15592941b18909da81535de9b273f70361d1b0cd4e2f99eaebf1b08dae7d:56f4459d4e1dbca44eded864fcdd82d2972967bc744b1a77003b44d2902d3c71:5860168b413a48233df8025f61a7392d76203d14e2c8bb11928dcae337249c79:5b641a0bbefc6c4d4b13e73a65dbcc3254c11a2a92d1e5298e1a065b32ea2de3:5e28543f8f5c7955b39c615e146aba27526ecc84ae6c491af9773539cd996cf0:602f51980354dc80180f8901847042d215ab2a29c23043dc50c29447e2bf2b49:64bb71f3f5711ca9461a7828295f8dc00eb816778deada45d753531d28ee4ef1:657f7d679212dcccc4a8235419fdd1194c09e9911f37c125244a8cbad8947c70:6598d6818e668be874ad2f94c6aff0a448eae0974d97c8148bc20a29cb11c6f9:6667daa335cce74a07ca6040f7edd583f458320b24d3e67e070a493f94bffafc:69c7ab127ec451978df4c40faec592c9f76c7a0e2938e451dfd0b1fc11de0fef:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6c2ad3ced9613a573123960ae47e929aeec0aabcafe5364fe96e217bf3ec257c:7164dccafdaf2640161d6947c2fa7537954a9b574c950943effd2ac3695715be:71a492419ab7854586cc7248490771e86329b3260e6add4c3756569a07ac6692:71eac31104529dc564ecb61beb7032d2db805e6107d6eef3704c64a6a659f4c6:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:740da886ccc77afb63e2faf4ef603ce5a454bd635dac184158f6022f73235099:74b6a103c8f72ea355d31c5ef7c6a9deca8d75ecf57c549dd345f2c33b8d2fe6:78951f55f5343fa46375a9cd6b10b4e8608620aeda7c93cd092368da99df95bc:79f46428192658c8673f4172030958646db2b132410c465350dc52d48a8f0700:7de99daa56ce0bdb393ea9b98028f54c7eae77b7e9de0ca504a43c761b8ceb5a:7e595b0b5bf54974b5cec7c15a38738b95850e23fb8e8506d0b7203c8be12b85:847349585cb07409388c0008e16eb5a4772ed14027d553c648883cdfd61d284d:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8a9ebe36819523092f836ea0364594b56fa31acf8773df5417aeeede55e0d9be:8ae4af5a57505dd1aeef3333c1edeff17eb0ae29a67233bb49063d227cba484b:8bf18e5e72a33f3695425cd9e659b27ccc69a1de833de83dce7c4cef5fce281b:8c7f0296f1685ad02bf6bbf430cba6b9ddb38e411da31efa5f8c227e67368729:8d4d7941ecef86584b3fc10492a149fc9b94d609be05f64021bd48f9a6bf53e8:90636c7dbe6c3936810176fb1da3faad3b5e0732d3343d8377bb7252610ccfed:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98bf8b24c59b787a9200af66aac9ebb56fb55daac8b5e748eb51989436e953a9:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a47bf612d7fc2d899372b0d42478de42a2db9923d35f5d6d70f80f0b74d4a8c0:a98bfd770daf1ccd31bb3d3f48b95e94de32922e5d42a85830b188d653d76523:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:afab1efb7305c5cd42a487f82697a4d8f210fefc66df00213a14d3abf269bca3:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b850eb7ba1dd4b3df63dd238434fa4e43f3efe4796a1dd7234e32b26b0bbd2ca:b89f15fec1dc869221ea412eb407eb88f0862769308126bdb1f9c58d251ce25e:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:c09932d02dce2f7fa48843f2fbdee2d878a23438b0c38e85f6528ddc519a7166:c450045c260172a40ff808ec8595f7bac2ff076056bf796a0341aecac091ed0f:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cbd4defc862e07c880839b8670d7d44c6669732f7c5c9fe867bd8fe983dc7662:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:ceb4155578dee96643afa9bfe9dacaf38ef38b3ef82998790bb44d63ad9d1055:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:da8e33de8edcc0a43ddaa68b2be18019389a6a0b102f5d18d8f64e010e6bb2d3:daa95ffeb98afb8be65cefa8d613f3fe28fc7dd67abe9a80719109adb92acdff:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:dc54e3ad7fed08a72a02fb51f3c97a48885d9bcc23b11d61b91f3f980d404f6a:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:defdfb0e89f2ce4997de29156c91f602d924f9a55e614d3c15e20a87b9f94086:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e1c58559d9dd56e47aa1bdd82fae164d6fc6a7abeee424323601453aadfb8f05:e31bb042c57dac90622854278a56f4dd9d783f7d3729ad28496963ca684d0832:e419122e972fa98353022d3c7c4749e2ababdb10528a7526a79cffcf9a878463:e50b3d0372bf29efef870f880714426dd3381160693fdf99785bb285a3747515:e788cf98eb9f06dbb532eee0eac4248692c6d7c391b07d878dc5b41a3029531b:e7d691fc516e8164441cee49534b831ad4e1234cd696ff5058ed115c0390d85d:ea80ec011274b8a933643d487557d435c4c3fad8514da59e6ce95941eaf6b0e1:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f3b771c30b184809d26d5718a847825069b20f37157165e74284457510d0f97f:f404878c29f7b66a9eea56991aed918298f97eaca05870c4b8647480aec107ed:f40f43783ea2ed561b48b803d8dc4abff9ece2a2bb5f7251146a1cd4623914ee:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f704fe65334afc48560183b7054124c103523b47eda7ca79b871d7e44adb1bb5:f80cf6a868c3a0c8df679a79f0ee983fe6722da9fa63a0fe887ebd3abadd722f:f8f83ff78273645146d92514939c4ffcff6e7a5b8477da5b27ca8c29378c2154:f9c85c8e0fc262156fddb19ec26d6a1397fdab244bd00c8eef11872aae838728:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdbe0a107f4e0c4b2d1519b30f851dc8a3b7ea6adfb67c25dbc9c02c0047d5e1:ff06877d6cc063ad1d1b7ed69e24bb65e19e1a1b2dde8d100076de61b21fac9c";
+export const WIRING_CONTRACT_HASH = "0213663aa57a43cffa7ccd193715fdff0daeffa7dc53c3cdb708725e7ee254e1:058710c0417591c2c4df097c0121f4aa4a8c74ed66a07e664278127e8dd6fb38:068ab397eb95dbdf8d0a5b8eba4e228df862fa9784d4445667f40c1b4e165ac9:07bfc375e50745729ec6bc7072d8cedc51b11bc15548cd5d227376b343ff0653:0b72d23f0c0da69f2a0415409e5fbd6637d81d3f4bd85012156e67784b189213:0bc5edbdf245f323731a2efca440c17f99693d86a7de6f1baa5c9b48ffd6af31:0be6b50b59cb4405ceec66107fb813b3bef06b9640be7c651ef86466b34050d3:0bf13f59241289071080edca1701be1ee65385d093d2667e22ea5574fadd7bbd:0d9c6cf13f50ded1b7b367aa67e536076d46b94650c32ca02feaa6bd7cf8e174:0de9704fea65de3dd0507201f452122ffe8da95472a64f22516f2c1a35cdfef8:116ed979f565c2bb19e7d952cd9628d358b18513b0edf6f1c21ecdcc48763235:1550ce215905a99fad62a428380da24f092d79133911dbfbd69036f3aafa3f85:17d02f4d4e295fc7c46310b54ca5be0fcaa9f9fc960bff4fa30a80f8d873c093:196b19be709cc57699a7e89576dd065b3081bc8128ddaf372b678472f60d7533:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:207fcacb78874615cc2a27d7f37434068cf91ba8ce66df0646e82532eaef6909:2588db758736cb6ae2b4c15c4b4993f99b09608ed1ca7b6a5c26d1ff8b1b12dd:25d0c7c3d002bb87a0a38777285355e09065ab44f7aea1daed190ee52c4c9e42:260d9aced49b550eb0679d41f8881514d3147536671c4b064117be415f2b2b97:279499f46cb1cd8c860416cfdb5ca18875afc3b3ee061e829bfff7f2d8399371:29c06a38ab7365b24e1b363c053b033783b47196a0d2da53fd8e061ce55d9b30:2a9e9f22438a06938d96b7be8056b9f3177aa04f6e1994a8cf53c710d34b668f:2b2fe452d33e54136f07e5aa4d408edd4ac6af34eb3b331c2a3dcb85d09264fa:2d7ba8e0bfdec341e11638edb8b0ea7a9a1477bd6b1a3f030c4d1f9b434e02d9:2e1e87215781cd35a2efa871d050eb57a3620fa5a15457c0ba661c42dab0ad67:2e535decbfbb1e2cf26eb2969073000e0950c529a696b1ce26034714f0c59941:3306ebabf219c0cc21ad6e7bba1de138890a236c04f809451dbce4023259c19c:332937abd21f9fc911b10ecff90f282a3edd09ce4515bb29c726d7340deb60b3:35b3f7ee206b67fe00580ba99b068a73fdf75a10a31affb8c402237556fc5bea:3b3ffdd70fd17ae2a9465b52ea6fb977865da12e73b6a089e2a36d0f8222c0f6:3f52954d6abf659d1925d874341d30f430df4abcef93d1e52aa7ed97bf4820bf:40ecc7a59a734276d1cde97753c93ecc2b390b5d866454e0be804b2dce5d7765:44ac6b71cf78704f7a507af4b5dd18615adcc5461a8b69552b33f3a6c8289e0d:46c75fe9fb1c05c68533156dd5afdffd660b79da32ef2b549a122a3718b40d3d:47fe3db87b74fdc20fa6141d68f4fa18294572bc5ee9066fc357230d1053d135:486499d7e4a1a3a077d703f398d4e7563afbafee52e12532734e279290a04d4e:49012eaf78dc9fa5bc5806f4fa4f5f9fbac6b570bf8b5023ea17be1b5d5b8a7e:49410c543430b0ac862c771a86ff40f0ccab5451af90fe7d693a99f1de9e6b02:4b6b1ac2b81ba328bfd08ea25f013956a8a59fbd6847faa906fd2a008fc0f847:4eb17c1f004199fa77252cfb159f427235907fd88023a1c2a6845bf3d0e3526a:50d04b3a815c4459946edf003bcd30b1b0f03cde0533d13ecdd52d049c0a6920:51df17cf89090665a7e0c1ab1d0819b7d9624737942c5e4d7d7c21680012b7ea:520bfcb65f66d5f26da22cca9d4e580792be11a819ece336925a76a9ad4a2c27:525fcebcca9951eed2cac9eefef6137c9197dc4a3781e9c146b06288220dad0a:5596f820716ad9ea502ff771902f0ed450c21f88551ec4b00fd85156f3e1fe13:55cb15592941b18909da81535de9b273f70361d1b0cd4e2f99eaebf1b08dae7d:56f4459d4e1dbca44eded864fcdd82d2972967bc744b1a77003b44d2902d3c71:5860168b413a48233df8025f61a7392d76203d14e2c8bb11928dcae337249c79:5b641a0bbefc6c4d4b13e73a65dbcc3254c11a2a92d1e5298e1a065b32ea2de3:5e28543f8f5c7955b39c615e146aba27526ecc84ae6c491af9773539cd996cf0:602f51980354dc80180f8901847042d215ab2a29c23043dc50c29447e2bf2b49:64bb71f3f5711ca9461a7828295f8dc00eb816778deada45d753531d28ee4ef1:657f7d679212dcccc4a8235419fdd1194c09e9911f37c125244a8cbad8947c70:6598d6818e668be874ad2f94c6aff0a448eae0974d97c8148bc20a29cb11c6f9:6667daa335cce74a07ca6040f7edd583f458320b24d3e67e070a493f94bffafc:69c7ab127ec451978df4c40faec592c9f76c7a0e2938e451dfd0b1fc11de0fef:69d91a11d6cc16019e5b50d2e31b2961fa397eac4cb0801c74cbe3f83b79184e:6c2ad3ced9613a573123960ae47e929aeec0aabcafe5364fe96e217bf3ec257c:7164dccafdaf2640161d6947c2fa7537954a9b574c950943effd2ac3695715be:71a492419ab7854586cc7248490771e86329b3260e6add4c3756569a07ac6692:71eac31104529dc564ecb61beb7032d2db805e6107d6eef3704c64a6a659f4c6:73d7550d185afbf379b020aded87efa976ee2278222ec24fa4d9d87755fce5c6:740da886ccc77afb63e2faf4ef603ce5a454bd635dac184158f6022f73235099:74b6a103c8f72ea355d31c5ef7c6a9deca8d75ecf57c549dd345f2c33b8d2fe6:78951f55f5343fa46375a9cd6b10b4e8608620aeda7c93cd092368da99df95bc:79f46428192658c8673f4172030958646db2b132410c465350dc52d48a8f0700:7de99daa56ce0bdb393ea9b98028f54c7eae77b7e9de0ca504a43c761b8ceb5a:7e595b0b5bf54974b5cec7c15a38738b95850e23fb8e8506d0b7203c8be12b85:83f956a15edb5a2516726bdf794085d3fc92c3b08dd9327773f7ae4ff2167d43:847349585cb07409388c0008e16eb5a4772ed14027d553c648883cdfd61d284d:86d8296968beb30ac1d339ca78389269a7d6cc3306bb9bc266b0490a120bc0a4:8a9ebe36819523092f836ea0364594b56fa31acf8773df5417aeeede55e0d9be:8ae4af5a57505dd1aeef3333c1edeff17eb0ae29a67233bb49063d227cba484b:8bf18e5e72a33f3695425cd9e659b27ccc69a1de833de83dce7c4cef5fce281b:8c7f0296f1685ad02bf6bbf430cba6b9ddb38e411da31efa5f8c227e67368729:8d4d7941ecef86584b3fc10492a149fc9b94d609be05f64021bd48f9a6bf53e8:90636c7dbe6c3936810176fb1da3faad3b5e0732d3343d8377bb7252610ccfed:90dc91b58f2603da7c4df2c979c7492b0975c8d930f68c2accc1b8d66095b4a8:916c61b111b5973be532c0a7a4c9f2e0e841b698f8120578e66bf174ee938dc7:9196558e4c78ba0bf196a52ef2abef752dbe2820181a812b160ef70fc0a14467:92771e75965a458ad5237453310d7059475ce4695d4956c0254184ef1ccbb128:98bde6b47ce7226630b7e3bea3b9a1953a829bef3827737b6e330da33f595f7a:98bf8b24c59b787a9200af66aac9ebb56fb55daac8b5e748eb51989436e953a9:a1219922c6cc6aaed511bb9b69a3a1b398586233a77c16a7a0b4da5312d7ff2f:a47bf612d7fc2d899372b0d42478de42a2db9923d35f5d6d70f80f0b74d4a8c0:a98bfd770daf1ccd31bb3d3f48b95e94de32922e5d42a85830b188d653d76523:ad913e5cd8d3c233f39c80cd27258cec95673af18231bf1e60f29f7e680a5ee0:afab1efb7305c5cd42a487f82697a4d8f210fefc66df00213a14d3abf269bca3:b02a0a872e6b54e1c469fa0238205e43f94efb2515d6c39b952e989d1e686be5:b06cfe962b3bdb09c3dcf67e388840e1c0288df3ff4bc022dc255538c6019ae1:b3c490862a8c9171ddf41943eea624b8418630628fcdbd2a26bb92cb8baaa096:b850eb7ba1dd4b3df63dd238434fa4e43f3efe4796a1dd7234e32b26b0bbd2ca:b89f15fec1dc869221ea412eb407eb88f0862769308126bdb1f9c58d251ce25e:b95e8654dc8b4784e37b31697261c91c02a1a8f5a6b6a24b5e7866bda99c5fee:c09932d02dce2f7fa48843f2fbdee2d878a23438b0c38e85f6528ddc519a7166:c450045c260172a40ff808ec8595f7bac2ff076056bf796a0341aecac091ed0f:c8a80f09b2540d0de89f5163cb830e817144fbe12e4817873808c1ac829b7784:c8fb4f35e19c7e39034cfbd80cc1dd424eb0dee55a95b1f5514ef8ba4aa6117f:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:cbd4defc862e07c880839b8670d7d44c6669732f7c5c9fe867bd8fe983dc7662:ccfad98608360378765c46c859b0fe3accc636dbed5f0992f4d8f2c2c3182485:ceb4155578dee96643afa9bfe9dacaf38ef38b3ef82998790bb44d63ad9d1055:d05155ed7c746e3918c5cad8731afe7423a1eba1539a7f5209856e36f051e72e:d2c40dd75f36265e5632a33a47d5c7af903d0efbda5ee893392dd5ad8751051b:d7a80ab21756bf2d99453dfff30cb21ac6a8da37a82800192cea2f522ce53be3:da8e33de8edcc0a43ddaa68b2be18019389a6a0b102f5d18d8f64e010e6bb2d3:daa95ffeb98afb8be65cefa8d613f3fe28fc7dd67abe9a80719109adb92acdff:dc1a1ac39b4ddf3a6a2eac3c6136ae20e00812ba0ac66d711ecc22443165c811:de004e3addaa7b68b3c4dc1f29592075e0fbccc15fbe5b9c643a8b67d55b7b94:defdfb0e89f2ce4997de29156c91f602d924f9a55e614d3c15e20a87b9f94086:dfe429e85946a064f969666453e42149b6861f448e0e374df03aa21895b23380:e1c58559d9dd56e47aa1bdd82fae164d6fc6a7abeee424323601453aadfb8f05:e31bb042c57dac90622854278a56f4dd9d783f7d3729ad28496963ca684d0832:e419122e972fa98353022d3c7c4749e2ababdb10528a7526a79cffcf9a878463:e50b3d0372bf29efef870f880714426dd3381160693fdf99785bb285a3747515:e788cf98eb9f06dbb532eee0eac4248692c6d7c391b07d878dc5b41a3029531b:e7d691fc516e8164441cee49534b831ad4e1234cd696ff5058ed115c0390d85d:ea80ec011274b8a933643d487557d435c4c3fad8514da59e6ce95941eaf6b0e1:ec5f9097c796baa4712c905010b6d53a16c9e529857a56a2facb2a592199838e:f0933c6f758e1752d1609a171b46320e8ce6e6480a61339680c7812c0fe7d2f0:f3b771c30b184809d26d5718a847825069b20f37157165e74284457510d0f97f:f404878c29f7b66a9eea56991aed918298f97eaca05870c4b8647480aec107ed:f40f43783ea2ed561b48b803d8dc4abff9ece2a2bb5f7251146a1cd4623914ee:f44b5fb876d9244f29370d1b5343994805de196cd68495f7acd38bdcab5ad0a7:f59faf5762812188aae9b9d79e794409b4cedcd29a722a2b37cf44a096e02427:f704fe65334afc48560183b7054124c103523b47eda7ca79b871d7e44adb1bb5:f80cf6a868c3a0c8df679a79f0ee983fe6722da9fa63a0fe887ebd3abadd722f:f8f83ff78273645146d92514939c4ffcff6e7a5b8477da5b27ca8c29378c2154:f9c85c8e0fc262156fddb19ec26d6a1397fdab244bd00c8eef11872aae838728:fb9e2b1ecf3b6e70aa7f4aa4e94812e8033e1fd2d6c4c89d7ea4eded21d71ef5:fdbe0a107f4e0c4b2d1519b30f851dc8a3b7ea6adfb67c25dbc9c02c0047d5e1:ff06877d6cc063ad1d1b7ed69e24bb65e19e1a1b2dde8d100076de61b21fac9c";
 
 /** Canonical command transport. One protocol for every capability. */
 export const WIRING_TRANSPORT = {
@@ -33,6 +33,286 @@ export const WIRING_TRANSPORT = {
   "errorEnvelope": "error",
   "dateWire": "epoch-ms",
   "instanceIdentityField": "docId"
+} as const;
+
+// --- AccountabilitySeat.place ---
+export interface AccountabilitySeatPlaceClientInput {
+  title: string;
+  roles?: string;
+  personId?: string;
+  parentSeatId?: string;
+  sortOrder: number;
+}
+
+export const AccountabilitySeatPlaceCapability = {
+  capabilityId: "AccountabilitySeat.place",
+  entity: "AccountabilitySeat",
+  command: "place",
+  route: "/api/manifest/AccountabilitySeat/commands/place",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["title","roles","personId","parentSeatId","sortOrder"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Everyone may see the Accountability Chart"},{"kind":"policy_denial","message":"Managers may update the Accountability Chart"},{"kind":"policy_denial","message":"Managers may change the Accountability Chart"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Name the seat."}],
+  emits: ["AccountabilitySeatPlaced"],
+} as const;
+
+export type AccountabilitySeatPlaceResult = { docId: string };
+
+/**
+ * Build command input for AccountabilitySeat.place.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindAccountabilitySeatPlaceInput(client: AccountabilitySeatPlaceClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful AccountabilitySeat.place. */
+export const AccountabilitySeatPlaceInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer AccountabilitySeat.place. Not a rendered control. */
+export const AccountabilitySeatPlaceAction = {
+  "exposure": "human",
+  "label": "Place",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "title",
+      "label": "Title",
+      "required": true
+    },
+    {
+      "name": "roles",
+      "label": "Roles",
+      "required": false
+    },
+    {
+      "name": "personId",
+      "label": "Person id",
+      "required": false
+    },
+    {
+      "name": "parentSeatId",
+      "label": "Parent seat id",
+      "required": false
+    },
+    {
+      "name": "sortOrder",
+      "label": "Sort order",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- AccountabilitySeat.remove ---
+export type AccountabilitySeatRemoveClientInput = Record<string, never>;
+
+export const AccountabilitySeatRemoveCapability = {
+  capabilityId: "AccountabilitySeat.remove",
+  entity: "AccountabilitySeat",
+  command: "remove",
+  route: "/api/manifest/AccountabilitySeat/commands/remove",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; title: string; roles: string | null; personId: string | null; parentSeatId: string | null; sortOrder: number; createdByPersonId: string | null; placedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Everyone may see the Accountability Chart"},{"kind":"policy_denial","message":"Managers may update the Accountability Chart"},{"kind":"policy_denial","message":"Managers may change the Accountability Chart"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"AccountabilitySeat not found"}],
+  emits: ["AccountabilitySeatRemoved"],
+} as const;
+
+export type AccountabilitySeatRemoveResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; title: string; roles: string | null; personId: string | null; parentSeatId: string | null; sortOrder: number; createdByPersonId: string | null; placedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for AccountabilitySeat.remove.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindAccountabilitySeatRemoveInput(client: AccountabilitySeatRemoveClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful AccountabilitySeat.remove. */
+export const AccountabilitySeatRemoveInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer AccountabilitySeat.remove. Not a rendered control. */
+export const AccountabilitySeatRemoveAction = {
+  "exposure": "human",
+  "label": "Remove",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- AccountabilitySeat.revise ---
+export interface AccountabilitySeatReviseClientInput {
+  title: string;
+  roles?: string;
+  personId?: string;
+  parentSeatId?: string;
+  sortOrder: number;
+}
+
+export const AccountabilitySeatReviseCapability = {
+  capabilityId: "AccountabilitySeat.revise",
+  entity: "AccountabilitySeat",
+  command: "revise",
+  route: "/api/manifest/AccountabilitySeat/commands/revise",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; title: string; roles: string | null; personId: string | null; parentSeatId: string | null; sortOrder: number; createdByPersonId: string | null; placedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["title","roles","personId","parentSeatId","sortOrder"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Everyone may see the Accountability Chart"},{"kind":"policy_denial","message":"Managers may update the Accountability Chart"},{"kind":"policy_denial","message":"Managers may change the Accountability Chart"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Name the seat."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"AccountabilitySeat not found"}],
+  emits: ["AccountabilitySeatRevised"],
+} as const;
+
+export type AccountabilitySeatReviseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; title: string; roles: string | null; personId: string | null; parentSeatId: string | null; sortOrder: number; createdByPersonId: string | null; placedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for AccountabilitySeat.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindAccountabilitySeatReviseInput(client: AccountabilitySeatReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful AccountabilitySeat.revise. */
+export const AccountabilitySeatReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer AccountabilitySeat.revise. Not a rendered control. */
+export const AccountabilitySeatReviseAction = {
+  "exposure": "human",
+  "label": "Revise",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "title",
+      "label": "Title",
+      "required": true
+    },
+    {
+      "name": "roles",
+      "label": "Roles",
+      "required": false
+    },
+    {
+      "name": "personId",
+      "label": "Person id",
+      "required": false
+    },
+    {
+      "name": "parentSeatId",
+      "label": "Parent seat id",
+      "required": false
+    },
+    {
+      "name": "sortOrder",
+      "label": "Sort order",
+      "required": true
+    }
+  ]
 } as const;
 
 // --- Announcement.post ---
@@ -7492,6 +7772,394 @@ export const ClientPortalLinkRevokeAction = {
   "label": "Revoke",
   "confirm": false,
   "fields": []
+} as const;
+
+// --- CompanyVision.revise ---
+export interface CompanyVisionReviseClientInput {
+  coreFocusPurpose?: string;
+  coreFocusNiche?: string;
+  tenYearTarget?: string;
+  tenYearDate?: string;
+  targetMarket?: string;
+  provenProcess?: string;
+  guarantee?: string;
+  threeYearDate?: string;
+  threeYearRevenue?: number;
+  threeYearProfit?: number;
+  threeYearMeasurables?: string;
+  oneYearDate?: string;
+  oneYearRevenue?: number;
+  oneYearProfit?: number;
+  oneYearMeasurables?: string;
+  quarterDate?: string;
+  quarterRevenue?: number;
+  quarterProfit?: number;
+  quarterMeasurables?: string;
+  peopleBarMaxMixed?: number;
+}
+
+export const CompanyVisionReviseCapability = {
+  capabilityId: "CompanyVision.revise",
+  entity: "CompanyVision",
+  command: "revise",
+  route: "/api/manifest/CompanyVision/commands/revise",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: ["tenYearDate","threeYearDate","oneYearDate","quarterDate"],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; coreFocusPurpose: string | null; coreFocusNiche: string | null; tenYearTarget: string | null; tenYearDate: number | null; targetMarket: string | null; provenProcess: string | null; guarantee: string | null; threeYearDate: number | null; threeYearRevenue: number | null; threeYearProfit: number | null; threeYearMeasurables: string | null; oneYearDate: number | null; oneYearRevenue: number | null; oneYearProfit: number | null; oneYearMeasurables: string | null; quarterDate: number | null; quarterRevenue: number | null; quarterProfit: number | null; quarterMeasurables: string | null; peopleBarMaxMixed: number | null; writtenAt: number | null; writtenByPersonId: string | null; revisedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["coreFocusPurpose","coreFocusNiche","tenYearTarget","tenYearDate","targetMarket","provenProcess","guarantee","threeYearDate","threeYearRevenue","threeYearProfit","threeYearMeasurables","oneYearDate","oneYearRevenue","oneYearProfit","oneYearMeasurables","quarterDate","quarterRevenue","quarterProfit","quarterMeasurables","peopleBarMaxMixed"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Everyone may see the company vision"},{"kind":"policy_denial","message":"Managers may update the company vision"},{"kind":"policy_denial","message":"Managers may change the company vision"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"CompanyVision not found"}],
+  emits: ["CompanyVisionRevised"],
+} as const;
+
+export type CompanyVisionReviseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; coreFocusPurpose: string | null; coreFocusNiche: string | null; tenYearTarget: string | null; tenYearDate: number | null; targetMarket: string | null; provenProcess: string | null; guarantee: string | null; threeYearDate: number | null; threeYearRevenue: number | null; threeYearProfit: number | null; threeYearMeasurables: string | null; oneYearDate: number | null; oneYearRevenue: number | null; oneYearProfit: number | null; oneYearMeasurables: string | null; quarterDate: number | null; quarterRevenue: number | null; quarterProfit: number | null; quarterMeasurables: string | null; peopleBarMaxMixed: number | null; writtenAt: number | null; writtenByPersonId: string | null; revisedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for CompanyVision.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindCompanyVisionReviseInput(client: CompanyVisionReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful CompanyVision.revise. */
+export const CompanyVisionReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer CompanyVision.revise. Not a rendered control. */
+export const CompanyVisionReviseAction = {
+  "exposure": "human",
+  "label": "Revise",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "coreFocusPurpose",
+      "label": "Core focus purpose",
+      "required": false
+    },
+    {
+      "name": "coreFocusNiche",
+      "label": "Core focus niche",
+      "required": false
+    },
+    {
+      "name": "tenYearTarget",
+      "label": "Ten year target",
+      "required": false
+    },
+    {
+      "name": "tenYearDate",
+      "label": "Ten year date",
+      "required": false
+    },
+    {
+      "name": "targetMarket",
+      "label": "Target market",
+      "required": false
+    },
+    {
+      "name": "provenProcess",
+      "label": "Proven process",
+      "required": false
+    },
+    {
+      "name": "guarantee",
+      "label": "Guarantee",
+      "required": false
+    },
+    {
+      "name": "threeYearDate",
+      "label": "Three year date",
+      "required": false
+    },
+    {
+      "name": "threeYearRevenue",
+      "label": "Three year revenue",
+      "required": false
+    },
+    {
+      "name": "threeYearProfit",
+      "label": "Three year profit",
+      "required": false
+    },
+    {
+      "name": "threeYearMeasurables",
+      "label": "Three year measurables",
+      "required": false
+    },
+    {
+      "name": "oneYearDate",
+      "label": "One year date",
+      "required": false
+    },
+    {
+      "name": "oneYearRevenue",
+      "label": "One year revenue",
+      "required": false
+    },
+    {
+      "name": "oneYearProfit",
+      "label": "One year profit",
+      "required": false
+    },
+    {
+      "name": "oneYearMeasurables",
+      "label": "One year measurables",
+      "required": false
+    },
+    {
+      "name": "quarterDate",
+      "label": "Quarter date",
+      "required": false
+    },
+    {
+      "name": "quarterRevenue",
+      "label": "Quarter revenue",
+      "required": false
+    },
+    {
+      "name": "quarterProfit",
+      "label": "Quarter profit",
+      "required": false
+    },
+    {
+      "name": "quarterMeasurables",
+      "label": "Quarter measurables",
+      "required": false
+    },
+    {
+      "name": "peopleBarMaxMixed",
+      "label": "People bar max mixed",
+      "required": false
+    }
+  ]
+} as const;
+
+// --- CompanyVision.write ---
+export interface CompanyVisionWriteClientInput {
+  coreFocusPurpose?: string;
+  coreFocusNiche?: string;
+  tenYearTarget?: string;
+  tenYearDate?: string;
+  targetMarket?: string;
+  provenProcess?: string;
+  guarantee?: string;
+  threeYearDate?: string;
+  threeYearRevenue?: number;
+  threeYearProfit?: number;
+  threeYearMeasurables?: string;
+  oneYearDate?: string;
+  oneYearRevenue?: number;
+  oneYearProfit?: number;
+  oneYearMeasurables?: string;
+  quarterDate?: string;
+  quarterRevenue?: number;
+  quarterProfit?: number;
+  quarterMeasurables?: string;
+  peopleBarMaxMixed?: number;
+}
+
+export const CompanyVisionWriteCapability = {
+  capabilityId: "CompanyVision.write",
+  entity: "CompanyVision",
+  command: "write",
+  route: "/api/manifest/CompanyVision/commands/write",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: ["tenYearDate","threeYearDate","oneYearDate","quarterDate"],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["coreFocusPurpose","coreFocusNiche","tenYearTarget","tenYearDate","targetMarket","provenProcess","guarantee","threeYearDate","threeYearRevenue","threeYearProfit","threeYearMeasurables","oneYearDate","oneYearRevenue","oneYearProfit","oneYearMeasurables","quarterDate","quarterRevenue","quarterProfit","quarterMeasurables","peopleBarMaxMixed"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Everyone may see the company vision"},{"kind":"policy_denial","message":"Managers may update the company vision"},{"kind":"policy_denial","message":"Managers may change the company vision"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"}],
+  emits: ["CompanyVisionWritten"],
+} as const;
+
+export type CompanyVisionWriteResult = { docId: string };
+
+/**
+ * Build command input for CompanyVision.write.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindCompanyVisionWriteInput(client: CompanyVisionWriteClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful CompanyVision.write. */
+export const CompanyVisionWriteInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer CompanyVision.write. Not a rendered control. */
+export const CompanyVisionWriteAction = {
+  "exposure": "human",
+  "label": "Write",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "coreFocusPurpose",
+      "label": "Core focus purpose",
+      "required": false
+    },
+    {
+      "name": "coreFocusNiche",
+      "label": "Core focus niche",
+      "required": false
+    },
+    {
+      "name": "tenYearTarget",
+      "label": "Ten year target",
+      "required": false
+    },
+    {
+      "name": "tenYearDate",
+      "label": "Ten year date",
+      "required": false
+    },
+    {
+      "name": "targetMarket",
+      "label": "Target market",
+      "required": false
+    },
+    {
+      "name": "provenProcess",
+      "label": "Proven process",
+      "required": false
+    },
+    {
+      "name": "guarantee",
+      "label": "Guarantee",
+      "required": false
+    },
+    {
+      "name": "threeYearDate",
+      "label": "Three year date",
+      "required": false
+    },
+    {
+      "name": "threeYearRevenue",
+      "label": "Three year revenue",
+      "required": false
+    },
+    {
+      "name": "threeYearProfit",
+      "label": "Three year profit",
+      "required": false
+    },
+    {
+      "name": "threeYearMeasurables",
+      "label": "Three year measurables",
+      "required": false
+    },
+    {
+      "name": "oneYearDate",
+      "label": "One year date",
+      "required": false
+    },
+    {
+      "name": "oneYearRevenue",
+      "label": "One year revenue",
+      "required": false
+    },
+    {
+      "name": "oneYearProfit",
+      "label": "One year profit",
+      "required": false
+    },
+    {
+      "name": "oneYearMeasurables",
+      "label": "One year measurables",
+      "required": false
+    },
+    {
+      "name": "quarterDate",
+      "label": "Quarter date",
+      "required": false
+    },
+    {
+      "name": "quarterRevenue",
+      "label": "Quarter revenue",
+      "required": false
+    },
+    {
+      "name": "quarterProfit",
+      "label": "Quarter profit",
+      "required": false
+    },
+    {
+      "name": "quarterMeasurables",
+      "label": "Quarter measurables",
+      "required": false
+    },
+    {
+      "name": "peopleBarMaxMixed",
+      "label": "People bar max mixed",
+      "required": false
+    }
+  ]
 } as const;
 
 // --- Component.clearPrimaryImage ---
@@ -18033,6 +18701,367 @@ export const ContractStageClientMergeAction = {
   ]
 } as const;
 
+// --- CoreProcess.remove ---
+export type CoreProcessRemoveClientInput = Record<string, never>;
+
+export const CoreProcessRemoveCapability = {
+  capabilityId: "CoreProcess.remove",
+  entity: "CoreProcess",
+  command: "remove",
+  route: "/api/manifest/CoreProcess/commands/remove",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; ownerPersonId: string | null; steps: string | null; stage: \"named\" | \"documented\" | \"simplified\" | \"followed_by_all\"; sortOrder: number; namedAt: number | null; stageSetAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Everyone may see the core processes"},{"kind":"policy_denial","message":"Managers may update the core processes"},{"kind":"policy_denial","message":"Managers may change the core processes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"CoreProcess not found"}],
+  emits: ["CoreProcessRemoved"],
+} as const;
+
+export type CoreProcessRemoveResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; ownerPersonId: string | null; steps: string | null; stage: "named" | "documented" | "simplified" | "followed_by_all"; sortOrder: number; namedAt: number | null; stageSetAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for CoreProcess.remove.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindCoreProcessRemoveInput(client: CoreProcessRemoveClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful CoreProcess.remove. */
+export const CoreProcessRemoveInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer CoreProcess.remove. Not a rendered control. */
+export const CoreProcessRemoveAction = {
+  "exposure": "human",
+  "label": "Remove",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- CoreProcess.revise ---
+export interface CoreProcessReviseClientInput {
+  name: string;
+  ownerPersonId?: string;
+  steps?: string;
+  sortOrder: number;
+}
+
+export const CoreProcessReviseCapability = {
+  capabilityId: "CoreProcess.revise",
+  entity: "CoreProcess",
+  command: "revise",
+  route: "/api/manifest/CoreProcess/commands/revise",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; ownerPersonId: string | null; steps: string | null; stage: \"named\" | \"documented\" | \"simplified\" | \"followed_by_all\"; sortOrder: number; namedAt: number | null; stageSetAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["name","ownerPersonId","steps","sortOrder"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Everyone may see the core processes"},{"kind":"policy_denial","message":"Managers may update the core processes"},{"kind":"policy_denial","message":"Managers may change the core processes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Name the process."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"CoreProcess not found"}],
+  emits: ["CoreProcessRevised"],
+} as const;
+
+export type CoreProcessReviseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; ownerPersonId: string | null; steps: string | null; stage: "named" | "documented" | "simplified" | "followed_by_all"; sortOrder: number; namedAt: number | null; stageSetAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for CoreProcess.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindCoreProcessReviseInput(client: CoreProcessReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful CoreProcess.revise. */
+export const CoreProcessReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer CoreProcess.revise. Not a rendered control. */
+export const CoreProcessReviseAction = {
+  "exposure": "human",
+  "label": "Revise",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "name",
+      "label": "Name",
+      "required": true
+    },
+    {
+      "name": "ownerPersonId",
+      "label": "Owner person id",
+      "required": false
+    },
+    {
+      "name": "steps",
+      "label": "Steps",
+      "required": false
+    },
+    {
+      "name": "sortOrder",
+      "label": "Sort order",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- CoreProcess.setStage ---
+export interface CoreProcessSetStageClientInput {
+  /** Allowed: "named" | "documented" | "simplified" | "followed_by_all" */
+  stage: "named" | "documented" | "simplified" | "followed_by_all";
+}
+
+export const CoreProcessSetStageCapability = {
+  capabilityId: "CoreProcess.setStage",
+  entity: "CoreProcess",
+  command: "setStage",
+  route: "/api/manifest/CoreProcess/commands/setStage",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; ownerPersonId: string | null; steps: string | null; stage: \"named\" | \"documented\" | \"simplified\" | \"followed_by_all\"; sortOrder: number; namedAt: number | null; stageSetAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["stage"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Everyone may see the core processes"},{"kind":"policy_denial","message":"Managers may update the core processes"},{"kind":"policy_denial","message":"Managers may change the core processes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"CoreProcess not found"}],
+  emits: ["CoreProcessStageSet"],
+} as const;
+
+export type CoreProcessSetStageResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; ownerPersonId: string | null; steps: string | null; stage: "named" | "documented" | "simplified" | "followed_by_all"; sortOrder: number; namedAt: number | null; stageSetAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for CoreProcess.setStage.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindCoreProcessSetStageInput(client: CoreProcessSetStageClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful CoreProcess.setStage. */
+export const CoreProcessSetStageInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer CoreProcess.setStage. Not a rendered control. */
+export const CoreProcessSetStageAction = {
+  "exposure": "human",
+  "label": "Set stage",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "stage",
+      "label": "Stage",
+      "required": true,
+      "choices": [
+        {
+          "value": "named",
+          "label": "named"
+        },
+        {
+          "value": "documented",
+          "label": "documented"
+        },
+        {
+          "value": "simplified",
+          "label": "simplified"
+        },
+        {
+          "value": "followed_by_all",
+          "label": "followed_by_all"
+        }
+      ]
+    }
+  ]
+} as const;
+
+// --- CoreProcess.start ---
+export interface CoreProcessStartClientInput {
+  name: string;
+  ownerPersonId?: string;
+  sortOrder: number;
+}
+
+export const CoreProcessStartCapability = {
+  capabilityId: "CoreProcess.start",
+  entity: "CoreProcess",
+  command: "start",
+  route: "/api/manifest/CoreProcess/commands/start",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["name","ownerPersonId","sortOrder"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Everyone may see the core processes"},{"kind":"policy_denial","message":"Managers may update the core processes"},{"kind":"policy_denial","message":"Managers may change the core processes"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Name the process."}],
+  emits: ["CoreProcessNamed"],
+} as const;
+
+export type CoreProcessStartResult = { docId: string };
+
+/**
+ * Build command input for CoreProcess.start.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindCoreProcessStartInput(client: CoreProcessStartClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful CoreProcess.start. */
+export const CoreProcessStartInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer CoreProcess.start. Not a rendered control. */
+export const CoreProcessStartAction = {
+  "exposure": "human",
+  "label": "Start",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "name",
+      "label": "Name",
+      "required": true
+    },
+    {
+      "name": "ownerPersonId",
+      "label": "Owner person id",
+      "required": false
+    },
+    {
+      "name": "sortOrder",
+      "label": "Sort order",
+      "required": true
+    }
+  ]
+} as const;
+
 // --- CorrectiveAction.close ---
 export interface CorrectiveActionCloseClientInput {
   resolutionNotes: string;
@@ -20313,6 +21342,288 @@ export const DeckShareLinkRevokeInvalidation = [
 export const DeckShareLinkRevokeAction = {
   "exposure": "human",
   "label": "Revoke",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- DelegateElevateItem.add ---
+export interface DelegateElevateItemAddClientInput {
+  personId: string;
+  activity: string;
+  /** Allowed: "love_great" | "like_good" | "dislike_good" | "dislike_not_good" */
+  quadrant: "love_great" | "like_good" | "dislike_good" | "dislike_not_good";
+}
+
+export const DelegateElevateItemAddCapability = {
+  capabilityId: "DelegateElevateItem.add",
+  entity: "DelegateElevateItem",
+  command: "add",
+  route: "/api/manifest/DelegateElevateItem/commands/add",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["personId","activity","quadrant"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see Delegate and Elevate"},{"kind":"policy_denial","message":"Managers may update Delegate and Elevate"},{"kind":"policy_denial","message":"Managers may change Delegate and Elevate"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Name the activity."}],
+  emits: ["DelegateElevateAdded"],
+} as const;
+
+export type DelegateElevateItemAddResult = { docId: string };
+
+/**
+ * Build command input for DelegateElevateItem.add.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDelegateElevateItemAddInput(client: DelegateElevateItemAddClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DelegateElevateItem.add. */
+export const DelegateElevateItemAddInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer DelegateElevateItem.add. Not a rendered control. */
+export const DelegateElevateItemAddAction = {
+  "exposure": "human",
+  "label": "Add",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "personId",
+      "label": "Person id",
+      "required": true
+    },
+    {
+      "name": "activity",
+      "label": "Activity",
+      "required": true
+    },
+    {
+      "name": "quadrant",
+      "label": "Quadrant",
+      "required": true,
+      "choices": [
+        {
+          "value": "love_great",
+          "label": "love_great"
+        },
+        {
+          "value": "like_good",
+          "label": "like_good"
+        },
+        {
+          "value": "dislike_good",
+          "label": "dislike_good"
+        },
+        {
+          "value": "dislike_not_good",
+          "label": "dislike_not_good"
+        }
+      ]
+    }
+  ]
+} as const;
+
+// --- DelegateElevateItem.move ---
+export interface DelegateElevateItemMoveClientInput {
+  /** Allowed: "love_great" | "like_good" | "dislike_good" | "dislike_not_good" */
+  quadrant: "love_great" | "like_good" | "dislike_good" | "dislike_not_good";
+}
+
+export const DelegateElevateItemMoveCapability = {
+  capabilityId: "DelegateElevateItem.move",
+  entity: "DelegateElevateItem",
+  command: "move",
+  route: "/api/manifest/DelegateElevateItem/commands/move",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; activity: string; quadrant: \"love_great\" | \"like_good\" | \"dislike_good\" | \"dislike_not_good\"; addedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["quadrant"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see Delegate and Elevate"},{"kind":"policy_denial","message":"Managers may update Delegate and Elevate"},{"kind":"policy_denial","message":"Managers may change Delegate and Elevate"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"DelegateElevateItem not found"}],
+  emits: ["DelegateElevateMoved"],
+} as const;
+
+export type DelegateElevateItemMoveResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; activity: string; quadrant: "love_great" | "like_good" | "dislike_good" | "dislike_not_good"; addedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for DelegateElevateItem.move.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDelegateElevateItemMoveInput(client: DelegateElevateItemMoveClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DelegateElevateItem.move. */
+export const DelegateElevateItemMoveInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer DelegateElevateItem.move. Not a rendered control. */
+export const DelegateElevateItemMoveAction = {
+  "exposure": "human",
+  "label": "Move",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "quadrant",
+      "label": "Quadrant",
+      "required": true,
+      "choices": [
+        {
+          "value": "love_great",
+          "label": "love_great"
+        },
+        {
+          "value": "like_good",
+          "label": "like_good"
+        },
+        {
+          "value": "dislike_good",
+          "label": "dislike_good"
+        },
+        {
+          "value": "dislike_not_good",
+          "label": "dislike_not_good"
+        }
+      ]
+    }
+  ]
+} as const;
+
+// --- DelegateElevateItem.remove ---
+export type DelegateElevateItemRemoveClientInput = Record<string, never>;
+
+export const DelegateElevateItemRemoveCapability = {
+  capabilityId: "DelegateElevateItem.remove",
+  entity: "DelegateElevateItem",
+  command: "remove",
+  route: "/api/manifest/DelegateElevateItem/commands/remove",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; activity: string; quadrant: \"love_great\" | \"like_good\" | \"dislike_good\" | \"dislike_not_good\"; addedAt: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see Delegate and Elevate"},{"kind":"policy_denial","message":"Managers may update Delegate and Elevate"},{"kind":"policy_denial","message":"Managers may change Delegate and Elevate"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"DelegateElevateItem not found"}],
+  emits: ["DelegateElevateRemoved"],
+} as const;
+
+export type DelegateElevateItemRemoveResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; activity: string; quadrant: "love_great" | "like_good" | "dislike_good" | "dislike_not_good"; addedAt: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for DelegateElevateItem.remove.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDelegateElevateItemRemoveInput(client: DelegateElevateItemRemoveClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DelegateElevateItem.remove. */
+export const DelegateElevateItemRemoveInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer DelegateElevateItem.remove. Not a rendered control. */
+export const DelegateElevateItemRemoveAction = {
+  "exposure": "human",
+  "label": "Remove",
   "confirm": false,
   "fields": []
 } as const;
@@ -125948,6 +127259,78 @@ export const LeadershipItemAddLifecycle = [
   }
 ] as const;
 
+// --- LeadershipItem.bringBack ---
+export type LeadershipItemBringBackClientInput = Record<string, never>;
+
+export const LeadershipItemBringBackCapability = {
+  capabilityId: "LeadershipItem.bringBack",
+  entity: "LeadershipItem",
+  command: "bringBack",
+  route: "/api/manifest/LeadershipItem/commands/bringBack",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may update meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may change meeting priorities, issues and to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"LeadershipItem not found"}],
+  emits: ["LeadershipItemBroughtBack"],
+} as const;
+
+export type LeadershipItemBringBackResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for LeadershipItem.bringBack.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindLeadershipItemBringBackInput(client: LeadershipItemBringBackClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful LeadershipItem.bringBack. */
+export const LeadershipItemBringBackInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "LeadershipItem",
+    "queryKeyHint": "queryKeys.leadershipItem.lists()",
+    "readId": "LeadershipItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "LeadershipItem",
+    "queryKeyHint": "queryKeys.leadershipItem.detail(id)",
+    "readId": "LeadershipItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer LeadershipItem.bringBack. Not a rendered control. */
+export const LeadershipItemBringBackAction = {
+  "exposure": "human",
+  "label": "Bring back",
+  "confirm": false,
+  "fields": []
+} as const;
+
 // --- LeadershipItem.complete ---
 export type LeadershipItemCompleteClientInput = Record<string, never>;
 
@@ -125963,14 +127346,14 @@ export const LeadershipItemCompleteCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Managers may see meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may update meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may change meeting priorities, issues and to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"LeadershipItem not found"}],
   emits: ["LeadershipItemCompleted"],
 } as const;
 
-export type LeadershipItemCompleteResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type LeadershipItemCompleteResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for LeadershipItem.complete.
@@ -126051,14 +127434,14 @@ export const LeadershipItemDropCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Managers may see meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may update meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may change meeting priorities, issues and to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"LeadershipItem not found"}],
   emits: ["LeadershipItemDropped"],
 } as const;
 
-export type LeadershipItemDropResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type LeadershipItemDropResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for LeadershipItem.drop.
@@ -126142,14 +127525,14 @@ export const LeadershipItemMarkTrackCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["track"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Managers may see meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may update meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may change meeting priorities, issues and to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"LeadershipItem not found"}],
   emits: ["LeadershipItemTrackMarked"],
 } as const;
 
-export type LeadershipItemMarkTrackResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type LeadershipItemMarkTrackResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for LeadershipItem.markTrack.
@@ -126219,6 +127602,158 @@ export const LeadershipItemMarkTrackAction = {
   ]
 } as const;
 
+// --- LeadershipItem.park ---
+export type LeadershipItemParkClientInput = Record<string, never>;
+
+export const LeadershipItemParkCapability = {
+  capabilityId: "LeadershipItem.park",
+  entity: "LeadershipItem",
+  command: "park",
+  route: "/api/manifest/LeadershipItem/commands/park",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may update meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may change meeting priorities, issues and to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"guard_failure","message":"Guard 4 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"LeadershipItem not found"}],
+  emits: ["LeadershipItemParked"],
+} as const;
+
+export type LeadershipItemParkResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for LeadershipItem.park.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindLeadershipItemParkInput(client: LeadershipItemParkClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful LeadershipItem.park. */
+export const LeadershipItemParkInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "LeadershipItem",
+    "queryKeyHint": "queryKeys.leadershipItem.lists()",
+    "readId": "LeadershipItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "LeadershipItem",
+    "queryKeyHint": "queryKeys.leadershipItem.detail(id)",
+    "readId": "LeadershipItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer LeadershipItem.park. Not a rendered control. */
+export const LeadershipItemParkAction = {
+  "exposure": "human",
+  "label": "Park",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- LeadershipItem.prioritize ---
+export interface LeadershipItemPrioritizeClientInput {
+  priority?: number;
+}
+
+export const LeadershipItemPrioritizeCapability = {
+  capabilityId: "LeadershipItem.prioritize",
+  entity: "LeadershipItem",
+  command: "prioritize",
+  route: "/api/manifest/LeadershipItem/commands/prioritize",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["priority"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may update meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may change meeting priorities, issues and to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"LeadershipItem not found"}],
+  emits: ["LeadershipItemPrioritized"],
+} as const;
+
+export type LeadershipItemPrioritizeResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for LeadershipItem.prioritize.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindLeadershipItemPrioritizeInput(client: LeadershipItemPrioritizeClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful LeadershipItem.prioritize. */
+export const LeadershipItemPrioritizeInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "LeadershipItem",
+    "queryKeyHint": "queryKeys.leadershipItem.lists()",
+    "readId": "LeadershipItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "LeadershipItem",
+    "queryKeyHint": "queryKeys.leadershipItem.detail(id)",
+    "readId": "LeadershipItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer LeadershipItem.prioritize. Not a rendered control. */
+export const LeadershipItemPrioritizeAction = {
+  "exposure": "human",
+  "label": "Prioritize",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "priority",
+      "label": "Priority",
+      "required": false
+    }
+  ]
+} as const;
+
 // --- LeadershipItem.reopen ---
 export type LeadershipItemReopenClientInput = Record<string, never>;
 
@@ -126234,14 +127769,14 @@ export const LeadershipItemReopenCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: [],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Managers may see meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may update meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may change meeting priorities, issues and to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"LeadershipItem not found"}],
   emits: ["LeadershipItemReopened"],
 } as const;
 
-export type LeadershipItemReopenResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type LeadershipItemReopenResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for LeadershipItem.reopen.
@@ -126334,14 +127869,14 @@ export const LeadershipItemReviseCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["title","ownerPersonId","dueAt","notes"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Managers may see meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may update meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may change meeting priorities, issues and to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"constraint_block","message":"Give this a short title."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"LeadershipItem not found"}],
   emits: ["LeadershipItemRevised"],
 } as const;
 
-export type LeadershipItemReviseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type LeadershipItemReviseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for LeadershipItem.revise.
@@ -126429,14 +127964,14 @@ export const LeadershipItemSolveCapability = {
   versionField: "version",
   acceptsIdempotencyKey: true,
   resultKind: "instance",
-  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }",
   clientParameterNames: ["solution"],
   serverParameterNames: [],
   failures: [{"kind":"policy_denial","message":"Managers may see meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may update meeting priorities, issues and to-dos"},{"kind":"policy_denial","message":"Managers may change meeting priorities, issues and to-dos"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"guard_failure","message":"Guard 3 failed"},{"kind":"constraint_block","message":"Write the answer the team agreed on."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"LeadershipItem not found"}],
   emits: ["LeadershipItemSolved"],
 } as const;
 
-export type LeadershipItemSolveResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number };
+export type LeadershipItemSolveResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number };
 
 /**
  * Build command input for LeadershipItem.solve.
@@ -133592,6 +135127,93 @@ export const OrganizationSuspendLifecycle = [
     "proven": true
   }
 ] as const;
+
+// --- OrganizationalCheckup.take ---
+export interface OrganizationalCheckupTakeClientInput {
+  answers: string;
+  /** Bounds: 0..100 */
+  score: number;
+}
+
+export const OrganizationalCheckupTakeCapability = {
+  capabilityId: "OrganizationalCheckup.take",
+  entity: "OrganizationalCheckup",
+  command: "take",
+  route: "/api/manifest/OrganizationalCheckup/commands/take",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["answers","score"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see checkup results"},{"kind":"policy_denial","message":"Managers may update checkup results"},{"kind":"policy_denial","message":"Managers may take the checkup"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Answer all 20 statements."},{"kind":"constraint_block","message":"The score is a percent from 0 to 100."}],
+  emits: ["OrganizationalCheckupTaken"],
+} as const;
+
+export type OrganizationalCheckupTakeResult = { docId: string };
+
+/**
+ * Build command input for OrganizationalCheckup.take.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindOrganizationalCheckupTakeInput(client: OrganizationalCheckupTakeClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful OrganizationalCheckup.take. */
+export const OrganizationalCheckupTakeInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer OrganizationalCheckup.take. Not a rendered control. */
+export const OrganizationalCheckupTakeAction = {
+  "exposure": "human",
+  "label": "Take",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "answers",
+      "label": "Answers",
+      "required": true
+    },
+    {
+      "name": "score",
+      "label": "Score",
+      "required": true
+    }
+  ]
+} as const;
 
 // --- OrganizationCapabilitySetting.register ---
 export interface OrganizationCapabilitySettingRegisterClientInput {
@@ -147486,6 +149108,280 @@ export const PayrollInputPrepareLifecycle = [
   }
 ] as const;
 
+// --- PeopleAnalyzerScore.rate ---
+export interface PeopleAnalyzerScoreRateClientInput {
+  personId: string;
+  subject: string;
+  /** Allowed: "plus" | "plus_minus" | "minus" */
+  score: "plus" | "plus_minus" | "minus";
+}
+
+export const PeopleAnalyzerScoreRateCapability = {
+  capabilityId: "PeopleAnalyzerScore.rate",
+  entity: "PeopleAnalyzerScore",
+  command: "rate",
+  route: "/api/manifest/PeopleAnalyzerScore/commands/rate",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["personId","subject","score"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see the People Analyzer"},{"kind":"policy_denial","message":"Managers may update the People Analyzer"},{"kind":"policy_denial","message":"Managers may score people"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Pick what this mark is for."}],
+  emits: ["PeopleAnalyzerScored"],
+} as const;
+
+export type PeopleAnalyzerScoreRateResult = { docId: string };
+
+/**
+ * Build command input for PeopleAnalyzerScore.rate.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPeopleAnalyzerScoreRateInput(client: PeopleAnalyzerScoreRateClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PeopleAnalyzerScore.rate. */
+export const PeopleAnalyzerScoreRateInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PeopleAnalyzerScore.rate. Not a rendered control. */
+export const PeopleAnalyzerScoreRateAction = {
+  "exposure": "human",
+  "label": "Rate",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "personId",
+      "label": "Person id",
+      "required": true
+    },
+    {
+      "name": "subject",
+      "label": "Subject",
+      "required": true
+    },
+    {
+      "name": "score",
+      "label": "Score",
+      "required": true,
+      "choices": [
+        {
+          "value": "plus",
+          "label": "plus"
+        },
+        {
+          "value": "plus_minus",
+          "label": "plus_minus"
+        },
+        {
+          "value": "minus",
+          "label": "minus"
+        }
+      ]
+    }
+  ]
+} as const;
+
+// --- PeopleAnalyzerScore.rescore ---
+export interface PeopleAnalyzerScoreRescoreClientInput {
+  /** Allowed: "plus" | "plus_minus" | "minus" */
+  score: "plus" | "plus_minus" | "minus";
+}
+
+export const PeopleAnalyzerScoreRescoreCapability = {
+  capabilityId: "PeopleAnalyzerScore.rescore",
+  entity: "PeopleAnalyzerScore",
+  command: "rescore",
+  route: "/api/manifest/PeopleAnalyzerScore/commands/rescore",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; subject: string; score: \"plus\" | \"plus_minus\" | \"minus\"; ratedAt: number | null; ratedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["score"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see the People Analyzer"},{"kind":"policy_denial","message":"Managers may update the People Analyzer"},{"kind":"policy_denial","message":"Managers may score people"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PeopleAnalyzerScore not found"}],
+  emits: ["PeopleAnalyzerRescored"],
+} as const;
+
+export type PeopleAnalyzerScoreRescoreResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; subject: string; score: "plus" | "plus_minus" | "minus"; ratedAt: number | null; ratedByPersonId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PeopleAnalyzerScore.rescore.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPeopleAnalyzerScoreRescoreInput(client: PeopleAnalyzerScoreRescoreClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PeopleAnalyzerScore.rescore. */
+export const PeopleAnalyzerScoreRescoreInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PeopleAnalyzerScore.rescore. Not a rendered control. */
+export const PeopleAnalyzerScoreRescoreAction = {
+  "exposure": "human",
+  "label": "Rescore",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "score",
+      "label": "Score",
+      "required": true,
+      "choices": [
+        {
+          "value": "plus",
+          "label": "plus"
+        },
+        {
+          "value": "plus_minus",
+          "label": "plus_minus"
+        },
+        {
+          "value": "minus",
+          "label": "minus"
+        }
+      ]
+    }
+  ]
+} as const;
+
+// --- PeopleAnalyzerScore.withdraw ---
+export type PeopleAnalyzerScoreWithdrawClientInput = Record<string, never>;
+
+export const PeopleAnalyzerScoreWithdrawCapability = {
+  capabilityId: "PeopleAnalyzerScore.withdraw",
+  entity: "PeopleAnalyzerScore",
+  command: "withdraw",
+  route: "/api/manifest/PeopleAnalyzerScore/commands/withdraw",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; subject: string; score: \"plus\" | \"plus_minus\" | \"minus\"; ratedAt: number | null; ratedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Managers may see the People Analyzer"},{"kind":"policy_denial","message":"Managers may update the People Analyzer"},{"kind":"policy_denial","message":"Managers may score people"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"PeopleAnalyzerScore not found"}],
+  emits: ["PeopleAnalyzerCleared"],
+} as const;
+
+export type PeopleAnalyzerScoreWithdrawResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; subject: string; score: "plus" | "plus_minus" | "minus"; ratedAt: number | null; ratedByPersonId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for PeopleAnalyzerScore.withdraw.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPeopleAnalyzerScoreWithdrawInput(client: PeopleAnalyzerScoreWithdrawClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PeopleAnalyzerScore.withdraw. */
+export const PeopleAnalyzerScoreWithdrawInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer PeopleAnalyzerScore.withdraw. Not a rendered control. */
+export const PeopleAnalyzerScoreWithdrawAction = {
+  "exposure": "human",
+  "label": "Withdraw",
+  "confirm": false,
+  "fields": []
+} as const;
+
 // --- PerformanceReview.record ---
 export interface PerformanceReviewRecordClientInput {
   personId: string;
@@ -147729,6 +149625,20 @@ export const PersonAssignRoleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "AvailabilityWindow",
     "queryKeyHint": "queryKeys.availabilityWindow.lists()",
     "readId": "AvailabilityWindow.list",
@@ -147767,6 +149677,48 @@ export const PersonAssignRoleInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
     "label": "related entity detail"
   },
   {
@@ -147967,6 +149919,20 @@ export const PersonAssignRoleInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackScan",
     "queryKeyHint": "queryKeys.packScan.lists()",
     "readId": "PackScan.list",
@@ -148033,6 +149999,20 @@ export const PersonAssignRoleInvalidation = [
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.detail(id)",
     "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
     "label": "related entity detail"
   },
   {
@@ -148383,6 +150363,20 @@ export const PersonAssignRoleInvalidation = [
     "entity": "VenueVendorRelationship",
     "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
     "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
     "label": "related entity detail"
   },
   {
@@ -148561,6 +150555,20 @@ export const PersonChangeAddressInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "AvailabilityWindow",
     "queryKeyHint": "queryKeys.availabilityWindow.lists()",
     "readId": "AvailabilityWindow.list",
@@ -148599,6 +150607,48 @@ export const PersonChangeAddressInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
     "label": "related entity detail"
   },
   {
@@ -148799,6 +150849,20 @@ export const PersonChangeAddressInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackScan",
     "queryKeyHint": "queryKeys.packScan.lists()",
     "readId": "PackScan.list",
@@ -148865,6 +150929,20 @@ export const PersonChangeAddressInvalidation = [
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.detail(id)",
     "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
     "label": "related entity detail"
   },
   {
@@ -149215,6 +151293,20 @@ export const PersonChangeAddressInvalidation = [
     "entity": "VenueVendorRelationship",
     "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
     "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
     "label": "related entity detail"
   },
   {
@@ -149319,6 +151411,20 @@ export const PersonCorrectEmailInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "AvailabilityWindow",
     "queryKeyHint": "queryKeys.availabilityWindow.lists()",
     "readId": "AvailabilityWindow.list",
@@ -149357,6 +151463,48 @@ export const PersonCorrectEmailInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
     "label": "related entity detail"
   },
   {
@@ -149557,6 +151705,20 @@ export const PersonCorrectEmailInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackScan",
     "queryKeyHint": "queryKeys.packScan.lists()",
     "readId": "PackScan.list",
@@ -149623,6 +151785,20 @@ export const PersonCorrectEmailInvalidation = [
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.detail(id)",
     "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
     "label": "related entity detail"
   },
   {
@@ -149973,6 +152149,20 @@ export const PersonCorrectEmailInvalidation = [
     "entity": "VenueVendorRelationship",
     "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
     "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
     "label": "related entity detail"
   },
   {
@@ -150059,6 +152249,20 @@ export const PersonCorrectIdentityInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "AvailabilityWindow",
     "queryKeyHint": "queryKeys.availabilityWindow.lists()",
     "readId": "AvailabilityWindow.list",
@@ -150097,6 +152301,48 @@ export const PersonCorrectIdentityInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
     "label": "related entity detail"
   },
   {
@@ -150297,6 +152543,20 @@ export const PersonCorrectIdentityInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackScan",
     "queryKeyHint": "queryKeys.packScan.lists()",
     "readId": "PackScan.list",
@@ -150363,6 +152623,20 @@ export const PersonCorrectIdentityInvalidation = [
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.detail(id)",
     "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
     "label": "related entity detail"
   },
   {
@@ -150713,6 +152987,20 @@ export const PersonCorrectIdentityInvalidation = [
     "entity": "VenueVendorRelationship",
     "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
     "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
     "label": "related entity detail"
   },
   {
@@ -150805,6 +153093,20 @@ export const PersonDeactivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "AvailabilityWindow",
     "queryKeyHint": "queryKeys.availabilityWindow.lists()",
     "readId": "AvailabilityWindow.list",
@@ -150843,6 +153145,48 @@ export const PersonDeactivateInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
     "label": "related entity detail"
   },
   {
@@ -151043,6 +153387,20 @@ export const PersonDeactivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackScan",
     "queryKeyHint": "queryKeys.packScan.lists()",
     "readId": "PackScan.list",
@@ -151109,6 +153467,20 @@ export const PersonDeactivateInvalidation = [
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.detail(id)",
     "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
     "label": "related entity detail"
   },
   {
@@ -151459,6 +153831,20 @@ export const PersonDeactivateInvalidation = [
     "entity": "VenueVendorRelationship",
     "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
     "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
     "label": "related entity detail"
   },
   {
@@ -151563,6 +153949,20 @@ export const PersonHireInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "AvailabilityWindow",
     "queryKeyHint": "queryKeys.availabilityWindow.lists()",
     "readId": "AvailabilityWindow.list",
@@ -151601,6 +154001,48 @@ export const PersonHireInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
     "label": "related entity detail"
   },
   {
@@ -151801,6 +154243,20 @@ export const PersonHireInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackScan",
     "queryKeyHint": "queryKeys.packScan.lists()",
     "readId": "PackScan.list",
@@ -151867,6 +154323,20 @@ export const PersonHireInvalidation = [
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.detail(id)",
     "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
     "label": "related entity detail"
   },
   {
@@ -152217,6 +154687,20 @@ export const PersonHireInvalidation = [
     "entity": "VenueVendorRelationship",
     "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
     "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
     "label": "related entity detail"
   },
   {
@@ -152449,6 +154933,20 @@ export const PersonLinkAccountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "AvailabilityWindow",
     "queryKeyHint": "queryKeys.availabilityWindow.lists()",
     "readId": "AvailabilityWindow.list",
@@ -152487,6 +154985,48 @@ export const PersonLinkAccountInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
     "label": "related entity detail"
   },
   {
@@ -152687,6 +155227,20 @@ export const PersonLinkAccountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackScan",
     "queryKeyHint": "queryKeys.packScan.lists()",
     "readId": "PackScan.list",
@@ -152753,6 +155307,20 @@ export const PersonLinkAccountInvalidation = [
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.detail(id)",
     "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
     "label": "related entity detail"
   },
   {
@@ -153103,6 +155671,20 @@ export const PersonLinkAccountInvalidation = [
     "entity": "VenueVendorRelationship",
     "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
     "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
     "label": "related entity detail"
   },
   {
@@ -153185,6 +155767,20 @@ export const PersonReactivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "AvailabilityWindow",
     "queryKeyHint": "queryKeys.availabilityWindow.lists()",
     "readId": "AvailabilityWindow.list",
@@ -153223,6 +155819,48 @@ export const PersonReactivateInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
     "label": "related entity detail"
   },
   {
@@ -153423,6 +156061,20 @@ export const PersonReactivateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackScan",
     "queryKeyHint": "queryKeys.packScan.lists()",
     "readId": "PackScan.list",
@@ -153489,6 +156141,20 @@ export const PersonReactivateInvalidation = [
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.detail(id)",
     "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
     "label": "related entity detail"
   },
   {
@@ -153839,6 +156505,20 @@ export const PersonReactivateInvalidation = [
     "entity": "VenueVendorRelationship",
     "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
     "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
     "label": "related entity detail"
   },
   {
@@ -153933,6 +156613,20 @@ export const PersonSetEmployeeNumberInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "AvailabilityWindow",
     "queryKeyHint": "queryKeys.availabilityWindow.lists()",
     "readId": "AvailabilityWindow.list",
@@ -153971,6 +156665,48 @@ export const PersonSetEmployeeNumberInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
     "label": "related entity detail"
   },
   {
@@ -154171,6 +156907,20 @@ export const PersonSetEmployeeNumberInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackScan",
     "queryKeyHint": "queryKeys.packScan.lists()",
     "readId": "PackScan.list",
@@ -154237,6 +156987,20 @@ export const PersonSetEmployeeNumberInvalidation = [
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.detail(id)",
     "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
     "label": "related entity detail"
   },
   {
@@ -154587,6 +157351,20 @@ export const PersonSetEmployeeNumberInvalidation = [
     "entity": "VenueVendorRelationship",
     "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
     "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
     "label": "related entity detail"
   },
   {
@@ -154672,6 +157450,20 @@ export const PersonSetPayRateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "AvailabilityWindow",
     "queryKeyHint": "queryKeys.availabilityWindow.lists()",
     "readId": "AvailabilityWindow.list",
@@ -154710,6 +157502,48 @@ export const PersonSetPayRateInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
     "label": "related entity detail"
   },
   {
@@ -154910,6 +157744,20 @@ export const PersonSetPayRateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackScan",
     "queryKeyHint": "queryKeys.packScan.lists()",
     "readId": "PackScan.list",
@@ -154976,6 +157824,20 @@ export const PersonSetPayRateInvalidation = [
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.detail(id)",
     "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
     "label": "related entity detail"
   },
   {
@@ -155326,6 +158188,20 @@ export const PersonSetPayRateInvalidation = [
     "entity": "VenueVendorRelationship",
     "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
     "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
     "label": "related entity detail"
   },
   {
@@ -155410,6 +158286,20 @@ export const PersonSetSchedulingHoldInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "AvailabilityWindow",
     "queryKeyHint": "queryKeys.availabilityWindow.lists()",
     "readId": "AvailabilityWindow.list",
@@ -155448,6 +158338,48 @@ export const PersonSetSchedulingHoldInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
     "label": "related entity detail"
   },
   {
@@ -155648,6 +158580,20 @@ export const PersonSetSchedulingHoldInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackScan",
     "queryKeyHint": "queryKeys.packScan.lists()",
     "readId": "PackScan.list",
@@ -155714,6 +158660,20 @@ export const PersonSetSchedulingHoldInvalidation = [
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.detail(id)",
     "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
     "label": "related entity detail"
   },
   {
@@ -156064,6 +159024,20 @@ export const PersonSetSchedulingHoldInvalidation = [
     "entity": "VenueVendorRelationship",
     "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
     "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
     "label": "related entity detail"
   },
   {
@@ -156148,6 +159122,20 @@ export const PersonSetSmsAlertsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "AvailabilityWindow",
     "queryKeyHint": "queryKeys.availabilityWindow.lists()",
     "readId": "AvailabilityWindow.list",
@@ -156186,6 +159174,48 @@ export const PersonSetSmsAlertsInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
     "label": "related entity detail"
   },
   {
@@ -156386,6 +159416,20 @@ export const PersonSetSmsAlertsInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackScan",
     "queryKeyHint": "queryKeys.packScan.lists()",
     "readId": "PackScan.list",
@@ -156452,6 +159496,20 @@ export const PersonSetSmsAlertsInvalidation = [
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.detail(id)",
     "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
     "label": "related entity detail"
   },
   {
@@ -156802,6 +159860,20 @@ export const PersonSetSmsAlertsInvalidation = [
     "entity": "VenueVendorRelationship",
     "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
     "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
     "label": "related entity detail"
   },
   {
@@ -156886,6 +159958,20 @@ export const PersonSetStaffingVendorInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "AvailabilityWindow",
     "queryKeyHint": "queryKeys.availabilityWindow.lists()",
     "readId": "AvailabilityWindow.list",
@@ -156924,6 +160010,48 @@ export const PersonSetStaffingVendorInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
     "label": "related entity detail"
   },
   {
@@ -157124,6 +160252,20 @@ export const PersonSetStaffingVendorInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackScan",
     "queryKeyHint": "queryKeys.packScan.lists()",
     "readId": "PackScan.list",
@@ -157190,6 +160332,20 @@ export const PersonSetStaffingVendorInvalidation = [
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.detail(id)",
     "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
     "label": "related entity detail"
   },
   {
@@ -157540,6 +160696,20 @@ export const PersonSetStaffingVendorInvalidation = [
     "entity": "VenueVendorRelationship",
     "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
     "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
     "label": "related entity detail"
   },
   {
@@ -157625,6 +160795,20 @@ export const PersonSetWorkPreferencesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "AvailabilityWindow",
     "queryKeyHint": "queryKeys.availabilityWindow.lists()",
     "readId": "AvailabilityWindow.list",
@@ -157663,6 +160847,48 @@ export const PersonSetWorkPreferencesInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
     "label": "related entity detail"
   },
   {
@@ -157863,6 +161089,20 @@ export const PersonSetWorkPreferencesInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackScan",
     "queryKeyHint": "queryKeys.packScan.lists()",
     "readId": "PackScan.list",
@@ -157929,6 +161169,20 @@ export const PersonSetWorkPreferencesInvalidation = [
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.detail(id)",
     "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
     "label": "related entity detail"
   },
   {
@@ -158279,6 +161533,20 @@ export const PersonSetWorkPreferencesInvalidation = [
     "entity": "VenueVendorRelationship",
     "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
     "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
     "label": "related entity detail"
   },
   {
@@ -158368,6 +161636,20 @@ export const PersonTerminateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "AvailabilityWindow",
     "queryKeyHint": "queryKeys.availabilityWindow.lists()",
     "readId": "AvailabilityWindow.list",
@@ -158406,6 +161688,48 @@ export const PersonTerminateInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
     "label": "related entity detail"
   },
   {
@@ -158606,6 +161930,20 @@ export const PersonTerminateInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackScan",
     "queryKeyHint": "queryKeys.packScan.lists()",
     "readId": "PackScan.list",
@@ -158672,6 +162010,20 @@ export const PersonTerminateInvalidation = [
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.detail(id)",
     "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
     "label": "related entity detail"
   },
   {
@@ -159022,6 +162374,20 @@ export const PersonTerminateInvalidation = [
     "entity": "VenueVendorRelationship",
     "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
     "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
     "label": "related entity detail"
   },
   {
@@ -159127,6 +162493,20 @@ export const PersonUnlinkAccountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.lists()",
+    "readId": "AccountabilitySeat.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AccountabilitySeat",
+    "queryKeyHint": "queryKeys.accountabilitySeat.detail(id)",
+    "readId": "AccountabilitySeat.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "AvailabilityWindow",
     "queryKeyHint": "queryKeys.availabilityWindow.lists()",
     "readId": "AvailabilityWindow.list",
@@ -159165,6 +162545,48 @@ export const PersonUnlinkAccountInvalidation = [
     "entity": "Client",
     "queryKeyHint": "queryKeys.client.detail(id)",
     "readId": "Client.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.lists()",
+    "readId": "CompanyVision.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CompanyVision",
+    "queryKeyHint": "queryKeys.companyVision.detail(id)",
+    "readId": "CompanyVision.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.lists()",
+    "readId": "CoreProcess.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "CoreProcess",
+    "queryKeyHint": "queryKeys.coreProcess.detail(id)",
+    "readId": "CoreProcess.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.lists()",
+    "readId": "DelegateElevateItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DelegateElevateItem",
+    "queryKeyHint": "queryKeys.delegateElevateItem.detail(id)",
+    "readId": "DelegateElevateItem.get",
     "label": "related entity detail"
   },
   {
@@ -159365,6 +162787,20 @@ export const PersonUnlinkAccountInvalidation = [
   },
   {
     "kind": "entityList",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.lists()",
+    "readId": "OrganizationalCheckup.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "OrganizationalCheckup",
+    "queryKeyHint": "queryKeys.organizationalCheckup.detail(id)",
+    "readId": "OrganizationalCheckup.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
     "entity": "PackScan",
     "queryKeyHint": "queryKeys.packScan.lists()",
     "readId": "PackScan.list",
@@ -159431,6 +162867,20 @@ export const PersonUnlinkAccountInvalidation = [
     "entity": "PayrollInput",
     "queryKeyHint": "queryKeys.payrollInput.detail(id)",
     "readId": "PayrollInput.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.lists()",
+    "readId": "PeopleAnalyzerScore.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PeopleAnalyzerScore",
+    "queryKeyHint": "queryKeys.peopleAnalyzerScore.detail(id)",
+    "readId": "PeopleAnalyzerScore.get",
     "label": "related entity detail"
   },
   {
@@ -159781,6 +163231,20 @@ export const PersonUnlinkAccountInvalidation = [
     "entity": "VenueVendorRelationship",
     "queryKeyHint": "queryKeys.venueVendorRelationship.detail(id)",
     "readId": "VenueVendorRelationship.get",
+    "label": "related entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
     "label": "related entity detail"
   },
   {
@@ -220242,6 +223706,431 @@ export const VenueVendorRelationshipReviseStatusAction = {
   ]
 } as const;
 
+// --- VisionItem.add ---
+export interface VisionItemAddClientInput {
+  /** Allowed: "core_value" | "differentiator" | "three_year" | "one_year_goal" */
+  section: "core_value" | "differentiator" | "three_year" | "one_year_goal";
+  text: string;
+  detail?: string;
+  sortOrder: number;
+}
+
+export const VisionItemAddCapability = {
+  capabilityId: "VisionItem.add",
+  entity: "VisionItem",
+  command: "add",
+  route: "/api/manifest/VisionItem/commands/add",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: false,
+  dateParameterNames: [],
+  versionField: null,
+  acceptsIdempotencyKey: true,
+  resultKind: "allocation",
+  returnTsType: "{ docId: string }",
+  clientParameterNames: ["section","text","detail","sortOrder"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Everyone may see the core values and the plan"},{"kind":"policy_denial","message":"Managers may update the core values and the plan"},{"kind":"policy_denial","message":"Managers may change the core values and the plan"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Write something first."}],
+  emits: ["VisionItemAdded"],
+} as const;
+
+export type VisionItemAddResult = { docId: string };
+
+/**
+ * Build command input for VisionItem.add.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVisionItemAddInput(client: VisionItemAddClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VisionItem.add. */
+export const VisionItemAddInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer VisionItem.add. Not a rendered control. */
+export const VisionItemAddAction = {
+  "exposure": "human",
+  "label": "Add",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "section",
+      "label": "Section",
+      "required": true,
+      "choices": [
+        {
+          "value": "core_value",
+          "label": "core_value"
+        },
+        {
+          "value": "differentiator",
+          "label": "differentiator"
+        },
+        {
+          "value": "three_year",
+          "label": "three_year"
+        },
+        {
+          "value": "one_year_goal",
+          "label": "one_year_goal"
+        }
+      ]
+    },
+    {
+      "name": "text",
+      "label": "Text",
+      "required": true
+    },
+    {
+      "name": "detail",
+      "label": "Detail",
+      "required": false
+    },
+    {
+      "name": "sortOrder",
+      "label": "Sort order",
+      "required": true
+    }
+  ]
+} as const;
+
+// --- VisionItem.markDone ---
+export type VisionItemMarkDoneClientInput = Record<string, never>;
+
+export const VisionItemMarkDoneCapability = {
+  capabilityId: "VisionItem.markDone",
+  entity: "VisionItem",
+  command: "markDone",
+  route: "/api/manifest/VisionItem/commands/markDone",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; section: \"core_value\" | \"differentiator\" | \"three_year\" | \"one_year_goal\"; text: string; detail: string | null; sortOrder: number; doneAt: number | null; addedAt: number | null; addedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Everyone may see the core values and the plan"},{"kind":"policy_denial","message":"Managers may update the core values and the plan"},{"kind":"policy_denial","message":"Managers may change the core values and the plan"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VisionItem not found"}],
+  emits: ["VisionItemDone"],
+} as const;
+
+export type VisionItemMarkDoneResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; section: "core_value" | "differentiator" | "three_year" | "one_year_goal"; text: string; detail: string | null; sortOrder: number; doneAt: number | null; addedAt: number | null; addedByPersonId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for VisionItem.markDone.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVisionItemMarkDoneInput(client: VisionItemMarkDoneClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VisionItem.markDone. */
+export const VisionItemMarkDoneInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer VisionItem.markDone. Not a rendered control. */
+export const VisionItemMarkDoneAction = {
+  "exposure": "human",
+  "label": "Mark done",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- VisionItem.markNotDone ---
+export type VisionItemMarkNotDoneClientInput = Record<string, never>;
+
+export const VisionItemMarkNotDoneCapability = {
+  capabilityId: "VisionItem.markNotDone",
+  entity: "VisionItem",
+  command: "markNotDone",
+  route: "/api/manifest/VisionItem/commands/markNotDone",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; section: \"core_value\" | \"differentiator\" | \"three_year\" | \"one_year_goal\"; text: string; detail: string | null; sortOrder: number; doneAt: number | null; addedAt: number | null; addedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Everyone may see the core values and the plan"},{"kind":"policy_denial","message":"Managers may update the core values and the plan"},{"kind":"policy_denial","message":"Managers may change the core values and the plan"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VisionItem not found"}],
+  emits: ["VisionItemNotDone"],
+} as const;
+
+export type VisionItemMarkNotDoneResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; section: "core_value" | "differentiator" | "three_year" | "one_year_goal"; text: string; detail: string | null; sortOrder: number; doneAt: number | null; addedAt: number | null; addedByPersonId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for VisionItem.markNotDone.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVisionItemMarkNotDoneInput(client: VisionItemMarkNotDoneClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VisionItem.markNotDone. */
+export const VisionItemMarkNotDoneInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer VisionItem.markNotDone. Not a rendered control. */
+export const VisionItemMarkNotDoneAction = {
+  "exposure": "human",
+  "label": "Mark not done",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- VisionItem.remove ---
+export type VisionItemRemoveClientInput = Record<string, never>;
+
+export const VisionItemRemoveCapability = {
+  capabilityId: "VisionItem.remove",
+  entity: "VisionItem",
+  command: "remove",
+  route: "/api/manifest/VisionItem/commands/remove",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; section: \"core_value\" | \"differentiator\" | \"three_year\" | \"one_year_goal\"; text: string; detail: string | null; sortOrder: number; doneAt: number | null; addedAt: number | null; addedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: [],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Everyone may see the core values and the plan"},{"kind":"policy_denial","message":"Managers may update the core values and the plan"},{"kind":"policy_denial","message":"Managers may change the core values and the plan"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VisionItem not found"}],
+  emits: ["VisionItemRemoved"],
+} as const;
+
+export type VisionItemRemoveResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; section: "core_value" | "differentiator" | "three_year" | "one_year_goal"; text: string; detail: string | null; sortOrder: number; doneAt: number | null; addedAt: number | null; addedByPersonId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for VisionItem.remove.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVisionItemRemoveInput(client: VisionItemRemoveClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VisionItem.remove. */
+export const VisionItemRemoveInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer VisionItem.remove. Not a rendered control. */
+export const VisionItemRemoveAction = {
+  "exposure": "human",
+  "label": "Remove",
+  "confirm": false,
+  "fields": []
+} as const;
+
+// --- VisionItem.revise ---
+export interface VisionItemReviseClientInput {
+  text: string;
+  detail?: string;
+  sortOrder: number;
+}
+
+export const VisionItemReviseCapability = {
+  capabilityId: "VisionItem.revise",
+  entity: "VisionItem",
+  command: "revise",
+  route: "/api/manifest/VisionItem/commands/revise",
+  instanceCommand: true,
+  dispatchable: true,
+  targetsExistingInstance: true,
+  dateParameterNames: [],
+  versionField: "version",
+  acceptsIdempotencyKey: true,
+  resultKind: "instance",
+  returnTsType: "{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; section: \"core_value\" | \"differentiator\" | \"three_year\" | \"one_year_goal\"; text: string; detail: string | null; sortOrder: number; doneAt: number | null; addedAt: number | null; addedByPersonId: string | null; createdAt: number; updatedAt: number }",
+  clientParameterNames: ["text","detail","sortOrder"],
+  serverParameterNames: [],
+  failures: [{"kind":"policy_denial","message":"Everyone may see the core values and the plan"},{"kind":"policy_denial","message":"Managers may update the core values and the plan"},{"kind":"policy_denial","message":"Managers may change the core values and the plan"},{"kind":"guard_failure","message":"Guard 0 failed"},{"kind":"guard_failure","message":"Guard 1 failed"},{"kind":"guard_failure","message":"Guard 2 failed"},{"kind":"constraint_block","message":"Write something first."},{"kind":"concurrency_conflict","message":"ConcurrencyConflict:","prefix":true},{"kind":"not_found","message":"VisionItem not found"}],
+  emits: ["VisionItemRevised"],
+} as const;
+
+export type VisionItemReviseResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; section: "core_value" | "differentiator" | "three_year" | "one_year_goal"; text: string; detail: string | null; sortOrder: number; doneAt: number | null; addedAt: number | null; addedByPersonId: string | null; createdAt: number; updatedAt: number };
+
+/**
+ * Build command input for VisionItem.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVisionItemReviseInput(client: VisionItemReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VisionItem.revise. */
+export const VisionItemReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.lists()",
+    "readId": "VisionItem.list",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VisionItem",
+    "queryKeyHint": "queryKeys.visionItem.detail(id)",
+    "readId": "VisionItem.get",
+    "label": "entity detail"
+  },
+  {
+    "kind": "entityList",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.lists()",
+    "readId": "Person.list",
+    "label": "related entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Person",
+    "queryKeyHint": "queryKeys.person.detail(id)",
+    "readId": "Person.get",
+    "label": "related entity detail"
+  }
+] as const;
+
+/** How a screen should offer VisionItem.revise. Not a rendered control. */
+export const VisionItemReviseAction = {
+  "exposure": "human",
+  "label": "Revise",
+  "confirm": false,
+  "fields": [
+    {
+      "name": "text",
+      "label": "Text",
+      "required": true
+    },
+    {
+      "name": "detail",
+      "label": "Detail",
+      "required": false
+    },
+    {
+      "name": "sortOrder",
+      "label": "Sort order",
+      "required": true
+    }
+  ]
+} as const;
+
 // --- WasteRecord.record ---
 export interface WasteRecordRecordClientInput {
   ingredientId: string;
@@ -221419,6 +225308,9 @@ export const WeeklyScheduleNoticeRepublishScheduleAction = {
 
 /** All capability ids in this contract (sorted). */
 export const ALL_CAPABILITY_IDS = [
+  "AccountabilitySeat.place",
+  "AccountabilitySeat.remove",
+  "AccountabilitySeat.revise",
   "Announcement.post",
   "Announcement.remove",
   "AnnouncementDismissal.dismiss",
@@ -221461,6 +225353,8 @@ export const ALL_CAPABILITY_IDS = [
   "ClientOutreachTask.stageClientMerge",
   "ClientPortalLink.create",
   "ClientPortalLink.revoke",
+  "CompanyVision.revise",
+  "CompanyVision.write",
   "Component.clearPrimaryImage",
   "Component.draft",
   "Component.publishVersion",
@@ -221523,6 +225417,10 @@ export const ALL_CAPABILITY_IDS = [
   "Contract.send",
   "Contract.sign",
   "Contract.stageClientMerge",
+  "CoreProcess.remove",
+  "CoreProcess.revise",
+  "CoreProcess.setStage",
+  "CoreProcess.start",
   "CorrectiveAction.close",
   "CorrectiveAction.open",
   "CreditMemo.issue",
@@ -221544,6 +225442,9 @@ export const ALL_CAPABILITY_IDS = [
   "DateWaitlistEntry.withdraw",
   "DeckShareLink.create",
   "DeckShareLink.revoke",
+  "DelegateElevateItem.add",
+  "DelegateElevateItem.move",
+  "DelegateElevateItem.remove",
   "Delivery.cancel",
   "Delivery.confirmDelivery",
   "Delivery.markFailed",
@@ -221896,9 +225797,12 @@ export const ALL_CAPABILITY_IDS = [
   "Lead.stageProposal",
   "Lead.updatePipeline",
   "LeadershipItem.add",
+  "LeadershipItem.bringBack",
   "LeadershipItem.complete",
   "LeadershipItem.drop",
   "LeadershipItem.markTrack",
+  "LeadershipItem.park",
+  "LeadershipItem.prioritize",
   "LeadershipItem.reopen",
   "LeadershipItem.revise",
   "LeadershipItem.solve",
@@ -221964,6 +225868,7 @@ export const ALL_CAPABILITY_IDS = [
   "Organization.setBrandLogo",
   "Organization.setDefaultCurrency",
   "Organization.suspend",
+  "OrganizationalCheckup.take",
   "OrganizationCapabilitySetting.register",
   "OrganizationCapabilitySetting.setEnabled",
   "PackList.acknowledgePackingRequirement",
@@ -222053,6 +225958,9 @@ export const ALL_CAPABILITY_IDS = [
   "PayrollInput.finalize",
   "PayrollInput.markVoided",
   "PayrollInput.prepare",
+  "PeopleAnalyzerScore.rate",
+  "PeopleAnalyzerScore.rescore",
+  "PeopleAnalyzerScore.withdraw",
   "PerformanceReview.record",
   "Person.assignRole",
   "Person.changeAddress",
@@ -222427,6 +226335,11 @@ export const ALL_CAPABILITY_IDS = [
   "VenueVendorRelationship.retire",
   "VenueVendorRelationship.reviseDetails",
   "VenueVendorRelationship.reviseStatus",
+  "VisionItem.add",
+  "VisionItem.markDone",
+  "VisionItem.markNotDone",
+  "VisionItem.remove",
+  "VisionItem.revise",
   "WasteRecord.record",
   "WasteRecord.voidRecord",
   "WeeklyPurchasingConfig.configure",
@@ -222439,6 +226352,11 @@ export const ALL_CAPABILITY_IDS = [
 
 /** Stored-record reads. A list has no page cursor. */
 export const ALL_READ_IDS = [
+  "AccountabilitySeat.byCreatedByPersonId",
+  "AccountabilitySeat.byPersonId",
+  "AccountabilitySeat.byTenantId",
+  "AccountabilitySeat.get",
+  "AccountabilitySeat.list",
   "Announcement.byTenantId",
   "Announcement.get",
   "Announcement.list",
@@ -222512,6 +226430,10 @@ export const ALL_READ_IDS = [
   "CommandAuditRecord.byTenantId",
   "CommandAuditRecord.get",
   "CommandAuditRecord.list",
+  "CompanyVision.byTenantId",
+  "CompanyVision.byWrittenByPersonId",
+  "CompanyVision.get",
+  "CompanyVision.list",
   "Component.byRecipeIdentityFingerprint",
   "Component.byTenantId",
   "Component.get",
@@ -222560,6 +226482,10 @@ export const ALL_READ_IDS = [
   "Contract.byTenantId",
   "Contract.get",
   "Contract.list",
+  "CoreProcess.byOwnerPersonId",
+  "CoreProcess.byTenantId",
+  "CoreProcess.get",
+  "CoreProcess.list",
   "CorrectiveAction.byEventId",
   "CorrectiveAction.byIncidentId",
   "CorrectiveAction.byTenantId",
@@ -222595,6 +226521,10 @@ export const ALL_READ_IDS = [
   "DeckShareLink.byTenantId",
   "DeckShareLink.get",
   "DeckShareLink.list",
+  "DelegateElevateItem.byPersonId",
+  "DelegateElevateItem.byTenantId",
+  "DelegateElevateItem.get",
+  "DelegateElevateItem.list",
   "Delivery.byDriverId",
   "Delivery.byEventId",
   "Delivery.byPackListId",
@@ -222992,6 +226922,10 @@ export const ALL_READ_IDS = [
   "Organization.byTenantId",
   "Organization.get",
   "Organization.list",
+  "OrganizationalCheckup.byTakenByPersonId",
+  "OrganizationalCheckup.byTenantId",
+  "OrganizationalCheckup.get",
+  "OrganizationalCheckup.list",
   "OrganizationCapabilitySetting.byTenantId",
   "OrganizationCapabilitySetting.get",
   "OrganizationCapabilitySetting.list",
@@ -223066,6 +227000,11 @@ export const ALL_READ_IDS = [
   "PayrollInput.byTenantId",
   "PayrollInput.get",
   "PayrollInput.list",
+  "PeopleAnalyzerScore.byPersonId",
+  "PeopleAnalyzerScore.byRatedByPersonId",
+  "PeopleAnalyzerScore.byTenantId",
+  "PeopleAnalyzerScore.get",
+  "PeopleAnalyzerScore.list",
   "PerformanceReview.byEventId",
   "PerformanceReview.byPersonId",
   "PerformanceReview.byReviewerId",
@@ -223514,6 +227453,10 @@ export const ALL_READ_IDS = [
   "VenueVendorRelationship.byVenueId",
   "VenueVendorRelationship.get",
   "VenueVendorRelationship.list",
+  "VisionItem.byAddedByPersonId",
+  "VisionItem.byTenantId",
+  "VisionItem.get",
+  "VisionItem.list",
   "WasteRecord.byEventId",
   "WasteRecord.byIngredientId",
   "WasteRecord.byInventoryItemId",
@@ -223530,6 +227473,21 @@ export const ALL_READ_IDS = [
   "WeeklyScheduleNotice.get",
   "WeeklyScheduleNotice.list"
 ] as const;
+
+export const listAccountabilitySeatByCreatedByPersonIdRead = {"entity":"AccountabilitySeat","readId":"AccountabilitySeat.byCreatedByPersonId","exportName":"listAccountabilitySeatByCreatedByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"createdByPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; title: string; roles: string | null; personId: string | null; parentSeatId: string | null; sortOrder: number; createdByPersonId: string | null; placedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listAccountabilitySeatByCreatedByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; title: string; roles: string | null; personId: string | null; parentSeatId: string | null; sortOrder: number; createdByPersonId: string | null; placedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listAccountabilitySeatByPersonIdRead = {"entity":"AccountabilitySeat","readId":"AccountabilitySeat.byPersonId","exportName":"listAccountabilitySeatByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"personId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; title: string; roles: string | null; personId: string | null; parentSeatId: string | null; sortOrder: number; createdByPersonId: string | null; placedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listAccountabilitySeatByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; title: string; roles: string | null; personId: string | null; parentSeatId: string | null; sortOrder: number; createdByPersonId: string | null; placedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listAccountabilitySeatByTenantIdRead = {"entity":"AccountabilitySeat","readId":"AccountabilitySeat.byTenantId","exportName":"listAccountabilitySeatByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; title: string; roles: string | null; personId: string | null; parentSeatId: string | null; sortOrder: number; createdByPersonId: string | null; placedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listAccountabilitySeatByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; title: string; roles: string | null; personId: string | null; parentSeatId: string | null; sortOrder: number; createdByPersonId: string | null; placedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getAccountabilitySeatRead = {"entity":"AccountabilitySeat","readId":"AccountabilitySeat.get","exportName":"getAccountabilitySeat","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; title: string; roles: string | null; personId: string | null; parentSeatId: string | null; sortOrder: number; createdByPersonId: string | null; placedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getAccountabilitySeatResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; title: string; roles: string | null; personId: string | null; parentSeatId: string | null; sortOrder: number; createdByPersonId: string | null; placedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listAccountabilitySeatRead = {"entity":"AccountabilitySeat","readId":"AccountabilitySeat.list","exportName":"listAccountabilitySeat","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; title: string; roles: string | null; personId: string | null; parentSeatId: string | null; sortOrder: number; createdByPersonId: string | null; placedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listAccountabilitySeatResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; title: string; roles: string | null; personId: string | null; parentSeatId: string | null; sortOrder: number; createdByPersonId: string | null; placedAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listAnnouncementByTenantIdRead = {"entity":"Announcement","readId":"Announcement.byTenantId","exportName":"listAnnouncementByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; title: string; body: string; category: \"policyUpdate\" | \"safety\" | \"training\" | \"general\"; expiresAt: number; postedById: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listAnnouncementByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; title: string; body: string; category: "policyUpdate" | "safety" | "training" | "general"; expiresAt: number; postedById: string | null; createdAt: number; updatedAt: number }>;
@@ -223750,6 +227708,18 @@ export type getCommandAuditRecordResult = { _id: string; _creationTime: number; 
 export const listCommandAuditRecordRead = {"entity":"CommandAuditRecord","readId":"CommandAuditRecord.list","exportName":"listCommandAuditRecord","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; occurredAt: number; lastOccurredAt: number | null; stepName: string | null; subjectEntity: string | null; subjectId: string | null; eventType: string | null; manifestEventId: string | null; manifestEventIds: unknown | null; eventCount: number | null; versionAfter: number | null; actorUserId: string | null; actorPersonId: string | null; actorRole: string | null; idempotencyKey: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listCommandAuditRecordResult = Array<{ _id: string; _creationTime: number; tenantId: string; occurredAt: number; lastOccurredAt: number | null; stepName: string | null; subjectEntity: string | null; subjectId: string | null; eventType: string | null; manifestEventId: string | null; manifestEventIds: unknown | null; eventCount: number | null; versionAfter: number | null; actorUserId: string | null; actorPersonId: string | null; actorRole: string | null; idempotencyKey: string | null; createdAt: number; updatedAt: number }>;
 
+export const listCompanyVisionByTenantIdRead = {"entity":"CompanyVision","readId":"CompanyVision.byTenantId","exportName":"listCompanyVisionByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; coreFocusPurpose: string | null; coreFocusNiche: string | null; tenYearTarget: string | null; tenYearDate: number | null; targetMarket: string | null; provenProcess: string | null; guarantee: string | null; threeYearDate: number | null; threeYearRevenue: number | null; threeYearProfit: number | null; threeYearMeasurables: string | null; oneYearDate: number | null; oneYearRevenue: number | null; oneYearProfit: number | null; oneYearMeasurables: string | null; quarterDate: number | null; quarterRevenue: number | null; quarterProfit: number | null; quarterMeasurables: string | null; peopleBarMaxMixed: number | null; writtenAt: number | null; writtenByPersonId: string | null; revisedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listCompanyVisionByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; coreFocusPurpose: string | null; coreFocusNiche: string | null; tenYearTarget: string | null; tenYearDate: number | null; targetMarket: string | null; provenProcess: string | null; guarantee: string | null; threeYearDate: number | null; threeYearRevenue: number | null; threeYearProfit: number | null; threeYearMeasurables: string | null; oneYearDate: number | null; oneYearRevenue: number | null; oneYearProfit: number | null; oneYearMeasurables: string | null; quarterDate: number | null; quarterRevenue: number | null; quarterProfit: number | null; quarterMeasurables: string | null; peopleBarMaxMixed: number | null; writtenAt: number | null; writtenByPersonId: string | null; revisedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listCompanyVisionByWrittenByPersonIdRead = {"entity":"CompanyVision","readId":"CompanyVision.byWrittenByPersonId","exportName":"listCompanyVisionByWrittenByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"writtenByPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; coreFocusPurpose: string | null; coreFocusNiche: string | null; tenYearTarget: string | null; tenYearDate: number | null; targetMarket: string | null; provenProcess: string | null; guarantee: string | null; threeYearDate: number | null; threeYearRevenue: number | null; threeYearProfit: number | null; threeYearMeasurables: string | null; oneYearDate: number | null; oneYearRevenue: number | null; oneYearProfit: number | null; oneYearMeasurables: string | null; quarterDate: number | null; quarterRevenue: number | null; quarterProfit: number | null; quarterMeasurables: string | null; peopleBarMaxMixed: number | null; writtenAt: number | null; writtenByPersonId: string | null; revisedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listCompanyVisionByWrittenByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; coreFocusPurpose: string | null; coreFocusNiche: string | null; tenYearTarget: string | null; tenYearDate: number | null; targetMarket: string | null; provenProcess: string | null; guarantee: string | null; threeYearDate: number | null; threeYearRevenue: number | null; threeYearProfit: number | null; threeYearMeasurables: string | null; oneYearDate: number | null; oneYearRevenue: number | null; oneYearProfit: number | null; oneYearMeasurables: string | null; quarterDate: number | null; quarterRevenue: number | null; quarterProfit: number | null; quarterMeasurables: string | null; peopleBarMaxMixed: number | null; writtenAt: number | null; writtenByPersonId: string | null; revisedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getCompanyVisionRead = {"entity":"CompanyVision","readId":"CompanyVision.get","exportName":"getCompanyVision","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; coreFocusPurpose: string | null; coreFocusNiche: string | null; tenYearTarget: string | null; tenYearDate: number | null; targetMarket: string | null; provenProcess: string | null; guarantee: string | null; threeYearDate: number | null; threeYearRevenue: number | null; threeYearProfit: number | null; threeYearMeasurables: string | null; oneYearDate: number | null; oneYearRevenue: number | null; oneYearProfit: number | null; oneYearMeasurables: string | null; quarterDate: number | null; quarterRevenue: number | null; quarterProfit: number | null; quarterMeasurables: string | null; peopleBarMaxMixed: number | null; writtenAt: number | null; writtenByPersonId: string | null; revisedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getCompanyVisionResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; coreFocusPurpose: string | null; coreFocusNiche: string | null; tenYearTarget: string | null; tenYearDate: number | null; targetMarket: string | null; provenProcess: string | null; guarantee: string | null; threeYearDate: number | null; threeYearRevenue: number | null; threeYearProfit: number | null; threeYearMeasurables: string | null; oneYearDate: number | null; oneYearRevenue: number | null; oneYearProfit: number | null; oneYearMeasurables: string | null; quarterDate: number | null; quarterRevenue: number | null; quarterProfit: number | null; quarterMeasurables: string | null; peopleBarMaxMixed: number | null; writtenAt: number | null; writtenByPersonId: string | null; revisedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listCompanyVisionRead = {"entity":"CompanyVision","readId":"CompanyVision.list","exportName":"listCompanyVision","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; coreFocusPurpose: string | null; coreFocusNiche: string | null; tenYearTarget: string | null; tenYearDate: number | null; targetMarket: string | null; provenProcess: string | null; guarantee: string | null; threeYearDate: number | null; threeYearRevenue: number | null; threeYearProfit: number | null; threeYearMeasurables: string | null; oneYearDate: number | null; oneYearRevenue: number | null; oneYearProfit: number | null; oneYearMeasurables: string | null; quarterDate: number | null; quarterRevenue: number | null; quarterProfit: number | null; quarterMeasurables: string | null; peopleBarMaxMixed: number | null; writtenAt: number | null; writtenByPersonId: string | null; revisedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listCompanyVisionResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; coreFocusPurpose: string | null; coreFocusNiche: string | null; tenYearTarget: string | null; tenYearDate: number | null; targetMarket: string | null; provenProcess: string | null; guarantee: string | null; threeYearDate: number | null; threeYearRevenue: number | null; threeYearProfit: number | null; threeYearMeasurables: string | null; oneYearDate: number | null; oneYearRevenue: number | null; oneYearProfit: number | null; oneYearMeasurables: string | null; quarterDate: number | null; quarterRevenue: number | null; quarterProfit: number | null; quarterMeasurables: string | null; peopleBarMaxMixed: number | null; writtenAt: number | null; writtenByPersonId: string | null; revisedAt: number | null; createdAt: number; updatedAt: number }>;
+
 export const listComponentByRecipeIdentityFingerprintRead = {"entity":"Component","readId":"Component.byRecipeIdentityFingerprint","exportName":"listComponentByRecipeIdentityFingerprint","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"recipeIdentityFingerprint","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; servesPerYield: number | null; batchMultiplier: number | null; status: \"draft\" | \"published\" | \"retired\"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; activePrepMinutes: number | null; passiveCookMinutes: number | null; declaredAllergens: (\"milk\" | \"eggs\" | \"fish\" | \"crustacean_shellfish\" | \"tree_nuts\" | \"peanuts\" | \"wheat\" | \"soybeans\" | \"sesame\")[]; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listComponentByRecipeIdentityFingerprintResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; category: string | null; cuisine: string | null; description: string | null; instructions: string | null; recipeSourceFingerprint: string | null; recipeSourceText: string | null; recipeIdentityFingerprint: string | null; versionNumber: number; yieldQuantity: number; yieldUnit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; servesPerYield: number | null; batchMultiplier: number | null; status: "draft" | "published" | "retired"; draftedAt: number | null; publishedAt: number | null; retiredAt: number | null; retirementReason: string | null; storageWindowDays: number | null; storageWindowSource: string | null; equipmentNotes: string | null; activePrepMinutes: number | null; passiveCookMinutes: number | null; declaredAllergens: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[]; platingInstructions: string | null; coolingInstructions: string | null; holdingInstructions: string | null; reheatInstructions: string | null; substitutionNotes: string | null; videoUrl: string | null; primaryImageStorageId: string | null; primaryImageFileName: string | null; createdAt: number; updatedAt: number }>;
 
@@ -223894,6 +227864,18 @@ export type getContractResult = { _id: string; _creationTime: number; tenantId: 
 export const listContractRead = {"entity":"Contract","readId":"Contract.list","exportName":"listContract","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; contractNumber: string | null; title: string; documentUrl: string | null; expiresAt: number | null; sentAt: number | null; viewedAt: number | null; signedAt: number | null; signedBy: string | null; voidedAt: number | null; voidReason: string | null; notes: string | null; status: \"draft\" | \"sent\" | \"viewed\" | \"signed\" | \"expired\" | \"voided\"; draftedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listContractResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; eventId: string; clientId: string; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; contractNumber: string | null; title: string; documentUrl: string | null; expiresAt: number | null; sentAt: number | null; viewedAt: number | null; signedAt: number | null; signedBy: string | null; voidedAt: number | null; voidReason: string | null; notes: string | null; status: "draft" | "sent" | "viewed" | "signed" | "expired" | "voided"; draftedAt: number | null; createdAt: number; updatedAt: number }>;
 
+export const listCoreProcessByOwnerPersonIdRead = {"entity":"CoreProcess","readId":"CoreProcess.byOwnerPersonId","exportName":"listCoreProcessByOwnerPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"ownerPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; ownerPersonId: string | null; steps: string | null; stage: \"named\" | \"documented\" | \"simplified\" | \"followed_by_all\"; sortOrder: number; namedAt: number | null; stageSetAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listCoreProcessByOwnerPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; ownerPersonId: string | null; steps: string | null; stage: "named" | "documented" | "simplified" | "followed_by_all"; sortOrder: number; namedAt: number | null; stageSetAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listCoreProcessByTenantIdRead = {"entity":"CoreProcess","readId":"CoreProcess.byTenantId","exportName":"listCoreProcessByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; ownerPersonId: string | null; steps: string | null; stage: \"named\" | \"documented\" | \"simplified\" | \"followed_by_all\"; sortOrder: number; namedAt: number | null; stageSetAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listCoreProcessByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; ownerPersonId: string | null; steps: string | null; stage: "named" | "documented" | "simplified" | "followed_by_all"; sortOrder: number; namedAt: number | null; stageSetAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getCoreProcessRead = {"entity":"CoreProcess","readId":"CoreProcess.get","exportName":"getCoreProcess","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; ownerPersonId: string | null; steps: string | null; stage: \"named\" | \"documented\" | \"simplified\" | \"followed_by_all\"; sortOrder: number; namedAt: number | null; stageSetAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getCoreProcessResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; ownerPersonId: string | null; steps: string | null; stage: "named" | "documented" | "simplified" | "followed_by_all"; sortOrder: number; namedAt: number | null; stageSetAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listCoreProcessRead = {"entity":"CoreProcess","readId":"CoreProcess.list","exportName":"listCoreProcess","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; ownerPersonId: string | null; steps: string | null; stage: \"named\" | \"documented\" | \"simplified\" | \"followed_by_all\"; sortOrder: number; namedAt: number | null; stageSetAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listCoreProcessResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; ownerPersonId: string | null; steps: string | null; stage: "named" | "documented" | "simplified" | "followed_by_all"; sortOrder: number; namedAt: number | null; stageSetAt: number | null; createdAt: number; updatedAt: number }>;
+
 export const listCorrectiveActionByEventIdRead = {"entity":"CorrectiveAction","readId":"CorrectiveAction.byEventId","exportName":"listCorrectiveActionByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; incidentId: string; eventId: string; description: string; resolutionNotes: string | null; openedById: string | null; closedById: string | null; status: \"open\" | \"closed\"; openedAt: number | null; closedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listCorrectiveActionByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; incidentId: string; eventId: string; description: string; resolutionNotes: string | null; openedById: string | null; closedById: string | null; status: "open" | "closed"; openedAt: number | null; closedAt: number | null; createdAt: number; updatedAt: number }>;
 
@@ -223998,6 +227980,18 @@ export type getDeckShareLinkResult = { _id: string; _creationTime: number; tenan
 
 export const listDeckShareLinkRead = {"entity":"DeckShareLink","readId":"DeckShareLink.list","exportName":"listDeckShareLink","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; attachmentId: string; audience: \"anyone\" | \"staff\"; status: \"active\" | \"revoked\"; expiresAt: number | null; revokedAt: number | null; revokedByPersonId: string | null; createdByPersonId: string | null; viewCount: number; firstViewedAt: number | null; lastViewedAt: number | null; lastViewerIdentity: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listDeckShareLinkResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; attachmentId: string; audience: "anyone" | "staff"; status: "active" | "revoked"; expiresAt: number | null; revokedAt: number | null; revokedByPersonId: string | null; createdByPersonId: string | null; viewCount: number; firstViewedAt: number | null; lastViewedAt: number | null; lastViewerIdentity: string | null; createdAt: number; updatedAt: number }>;
+
+export const listDelegateElevateItemByPersonIdRead = {"entity":"DelegateElevateItem","readId":"DelegateElevateItem.byPersonId","exportName":"listDelegateElevateItemByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"personId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; activity: string; quadrant: \"love_great\" | \"like_good\" | \"dislike_good\" | \"dislike_not_good\"; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDelegateElevateItemByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; activity: string; quadrant: "love_great" | "like_good" | "dislike_good" | "dislike_not_good"; addedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listDelegateElevateItemByTenantIdRead = {"entity":"DelegateElevateItem","readId":"DelegateElevateItem.byTenantId","exportName":"listDelegateElevateItemByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; activity: string; quadrant: \"love_great\" | \"like_good\" | \"dislike_good\" | \"dislike_not_good\"; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDelegateElevateItemByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; activity: string; quadrant: "love_great" | "like_good" | "dislike_good" | "dislike_not_good"; addedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const getDelegateElevateItemRead = {"entity":"DelegateElevateItem","readId":"DelegateElevateItem.get","exportName":"getDelegateElevateItem","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; activity: string; quadrant: \"love_great\" | \"like_good\" | \"dislike_good\" | \"dislike_not_good\"; addedAt: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getDelegateElevateItemResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; activity: string; quadrant: "love_great" | "like_good" | "dislike_good" | "dislike_not_good"; addedAt: number | null; createdAt: number; updatedAt: number } | null;
+
+export const listDelegateElevateItemRead = {"entity":"DelegateElevateItem","readId":"DelegateElevateItem.list","exportName":"listDelegateElevateItem","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; activity: string; quadrant: \"love_great\" | \"like_good\" | \"dislike_good\" | \"dislike_not_good\"; addedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listDelegateElevateItemResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; activity: string; quadrant: "love_great" | "like_good" | "dislike_good" | "dislike_not_good"; addedAt: number | null; createdAt: number; updatedAt: number }>;
 
 export const listDeliveryByDriverIdRead = {"entity":"Delivery","readId":"Delivery.byDriverId","exportName":"listDeliveryByDriverId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"driverId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; eventId: string; driverId: string | null; vehicleId: string | null; destination: string; windowStartsAt: number | null; windowEndsAt: number | null; notes: string | null; status: \"scheduled\" | \"in_transit\" | \"delivered\" | \"failed\" | \"cancelled\"; scheduledAt: number | null; departedAt: number | null; deliveredAt: number | null; failedAt: number | null; failureReason: string | null; cancelledAt: number | null; cancellationReason: string | null; departedByPersonId: string | null; deliveredByPersonId: string | null; receivedByName: string | null; deliveryNote: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listDeliveryByDriverIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; packListId: string; eventId: string; driverId: string | null; vehicleId: string | null; destination: string; windowStartsAt: number | null; windowEndsAt: number | null; notes: string | null; status: "scheduled" | "in_transit" | "delivered" | "failed" | "cancelled"; scheduledAt: number | null; departedAt: number | null; deliveredAt: number | null; failedAt: number | null; failureReason: string | null; cancelledAt: number | null; cancellationReason: string | null; departedByPersonId: string | null; deliveredByPersonId: string | null; receivedByName: string | null; deliveryNote: string | null; createdAt: number; updatedAt: number }>;
@@ -224989,23 +228983,23 @@ export type getLeadResult = { _id: string; _creationTime: number; tenantId: stri
 export const listLeadRead = {"entity":"Lead","readId":"Lead.list","exportName":"listLead","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: \"company\" | \"person\"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: \"new\" | \"qualified\" | \"proposalSent\" | \"negotiating\"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; guestCount: number | null; eventType: string | null; closedAt: number | null; closeReason: string | null; firstRepliedAt: number | null; firstRepliedById: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listLeadResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; leadType: "company" | "person"; companyName: string | null; givenName: string | null; familyName: string | null; email: string | null; phone: string | null; source: string; referralSourceId: string | null; estimatedValue: number; stage: "new" | "qualified" | "proposalSent" | "negotiating"; probability: number; notes: string | null; clientId: string | null; clientContactId: string | null; proposalId: string | null; capturedAt: number | null; convertedAt: number | null; proposalLinkedAt: number | null; sourceStage: string | null; eventDate: number | null; guestCount: number | null; eventType: string | null; closedAt: number | null; closeReason: string | null; firstRepliedAt: number | null; firstRepliedById: string | null; clientMergeAuthorizationId: string | null; mergeTargetClientId: string | null; createdAt: number; updatedAt: number }>;
 
-export const listLeadershipItemByClosedByPersonIdRead = {"entity":"LeadershipItem","readId":"LeadershipItem.byClosedByPersonId","exportName":"listLeadershipItemByClosedByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"closedByPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listLeadershipItemByClosedByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+export const listLeadershipItemByClosedByPersonIdRead = {"entity":"LeadershipItem","readId":"LeadershipItem.byClosedByPersonId","exportName":"listLeadershipItemByClosedByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"closedByPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listLeadershipItemByClosedByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }>;
 
-export const listLeadershipItemByOpenedByPersonIdRead = {"entity":"LeadershipItem","readId":"LeadershipItem.byOpenedByPersonId","exportName":"listLeadershipItemByOpenedByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"openedByPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listLeadershipItemByOpenedByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+export const listLeadershipItemByOpenedByPersonIdRead = {"entity":"LeadershipItem","readId":"LeadershipItem.byOpenedByPersonId","exportName":"listLeadershipItemByOpenedByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"openedByPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listLeadershipItemByOpenedByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }>;
 
-export const listLeadershipItemByOwnerPersonIdRead = {"entity":"LeadershipItem","readId":"LeadershipItem.byOwnerPersonId","exportName":"listLeadershipItemByOwnerPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"ownerPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listLeadershipItemByOwnerPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+export const listLeadershipItemByOwnerPersonIdRead = {"entity":"LeadershipItem","readId":"LeadershipItem.byOwnerPersonId","exportName":"listLeadershipItemByOwnerPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"ownerPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listLeadershipItemByOwnerPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }>;
 
-export const listLeadershipItemByTenantIdRead = {"entity":"LeadershipItem","readId":"LeadershipItem.byTenantId","exportName":"listLeadershipItemByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listLeadershipItemByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+export const listLeadershipItemByTenantIdRead = {"entity":"LeadershipItem","readId":"LeadershipItem.byTenantId","exportName":"listLeadershipItemByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listLeadershipItemByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }>;
 
-export const getLeadershipItemRead = {"entity":"LeadershipItem","readId":"LeadershipItem.get","exportName":"getLeadershipItem","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number } | null"} as const;
-export type getLeadershipItemResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number } | null;
+export const getLeadershipItemRead = {"entity":"LeadershipItem","readId":"LeadershipItem.get","exportName":"getLeadershipItem","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getLeadershipItemResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number } | null;
 
-export const listLeadershipItemRead = {"entity":"LeadershipItem","readId":"LeadershipItem.list","exportName":"listLeadershipItem","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
-export type listLeadershipItemResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+export const listLeadershipItemRead = {"entity":"LeadershipItem","readId":"LeadershipItem.list","exportName":"listLeadershipItem","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: \"rock\" | \"issue\" | \"todo\" | \"client_headline\" | \"people_headline\"; title: string; ownerPersonId: string | null; dueAt: number | null; status: \"open\" | \"done\" | \"dropped\"; notes: string | null; track: \"on_track\" | \"at_risk\" | \"off_track\" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }>"} as const;
+export type listLeadershipItemResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; kind: "rock" | "issue" | "todo" | "client_headline" | "people_headline"; title: string; ownerPersonId: string | null; dueAt: number | null; status: "open" | "done" | "dropped"; notes: string | null; track: "on_track" | "at_risk" | "off_track" | null; trackSetAt: number | null; solution: string | null; openedAt: number | null; openedByPersonId: string | null; closedAt: number | null; closedByPersonId: string | null; parkedAt: number | null; priority: number | null; createdAt: number; updatedAt: number }>;
 
 export const listLeadershipMeetingByFacilitatorPersonIdRead = {"entity":"LeadershipMeeting","readId":"LeadershipMeeting.byFacilitatorPersonId","exportName":"listLeadershipMeetingByFacilitatorPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"facilitatorPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; heldAt: number | null; facilitatorPersonId: string | null; rating: number | null; wentWell: string | null; toImprove: string | null; decisions: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listLeadershipMeetingByFacilitatorPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; heldAt: number | null; facilitatorPersonId: string | null; rating: number | null; wentWell: string | null; toImprove: string | null; decisions: string | null; recordedAt: number | null; recordedByPersonId: string | null; createdAt: number; updatedAt: number }>;
@@ -225189,6 +229183,18 @@ export type getOrganizationResult = { _id: string; _creationTime: number; tenant
 
 export const listOrganizationRead = {"entity":"Organization","readId":"Organization.list","exportName":"listOrganization","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: \"active\" | \"suspended\" | \"deactivated\"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: \"traffic_aware\" | \"no_traffic\" | null; routeRefreshHours: number | null; travelFeeMode: \"off\" | \"per_mile\" | \"zone\" | null; travelFeeRatePerMile: number | null; travelFeeFreeMiles: number | null; travelFeeMinimum: number | null; travelFeeRoundTrip: boolean | null; travelFeeZonesJson: string | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; stageMovesByHandJson: string | null; equipmentFieldsJson: string | null; emailSenderName: string | null; emailReplyTo: string | null; smsNumber: string | null; facebookPageId: string | null; instagramAccountId: string | null; brandPhone: string | null; brandWebsite: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listOrganizationResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; name: string; status: "active" | "suspended" | "deactivated"; brandDisplayName: string | null; brandAddress: string | null; brandPrimaryColor: string | null; brandAccentColor: string | null; brandLogoStorageId: string | null; defaultCurrencyCode: string | null; defaultExchangeRateScale: number; routeSafetyBufferMinutes: number | null; routeTrafficPolicy: "traffic_aware" | "no_traffic" | null; routeRefreshHours: number | null; travelFeeMode: "off" | "per_mile" | "zone" | null; travelFeeRatePerMile: number | null; travelFeeFreeMiles: number | null; travelFeeMinimum: number | null; travelFeeRoundTrip: boolean | null; travelFeeZonesJson: string | null; timingFullServiceSetupMinutes: number | null; timingLimitedServiceSetupMinutes: number | null; timingBriefingMinutes: number | null; timingLoadBaselineMinutes: number | null; timingLoadRulesJson: string | null; planningChecksJson: string | null; stageMovesByHandJson: string | null; equipmentFieldsJson: string | null; emailSenderName: string | null; emailReplyTo: string | null; smsNumber: string | null; facebookPageId: string | null; instagramAccountId: string | null; brandPhone: string | null; brandWebsite: string | null; createdAt: number; updatedAt: number }>;
+
+export const listOrganizationalCheckupByTakenByPersonIdRead = {"entity":"OrganizationalCheckup","readId":"OrganizationalCheckup.byTakenByPersonId","exportName":"listOrganizationalCheckupByTakenByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"takenByPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; answers: string; score: number; takenAt: number | null; takenByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listOrganizationalCheckupByTakenByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; answers: string; score: number; takenAt: number | null; takenByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const listOrganizationalCheckupByTenantIdRead = {"entity":"OrganizationalCheckup","readId":"OrganizationalCheckup.byTenantId","exportName":"listOrganizationalCheckupByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; answers: string; score: number; takenAt: number | null; takenByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listOrganizationalCheckupByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; answers: string; score: number; takenAt: number | null; takenByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const getOrganizationalCheckupRead = {"entity":"OrganizationalCheckup","readId":"OrganizationalCheckup.get","exportName":"getOrganizationalCheckup","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; answers: string; score: number; takenAt: number | null; takenByPersonId: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getOrganizationalCheckupResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; answers: string; score: number; takenAt: number | null; takenByPersonId: string | null; createdAt: number; updatedAt: number } | null;
+
+export const listOrganizationalCheckupRead = {"entity":"OrganizationalCheckup","readId":"OrganizationalCheckup.list","exportName":"listOrganizationalCheckup","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; answers: string; score: number; takenAt: number | null; takenByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listOrganizationalCheckupResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; answers: string; score: number; takenAt: number | null; takenByPersonId: string | null; createdAt: number; updatedAt: number }>;
 
 export const listOrganizationCapabilitySettingByTenantIdRead = {"entity":"OrganizationCapabilitySetting","readId":"OrganizationCapabilitySetting.byTenantId","exportName":"listOrganizationCapabilitySettingByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; capability: \"kitchen\" | \"inventory\" | \"procurement\" | \"events\" | \"sales\" | \"logistics\" | \"workforce\" | \"finance\" | \"reports\" | \"administration\"; enabled: boolean; updatedBy: string | null; registeredAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listOrganizationCapabilitySettingByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; capability: "kitchen" | "inventory" | "procurement" | "events" | "sales" | "logistics" | "workforce" | "finance" | "reports" | "administration"; enabled: boolean; updatedBy: string | null; registeredAt: number | null; createdAt: number; updatedAt: number }>;
@@ -225411,6 +229417,21 @@ export type getPayrollInputResult = { _id: string; _creationTime: number; tenant
 
 export const listPayrollInputRead = {"entity":"PayrollInput","readId":"PayrollInput.list","exportName":"listPayrollInput","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: \"draft\" | \"prepared\" | \"finalized\" | \"voided\"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number }>"} as const;
 export type listPayrollInputResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; periodStart: number; periodEnd: number; eventId: string | null; shiftId: string | null; regularMinutes: number; overtimeMinutes: number; totalMinutes: number; notes: string | null; status: "draft" | "prepared" | "finalized" | "voided"; preparedAt: number | null; finalizedAt: number | null; voidedAt: number | null; voidReason: string | null; sourceTimeRecordIds: string[]; createdAt: number; updatedAt: number }>;
+
+export const listPeopleAnalyzerScoreByPersonIdRead = {"entity":"PeopleAnalyzerScore","readId":"PeopleAnalyzerScore.byPersonId","exportName":"listPeopleAnalyzerScoreByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"personId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; subject: string; score: \"plus\" | \"plus_minus\" | \"minus\"; ratedAt: number | null; ratedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPeopleAnalyzerScoreByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; subject: string; score: "plus" | "plus_minus" | "minus"; ratedAt: number | null; ratedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const listPeopleAnalyzerScoreByRatedByPersonIdRead = {"entity":"PeopleAnalyzerScore","readId":"PeopleAnalyzerScore.byRatedByPersonId","exportName":"listPeopleAnalyzerScoreByRatedByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"ratedByPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; subject: string; score: \"plus\" | \"plus_minus\" | \"minus\"; ratedAt: number | null; ratedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPeopleAnalyzerScoreByRatedByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; subject: string; score: "plus" | "plus_minus" | "minus"; ratedAt: number | null; ratedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const listPeopleAnalyzerScoreByTenantIdRead = {"entity":"PeopleAnalyzerScore","readId":"PeopleAnalyzerScore.byTenantId","exportName":"listPeopleAnalyzerScoreByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; subject: string; score: \"plus\" | \"plus_minus\" | \"minus\"; ratedAt: number | null; ratedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPeopleAnalyzerScoreByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; subject: string; score: "plus" | "plus_minus" | "minus"; ratedAt: number | null; ratedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const getPeopleAnalyzerScoreRead = {"entity":"PeopleAnalyzerScore","readId":"PeopleAnalyzerScore.get","exportName":"getPeopleAnalyzerScore","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; subject: string; score: \"plus\" | \"plus_minus\" | \"minus\"; ratedAt: number | null; ratedByPersonId: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getPeopleAnalyzerScoreResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; subject: string; score: "plus" | "plus_minus" | "minus"; ratedAt: number | null; ratedByPersonId: string | null; createdAt: number; updatedAt: number } | null;
+
+export const listPeopleAnalyzerScoreRead = {"entity":"PeopleAnalyzerScore","readId":"PeopleAnalyzerScore.list","exportName":"listPeopleAnalyzerScore","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; subject: string; score: \"plus\" | \"plus_minus\" | \"minus\"; ratedAt: number | null; ratedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listPeopleAnalyzerScoreResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; subject: string; score: "plus" | "plus_minus" | "minus"; ratedAt: number | null; ratedByPersonId: string | null; createdAt: number; updatedAt: number }>;
 
 export const listPerformanceReviewByEventIdRead = {"entity":"PerformanceReview","readId":"PerformanceReview.byEventId","exportName":"listPerformanceReviewByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; reviewerId: string; eventId: string | null; reviewDate: number | null; reliabilityRating: number; qualityRating: number; teamworkRating: number; notes: string | null; scorecardId: string | null; strengths: string | null; opportunities: string | null; comments: string | null; followUp: string | null; followUpDue: number | null; recordedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listPerformanceReviewByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; personId: string; reviewerId: string; eventId: string | null; reviewDate: number | null; reliabilityRating: number; qualityRating: number; teamworkRating: number; notes: string | null; scorecardId: string | null; strengths: string | null; opportunities: string | null; comments: string | null; followUp: string | null; followUpDue: number | null; recordedAt: number | null; createdAt: number; updatedAt: number }>;
@@ -226755,6 +230776,18 @@ export type getVenueVendorRelationshipResult = { _id: string; _creationTime: num
 
 export const listVenueVendorRelationshipRead = {"entity":"VenueVendorRelationship","readId":"VenueVendorRelationship.list","exportName":"listVenueVendorRelationship","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; venueId: string; vendorId: string; category: \"catering_equipment\" | \"florist\" | \"linens\" | \"audio_visual\" | \"tent_rental\" | \"furniture_rental\" | \"tableware_china\" | \"glassware\" | \"flatware\" | \"transportation\" | \"waste_management\" | \"security\" | \"photography_videography\" | \"entertainment\" | \"other\"; status: \"preferred\" | \"approved\" | \"restricted\" | \"banned\"; effectiveFrom: number | null; effectiveUntil: number | null; primaryContactId: string | null; insuranceCertificate: string | null; insuranceExpiry: number | null; complianceNotes: string | null; discountPercent: number | null; paymentTerms: string | null; minimumOrder: number | null; notes: string | null; establishedByPersonId: string | null; revisedByPersonId: string | null; revisedAt: number | null; createdAt: number; updatedAt: number }>"} as const;
 export type listVenueVendorRelationshipResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; venueId: string; vendorId: string; category: "catering_equipment" | "florist" | "linens" | "audio_visual" | "tent_rental" | "furniture_rental" | "tableware_china" | "glassware" | "flatware" | "transportation" | "waste_management" | "security" | "photography_videography" | "entertainment" | "other"; status: "preferred" | "approved" | "restricted" | "banned"; effectiveFrom: number | null; effectiveUntil: number | null; primaryContactId: string | null; insuranceCertificate: string | null; insuranceExpiry: number | null; complianceNotes: string | null; discountPercent: number | null; paymentTerms: string | null; minimumOrder: number | null; notes: string | null; establishedByPersonId: string | null; revisedByPersonId: string | null; revisedAt: number | null; createdAt: number; updatedAt: number }>;
+
+export const listVisionItemByAddedByPersonIdRead = {"entity":"VisionItem","readId":"VisionItem.byAddedByPersonId","exportName":"listVisionItemByAddedByPersonId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"addedByPersonId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; section: \"core_value\" | \"differentiator\" | \"three_year\" | \"one_year_goal\"; text: string; detail: string | null; sortOrder: number; doneAt: number | null; addedAt: number | null; addedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVisionItemByAddedByPersonIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; section: "core_value" | "differentiator" | "three_year" | "one_year_goal"; text: string; detail: string | null; sortOrder: number; doneAt: number | null; addedAt: number | null; addedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const listVisionItemByTenantIdRead = {"entity":"VisionItem","readId":"VisionItem.byTenantId","exportName":"listVisionItemByTenantId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"tenantId","tsType":"string","required":true}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; section: \"core_value\" | \"differentiator\" | \"three_year\" | \"one_year_goal\"; text: string; detail: string | null; sortOrder: number; doneAt: number | null; addedAt: number | null; addedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVisionItemByTenantIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; section: "core_value" | "differentiator" | "three_year" | "one_year_goal"; text: string; detail: string | null; sortOrder: number; doneAt: number | null; addedAt: number | null; addedByPersonId: string | null; createdAt: number; updatedAt: number }>;
+
+export const getVisionItemRead = {"entity":"VisionItem","readId":"VisionItem.get","exportName":"getVisionItem","kind":"detail","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"id","tsType":"string","required":true}],"returnTsType":"{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; section: \"core_value\" | \"differentiator\" | \"three_year\" | \"one_year_goal\"; text: string; detail: string | null; sortOrder: number; doneAt: number | null; addedAt: number | null; addedByPersonId: string | null; createdAt: number; updatedAt: number } | null"} as const;
+export type getVisionItemResult = { _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; section: "core_value" | "differentiator" | "three_year" | "one_year_goal"; text: string; detail: string | null; sortOrder: number; doneAt: number | null; addedAt: number | null; addedByPersonId: string | null; createdAt: number; updatedAt: number } | null;
+
+export const listVisionItemRead = {"entity":"VisionItem","readId":"VisionItem.list","exportName":"listVisionItem","kind":"list","clientCallable":false,"pagination":"unsupported","parameters":[],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; section: \"core_value\" | \"differentiator\" | \"three_year\" | \"one_year_goal\"; text: string; detail: string | null; sortOrder: number; doneAt: number | null; addedAt: number | null; addedByPersonId: string | null; createdAt: number; updatedAt: number }>"} as const;
+export type listVisionItemResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; section: "core_value" | "differentiator" | "three_year" | "one_year_goal"; text: string; detail: string | null; sortOrder: number; doneAt: number | null; addedAt: number | null; addedByPersonId: string | null; createdAt: number; updatedAt: number }>;
 
 export const listWasteRecordByEventIdRead = {"entity":"WasteRecord","readId":"WasteRecord.byEventId","exportName":"listWasteRecordByEventId","kind":"indexed","clientCallable":false,"pagination":"unsupported","parameters":[{"name":"eventId","tsType":"string | null","required":false}],"returnTsType":"Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; ingredientId: string; locationId: string; eventId: string | null; inventoryItemId: string | null; quantity: number; unit: \"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\" | \"serving\" | \"batch\" | \"melon\" | \"bottle\" | \"fluid_ounce\" | \"piece\" | \"slice\" | \"pizza\" | \"package\" | \"case\" | \"can\" | \"tub\"; reason: \"spoilage\" | \"prep_error\" | \"overproduction\" | \"dropped\" | \"date_expired\" | \"quality_reject\" | \"other\"; unitCost: number; status: \"pending\" | \"recorded\" | \"voided\"; notes: string | null; recordedAt: number | null; voidedAt: number | null; voidReason: string | null; recordedById: string | null; voidedById: string | null; createdAt: number; updatedAt: number }>"} as const;
 export type listWasteRecordByEventIdResult = Array<{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | null; ingredientId: string; locationId: string; eventId: string | null; inventoryItemId: string | null; quantity: number; unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" | "serving" | "batch" | "melon" | "bottle" | "fluid_ounce" | "piece" | "slice" | "pizza" | "package" | "case" | "can" | "tub"; reason: "spoilage" | "prep_error" | "overproduction" | "dropped" | "date_expired" | "quality_reject" | "other"; unitCost: number; status: "pending" | "recorded" | "voided"; notes: string | null; recordedAt: number | null; voidedAt: number | null; voidReason: string | null; recordedById: string | null; voidedById: string | null; createdAt: number; updatedAt: number }>;

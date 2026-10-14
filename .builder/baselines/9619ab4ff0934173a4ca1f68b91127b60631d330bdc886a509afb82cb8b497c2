@@ -11,6 +11,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   let rowsAttempted = 0;
   void PACK_ID;
   void PACK_VERSION;
+  // AccountabilitySeat has multiple initialization commands (place, remove); using the selected initialization command: place.
+  // AccountabilitySeat → api.mutations.AccountabilitySeat_createViaPlace
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.AccountabilitySeat_createViaPlace, { "title": "AccountabilitySeat 1", "roles": "demo-roles-1", "personId": "personId-accountability-seat-1", "parentSeatId": "parentSeatId-accountability-seat-1", "sortOrder": 1 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.AccountabilitySeat_createViaPlace, { "title": "AccountabilitySeat 2", "roles": "demo-roles-2", "personId": "personId-accountability-seat-2", "parentSeatId": "parentSeatId-accountability-seat-2", "sortOrder": 2 } as any);
   // Announcement has multiple initialization commands (post, remove); using the selected initialization command: post.
   // Announcement → api.mutations.Announcement_createViaPost
   rowsAttempted += 1;
@@ -77,6 +83,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   rowsAttempted += 1;
   await client.mutation(api.mutations.ClientPortalLink_create, { "eventId": "eventId-client-portal-link-2", "expiresAt": 1767355200000 } as any);
   // skip CommandAuditRecord: no creation command in IR (2 rows unused)
+  // CompanyVision → api.mutations.CompanyVision_createViaWrite
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.CompanyVision_createViaWrite, { "coreFocusPurpose": "demo-coreFocusPurpose-1", "coreFocusNiche": "demo-coreFocusNiche-1", "tenYearTarget": "demo-tenYearTarget-1", "tenYearDate": 1767268800000, "targetMarket": "demo-targetMarket-1", "provenProcess": "demo-provenProcess-1", "guarantee": "demo-guarantee-1", "threeYearDate": 1767268800000, "threeYearRevenue": 1, "threeYearProfit": 1, "threeYearMeasurables": "demo-threeYearMeasurables-1", "oneYearDate": 1767268800000, "oneYearRevenue": 1, "oneYearProfit": 1, "oneYearMeasurables": "demo-oneYearMeasurables-1", "quarterDate": 1767268800000, "quarterRevenue": 1, "quarterProfit": 1, "quarterMeasurables": "demo-quarterMeasurables-1", "peopleBarMaxMixed": 1 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.CompanyVision_createViaWrite, { "coreFocusPurpose": "demo-coreFocusPurpose-2", "coreFocusNiche": "demo-coreFocusNiche-2", "tenYearTarget": "demo-tenYearTarget-2", "tenYearDate": 1767355200000, "targetMarket": "demo-targetMarket-2", "provenProcess": "demo-provenProcess-2", "guarantee": "demo-guarantee-2", "threeYearDate": 1767355200000, "threeYearRevenue": 2, "threeYearProfit": 2, "threeYearMeasurables": "demo-threeYearMeasurables-2", "oneYearDate": 1767355200000, "oneYearRevenue": 2, "oneYearProfit": 2, "oneYearMeasurables": "demo-oneYearMeasurables-2", "quarterDate": 1767355200000, "quarterRevenue": 2, "quarterProfit": 2, "quarterMeasurables": "demo-quarterMeasurables-2", "peopleBarMaxMixed": 2 } as any);
   // Component has multiple initialization commands (draft, purge, retire); using the selected initialization command: draft.
   // Component → api.mutations.Component_createViaDraft
   rowsAttempted += 1;
@@ -135,6 +146,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.Contract_createViaDraft, { "eventId": "eventId-contract-1", "clientId": "clientId-contract-1", "contractNumber": "demo-contractNumber-1", "title": "Contract 1", "documentUrl": "demo-documentUrl-1", "expiresAt": 1767268800000, "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.Contract_createViaDraft, { "eventId": "eventId-contract-2", "clientId": "clientId-contract-2", "contractNumber": "demo-contractNumber-2", "title": "Contract 2", "documentUrl": "demo-documentUrl-2", "expiresAt": 1767355200000, "notes": "demo-notes-2" } as any);
+  // CoreProcess has multiple initialization commands (remove, start); using the selected initialization command: start.
+  // CoreProcess → api.mutations.CoreProcess_createViaStart
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.CoreProcess_createViaStart, { "name": "CoreProcess 1", "ownerPersonId": "ownerPersonId-core-process-1", "sortOrder": 1 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.CoreProcess_createViaStart, { "name": "CoreProcess 2", "ownerPersonId": "ownerPersonId-core-process-2", "sortOrder": 2 } as any);
   // CorrectiveAction → api.mutations.CorrectiveAction_createViaOpen
   rowsAttempted += 1;
   await client.mutation(api.mutations.CorrectiveAction_createViaOpen, { "incidentId": "incidentId-corrective-action-1", "eventId": "eventId-corrective-action-1", "description": "demo-description-1" } as any);
@@ -166,6 +183,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.DeckShareLink_create, { "attachmentId": "attachmentId-deck-share-link-1", "audience": "demo-audience-1", "expiresAt": 1767268800000 } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.DeckShareLink_create, { "attachmentId": "attachmentId-deck-share-link-2", "audience": "demo-audience-2", "expiresAt": 1767355200000 } as any);
+  // DelegateElevateItem has multiple initialization commands (add, remove); using the selected initialization command: add.
+  // DelegateElevateItem → api.mutations.DelegateElevateItem_createViaAdd
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.DelegateElevateItem_createViaAdd, { "personId": "personId-delegate-elevate-item-1", "activity": "demo-activity-1", "quadrant": "demo-quadrant-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.DelegateElevateItem_createViaAdd, { "personId": "personId-delegate-elevate-item-2", "activity": "demo-activity-2", "quadrant": "demo-quadrant-2" } as any);
   // Delivery → api.mutations.Delivery_createViaSchedule
   rowsAttempted += 1;
   await client.mutation(api.mutations.Delivery_createViaSchedule, { "packListId": "packListId-delivery-1", "eventId": "eventId-delivery-1", "driverId": "driverId-delivery-1", "destination": "demo-destination-1", "windowStartsAt": 1767268800000, "windowEndsAt": 1767268800000, "notes": "demo-notes-1" } as any);
@@ -441,6 +464,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.Lead_createViaCapture, { "leadType": "demo-leadType-1", "companyName": "Lead 1", "givenName": "Lead 1", "familyName": "Lead 1", "email": "user1@example.com", "phone": "demo-phone-1", "source": "demo-source-1", "referralSourceId": "referralSourceId-lead-1", "estimatedValue": 1, "probability": 1, "notes": "demo-notes-1", "eventDate": 1767268800000, "guestCount": 1, "eventType": "demo-eventType-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.Lead_createViaCapture, { "leadType": "demo-leadType-2", "companyName": "Lead 2", "givenName": "Lead 2", "familyName": "Lead 2", "email": "user2@example.com", "phone": "demo-phone-2", "source": "demo-source-2", "referralSourceId": "referralSourceId-lead-2", "estimatedValue": 2, "probability": 2, "notes": "demo-notes-2", "eventDate": 1767355200000, "guestCount": 2, "eventType": "demo-eventType-2" } as any);
+  // LeadershipItem has multiple initialization commands (add, park); using the selected initialization command: add.
   // LeadershipItem → api.mutations.LeadershipItem_createViaAdd
   rowsAttempted += 1;
   await client.mutation(api.mutations.LeadershipItem_createViaAdd, { "kind": "demo-kind-1", "title": "LeadershipItem 1", "ownerPersonId": "ownerPersonId-leadership-item-1", "dueAt": 1767268800000, "notes": "demo-notes-1" } as any);
@@ -510,6 +534,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.Organization_createViaRegister, { "name": "Organization 1", "brandDisplayName": "Organization 1", "brandAddress": "demo-brandAddress-1", "brandPrimaryColor": "demo-brandPrimaryColor-1", "brandAccentColor": "demo-brandAccentColor-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.Organization_createViaRegister, { "name": "Organization 2", "brandDisplayName": "Organization 2", "brandAddress": "demo-brandAddress-2", "brandPrimaryColor": "demo-brandPrimaryColor-2", "brandAccentColor": "demo-brandAccentColor-2" } as any);
+  // OrganizationalCheckup → api.mutations.OrganizationalCheckup_createViaTake
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.OrganizationalCheckup_createViaTake, { "answers": "demo-answers-1", "score": 1 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.OrganizationalCheckup_createViaTake, { "answers": "demo-answers-2", "score": 2 } as any);
   // OrganizationCapabilitySetting → api.mutations.OrganizationCapabilitySetting_createViaRegister
   rowsAttempted += 1;
   await client.mutation(api.mutations.OrganizationCapabilitySetting_createViaRegister, { "capability": "demo-capability-1", "enabled": false } as any);
@@ -574,6 +603,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.PayrollInput_createViaPrepare, { "personId": "personId-payroll-input-1", "periodStart": 1767268800000, "periodEnd": 1767268800000, "eventId": "eventId-payroll-input-1", "shiftId": "shiftId-payroll-input-1", "regularMinutes": 1, "overtimeMinutes": 1, "totalMinutes": 1, "hourlyRate": 1, "overtimeRate": 1, "grossAmount": 1, "notes": "demo-notes-1", "sourceTimeRecordIds": "demo-sourceTimeRecordIds-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.PayrollInput_createViaPrepare, { "personId": "personId-payroll-input-2", "periodStart": 1767355200000, "periodEnd": 1767355200000, "eventId": "eventId-payroll-input-2", "shiftId": "shiftId-payroll-input-2", "regularMinutes": 2, "overtimeMinutes": 2, "totalMinutes": 2, "hourlyRate": 2, "overtimeRate": 2, "grossAmount": 2, "notes": "demo-notes-2", "sourceTimeRecordIds": "demo-sourceTimeRecordIds-2" } as any);
+  // PeopleAnalyzerScore has multiple initialization commands (rate, withdraw); using the selected initialization command: rate.
+  // PeopleAnalyzerScore → api.mutations.PeopleAnalyzerScore_createViaRate
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PeopleAnalyzerScore_createViaRate, { "personId": "personId-people-analyzer-score-1", "subject": "demo-subject-1", "score": "demo-score-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.PeopleAnalyzerScore_createViaRate, { "personId": "personId-people-analyzer-score-2", "subject": "demo-subject-2", "score": "demo-score-2" } as any);
   // PerformanceReview → api.mutations.PerformanceReview_createViaRecord
   rowsAttempted += 1;
   await client.mutation(api.mutations.PerformanceReview_createViaRecord, { "personId": "personId-performance-review-1", "reviewerId": "reviewerId-performance-review-1", "eventId": "eventId-performance-review-1", "reviewDate": 1767268800000, "reliabilityRating": 1, "qualityRating": 1, "teamworkRating": 1, "notes": "demo-notes-1", "scorecardId": "scorecardId-performance-review-1", "strengths": "demo-strengths-1", "opportunities": "demo-opportunities-1", "comments": "demo-comments-1", "followUp": "demo-followUp-1", "followUpDue": 1767268800000 } as any);
@@ -998,6 +1033,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.VenueVendorRelationship_createViaEstablish, { "venueId": "venueId-venue-vendor-relationship-1", "vendorId": "vendorId-venue-vendor-relationship-1", "category": "demo-category-1", "status": "demo-status-1", "effectiveFrom": 1767268800000, "effectiveUntil": 1767268800000, "primaryContactId": "primaryContactId-venue-vendor-relationship-1", "insuranceCertificate": "demo-insuranceCertificate-1", "insuranceExpiry": 1767268800000, "complianceNotes": "demo-complianceNotes-1", "discountPercent": 1, "paymentTerms": "demo-paymentTerms-1", "minimumOrder": 1, "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.VenueVendorRelationship_createViaEstablish, { "venueId": "venueId-venue-vendor-relationship-2", "vendorId": "vendorId-venue-vendor-relationship-2", "category": "demo-category-2", "status": "demo-status-2", "effectiveFrom": 1767355200000, "effectiveUntil": 1767355200000, "primaryContactId": "primaryContactId-venue-vendor-relationship-2", "insuranceCertificate": "demo-insuranceCertificate-2", "insuranceExpiry": 1767355200000, "complianceNotes": "demo-complianceNotes-2", "discountPercent": 2, "paymentTerms": "demo-paymentTerms-2", "minimumOrder": 2, "notes": "demo-notes-2" } as any);
+  // VisionItem has multiple initialization commands (add, markDone, remove); using the selected initialization command: add.
+  // VisionItem → api.mutations.VisionItem_createViaAdd
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.VisionItem_createViaAdd, { "section": "demo-section-1", "text": "demo-text-1", "detail": "demo-detail-1", "sortOrder": 1 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.VisionItem_createViaAdd, { "section": "demo-section-2", "text": "demo-text-2", "detail": "demo-detail-2", "sortOrder": 2 } as any);
   // WasteRecord → api.mutations.WasteRecord_createViaRecord
   rowsAttempted += 1;
   await client.mutation(api.mutations.WasteRecord_createViaRecord, { "ingredientId": "ingredientId-waste-record-1", "locationId": "locationId-waste-record-1", "eventId": "eventId-waste-record-1", "inventoryItemId": "inventoryItemId-waste-record-1", "quantity": 1, "unit": "demo-unit-1", "reason": "demo-reason-1", "unitCost": 1, "notes": "demo-notes-1" } as any);
@@ -1021,6 +1062,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
   "packId": "capsule",
   "version": "1.0.0",
   "entities": [
+    {
+      "entity": "AccountabilitySeat",
+      "createMutation": "AccountabilitySeat_createViaPlace",
+      "rowCount": 2
+    },
     {
       "entity": "Announcement",
       "createMutation": "Announcement_createViaPost",
@@ -1097,6 +1143,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "CompanyVision",
+      "createMutation": "CompanyVision_createViaWrite",
+      "rowCount": 2
+    },
+    {
       "entity": "Component",
       "createMutation": "Component_createViaDraft",
       "rowCount": 2
@@ -1147,6 +1198,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "CoreProcess",
+      "createMutation": "CoreProcess_createViaStart",
+      "rowCount": 2
+    },
+    {
       "entity": "CorrectiveAction",
       "createMutation": "CorrectiveAction_createViaOpen",
       "rowCount": 2
@@ -1174,6 +1230,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "DeckShareLink",
       "createMutation": "DeckShareLink_create",
+      "rowCount": 2
+    },
+    {
+      "entity": "DelegateElevateItem",
+      "createMutation": "DelegateElevateItem_createViaAdd",
       "rowCount": 2
     },
     {
@@ -1542,6 +1603,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "OrganizationalCheckup",
+      "createMutation": "OrganizationalCheckup_createViaTake",
+      "rowCount": 2
+    },
+    {
       "entity": "OrganizationCapabilitySetting",
       "createMutation": "OrganizationCapabilitySetting_createViaRegister",
       "rowCount": 2
@@ -1609,6 +1675,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "PayrollInput",
       "createMutation": "PayrollInput_createViaPrepare",
+      "rowCount": 2
+    },
+    {
+      "entity": "PeopleAnalyzerScore",
+      "createMutation": "PeopleAnalyzerScore_createViaRate",
       "rowCount": 2
     },
     {
@@ -2034,6 +2105,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "VenueVendorRelationship",
       "createMutation": "VenueVendorRelationship_createViaEstablish",
+      "rowCount": 2
+    },
+    {
+      "entity": "VisionItem",
+      "createMutation": "VisionItem_createViaAdd",
       "rowCount": 2
     },
     {

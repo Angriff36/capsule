@@ -249,6 +249,31 @@ const TimsKPIsDashboardPage = lazy(() =>
     default: module.TimsKPIsDashboardPage,
   })),
 );
+const EosOverviewPage = lazy(() =>
+  import("../features/eos/EosOverviewPage").then((module) => ({
+    default: module.EosOverviewPage,
+  })),
+);
+const VisionTractionPage = lazy(() =>
+  import("../features/eos/VisionTractionPage").then((module) => ({
+    default: module.VisionTractionPage,
+  })),
+);
+const EosPeoplePage = lazy(() =>
+  import("../features/eos/PeoplePage").then((module) => ({
+    default: module.PeoplePage,
+  })),
+);
+const CoreProcessesPage = lazy(() =>
+  import("../features/eos/CoreProcessesPage").then((module) => ({
+    default: module.CoreProcessesPage,
+  })),
+);
+const EosTabs = lazy(() =>
+  import("../features/eos/EosShared").then((module) => ({
+    default: module.EosTabs,
+  })),
+);
 const L10DashboardPage = lazy(() =>
   import("../features/reports/L10DashboardPage").then((module) => ({
     default: module.L10DashboardPage,
@@ -1107,13 +1132,46 @@ export function App() {
             />
             <Route
               path="/reports/scorecard"
-              element={<MovedRoute to="/reports/l10" hash="scorecard" />}
+              element={<MovedRoute to="/eos/l10" hash="scorecard" />}
             />
+            <Route path="/reports/l10" element={<MovedRoute to="/eos/l10" />} />
             <Route
-              path="/reports/l10"
+              path="/eos"
               element={
                 <SupplyRoute>
-                  <ReportsWorkspaceNav />
+                  <EosOverviewPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/eos/vision"
+              element={
+                <SupplyRoute>
+                  <VisionTractionPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/eos/people"
+              element={
+                <SupplyRoute>
+                  <EosPeoplePage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/eos/process"
+              element={
+                <SupplyRoute>
+                  <CoreProcessesPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/eos/l10"
+              element={
+                <SupplyRoute>
+                  <EosTabs />
                   <L10DashboardPage />
                 </SupplyRoute>
               }

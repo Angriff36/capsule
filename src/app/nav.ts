@@ -5,6 +5,7 @@ import {
   CalendarIcon,
   ChartIcon,
   CoinsIcon,
+  CompassIcon,
   ContactIcon,
   FileTextIcon,
   FlameIcon,
@@ -83,6 +84,12 @@ export const NAV_AREAS: NavArea[] = [
     label: "Reports",
     group: "Business",
     icon: ChartIcon,
+  },
+  {
+    path: "/eos",
+    label: "EOS",
+    group: "Business",
+    icon: CompassIcon,
   },
   {
     path: "/facilities",
