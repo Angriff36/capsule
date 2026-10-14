@@ -188,24 +188,26 @@
 }
 
 @layer components {
+  /* Buttons after the ui-layouts outline buttons (owner, 2026-10-14: the
+     uppercase pills were "ugly as shit"): sentence case, normal tracking,
+     8px corners, a hairline border and a soft shadow. Phones keep 40px. */
   .btn {
-    @apply inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full border px-5 py-1 text-center text-base leading-tight font-semibold tracking-[0.06em] uppercase transition-all duration-150 select-none disabled:cursor-not-allowed disabled:opacity-45;
+    @apply inline-flex min-h-10 cursor-pointer items-center justify-center gap-1.5 rounded-md border px-3.5 py-1 text-center text-sm leading-tight font-semibold shadow-[0_1px_2px_rgb(15_15_17/0.06)] transition-colors duration-150 select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-45 md:min-h-9;
   }
   .btn-primary {
-    @apply border-brand bg-brand text-white hover:-translate-y-px hover:bg-ink;
-    box-shadow: 0 8px 18px -12px rgb(36 50 45 / 0.65);
+    @apply border-brand bg-brand text-on-brand hover:border-accent-deep hover:bg-accent-deep;
   }
   .btn-ghost {
-    @apply border-line-2 bg-panel text-ink hover:border-brand/50 hover:bg-inset;
+    @apply border-line bg-panel text-ink hover:border-line-2 hover:bg-inset;
   }
   .btn-secondary {
-    @apply border-brand/40 bg-panel text-brand hover:border-brand hover:bg-brand-soft;
+    @apply border-line bg-panel text-brand hover:border-brand/40 hover:bg-brand-soft;
   }
   .btn-danger {
-    @apply border-danger/40 bg-panel text-danger hover:bg-danger-soft;
+    @apply border-line bg-panel text-danger hover:border-danger/40 hover:bg-danger-soft;
   }
   .btn-sm {
-    @apply min-h-8 px-3.5 text-sm;
+    @apply min-h-8 px-3 text-sm;
   }
   /* Every file picker gets the small ghost button look. The browser's own
      grey "Choose File" box read as plain text on a phone, on every import. */
