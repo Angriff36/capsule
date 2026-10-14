@@ -227,6 +227,23 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Put a different driver on this run, or (omitted) leave it without one.
+  // The rig keeps its riders and its load.
+  command changeDriver(optional driverId: uuid) {
+    guard self.assignedAt != null
+    guard self.releasedAt == null
+    guard self.deletedAt == null
+    mutate driverId = driverId
+    emit EventVehicleAssigned {
+      eventVehicleAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      vehicleId: self.vehicleId
+      trailerId: self.trailerId
+      driverId: driverId
+    }
+  }
+
   // Take the rig off the event. The row stays as history.
   command release() {
     guard self.assignedAt != null

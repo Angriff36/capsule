@@ -1395,6 +1395,8 @@ export const EventAssignmentSchema = z.object({
   followsEventTiming: z.boolean().nullable().optional(),
   rideVehicleAssignmentId: z.string().uuid().nullable().optional(),
   meetsAtVenue: z.boolean().nullable().optional(),
+  planX: z.number().int().nullable().optional(),
+  planY: z.number().int().nullable().optional(),
   notes: z.string().nullable().optional(),
   status: z.enum(["assigned", "confirmed", "checked_in", "checked_out", "no_show", "unassigned"]).default("assigned"),
   assignedAt: z.coerce.date().nullable().optional(),
@@ -1631,6 +1633,10 @@ export const EventLayoutSectionSchema = z.object({
   addedAt: z.coerce.date().nullable().optional(),
   sourceTemplateId: z.string().uuid().nullable().optional(),
   sourceTemplateVersion: z.number().int().nullable().optional(),
+  planX: z.number().int().nullable().optional(),
+  planY: z.number().int().nullable().optional(),
+  planWidth: z.number().int().nullable().optional(),
+  planHeight: z.number().int().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -7929,6 +7935,14 @@ export const EventAssignmentMarkNoShowParamsSchema = z.object({});
 
 export type EventAssignmentMarkNoShowParams = z.infer<typeof EventAssignmentMarkNoShowParamsSchema>;
 
+// Command: pinOnPlan on EventAssignment
+export const EventAssignmentPinOnPlanParamsSchema = z.object({
+  planX: z.number().optional(),
+  planY: z.number().optional(),
+});
+
+export type EventAssignmentPinOnPlanParams = z.infer<typeof EventAssignmentPinOnPlanParamsSchema>;
+
 // Command: planTiming on EventAssignment
 export const EventAssignmentPlanTimingParamsSchema = z.object({
   startsAt: z.coerce.date().optional(),
@@ -8319,10 +8333,25 @@ export const EventLayoutSectionAddParamsSchema = z.object({
 
 export type EventLayoutSectionAddParams = z.infer<typeof EventLayoutSectionAddParamsSchema>;
 
+// Command: placeOnPlan on EventLayoutSection
+export const EventLayoutSectionPlaceOnPlanParamsSchema = z.object({
+  planX: z.number(),
+  planY: z.number(),
+  planWidth: z.number(),
+  planHeight: z.number(),
+});
+
+export type EventLayoutSectionPlaceOnPlanParams = z.infer<typeof EventLayoutSectionPlaceOnPlanParamsSchema>;
+
 // Command: remove on EventLayoutSection
 export const EventLayoutSectionRemoveParamsSchema = z.object({});
 
 export type EventLayoutSectionRemoveParams = z.infer<typeof EventLayoutSectionRemoveParamsSchema>;
+
+// Command: takeOffPlan on EventLayoutSection
+export const EventLayoutSectionTakeOffPlanParamsSchema = z.object({});
+
+export type EventLayoutSectionTakeOffPlanParams = z.infer<typeof EventLayoutSectionTakeOffPlanParamsSchema>;
 
 // Command: update on EventLayoutSection
 export const EventLayoutSectionUpdateParamsSchema = z.object({
@@ -8670,6 +8699,13 @@ export const EventVehicleAssignmentAttachTrailerParamsSchema = z.object({
 });
 
 export type EventVehicleAssignmentAttachTrailerParams = z.infer<typeof EventVehicleAssignmentAttachTrailerParamsSchema>;
+
+// Command: changeDriver on EventVehicleAssignment
+export const EventVehicleAssignmentChangeDriverParamsSchema = z.object({
+  driverId: z.string().min(1).optional(),
+});
+
+export type EventVehicleAssignmentChangeDriverParams = z.infer<typeof EventVehicleAssignmentChangeDriverParamsSchema>;
 
 // Command: clearPreloaded on EventVehicleAssignment
 export const EventVehicleAssignmentClearPreloadedParamsSchema = z.object({});

@@ -2957,7 +2957,7 @@
       "path": "EventGuest.entreeEventDishId",
       "category": "property-added",
       "acknowledgedAt": "2026-10-05",
-      "reason": "Plated entrée pick (event-menu line): optional; existing guests stay valid with none."
+      "reason": "Plated entr\u00e9e pick (event-menu line): optional; existing guests stay valid with none."
     },
     {
       "path": "EventGuest.seatNumber",
@@ -3558,6 +3558,42 @@
       "category": "command-parameter-added",
       "acknowledgedAt": "2026-10-13",
       "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "EventAssignment.planX",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-14",
+      "reason": "Production board floor plan: optional (nullable) position on the plan; unset = not placed. Existing rows stay valid; the checker reads nullable fields as required."
+    },
+    {
+      "path": "EventAssignment.planY",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-14",
+      "reason": "Production board floor plan: optional (nullable) position on the plan; unset = not placed. Existing rows stay valid; the checker reads nullable fields as required."
+    },
+    {
+      "path": "EventLayoutSection.planX",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-14",
+      "reason": "Production board floor plan: optional (nullable) position on the plan; unset = not placed. Existing rows stay valid; the checker reads nullable fields as required."
+    },
+    {
+      "path": "EventLayoutSection.planY",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-14",
+      "reason": "Production board floor plan: optional (nullable) position on the plan; unset = not placed. Existing rows stay valid; the checker reads nullable fields as required."
+    },
+    {
+      "path": "EventLayoutSection.planWidth",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-14",
+      "reason": "Production board floor plan: optional (nullable) position on the plan; unset = not placed. Existing rows stay valid; the checker reads nullable fields as required."
+    },
+    {
+      "path": "EventLayoutSection.planHeight",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-14",
+      "reason": "Production board floor plan: optional (nullable) position on the plan; unset = not placed. Existing rows stay valid; the checker reads nullable fields as required."
     }
   ]
 }

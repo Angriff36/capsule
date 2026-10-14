@@ -226,6 +226,7 @@ import {
   EventAssignmentConfirmParamsSchema,
   EventAssignmentDeclineParamsSchema,
   EventAssignmentMarkNoShowParamsSchema,
+  EventAssignmentPinOnPlanParamsSchema,
   EventAssignmentPlanTimingParamsSchema,
   EventAssignmentUnassignParamsSchema,
   EventBeginExecutionParamsSchema,
@@ -288,7 +289,9 @@ import {
   EventIngredientContributionReviseParamsSchema,
   EventIngredientContributionSupersedeParamsSchema,
   EventLayoutSectionAddParamsSchema,
+  EventLayoutSectionPlaceOnPlanParamsSchema,
   EventLayoutSectionRemoveParamsSchema,
+  EventLayoutSectionTakeOffPlanParamsSchema,
   EventLayoutSectionUpdateParamsSchema,
   EventLinkExternalChannelParamsSchema,
   EventLockForSalesParamsSchema,
@@ -351,6 +354,7 @@ import {
   EventUseCompanyTimingRuleParamsSchema,
   EventVehicleAssignmentAssignParamsSchema,
   EventVehicleAssignmentAttachTrailerParamsSchema,
+  EventVehicleAssignmentChangeDriverParamsSchema,
   EventVehicleAssignmentClearPreloadedParamsSchema,
   EventVehicleAssignmentMarkPreloadedParamsSchema,
   EventVehicleAssignmentPlanLegParamsSchema,
@@ -4747,6 +4751,16 @@ export function useEventAssignmentMarkNoShow() {
   };
 }
 
+/** Mutation hook for EventAssignment.pinOnPlan. */
+export function useEventAssignmentPinOnPlan() {
+  const mutate = useMutation(api.mutations.EventAssignment_pinOnPlan);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventAssignmentPinOnPlanParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for EventAssignment.planTiming. */
 export function useEventAssignmentPlanTiming() {
   const mutate = useMutation(api.mutations.EventAssignment_planTiming);
@@ -5355,12 +5369,32 @@ export function useEventLayoutSectionAdd() {
   };
 }
 
+/** Mutation hook for EventLayoutSection.placeOnPlan. */
+export function useEventLayoutSectionPlaceOnPlan() {
+  const mutate = useMutation(api.mutations.EventLayoutSection_placeOnPlan);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventLayoutSectionPlaceOnPlanParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for EventLayoutSection.remove. */
 export function useEventLayoutSectionRemove() {
   const mutate = useMutation(api.mutations.EventLayoutSection_remove);
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventLayoutSectionRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventLayoutSection.takeOffPlan. */
+export function useEventLayoutSectionTakeOffPlan() {
+  const mutate = useMutation(api.mutations.EventLayoutSection_takeOffPlan);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventLayoutSectionTakeOffPlanParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -5938,6 +5972,16 @@ export function useEventVehicleAssignmentAttachTrailer() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventVehicleAssignmentAttachTrailerParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventVehicleAssignment.changeDriver. */
+export function useEventVehicleAssignmentChangeDriver() {
+  const mutate = useMutation(api.mutations.EventVehicleAssignment_changeDriver);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventVehicleAssignmentChangeDriverParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -15564,4 +15608,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1644 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1648 as const;

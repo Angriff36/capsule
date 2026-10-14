@@ -10,13 +10,8 @@ import { EosPanel } from "../../eos/EosShared";
 import { buildBoard } from "../../eventDay/BattleBoardPage";
 import { eventDetailPath } from "../eventRoutes";
 import { boardStats, untilText } from "./productionBoardModel";
-import {
-  CrewColumn,
-  RunsAndEquipment,
-  TasksColumn,
-  TimelinePanel,
-  VenueAndFood,
-} from "./ProductionBoardSections";
+import { TimelinePanel } from "./ProductionBoardSections";
+import { ProductionBoardViews } from "./ProductionBoardViews";
 import "./productionBoard.css";
 
 const DAY_MS = 86_400_000;
@@ -171,13 +166,12 @@ export function ProductionBoardPage() {
 
           <TimelinePanel briefing={briefing} board={board} now={now} />
 
-          <div className="pb-grid">
-            <CrewColumn board={board} />
-            <VenueAndFood briefing={briefing} board={board} />
-            <TasksColumn board={board} stats={stats} />
-          </div>
-
-          <RunsAndEquipment briefing={briefing} board={board} />
+          <ProductionBoardViews
+            eventId={board.event._id}
+            briefing={briefing}
+            board={board}
+            stats={stats}
+          />
         </div>
       ) : null}
     </div>
