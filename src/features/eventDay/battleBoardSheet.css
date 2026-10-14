@@ -255,6 +255,27 @@
   color: var(--bbs-blue);
 }
 
+.bbs-contact,
+.bbs-allergens {
+  margin: 0.3rem 0;
+}
+.bbs-allergens {
+  color: var(--bbs-orange);
+}
+.bbs-readiness {
+  margin-top: 0.9rem;
+  border-left: 4px solid var(--bbs-orange);
+  padding: 0.3rem 0.6rem;
+  background: #fbefe5;
+  font-size: 0.72rem;
+}
+.bbs-readiness[data-ready] {
+  border-left-color: var(--bbs-green);
+  background: #e9f1e6;
+}
+.bbs-section .bbs-table + .bbs-table {
+  margin-top: 0.6rem;
+}
 .bbs-hint {
   margin-top: 0.4rem;
   color: var(--bbs-orange);

@@ -18,6 +18,7 @@ import { BattleBoardSheet } from "./BattleBoardSheet";
 import { useTenantBranding } from "../admin/tenantBranding";
 import type { Id } from "../../lib/api";
 import { useEventTimingPlan } from "../../lib/operational-transactions";
+import { useFinalLock } from "../../lib/eventPacket/useFinalLock";
 import "./EventDay.css";
 import { EventDayNav } from "./EventDayNav";
 
@@ -194,6 +195,7 @@ export function BattleBoardPage() {
   const briefing = useEventDayBriefing(id);
   const { branding } = useTenantBranding();
   const plan = useEventTimingPlan(id ? (id as Id<"events">) : null);
+  const { report: finalLock } = useFinalLock((id ?? "") as Id<"events">);
   const board = useMemo(
     () => (briefing ? buildBoard(briefing) : null),
     [briefing],
@@ -250,6 +252,7 @@ export function BattleBoardPage() {
             briefing={briefing}
             board={board}
             companyName={branding.displayName || "Mangia Catering Co."}
+            finalLock={finalLock?.answers}
             timing={
               (plan as { event?: Record<string, unknown> } | null | undefined)
                 ?.event ?? null

@@ -279,6 +279,7 @@ export const getBriefing = query({
       deliveries,
       packLists,
       rentalLines,
+      rigRows,
     ] = await Promise.all([
       byEvent(ctx, "eventAssignments", tenantId, id),
       byEvent(ctx, "eventStaffNeeds", tenantId, id),
@@ -289,6 +290,7 @@ export const getBriefing = query({
       byEvent(ctx, "deliveries", tenantId, id),
       byEvent(ctx, "packLists", tenantId, id),
       byEvent(ctx, "rentalOrderLines", tenantId, id),
+      byEvent(ctx, "eventVehicleAssignments", tenantId, id),
     ]);
 
     const canCall = mayCallContacts(auth, assignments, deliveries);
@@ -439,6 +441,8 @@ export const getBriefing = query({
       if (row.personId != null) personIds.add(String(row.personId));
     for (const row of deliveries as any[])
       if (row.driverId != null) personIds.add(String(row.driverId));
+    for (const row of rigRows as any[])
+      if (row.driverId != null) personIds.add(String(row.driverId));
     for (const row of activities as any[])
       for (const pid of row.assigneePersonIds ?? [])
         if (pid != null) personIds.add(String(pid));
@@ -501,9 +505,42 @@ export const getBriefing = query({
         }),
     );
 
+    // The trucks on the event now (Event Tracker rigs), with who rides and
+    // how many pack lines are loaded on each.
+    const rigs = await Promise.all(
+      (rigRows as any[])
+        .filter((row) => row.activeEventId != null && row.releasedAt == null)
+        .map(async (row) => {
+          const vehicle: any = row.vehicleId
+            ? await tenantDoc(ctx, tenantId, row.vehicleId)
+            : null;
+          const trailer: any = row.trailerId
+            ? await tenantDoc(ctx, tenantId, row.trailerId)
+            : null;
+          const name = (doc: any) =>
+            doc ? `${doc.make ?? ""} ${doc.model ?? ""}`.trim() || null : null;
+          return {
+            _id: row._id,
+            vehicleName: name(vehicle) ?? row.vendorName ?? null,
+            trailerName: name(trailer),
+            driverId: row.driverId ?? null,
+            loadingZone: row.loadingZone ?? null,
+            preloadedAt: row.preloadedAt ?? null,
+            riderCount: (assignments as any[]).filter(
+              (crew) =>
+                String(crew.rideVehicleAssignmentId) === String(row._id),
+            ).length,
+            loadedLineCount: (packListItems as any[]).filter(
+              (line) => String(line.loadAssignmentId) === String(row._id),
+            ).length,
+          };
+        }),
+    );
+
     return {
       packetReadiness,
       rentals,
+      rigs,
       event: {
         _id: event._id,
         deletedAt: event.deletedAt ?? null,
@@ -533,6 +570,7 @@ export const getBriefing = query({
         waterOnsite: event.waterOnsite ?? null,
         buffetColdPlates: event.buffetColdPlates ?? null,
         buffetHotPlates: event.buffetHotPlates ?? null,
+        eventNumber: event.eventNumber ?? null,
         // The BEO's overview and its labelled setup prose (imports write
         // "Operations: …", "Service setup: …", "Kitchen: …" lines), and the
         // Final Lock kit answers: the battle board prints them.

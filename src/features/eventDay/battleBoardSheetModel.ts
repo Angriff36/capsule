@@ -144,3 +144,49 @@ export function courseTitle(course: string): string {
   const text = course.replaceAll("_", " ").trim();
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
+
+/** The day-sheet fields and the labels a printed battle board uses for them. */
+const SCOPE_LABELS: ReadonlyArray<readonly [string, string]> = [
+  ["Bar service", "barService"],
+  ["Cocktail hour food", "cocktailHourFood"],
+  ["Dessert", "dessertService"],
+  ["Bussing", "bussing"],
+  ["Place settings", "placeSettings"],
+  ["Passed apps", "passedApps"],
+  ["Stationary apps", "stationaryApps"],
+  ["Beverages on menu", "beveragesOnMenu"],
+  ["Tableside water", "tablesideWater"],
+  ["Mangia disposables", "mangiaDisposables"],
+  ["Our disposables", "mangiaDisposables"],
+  ["Event rentals", "eventRentals"],
+  ["Scullery", "scullery"],
+  ["Power onsite", "powerOnsite"],
+  ["Water onsite", "waterOnsite"],
+];
+
+/**
+ * An imported battle board keeps its responsibilities chart as one line of
+ * text ("Bar service THIRD PARTY | Cocktail hour food MANGIA | ..."). Read it
+ * back into the day-sheet fields, and return the text without those parts.
+ */
+export function readScopeText(text: string): {
+  answers: Record<string, string>;
+  rest: string;
+} {
+  const answers: Record<string, string> = {};
+  const kept: string[] = [];
+  for (const line of text.split(/\r?\n/)) {
+    const parts = line.split("|").map((part) => part.trim());
+    const left: string[] = [];
+    for (const part of parts) {
+      const hit = SCOPE_LABELS.find(([label]) =>
+        part.toLowerCase().startsWith(label.toLowerCase()),
+      );
+      const value = hit ? part.slice(hit[0].length).trim() : "";
+      if (hit && value) answers[hit[1]] ??= value;
+      else if (part) left.push(part);
+    }
+    if (left.length) kept.push(left.join(" | "));
+  }
+  return { answers, rest: kept.join("\n") };
+}

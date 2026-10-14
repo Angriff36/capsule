@@ -4,12 +4,17 @@ import type { EventDayBriefing } from "../../lib/eventDayBriefing";
 import { eventTimingWindows } from "../../lib/eventTimingMilestones";
 import { formatTime } from "../../lib/format";
 import { displayEventMenuNotes } from "../events/eventMenuLineFields";
+import type {
+  FinalLockAnswer,
+  FinalLockValue,
+} from "../../lib/eventPacket/finalLock/types";
 import type { buildBoard } from "./BattleBoardPage";
 import {
   boardDate,
   courseTitle,
   plates,
   readAnswer,
+  readScopeText,
   splitOperational,
   splitRole,
   splitService,
@@ -65,14 +70,58 @@ export function BattleBoardSheet({
   board,
   companyName,
   timing,
+  finalLock,
 }: {
   briefing: EventDayBriefing;
   board: Board;
   companyName: string;
   /** The event's computed crew plan times (staff on, depart shop, ...). */
   timing?: Record<string, unknown> | null;
+  /** The event's Final Lock answers: defaults where the day sheet is blank. */
+  finalLock?: readonly FinalLockAnswer[];
 }) {
-  const { event } = board;
+  const lockText = (key: string) => {
+    const answer = finalLock?.find(
+      (row) => row.questionKey === key && row.result === "answered",
+    );
+    return answer ? finalLockText(answer.value) : "";
+  };
+  // An imported board's chart, kept as one line in the event's notes.
+  const opsText = splitOperational(board.event.operationalRequirements);
+  const imported = readScopeText(`${opsText.also}\n${opsText.other}`);
+  // A blank day-sheet answer takes the imported chart, then Final Lock.
+  const event = {
+    ...board.event,
+    ...Object.fromEntries(
+      Object.entries(imported.answers).filter(
+        ([key]) => !(board.event as unknown as Record<string, unknown>)[key],
+      ),
+    ),
+    barService:
+      board.event.barService ||
+      imported.answers.barService ||
+      lockText("beverage.bar") ||
+      null,
+    dessertService:
+      board.event.dessertService ||
+      imported.answers.dessertService ||
+      lockText("dessert.plan") ||
+      null,
+    bussing:
+      board.event.bussing ||
+      imported.answers.bussing ||
+      lockText("bussing.plan") ||
+      null,
+    tablesideWater:
+      board.event.tablesideWater ||
+      imported.answers.tablesideWater ||
+      lockText("room.water_goblets") ||
+      null,
+    buffetHotPlates:
+      board.event.buffetHotPlates ||
+      (board.event.buffetColdPlates ? null : lockText("buffet.arrangement")) ||
+      null,
+  };
   const ops = splitOperational(event.operationalRequirements);
   const service = splitService(event.serviceRequirements);
   // No BEO overview: say what the event is from its own facts.
@@ -180,15 +229,45 @@ export function BattleBoardSheet({
         .join("\n"),
     ],
     ["Equipment & Rentals", ops.rentals],
-    [
-      "Additional Tasks / Responsibilities",
-      [ops.also, ops.other].filter(Boolean).join("\n"),
-    ],
+    ["Additional Tasks / Responsibilities", imported.rest],
   ];
 
   // Crew-plan steps ("Staff on / Load at shop", "Depart shop" ...) carry no
   // time of their own; the event's plan works them out.
   const planned = eventTimingWindows(timing ?? {});
+  const personName = (id: string | null) => {
+    const person = id ? board.people.get(id) : undefined;
+    return [person?.givenName, person?.familyName].filter(Boolean).join(" ");
+  };
+  const trucks = briefing.rigs ?? [];
+  const packs = board.packLists.map((list) => {
+    const lines = briefing.packListItems.filter(
+      (item) => item.packListId === list._id && item.deletedAt == null,
+    );
+    return {
+      id: list._id,
+      name: list.name || "Pack list",
+      status: list.status,
+      total: lines.length,
+      packed: lines.filter((item) => String(item.status) === "packed").length,
+    };
+  });
+  // The event packet's check of the documents against the event.
+  const packet = briefing.packetReadiness;
+  const readiness = packet
+    ? packet.ready
+      ? { ready: true, text: "Event packet: ready, every check signed off." }
+      : {
+          ready: false,
+          text: `Event packet: ${packet.requiredOpenIssueCount} open checks — ${packet.sections
+            .filter((row) => row.openIssueCount > 0)
+            .map(
+              (row) =>
+                `${words(row.section).toLowerCase()} ${row.openIssueCount}`,
+            )
+            .join(", ")}.`,
+        }
+    : null;
   const timeline = board.timeline.map((row) => {
     if (row.startsAt != null) return row;
     const milestone = planned.find((entry) =>
@@ -224,7 +303,11 @@ export function BattleBoardSheet({
     <article className="bbs">
       <header className="bbs-title">
         <strong>{companyName} — FOH Battle Board</strong>
-        <span> · {event.title ?? "Event"}</span>
+        <span>
+          {" "}
+          · {event.title ?? "Event"}
+          {event.eventNumber ? ` · #${event.eventNumber}` : ""}
+        </span>
       </header>
       <dl className="bbs-facts">
         <Fact label="Event">{event.title ?? "—"}</Fact>
@@ -238,6 +321,13 @@ export function BattleBoardSheet({
           {event.serviceStyleName ?? event.eventType ?? "—"}
         </Fact>
       </dl>
+      {event.primaryContactName ? (
+        <p className="bbs-contact">
+          <b>Client contact:</b> {event.primaryContactName}
+          {event.primaryContactPhone ? ` · ${event.primaryContactPhone}` : ""}
+          {event.primaryContactEmail ? ` · ${event.primaryContactEmail}` : ""}
+        </p>
+      ) : null}
       {summary.length > 1 ? <p className="bbs-summary">{summary}</p> : null}
 
       {layoutLines.some(([, text]) => text) ? (
@@ -274,7 +364,12 @@ export function BattleBoardSheet({
                   const note = displayEventMenuNotes(row.specialInstructions);
                   return (
                     <div key={row._id} className="bbs-menu-row">
-                      <span>{dishName(row.dishId)}</span>
+                      <span>
+                        {dishName(row.dishId)}
+                        {row.quantityServings != null
+                          ? ` ×${row.quantityServings}`
+                          : ""}
+                      </span>
                       {note ? <em>{note}</em> : null}
                     </div>
                   );
@@ -282,6 +377,12 @@ export function BattleBoardSheet({
               </div>
             ))}
           </div>
+          {board.menuAllergens.length ? (
+            <p className="bbs-allergens">
+              <b>Menu contains:</b>{" "}
+              {board.menuAllergens.map((row) => row.label).join(" · ")}
+            </p>
+          ) : null}
         </Section>
       ) : null}
 
@@ -425,6 +526,89 @@ export function BattleBoardSheet({
         </Section>
       ) : null}
 
+      {trucks.length || board.deliveries.length || packs.length ? (
+        <Section title="Trucks, Deliveries & Packing">
+          {trucks.length ? (
+            <table className="bbs-table">
+              <thead>
+                <tr>
+                  <th>Truck</th>
+                  <th>Trailer</th>
+                  <th>Driver</th>
+                  <th>Riders</th>
+                  <th>Loaded</th>
+                  <th>Loads at</th>
+                </tr>
+              </thead>
+              <tbody>
+                {trucks.map((rig) => (
+                  <tr key={rig._id}>
+                    <td className="bbs-task">{rig.vehicleName ?? "Truck"}</td>
+                    <td>{rig.trailerName ?? "—"}</td>
+                    <td>{personName(rig.driverId) || "Not set"}</td>
+                    <td>{rig.riderCount}</td>
+                    <td>
+                      {rig.loadedLineCount} lines
+                      {rig.preloadedAt ? " · loaded" : ""}
+                    </td>
+                    <td>{rig.loadingZone ?? ""}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : null}
+          {board.deliveries.length ? (
+            <table className="bbs-table">
+              <thead>
+                <tr>
+                  <th>Delivery window</th>
+                  <th>Destination</th>
+                  <th>Driver</th>
+                  <th>Vehicle</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {board.deliveries.map((row) => (
+                  <tr key={row._id}>
+                    <td className="bbs-time">
+                      {shift(row.windowStartsAt, row.windowEndsAt)}
+                    </td>
+                    <td>{row.destination ?? ""}</td>
+                    <td>{personName(row.driverId) || "Not set"}</td>
+                    <td>
+                      {[
+                        briefing.vehicles.find(
+                          (item) => item._id === row.vehicleId,
+                        )?.make,
+                        briefing.vehicles.find(
+                          (item) => item._id === row.vehicleId,
+                        )?.model,
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    </td>
+                    <td>{words(row.status)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : null}
+          {packs.map((pack) => (
+            <p key={pack.id} className="bbs-para">
+              <b>{pack.name}:</b> {words(pack.status)} · {pack.packed} of{" "}
+              {pack.total} lines packed
+            </p>
+          ))}
+        </Section>
+      ) : null}
+
+      {readiness ? (
+        <p className="bbs-readiness" data-ready={readiness.ready || undefined}>
+          {readiness.text}
+        </p>
+      ) : null}
+
       {rentals.length || reference.some(([, text]) => text) ? (
         <Section title="Setup & Reference Notes">
           {rentals.length ? (
@@ -523,4 +707,26 @@ function AnswerView({ answer }: { answer: Answer }) {
       {answer.note ? <em className="bbs-note">&gt; {answer.note}</em> : null}
     </span>
   );
+}
+
+/** A Final Lock answer as the few words the board prints. */
+function finalLockText(value: FinalLockValue): string {
+  switch (value.type) {
+    case "text":
+      return value.text;
+    case "choice":
+      return value.choice;
+    case "yes_no":
+      return value.yes ? "Y" : "N";
+    case "count":
+      return String(value.count);
+    case "list":
+      return value.items.join("; ");
+    case "record":
+      return Object.values(value.fields)
+        .filter((part) => part != null && part !== "")
+        .join(" · ");
+    default:
+      return "";
+  }
 }
