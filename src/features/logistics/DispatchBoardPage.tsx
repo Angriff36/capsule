@@ -246,7 +246,7 @@ export function DispatchBoardPage() {
       <PageHeader
         eyebrow="Logistics · Dispatch"
         title="Dispatch board"
-        lead="Every event going out, soonest first, with what is still open before its trucks leave."
+        lead="Everything leaving the kitchen: the events going out, what is still open before the trucks leave, what is being packed, which vehicle goes where, and what still has to come back."
         facts={[
           { label: "Events", value: loading ? "…" : rows.length },
           { label: "Fix first", value: loading ? "…" : fixTotal },
