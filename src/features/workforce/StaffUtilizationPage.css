@@ -88,7 +88,7 @@
 .staff-utilization-switch button[aria-pressed="true"] {
   border-color: var(--utilization-green);
   background: var(--utilization-green);
-  color: white;
+  color: var(--color-panel);
 }
 
 .staff-utilization-dates {

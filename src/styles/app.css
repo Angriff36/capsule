@@ -1087,7 +1087,7 @@
     place-items: center;
     border-radius: 50%;
     background: var(--color-brand);
-    color: white;
+    color: var(--color-on-brand);
   }
   .decision-list {
     margin-top: 2rem;
@@ -2397,7 +2397,7 @@
   place-items: center;
   border-radius: 999px;
   background: var(--color-brand);
-  color: white;
+  color: var(--color-on-brand);
   font-family: var(--font-mono);
   font-size: 11px;
 }
@@ -5145,7 +5145,7 @@ div.tpp-parameter-wide {
 
 .revenue-switch button[aria-pressed="true"] {
   background: var(--color-brand);
-  color: white;
+  color: var(--color-on-brand);
   box-shadow: 0 7px 14px -10px rgb(36 50 45 / 0.8);
 }
 

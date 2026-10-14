@@ -458,7 +458,7 @@
   padding: 2px 7px;
   border-radius: var(--radius-xs);
   background: var(--color-danger);
-  color: #fff;
+  color: var(--color-panel);
   font-size: 13px;
   white-space: nowrap;
 }
@@ -848,7 +848,7 @@
 }
 .cx-cov-4 {
   background: var(--color-danger);
-  color: #fff;
+  color: var(--color-panel);
   font-weight: 700;
 }
 .cx-cov-legend {
@@ -1023,7 +1023,7 @@
 }
 .cx-prompt-actions .cx-go[data-tone="danger"] {
   background: var(--color-danger);
-  color: #fff;
+  color: var(--color-panel);
 }
 .cx-prompt-actions .cx-no {
   height: 28px;
@@ -1061,7 +1061,7 @@
 }
 .cx-toast[data-tone="danger"] {
   background: var(--color-danger);
-  color: #fff;
+  color: var(--color-panel);
 }
 .cx-toast-undo {
   margin-left: auto;

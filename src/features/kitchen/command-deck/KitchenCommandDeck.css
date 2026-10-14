@@ -87,7 +87,7 @@
 .kcd-horizon-nav button[data-active="true"] {
   background: var(--color-brand);
   border-color: var(--color-brand);
-  color: white;
+  color: var(--color-on-brand);
 }
 
 .dark .kcd-horizon-nav button[data-active="true"] {

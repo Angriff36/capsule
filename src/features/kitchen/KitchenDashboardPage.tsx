@@ -1737,7 +1737,7 @@ export function KitchenDashboardPage() {
                               aria-hidden="true"
                               className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border ${
                                 done
-                                  ? "border-ok bg-ok text-white"
+                                  ? "border-ok bg-ok text-panel"
                                   : blocked
                                     ? "border-danger text-danger"
                                     : "border-line-2 text-ink-3"

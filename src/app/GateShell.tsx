@@ -21,7 +21,7 @@ export function GateShell({
 export function CapsuleWordmark() {
   return (
     <div className="flex items-center gap-2.5">
-      <span className="grid h-6 w-6 place-items-center rounded-xs bg-accent font-mono text-sm font-bold text-white">
+      <span className="grid h-6 w-6 place-items-center rounded-xs bg-accent font-mono text-sm font-bold text-on-brand">
         C
       </span>
       <span className="text-base font-semibold tracking-[0.14em] uppercase">

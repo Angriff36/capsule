@@ -369,7 +369,7 @@
 
 .menu-profitability__price-form button {
   padding: 9px 12px;
-  color: white;
+  color: var(--color-panel);
   font-size: 10px;
   font-weight: 800;
   letter-spacing: 0.06em;

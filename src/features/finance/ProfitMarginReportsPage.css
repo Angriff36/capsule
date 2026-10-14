@@ -93,7 +93,7 @@
 .profit-switch button[aria-pressed="true"],
 .profit-view-switch button[aria-pressed="true"] {
   background: var(--profit-green);
-  color: #fff;
+  color: var(--color-panel);
 }
 
 .profit-range-stamp {
