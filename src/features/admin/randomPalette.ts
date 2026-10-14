@@ -122,7 +122,7 @@ function mode(dark: boolean, brandHue: number, tintHue: number) {
     rail,
     ink: text(dark ? 88 : 10, 7),
     "ink-2": text(dark ? 74 : 26, 4.5),
-    "ink-3": text(dark ? 60 : 42, 3),
+    "ink-3": text(dark ? 60 : 42, 4.5),
     line: surface(dark ? between(22, 26) : between(83, 87)),
     "line-2": surface(dark ? between(30, 35) : between(74, 79)),
     ok: status(STATUS.ok),
