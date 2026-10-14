@@ -28,25 +28,6 @@
   color: var(--color-ink);
 }
 
-.plan-switch {
-  display: inline-flex;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-pill);
-  background: var(--color-inset);
-  padding: 0.125rem;
-}
-.plan-switch > button {
-  min-height: 2rem;
-  padding: 0.25rem 0.875rem;
-  border-radius: var(--radius-pill);
-  font-size: var(--text-sm);
-  color: var(--color-ink-2);
-}
-.plan-switch > button[data-active] {
-  background: var(--color-brand);
-  color: var(--color-on-brand);
-}
-
 .plan-scroll {
   overflow-x: auto;
   border-top: 1.5px solid var(--color-ink);

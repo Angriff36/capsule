@@ -1,4 +1,5 @@
 import { Link, useSearchParams } from "react-router-dom";
+import { SegmentedTabs } from "../../../ui/SegmentedTabs";
 import { EventTrackerPage } from "../EventTrackerPage";
 import { eventsIndexPath } from "../eventRoutes";
 import "../../home/HomeCalendar.css";
@@ -25,29 +26,18 @@ export function EventTrackerHome() {
     viewParam === "board" ? "board" : viewParam === "plan" ? "plan" : "sheet";
 
   const switcher = (
-    <div
-      className="tracker-view-switch"
-      role="tablist"
-      aria-label="Tracker view"
-    >
-      {VIEWS.map((entry) => (
-        <button
-          key={entry.key}
-          type="button"
-          role="tab"
-          aria-selected={view === entry.key}
-          data-active={view === entry.key || undefined}
-          onClick={() => {
-            const next = new URLSearchParams(params);
-            if (entry.key === "sheet") next.delete("view");
-            else next.set("view", entry.key);
-            setParams(next, { replace: true });
-          }}
-        >
-          {entry.label}
-        </button>
-      ))}
-    </div>
+    <SegmentedTabs
+      label="Tracker view"
+      className="mb-4"
+      options={VIEWS.map((entry) => ({ value: entry.key, label: entry.label }))}
+      value={view}
+      onChange={(key) => {
+        const next = new URLSearchParams(params);
+        if (key === "sheet") next.delete("view");
+        else next.set("view", key);
+        setParams(next, { replace: true });
+      }}
+    />
   );
 
   if (view === "board") {

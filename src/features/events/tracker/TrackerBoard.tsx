@@ -13,6 +13,7 @@ import { useEventMonthRows } from "../../../lib/useEventMonthRows";
 import { useInvoicesForEvents } from "../../../lib/useEventAreaRows";
 import { useEventRecordsInRange } from "../../facilities/useEventsById";
 import { QueryLoadState } from "../../../ui/QueryLoadState";
+import { SegmentedTabs } from "../../../ui/SegmentedTabs";
 import { useSlowQuery } from "../../../ui/useSlowQuery";
 import { useActionPrompt } from "../../../ui/action-prompt";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
@@ -446,24 +447,17 @@ export function TrackerBoard() {
 
       <section className="trk-card">
         <div className="trk-bar">
-          <div
-            className="trk-tabs"
-            role="tablist"
-            aria-label="Events by status"
-          >
-            {TABS.map((key) => (
-              <button
-                key={key}
-                type="button"
-                role="tab"
-                aria-selected={tab === key}
-                onClick={() => setTab(key)}
-              >
-                {key === "all" ? "All" : STATUS_LABEL[key]}
-                <span className="trk-count">{counts[key]}</span>
-              </button>
-            ))}
-          </div>
+          <SegmentedTabs
+            label="Events by status"
+            size="sm"
+            options={TABS.map((key) => ({
+              value: key,
+              label: key === "all" ? "All" : STATUS_LABEL[key],
+              count: counts[key],
+            }))}
+            value={tab}
+            onChange={setTab}
+          />
           <div className="trk-bar-tools">
             <div className="trk-month">
               <button

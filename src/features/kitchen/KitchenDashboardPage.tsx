@@ -37,7 +37,14 @@ import { usePrepBoardRows } from "../../lib/recipeScopedQueries";
 import { setWorkingEvent, useWorkingEventId } from "../events/workingEvent";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { reportActionOk } from "../../ui/action-result";
-import { ActionMenu, TableSkeleton } from "../../ui/primitives";
+import { ChevronDownIcon } from "../../ui/icons";
+import { TableSkeleton } from "../../ui/primitives";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../ui/DropdownMenu";
 import { BulkRunFailure, runBulkItems } from "../../ui/bulk-select";
 import { displayEventMenuNotes } from "../events/eventMenuLineFields";
 import { ProductionLifecyclePolicy } from "../production/ProductionLifecyclePolicy";
@@ -1430,13 +1437,31 @@ export function KitchenDashboardPage() {
               </option>
             ))}
           </select>
-          <ActionMenu>
-            <Link to="/kitchen/plan#yield">Yield variance</Link>
-            <Link to="/kitchen">Recipes</Link>
-            <Link to="/kitchen/ingredients">Ingredients</Link>
-            <Link to="/kitchen/dishes">Dishes</Link>
-            <Link to="/kitchen/menus">Menus</Link>
-          </ActionMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button type="button" className="btn btn-ghost">
+                More
+                <ChevronDownIcon width={12} height={12} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link to="/kitchen/plan#yield">Yield variance</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/kitchen">Recipes</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/kitchen/ingredients">Ingredients</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/kitchen/dishes">Dishes</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/kitchen/menus">Menus</Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {/* Active filters read back as removable pills; nothing shows when

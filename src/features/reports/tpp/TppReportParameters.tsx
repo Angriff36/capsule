@@ -1,5 +1,6 @@
 import { useRef, type FormEvent } from "react";
 import { BoundedDateInput } from "../../../ui/BoundedDateInputs";
+import { MultiSelect } from "../../../ui/MultiSelect";
 import { useWorkingEventId } from "../../events/workingEvent";
 import { SavedLetterTextPicker } from "./SavedLetterTextPicker";
 import type { TppReportDefinition, TppReportOption } from "./types";
@@ -209,6 +210,30 @@ export function TppReportParameters({
               )
                 ? workingEventId
                 : "";
+            if (parameter.multiple) {
+              return (
+                <div key={parameter.key} className="tpp-parameter-field">
+                  <span>{parameter.label}</span>
+                  <MultiSelect
+                    // Remount once options load so the default can apply.
+                    key={values.length > 0 ? "ready" : "loading"}
+                    name={parameter.key}
+                    label={parameter.label}
+                    placeholder={`All ${parameter.label.toLowerCase()}`}
+                    defaultValue={eventDefault ? [eventDefault] : []}
+                    options={values.map((option) => ({
+                      value: "value" in option ? option.value : option.id,
+                      label: option.label,
+                    }))}
+                  />
+                  {errors[parameter.key] ? (
+                    <small className="field-error">
+                      {errors[parameter.key]}
+                    </small>
+                  ) : null}
+                </div>
+              );
+            }
             return (
               <label key={parameter.key}>
                 <span>{parameter.label}</span>
@@ -218,14 +243,7 @@ export function TppReportParameters({
                   className="input"
                   name={parameter.key}
                   required={parameter.required}
-                  multiple={parameter.multiple}
-                  defaultValue={
-                    parameter.multiple
-                      ? eventDefault
-                        ? [eventDefault]
-                        : []
-                      : eventDefault
-                  }
+                  defaultValue={eventDefault}
                 >
                   <option value="">
                     {parameter.required

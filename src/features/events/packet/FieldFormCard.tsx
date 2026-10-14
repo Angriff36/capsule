@@ -1,3 +1,4 @@
+import { FileDrop } from "../../../ui/FileDrop";
 import { useState, type ReactNode } from "react";
 import { fieldFormLateness } from "../../../lib/eventPacket/finalLock/fieldForms";
 import {
@@ -276,17 +277,18 @@ function SignForm({
           />
         </label>
         {form.evidence === "photo" && (
-          <label className="block">
-            Photo
-            <input
-              className="mt-1 block w-full"
-              type="file"
+          <div className="block">
+            <span>Photo</span>
+            <FileDrop
+              layout="row"
+              label="Take or choose a photo"
+              hint="Photos"
               accept="image/*"
               capture="environment"
               required
               onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
             />
-          </label>
+          </div>
         )}
         <button className="btn btn-primary btn-sm" disabled={busy}>
           {busy ? "Saving…" : "Sign it"}

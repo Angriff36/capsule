@@ -197,8 +197,8 @@ export function CutoverPage() {
     details?: string;
     action?: React.ReactNode;
   }) => (
-    <div className="border rounded-sm p-4 space-y-2">
-      <div className="flex items-center justify-between">
+    <div className="min-w-0 border rounded-sm p-4 space-y-2 break-words">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           {check.passed ? (
             <CheckCircle className="w-5 h-5 text-ok" />
@@ -348,7 +348,7 @@ export function CutoverPage() {
         </div>
 
         {/* Individual checks */}
-        <div className="grid gap-4">
+        <div className="grid grid-cols-1 gap-4">
           <ValidationCard
             title="Last import"
             check={validation.checks.finalDeltaImport}
@@ -387,10 +387,10 @@ export function CutoverPage() {
             }
           />
           {validation.openItems.length > 0 && (
-            <ul className="border rounded-sm p-3 text-xs space-y-1">
+            <ul className="min-w-0 border rounded-sm p-3 text-xs space-y-1">
               {validation.openItems.map((item) => (
                 <li key={item.id} className="flex justify-between gap-2">
-                  <span>
+                  <span className="min-w-0 break-words">
                     {item.kind === "comparison_difference"
                       ? `${item.recordType} ${item.externalId}: the daily comparison found a different ${item.field?.replace(/_/g, " ")}`
                       : item.kind === "field_difference"

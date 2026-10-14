@@ -1,6 +1,7 @@
 // Pick the old system's report file (.xlsx or .csv) instead of pasting rows.
 // The printed headings are matched to the import's field names; columns with
 // no field are kept on the import as written (src/lib/importSourceFile.ts).
+import { FileDrop } from "../../../ui/FileDrop";
 import { useState, type ChangeEvent } from "react";
 import { formatCountNoun } from "../../../lib/format";
 import {
@@ -53,16 +54,17 @@ export function SourceRowsFilePicker({
 
   return (
     <div className="mb-3 space-y-1">
-      <label className="field-label max-w-full min-w-0">
-        Old system file (.xlsx or .csv)
-        <input
-          type="file"
+      <div className="max-w-full min-w-0">
+        <span className="field-label">Old system file (.xlsx or .csv)</span>
+        <FileDrop
+          layout="row"
+          label="Drop the old system file here"
+          hint="CSV or Excel"
           accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           onChange={handleFile}
-          className="max-w-full text-xs"
           data-testid="import-source-file"
         />
-      </label>
+      </div>
       {read ? (
         <p className="text-xs text-ink-2" role="status">
           {formatCountNoun(read.rows.length, `${noun} row`)} read from{" "}

@@ -83,6 +83,8 @@ export function RecordPreviewSheet({
       onKeyDown={(event) => {
         // A menu/picker inside the sheet owns its first Escape press.
         if ((event.target as Element).closest("details[open]")) return;
+        // A Radix menu has already used this press (it marks it handled).
+        if (event.nativeEvent.defaultPrevented) return;
         if (event.key === "Escape") {
           if (panelRef.current?.querySelector("[data-action-prompt]")) return;
           event.preventDefault();

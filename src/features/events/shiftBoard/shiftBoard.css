@@ -154,26 +154,6 @@
   padding: 0.75rem;
   border-bottom: 1px solid var(--color-line);
 }
-.sb-seg {
-  display: flex;
-  gap: 0.125rem;
-  border-radius: var(--radius-sm);
-  background: var(--color-inset);
-  padding: 0.125rem;
-}
-.sb-seg > button {
-  flex: 1;
-  border-radius: var(--radius-xs);
-  padding: 0.25rem;
-  font-size: var(--text-xs);
-  font-weight: 500;
-  color: var(--color-ink-3);
-}
-.sb-seg > button[aria-selected="true"] {
-  background: var(--color-panel);
-  color: var(--color-ink);
-  box-shadow: 0 1px 2px color-mix(in srgb, var(--color-ink) 10%, transparent);
-}
 .sb-find {
   min-height: 2rem;
   font-size: var(--text-xs);
@@ -635,23 +615,4 @@
   .sb-legend {
     justify-content: flex-start;
   }
-}
-
-/* Board / list switch on the staffing tab. */
-.sb-view-switch {
-  display: inline-flex;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-pill);
-  background: var(--color-inset);
-  padding: 0.125rem;
-}
-.sb-view-switch > button {
-  border-radius: var(--radius-pill);
-  padding: 0.25rem 0.875rem;
-  font-size: var(--text-sm);
-  color: var(--color-ink-2);
-}
-.sb-view-switch > button[aria-selected="true"] {
-  background: var(--color-brand);
-  color: var(--color-on-brand);
 }

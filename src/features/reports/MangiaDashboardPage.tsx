@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { SegmentedTabs } from "../../ui/SegmentedTabs";
 import {
   useListOccasion,
   useListPerson,
@@ -134,27 +135,13 @@ function MangiaReport() {
         </div>
       ) : null}
 
-      <div
-        role="tablist"
-        aria-label="Report part"
-        className="mt-4 flex overflow-x-auto border-b border-line"
-      >
-        {TABS.map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            role="tab"
-            aria-selected={tab === key}
-            onClick={() => setTab(key)}
-            className={`-mb-px h-11 shrink-0 cursor-pointer border-b-2 px-4 text-sm font-semibold whitespace-nowrap md:h-9 ${
-              tab === key
-                ? "border-brand text-brand"
-                : "border-transparent text-ink-2 hover:text-ink"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="mt-4 max-w-full overflow-x-auto">
+        <SegmentedTabs
+          label="Report part"
+          options={TABS.map(([value, label]) => ({ value, label }))}
+          value={tab}
+          onChange={setTab}
+        />
       </div>
 
       <div className="mt-4">

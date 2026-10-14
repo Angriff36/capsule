@@ -2,6 +2,7 @@
 // or the old system's Inventory In-Stock report. Each item becomes an
 // equipment item with its price, place, details and picture; reading the
 // file again updates the same items and adds nothing twice.
+import { FileDrop } from "../../ui/FileDrop";
 import { useState, type ChangeEvent } from "react";
 import { formatCountNoun } from "../../lib/format";
 import { goodshuffleSheetRows } from "../../lib/goodshuffleItems";
@@ -184,17 +185,18 @@ export function GoodshuffleItemsImport({ onClose }: { onClose: () => void }) {
         Its kitchen tools and trailer items come in with their count and storage
         place. Food, disposables and prep steps are left out.
       </p>
-      <label className="field-label max-w-full min-w-0">
-        Item list file
-        <input
-          type="file"
+      <div className="max-w-full min-w-0">
+        <span className="field-label">Item list file</span>
+        <FileDrop
+          layout="row"
+          label="Drop the item list here"
+          hint="CSV or Excel"
           accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           onChange={handleFile}
           disabled={busy}
-          className="max-w-full text-xs"
           data-testid="goodshuffle-file"
         />
-      </label>
+      </div>
       {message ? (
         <p className="text-sm text-ink-2" role="status">
           {message}

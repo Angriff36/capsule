@@ -5,6 +5,7 @@
 // from. The import can't finish until every file is accounted for — which
 // does not mean every row became a Capsule record.
 
+import { FileDrop } from "../../../ui/FileDrop";
 import { useAction, useMutation, useQuery } from "convex/react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
@@ -217,18 +218,20 @@ export function ArchiveIntakePanel({ run }: { run: ArchiveIntakeRun }) {
               file in it, sorts each one, and counts every row. Nothing becomes
               a Capsule record until you commit.
             </p>
-            <label className="grid gap-1">
+            <div className="grid gap-1">
               <span className="font-medium text-ink">Archive (.zip)</span>
-              <input
-                type="file"
+              <FileDrop
                 name="archiveFile"
+                label="Drop the archive here"
+                hint="ZIP file"
+                layout="row"
                 accept=".zip,application/zip"
                 disabled={busy !== null}
                 onChange={(event) =>
                   setArchiveFile(event.target.files?.[0] ?? null)
                 }
               />
-            </label>
+            </div>
             <label className="grid gap-1">
               <span className="font-medium text-ink">
                 Report list from the old system (optional)

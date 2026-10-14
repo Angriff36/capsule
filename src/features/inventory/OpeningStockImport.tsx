@@ -1,5 +1,6 @@
 // Import a stock count sheet (CSV). Every row lands on the opening stock list
 // below for review; nothing changes on-hand stock until a person uses a row.
+import { FileDrop } from "../../ui/FileDrop";
 import { useState, type ChangeEvent } from "react";
 import { useImportStockFile } from "../facilities/openingStock";
 import { readOpeningStockRow } from "../../lib/openingStock";
@@ -119,16 +120,17 @@ export function OpeningStockImport() {
           />
           Every row on this sheet was counted by hand
         </label>
-        <label className="field-label max-w-full min-w-0 grid-cols-1">
-          Count sheet
-          <input
-            type="file"
+        <div className="max-w-full min-w-0">
+          <span className="field-label">Count sheet</span>
+          <FileDrop
+            layout="row"
+            label="Drop the count sheet here"
+            hint="CSV file"
             accept=".csv,text/csv"
             onChange={handleFile}
             disabled={busy}
-            className="max-w-full text-xs"
           />
-        </label>
+        </div>
       </div>
       {message ? (
         <p className="px-4 pb-3 text-xs text-ink-2" role="status">

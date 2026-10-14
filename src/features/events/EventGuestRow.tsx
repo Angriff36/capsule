@@ -1,8 +1,15 @@
 import { Fragment, type FormEvent } from "react";
 import type { Doc } from "../../lib/api";
 import { formatDate, formatTime } from "../../lib/format";
-import { ActionMenu, ActionMenuRule, StatusChip } from "../../ui/primitives";
-import { CheckCircleIcon } from "../../ui/icons";
+import { StatusChip } from "../../ui/primitives";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../ui/DropdownMenu";
+import { CheckCircleIcon, ChevronDownIcon } from "../../ui/icons";
 import { eventGuestPolicy } from "./EventGuestPolicy";
 import { guestTableLabel } from "./guestTableLabel";
 import type { EntreeLine } from "./guestMealCounts";
@@ -134,54 +141,56 @@ export function EventGuestRow({
           )}
         </td>
         <td className="td text-right">
-          <ActionMenu>
-            <button
-              type="button"
-              disabled={!eventGuestPolicy.canConfirm(guest) || isBusy}
-              onClick={onConfirm}
-            >
-              Confirm RSVP
-            </button>
-            {guest.checkedInAt != null ? (
-              <button
-                type="button"
-                disabled={guest.deletedAt != null || isBusy}
-                onClick={onUndoCheckIn}
-              >
-                Undo check-in
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button type="button" className="btn btn-ghost">
+                More
+                <ChevronDownIcon width={12} height={12} />
               </button>
-            ) : null}
-            <button
-              type="button"
-              disabled={!eventGuestPolicy.canDecline(guest) || isBusy}
-              onClick={() => onOpenAction("decline")}
-            >
-              Decline RSVP
-            </button>
-            <button
-              type="button"
-              disabled={!eventGuestPolicy.canAssignTable(guest) || isBusy}
-              onClick={() => onOpenAction("table")}
-            >
-              Assign table
-            </button>
-            <button
-              type="button"
-              disabled={guest.deletedAt != null || isBusy}
-              onClick={() => onOpenAction("meal")}
-            >
-              Entrée, seat &amp; place card
-            </button>
-            <ActionMenuRule />
-            <button
-              type="button"
-              className="action-menu-danger"
-              disabled={!eventGuestPolicy.canWithdraw(guest) || isBusy}
-              onClick={() => onOpenAction("withdraw")}
-            >
-              Withdraw guest
-            </button>
-          </ActionMenu>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                disabled={!eventGuestPolicy.canConfirm(guest) || isBusy}
+                onSelect={onConfirm}
+              >
+                Confirm RSVP
+              </DropdownMenuItem>
+              {guest.checkedInAt != null ? (
+                <DropdownMenuItem
+                  disabled={guest.deletedAt != null || isBusy}
+                  onSelect={onUndoCheckIn}
+                >
+                  Undo check-in
+                </DropdownMenuItem>
+              ) : null}
+              <DropdownMenuItem
+                disabled={!eventGuestPolicy.canDecline(guest) || isBusy}
+                onSelect={() => onOpenAction("decline")}
+              >
+                Decline RSVP
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={!eventGuestPolicy.canAssignTable(guest) || isBusy}
+                onSelect={() => onOpenAction("table")}
+              >
+                Assign table
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                disabled={guest.deletedAt != null || isBusy}
+                onSelect={() => onOpenAction("meal")}
+              >
+                Entrée, seat &amp; place card
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                variant="destructive"
+                disabled={!eventGuestPolicy.canWithdraw(guest) || isBusy}
+                onSelect={() => onOpenAction("withdraw")}
+              >
+                Withdraw guest
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </td>
       </tr>
       {openAction === "meal" ? (

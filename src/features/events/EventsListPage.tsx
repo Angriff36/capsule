@@ -12,6 +12,7 @@ import {
 } from "../../ui/DropdownMenu";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
+import { SegmentedTabs } from "../../ui/SegmentedTabs";
 import { SavedViewsBar } from "../views/SavedViewsBar";
 import { eventImportPath } from "./eventRoutes";
 import { EVENT_STAGES, type EventStage, STAGE_LABEL } from "./eventStatus";
@@ -305,38 +306,21 @@ export function EventsListPage() {
 
   const filterControls = (
     <>
-      <div
-        role="tablist"
-        aria-label="Show"
-        className="flex rounded-full bg-inset p-1"
-      >
-        {questionTabs.map((t) => (
-          <button
-            key={t}
-            type="button"
-            role="tab"
-            aria-selected={tab === t}
-            onClick={() => {
-              setInitialFallbackPending(false);
-              setListState({ tab: t, limit: WINDOW });
-            }}
-            className={`h-11 cursor-pointer rounded-full px-4 text-sm font-semibold whitespace-nowrap transition-colors md:h-9 ${
-              tab === t
-                ? "bg-panel text-ink shadow-[0_1px_2px_rgb(30_40_36/0.15)]"
-                : "text-ink-2 hover:text-ink"
-            }`}
-          >
-            {TAB_LABEL[t as keyof typeof TAB_LABEL]}
-            {t === "all" ? null : (
-              <span
-                className={`ml-1.5 ${t === "attention" && counts[t] > 0 ? "font-bold text-warn" : "text-ink-2"}`}
-              >
-                {countLabel(t as "upcoming" | "attention")}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
+      <SegmentedTabs
+        label="Show"
+        options={questionTabs.map((t) => ({
+          value: t,
+          label:
+            t === "all"
+              ? TAB_LABEL.all
+              : `${TAB_LABEL[t as keyof typeof TAB_LABEL]} ${countLabel(t as "upcoming" | "attention")}`,
+        }))}
+        value={tab}
+        onChange={(t) => {
+          setInitialFallbackPending(false);
+          setListState({ tab: t, limit: WINDOW });
+        }}
+      />
       <label className="flex items-center gap-2 text-sm font-medium text-ink-2">
         Stage
         <select

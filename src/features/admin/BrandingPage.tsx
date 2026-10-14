@@ -1,3 +1,4 @@
+import { FileDrop } from "../../ui/FileDrop";
 import { CatalogsPage } from "./CatalogsPage";
 import { useQuery } from "convex/react";
 import { MergedSection } from "../../ui/MergedSection";
@@ -380,21 +381,19 @@ export function BrandingPage() {
                 </span>
               </label>
             </div>
-            <label>
-              Organization logo
-              <input
+            <div>
+              <span className="field-label">Organization logo</span>
+              <FileDrop
                 name="logo"
-                type="file"
+                label="Drop the logo here"
+                hint="PNG, JPEG, or WebP · up to 10 MB · transparent PNG works best."
                 accept="image/png,image/jpeg,image/webp"
                 disabled={!canEdit || busy}
                 onChange={(event) =>
                   setLogoFile(event.target.files?.[0] ?? null)
                 }
               />
-              <span className="mt-1 block text-xs font-normal text-ink-3">
-                PNG, JPEG, or WebP · up to 10 MB · transparent PNG works best.
-              </span>
-            </label>
+            </div>
             <div className="supply-row-actions">
               <button className="btn btn-primary" disabled={!canEdit || busy}>
                 {busy ? "Saving…" : "Save branding"}

@@ -11,11 +11,17 @@ import {
   button,
   click,
   change,
+  openMenu,
+  menuItem,
   submit,
 } from "./support/mounted-app";
 import { EventMenuTab } from "../src/features/events/EventMenuTab";
 import { EventMarginTab } from "../src/features/events/EventMarginTab";
 import { EventPrepTab } from "../src/features/events/EventPrepTab";
+
+function menuTrigger() {
+  return container.querySelector<HTMLElement>("button[aria-haspopup='menu']")!;
+}
 
 function menu() {
   backend.values.set("useGetEvent", {
@@ -102,7 +108,8 @@ it("calculates displayed menu cost and pans from the recipe, and saves course pl
     course: "Main",
     serviceStyle: "plated",
   });
-  await click(button("Edit recipe on this menu"));
+  await openMenu(menuTrigger());
+  await click(menuItem("Edit recipe on this menu"));
   const editor = container.querySelector(
     '[data-testid="event-menu-recipe-editor"]',
   )!;
@@ -142,7 +149,8 @@ it("warns about incompatible recipe units and excludes that line from the priced
     container.querySelector('[data-testid="event-menu-food-cost"]')
       ?.textContent,
   ).toContain("$0.00");
-  await click(button("Edit recipe on this menu"));
+  await openMenu(menuTrigger());
+  await click(menuItem("Edit recipe on this menu"));
   expect(
     container.querySelector(
       '[data-testid="event-menu-recipe-editor"] [data-testid="event-menu-unit-mismatch"]',
@@ -155,7 +163,8 @@ it("searches the live ingredient catalog, adds the selected amount, and creates 
   const add = command("useCreateDishIngredient");
   const pan = command("useCreateDishContainer");
   await mount(page());
-  await click(button("Edit recipe on this menu"));
+  await openMenu(menuTrigger());
+  await click(menuItem("Edit recipe on this menu"));
   const search = field("eventMenuRecipeCatalogSearch");
   await act(async () => search.focus());
   input("eventMenuRecipeCatalogSearch", "But");
@@ -195,7 +204,8 @@ it("creates and links an ingredient from the always-available inline form withou
   const create = command("useCreateIngredient", { docId: "new-ingredient" });
   const add = command("useCreateDishIngredient");
   await mount(page());
-  await click(button("Edit recipe on this menu"));
+  await openMenu(menuTrigger());
+  await click(menuItem("Edit recipe on this menu"));
   expect(field("eventMenuRecipeCatalogSearch").value).toBe("");
   await click(button("Create ingredient"));
   input("newIngredientName", "Saffron");

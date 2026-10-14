@@ -3,6 +3,7 @@
 // sign-in is emailed) and writes each past shift, finished, under its worker
 // and its event. Nothing is sent to anyone, and no hours reach the time sheet
 // or payroll.
+import { FileDrop } from "../../ui/FileDrop";
 import { useConvex, useMutation } from "convex/react";
 import { useState, type ChangeEvent } from "react";
 import { api } from "../../lib/api";
@@ -215,17 +216,18 @@ export function NowstaShiftImport({
           with their email and phone; nobody is emailed. Pay and billing figures
           stay in Nowsta, and no hours go to the time sheet or payroll.
         </p>
-        <label className="field-label max-w-full min-w-0">
-          Nowsta export file
-          <input
-            type="file"
+        <div className="max-w-full min-w-0">
+          <span className="field-label">Nowsta export file</span>
+          <FileDrop
+            layout="row"
+            label="Drop the Nowsta export here"
+            hint="CSV or Excel"
             accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             onChange={(event) => void handleFile(event)}
             disabled={busy}
-            className="max-w-full text-xs"
             data-testid="nowsta-shift-file"
           />
-        </label>
+        </div>
         {busy && !steps ? (
           <p className="text-ink-2" role="status">
             Reading the file…

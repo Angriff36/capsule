@@ -19,6 +19,7 @@ import {
   usePackListMarkLoaded,
 } from "../../lib/manifest-convex-react";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { SegmentedTabs } from "../../ui/SegmentedTabs";
 import { useActionNotice } from "../../ui/action-result";
 import { EmptyState, PageHeader, TableSkeleton } from "../../ui/primitives";
 import { resolveManifestPolicies } from "../admin/rolePermissionAudit";
@@ -253,29 +254,20 @@ export function DispatchBoardPage() {
           { label: "Left", value: loading ? "…" : leftTotal },
         ]}
         actions={
-          <div
-            className="dispatch-switch"
-            role="tablist"
-            aria-label="Days shown"
-          >
-            {RANGES.map((entry) => (
-              <button
-                key={entry.key}
-                type="button"
-                role="tab"
-                aria-selected={rangeKey === entry.key}
-                data-active={rangeKey === entry.key || undefined}
-                onClick={() => {
-                  const next = new URLSearchParams(params);
-                  if (entry.key === "today") next.delete("days");
-                  else next.set("days", entry.key);
-                  setParams(next, { replace: true });
-                }}
-              >
-                {entry.label}
-              </button>
-            ))}
-          </div>
+          <SegmentedTabs
+            label="Days shown"
+            options={RANGES.map((entry) => ({
+              value: entry.key,
+              label: entry.label,
+            }))}
+            value={rangeKey}
+            onChange={(key) => {
+              const next = new URLSearchParams(params);
+              if (key === "today") next.delete("days");
+              else next.set("days", key);
+              setParams(next, { replace: true });
+            }}
+          />
         }
       />
       <LogisticsWorkspaceNav />

@@ -4,6 +4,7 @@ import type { Id } from "../../lib/api";
 import { api } from "../../lib/api";
 import { copyText } from "../../lib/copyText";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { DropdownMenuItem } from "../../ui/DropdownMenu";
 
 type ShareState =
   | { kind: "idle" }
@@ -11,7 +12,13 @@ type ShareState =
   | { kind: "ready"; url: string; copied: boolean }
   | { kind: "error"; message: string };
 
-export function EventClientPortalShare({ eventId }: { eventId: Id<"events"> }) {
+/**
+ * Client-portal link actions for a DropdownMenu. The state and the confirm
+ * prompt host live in the caller (outside the menu content), so the prompt
+ * survives the menu closing; render `menuItems` inside the menu and `host`
+ * anywhere outside it.
+ */
+export function useEventClientPortalShare(eventId: Id<"events">) {
   const createShareToken = useAction(api.clientPortal.createShareToken);
   const turnOffShare = useAction(api.clientPortal.turnOffShare);
   const { prompt, host } = useActionPrompt();
@@ -66,65 +73,61 @@ export function EventClientPortalShare({ eventId }: { eventId: Id<"events"> }) {
     }
   };
 
-  return (
-    <div className="action-menu-group" key="client-portal-share" data-keep-open>
-      {host}
-      <button
-        type="button"
-        className="btn btn-ghost"
+  const menuItems = (
+    <>
+      <DropdownMenuItem
         disabled={state.kind === "working"}
-        onClick={() => void copyPortalLink()}
+        onSelect={(event) => {
+          // The result (copied, or the link to copy by hand) shows in place.
+          event.preventDefault();
+          void copyPortalLink();
+        }}
       >
         {state.kind === "working"
           ? "Preparing link…"
           : state.kind === "ready" && state.copied
             ? "Client link copied"
             : "Copy client portal"}
-      </button>
-      <button
-        type="button"
-        className="btn btn-ghost"
+      </DropdownMenuItem>
+      <DropdownMenuItem
         disabled={offState.kind === "working"}
-        onClick={() => void turnOffPortalLink()}
+        onSelect={() => void turnOffPortalLink()}
       >
         {offState.kind === "working"
           ? "Turning off…"
           : offState.kind === "ready"
             ? "Client link off"
             : "Turn off client link"}
-      </button>
+      </DropdownMenuItem>
       {state.kind === "ready" ? (
-        <a
-          className="text-xs font-medium text-brand underline underline-offset-2"
-          href={state.url}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Preview
-        </a>
+        <DropdownMenuItem asChild>
+          <a href={state.url} target="_blank" rel="noreferrer">
+            Preview
+          </a>
+        </DropdownMenuItem>
       ) : null}
       {state.kind === "ready" && !state.copied ? (
-        <span className="max-w-64 text-xs text-ink-2">
+        <div className="max-w-64 px-3 py-1 text-xs text-ink-2">
           This browser would not copy. Select the link and copy it:{" "}
           <span className="select-all break-all font-medium text-ink">
             {state.url}
           </span>
-        </span>
+        </div>
       ) : null}
       {state.kind === "ready" ? (
-        <span className="max-w-64 text-xs text-ink-3">
+        <div className="max-w-64 px-3 py-1 text-xs text-ink-3">
           Works for 90 days. Copying again turns the previous link off.
-        </span>
+        </div>
       ) : null}
       {state.kind === "error" ? (
-        <span className="max-w-52 text-xs text-danger" role="alert">
+        <div className="max-w-52 px-3 py-1 text-xs text-danger" role="alert">
           {state.message}
-        </span>
+        </div>
       ) : null}
       {offState.kind === "error" ? (
-        <span className="max-w-52 text-xs text-danger" role="alert">
+        <div className="max-w-52 px-3 py-1 text-xs text-danger" role="alert">
           {offState.message}
-        </span>
+        </div>
       ) : null}
       <span className="sr-only" role="status" aria-live="polite">
         {state.kind === "ready"
@@ -133,6 +136,8 @@ export function EventClientPortalShare({ eventId }: { eventId: Id<"events"> }) {
             : "Client portal link ready to copy."
           : ""}
       </span>
-    </div>
+    </>
   );
+
+  return { host, menuItems };
 }

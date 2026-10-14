@@ -168,7 +168,15 @@
       1fr
     );
   gap: 24px;
-  align-items: start;
+  align-items: stretch;
+}
+/* The three top cards end on one line: each card fills its column. */
+.my-day-dashboard-grid > * {
+  display: flex;
+  flex-direction: column;
+}
+.my-day-dashboard-grid > * > :only-child {
+  flex: 1;
 }
 .my-day-dashboard-grid > *,
 .my-day-secondary-grid > * {
@@ -424,7 +432,7 @@
 .my-day-prep-dishes {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: start;
+  align-items: stretch;
   gap: 20px;
   padding: 4px 20px 20px;
 }

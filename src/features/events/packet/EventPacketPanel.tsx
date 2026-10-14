@@ -1,3 +1,4 @@
+import { FileDrop } from "../../../ui/FileDrop";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import type { Id } from "../../../lib/api";
@@ -312,17 +313,18 @@ function ManagerPacketPanel({ eventId }: { eventId: Id<"events"> }) {
         </p>
       )}
       <div className="mt-3 flex flex-wrap items-end gap-3">
-        <label className="text-sm">
-          Source files or packet export
-          <input
-            className="mt-1 block max-w-full"
-            type="file"
+        <div className="text-sm">
+          <span>Source files or packet export</span>
+          <FileDrop
+            layout="row"
+            label="Drop the files here"
+            hint="PDF, RTF, CSV, JSON, or images"
             accept=".pdf,.rtf,.csv,.json,.png,.jpg,.jpeg,.gif,.webp"
             multiple
             disabled={busy}
             onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
           />
-        </label>
+        </div>
         <label className="text-sm">
           Event time zone
           <input

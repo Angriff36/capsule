@@ -9,6 +9,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { EmptyState, PageHeader, TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { SegmentedTabs } from "../../ui/SegmentedTabs";
 import { useActionFailure } from "../../ui/action-result/useActionNotice";
 import { eventDetailPath } from "../events/eventRoutes";
 import { useEventsById, useEventsInRange } from "../facilities/useEventsById";
@@ -268,30 +269,24 @@ export function ReturnsPage() {
     }
   };
 
+  const tabSwitch = (
+    <SegmentedTabs
+      label="Show"
+      options={TABS.map((entry) => ({ value: entry.key, label: entry.label }))}
+      value={tab}
+      onChange={(key) => {
+        const next = new URLSearchParams(params);
+        if (key === "open") next.delete("show");
+        else next.set("show", key);
+        setParams(next, { replace: true });
+      }}
+    />
+  );
+
   return (
     <div className="operations-stage supply-stage">
       {embedded ? (
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="dispatch-switch" role="tablist" aria-label="Show">
-            {TABS.map((entry) => (
-              <button
-                key={entry.key}
-                type="button"
-                role="tab"
-                aria-selected={tab === entry.key}
-                data-active={tab === entry.key || undefined}
-                onClick={() => {
-                  const next = new URLSearchParams(params);
-                  if (entry.key === "open") next.delete("show");
-                  else next.set("show", entry.key);
-                  setParams(next, { replace: true });
-                }}
-              >
-                {entry.label}
-              </button>
-            ))}
-          </div>
-        </div>
+        <div className="flex flex-wrap items-center gap-2">{tabSwitch}</div>
       ) : (
         <>
           <PageHeader
@@ -303,27 +298,7 @@ export function ReturnsPage() {
               { label: "Lost or broken", value: loading ? "…" : problemCount },
               { label: "Counted", value: loading ? "…" : done.length },
             ]}
-            actions={
-              <div className="dispatch-switch" role="tablist" aria-label="Show">
-                {TABS.map((entry) => (
-                  <button
-                    key={entry.key}
-                    type="button"
-                    role="tab"
-                    aria-selected={tab === entry.key}
-                    data-active={tab === entry.key || undefined}
-                    onClick={() => {
-                      const next = new URLSearchParams(params);
-                      if (entry.key === "open") next.delete("show");
-                      else next.set("show", entry.key);
-                      setParams(next, { replace: true });
-                    }}
-                  >
-                    {entry.label}
-                  </button>
-                ))}
-              </div>
-            }
+            actions={tabSwitch}
           />
           <LogisticsWorkspaceNav />
         </>

@@ -237,26 +237,6 @@
    Month sheet: the tracker as a spreadsheet. Dense rows, ruled cells, inputs
    that look like cells until they are focused.
    ------------------------------------------------------------------------ */
-.tracker-view-switch {
-  display: inline-flex;
-  margin-bottom: 1rem;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-pill);
-  background: var(--color-inset);
-  padding: 0.125rem;
-}
-.tracker-view-switch > button {
-  padding: 0.25rem 0.875rem;
-  border-radius: var(--radius-pill);
-  font-size: var(--text-sm);
-  color: var(--color-ink-2);
-}
-.tracker-view-switch > button[data-active] {
-  background: var(--color-brand);
-  color: var(--color-on-brand);
-}
-
-/* An input that reads as a cell: no chrome until hover or focus. */
 .tracker-sheet-input {
   width: 100%;
   min-height: 1.75rem;

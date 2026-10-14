@@ -1,3 +1,4 @@
+import { FileDrop } from "../../ui/FileDrop";
 import { formatMoneyExact } from "../../lib/format";
 import type { FormEvent } from "react";
 import { useMemo, useRef, useState } from "react";
@@ -317,18 +318,16 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
                 })}
               </div>
             ) : null}
-            <label className="field-label sm:col-span-2">
-              Photo
-              <input
+            <div className="sm:col-span-2">
+              <span className="field-label">Photo</span>
+              <FileDrop
                 name="photo"
-                type="file"
+                layout="row"
+                label="Drop a photo here"
+                hint="Optional — shows on the catalog card and ingredient detail."
                 accept="image/*"
-                className="input"
               />
-              <span className="field-hint">
-                Optional — shows on the catalog card and ingredient detail.
-              </span>
-            </label>
+            </div>
           </>
         ) : (
           <label className="field-label">
