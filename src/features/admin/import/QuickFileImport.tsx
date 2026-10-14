@@ -6,6 +6,7 @@
 // precise. Menu items read the TPP Menu Items Export; the other kinds read any
 // .xlsx or .csv report with a heading row (src/lib/importSourceFile.ts).
 
+import { FileDrop } from "../../../ui/FileDrop";
 import { useAction, useMutation } from "convex/react";
 import { useRef, useState, type ChangeEvent } from "react";
 import { api } from "../../../lib/api";
@@ -298,14 +299,15 @@ export function QuickFileImport() {
             ))}
           </select>
         </label>
-        <input
+        <FileDrop
           ref={fileInput}
-          type="file"
+          layout="row"
+          label="Drop the file here"
+          hint="CSV or Excel"
           aria-label="File to import"
           accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
           onChange={handleFile}
           disabled={busy}
-          className="max-w-full text-xs"
           data-testid="quick-import-file"
         />
         {progress ? (

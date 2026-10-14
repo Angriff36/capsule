@@ -1,3 +1,4 @@
+import { FileDrop } from "../../../ui/FileDrop";
 import { useState } from "react";
 import type { TextReportSource } from "../../../lib/tppReports/loadEventBundleFromText";
 import { readPdfTextLinesInBrowser } from "../../../lib/tppReports/pdfTextReaderBrowser";
@@ -144,13 +145,15 @@ export function EventImportSourcesPanel({
       </label>
 
       <div className="space-y-1">
-        <label className="field-label">
-          Add TPP reports: PDF, BEO .rtf, or Excel / CSV (optional)
-          <input
-            type="file"
+        <div>
+          <span className="field-label">
+            Add TPP reports: PDF, BEO .rtf, or Excel / CSV (optional)
+          </span>
+          <FileDrop
+            label="Drop the TPP reports here"
+            hint="PDF, RTF, Excel, or CSV"
             accept=".pdf,.rtf,.xlsx,.csv,application/pdf,text/csv,application/rtf,text/rtf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             multiple
-            className="input py-1.5"
             disabled={disabled}
             onChange={(event) => {
               void readFiles(event.target.files);
@@ -167,7 +170,7 @@ export function EventImportSourcesPanel({
             count is used and the disagreement is flagged for review on the
             event.
           </span>
-        </label>
+        </div>
         {csvFiles.length > 0 ? (
           <ul className="flex flex-wrap gap-2 text-sm">
             {csvFiles.map((file) => (

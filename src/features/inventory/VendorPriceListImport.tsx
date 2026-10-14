@@ -1,6 +1,7 @@
 // Bring in a vendor price list (CSV). New vendors are added, each row becomes
 // or updates that vendor's item for one ingredient, and a new price keeps the
 // old one in the item's history. Reading the same file again changes nothing.
+import { FileDrop } from "../../ui/FileDrop";
 import { useState, type ChangeEvent } from "react";
 import { useImportVendorPriceRows } from "../facilities/vendorPriceList";
 import { formatCountNoun } from "../../lib/format";
@@ -114,16 +115,17 @@ export function VendorPriceListImport() {
         </div>
       </div>
       <div className="flex flex-wrap items-end gap-3 p-4">
-        <label className="field-label max-w-full min-w-0 grid-cols-1">
-          Price list
-          <input
-            type="file"
+        <div className="max-w-full min-w-0">
+          <span className="field-label">Price list</span>
+          <FileDrop
+            layout="row"
+            label="Drop the price list here"
+            hint="CSV file"
             accept=".csv,text/csv"
             onChange={handleFile}
             disabled={busy}
-            className="max-w-full text-xs"
           />
-        </label>
+        </div>
       </div>
       {message ? (
         <p className="px-4 pb-3 text-xs text-ink-2" role="status">

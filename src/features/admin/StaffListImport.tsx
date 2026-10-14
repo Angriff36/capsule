@@ -2,6 +2,7 @@
 // sees what each row will do first: add a team member, fill a blank phone or
 // address of someone already here, or nothing. Nobody is emailed a sign-in;
 // the office sends that from the person's row when they want them in the app.
+import { FileDrop } from "../../ui/FileDrop";
 import { useState, type ChangeEvent } from "react";
 import { formatCountNoun } from "../../lib/format";
 import {
@@ -165,17 +166,18 @@ export function StaffListImport({
           or address is filled in. Nobody is emailed until you send a sign-in
           from their row.
         </p>
-        <label className="field-label max-w-full min-w-0">
-          Staff list file
-          <input
-            type="file"
+        <div className="max-w-full min-w-0">
+          <span className="field-label">Staff list file</span>
+          <FileDrop
+            layout="row"
+            label="Drop the staff list here"
+            hint="Excel file"
             accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             onChange={(event) => void handleFile(event)}
             disabled={busy}
-            className="max-w-full text-xs"
             data-testid="staff-list-file"
           />
-        </label>
+        </div>
         {steps ? (
           <div className="space-y-2">
             <ul className="list-disc pl-5 text-ink-2">

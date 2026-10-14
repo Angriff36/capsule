@@ -1,3 +1,4 @@
+import { FileDrop } from "../../../ui/FileDrop";
 import { useEffect, useRef, useState } from "react";
 import { useEmbedded } from "../../../ui/embedded";
 import {
@@ -594,11 +595,11 @@ export function TppUploadPage() {
         className="space-y-4 border-y border-line py-6"
         aria-label="Choose TPP export"
       >
-        <label className="block">
-          Downloaded account export
-          <input
-            className="block mt-2 max-w-full"
-            type="file"
+        <div className="block">
+          <span className="block">Downloaded account export</span>
+          <FileDrop
+            label="Drop the account export here"
+            hint="JSON file"
             accept=".json,application/json"
             disabled={busy}
             onChange={(e) => {
@@ -607,7 +608,7 @@ export function TppUploadPage() {
               if (selected) select(selected);
             }}
           />
-        </label>
+        </div>
         <p className="text-sm text-ink-3">
           Uploads run in parallel while the server imports saved batches. Keep
           this page open until the upload is saved; importing continues after

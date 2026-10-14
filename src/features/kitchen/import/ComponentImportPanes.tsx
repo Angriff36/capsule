@@ -1,3 +1,4 @@
+import { FileDrop } from "../../../ui/FileDrop";
 import { formatCountNoun } from "../../../lib/format";
 import type { ImportSourceMode } from "./ImportSourceReadiness";
 import {
@@ -130,10 +131,12 @@ export function ComponentImportSourcePane({
         </>
       ) : (
         <div className="component-import-files">
-          <label className="field-label">
-            Recipe sheet CSV
-            <input
-              type="file"
+          <div>
+            <span className="field-label">Recipe sheet CSV</span>
+            <FileDrop
+              layout="row"
+              label="Drop the recipe sheet here"
+              hint="CSV file"
               accept=".csv,text/csv"
               disabled={fileLoading}
               onChange={(event) => {
@@ -149,11 +152,13 @@ export function ComponentImportSourcePane({
                 {sheetFilename}
               </span>
             ) : null}
-          </label>
-          <label className="field-label">
-            Recipe lines CSV
-            <input
-              type="file"
+          </div>
+          <div>
+            <span className="field-label">Recipe lines CSV</span>
+            <FileDrop
+              layout="row"
+              label="Drop the recipe lines here"
+              hint="CSV file"
               accept=".csv,text/csv"
               disabled={fileLoading}
               onChange={(event) => {
@@ -169,11 +174,13 @@ export function ComponentImportSourcePane({
                 {linesFilename}
               </span>
             ) : null}
-          </label>
-          <label className="field-label">
-            Plain text recipe (.txt)
-            <input
-              type="file"
+          </div>
+          <div>
+            <span className="field-label">Plain text recipe (.txt)</span>
+            <FileDrop
+              layout="row"
+              label="Drop the text recipe here"
+              hint="Text file"
               accept=".txt,text/plain"
               disabled={fileLoading}
               onChange={(event) => {
@@ -189,7 +196,7 @@ export function ComponentImportSourcePane({
                 {textFilename}
               </span>
             ) : null}
-          </label>
+          </div>
           {fileStatus ? (
             <p className="font-mono text-xs text-ink-3">{fileStatus}</p>
           ) : null}
