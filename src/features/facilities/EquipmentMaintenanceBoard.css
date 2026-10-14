@@ -1,8 +1,8 @@
 .maintenance-board {
-  --maintenance-ink: #1b2420;
-  --maintenance-paper: #eee9dc;
-  --maintenance-signal: #ed6a32;
-  --maintenance-warning: #b93624;
+  --maintenance-ink: var(--color-ink);
+  --maintenance-paper: var(--color-inset);
+  --maintenance-signal: var(--color-brand);
+  --maintenance-warning: var(--color-danger);
   margin-bottom: 22px;
   border: 1px solid color-mix(in srgb, var(--line) 65%, var(--maintenance-ink));
   border-radius: 12px;
@@ -18,14 +18,14 @@
   gap: 28px;
   padding: 22px 24px;
   border-bottom: 1px solid rgba(27, 36, 32, 0.22);
-  background: #e2dccb;
+  background: var(--color-sage);
 }
 
 .maintenance-board__kicker,
 .maintenance-form__stamp span,
 .maintenance-ticket__label {
   margin: 0 0 6px;
-  color: #697068;
+  color: var(--color-ink-3);
   font-family: "IBM Plex Mono", monospace;
   font-size: 9px;
   font-weight: 700;
@@ -44,7 +44,7 @@
 .maintenance-board__header p:not(.maintenance-board__kicker) {
   max-width: 630px;
   margin: 7px 0 0;
-  color: #59635d;
+  color: var(--color-ink-2);
   font-size: 13px;
   line-height: 1.55;
 }
@@ -69,7 +69,7 @@
   align-items: baseline;
   gap: 5px;
   padding: 7px 9px;
-  color: #677068;
+  color: var(--color-ink-3);
   font-family: "IBM Plex Mono", monospace;
   font-size: 9px;
   text-transform: uppercase;
@@ -93,7 +93,7 @@
   border-left: 5px solid var(--maintenance-warning);
   background: rgba(185, 54, 36, 0.07);
   padding: 11px 14px;
-  color: #6f251b;
+  color: var(--color-danger);
 }
 
 .maintenance-alert__signal {
@@ -103,7 +103,7 @@
   place-items: center;
   border-radius: 50%;
   background: var(--maintenance-warning);
-  color: white;
+  color: var(--color-panel);
   font-family: "IBM Plex Mono", monospace;
   font-weight: 800;
 }
@@ -116,16 +116,16 @@
 
 .maintenance-alert p {
   margin-top: 2px;
-  color: #7e4a42;
+  color: var(--color-danger);
   font-size: 11px;
 }
 
 .maintenance-board__notice {
   margin: 14px 18px 0;
-  border-left: 3px solid #2f8156;
+  border-left: 3px solid var(--color-ok);
   background: rgba(47, 129, 86, 0.09);
   padding: 9px 12px;
-  color: #245d40;
+  color: var(--color-ok);
   font-size: 12px;
 }
 
@@ -155,7 +155,7 @@
   grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
   margin: 0;
   border-width: 1px 0 0 5px;
-  background: #e4decf;
+  background: var(--color-sage);
   box-shadow: none;
 }
 
@@ -175,7 +175,7 @@
 }
 
 .maintenance-form__inline-input em {
-  color: #717870;
+  color: var(--color-ink-3);
   font-family: "IBM Plex Mono", monospace;
   font-size: 10px;
   font-style: normal;
@@ -211,7 +211,7 @@
 
 .maintenance-board__empty p {
   margin: 4px 0 0;
-  color: #697169;
+  color: var(--color-ink-3);
   font-size: 12px;
 }
 
@@ -292,14 +292,14 @@
 
 .maintenance-ticket small {
   margin-top: 4px;
-  color: #69716a;
+  color: var(--color-ink-3);
   font-family: "IBM Plex Mono", monospace;
   font-size: 9px;
 }
 
 .maintenance-ticket p {
   margin: 6px 0 0;
-  color: #576059;
+  color: var(--color-ink-2);
   font-size: 11px;
   line-height: 1.4;
 }
@@ -320,17 +320,17 @@
 .maintenance-ticket[data-due="overdue"] .maintenance-ticket__due-chip,
 .maintenance-ticket__lock {
   background: rgba(185, 54, 36, 0.14);
-  color: #9a2e20;
+  color: var(--color-danger);
 }
 
 .maintenance-ticket[data-due="soon"] .maintenance-ticket__due-chip {
   background: rgba(237, 106, 50, 0.16);
-  color: #9f451f;
+  color: var(--color-warn);
 }
 
 .maintenance-ticket[data-due="scheduled"] .maintenance-ticket__due-chip {
   background: rgba(47, 129, 86, 0.12);
-  color: #286c49;
+  color: var(--color-ok);
 }
 
 .maintenance-ticket__action {

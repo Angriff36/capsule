@@ -3,7 +3,7 @@
   --yield-sage: var(--color-brand);
   --yield-red: #ad4e32;
   --yield-amber: #bd7a2e;
-  --yield-paper: #f4f0e5;
+  --yield-paper: var(--color-panel);
 }
 
 .production-yield-masthead {

@@ -1,6 +1,6 @@
 .menu-profitability {
   --margin-ink: #26241f;
-  --margin-paper: #f8f4ea;
+  --margin-paper: var(--color-panel);
   --margin-line: rgba(54, 50, 40, 0.16);
   --margin-green: #276749;
   --margin-red: #a33e2f;
