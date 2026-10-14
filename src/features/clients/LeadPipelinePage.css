@@ -500,13 +500,24 @@
   padding-inline: 0.5rem;
 }
 
+/* Two even columns of buttons. An odd last button takes the whole row, and
+   the Open links sit together on one row, so no card ends on a lone button. */
 .lead-card-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   min-height: 2rem;
   align-items: center;
-  justify-content: space-between;
   gap: 0.5rem;
+}
+
+.lead-card-actions > .btn {
+  justify-content: center;
+  width: 100%;
+  padding-inline: 0.5rem;
+}
+
+.lead-card-actions > button:last-of-type:nth-of-type(odd) {
+  grid-column: 1 / -1;
 }
 
 .lead-card-actions .text-link {
