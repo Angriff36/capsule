@@ -29,6 +29,7 @@ import {
   percentText,
 } from "./dashboardRecordSets";
 import { MetricDefinitionList } from "./MetricDefinitionList";
+import { SalesFunnelSection } from "./SalesFunnelSection";
 
 /**
  * Sales Dashboard (Priority 36)
@@ -58,7 +59,7 @@ const STAGE_ORDER: Record<LeadStage, number> = {
 
 const TITLE = "Sales Dashboard";
 const LEAD =
-  "Pipeline visibility, conversion tracking, and sales performance metrics";
+  "The sales funnel for this week, month, quarter or year, for the whole company or one salesperson.";
 
 /**
  * Every figure here is all-time (every event and lead the company has), so
@@ -76,27 +77,28 @@ export function SalesDashboardPage() {
       <AvgEventValueGrowthDashboardPage />
     </MergedSection>
   );
-  if (requested)
-    return (
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-8">
-        <SalesDashboardBody />
-        {avgEventValue}
-      </div>
-    );
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader title={TITLE} lead={LEAD} />
-      <p className="mt-3 max-w-160 text-ink-2">
-        These figures add up every event and lead on file.
-      </p>
-      <button
-        type="button"
-        className="btn btn-primary mt-4"
-        onClick={() => setRequested(true)}
-      >
-        Show all-time sales figures
-      </button>
-      {avgEventValue}
+      <PageHeader eyebrow="Reports · Sales" title={TITLE} lead={LEAD} />
+      {/* Period figures read only their dates, so they show at once. */}
+      <SalesFunnelSection />
+      {requested ? (
+        <SalesDashboardBody />
+      ) : (
+        <div className="mt-8">
+          <p className="max-w-160 text-ink-2">
+            The all-time figures add up every event and lead on file.
+          </p>
+          <button
+            type="button"
+            className="btn btn-primary mt-4"
+            onClick={() => setRequested(true)}
+          >
+            Show all-time sales figures
+          </button>
+        </div>
+      )}
+      <div className="mt-8">{avgEventValue}</div>
     </div>
   );
 }
@@ -416,8 +418,10 @@ function SalesDashboardBody() {
   ];
 
   return (
-    <div className="operations-stage supply-stage">
-      <PageHeader title={TITLE} lead={LEAD} />
+    <div className="mt-8">
+      <h2 className="font-display text-2xl font-bold text-ink">
+        All-time figures
+      </h2>
 
       {events?.length === 0 && leads?.length === 0 ? (
         <div data-testid="dashboard-empty">

@@ -73,6 +73,8 @@ vi.mock("../../src/features/facilities/useEventsById", () => ({
   useAllEventReportRows: () => seed.events ?? [],
   useEventsInRange: (window: unknown) =>
     window === "skip" ? undefined : (seed.events ?? []),
+  useEventRecordsInRange: (window: unknown) =>
+    window === "skip" ? undefined : (seed.events ?? []),
 }));
 vi.mock("../../src/lib/useClientDirectory", () => ({
   useClientDirectory: () => seed.clients ?? [],

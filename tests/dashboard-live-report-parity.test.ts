@@ -15,6 +15,7 @@ vi.mock("../src/lib/manifest-convex-react", () => ({
   useListProposal: () => [],
   useListClient: () => [],
   useListPerson: () => [],
+  useListReferralSource: () => [],
   useListEventCloseout: () => [],
   useListVenue: () => [],
   useListServiceStyle: () => [],
@@ -26,6 +27,8 @@ vi.mock("../src/lib/financeScopedQueries", async () =>
 );
 vi.mock("../src/features/facilities/useEventsById", () => ({
   useAllEventReportRows: () => seed.events,
+  useEventsInRange: () => [],
+  useEventRecordsInRange: () => [],
 }));
 vi.mock("../src/lib/useClientDirectory", () => ({
   useClientDirectory: () => [],
