@@ -361,11 +361,7 @@ export function PayrollPage() {
         <Link className="text-link" to="/reports">
           Reports
         </Link>
-        . Event closeouts live under{" "}
-        <Link className="text-link" to={FINANCE_ROUTES.closeout}>
-          Closeout
-        </Link>
-        .
+        . Each event's closeout lives on that event's Proposal &amp; margin tab.
       </p>
     </div>
   );

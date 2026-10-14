@@ -106,8 +106,17 @@ type TemplateSummary = {
   deletedAt?: number | null;
 };
 
-export function PackListDetailPage() {
-  const { id } = useParams();
+/**
+ * One pack list. On its own URL it is a full page; `listId` + `inEvent`
+ * shows the same sheet inside its event's Equipment tab (owner, 2026-10-14:
+ * "if i want to see the pack list for an event ill go to the event").
+ */
+export function PackListDetailPage({
+  listId,
+  inEvent = false,
+}: { listId?: string; inEvent?: boolean } = {}) {
+  const params = useParams();
+  const id = listId ?? params.id;
   const packList = useRouteRecord(useGetPackList, id);
   // This list's lines only, read by list.
   const items = usePackListItemsFor(packList ? packList._id : null);
@@ -207,10 +216,14 @@ export function PackListDetailPage() {
   if (packList === undefined) {
     return (
       <div className="operations-stage supply-stage order-folio">
-        <ReturnToListLink fallback="/logistics/packs" className="text-link">
-          ← Pack lists
-        </ReturnToListLink>
-        <LogisticsWorkspaceNav />
+        {inEvent ? null : (
+          <>
+            <ReturnToListLink fallback="/logistics/packs" className="text-link">
+              ← Pack lists
+            </ReturnToListLink>
+            <LogisticsWorkspaceNav />
+          </>
+        )}
         <QueryLoadState
           title="Pack list data is not loading"
           detail="The workspace did not return this pack list. Check the session or backend connection, then retry."
@@ -1029,100 +1042,120 @@ export function PackListDetailPage() {
     });
   };
 
+  const headerActions = (
+    <>
+      <StatusChip status={String(packList.status)} />
+      {policy.packListActions(String(packList.status)).map((action) => (
+        <button
+          key={action.key}
+          className="btn btn-ghost"
+          disabled={
+            busy != null ||
+            (action.key === "startPacking" && listItems.length === 0)
+          }
+          title={
+            action.key === "startPacking" && listItems.length === 0
+              ? "Add items before packing."
+              : undefined
+          }
+          onClick={() => invokeList(action.key)}
+        >
+          {busy === `list:${action.key}`
+            ? "Working…"
+            : // Each line also has "Mark packed"; say this one is the list.
+              action.key === "markPacked"
+              ? "Mark list packed"
+              : action.label}
+        </button>
+      ))}
+      {canAddItems ? (
+        <>
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={() => {
+              setShowAdd((value) => !value);
+              setShowTemplates(false);
+            }}
+          >
+            {showAdd ? "Close form" : "Add item"}
+          </button>
+          <button
+            className="btn btn-ghost"
+            type="button"
+            onClick={() => {
+              setShowTemplates((value) => !value);
+              setShowAdd(false);
+            }}
+          >
+            {showTemplates ? "Close templates" : "From template"}
+          </button>
+        </>
+      ) : null}
+      {String(packList.status) !== "cancelled" ? (
+        <button
+          className="btn btn-ghost"
+          type="button"
+          aria-pressed={showScan}
+          onClick={() => setShowScan((value) => !value)}
+        >
+          {showScan ? "Close scan" : "Scan labels"}
+        </button>
+      ) : null}
+      {listIsLive ? (
+        <button
+          className="btn btn-ghost"
+          type="button"
+          disabled={busy != null}
+          onClick={() =>
+            void run("list:refresh", async () => {
+              await refreshPackRules({ packListId: packList._id });
+              setNotice(
+                "Pack lines now match the event and the pack rules. Amounts you set by hand stay.",
+              );
+            })
+          }
+        >
+          {busy === "list:refresh" ? "Working…" : "Update from the event"}
+        </button>
+      ) : null}
+    </>
+  );
+
   return (
     <div className="operations-stage supply-stage order-folio">
-      <ReturnToListLink fallback="/logistics/packs" className="text-link">
-        ← Pack lists
-      </ReturnToListLink>
-      <PageHeader
-        title={<>{packListName(packList.name, eventTitle)}</>}
-        lead={
-          <>
-            {eventTitle}
-            {packList.purpose ? ` · ${packList.purpose}` : ""}
-          </>
-        }
-        actions={
-          <>
-            <StatusChip status={String(packList.status)} />
-            {policy.packListActions(String(packList.status)).map((action) => (
-              <button
-                key={action.key}
-                className="btn btn-ghost"
-                disabled={
-                  busy != null ||
-                  (action.key === "startPacking" && listItems.length === 0)
-                }
-                title={
-                  action.key === "startPacking" && listItems.length === 0
-                    ? "Add items before packing."
-                    : undefined
-                }
-                onClick={() => invokeList(action.key)}
-              >
-                {busy === `list:${action.key}`
-                  ? "Working…"
-                  : // Each line also has "Mark packed"; say this one is the list.
-                    action.key === "markPacked"
-                    ? "Mark list packed"
-                    : action.label}
-              </button>
-            ))}
-            {canAddItems ? (
+      {inEvent ? (
+        <header className="flex flex-wrap items-end justify-between gap-x-4 gap-y-2 border-b border-line pb-3">
+          <div className="min-w-0">
+            <h2 className="font-display text-2xl leading-tight font-bold text-ink">
+              Pack list
+            </h2>
+            {packList.purpose ? (
+              <p className="mt-0.5 text-sm text-ink-2">{packList.purpose}</p>
+            ) : null}
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            {headerActions}
+          </div>
+        </header>
+      ) : (
+        <>
+          <ReturnToListLink fallback="/logistics/packs" className="text-link">
+            ← Pack lists
+          </ReturnToListLink>
+          <PageHeader
+            title={<>{packListName(packList.name, eventTitle)}</>}
+            lead={
               <>
-                <button
-                  className="btn btn-primary"
-                  type="button"
-                  onClick={() => {
-                    setShowAdd((value) => !value);
-                    setShowTemplates(false);
-                  }}
-                >
-                  {showAdd ? "Close form" : "Add item"}
-                </button>
-                <button
-                  className="btn btn-ghost"
-                  type="button"
-                  onClick={() => {
-                    setShowTemplates((value) => !value);
-                    setShowAdd(false);
-                  }}
-                >
-                  {showTemplates ? "Close templates" : "From template"}
-                </button>
+                {eventTitle}
+                {packList.purpose ? ` · ${packList.purpose}` : ""}
               </>
-            ) : null}
-            {String(packList.status) !== "cancelled" ? (
-              <button
-                className="btn btn-ghost"
-                type="button"
-                aria-pressed={showScan}
-                onClick={() => setShowScan((value) => !value)}
-              >
-                {showScan ? "Close scan" : "Scan labels"}
-              </button>
-            ) : null}
-            {listIsLive ? (
-              <button
-                className="btn btn-ghost"
-                type="button"
-                disabled={busy != null}
-                onClick={() =>
-                  void run("list:refresh", async () => {
-                    await refreshPackRules({ packListId: packList._id });
-                    setNotice(
-                      "Pack lines now match the event and the pack rules. Amounts you set by hand stay.",
-                    );
-                  })
-                }
-              >
-                {busy === "list:refresh" ? "Working…" : "Update from the event"}
-              </button>
-            ) : null}
-          </>
-        }
-      />
-      <LogisticsWorkspaceNav />
+            }
+            actions={headerActions}
+          />
+          <LogisticsWorkspaceNav />
+        </>
+      )}
       {failure ? <LogisticsFailureBanner error={failure} /> : null}
       {notice ? (
         <p className="mt-3 text-base text-ink-2" role="status">

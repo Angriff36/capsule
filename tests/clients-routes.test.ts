@@ -11,10 +11,9 @@ import {
 import { NAV_AREAS } from "../src/app/nav";
 
 describe("Clients CRM routes and lifecycle bindings", () => {
-  it("exposes accounts, contracts, and inbox sections (proposals live on their event)", () => {
+  it("exposes accounts and inbox sections (proposals and contracts live on their event)", () => {
     expect(CLIENTS_SECTIONS.map((section) => section.path)).toEqual([
       "/clients",
-      "/clients/contracts",
       "/clients/inbox",
     ]);
   });

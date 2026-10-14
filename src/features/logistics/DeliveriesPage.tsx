@@ -1,7 +1,4 @@
-import { RoutePlannerPage } from "./RoutePlannerPage";
 import { useOverdueVehicleService } from "./vehicleServiceDue";
-import { MergedSection } from "../../ui/MergedSection";
-import { VehicleSchedulePage } from "./VehicleSchedulePage";
 import { Fragment, useMemo, useState, type FormEvent } from "react";
 import { useEventTimingPlan } from "../../lib/operational-transactions";
 import { localDateTime } from "../events/eventDetailFormHelpers";
@@ -70,22 +67,32 @@ const toEpoch = (value: FormDataEntryValue | null) => {
   return Number.isFinite(time) ? time : Number.NaN;
 };
 
-export function DeliveriesPage() {
+/**
+ * Delivery runs. With `eventId` it is that event's deliveries, shown on the
+ * event's Equipment tab (owner, 2026-10-14: "just have the shit fucking tied
+ * to the event"): every run of the event, finished ones too.
+ */
+export function DeliveriesPage({ eventId }: { eventId?: string } = {}) {
   const eventScope = useWorkingEventScope("deliveries");
+  const scopeId = eventId ?? eventScope.scopeId;
   const [showCreate, setShowCreate] = useState(false);
-  const [showTerminal, setShowTerminal] = useState(false);
+  const [showTerminal, setShowTerminal] = useState(eventId != null);
   const [finishedDays, setFinishedDays] = useState(FINISHED_PAGE_DAYS);
   // Runs still on the road always; finished runs only when asked, for the
   // events of the last two weeks, older ones a step at a time.
   const dayStart = new Date().setHours(0, 0, 0, 0);
   const activeDeliveries = useDeliveriesByStatus(ACTIVE_DELIVERY_STATUSES);
   const finishedEvents = useEventsInRange(
-    showTerminal
+    showTerminal && eventId == null
       ? { from: dayStart - finishedDays * DAY_MS, to: dayStart + DAY_MS }
       : "skip",
   );
   const finished = useLogisticsForEvents(
-    showTerminal ? finishedEvents?.map((event) => event._id) : [],
+    eventId != null
+      ? [eventId]
+      : showTerminal
+        ? finishedEvents?.map((event) => event._id)
+        : [],
     DELIVERY_PARTS,
   );
   const deliveries = useMemo(
@@ -163,9 +170,7 @@ export function DeliveriesPage() {
   // Only the list follows the working event; the one-run-per-pack check in
   // submit also reads the picked list's own runs.
   const scopedRows = activeRows.filter(
-    (row) =>
-      eventScope.scopeId == null ||
-      String(row.eventId ?? "") === eventScope.scopeId,
+    (row) => scopeId == null || String(row.eventId ?? "") === scopeId,
   );
   const visibleRows = showTerminal
     ? scopedRows
@@ -184,6 +189,7 @@ export function DeliveriesPage() {
   const schedulablePacks = (packLists ?? []).filter(
     (row) =>
       row.deletedAt == null &&
+      (eventId == null || String(row.eventId) === eventId) &&
       ["packed", "loaded", "dispatched"].includes(String(row.status)) &&
       !finishedEvent(row.eventId),
   );
@@ -201,9 +207,7 @@ export function DeliveriesPage() {
   // Opened while the page shows one event: start on that event's pack list.
   const openCreate = () => {
     const own = schedulablePacks.filter(
-      (pack) =>
-        eventScope.scopeId != null &&
-        String(pack.eventId ?? "") === eventScope.scopeId,
+      (pack) => scopeId != null && String(pack.eventId ?? "") === scopeId,
     );
     if (!pickedPackId && own.length === 1) setPickedPackId(own[0]._id);
     setShowCreate(true);
@@ -442,29 +446,35 @@ export function DeliveriesPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        title="Deliveries"
-        lead="Schedule a delivery from a packed pack list, assign a driver and vehicle, then start transit and confirm delivery."
-        actions={
-          <>
-            <button
-              className="btn btn-ghost"
-              type="button"
-              onClick={() => setShowTerminal((value) => !value)}
-            >
-              {showTerminal ? "Hide completed" : "Show completed"}
-            </button>
-            <button
-              className="btn btn-primary"
-              type="button"
-              onClick={() => (showCreate ? setShowCreate(false) : openCreate())}
-            >
-              {showCreate ? "Close form" : "Schedule delivery"}
-            </button>
-          </>
-        }
-      />
-      <LogisticsWorkspaceNav />
+      {eventId != null ? null : (
+        <>
+          <PageHeader
+            title="Deliveries"
+            lead="Schedule a delivery from a packed pack list, assign a driver and vehicle, then start transit and confirm delivery."
+            actions={
+              <>
+                <button
+                  className="btn btn-ghost"
+                  type="button"
+                  onClick={() => setShowTerminal((value) => !value)}
+                >
+                  {showTerminal ? "Hide completed" : "Show completed"}
+                </button>
+                <button
+                  className="btn btn-primary"
+                  type="button"
+                  onClick={() =>
+                    showCreate ? setShowCreate(false) : openCreate()
+                  }
+                >
+                  {showCreate ? "Close form" : "Schedule delivery"}
+                </button>
+              </>
+            }
+          />
+          <LogisticsWorkspaceNav />
+        </>
+      )}
       {failure ? <LogisticsFailureBanner error={failure} /> : null}
       {notice ? (
         <p className="mt-3 text-base text-ink-2" role="status">
@@ -557,38 +567,50 @@ export function DeliveriesPage() {
           </div>
           {schedulablePacks.length === 0 ? (
             <p className="mt-3 text-base text-ink-2">
-              No packed pack lists are ready.{" "}
-              <Link className="text-link" to="/logistics/packs">
-                Finish packing first
-              </Link>
+              No packed pack list is ready.{" "}
+              <a className="text-link" href="#pack-list">
+                Finish the pack list first
+              </a>
               .
             </p>
           ) : null}
         </form>
       ) : null}
 
-      <WorkingEventScopeNote scope={eventScope} noun="deliveries" />
+      {eventId != null ? null : (
+        <WorkingEventScopeNote scope={eventScope} noun="deliveries" />
+      )}
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
             <p className="eyebrow">On the schedule</p>
             <h2>Deliveries</h2>
           </div>
-          <span>
-            {formatCountNoun(visibleRows.length, "delivery", "deliveries")}
-          </span>
+          {eventId != null ? (
+            <button
+              className="btn btn-primary btn-sm"
+              type="button"
+              onClick={() => (showCreate ? setShowCreate(false) : openCreate())}
+            >
+              {showCreate ? "Close form" : "Schedule delivery"}
+            </button>
+          ) : (
+            <span>
+              {formatCountNoun(visibleRows.length, "delivery", "deliveries")}
+            </span>
+          )}
         </div>
         {loading ? (
           <TableSkeleton rows={5} />
         ) : visibleRows.length === 0 ? (
           <div className="document-empty">
-            <p>No active deliveries.</p>
+            <p>No deliveries yet.</p>
             <span>
-              Deliveries start from packed lists — open{" "}
-              <Link className="text-link" to="/logistics/packs">
-                Pack lists
-              </Link>{" "}
-              to pack an event first, then schedule the run here.
+              A delivery starts from a packed list.{" "}
+              <a className="text-link" href="#pack-list">
+                Pack the pack list
+              </a>
+              , then schedule the run here.
             </span>
             <div className="mt-3 flex justify-center">
               {showCreate ? null : (
@@ -772,7 +794,7 @@ export function DeliveriesPage() {
             </table>
           </div>
         )}
-        {showTerminal && !loading ? (
+        {showTerminal && !loading && eventId == null ? (
           <div className="mt-3 flex justify-center">
             <button
               type="button"
@@ -786,20 +808,6 @@ export function DeliveriesPage() {
           </div>
         ) : null}
       </section>
-      <MergedSection
-        id="vehicles"
-        title="Vehicles by day"
-        summary="Each vehicle's runs for one day, and runs with no vehicle yet."
-      >
-        <VehicleSchedulePage />
-      </MergedSection>
-      <MergedSection
-        id="route"
-        title="Route order"
-        summary="Suggested stop order for one day and vehicle, ready to print."
-      >
-        <RoutePlannerPage />
-      </MergedSection>
     </div>
   );
 }

@@ -104,8 +104,8 @@ export const FIELD_HELP: Record<FieldHelpTerm, FieldHelpEntry> = {
     example:
       "After the event is closed out, capture the recorded totals and finalize the folio when the reconciliation is ready.",
     link: {
-      href: "/finance/closeout",
-      label: "See the event-to-purchase cascade",
+      href: "/events",
+      label: "Open the event: closeout is on its Proposal & margin tab",
     },
   },
 };

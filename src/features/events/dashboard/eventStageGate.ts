@@ -211,14 +211,8 @@ function executionChecks(
         ? count(packListIds.length, "list")
         : undefined,
       fix: {
-        label: packListIds.length === 1 ? "Open pack list" : "Open pack lists",
-        to: {
-          kind: "route",
-          to:
-            packListIds.length === 1
-              ? `/logistics/packs/${packListIds[0]}`
-              : "/logistics/packs",
-        },
+        label: "Open pack list",
+        to: { kind: "tab", tab: "equipment" },
       },
     },
     {
@@ -233,7 +227,7 @@ function executionChecks(
         : undefined,
       fix: {
         label: "Open deliveries",
-        to: { kind: "route", to: "/logistics/deliveries" },
+        to: { kind: "tab", tab: "equipment" },
       },
     },
   ];

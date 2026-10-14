@@ -22,11 +22,10 @@ import {
 } from "../src/generated/manifest-wiring-bindings";
 
 describe("Finance routes and lifecycle bindings", () => {
-  it("exposes invoice, payment, closeout, and payroll sections", () => {
+  it("exposes invoice, payment and payroll sections (closeouts live on their event)", () => {
     expect(FINANCE_SECTIONS.map((section) => section.path)).toEqual([
       "/finance/invoices",
       "/finance/payments",
-      "/finance/closeout",
       "/finance/payroll",
     ]);
   });

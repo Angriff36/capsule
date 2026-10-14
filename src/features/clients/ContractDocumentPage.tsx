@@ -162,8 +162,11 @@ export function ContractDocumentPage() {
           </p>
         </div>
         <div className="supply-row-actions">
-          <Link className="btn btn-ghost" to={CLIENTS_ROUTES.contracts}>
-            Back to contracts
+          <Link
+            className="btn btn-ghost"
+            to={`/events/${String(contract.eventId)}?tab=margin#contract`}
+          >
+            Back to the event
           </Link>
           <button
             className="btn btn-primary"

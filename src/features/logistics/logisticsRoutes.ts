@@ -1,7 +1,5 @@
 export const LOGISTICS_SECTIONS = [
   { key: "dispatch", label: "Dispatch board", path: "/logistics/dispatch" },
-  { key: "packs", label: "Pack lists", path: "/logistics/packs" },
-  { key: "deliveries", label: "Deliveries", path: "/logistics/deliveries" },
   { key: "fleet", label: "Fleet", path: "/logistics/fleet" },
   {
     key: "pack-templates",

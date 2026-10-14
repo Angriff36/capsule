@@ -12,11 +12,9 @@ import {
 } from "../src/generated/manifest-wiring-bindings";
 
 describe("Logistics routes and lifecycle bindings", () => {
-  it("exposes pack list and delivery sections", () => {
+  it("keeps pack lists and deliveries on their event, not in the strip (owner, 2026-10-14)", () => {
     expect(LOGISTICS_SECTIONS.map((section) => section.path)).toEqual([
       "/logistics/dispatch",
-      "/logistics/packs",
-      "/logistics/deliveries",
       "/logistics/fleet",
       "/logistics/pack-templates",
     ]);

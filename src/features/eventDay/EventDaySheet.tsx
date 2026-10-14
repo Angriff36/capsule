@@ -48,9 +48,9 @@ function capsuleLink(key: EventDaySectionKey, eventId: string): string {
     case "contacts":
       return eventDetailPath(eventId, "client");
     case "vehicles":
-      return "/logistics/deliveries";
+      return `${eventDetailPath(eventId, "equipment")}#deliveries`;
     case "packlist":
-      return "/logistics/packs";
+      return `${eventDetailPath(eventId, "equipment")}#pack-list`;
   }
 }
 

@@ -26,14 +26,10 @@ beforeAll(async () => {
 it.each([
   ["/events", "Events"],
   ["/clients", "Clients"],
-  ["/clients/contracts", "Contracts"],
   ["/finance/invoices", "Invoices"],
   ["/finance/payments", "Payments"],
-  ["/finance/closeout", "Event closeouts"],
   ["/finance/payroll", "Payroll inputs"],
-  ["/logistics/packs", "Pack lists"],
   ["/logistics/pack-templates", "Pack setup"],
-  ["/logistics/deliveries", "Deliveries"],
   ["/reports", "Reports"],
   ["/inventory/stock", "Stock"],
   ["/inventory/purchasing", "Weekly purchasing drafts"],
@@ -63,22 +59,44 @@ it.each([
   },
 );
 
-it.each(["/logistics/pack-lists", "/logistics/packlists"])(
-  "redirects the legacy %s bookmark to the working pack list",
-  async (path) => {
-    await mount(createElement(App), path);
-    await act(async () => {
-      await vi.dynamicImportSettled();
-    });
-    await vi.waitFor(async () => {
-      await act(async () => {});
-      expect(location).toBe("/logistics/packs");
-      expect(container.querySelector("main h1")?.textContent).toBe(
-        "Pack lists",
-      );
-    });
-  },
-);
+// Pack lists, deliveries, contracts and closeouts live on their event (owner,
+// 2026-10-14); the old list pages send people to the board or the events.
+it.each([
+  ["/logistics/pack-lists", "/logistics/dispatch"],
+  ["/logistics/packlists", "/logistics/dispatch"],
+  ["/logistics/packs", "/logistics/dispatch"],
+  ["/logistics/deliveries", "/logistics/dispatch"],
+  ["/clients/contracts", "/events"],
+  ["/finance/closeout", "/events"],
+])("sends the old %s list to %s", async (path, target) => {
+  await mount(createElement(App), path);
+  await act(async () => {
+    await vi.dynamicImportSettled();
+  });
+  await vi.waitFor(async () => {
+    await act(async () => {});
+    expect(location).toBe(target);
+  });
+});
+
+it("opens an old pack list link on its event's Equipment tab", async () => {
+  const eventId = "kd7ez3fz56ya246m6p17az2ad58crnwh";
+  backend.values.set("useGetPackList", {
+    _id: recordId,
+    version: 1,
+    eventId,
+    name: "Harborview service pack",
+    status: "draft",
+  });
+  await mount(createElement(App), `/logistics/packs/${recordId}`);
+  await act(async () => {
+    await vi.dynamicImportSettled();
+  });
+  await vi.waitFor(async () => {
+    await act(async () => {});
+    expect(location).toBe(`/events/${eventId}?tab=equipment`);
+  });
+});
 
 const recordId = "nn7ez3fz56ya246m6p17az2ad58crnwg";
 it.each([
@@ -93,12 +111,6 @@ it.each([
     "useGetVendorOrder",
     "PO-204",
     { orderNumber: "PO-204", status: "received", totalAmount: 120 },
-  ],
-  [
-    "/logistics/packs",
-    "useGetPackList",
-    "Harborview service pack",
-    { name: "Harborview service pack", status: "draft" },
   ],
   [
     "/kitchen/ingredients",

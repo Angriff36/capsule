@@ -337,13 +337,24 @@ export function ClientDetailPage() {
               ))}
           </ul>
         )}
-        <p className="border-t border-line px-3 py-3 text-base text-ink-2">
-          {clientContracts.length} contract
-          {clientContracts.length === 1 ? "" : "s"} for this client.{" "}
-          <Link className="text-link" to={CLIENTS_ROUTES.contracts}>
-            Open contracts
-          </Link>
-        </p>
+        {/* Each contract opens on its event, where it is drafted and signed. */}
+        {clientContracts.length === 0 ? null : (
+          <ul className="divide-y divide-line border-t border-line">
+            {clientContracts.map((contract) => (
+              <li key={contract._id}>
+                <Link
+                  className="flex items-center justify-between gap-3 px-3 py-2.5 hover:bg-inset"
+                  to={`/events/${String(contract.eventId)}?tab=margin#contract`}
+                >
+                  <span className="min-w-0 truncate font-medium text-ink">
+                    {contract.title || "Contract"}
+                  </span>
+                  <StatusChip status={String(contract.status)} />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </Section>
 
       <Section title="Invoices" count={clientInvoices.length}>

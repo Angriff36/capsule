@@ -42,6 +42,22 @@ export function useEventProposals(eventId: string | undefined) {
   );
 }
 
+/** One event's contracts (shown on the event, owner 2026-10-14). */
+export function useEventContracts(eventId: string | null | undefined) {
+  return useQuery(
+    api.queries.listContractByEventId,
+    eventId ? { eventId: eventId as Id<"events"> } : "skip",
+  );
+}
+
+/** One event's closeout (shown on the event, owner 2026-10-14). */
+export function useEventCloseouts(eventId: string | null | undefined) {
+  return useQuery(
+    api.queries.listEventCloseoutByEventId,
+    eventId ? { eventId: eventId as Id<"events"> } : "skip",
+  );
+}
+
 /** One event's pack lists, never the whole company's (PL-SCALE). */
 export function useEventPackLists(eventId: string) {
   return useQuery(api.queries.listPackListByEventId, {

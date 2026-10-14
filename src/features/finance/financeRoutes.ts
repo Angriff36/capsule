@@ -1,7 +1,6 @@
 export const FINANCE_SECTIONS = [
   { key: "invoices", label: "Invoices", path: "/finance/invoices" },
   { key: "payments", label: "Payments", path: "/finance/payments" },
-  { key: "closeout", label: "Closeout", path: "/finance/closeout" },
   { key: "payroll", label: "Payroll", path: "/finance/payroll" },
 ] as const;
 

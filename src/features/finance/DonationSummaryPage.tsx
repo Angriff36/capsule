@@ -64,11 +64,8 @@ export function DonationSummaryPage() {
           <p className="mt-3 max-w-160 text-ink-2">
             Every donation of leftover food in a year, by recipient, with
             weights, values, receipts and handling notes. Print it for the tax
-            file and Good Samaritan Act records. Record leftovers on each{" "}
-            <Link className="text-link" to={FINANCE_ROUTES.closeout}>
-              closeout
-            </Link>
-            .
+            file and Good Samaritan Act records. Record leftovers on each
+            event's closeout, on its Proposal &amp; margin tab.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -132,11 +129,8 @@ export function DonationSummaryPage() {
             <div className="document-empty">
               <p>No donations recorded for {summary.year}.</p>
               <span>
-                Record leftovers from the{" "}
-                <Link className="text-link" to={FINANCE_ROUTES.closeout}>
-                  closeout screen
-                </Link>
-                .
+                Record leftovers on the event's closeout, on its Proposal &amp;
+                margin tab.
               </span>
             </div>
           ) : (

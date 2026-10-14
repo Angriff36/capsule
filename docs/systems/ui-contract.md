@@ -37,16 +37,22 @@ Screens (25): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 - `queries.listClientContactByClientId` - live read
 - `queries.listClientOutreachTaskByClientId` - live read
 - `queries.listContractByClientId` - live read
+- `queries.listContractByEventId` - live read
 - `queries.listCreditMemoByClientId` - live read
 - `queries.listCreditMemoBySourceInvoiceId` - live read
 - `queries.listDateHoldByHoldDate` - live read
 - `queries.listDateWaitlistEntryByHoldDate` - live read
+- `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEvent` - live read
 - `queries.listEventAssignmentByEventId` - live read
 - `queries.listEventCloseoutByEventId` - live read
 - `queries.listEventCloseoutByTenantIdAndStatus` - live read
+- `queries.listEventGuestByEventId` - live read
 - `queries.listEventNumberAssignmentByEventId` - live read
+- `queries.listEventStaffNeedByEventId` - live read
 - `queries.listEventTimelineActivityByEventId` - live read
+- `queries.listEventTimelineCommentByEventId` - live read
+- `queries.listIngredientDemandByEventId` - live read
 - `queries.listInvoiceByClientId` - live read
 - `queries.listInvoiceByEventId` - live read
 - `queries.listInvoiceByTenantIdAndStatus` - live read
@@ -60,6 +66,7 @@ Screens (25): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 - `queries.listPayrollExportRecordByPersonId` - live read
 - `queries.listPayrollInputByEventId` - live read
 - `queries.listPerson` - live read
+- `queries.listPrepTaskByEventId` - live read
 - `queries.listProposalByClientId` - live read
 - `queries.listProposalByEventId` - live read
 - `queries.listProposalDishSelectionByProposalId` - live read
@@ -68,10 +75,13 @@ Screens (25): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 - `queries.listProposalRevisionByProposalId` - live read
 - `queries.listQuoteSubmissionByTenantIdAndStatus` - live read
 - `queries.listReferralSource` - live read
+- `queries.listRentalOrderLineByEventId` - live read
 - `queries.listRevenueAttributionByEventId` - live read
+- `queries.listReviewFlagByEventId` - live read
 - `queries.listSavedReportSnapshotBySavedReportDefinitionId` - live read
 - `queries.listServiceStyle` - live read
 - `queries.listShareLinkByProposalId` - live read
+- `queries.listShiftByEventId` - live read
 - `queries.listSignatureRequestByProposalRevisionId` - live read
 - `queries.listTastingDishByTastingId` - live read
 
@@ -403,6 +413,7 @@ Screens (25): `clients/ClientCommunicationPanel.tsx`, `clients/ClientContactEdit
 - `financeWindow.page` - query; live read, updates by itself
 - `financeWindow.threadLastMessageAt` - query; live read, updates by itself
 - `lib.clientOutreach.ensureOpen` - mutation; authored step; live reads update by themselves
+- `lib.proposalPreview.previewProposalFromEvent` - query; live read, updates by itself
 - `lib.proposalRevision.sendProposalWithRevisionCapture` - mutation; authored step; live reads update by themselves
 - `messageInbox.ingestInboundMessage` - action; one-time call (not live); the live reads it changes update by themselves
 - `messageInbox.ingestProviderEnvelope` - action; one-time call (not live); the live reads it changes update by themselves
@@ -434,6 +445,7 @@ Screens (37): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 - `queries.listClientContactByClientId` - live read
 - `queries.listClientOutreachTaskByClientId` - live read
 - `queries.listContractByClientId` - live read
+- `queries.listContractByEventId` - live read
 - `queries.listCreditMemoByClientId` - live read
 - `queries.listCreditMemoBySourceInvoiceId` - live read
 - `queries.listDateHoldByHoldDate` - live read
@@ -701,6 +713,7 @@ Screens (68): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `queries.getLead` - live read
 - `queries.getProposal` - live read
 - `queries.listClientContactByClientId` - live read
+- `queries.listContractByEventId` - live read
 - `queries.listCorrectiveActionByEventId` - live read
 - `queries.listDeliveryByPackListId` - live read
 - `queries.listDish` - live read
@@ -1518,6 +1531,7 @@ Screens (176): `events/AllergenBriefingButton.tsx`, `events/CateringPackagePicke
 - `queries.listComponentPortionSpecByComponentId` - live read
 - `queries.listComponentSnapshotByComponentId` - live read
 - `queries.listComponentStepByComponentId` - live read
+- `queries.listContractByEventId` - live read
 - `queries.listCorrectiveActionByEventId` - live read
 - `queries.listDish` - live read
 - `queries.listDishComponent` - live read
@@ -2685,6 +2699,7 @@ Screens (22): `events/EventDaySheetPanel.tsx`, `events/EventDriveTimePanel.tsx`,
 
 - `queries.getEvent` - live read
 - `queries.listClientContactByClientId` - live read
+- `queries.listContractByEventId` - live read
 - `queries.listCorrectiveActionByEventId` - live read
 - `queries.listDishComponentByDishId` - live read
 - `queries.listDishIngredientByDishId` - live read
@@ -2906,6 +2921,7 @@ Screens (75): `events/EventStaffBilling.tsx`, `events/EventStaffingAddForm.tsx`,
 - `queries.listClientContactByClientId` - live read
 - `queries.listClientOutreachTaskByClientId` - live read
 - `queries.listContractByClientId` - live read
+- `queries.listContractByEventId` - live read
 - `queries.listCorrectiveActionByEventId` - live read
 - `queries.listCreditMemoByClientId` - live read
 - `queries.listCreditMemoBySourceInvoiceId` - live read
@@ -3763,7 +3779,7 @@ Screens (75): `events/EventStaffBilling.tsx`, `events/EventStaffingAddForm.tsx`,
 
 ## 7. Pack list and warehouse
 
-Screens (30): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`, `logistics/EventTripChecks.tsx`, `logistics/LogisticsOverviewPage.tsx`, `logistics/PackBinSheet.tsx`, `logistics/PackFoodPackaging.tsx`, `logistics/PackingFloorPage.tsx`, `logistics/PackLineWhy.tsx`, `logistics/PackListDetailPage.tsx`, `logistics/PackListItemForm.tsx`, `logistics/PackListItemTable.tsx`, `logistics/PackListKitAssistBar.tsx`, `logistics/PackListSourcePanel.tsx`, `logistics/PackListsPage.tsx`, `logistics/PackListTemplatesPage.tsx`, `logistics/PackListViews.tsx`, `logistics/PackReadinessNotice.tsx`, `logistics/PackRuleFields.tsx`, `logistics/PackRulesPage.tsx`, `logistics/PackScanPanel.tsx`, `logistics/PackTemplatePreview.tsx`, `logistics/RoutePlannerPage.tsx`, `logistics/ServiceStyleKitLineFields.tsx`, `logistics/ServiceStyleKitLineTable.tsx`, `logistics/ServiceStyleKitsPage.tsx`, `logistics/TripCheckPanel.tsx`, `logistics/usePackRigs.ts`, `logistics/VehicleFleetPage.tsx`, `logistics/VehicleMaintenancePage.tsx`, `logistics/VehicleSchedulePage.tsx`
+Screens (30): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`, `logistics/EventTripChecks.tsx`, `logistics/LogisticsOverviewPage.tsx`, `logistics/PackBinSheet.tsx`, `logistics/PackFoodPackaging.tsx`, `logistics/PackingFloorPage.tsx`, `logistics/PackLineWhy.tsx`, `logistics/PackListDetailPage.tsx`, `logistics/PackListItemForm.tsx`, `logistics/PackListItemTable.tsx`, `logistics/PackListKitAssistBar.tsx`, `logistics/PackListOnEvent.tsx`, `logistics/PackListSourcePanel.tsx`, `logistics/PackListTemplatesPage.tsx`, `logistics/PackListViews.tsx`, `logistics/PackReadinessNotice.tsx`, `logistics/PackRuleFields.tsx`, `logistics/PackRulesPage.tsx`, `logistics/PackScanPanel.tsx`, `logistics/PackTemplatePreview.tsx`, `logistics/RoutePlannerPage.tsx`, `logistics/ServiceStyleKitLineFields.tsx`, `logistics/ServiceStyleKitLineTable.tsx`, `logistics/ServiceStyleKitsPage.tsx`, `logistics/TripCheckPanel.tsx`, `logistics/usePackRigs.ts`, `logistics/VehicleFleetPage.tsx`, `logistics/VehicleMaintenancePage.tsx`, `logistics/VehicleSchedulePage.tsx`
 
 ### Generated reads
 
@@ -4008,13 +4024,6 @@ Screens (30): `logistics/DeliveriesPage.tsx`, `logistics/DispatchBoardPage.tsx`,
   - refusals (role, stage and rules): "Staff may see pack lists"; "Kitchen, logistics, event and sales staff and managers may update pack lists"; "Kitchen, logistics, event and sales staff and managers may change pack lists"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 3 more
   - effects: PackListCancelled
   - refresh: live reads update by themselves; reads affected: PackList.list, PackList.get, Delivery.list, Delivery.get, DepartureOverride.list, DepartureOverride.get, Event.list, Event.get and 6 more
-- `mutations.PackList_createViaOpen` (PackList.open)
-  - inputs from the screen: eventId, name, purpose, notes; filled by the server: none
-  - version: not used; retry key: accepted (same key = same result)
-  - result: allocation `{ docId: string }`
-  - refusals (role, stage and rules): "Staff may see pack lists"; "Kitchen, logistics, event and sales staff and managers may update pack lists"; "Kitchen, logistics, event and sales staff and managers may change pack lists"; "Guard 0 failed"; "Guard 1 failed"; "Guard 2 failed"; and 4 more
-  - effects: PackListOpened, PackListKitRequested
-  - refresh: live reads update by themselves; reads affected: PackList.list, PackList.get, Delivery.list, Delivery.get, DepartureOverride.list, DepartureOverride.get, Event.list, Event.get and 10 more
 - `mutations.PackList_dispatch` (PackList.dispatch)
   - inputs from the screen: none; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -4310,6 +4319,7 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
 - `queries.getEvent` - live read
 - `queries.getVenue` - live read
 - `queries.listClientContactByClientId` - live read
+- `queries.listContractByEventId` - live read
 - `queries.listCorrectiveActionByEventId` - live read
 - `queries.listDeliveryByPackListId` - live read
 - `queries.listDishComponentByDishId` - live read
@@ -4619,13 +4629,15 @@ Screens (20): `events/EventBattleBoardLayoutsPanel.tsx`, `events/EventEquipmentA
 
 ## 9. Final Lock and event packet
 
-Screens (13): `events/packet/EventPacketPanel.tsx`, `events/packet/EventWorkbookRow.tsx`, `events/packet/EventWorkbooksPage.tsx`, `events/packet/FieldFormAnswerInputs.tsx`, `events/packet/FieldFormCard.tsx`, `events/packet/FieldFormsPanel.tsx`, `events/packet/FinalLockQuestions.tsx`, `events/packet/OutsideChannelForm.tsx`, `events/review-flags/EventReviewFlagsPanel.tsx`, `events/review-flags/EventReviewFlagsSection.tsx`, `events/review-flags/ReviewFlagButton.tsx`, `events/review-flags/ReviewFlagInline.tsx`, `events/review-flags/useEventReviewFlags.ts`
+Screens (11): `events/packet/EventPacketPanel.tsx`, `events/packet/FieldFormAnswerInputs.tsx`, `events/packet/FieldFormCard.tsx`, `events/packet/FieldFormsPanel.tsx`, `events/packet/FinalLockQuestions.tsx`, `events/packet/OutsideChannelForm.tsx`, `events/review-flags/EventReviewFlagsPanel.tsx`, `events/review-flags/EventReviewFlagsSection.tsx`, `events/review-flags/ReviewFlagButton.tsx`, `events/review-flags/ReviewFlagInline.tsx`, `events/review-flags/useEventReviewFlags.ts`
 
 ### Generated reads
 
 - `queries.getEvent` - live read
+- `queries.listContractByEventId` - live read
 - `queries.listEquipmentReservationByEventId` - live read
 - `queries.listEventAssignmentByEventId` - live read
+- `queries.listEventCloseoutByEventId` - live read
 - `queries.listEventGuestByEventId` - live read
 - `queries.listEventStaffNeedByEventId` - live read
 - `queries.listEventTimelineActivityByEventId` - live read
@@ -4758,6 +4770,7 @@ Screens (71): `events/EventBudgetCard.tsx`, `events/EventClientBillingPanel.tsx`
 - `queries.listComponentSnapshotByComponentId` - live read
 - `queries.listComponentStepByComponentId` - live read
 - `queries.listContractByClientId` - live read
+- `queries.listContractByEventId` - live read
 - `queries.listCorrectiveActionByEventId` - live read
 - `queries.listCreditMemoByClientId` - live read
 - `queries.listCreditMemoBySourceInvoiceId` - live read
