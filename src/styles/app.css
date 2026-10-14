@@ -243,6 +243,10 @@
   .field-label {
     @apply grid gap-1 text-xs font-semibold text-ink-2;
   }
+  /* A file picker's own width must not push its field past a phone screen. */
+  label:has(> input[type="file"]) {
+    grid-template-columns: minmax(0, 1fr);
+  }
   /* Unit-aware quantity (src/ui/UnitQuantityInput.tsx). */
   .unit-quantity {
     @apply grid gap-1;
