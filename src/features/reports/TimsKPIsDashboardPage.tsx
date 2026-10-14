@@ -67,7 +67,7 @@ export function TimsKPIsDashboardPage() {
       </p>
       <button
         type="button"
-        className="btn btn-primary mt-4"
+        className="btn btn-primary mt-4 self-start justify-self-start"
         onClick={() => setRequested(true)}
       >
         Show all-time KPIs
