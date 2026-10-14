@@ -28,6 +28,7 @@ export function EventTrackerHome() {
   const switcher = (
     <SegmentedTabs
       label="Tracker view"
+      className="mb-4"
       options={VIEWS.map((entry) => ({ value: entry.key, label: entry.label }))}
       value={view}
       onChange={(key) => {
