@@ -32,6 +32,7 @@ import {
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useAwayForPeople } from "../../lib/eventHistoryQueries";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { SegmentedTabs } from "../../ui/SegmentedTabs";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import {
   EventStaffingCoverageView,
@@ -57,6 +58,11 @@ import {
   EventTimelineStaffRoster,
   type PersonRow,
 } from "./eventTimelineStaffRoster";
+
+const STAFFING_VIEWS = [
+  { value: "board", label: "Shift board" },
+  { value: "list", label: "Crew list" },
+] as const;
 
 type Props = {
   eventId: string;
@@ -98,7 +104,8 @@ export function EventStaffingTab({ eventId }: Props) {
   const leaveWaitlist = useStaffNeedWaitlistEntryLeave();
   const autoFill = useAutoFillEventStaffNeeds();
   const [autoFillNote, setAutoFillNote] = useState<string | null>(null);
-  const [view, setView] = useState<"board" | "list">("board");
+  const [view, setView] =
+    useState<(typeof STAFFING_VIEWS)[number]["value"]>("board");
   const routeLegs = useEventRouteLegs(eventId as Id<"events">);
   const trucks = (routeLegs?.legs ?? []).filter((leg) => leg.kind === "rig");
   const [busy, setBusy] = useState<string | null>(null);
@@ -491,24 +498,12 @@ export function EventStaffingTab({ eventId }: Props) {
       ) : null}
       {host}
 
-      <div className="sb-view-switch" role="tablist" aria-label="Staffing view">
-        {(
-          [
-            ["board", "Shift board"],
-            ["list", "Crew list"],
-          ] as const
-        ).map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            role="tab"
-            aria-selected={view === key}
-            onClick={() => setView(key)}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+      <SegmentedTabs
+        label="Staffing view"
+        options={STAFFING_VIEWS}
+        value={view}
+        onChange={setView}
+      />
 
       {view === "board" ? (
         <ShiftBoard

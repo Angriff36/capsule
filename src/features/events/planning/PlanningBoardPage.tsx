@@ -52,6 +52,7 @@ import {
 import { useAuthStatus } from "../../../lib/useAuthStatus";
 import { useActionPrompt } from "../../../ui/action-prompt";
 import { QueryLoadState } from "../../../ui/QueryLoadState";
+import { SegmentedTabs } from "../../../ui/SegmentedTabs";
 import { useSlowQuery } from "../../../ui/useSlowQuery";
 import { useSuccessToast } from "../../../ui/useSuccessToast";
 import { resolveManifestPolicies } from "../../admin/rolePermissionAudit";
@@ -838,20 +839,16 @@ export function PlanningBoardPage() {
             >
               Today
             </button>
-            <div className="plan-switch" role="tablist" aria-label="Days shown">
-              {VIEWS.map((entry) => (
-                <button
-                  key={entry.key}
-                  type="button"
-                  role="tab"
-                  aria-selected={view === entry.key}
-                  data-active={view === entry.key || undefined}
-                  onClick={() => setView(entry.key)}
-                >
-                  {entry.label}
-                </button>
-              ))}
-            </div>
+            <SegmentedTabs
+              label="Days shown"
+              size="sm"
+              options={VIEWS.map((entry) => ({
+                value: entry.key,
+                label: entry.label,
+              }))}
+              value={view}
+              onChange={setView}
+            />
             <BoundedDateInput
               naturalDateDirection="any"
               className="input w-auto"

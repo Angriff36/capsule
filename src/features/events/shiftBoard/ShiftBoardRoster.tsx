@@ -1,5 +1,12 @@
 import { useState, type DragEvent } from "react";
+import { SegmentedTabs } from "../../../ui/SegmentedTabs";
 import { GROUPS, groupOf, initialsOf, type RoleGroup } from "./shiftBoardModel";
+
+const SHOW_OPTIONS = [
+  { value: "all", label: "All" },
+  { value: "free", label: "Available" },
+  { value: "on", label: "Assigned" },
+] as const;
 
 export interface RosterPerson {
   personId: string;
@@ -102,25 +109,13 @@ export function ShiftBoardRoster({
   return (
     <aside className="sb-roster" aria-label="Crew">
       <div className="sb-pane-head">
-        <div className="sb-seg" role="tablist" aria-label="Show">
-          {(
-            [
-              ["all", "All"],
-              ["free", "Available"],
-              ["on", "Assigned"],
-            ] as const
-          ).map(([key, label]) => (
-            <button
-              key={key}
-              type="button"
-              role="tab"
-              aria-selected={show === key}
-              onClick={() => setShow(key)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <SegmentedTabs
+          label="Show"
+          size="sm"
+          options={SHOW_OPTIONS}
+          value={show}
+          onChange={setShow}
+        />
         <input
           type="search"
           className="input sb-find"

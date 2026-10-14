@@ -1,25 +1,6 @@
 /* Dispatch board: ruled rows, one per event going out. No cards: the state
    of a row is a rule on its leading edge plus its status chip. */
 
-.dispatch-switch {
-  display: inline-flex;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-pill);
-  background: var(--color-inset);
-  padding: 0.125rem;
-}
-.dispatch-switch > button {
-  min-height: 2rem;
-  padding: 0.25rem 0.875rem;
-  border-radius: var(--radius-pill);
-  font-size: var(--text-sm);
-  color: var(--color-ink-2);
-}
-.dispatch-switch > button[data-active] {
-  background: var(--color-brand);
-  color: var(--color-on-brand);
-}
-
 .dispatch-board {
   margin-top: 1.5rem;
   border-top: 1.5px solid var(--color-ink);

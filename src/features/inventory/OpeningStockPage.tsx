@@ -20,6 +20,7 @@ import {
 import { formatCountNoun } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { PageHeader, TableSkeleton } from "../../ui/primitives";
+import { SegmentedTabs } from "../../ui/SegmentedTabs";
 import {
   useApplyOpeningStock,
   useReviewOpeningStock,
@@ -218,19 +219,17 @@ export function OpeningStockPage() {
                   : `Use all ${readyFood.length} as opening stock`}
             </button>
           ) : null}
-          <div className="flex flex-wrap gap-2" role="tablist">
-            {TABS.map(([value, label]) => (
-              <button
-                key={value}
-                role="tab"
-                aria-selected={tab === value}
-                className={`btn btn-sm ${tab === value ? "btn-primary" : "btn-ghost"}`}
-                onClick={() => setTab(value)}
-              >
-                {label} ({counts[value]})
-              </button>
-            ))}
-          </div>
+          <SegmentedTabs
+            label="Count sheet rows"
+            size="sm"
+            options={TABS.map(([value, label]) => ({
+              value,
+              label,
+              count: counts[value],
+            }))}
+            value={tab}
+            onChange={setTab}
+          />
         </div>
         {records === undefined ? (
           <TableSkeleton rows={5} />

@@ -9,6 +9,7 @@ import {
   useListIngredient,
   useListServiceStyle,
 } from "../../../lib/manifest-convex-react";
+import { SegmentedTabs } from "../../../ui/SegmentedTabs";
 import type { ServiceStyleOption } from "../stylePackaging";
 import { isRecipeSheet, recipeSheetSave } from "./RecipeSheetParser";
 import {
@@ -72,6 +73,10 @@ const RESUMABLE_STATUSES: ReadonlySet<string> = new Set([
 ]);
 
 type MobilePane = "source" | "review";
+const MOBILE_PANES = [
+  { value: "source", label: "Source" },
+  { value: "review", label: "Review" },
+] as const;
 
 const NO_LINES: never[] = [];
 
@@ -619,29 +624,14 @@ export function ComponentImportPage() {
         </div>
       ) : (
         <>
-          <div
-            className="component-import-mobile-tabs"
-            role="tablist"
-            aria-label="Import panes"
-          >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mobilePane === "source"}
-              className={mobilePane === "source" ? "is-active" : undefined}
-              onClick={() => setMobilePane("source")}
-            >
-              Source
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={mobilePane === "review"}
-              className={mobilePane === "review" ? "is-active" : undefined}
-              onClick={() => setMobilePane("review")}
-            >
-              Review
-            </button>
+          <div className="component-import-mobile-tabs">
+            <SegmentedTabs
+              label="Import panes"
+              size="sm"
+              options={MOBILE_PANES}
+              value={mobilePane}
+              onChange={setMobilePane}
+            />
           </div>
 
           <div className="component-import-split">

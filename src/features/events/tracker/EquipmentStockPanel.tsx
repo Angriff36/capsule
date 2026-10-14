@@ -10,6 +10,8 @@ import {
   type TrackerKind,
 } from "./trackerBoardModel";
 
+import { SegmentedTabs } from "../../../ui/SegmentedTabs";
+
 const KINDS: TrackerKind[] = ["equipment", "decor", "pack"];
 
 type EquipmentRow = Doc<"equipments">;
@@ -94,28 +96,19 @@ export function EquipmentStockPanel({
           onChange={(event) => setFilter(event.target.value)}
         />
       </div>
-      <div
-        className="trk-tabs trk-stock-tabs"
-        role="tablist"
-        aria-label="Kind of item"
-      >
-        {KINDS.map((key) => (
-          <button
-            key={key}
-            type="button"
-            role="tab"
-            aria-selected={kind === key}
-            onClick={() => setKind(key)}
-          >
-            {TRACKER_KIND_LABEL[key]}
-            <span className="trk-count">
-              {
-                equipment.filter((row) => trackerKind(row.category) === key)
-                  .length
-              }
-            </span>
-          </button>
-        ))}
+      <div className="trk-stock-tabs">
+        <SegmentedTabs
+          label="Kind of item"
+          size="sm"
+          options={KINDS.map((key) => ({
+            value: key,
+            label: TRACKER_KIND_LABEL[key],
+            count: equipment.filter((row) => trackerKind(row.category) === key)
+              .length,
+          }))}
+          value={kind}
+          onChange={setKind}
+        />
       </div>
       <div className="trk-stock">
         <div className="trk-stock-row trk-stock-head" aria-hidden="true">
