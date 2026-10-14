@@ -31,6 +31,12 @@ export const NAV_AREAS: NavArea[] = [
     icon: ChartIcon,
   },
   {
+    path: "/events/production",
+    label: "Production board",
+    group: "Operate",
+    icon: TruckIcon,
+  },
+  {
     path: "/kitchen",
     label: "Kitchen",
     group: "Operate",

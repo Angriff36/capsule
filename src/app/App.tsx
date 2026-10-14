@@ -148,6 +148,11 @@ const CandidatesPage = lazy(() =>
     default: module.CandidatesPage,
   })),
 );
+const ProductionBoardPage = lazy(() =>
+  import("../features/events/production/ProductionBoardPage").then(
+    (module) => ({ default: module.ProductionBoardPage }),
+  ),
+);
 const PackListOnEvent = lazy(() =>
   import("../features/logistics/PackListOnEvent").then((module) => ({
     default: module.PackListOnEvent,
@@ -588,6 +593,15 @@ export function App() {
                 Overview (owner, 2026-10-14). */}
             <Route path="/workbooks" element={<MovedRoute to="/events" />} />
             <Route path="/events/tracker" element={<EventTrackerHome />} />
+            {/* The production meeting, one event at a time (owner, 2026-10-14). */}
+            <Route
+              path="/events/production"
+              element={
+                <SupplyRoute>
+                  <ProductionBoardPage />
+                </SupplyRoute>
+              }
+            />
             <Route path="/events/new" element={<EventCreatePage />} />
             <Route path="/events/import" element={<EventImportPage />} />
             <Route path="/events/setup" element={<EventSetupPage />} />

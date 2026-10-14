@@ -82,6 +82,17 @@ export const PAGE_GUIDES: PageGuide[] = [
     ],
   },
   {
+    prefix: "/events/production",
+    title: "Production board",
+    purpose:
+      "The production meeting, one event at a time: guests, crew, run of show, venue, food, tasks, vehicles and equipment.",
+    steps: [
+      "Pick the next event in the row at the top.",
+      "Walk the board top to bottom; anything short is marked.",
+      "Use Edit on a panel to change it on the event itself.",
+    ],
+  },
+  {
     prefix: "/events/capacity",
     title: "Room sizes",
     purpose:

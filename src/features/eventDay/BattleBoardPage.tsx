@@ -51,7 +51,7 @@ function allergenLabel(value: string): string {
   return value.replaceAll("_", " ");
 }
 
-function buildBoard(briefing: EventDayBriefing) {
+export function buildBoard(briefing: EventDayBriefing) {
   const { event, venue } = briefing;
   const people = new Map(briefing.people.map((person) => [person._id, person]));
   const whoLabel = (row: EventDayActivity) =>
