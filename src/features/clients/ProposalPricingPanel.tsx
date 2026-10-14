@@ -276,14 +276,14 @@ export function ProposalPricingPanel({
                     ? `% of ${FEE_SCOPE_LABELS[row.feeAppliesTo as FeeScope] ?? row.feeAppliesTo}`
                     : PRICING_BASIS_LABELS[row.pricingBasis as PricingBasis]}
                 </td>
-                <td className="tabular-nums" data-label="Price / %">
+                <td className="tabular-nums num" data-label="Price / %">
                   {row.feeAppliesTo
                     ? `${Number(row.feePercent)}%`
                     : row.pricingBasis === "percentage"
                       ? `${Number(row.unitPrice)}%`
                       : formatMoneyExact(Number(row.unitPrice))}
                 </td>
-                <td className="tabular-nums" data-label="Qty">
+                <td className="tabular-nums num" data-label="Qty">
                   {row.pricingBasis === "per_unit"
                     ? Number(row.quantity)
                     : row.pricingBasis === "per_person"

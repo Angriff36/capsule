@@ -426,7 +426,8 @@
 
   /* section-rule: LABEL ————————————— trailing context */
   .section-rule {
-    @apply flex items-center gap-3.5;
+    /* Wraps on a phone so a long side note never pushes past the screen. */
+    @apply flex flex-wrap items-center gap-x-3.5 gap-y-1;
   }
   /* A section label may carry a tick-all box; style the label the same. */
   .section-rule > span:first-child,
@@ -2580,71 +2581,46 @@
    follows its numbers (owner, 2026-10-14: "make all the pages on the app
    symetrical"). Phones keep the left-aligned card layout. */
 @media (min-width: 768px) {
-  :is(.supply-table, .data-table)
-    :is(td, th):is(.supply-number, .num, .text-right),
-  :is(.supply-table, .data-table):has(
-      tbody td:nth-child(1):is(.supply-number, .num, .text-right)
-    )
+  table :is(td, th):is(.supply-number, .num, .text-right),
+  table:has(tbody td:nth-child(1):is(.supply-number, .num, .text-right))
     thead
     th:nth-child(1),
-  :is(.supply-table, .data-table):has(
-      tbody td:nth-child(2):is(.supply-number, .num, .text-right)
-    )
+  table:has(tbody td:nth-child(2):is(.supply-number, .num, .text-right))
     thead
     th:nth-child(2),
-  :is(.supply-table, .data-table):has(
-      tbody td:nth-child(3):is(.supply-number, .num, .text-right)
-    )
+  table:has(tbody td:nth-child(3):is(.supply-number, .num, .text-right))
     thead
     th:nth-child(3),
-  :is(.supply-table, .data-table):has(
-      tbody td:nth-child(4):is(.supply-number, .num, .text-right)
-    )
+  table:has(tbody td:nth-child(4):is(.supply-number, .num, .text-right))
     thead
     th:nth-child(4),
-  :is(.supply-table, .data-table):has(
-      tbody td:nth-child(5):is(.supply-number, .num, .text-right)
-    )
+  table:has(tbody td:nth-child(5):is(.supply-number, .num, .text-right))
     thead
     th:nth-child(5),
-  :is(.supply-table, .data-table):has(
-      tbody td:nth-child(6):is(.supply-number, .num, .text-right)
-    )
+  table:has(tbody td:nth-child(6):is(.supply-number, .num, .text-right))
     thead
     th:nth-child(6),
-  :is(.supply-table, .data-table):has(
-      tbody td:nth-child(7):is(.supply-number, .num, .text-right)
-    )
+  table:has(tbody td:nth-child(7):is(.supply-number, .num, .text-right))
     thead
     th:nth-child(7),
-  :is(.supply-table, .data-table):has(
-      tbody td:nth-child(8):is(.supply-number, .num, .text-right)
-    )
+  table:has(tbody td:nth-child(8):is(.supply-number, .num, .text-right))
     thead
     th:nth-child(8),
-  :is(.supply-table, .data-table):has(
-      tbody td:nth-child(9):is(.supply-number, .num, .text-right)
-    )
+  table:has(tbody td:nth-child(9):is(.supply-number, .num, .text-right))
     thead
     th:nth-child(9),
-  :is(.supply-table, .data-table):has(
-      tbody td:nth-child(10):is(.supply-number, .num, .text-right)
-    )
+  table:has(tbody td:nth-child(10):is(.supply-number, .num, .text-right))
     thead
     th:nth-child(10),
-  :is(.supply-table, .data-table):has(
-      tbody td:nth-child(11):is(.supply-number, .num, .text-right)
-    )
+  table:has(tbody td:nth-child(11):is(.supply-number, .num, .text-right))
     thead
     th:nth-child(11),
-  :is(.supply-table, .data-table):has(
-      tbody td:nth-child(12):is(.supply-number, .num, .text-right)
-    )
+  table:has(tbody td:nth-child(12):is(.supply-number, .num, .text-right))
     thead
     th:nth-child(12) {
     text-align: right;
   }
-  :is(.supply-table, .data-table) :is(td, th).text-center {
+  table :is(td, th).text-center {
     text-align: center;
   }
 }

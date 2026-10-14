@@ -288,7 +288,7 @@ export function EventGuestPanel({
               {option.label}
             </button>
           ))}
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex flex-wrap items-center gap-2">
             <label className="relative flex items-center">
               <SearchIcon
                 width={14}
@@ -297,7 +297,7 @@ export function EventGuestPanel({
               />
               <span className="sr-only">Search guests</span>
               <input
-                className="input w-48 pl-8"
+                className="input w-48 max-w-full pl-8"
                 placeholder="Search guests…"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
