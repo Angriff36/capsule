@@ -116,6 +116,8 @@
   --color-ink-2: #c4c4c9;
   --color-ink-3: #9a9aa2;
   --color-brand: #e08a52;
+  /* Light brand on dark: text and icons on it are near black. */
+  --color-on-brand: #141416;
   --color-brand-soft: #3a2618;
 
   --color-line: #2f2f35;

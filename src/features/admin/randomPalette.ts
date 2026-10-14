@@ -106,6 +106,9 @@ function mode(dark: boolean, brandHue: number, tintHue: number) {
 
   return {
     brand: hex(brand),
+    // Light mode: brand passed 4.5:1 against white. Dark mode: brand passed
+    // 4.5:1 against the dark canvas, so the canvas color reads on it.
+    "on-brand": dark ? canvas : "#ffffff",
     // Hover: a step further from the page than the brand itself.
     "accent-deep": hex({
       ...brand,

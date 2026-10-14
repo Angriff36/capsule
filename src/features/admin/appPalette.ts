@@ -19,6 +19,11 @@ export const PALETTE_TOKENS: readonly {
     hint: "Main buttons, links, the active menu item",
     alsoSets: ["accent", "rail-active", "service"],
   },
+  {
+    token: "on-brand",
+    label: "Text on brand",
+    hint: "Words and icons on brand fills, like the chosen menu item",
+  },
   { token: "accent-deep", label: "Brand, dark", hint: "Brand on hover" },
   {
     token: "brand-soft",

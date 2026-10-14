@@ -194,7 +194,7 @@ export function AssistantPanel({
           if (m.role === "user") {
             return (
               <div key={m.id} className="my-2 flex flex-col items-end">
-                <div className="max-w-[85%] rounded-md bg-brand px-3 py-1.5 text-white">
+                <div className="max-w-[85%] rounded-md bg-brand px-3 py-1.5 text-on-brand">
                   {m.content}
                 </div>
                 {m.files?.map((f) => (
@@ -349,7 +349,7 @@ export function AssistantPanel({
               type="button"
               onClick={submit}
               disabled={draft.trim().length === 0 && pendingFiles.length === 0}
-              className="cursor-pointer rounded-full bg-brand px-4 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-default disabled:opacity-40"
+              className="cursor-pointer rounded-full bg-brand px-4 py-1.5 text-sm font-medium text-on-brand transition-opacity hover:opacity-90 disabled:cursor-default disabled:opacity-40"
             >
               Send
             </button>

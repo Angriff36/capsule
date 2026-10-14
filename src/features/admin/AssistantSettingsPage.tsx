@@ -124,7 +124,7 @@ export function AssistantSettingsPage() {
               <button
                 type="submit"
                 disabled={busy}
-                className="cursor-pointer rounded-full bg-brand px-4 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-default disabled:opacity-40"
+                className="cursor-pointer rounded-full bg-brand px-4 py-1.5 text-sm font-medium text-on-brand transition-opacity hover:opacity-90 disabled:cursor-default disabled:opacity-40"
               >
                 {busy ? "Saving…" : existing ? "Update" : "Save"}
               </button>

@@ -50,7 +50,7 @@ export function Topbar({
     <header className="app-shell-header flex h-16 shrink-0 items-center gap-3 border-b border-line/70 bg-panel/95 px-5 max-sm:px-3">
       <Link
         to="/"
-        className="mr-1 hidden h-8 w-8 place-items-center rounded-full bg-brand font-display text-xl text-white max-md:grid"
+        className="mr-1 hidden h-8 w-8 place-items-center rounded-full bg-brand font-display text-xl text-on-brand max-md:grid"
         aria-label="Capsule home"
       >
         C

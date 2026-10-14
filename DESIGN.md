@@ -329,7 +329,7 @@ components match them.
   `#141416`, panel `#1c1c1f`, inset `#242428`, sage `#222226`, sage-2
   `#34343a`, ink `#ececee`, ink-2 `#c4c4c9`, ink-3 `#9a9aa2`, line `#2f2f35`,
   line-2 `#45454c`, rail `#111113`, brand / accent / service `#e08a52`,
-  accent-deep `#f0a271`, brand-soft / accent-soft `#3a2618`, rail-active
+  accent-deep `#f0a271`, on-brand `#141416` (text on the light brand), brand-soft / accent-soft `#3a2618`, rail-active
   `#a4501f`, ok `#7fbf94`, info `#93a9d8`, warn `#d6ad5c`, danger `#e07f70`.
   Orange is the brand in both modes; no surface carries a green tint.
 - **ui-layouts components** (Ryan: "replace the clunky looking components

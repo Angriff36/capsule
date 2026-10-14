@@ -52,7 +52,7 @@ function RailEntry({
         ) : null}
       </span>
       {unread > 0 ? (
-        <span className="grid h-4.5 min-w-4.5 place-items-center rounded-full bg-brand px-1 text-2xs leading-none font-semibold text-white">
+        <span className="grid h-4.5 min-w-4.5 place-items-center rounded-full bg-brand px-1 text-2xs leading-none font-semibold text-on-brand">
           {unreadCapped ? `${unread}+` : unread}
         </span>
       ) : null}
