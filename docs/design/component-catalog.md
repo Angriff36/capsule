@@ -27,6 +27,11 @@ the Storybook build; this checks compilation, not visual or interaction behavior
 | Printable bar label and QR code for equipment, trucks and events | `src/ui/BarcodeLabel.tsx` | `src/ui/BarcodeLabel.stories.tsx` |
 | Area tab strip with one More menu for occasional tabs | `src/ui/WorkspaceTabs.tsx` | `src/ui/WorkspaceTabs.stories.tsx` |
 | A screen folded into another page (one h2, an anchor the old URL redirects to; the folded page reads `useEmbedded()` from `src/ui/embedded.ts` to drop its own title and area nav) | `src/ui/MergedSection.tsx` | `src/ui/MergedSection.stories.tsx` |
+| Filter tabs with one sliding highlight and optional counts (replaces hand-made pill, switch and button strips) | `src/ui/SegmentedTabs.tsx` | `src/ui/UiLayouts.stories.tsx` |
+| Modal window: centered on a computer, bottom sheet on a phone, focus kept inside | `src/ui/Dialog.tsx` | `src/ui/UiLayouts.stories.tsx` |
+| Fold-open sections with animated height (replaces bare `<details>` blocks) | `src/ui/Accordion.tsx` | `src/ui/UiLayouts.stories.tsx` |
+| File picker drop zone around a real file input; keeps the caller's `onChange` and `ref` | `src/ui/FileDrop.tsx` | `src/ui/UiLayouts.stories.tsx` |
+| Pick several values with chips, search, Select all; posts hidden inputs by `name` (replaces `<select multiple>`) | `src/ui/MultiSelect.tsx` | `src/ui/UiLayouts.stories.tsx` |
 | Redirect for a moved screen, keeping IDs, query and an optional #section | `src/app/MovedRoute.tsx` | — (route helper) |
 
 ## Dropdown usage
@@ -69,6 +74,15 @@ The Events index's More menu is a production example. Older `ActionMenu` callers
 in `primitives.tsx` still use native details; use `DropdownMenu` for new action
 menus and migrate those callers when changing their menus. Keep their existing
 actions, command handling, and permission behavior intact.
+
+## UI Layouts components
+
+SegmentedTabs, Dialog, Accordion, FileDrop and MultiSelect are adapted from
+[ui-layouts](https://ui-layouts.com) (MIT notice in `src/ui/ui-layouts.LICENSE.txt`).
+They use the `motion` package for their movement and honor reduced motion.
+Their styles live in `src/ui/ui-layouts.css` and use only app.css tokens. Use
+them in place of new hand-made filter strips, scrim-and-sheet pairs, bare
+`<details>` folds, bare file inputs and `<select multiple>` boxes.
 
 ## Adding to the catalog
 
