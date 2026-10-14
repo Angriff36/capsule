@@ -703,7 +703,7 @@ Screens (37): `clients/EventProposalEnhancementsCard.tsx`, `clients/EventProposa
 
 ## 3. Event overview
 
-Screens (68): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDashboard.tsx`, `events/dashboard/eventDashFacts.ts`, `events/dashboard/EventDashHero.tsx`, `events/dashboard/EventDashNav.tsx`, `events/dashboard/EventDashOverview.tsx`, `events/dashboard/EventDashPipeline.tsx`, `events/dashboard/EventDashSheet.tsx`, `events/dashboard/EventDashSheets.tsx`, `events/dashboard/eventDashTypes.ts`, `events/dashboard/EventPhoneBrief.tsx`, `events/dashboard/eventStageGate.ts`, `events/dashboard/EventStageRail.tsx`, `events/dashboard/useEventDayForecast.ts`, `events/EventArchiveMenuItems.tsx`, `events/EventChecklistsPage.tsx`, `events/EventClientBillingPanel.tsx`, `events/EventClientContactsPanel.tsx`, `events/EventClientForm.tsx`, `events/EventClientHistoryPanel.tsx`, `events/EventClientRatingCard.tsx`, `events/EventClientTab.tsx`, `events/EventCreateInlineForms.tsx`, `events/EventCreatePage.tsx`, `events/EventCreateServiceStyleField.tsx`, `events/EventCreateServiceStyleResolver.ts`, `events/EventCreateStandardList.tsx`, `events/EventCreateWizard.tsx`, `events/EventDetailPage.tsx`, `events/EventDetailReviseContactPanels.tsx`, `events/EventDetailRevisePanels.tsx`, `events/EventDetailsCard.tsx`, `events/EventDuplicateMenuItem.tsx`, `events/EventFormCluster.tsx`, `events/EventGuestInviteForm.tsx`, `events/EventGuestMealCard.tsx`, `events/EventGuestPanel.tsx`, `events/EventGuestPolicy.ts`, `events/EventGuestRow.tsx`, `events/EventGuestSidebar.tsx`, `events/EventHistoryTab.tsx`, `events/EventIncidentCard.tsx`, `events/EventIncidentPanel.tsx`, `events/EventIncidentSummaryAside.tsx`, `events/EventOverviewCard.tsx`, `events/EventOverviewRail.tsx`, `events/EventReadinessCard.tsx`, `events/EventRequirementsPanel.tsx`, `events/EventServiceStyleForm.tsx`, `events/EventSetupNotesPanel.tsx`, `events/EventSetupPage.tsx`, `events/EventSetupProgress.tsx`, `events/EventsListPage.tsx`, `events/EventSourceProvenancePanel.tsx`, `events/EventTodosTab.tsx`, `events/EventTrackerPage.tsx`, `events/EventWeatherChip.tsx`, `events/planning/PlanningBoardPage.tsx`, `events/planning/PlanningSchedule.tsx`, `events/planning/PlanningSetupPage.tsx`, `events/planning/StageMovesSection.tsx`, `events/planning/usePlanSnapshot.ts`, `events/tracker/EventTrackerHome.tsx`, `events/tracker/EventTrackerSheet.tsx`, `events/tracker/TrackerRigCells.tsx`, `events/tracker/trackerSheet.ts`, `events/tracker/TrackerSheetRow.tsx`, `events/tracker/useTrackerRowActions.ts`
+Screens (74): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDashboard.tsx`, `events/dashboard/eventDashFacts.ts`, `events/dashboard/EventDashHero.tsx`, `events/dashboard/EventDashNav.tsx`, `events/dashboard/EventDashOverview.tsx`, `events/dashboard/EventDashPipeline.tsx`, `events/dashboard/EventDashSheet.tsx`, `events/dashboard/EventDashSheets.tsx`, `events/dashboard/eventDashTypes.ts`, `events/dashboard/EventPhoneBrief.tsx`, `events/dashboard/eventStageGate.ts`, `events/dashboard/EventStageRail.tsx`, `events/dashboard/useEventDayForecast.ts`, `events/EventArchiveMenuItems.tsx`, `events/EventChecklistsPage.tsx`, `events/EventClientBillingPanel.tsx`, `events/EventClientContactsPanel.tsx`, `events/EventClientForm.tsx`, `events/EventClientHistoryPanel.tsx`, `events/EventClientRatingCard.tsx`, `events/EventClientTab.tsx`, `events/EventCreateInlineForms.tsx`, `events/EventCreatePage.tsx`, `events/EventCreateServiceStyleField.tsx`, `events/EventCreateServiceStyleResolver.ts`, `events/EventCreateStandardList.tsx`, `events/EventCreateWizard.tsx`, `events/EventDetailPage.tsx`, `events/EventDetailReviseContactPanels.tsx`, `events/EventDetailRevisePanels.tsx`, `events/EventDetailsCard.tsx`, `events/EventDuplicateMenuItem.tsx`, `events/EventFormCluster.tsx`, `events/EventGuestInviteForm.tsx`, `events/EventGuestMealCard.tsx`, `events/EventGuestPanel.tsx`, `events/EventGuestPolicy.ts`, `events/EventGuestRow.tsx`, `events/EventGuestSidebar.tsx`, `events/EventHistoryTab.tsx`, `events/EventIncidentCard.tsx`, `events/EventIncidentPanel.tsx`, `events/EventIncidentSummaryAside.tsx`, `events/EventOverviewCard.tsx`, `events/EventOverviewRail.tsx`, `events/EventReadinessCard.tsx`, `events/EventRequirementsPanel.tsx`, `events/EventServiceStyleForm.tsx`, `events/EventSetupNotesPanel.tsx`, `events/EventSetupPage.tsx`, `events/EventSetupProgress.tsx`, `events/EventsListPage.tsx`, `events/EventSourceProvenancePanel.tsx`, `events/EventTodosTab.tsx`, `events/EventTrackerPage.tsx`, `events/EventWeatherChip.tsx`, `events/planning/PlanningBoardPage.tsx`, `events/planning/PlanningSchedule.tsx`, `events/planning/PlanningSetupPage.tsx`, `events/planning/StageMovesSection.tsx`, `events/planning/usePlanSnapshot.ts`, `events/tracker/bookingConflicts.ts`, `events/tracker/BookingRulesPanel.tsx`, `events/tracker/EquipmentStockPanel.tsx`, `events/tracker/EventTrackerHome.tsx`, `events/tracker/TrackerBoard.tsx`, `events/tracker/TrackerBoardCells.tsx`, `events/tracker/trackerBoardModel.ts`, `events/tracker/TrackerBoardRow.tsx`, `events/tracker/TrackerRigCells.tsx`, `events/tracker/trackerSheet.ts`, `events/tracker/TrackerStats.tsx`, `events/tracker/useTrackerRowActions.ts`
 
 ### Generated reads
 
@@ -712,6 +712,7 @@ Screens (68): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `queries.getEventTemplate` - live read
 - `queries.getLead` - live read
 - `queries.getProposal` - live read
+- `queries.listBookingRule` - live read
 - `queries.listClientContactByClientId` - live read
 - `queries.listContractByEventId` - live read
 - `queries.listCorrectiveActionByEventId` - live read
@@ -777,6 +778,20 @@ Screens (68): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 
 ### Generated actions
 
+- `mutations.BookingRule_change` (BookingRule.change)
+  - inputs from the screen: mode, gapMinutes; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Everyone may see the booking rules"; "Event, sales, logistics and managers may update the booking rules"; "Event, sales, logistics and managers may change the booking rules"; "Guard 0 failed"; "Guard 1 failed"; "The gap between bookings can't be negative."; and 2 more
+  - effects: BookingRuleSet
+  - refresh: live reads update by themselves; reads affected: BookingRule.list, BookingRule.get
+- `mutations.BookingRule_createViaStart` (BookingRule.start)
+  - inputs from the screen: resource, mode, gapMinutes; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Everyone may see the booking rules"; "Event, sales, logistics and managers may update the booking rules"; "Event, sales, logistics and managers may change the booking rules"; "Guard 0 failed"; "Guard 1 failed"; "The gap between bookings can't be negative."
+  - effects: BookingRuleSet
+  - refresh: live reads update by themselves; reads affected: BookingRule.list, BookingRule.get
 - `mutations.CorrectiveAction_close` (CorrectiveAction.close)
   - inputs from the screen: resolutionNotes; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -805,6 +820,20 @@ Screens (68): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - refusals (role, stage and rules): "Inventory or logistics staff may see equipment handoffs, or event managers stand down a cancelled event"; "Inventory or logistics staff may update equipment handoffs, or event managers stand down a cancelled event"; "Inventory or logistics staff may change equipment handoffs, or event managers stand down a cancelled event"; "Guard 0 failed"; "Guard 1 failed"; "ConcurrencyConflict:"; and 1 more
   - effects: EquipmentReservationCancelled
   - refresh: live reads update by themselves; reads affected: EquipmentReservation.list, EquipmentReservation.get, Equipment.list, Equipment.get, Event.list, Event.get
+- `mutations.Equipment_createViaRegister` (Equipment.register)
+  - inputs from the screen: name, assetTag, category, ownership, quantity, purchaseValue, condition, trackingMode, serialNumber, description, countUnit, replacementCost, customerPrice, vendorId, homeLocation; filled by the server: none
+  - version: not used; retry key: accepted (same key = same result)
+  - result: allocation `{ docId: string }`
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "Give this equipment a name."; and 7 more
+  - effects: EquipmentRegistered
+  - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
+- `mutations.Equipment_recount` (Equipment.recount)
+  - inputs from the screen: actualQuantity; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Inventory, logistics or kitchen staff may see equipment"; "Inventory or logistics staff may update equipment"; "Inventory or logistics staff may change equipment"; "Guard 0 failed"; "Guard 1 failed"; "This equipment's counted amount can't be negative. Use zero or more."; and 3 more
+  - effects: EquipmentRecounted
+  - refresh: live reads update by themselves; reads affected: Equipment.list, Equipment.get, EquipmentIssue.list, EquipmentIssue.get, EquipmentMaintenanceTask.list, EquipmentMaintenanceTask.get, EquipmentPart.list, EquipmentPart.get and 10 more
 - `mutations.Equipment_setOperatingFacts` (Equipment.setOperatingFacts)
   - inputs from the screen: providesJson, needsJson; filled by the server: none
   - version: required (`version`); retry key: accepted (same key = same result)
@@ -1203,6 +1232,13 @@ Screens (68): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
   - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
   - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "ConcurrencyConflict:"; "Event not found"
   - effects: EventNumberSet
+  - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
+- `mutations.Event_setTrackerNotes` (Event.setTrackerNotes)
+  - inputs from the screen: notes; filled by the server: none
+  - version: required (`version`); retry key: accepted (same key = same result)
+  - result: instance `{ _id: string; _creationTime: number; tenantId: string; deletedAt: number | n...`
+  - refusals (role, stage and rules): "Staff may see shared event plans and operational context"; "Event and sales staff may update events"; "Event and sales staff may change events"; "Guard 0 failed"; "ConcurrencyConflict:"; "Event not found"
+  - effects: EventTrackerNotesSet
   - refresh: live reads update by themselves; reads affected: Event.list, Event.get, Client.list, Client.get, ClientCommunication.list, ClientCommunication.get, ClientMerge.list, ClientMerge.get and 132 more
 - `mutations.Event_submitForApproval` (Event.submitForApproval)
   - inputs from the screen: none; filled by the server: none
