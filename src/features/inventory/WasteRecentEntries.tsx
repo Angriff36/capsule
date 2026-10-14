@@ -8,6 +8,7 @@ import { useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { WASTE_REASON_LABELS } from "./WasteRecordForm";
+import { WasteColumns } from "./WasteCostReportPage";
 
 const MAX_ROWS = 20;
 
@@ -117,18 +118,21 @@ export function WasteRecentEntries({
       ) : (
         <div className="supply-table-wrap">
           <table
-            className="supply-table phone-cards"
+            className="supply-table phone-cards waste-table"
             data-testid="waste-recent-entries"
           >
+            <WasteColumns />
             <thead>
               <tr>
                 <th>When</th>
                 <th>Ingredient</th>
-                <th>Quantity</th>
                 <th>Reason</th>
                 <th>Event</th>
-                <th>Waste value</th>
-                <th aria-label="Actions" />
+                <th className="num">Quantity</th>
+                <th className="num">Waste value</th>
+                <th className="num">
+                  <span className="sr-only">Actions</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -144,17 +148,19 @@ export function WasteRecentEntries({
                     <strong>{ingredientName(record.ingredientId)}</strong>
                     {record.notes ? <small>{record.notes}</small> : null}
                   </td>
-                  <td className="supply-number" data-label="Quantity">
-                    {record.quantity} {record.unit}
-                  </td>
                   <td data-label="Reason">
                     {WASTE_REASON_LABELS[record.reason] ?? record.reason}
                   </td>
                   <td data-label="Event">{eventName(record.eventId)}</td>
-                  <td className="supply-number" data-label="Waste value">
-                    {formatMoney(record.quantity * record.unitCost)}
+                  <td className="supply-number num" data-label="Quantity">
+                    {record.quantity} {record.unit}
                   </td>
-                  <td>
+                  <td className="supply-number num" data-label="Waste value">
+                    <strong>
+                      {formatMoney(record.quantity * record.unitCost)}
+                    </strong>
+                  </td>
+                  <td className="num">
                     <div className="supply-row-actions">
                       <button
                         className="btn btn-ghost btn-sm"
