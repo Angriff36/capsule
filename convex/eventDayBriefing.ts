@@ -292,14 +292,6 @@ export const getBriefing = query({
     ]);
 
     const canCall = mayCallContacts(auth, assignments, deliveries);
-    // The event's free-text requirements can hold office-only matters
-    // (money, approvals, HR): event and sales roles only, never crew.
-    const officeNotes =
-      EVENT_CONTACT_ROLES.has(auth.role) &&
-      !(
-        orgCapabilityDeniesAction("eventAccess", auth.disabledCapabilities) &&
-        orgCapabilityDeniesAction("salesAccess", auth.disabledCapabilities)
-      );
 
     const packListItems = (
       await Promise.all(
@@ -544,12 +536,11 @@ export const getBriefing = query({
         // The BEO's overview and its labelled setup prose (imports write
         // "Operations: …", "Service setup: …", "Kitchen: …" lines), and the
         // Final Lock kit answers: the battle board prints them.
-        serviceRequirements: officeNotes
-          ? (event.serviceRequirements ?? null)
-          : null,
-        operationalRequirements: officeNotes
-          ? (event.operationalRequirements ?? null)
-          : null,
+        // The crew's own sheet: everyone on the board sees these (owner,
+        // 2026-10-14: crew must see the summary, layout, staging and
+        // operations notes).
+        serviceRequirements: event.serviceRequirements ?? null,
+        operationalRequirements: event.operationalRequirements ?? null,
         servingwareKit: event.servingwareKit ?? null,
         decorKit: event.decorKit ?? null,
         linenColorTables: event.linenColorTables ?? null,
