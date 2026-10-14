@@ -86,9 +86,9 @@
 
 .staff-utilization-switch button:hover,
 .staff-utilization-switch button[aria-pressed="true"] {
-  border-color: var(--utilization-green);
-  background: var(--utilization-green);
-  color: var(--color-panel);
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
 }
 
 .staff-utilization-dates {
