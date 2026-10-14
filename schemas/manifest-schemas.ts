@@ -117,6 +117,21 @@ export const AvailabilityWindowSchema = z.object({
 
 export type AvailabilityWindow = z.infer<typeof AvailabilityWindowSchema>;
 
+// Entity: BookingRule
+export const BookingRuleSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  resource: z.enum(["vehicle", "person", "equipment"]).default("vehicle"),
+  mode: z.enum(["same_day", "overlap", "off"]).default("same_day"),
+  gapMinutes: z.number().int().min(0).default(0),
+  setAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type BookingRule = z.infer<typeof BookingRuleSchema>;
+
 // Entity: Candidate
 export const CandidateSchema = z.object({
   id: z.string().uuid(),
@@ -1305,6 +1320,7 @@ export const EventSchema = z.object({
   linenColorBaskets: z.string().nullable().optional(),
   servingwareKit: z.string().nullable().optional(),
   decorKit: z.string().nullable().optional(),
+  trackerNotes: z.string().nullable().optional(),
   rainPlan: z.string().nullable().optional(),
   setupDiagram: z.string().nullable().optional(),
   venueSurface: z.string().nullable().optional(),
@@ -5708,6 +5724,23 @@ export const AvailabilityWindowWithdrawParamsSchema = z.object({});
 
 export type AvailabilityWindowWithdrawParams = z.infer<typeof AvailabilityWindowWithdrawParamsSchema>;
 
+// Command: change on BookingRule
+export const BookingRuleChangeParamsSchema = z.object({
+  mode: z.enum(["same_day", "overlap", "off"]),
+  gapMinutes: z.number().int(),
+});
+
+export type BookingRuleChangeParams = z.infer<typeof BookingRuleChangeParamsSchema>;
+
+// Command: start on BookingRule
+export const BookingRuleStartParamsSchema = z.object({
+  resource: z.enum(["vehicle", "person", "equipment"]),
+  mode: z.enum(["same_day", "overlap", "off"]),
+  gapMinutes: z.number().int(),
+});
+
+export type BookingRuleStartParams = z.infer<typeof BookingRuleStartParamsSchema>;
+
 // Command: advance on Candidate
 export const CandidateAdvanceParamsSchema = z.object({
   toStage: z.enum(["application", "screening", "interview", "decision", "hired", "rejected"]),
@@ -7736,6 +7769,13 @@ export const EventSetEventNumberParamsSchema = z.object({
 });
 
 export type EventSetEventNumberParams = z.infer<typeof EventSetEventNumberParamsSchema>;
+
+// Command: setTrackerNotes on Event
+export const EventSetTrackerNotesParamsSchema = z.object({
+  notes: z.string(),
+});
+
+export type EventSetTrackerNotesParams = z.infer<typeof EventSetTrackerNotesParamsSchema>;
 
 // Command: setTravelFee on Event
 export const EventSetTravelFeeParamsSchema = z.object({

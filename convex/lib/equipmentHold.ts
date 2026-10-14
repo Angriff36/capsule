@@ -55,6 +55,12 @@ export type EquipmentHoldRequest = {
   overrideReason: string | null;
   /** Who approved the override, when a person did. */
   personId?: string | null;
+  /**
+   * The office was warned that this is more than is free and booked it
+   * anyway, and why (owner, 2026-10-14: the tracker warns, then lets you
+   * book). Other events keep their holds; this one is saved over the count.
+   */
+  overbookReason?: string | null;
 };
 
 /**
@@ -68,6 +74,7 @@ export async function placeEquipmentHold(
   request: EquipmentHoldRequest,
 ): Promise<{ equipmentReservationId: Id<"equipmentReservations"> }> {
   const { tenantId, overrideReason } = request;
+  const overbookReason = request.overbookReason?.trim() || null;
   if (
     !Number.isFinite(request.startsAt) ||
     !Number.isFinite(request.endsAt) ||
@@ -124,7 +131,7 @@ export async function placeEquipmentHold(
     reservations,
     window,
   );
-  if (request.quantity > availableQuantity) {
+  if (request.quantity > availableQuantity && !overbookReason) {
     // PR10-03: the loser of a race for the last units sees who holds them
     // and when, where the item is kept, and the ways out.
     const held = await describeConflicts(
@@ -157,9 +164,11 @@ export async function placeEquipmentHold(
     quantity: request.quantity,
     status: "reserved",
     reservedAt: now,
-    ...(overrideReason
+    ...(overrideReason || overbookReason
       ? {
-          overrideReason,
+          overrideReason: [overrideReason, overbookReason]
+            .filter(Boolean)
+            .join(" · "),
           ...(request.personId
             ? { overrideApprovedById: request.personId }
             : {}),

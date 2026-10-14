@@ -1059,6 +1059,8 @@ entity Event mixin TenantScoped, SoftDeletable {
   property linenColorBaskets: string?
   property servingwareKit: string?
   property decorKit: string?
+  // The office's free notes for the event tracker sheet (owner, 2026-10-14).
+  property trackerNotes: string?
   property rainPlan: string?
   property setupDiagram: string?
   // Weather and site setup the Final Lock answers need for an outdoor or
@@ -1895,6 +1897,16 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate tentAndFlooring = tentAndFlooring != null ? tentAndFlooring : self.tentAndFlooring
     mutate handwashing = handwashing != null ? handwashing : self.handwashing
     emit EventSetupNotesUpdated {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // The tracker sheet's Notes cell. "" clears it.
+  command setTrackerNotes(notes: string) {
+    guard self.deletedAt == null
+    mutate trackerNotes = notes
+    emit EventTrackerNotesSet {
       eventId: self.id
       tenantId: self.tenantId
     }
@@ -3280,6 +3292,11 @@ event EventDaySheetUpdated: "event_day_sheet.updated" {
 }
 
 event EventSetupNotesUpdated: "event_setup_notes.updated" {
+  eventId: string
+  tenantId: string
+}
+
+event EventTrackerNotesSet: "event_tracker_notes.set" {
   eventId: string
   tenantId: string
 }

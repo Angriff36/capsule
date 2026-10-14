@@ -2957,7 +2957,7 @@
       "path": "EventGuest.entreeEventDishId",
       "category": "property-added",
       "acknowledgedAt": "2026-10-05",
-      "reason": "Plated entr\u00e9e pick (event-menu line): optional; existing guests stay valid with none."
+      "reason": "Plated entrée pick (event-menu line): optional; existing guests stay valid with none."
     },
     {
       "path": "EventGuest.seatNumber",
@@ -3594,6 +3594,12 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-14",
       "reason": "Production board floor plan: optional (nullable) position on the plan; unset = not placed. Existing rows stay valid; the checker reads nullable fields as required."
+    },
+    {
+      "path": "Event.trackerNotes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-14",
+      "reason": "Event tracker Notes cell: optional (nullable) free text; unset = no notes. Existing rows stay valid; the checker reads nullable fields as required."
     }
   ]
 }

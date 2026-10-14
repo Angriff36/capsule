@@ -45,6 +45,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.AvailabilityWindow_createViaDeclare, { "personId": "personId-availability-window-1", "startsAt": 1767268800000, "endsAt": 1767268800000, "notes": "demo-notes-1", "kind": "demo-kind-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.AvailabilityWindow_createViaDeclare, { "personId": "personId-availability-window-2", "startsAt": 1767355200000, "endsAt": 1767355200000, "notes": "demo-notes-2", "kind": "demo-kind-2" } as any);
+  // BookingRule → api.mutations.BookingRule_createViaStart
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.BookingRule_createViaStart, { "resource": "demo-resource-1", "mode": "demo-mode-1", "gapMinutes": 1 } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.BookingRule_createViaStart, { "resource": "demo-resource-2", "mode": "demo-mode-2", "gapMinutes": 2 } as any);
   // Candidate → api.mutations.Candidate_createViaApply
   rowsAttempted += 1;
   await client.mutation(api.mutations.Candidate_createViaApply, { "fullName": "Candidate 1", "email": "user1@example.com", "phone": "demo-phone-1", "roleAppliedFor": "demo-roleAppliedFor-1", "sourceSystem": "demo-sourceSystem-1", "externalCandidateId": "externalCandidateId-candidate-1", "rawSourceData": "demo-rawSourceData-1" } as any);
@@ -1095,6 +1100,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "AvailabilityWindow",
       "createMutation": "AvailabilityWindow_createViaDeclare",
+      "rowCount": 2
+    },
+    {
+      "entity": "BookingRule",
+      "createMutation": "BookingRule_createViaStart",
       "rowCount": 2
     },
     {

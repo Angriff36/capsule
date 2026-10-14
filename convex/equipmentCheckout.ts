@@ -56,6 +56,8 @@ export const reserve = mutation({
     quantity: v.number(),
     /** A manager books out-of-service or in-repair units anyway, and why. */
     overrideReason: v.optional(v.string()),
+    /** Booked over the tracker's "already booked" warning, and why. */
+    overbookReason: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const auth = await getAuthContext(ctx);
@@ -82,6 +84,7 @@ export const reserve = mutation({
       endsAt: args.endsAt,
       quantity: args.quantity,
       overrideReason,
+      overbookReason: args.overbookReason ?? null,
       personId: auth.personId ?? null,
     });
   },

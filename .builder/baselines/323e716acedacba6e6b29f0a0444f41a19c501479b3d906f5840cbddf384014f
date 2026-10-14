@@ -14,6 +14,8 @@ import {
   AttachmentSetSurveySelectionParamsSchema,
   AvailabilityWindowDeclareParamsSchema,
   AvailabilityWindowWithdrawParamsSchema,
+  BookingRuleChangeParamsSchema,
+  BookingRuleStartParamsSchema,
   CandidateAdvanceParamsSchema,
   CandidateApplyParamsSchema,
   CandidateHireParamsSchema,
@@ -309,6 +311,7 @@ import {
   EventRescheduleParamsSchema,
   EventReturnToPlanningParamsSchema,
   EventSetEventNumberParamsSchema,
+  EventSetTrackerNotesParamsSchema,
   EventSetTravelFeeParamsSchema,
   EventSetUpsellPotentialParamsSchema,
   EventStaffNeedApplyApprovedShiftSwapParamsSchema,
@@ -1307,6 +1310,47 @@ export function useCreateAvailabilityWindow() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = AvailabilityWindowDeclareParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for BookingRule. */
+export function useListBookingRule() {
+  return useQuery(api.queries.listBookingRule);
+}
+
+/** Reactive get-by-id for BookingRule. Pass "skip" to suspend. */
+export function useGetBookingRule(id: string | "skip") {
+  return useQuery(api.queries.getBookingRule, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for BookingRule.change. */
+export function useBookingRuleChange() {
+  const mutate = useMutation(api.mutations.BookingRule_change);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = BookingRuleChangeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for BookingRule.start. */
+export function useBookingRuleStart() {
+  const mutate = useMutation(api.mutations.BookingRule_start);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = BookingRuleStartParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for BookingRule.start. */
+export function useCreateBookingRule() {
+  const mutate = useMutation(api.mutations.BookingRule_createViaStart);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = BookingRuleStartParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -4505,6 +4549,16 @@ export function useEventSetEventNumber() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventSetEventNumberParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Event.setTrackerNotes. */
+export function useEventSetTrackerNotes() {
+  const mutate = useMutation(api.mutations.Event_setTrackerNotes);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventSetTrackerNotesParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -15608,4 +15662,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1648 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1654 as const;

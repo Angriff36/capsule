@@ -117,7 +117,7 @@ screen merges into X, and the old URL redirects there.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `/events` | Events book | Search, sort, stage filter, open | Events by date | 3 (Upcoming / Needs attention / All) | Calendar, tracker | - | Keep |
 | `/workbooks` | (moved) | - | - | - | Each workbook lives on its event's Overview | - | → `/events` (owner, 2026-10-14) |
-| `/events/tracker` | Month sheet, two-week board, planning board | Edit vehicle/trailer/driver cells | Month events, vehicles | 3 | Calendar hover vehicles | Vehicles, trailers, driver, load marks | Keep |
+| `/events/tracker` | Tracker (stats, double-booking alert, status tabs; vehicles, drivers, crew, equipment, décor, notes per event; booking rules; equipment stock), two-week board, planning board | Edit vehicle/trailer/driver, equipment, décor, notes cells; book over a warning; edit stock counts | Month events, vehicles, crew, equipment holds | 3 | Calendar hover vehicles | Vehicles, trailers, driver, load marks | Keep |
 | `/events/new` | Create an event | Create event, inline client/venue | Event form | 2 (Form / Guided) | - | Event basics on create | Keep |
 | `/events/import` | Paste BEO / drop TPP CSVs | Create | Parsed preview | - | - | Event + shifts + pack list | Keep |
 | `/events/templates` | Event templates | New template, apply, archive | Templates | - | Template picker in create | Event templates | → Event setup |
