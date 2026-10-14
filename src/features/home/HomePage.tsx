@@ -133,13 +133,21 @@ function Decision({
       >
         {severity === "danger" ? "Blocking" : "Open"}
       </span>
-      <div className="font-display mt-3 text-2xl leading-tight text-ink">
+      <Link
+        to={item.href}
+        className="font-display mt-3 block text-2xl leading-tight text-ink hover:text-brand"
+      >
         {item.count}
         {capped ? "+" : ""} {item.label.toLowerCase()}
-      </div>
+      </Link>
       <p className="mt-1 text-base text-ink-2">{item.detail}</p>
-      <Link to={item.href} className="btn btn-primary mt-4">
-        Open
+      <Link
+        to={item.href}
+        className="text-link mt-3 inline-flex min-h-[44px]"
+        aria-hidden="true"
+        tabIndex={-1}
+      >
+        Open →
       </Link>
     </div>
   );

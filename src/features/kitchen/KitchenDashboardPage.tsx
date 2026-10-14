@@ -1104,6 +1104,13 @@ export function KitchenDashboardPage() {
         />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-baseline gap-x-2">
+            {/* The box beside the row only selects it; done needs its own mark. */}
+            {done ? (
+              <span className="shrink-0 font-semibold text-ok">
+                <span aria-hidden="true">✓</span>
+                <span className="sr-only">Done</span>
+              </span>
+            ) : null}
             {editing === id ? (
               <form
                 onSubmit={(e) => {
