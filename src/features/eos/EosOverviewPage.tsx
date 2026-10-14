@@ -155,7 +155,7 @@ export function EosOverviewPage() {
         note:
           live.length === 0
             ? "Name the core processes"
-            : `${live.length} core processes`,
+            : `${live.length} core ${live.length === 1 ? "process" : "processes"}`,
       },
       traction: {
         value: `${rocksGood}/${rocks.length}`,
