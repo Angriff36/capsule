@@ -158,7 +158,7 @@ export function EventImportPage() {
           disabled={busy}
         />
 
-        <div className="space-y-3">
+        <div className="flex flex-col gap-3">
           {bundle && loaded ? (
             <>
               <EventImportPreviewPanel
@@ -195,7 +195,7 @@ export function EventImportPage() {
               />
             </>
           ) : (
-            <section className="card p-4 text-sm text-ink-3">
+            <section className="card flex min-h-40 flex-1 items-center justify-center p-4 text-center text-sm text-ink-3">
               Nothing to review yet. Paste the report text on the left — the
               preview updates as you type.
             </section>
