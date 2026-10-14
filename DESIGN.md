@@ -318,6 +318,40 @@ map onto the app tokens. Phones use the same page (Ryan, 2026-09-24: "obviously 
 updated"): one tile per row, a 2x2 count strip, and a sideways-scrolling
 group switcher. This is a scoped exception. Do not add it to `design-contract-exceptions.json`.
 
+## Owner visual decisions (2026-10-14)
+
+Ryan approved each of these in conversation on 2026-10-14; app.css and the
+components match them.
+
+- **Dark scheme is neutral graphite** (Ryan: "why does capsule always have
+  this weird ugly fukcing hue to it"). The old green-black "lamplight" dark
+  scheme is gone. Dark tokens in `src/styles/app.css` `.dark`: canvas
+  `#141416`, panel `#1c1c1f`, inset `#242428`, sage `#222226`, sage-2
+  `#34343a`, ink `#ececee`, ink-2 `#c4c4c9`, ink-3 `#9a9aa2`, line `#2f2f35`,
+  line-2 `#45454c`, rail `#111113`, brand / accent / service `#e08a52`,
+  accent-deep `#f0a271`, brand-soft / accent-soft `#3a2618`, rail-active
+  `#a4501f`, ok `#7fbf94`, info `#93a9d8`, warn `#d6ad5c`, danger `#e07f70`.
+  Orange is the brand in both modes; no surface carries a green tint.
+- **ui-layouts components** (Ryan: "replace the clunky looking components
+  with the professional ones from the mcp"). Filter strips are
+  `SegmentedTabs` (one sliding highlight); file pickers are `FileDrop`;
+  pick-several fields are `MultiSelect`; action menus are `DropdownMenu`;
+  `Dialog` and `Accordion` are available in the catalog. All use app.css
+  tokens; see `docs/design/component-catalog.md`.
+- **Buttons are the ui-layouts "Cross Arrow" button** — see `button-primary`.
+- **Page help is a small "?" button**, top right of the page, that widens to
+  "About <page>" on hover and opens the purpose and tips in a small card
+  (Ryan: "replace the big dialog boxes with one of the smaller more subtle
+  buttons"). The full-width help strip that opened by itself is gone.
+- **Company app colors** (Ryan: "add a way for me to manually adjust color
+  palette", everyone, on the Branding page). Managers may override the light
+  and dark color tokens for their company on Admin → Branding → App colors,
+  with a Randomize button that keeps every text color at WCAG contrast
+  (Ryan: "randomizes the color palette but keep it kind of weighted so it
+  never becomes unreadable"). The values in this file stay the defaults.
+- **Balanced pages**: cards in one row end on one line, button groups in a
+  card form even columns, and side-by-side columns end together.
+
 ## Component picker decisions (owner, 2026-09-29)
 
 Ryan chose these in the component picker (Storybook stories carry the live
@@ -325,7 +359,9 @@ reference; section specs below are updated where they conflict):
 
 - **Page header** — editorial masthead (`PageHeader`): uppercase eyebrow with
   the state word in accent, large bold title, optional fact pairs on a 1.5px
-  ink rule, actions under it. `size="compact"` only in narrow shells (My Day).
+  ink rule; the page's actions sit on the right, level with the title, and
+  drop under it on a phone (owner, 2026-10-14: "make sure every page is
+  symetrical"). `size="compact"` only in narrow shells (My Day).
 - **Event stage rail** — numbered steps on a connector line with the open
   check count under the current step, and a gate list of the checks before
   the next stage. Every open check links to where it is fixed. Checks come
@@ -394,8 +430,8 @@ The visual language stays consistent across roles, but information priority chan
 
 ### Brand & Accent
 
-- **Culinary Green** (`#31574f`): Primary actions, active navigation, strong links, and structural emphasis.
-- **Main Ink** (`#24322d`): Display headings, object names, and primary body text.
+- **Brand Orange** (`#b04f18`): Primary actions, active navigation, strong links, and structural emphasis. (Replaces the old Culinary Green `#31574f`, removed from every screen 2026-10-14.)
+- **Main Ink** (`#0f0f11`): Display headings, object names, and primary body text. (Replaces the old green-black `#24322d`.)
 - **Saffron** (`#c8783f`): Hand-drawn underlines, small counts, and editorial cues.
 - **Deep Saffron** (`#9c572d`): Hover states and warning-adjacent editorial labels.
 
@@ -533,7 +569,7 @@ Botanical forms may appear in the outer frame or an authored zero state. They sh
 
 ### **`navigation-rail`**
 
-94px light vertical rail that lives **inside** the workspace sheet, separated from the document by a single hairline rather than floating as its own surface. It carries a 42px circular Capsule mark and 46px icon targets. Active navigation uses a brand-green filled rounded rectangle, not a circle. Only shipped, canonical workspaces remain persistent. Planned modules live in the bottom overflow drawer and do not compete with available work; legacy Capsule-Pro areas without current Manifest authority do not appear as promises.
+94px light vertical rail that lives **inside** the workspace sheet, separated from the document by a single hairline rather than floating as its own surface. It carries a 42px circular Capsule mark and 46px icon targets. Active navigation uses a brand-filled rounded rectangle, not a circle. Only shipped, canonical workspaces remain persistent. Planned modules live in the bottom overflow drawer and do not compete with available work; legacy Capsule-Pro areas without current Manifest authority do not appear as promises.
 
 ### **`workspace-sheet`**
 
