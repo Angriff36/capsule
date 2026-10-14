@@ -292,12 +292,12 @@ export function RevenueAttributionsPage() {
                     <td>
                       {attr.allocationMethod === "percent" ? "%" : "Fixed"}
                     </td>
-                    <td>
+                    <td className="num">
                       {attr.allocationMethod === "percent"
                         ? `${attr.percentBasis}%`
                         : usd(attr.fixedAmount)}
                     </td>
-                    <td>
+                    <td className="num">
                       {attr.status === "applied" || attr.allocatedAmount > 0
                         ? usd(attr.allocatedAmount)
                         : "—"}

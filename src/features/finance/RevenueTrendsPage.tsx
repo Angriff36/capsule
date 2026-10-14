@@ -329,9 +329,9 @@ function RevenueTable({
               return (
                 <tr key={period.key}>
                   <td>{period.label}</td>
-                  <td>{money.format(period.currentTotal)}</td>
-                  <td>{money.format(period.priorTotal)}</td>
-                  <td>
+                  <td className="num">{money.format(period.currentTotal)}</td>
+                  <td className="num">{money.format(period.priorTotal)}</td>
+                  <td className="num">
                     {change == null
                       ? "—"
                       : `${change >= 0 ? "+" : ""}${change.toFixed(1)}%`}

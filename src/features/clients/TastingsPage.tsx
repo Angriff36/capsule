@@ -286,7 +286,7 @@ export function TastingsPage() {
       ) : rows.length === 0 ? (
         <p className="mt-4 text-base text-ink-2">No tastings booked yet.</p>
       ) : (
-        <table className="data-table phone-cards mt-4">
+        <table className="data-table table-even phone-cards mt-4">
           <thead>
             <tr>
               <th>When</th>
@@ -304,7 +304,9 @@ export function TastingsPage() {
                   {formatTime(Number(row.scheduledAt))}
                 </td>
                 <td data-label="For">{linkLabel(row)}</td>
-                <td data-label="Guests">{Number(row.guestCount)}</td>
+                <td className="num" data-label="Guests">
+                  {Number(row.guestCount)}
+                </td>
                 <td data-label="Status">
                   <StatusChip
                     status={String(row.status)}

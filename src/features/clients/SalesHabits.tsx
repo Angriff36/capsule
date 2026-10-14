@@ -165,7 +165,9 @@ export function SalesHabits({
                         {clientDisplayName(row.clientId, clients)}
                       </p>
                     </td>
-                    <td data-label="Value">{formatMoneyExact(row.value)}</td>
+                    <td className="num" data-label="Value">
+                      {formatMoneyExact(row.value)}
+                    </td>
                     <td data-label="Last touch">{formatDate(row.lastTouch)}</td>
                     <td data-label="Why">{row.reason}</td>
                   </tr>

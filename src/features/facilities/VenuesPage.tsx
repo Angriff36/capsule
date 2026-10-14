@@ -622,7 +622,7 @@ export function VenuesPage() {
                         venue.venueType}
                     </td>
                     <td
-                      className="px-4 py-3 text-xs text-ink-2"
+                      className="num px-4 py-3 text-xs text-ink-2"
                       data-label="Capacity"
                     >
                       {largestKnownCapacity(venue) || "Not known"}

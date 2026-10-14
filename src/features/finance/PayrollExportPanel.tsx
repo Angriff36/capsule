@@ -271,11 +271,13 @@ function PayrollExportPreview({
                         <small>{row.employeeId}</small>
                       )}
                     </td>
-                    <td>{row.regularHours.toFixed(2)} h</td>
-                    <td>{row.overtimeHours.toFixed(2)} h</td>
-                    <td>{row.recordedHours.toFixed(2)} h</td>
-                    <td>{row.manualAdjustmentHours.toFixed(2)} h</td>
-                    <td>
+                    <td className="num">{row.regularHours.toFixed(2)} h</td>
+                    <td className="num">{row.overtimeHours.toFixed(2)} h</td>
+                    <td className="num">{row.recordedHours.toFixed(2)} h</td>
+                    <td className="num">
+                      {row.manualAdjustmentHours.toFixed(2)} h
+                    </td>
+                    <td className="num">
                       {gross == null ? (
                         <span className="text-ink-3">—</span>
                       ) : (

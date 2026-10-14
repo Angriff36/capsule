@@ -30,7 +30,7 @@ export function QuoteRequestPicks({
   ].filter(Boolean);
 
   return (
-    <dl className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+    <dl className="mt-2 grid grid-cols-1 gap-2 text-xs [overflow-wrap:anywhere] sm:grid-cols-3">
       {selections?.menu && (
         <div>
           <dt className="text-2xs uppercase text-ink-3">

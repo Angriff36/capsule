@@ -232,7 +232,9 @@ export function TastingDetail({
                       </span>
                     ) : null}
                   </td>
-                  <td data-label="Portions">{Number(row.portionCount)}</td>
+                  <td className="num" data-label="Portions">
+                    {Number(row.portionCount)}
+                  </td>
                   <td data-label="Decision">
                     <select
                       className="input"

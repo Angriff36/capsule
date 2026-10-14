@@ -600,7 +600,7 @@ export function TrainingPage() {
                         <td>
                           {row.completedAt ? formatDate(row.completedAt) : "—"}
                         </td>
-                        <td>
+                        <td className="num">
                           <span className="training-score">
                             {row.assessmentScore}%
                           </span>

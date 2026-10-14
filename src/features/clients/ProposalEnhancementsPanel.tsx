@@ -152,7 +152,7 @@ export function ProposalEnhancementsPanel({
                 <td className="text-ink-2" data-label="Description">
                   {row.description ?? "—"}
                 </td>
-                <td className="tabular-nums" data-label="Price">
+                <td className="tabular-nums num" data-label="Price">
                   {formatMoneyExact(Number(row.price) || 0)}
                 </td>
                 {editable ? (

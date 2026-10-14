@@ -114,7 +114,7 @@ export function VendorPriceListImport() {
         </div>
       </div>
       <div className="flex flex-wrap items-end gap-3 p-4">
-        <label className="field-label max-w-full min-w-0">
+        <label className="field-label max-w-full min-w-0 grid-cols-1">
           Price list
           <input
             type="file"

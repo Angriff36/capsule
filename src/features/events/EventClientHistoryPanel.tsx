@@ -51,10 +51,10 @@ export function EventClientHistoryPanel({ events, currentEventId }: Props) {
                   </Link>
                 )}
               </td>
-              <td className="td font-mono text-sm text-ink">
+              <td className="td font-mono text-sm text-ink num">
                 {formatCount(Number(event.expectedHeadcount))}
               </td>
-              <td className="td font-mono text-sm text-ink">
+              <td className="td font-mono text-sm text-ink num">
                 {Number(event.quotedPrice) > 0
                   ? formatMoney(Number(event.quotedPrice))
                   : "—"}

@@ -463,7 +463,10 @@ export function VenueLayoutTemplatesPage() {
                         {venueName(template.venueId)}
                       </Link>
                     </td>
-                    <td className="py-2 pr-3 text-ink-2" data-label="Sections">
+                    <td
+                      className="py-2 pr-3 text-ink-2 num"
+                      data-label="Sections"
+                    >
                       {count}
                     </td>
                     <td className="py-2 pr-3" data-label="Status">

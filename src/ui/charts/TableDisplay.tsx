@@ -131,6 +131,12 @@ export function TableDisplay({
     center: "text-center",
     right: "text-right",
   } as const;
+  // Numbers default to the right so digits line up down the column.
+  const alignOf = (col: TableColumn) =>
+    col.align ??
+    (col.type === "number" || col.type === "currency" || col.type === "percent"
+      ? "right"
+      : "left");
 
   return (
     <div
@@ -168,11 +174,16 @@ export function TableDisplay({
                   onClick={() => handleSort(col.key)}
                   className={clsx(
                     "px-4 py-2 font-medium text-ink-2",
-                    alignClass[col.align || "left"],
+                    alignClass[alignOf(col)],
                     sortable && col.sortable && "cursor-pointer hover:bg-inset",
                   )}
                 >
-                  <div className="flex items-center gap-1">
+                  <div
+                    className={clsx(
+                      "flex items-center gap-1",
+                      alignOf(col) === "right" && "justify-end",
+                    )}
+                  >
                     {col.header}
                     {sortable && col.sortable && (
                       <span className="text-ink-3">
@@ -196,7 +207,7 @@ export function TableDisplay({
                     key={col.key}
                     className={clsx(
                       "px-4 py-2 text-ink-2",
-                      alignClass[col.align || "left"],
+                      alignClass[alignOf(col)],
                     )}
                   >
                     {col.href?.(row) ? (

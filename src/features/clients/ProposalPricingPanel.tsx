@@ -290,7 +290,7 @@ export function ProposalPricingPanel({
                       ? `${guestCount} guests`
                       : "—"}
                 </td>
-                <td className="tabular-nums" data-label="Amount">
+                <td className="tabular-nums num" data-label="Amount">
                   {formatMoneyExact(recomputed.lines[index]?.amount ?? 0)}
                 </td>
                 {editable ? (

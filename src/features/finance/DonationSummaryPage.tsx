@@ -169,9 +169,13 @@ export function DonationSummaryPage() {
                               .filter(Boolean)
                               .join(" · ") || "—"}
                           </td>
-                          <td>{recipient.donations}</td>
-                          <td>{formatPounds(recipient.weightLb)}</td>
-                          <td>{formatMoneyExact(recipient.estimatedValue)}</td>
+                          <td className="num">{recipient.donations}</td>
+                          <td className="num">
+                            {formatPounds(recipient.weightLb)}
+                          </td>
+                          <td className="num">
+                            {formatMoneyExact(recipient.estimatedValue)}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -211,8 +215,10 @@ export function DonationSummaryPage() {
                           </td>
                           <td>{row.itemDescription}</td>
                           <td>{row.recipientOrganization ?? "—"}</td>
-                          <td>{formatPounds(row.weightLb)}</td>
-                          <td>{formatMoneyExact(row.estimatedValue)}</td>
+                          <td className="num">{formatPounds(row.weightLb)}</td>
+                          <td className="num">
+                            {formatMoneyExact(row.estimatedValue)}
+                          </td>
                           <td>{row.receiptReference ?? "—"}</td>
                           <td>{row.handlingNote ?? "—"}</td>
                         </tr>

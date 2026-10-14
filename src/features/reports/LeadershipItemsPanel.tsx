@@ -201,19 +201,21 @@ export function LeadershipItemsPanel({
               ) : (
                 <div className="supply-table-wrap">
                   <table
-                    className="supply-table"
+                    className="supply-table table-even"
                     data-testid={`leadership-${kind}`}
                   >
                     <thead>
                       <tr>
-                        <th>{LEADERSHIP_KIND_LABEL[kind]}</th>
+                        <th className="col-wide">
+                          {LEADERSHIP_KIND_LABEL[kind]}
+                        </th>
                         {kind === "issue" ? <th>Top 3</th> : null}
                         {kind === "issue" ? <th>Added by</th> : null}
                         <th>{isHeadline ? "From" : "Owner"}</th>
                         {isHeadline ? null : <th>Due</th>}
                         {kind === "rock" ? <th>This week</th> : null}
-                        <th>Status</th>
-                        <th className="text-right">Action</th>
+                        <th className="col-state">Status</th>
+                        <th className="col-action text-right">Action</th>
                       </tr>
                     </thead>
                     <tbody>

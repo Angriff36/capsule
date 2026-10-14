@@ -82,10 +82,10 @@ export function MyReviewsPage() {
                       )}
                     </td>
                     <td>{row.reviewerName}</td>
-                    <td>{row.reliabilityRating}</td>
-                    <td>{row.qualityRating}</td>
-                    <td>{row.teamworkRating}</td>
-                    <td>
+                    <td className="num">{row.reliabilityRating}</td>
+                    <td className="num">{row.qualityRating}</td>
+                    <td className="num">{row.teamworkRating}</td>
+                    <td className="num">
                       {(
                         (row.reliabilityRating +
                           row.qualityRating +

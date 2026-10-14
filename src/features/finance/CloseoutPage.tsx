@@ -435,18 +435,20 @@ export function CloseoutPage() {
                           ) : null}
                           <CloseoutRevenueNote row={row} billing={billing} />
                         </td>
-                        <td>{formatMoneyExact(billing.billedTotal)}</td>
-                        <td>
+                        <td className="num">
+                          {formatMoneyExact(billing.billedTotal)}
+                        </td>
+                        <td className="num">
                           {isCloseoutListProfitPending(row)
                             ? "—"
                             : formatMoneyExact(Number(row.actualRevenue ?? 0))}
                         </td>
-                        <td>
+                        <td className="num">
                           {listedCost == null
                             ? "—"
                             : formatMoneyExact(listedCost)}
                         </td>
-                        <td>
+                        <td className="num">
                           {isCloseoutListProfitPending(row)
                             ? "—"
                             : formatMoneyExact(Number(row.grossProfit ?? 0))}

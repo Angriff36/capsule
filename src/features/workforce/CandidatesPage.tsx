@@ -712,14 +712,14 @@ export function CandidatesPage() {
 
                 {candidateInterviews.length > 0 ? (
                   <div className="supply-table-wrap mt-4">
-                    <table className="supply-table">
+                    <table className="supply-table table-even">
                       <thead>
                         <tr>
                           <th>Scheduled</th>
                           <th>Interviewer</th>
                           <th>Outcome</th>
-                          <th>Notes</th>
-                          <th className="text-right">Action</th>
+                          <th className="col-wide">Notes</th>
+                          <th className="col-action text-right">Action</th>
                         </tr>
                       </thead>
                       <tbody>

@@ -346,7 +346,7 @@ export function L10DashboardPage() {
                         )
                       </span>
                     </td>
-                    <td>
+                    <td className="num">
                       {row.target
                         ? formatScorecardValue(
                             row.target.target,
@@ -354,7 +354,7 @@ export function L10DashboardPage() {
                           )
                         : "Not set"}
                     </td>
-                    <td className="font-mono">
+                    <td className="font-mono num">
                       {row.actual == null
                         ? NOT_KNOWN
                         : formatScorecardValue(row.actual, row.measure.unit)}
@@ -414,13 +414,15 @@ export function L10DashboardPage() {
                 {history.map((week) => (
                   <tr key={week.weekStart}>
                     <td>{formatDate(week.weekStart)}</td>
-                    <td>{week.opened}</td>
-                    <td>{week.done}</td>
-                    <td>{week.dropped}</td>
-                    <td>{week.completedEvents}</td>
-                    <td>{formatMoney(week.completedRevenue)}</td>
-                    <td>{week.newLeads}</td>
-                    <td>
+                    <td className="num">{week.opened}</td>
+                    <td className="num">{week.done}</td>
+                    <td className="num">{week.dropped}</td>
+                    <td className="num">{week.completedEvents}</td>
+                    <td className="num">
+                      {formatMoney(week.completedRevenue)}
+                    </td>
+                    <td className="num">{week.newLeads}</td>
+                    <td className="num">
                       {week.meetingRating == null
                         ? "—"
                         : `${week.meetingRating} / 10`}

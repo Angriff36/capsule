@@ -363,10 +363,10 @@ export function PerformanceReviewsPage() {
                       <td>
                         {row.reviewDate ? formatDate(row.reviewDate) : "—"}
                       </td>
-                      <td>{row.reliabilityRating}</td>
-                      <td>{row.qualityRating}</td>
-                      <td>{row.teamworkRating}</td>
-                      <td>{average(row).toFixed(1)}</td>
+                      <td className="num">{row.reliabilityRating}</td>
+                      <td className="num">{row.qualityRating}</td>
+                      <td className="num">{row.teamworkRating}</td>
+                      <td className="num">{average(row).toFixed(1)}</td>
                       <td>
                         <ReviewFeedback
                           review={{

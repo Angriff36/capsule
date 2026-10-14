@@ -408,10 +408,10 @@ function FoodCostReportBody({
             <details className="food-cost-table-disclosure">
               <summary>View exact period values</summary>
               <div className="supply-table-wrap">
-                <table className="supply-table">
+                <table className="supply-table table-even">
                   <thead>
                     <tr>
-                      <th>Period</th>
+                      <th className="col-wide">Period</th>
                       <th>Events</th>
                       <th>Food cost</th>
                       <th>Revenue</th>
@@ -428,10 +428,10 @@ function FoodCostReportBody({
                         }
                       >
                         <td>{period.label}</td>
-                        <td>{period.eventCount}</td>
-                        <td>{formatMoney(period.foodCost)}</td>
-                        <td>{formatMoney(period.revenue)}</td>
-                        <td>
+                        <td className="num">{period.eventCount}</td>
+                        <td className="num">{formatMoney(period.foodCost)}</td>
+                        <td className="num">{formatMoney(period.revenue)}</td>
+                        <td className="num">
                           <strong>{percentage(period.percentage)}</strong>
                         </td>
                         <td>
@@ -461,10 +461,10 @@ function FoodCostReportBody({
         </div>
         {report.events.length === 0 ? null : (
           <div className="supply-table-wrap">
-            <table className="supply-table food-cost-event-table">
+            <table className="supply-table table-even food-cost-event-table">
               <thead>
                 <tr>
-                  <th>Event</th>
+                  <th className="col-wide">Event</th>
                   <th>Service date</th>
                   <th>Food cost</th>
                   <th>Revenue</th>
@@ -485,9 +485,9 @@ function FoodCostReportBody({
                       <small>{event.eventType}</small>
                     </td>
                     <td>{formatDate(event.date.getTime())}</td>
-                    <td>{formatMoney(event.foodCost)}</td>
-                    <td>{formatMoney(event.revenue)}</td>
-                    <td>
+                    <td className="num">{formatMoney(event.foodCost)}</td>
+                    <td className="num">{formatMoney(event.revenue)}</td>
+                    <td className="num">
                       <strong>{percentage(event.percentage)}</strong>
                     </td>
                     <td>

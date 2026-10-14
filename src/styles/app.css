@@ -1156,19 +1156,20 @@
     top: 0;
     z-index: 5;
     height: 0;
-    margin-top: -24px;
-    margin-bottom: 24px;
+    margin-top: -1.5rem;
+    margin-bottom: 1.5rem;
   }
   .on-this-page {
     position: absolute;
-    inset: 0 -32px auto;
+    /* Match the sheet's px-8 / px-4 padding, which is in rem. */
+    inset: 0 -2rem auto;
     display: flex;
     align-items: center;
     gap: 2px;
     overflow-x: auto;
     border-bottom: 1px solid var(--color-line);
     background: var(--color-panel);
-    padding: 6px 32px;
+    padding: 6px 2rem;
     box-shadow: 0 6px 12px -10px rgb(30 40 36 / 0.25);
     scrollbar-width: thin;
   }
@@ -1178,8 +1179,8 @@
       margin-bottom: 12px;
     }
     .on-this-page {
-      inset: 0 -16px auto;
-      padding: 6px 16px;
+      inset: 0 -1rem auto;
+      padding: 6px 1rem;
     }
   }
   .on-this-page-label {
@@ -2545,6 +2546,100 @@
 .supply-number {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
+}
+
+/* Tables that repeat down a page (one per station, per candidate, per
+   week) or sit one under another share one column grid: fixed layout, and the
+   same width for the same kind of column, so columns line up table to table. */
+@media (min-width: 768px) {
+  :is(.supply-table, .data-table).table-even {
+    table-layout: fixed;
+  }
+  .table-even :is(th, col).col-wide {
+    width: 34%;
+  }
+  .table-even :is(th, col).col-num {
+    width: 12%;
+  }
+  .table-even :is(th, col).col-state {
+    width: 14%;
+  }
+  .table-even :is(th, col).col-action {
+    width: 10rem;
+  }
+  .table-even td {
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Numbers line up on the right, digit under digit, and the column heading
+   follows its numbers (owner, 2026-10-14: "make all the pages on the app
+   symetrical"). Phones keep the left-aligned card layout. */
+@media (min-width: 768px) {
+  :is(.supply-table, .data-table)
+    :is(td, th):is(.supply-number, .num, .text-right),
+  :is(.supply-table, .data-table):has(
+      tbody td:nth-child(1):is(.supply-number, .num, .text-right)
+    )
+    thead
+    th:nth-child(1),
+  :is(.supply-table, .data-table):has(
+      tbody td:nth-child(2):is(.supply-number, .num, .text-right)
+    )
+    thead
+    th:nth-child(2),
+  :is(.supply-table, .data-table):has(
+      tbody td:nth-child(3):is(.supply-number, .num, .text-right)
+    )
+    thead
+    th:nth-child(3),
+  :is(.supply-table, .data-table):has(
+      tbody td:nth-child(4):is(.supply-number, .num, .text-right)
+    )
+    thead
+    th:nth-child(4),
+  :is(.supply-table, .data-table):has(
+      tbody td:nth-child(5):is(.supply-number, .num, .text-right)
+    )
+    thead
+    th:nth-child(5),
+  :is(.supply-table, .data-table):has(
+      tbody td:nth-child(6):is(.supply-number, .num, .text-right)
+    )
+    thead
+    th:nth-child(6),
+  :is(.supply-table, .data-table):has(
+      tbody td:nth-child(7):is(.supply-number, .num, .text-right)
+    )
+    thead
+    th:nth-child(7),
+  :is(.supply-table, .data-table):has(
+      tbody td:nth-child(8):is(.supply-number, .num, .text-right)
+    )
+    thead
+    th:nth-child(8),
+  :is(.supply-table, .data-table):has(
+      tbody td:nth-child(9):is(.supply-number, .num, .text-right)
+    )
+    thead
+    th:nth-child(9),
+  :is(.supply-table, .data-table):has(
+      tbody td:nth-child(10):is(.supply-number, .num, .text-right)
+    )
+    thead
+    th:nth-child(10),
+  :is(.supply-table, .data-table):has(
+      tbody td:nth-child(11):is(.supply-number, .num, .text-right)
+    )
+    thead
+    th:nth-child(11),
+  :is(.supply-table, .data-table):has(
+      tbody td:nth-child(12):is(.supply-number, .num, .text-right)
+    )
+    thead
+    th:nth-child(12) {
+    text-align: right;
+  }
 }
 
 .supply-split {

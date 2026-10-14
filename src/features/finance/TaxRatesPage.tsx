@@ -446,10 +446,10 @@ export function TaxRatesPage() {
                 {remittance.map((row) => (
                   <tr key={row.taxRateId}>
                     <td>{row.name}</td>
-                    <td>{row.percentage}%</td>
-                    <td>{row.invoiceCount}</td>
-                    <td>{usd(row.assessedAmount)}</td>
-                    <td className="tax-collected-cell">
+                    <td className="num">{row.percentage}%</td>
+                    <td className="num">{row.invoiceCount}</td>
+                    <td className="num">{usd(row.assessedAmount)}</td>
+                    <td className="tax-collected-cell num">
                       {usd(row.collectedAmount)}
                     </td>
                   </tr>

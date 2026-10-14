@@ -102,7 +102,7 @@ export function KpiRecordList({
                     </Link>
                   </td>
                   <td>{event.startsAt ? formatDate(event.startsAt) : "—"}</td>
-                  <td>{event.expectedHeadcount ?? "—"}</td>
+                  <td className="num">{event.expectedHeadcount ?? "—"}</td>
                   <td className="text-right">
                     {formatMoney(event.quotedPrice ?? 0)}
                   </td>

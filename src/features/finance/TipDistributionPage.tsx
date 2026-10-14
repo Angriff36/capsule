@@ -603,7 +603,9 @@ export function TipDistributionPage() {
                   <tr>
                     <td className="tip-no-print" />
                     <td colSpan={4}>Distribution total</td>
-                    <td>{formatMoneyExact(calculation.totalCents / 100)}</td>
+                    <td className="num">
+                      {formatMoneyExact(calculation.totalCents / 100)}
+                    </td>
                     <td className="tip-signature" />
                   </tr>
                 </tfoot>
