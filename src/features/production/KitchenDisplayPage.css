@@ -148,6 +148,11 @@
   color: #b04f18;
 }
 
+/* A ticket with no secondary buttons keeps their room (two 42px buttons and
+   their 8px gaps), so every Start / Done button in a row lines up. */
+.kds-bump:last-child {
+  margin-bottom: 100px;
+}
 .kds-bump {
   margin-top: auto;
   background: #b04f18;
