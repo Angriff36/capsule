@@ -3953,6 +3953,14 @@ div.tpp-parameter-wide {
   margin-top: 1.5rem;
   min-height: 70vh;
 }
+/* Both panes reach the bottom of the split, so the columns end together. */
+:where(.component-import-split > div) {
+  display: flex;
+  flex-direction: column;
+}
+:where(.component-import-split > div) > .component-import-pane {
+  flex: 1;
+}
 
 .component-import-pane {
   display: flex;
