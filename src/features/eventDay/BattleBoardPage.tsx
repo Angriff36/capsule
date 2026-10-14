@@ -16,6 +16,8 @@ import { CULINARY_ALLERGENS } from "../kitchen/CulinaryAllergenVocabulary";
 import "./BattleBoardPage.css";
 import { BattleBoardSheet } from "./BattleBoardSheet";
 import { useTenantBranding } from "../admin/tenantBranding";
+import type { Id } from "../../lib/api";
+import { useEventTimingPlan } from "../../lib/operational-transactions";
 import "./EventDay.css";
 import { EventDayNav } from "./EventDayNav";
 
@@ -191,6 +193,7 @@ export function BattleBoardPage() {
   const { id } = useParams();
   const briefing = useEventDayBriefing(id);
   const { branding } = useTenantBranding();
+  const plan = useEventTimingPlan(id ? (id as Id<"events">) : null);
   const board = useMemo(
     () => (briefing ? buildBoard(briefing) : null),
     [briefing],
@@ -247,6 +250,10 @@ export function BattleBoardPage() {
             briefing={briefing}
             board={board}
             companyName={branding.displayName || "Mangia Catering Co."}
+            timing={
+              (plan as { event?: Record<string, unknown> } | null | undefined)
+                ?.event ?? null
+            }
           />
         </div>
 

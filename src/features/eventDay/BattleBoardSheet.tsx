@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
 import type { EventDayBriefing } from "../../lib/eventDayBriefing";
+import { eventTimingWindows } from "../../lib/eventTimingMilestones";
 import { formatTime } from "../../lib/format";
 import { displayEventMenuNotes } from "../events/eventMenuLineFields";
 import type { buildBoard } from "./BattleBoardPage";
@@ -62,20 +64,57 @@ export function BattleBoardSheet({
   briefing,
   board,
   companyName,
+  timing,
 }: {
   briefing: EventDayBriefing;
   board: Board;
   companyName: string;
+  /** The event's computed crew plan times (staff on, depart shop, ...). */
+  timing?: Record<string, unknown> | null;
 }) {
   const { event } = board;
   const ops = splitOperational(event.operationalRequirements);
   const service = splitService(event.serviceRequirements);
+  // No BEO overview: say what the event is from its own facts.
+  const summary =
+    service.overview ||
+    [
+      [event.serviceStyleName, event.eventType].filter(Boolean).join(" "),
+      event.expectedHeadcount != null
+        ? `for ${event.expectedHeadcount} ${event.expectedHeadcount === 1 ? "guest" : "guests"}`
+        : null,
+      board.venue?.name || event.venueName
+        ? `at ${board.venue?.name ?? event.venueName}`
+        : null,
+      event.startsAt != null
+        ? `from ${formatTime(event.startsAt)}${event.endsAt != null ? ` to ${formatTime(event.endsAt)}` : ""}`
+        : null,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .replace(/^./, (first) => first.toUpperCase())
+      .concat(".");
+  const venue = board.venue;
+  const venueLine = [
+    venue?.name ?? event.venueName,
+    [venue?.addressLine1, venue?.city].filter(Boolean).join(", ") ||
+      event.venueAddress,
+    board.venueTraits.length
+      ? `On site: ${board.venueTraits.join(", ")}`
+      : null,
+    venue?.contactName
+      ? `Venue contact: ${venue.contactName}${venue.contactPhone ? ` ${venue.contactPhone}` : ""}`
+      : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
   const cold = plates(event.buffetColdPlates);
   const hot = plates(event.buffetHotPlates);
   const dishName = (id: string | null) =>
     briefing.dishes.find((dish) => dish._id === id)?.name ?? "Dish";
 
   const layoutLines: [string, string][] = [
+    ["Venue", venueLine],
     [
       "Service Setup / Layout",
       [
@@ -147,7 +186,39 @@ export function BattleBoardSheet({
     ],
   ];
 
-  const timeline = board.timeline;
+  // Crew-plan steps ("Staff on / Load at shop", "Depart shop" ...) carry no
+  // time of their own; the event's plan works them out.
+  const planned = eventTimingWindows(timing ?? {});
+  const timeline = board.timeline.map((row) => {
+    if (row.startsAt != null) return row;
+    const milestone = planned.find((entry) =>
+      entry.aliases.some(
+        (name) =>
+          name.toLowerCase() ===
+          String(row.name ?? "")
+            .trim()
+            .toLowerCase(),
+      ),
+    );
+    // Service starts with the event when no separate service time is set.
+    const at =
+      milestone?.startsAt ??
+      (milestone?.key === "service" ? event.startsAt : null);
+    return at != null ? { ...row, startsAt: at } : row;
+  });
+  const untimedCrewSteps = timeline.filter(
+    (row) =>
+      row.startsAt == null &&
+      planned.some((entry) =>
+        entry.aliases.some(
+          (name) =>
+            name.toLowerCase() ===
+            String(row.name ?? "")
+              .trim()
+              .toLowerCase(),
+        ),
+      ),
+  ).length;
 
   return (
     <article className="bbs">
@@ -167,9 +238,7 @@ export function BattleBoardSheet({
           {event.serviceStyleName ?? event.eventType ?? "—"}
         </Fact>
       </dl>
-      {service.overview ? (
-        <p className="bbs-summary">{service.overview}</p>
-      ) : null}
+      {summary.length > 1 ? <p className="bbs-summary">{summary}</p> : null}
 
       {layoutLines.some(([, text]) => text) ? (
         <Section title="Layout & Locations">
@@ -343,6 +412,16 @@ export function BattleBoardSheet({
               })}
             </tbody>
           </table>
+          {untimedCrewSteps > 0 ? (
+            <p className="bbs-hint">
+              {untimedCrewSteps} crew steps have no time yet: set the travel,
+              load and setup minutes on the event&apos;s Timeline tab and their
+              times fill in here.{" "}
+              <Link to={`/events/${event._id}?tab=timeline`}>
+                Open timeline
+              </Link>
+            </p>
+          ) : null}
         </Section>
       ) : null}
 

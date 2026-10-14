@@ -5,8 +5,8 @@
  */
 .bbs {
   --bbs-ink: #1f2522;
-  --bbs-ink-2: #4c5450;
-  --bbs-ink-3: #8a908c;
+  --bbs-ink-2: #3a413d;
+  --bbs-ink-3: #5c635f;
   --bbs-line: #d6d8d4;
   --bbs-paper: #f3f2ee;
   --bbs-green: #2f6f2a;
@@ -255,6 +255,21 @@
   color: var(--bbs-blue);
 }
 
+.bbs-hint {
+  margin-top: 0.4rem;
+  color: var(--bbs-orange);
+  font-size: 0.72rem;
+}
+.bbs-hint a {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
+@media print {
+  .bbs-hint {
+    display: none;
+  }
+}
 .bbs-ref {
   margin-top: 0.6rem;
 }
