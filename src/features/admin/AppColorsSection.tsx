@@ -12,7 +12,7 @@ import {
   type AppPalette,
   type PaletteMode,
 } from "./appPalette";
-import { randomPalette } from "./randomPalette";
+import { contrast, randomPalette } from "./randomPalette";
 
 const MODES = [
   { value: "light", label: "Light mode" },
@@ -20,6 +20,17 @@ const MODES = [
 ] as const;
 
 const HEX = /^#[0-9a-f]{6}$/i;
+
+// Text and background pairs the app draws, and the contrast each needs.
+const READ_CHECKS: readonly [string, string, number][] = [
+  ["ink", "panel", 4.5],
+  ["ink-2", "panel", 4.5],
+  ["ink-3", "panel", 4.5],
+  ["ink", "canvas", 4.5],
+  ["brand", "panel", 4.5],
+  ["brand", "brand-soft", 4.5],
+  ["on-brand", "brand", 4.5],
+];
 
 interface OrganizationPaletteRecord {
   _id: string;
@@ -57,6 +68,14 @@ export function AppColorsSection({
   useEffect(() => () => applyAppPalette(saved), [saved]);
 
   const dirty = serializeAppPalette(draft) !== serializeAppPalette(saved);
+  const labelOf = (token: string) =>
+    PALETTE_TOKENS.find((entry) => entry.token === token)?.label ?? token;
+  const colorOf = (token: string) =>
+    draft[mode][token] ?? defaults[mode][token] ?? "#000000";
+  const hardToRead = READ_CHECKS.filter(
+    ([fg, bg, min]) => contrast(colorOf(fg), colorOf(bg)) < min,
+  );
+
   const changed = (palette: AppPalette) =>
     Object.keys(palette.light).length + Object.keys(palette.dark).length > 0;
 
@@ -166,6 +185,18 @@ export function AppColorsSection({
             );
           })}
         </ul>
+        {hardToRead.length > 0 ? (
+          <p className="text-sm text-warn" role="status">
+            Hard to read in {mode === "dark" ? "dark" : "light"} mode:{" "}
+            {hardToRead
+              .map(
+                ([fg, bg]) =>
+                  `${labelOf(fg)} on ${labelOf(bg)} (${contrast(colorOf(fg), colorOf(bg)).toFixed(1)}:1, needs 4.5:1)`,
+              )
+              .join("; ")}
+            . You can still save.
+          </p>
+        ) : null}
         {error ? (
           <p className="text-sm text-danger" role="alert">
             {error}

@@ -75,31 +75,39 @@ function mode(dark: boolean, brandHue: number, tintHue: number) {
   const inset = surface(dark ? between(16, 19) : between(95.5, 97.5));
   const sage = surface(dark ? between(15, 18) : between(90, 93));
   const rail = surface(dark ? between(7, 10) : between(90, 93));
-  const surfaces = [canvas, panel, inset];
+  // Every background text sits on: pages, cards, insets, soft fills, and the
+  // soft brand fill behind chosen rows and badges.
+  const brandSoft = hex({
+    h: brandHue,
+    s: dark ? 25 : 70,
+    l: dark ? 19 : 94,
+  });
+  const surfaces = [canvas, panel, inset, sage, brandSoft];
   const toward = dark ? 1 : -1;
   const text = (l: number, min: number) =>
     fit({ h: tintHue, s: tint, l }, surfaces, min, toward);
 
   const brandSat = between(45, 80);
   const brandStart = dark ? between(55, 70) : between(38, 50);
-  // Light: links stay readable on cards and the white arrow on brand.
-  const brand = dark
-    ? fitHsl(
-        { h: brandHue, s: brandSat, l: brandStart },
-        [panel, canvas],
-        4.5,
-        1,
-      )
-    : fitHsl(
-        { h: brandHue, s: brandSat, l: brandStart },
-        [panel, canvas, "#ffffff"],
-        4.5,
-        -1,
-      );
+  // Brand is link text on every surface. In light mode white text also sits
+  // on it; in dark mode the canvas color does (on-brand below).
+  const brand = fitHsl(
+    { h: brandHue, s: brandSat, l: brandStart },
+    dark ? surfaces : [...surfaces, "#ffffff"],
+    4.5,
+    toward,
+  );
+  // Hover: a step further from the page, still readable on every surface.
+  const accentDeep = fit(
+    { ...brand, l: Math.max(5, Math.min(95, brand.l + (dark ? 8 : -9))) },
+    surfaces,
+    4.5,
+    toward,
+  );
   const status = (hue: number) =>
     fit(
       { h: hue + between(-6, 6), s: between(55, 75), l: dark ? 62 : 38 },
-      [panel, canvas],
+      surfaces,
       4.5,
       toward,
     );
@@ -109,12 +117,8 @@ function mode(dark: boolean, brandHue: number, tintHue: number) {
     // Light mode: brand passed 4.5:1 against white. Dark mode: brand passed
     // 4.5:1 against the dark canvas, so the canvas color reads on it.
     "on-brand": dark ? canvas : "#ffffff",
-    // Hover: a step further from the page than the brand itself.
-    "accent-deep": hex({
-      ...brand,
-      l: Math.max(5, Math.min(95, brand.l + (dark ? 8 : -9))),
-    }),
-    "brand-soft": hex({ h: brandHue, s: dark ? 25 : 70, l: dark ? 19 : 94 }),
+    "accent-deep": accentDeep,
+    "brand-soft": brandSoft,
     canvas,
     panel,
     inset,
