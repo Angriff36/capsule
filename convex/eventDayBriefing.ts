@@ -278,6 +278,7 @@ export const getBriefing = query({
       equipmentReservations,
       deliveries,
       packLists,
+      rentalLines,
     ] = await Promise.all([
       byEvent(ctx, "eventAssignments", tenantId, id),
       byEvent(ctx, "eventStaffNeeds", tenantId, id),
@@ -287,9 +288,18 @@ export const getBriefing = query({
       byEvent(ctx, "equipmentReservations", tenantId, id),
       byEvent(ctx, "deliveries", tenantId, id),
       byEvent(ctx, "packLists", tenantId, id),
+      byEvent(ctx, "rentalOrderLines", tenantId, id),
     ]);
 
     const canCall = mayCallContacts(auth, assignments, deliveries);
+    // The event's free-text requirements can hold office-only matters
+    // (money, approvals, HR): event and sales roles only, never crew.
+    const officeNotes =
+      EVENT_CONTACT_ROLES.has(auth.role) &&
+      !(
+        orgCapabilityDeniesAction("eventAccess", auth.disabledCapabilities) &&
+        orgCapabilityDeniesAction("salesAccess", auth.disabledCapabilities)
+      );
 
     const packListItems = (
       await Promise.all(
@@ -484,8 +494,24 @@ export const getBriefing = query({
       .filter((item: any) => item != null)
       .map((item: any) => ({ _id: item._id, name: item.name ?? null }));
 
+    const rentals = await Promise.all(
+      (rentalLines as any[])
+        .filter((row) => String(row.status) !== "cancelled")
+        .map(async (row) => {
+          const vendor: any = await tenantDoc(ctx, tenantId, row.vendorId);
+          return {
+            _id: row._id,
+            description: row.description ?? null,
+            quantity: row.quantity ?? null,
+            countUnit: row.countUnit ?? null,
+            vendorName: vendor?.name ?? null,
+          };
+        }),
+    );
+
     return {
       packetReadiness,
+      rentals,
       event: {
         _id: event._id,
         deletedAt: event.deletedAt ?? null,
@@ -515,6 +541,19 @@ export const getBriefing = query({
         waterOnsite: event.waterOnsite ?? null,
         buffetColdPlates: event.buffetColdPlates ?? null,
         buffetHotPlates: event.buffetHotPlates ?? null,
+        // The BEO's overview and its labelled setup prose (imports write
+        // "Operations: …", "Service setup: …", "Kitchen: …" lines), and the
+        // Final Lock kit answers: the battle board prints them.
+        serviceRequirements: officeNotes
+          ? (event.serviceRequirements ?? null)
+          : null,
+        operationalRequirements: officeNotes
+          ? (event.operationalRequirements ?? null)
+          : null,
+        servingwareKit: event.servingwareKit ?? null,
+        decorKit: event.decorKit ?? null,
+        linenColorTables: event.linenColorTables ?? null,
+        linenColorBaskets: event.linenColorBaskets ?? null,
         clientId: event.clientId ?? null,
         primaryContactName: await decryptField(
           ctx,

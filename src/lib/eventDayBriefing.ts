@@ -70,6 +70,12 @@ export type EventDayEvent = {
   waterOnsite: string | null;
   buffetColdPlates: string | null;
   buffetHotPlates: string | null;
+  serviceRequirements?: string | null;
+  operationalRequirements?: string | null;
+  servingwareKit?: string | null;
+  decorKit?: string | null;
+  linenColorTables?: string | null;
+  linenColorBaskets?: string | null;
   clientId: string | null;
   primaryContactName: string | null;
   primaryContactEmail: string | null;
@@ -282,8 +288,18 @@ export type EventDayComponent = {
   declaredAllergens: string[];
 };
 
+export type EventDayRental = {
+  _id: string;
+  description: string | null;
+  quantity: number | null;
+  countUnit: string | null;
+  vendorName: string | null;
+};
+
 export type EventDayBriefing = {
   packetReadiness: EventDayPacketReadiness;
+  /** Rental order lines for the event (not cancelled), with the vendor name. */
+  rentals?: EventDayRental[];
   event: EventDayEvent;
   venue: EventDayVenue | null;
   assignments: EventDayAssignment[];
