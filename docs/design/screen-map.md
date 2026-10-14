@@ -52,7 +52,7 @@ One place edits each fact. Other screens can show it and link to that place.
 | Event stage moves (approve, sales lock, start, finish, cancel) | Event page header action |
 | Event menu lines | Event page › Menu |
 | Event prep tasks for one event | Event page › Prep. Day-to-day prep status: Kitchen › Prep board |
-| Event staffing (assignments) | Event page › Staffing. Weekly shifts: Staff › Roster |
+| Event staffing (assignments) | Event page › Staffing: Shift board (crew list, hour grid by kind of work with drag-to-assign, open shifts, shift details, coverage, event timeline) or Crew list. Weekly shifts: Staff › Roster |
 | Event timeline / run of show | Event page › Timeline (Event Day run view shows and ticks it) |
 | Event guests, client contacts on the event | Event page › Client & guests |
 | Event vehicles, trailers, driver, load marks | Event tracker sheet (calendar hover only shows them) |
