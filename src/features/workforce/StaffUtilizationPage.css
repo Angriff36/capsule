@@ -1,9 +1,9 @@
 .staff-utilization-stage {
-  --utilization-green: #31574f;
-  --utilization-sage: #718b6d;
+  --utilization-green: var(--color-ok);
+  --utilization-sage: var(--color-ink-3);
   --utilization-rust: #ad4e32;
   --utilization-gold: #c28a38;
-  --utilization-paper: #f5f1e6;
+  --utilization-paper: var(--color-panel);
 }
 
 .staff-utilization-masthead {

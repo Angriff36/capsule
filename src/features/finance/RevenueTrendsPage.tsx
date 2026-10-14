@@ -29,7 +29,7 @@ import {
 import { useWindowRows } from "../../lib/financeScopedQueries";
 
 const CATEGORY_COLORS = [
-  "#31574f",
+  "#b04f18",
   "#c8783f",
   "#40598a",
   "#8a641c",

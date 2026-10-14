@@ -50,7 +50,7 @@
   position: absolute;
   inset: 0 auto 0 0;
   width: 8px;
-  background: #31574f;
+  background: #b04f18;
   content: "";
 }
 
@@ -77,7 +77,7 @@
 .event-cost-report-section-heading p,
 .event-cost-report-footer p {
   margin: 0;
-  color: #31574f;
+  color: #b04f18;
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.17em;
@@ -115,7 +115,7 @@
 }
 
 .event-cost-report-stamp span {
-  color: #31574f;
+  color: #b04f18;
   font-size: 9px;
   font-weight: 800;
   letter-spacing: 0.15em;
@@ -174,7 +174,7 @@
 }
 
 .event-cost-report-score .is-positive strong {
-  color: #31574f;
+  color: #b04f18;
 }
 
 .event-cost-report-score .is-negative strong {
@@ -237,11 +237,11 @@
   display: block;
   min-width: 3px;
   height: 100%;
-  background: #31574f;
+  background: #b04f18;
 }
 
 .event-cost-report-bar .is-ingredient {
-  background: #31574f;
+  background: #b04f18;
 }
 
 .event-cost-report-bar .is-labor {

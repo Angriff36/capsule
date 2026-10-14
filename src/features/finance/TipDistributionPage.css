@@ -448,7 +448,7 @@
     /* Paper colors regardless of the on-screen theme — dark-theme tokens
        would print light ink on white paper. */
     background: #fff;
-    color: #24322d;
+    color: #0f0f11;
   }
   .tip-print-sheet th,
   .tip-print-sheet td > small,
@@ -456,7 +456,7 @@
   .tip-sheet-heading p:not(.eyebrow),
   .tip-sheet-heading small,
   .tip-sheet-heading > div:last-child span {
-    color: #53615b;
+    color: #3b3e45;
   }
   .tip-print-hours {
     display: inline;

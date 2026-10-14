@@ -1,6 +1,6 @@
 .profit-margin-stage {
-  --profit-green: #31574f;
-  --profit-green-soft: #dce9e3;
+  --profit-green: var(--color-ok);
+  --profit-green-soft: var(--color-ok-soft);
   --profit-copper: #b96336;
   --profit-ochre: #b18a32;
   --profit-blue: #46627c;

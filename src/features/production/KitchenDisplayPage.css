@@ -2,7 +2,7 @@
 .kds {
   min-height: 100vh;
   background: #1c2523;
-  color: #f4f1e8;
+  color: #f0f1f3;
   padding: 20px 24px 40px;
 }
 
@@ -37,7 +37,7 @@
 .kds-filter {
   max-width: 100%;
   background: #2a3733;
-  color: #f4f1e8;
+  color: #f0f1f3;
   border: 1px solid #45564f;
   border-radius: 8px;
   padding: 10px 12px;
@@ -69,13 +69,13 @@
 
 .kds-card {
   background: #fffefa;
-  color: #24322d;
+  color: #0f0f11;
   border-radius: 12px;
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  border-left: 6px solid #31574f;
+  border-left: 6px solid #b04f18;
 }
 
 .kds-card h2 {
@@ -114,7 +114,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #31574f;
+  color: #b04f18;
 }
 
 .kds-due {
@@ -145,12 +145,12 @@
 }
 
 .kds-sequence.is-ready {
-  color: #31574f;
+  color: #b04f18;
 }
 
 .kds-bump {
   margin-top: auto;
-  background: #31574f;
+  background: #b04f18;
   color: #fffefa;
   border: 0;
   border-radius: 10px;
@@ -176,7 +176,7 @@
 /* Secondary board action: destructive or follow-up, never the primary bump. */
 .kds-secondary {
   background: transparent;
-  color: #31574f;
+  color: #b04f18;
   border: 1px solid #a9b6ae;
   border-radius: 10px;
   padding: 10px;

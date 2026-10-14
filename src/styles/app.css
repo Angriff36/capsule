@@ -6,8 +6,8 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Capsule editorial system — warm working paper, botanical frame, deep green
-   ink, and a small saffron gesture. Dense controls stay crisp; key pages read
+/* Capsule editorial system — neutral paper and graphite, near-black ink, and
+   one orange action color. Dense controls stay crisp; key pages read
    like beautifully composed service documents. */
 @theme {
   /* Two faces, per DESIGN.md: DM Sans carries everything from page titles to
@@ -94,50 +94,51 @@
   --text-5xl: 45px;
 }
 
-/* Dark scheme — same editorial palette shifted to lamplight: deep green-black
-   paper, pale sage ink, brand lifted so it stays legible as text. Applied via
-   .dark on <html> (set pre-paint in index.html from the stored preference or
-   the OS prefers-color-scheme default). */
+/* Dark scheme — neutral graphite (owner, 2026-10-14: the green-black
+   "lamplight" dark had a "weird ugly hue"). Same hues as light mode: neutral
+   gray surfaces and text, Capsule orange lifted so it reads on dark. Applied
+   via .dark on <html> (set pre-paint in index.html from the stored preference
+   or the OS prefers-color-scheme default). */
 .dark {
   color-scheme: dark;
 
-  --color-canvas: #171d1a;
-  --color-panel: #212824;
-  --color-inset: #2a322d;
-  --color-sage: #242c27;
-  --color-sage-2: #38423b;
+  --color-canvas: #141416;
+  --color-panel: #1c1c1f;
+  --color-inset: #242428;
+  --color-sage: #222226;
+  --color-sage-2: #34343a;
 
-  --color-ink: #e3e9e2;
-  --color-chat-other: #2e3731;
-  --color-chat-on-accent: #171d1a;
+  --color-ink: #ececee;
+  --color-chat-other: #2a2a2f;
+  --color-chat-on-accent: #141416;
   --color-chat-plum: #c7a3d6;
   --color-chat-teal: #7fc4bd;
-  --color-ink-2: #bcc6be;
-  --color-ink-3: #97a39a;
-  --color-brand: #85b8a9;
-  --color-brand-soft: #26352f;
+  --color-ink-2: #c4c4c9;
+  --color-ink-3: #9a9aa2;
+  --color-brand: #e08a52;
+  --color-brand-soft: #3a2618;
 
-  --color-line: #343e37;
-  --color-line-2: #4d5a51;
-  --color-rail: #141c18;
-  --color-rail-2: #212b26;
-  --color-rail-active: #2f6a57;
-  --color-rail-ink: #eef3ef;
-  --color-rail-dim: #97a39a;
-  --color-service: #85b8a9;
+  --color-line: #2f2f35;
+  --color-line-2: #45454c;
+  --color-rail: #111113;
+  --color-rail-2: #1c1c1f;
+  --color-rail-active: #a4501f;
+  --color-rail-ink: #f1f1f3;
+  --color-rail-dim: #9a9aa2;
+  --color-service: #e08a52;
 
-  --color-accent: #d79860;
-  --color-accent-deep: #e2ac79;
-  --color-accent-soft: #3a2d20;
-  --color-ok: #82b992;
-  --color-ok-soft: #22362a;
+  --color-accent: #e08a52;
+  --color-accent-deep: #f0a271;
+  --color-accent-soft: #3a2618;
+  --color-ok: #7fbf94;
+  --color-ok-soft: #1f3127;
   --color-info: #93a9d8;
-  --color-info-soft: #242c3c;
-  --color-warn: #d0a854;
-  --color-warn-soft: #383021;
-  --color-danger: #d97f6e;
-  --color-danger-soft: #3c2723;
-  --color-mute-soft: #31302a;
+  --color-info-soft: #242a3a;
+  --color-warn: #d6ad5c;
+  --color-warn-soft: #372f1f;
+  --color-danger: #e07f70;
+  --color-danger-soft: #3d2522;
+  --color-mute-soft: #2e2e33;
 }
 
 /* Brand is light in dark mode, so white-on-brand chips flip to dark ink,
@@ -152,17 +153,17 @@
   background: var(--color-canvas);
 }
 .dark .attention-ledger {
-  background: #232b26;
+  background: var(--color-inset);
 }
 .dark .component-empty-state {
   background: var(--color-inset);
 }
 .dark .schedule-publish-status span,
 .dark .schedule-notice-item {
-  background: rgb(33 40 36 / 0.85);
+  background: rgb(36 36 40 / 0.85);
 }
 .dark .revenue-prior-bar {
-  fill: rgb(33 40 36 / 0.55);
+  fill: rgb(36 36 40 / 0.55);
 }
 
 @layer base {
@@ -4898,12 +4899,12 @@ div.tpp-parameter-wide {
    values so the sheet stays legible when the app is in dark mode; the page
    carries its own portrait @page override for printing. */
 .contract-document {
-  --color-ink: #24322d;
-  --color-ink-2: #53615b;
-  --color-ink-3: #7b867f;
-  --color-line: #dde1d9;
-  --color-line-2: #c8cec5;
-  --color-brand: #31574f;
+  --color-ink: #0f0f11;
+  --color-ink-2: #3b3e45;
+  --color-ink-3: #65686f;
+  --color-line: #d9dce1;
+  --color-line-2: #c3c7ce;
+  --color-brand: #b04f18;
   --color-brand-soft: #e0eae4;
   --color-accent: #c8783f;
   --color-accent-soft: #f3e2d4;
