@@ -84,12 +84,17 @@ export function BattleBoardSheet({
     const answer = finalLock?.find(
       (row) => row.questionKey === key && row.result === "answered",
     );
-    return answer ? finalLockText(answer.value) : "";
+    if (!answer) return "";
+    // A record answer is a set of flags; its explanation is the sentence.
+    return answer.value.type === "record"
+      ? answer.explanation
+      : finalLockText(answer.value);
   };
   // An imported board's chart, kept as one line in the event's notes.
   const opsText = splitOperational(board.event.operationalRequirements);
   const imported = readScopeText(`${opsText.also}\n${opsText.other}`);
-  // A blank day-sheet answer takes the imported chart, then Final Lock.
+  // A blank day-sheet answer takes the Final Lock answer, then the imported
+  // chart. Final Lock is newer than an import, so it wins.
   const event = {
     ...board.event,
     ...Object.fromEntries(
@@ -99,23 +104,23 @@ export function BattleBoardSheet({
     ),
     barService:
       board.event.barService ||
-      imported.answers.barService ||
       lockText("beverage.bar") ||
+      imported.answers.barService ||
       null,
     dessertService:
       board.event.dessertService ||
-      imported.answers.dessertService ||
       lockText("dessert.plan") ||
+      imported.answers.dessertService ||
       null,
     bussing:
       board.event.bussing ||
-      imported.answers.bussing ||
       lockText("bussing.plan") ||
+      imported.answers.bussing ||
       null,
     tablesideWater:
       board.event.tablesideWater ||
-      imported.answers.tablesideWater ||
       lockText("room.water_goblets") ||
+      imported.answers.tablesideWater ||
       null,
     buffetHotPlates:
       board.event.buffetHotPlates ||

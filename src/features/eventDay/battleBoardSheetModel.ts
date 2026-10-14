@@ -176,6 +176,12 @@ export function readScopeText(text: string): {
   const answers: Record<string, string> = {};
   const kept: string[] = [];
   for (const line of text.split(/\r?\n/)) {
+    // Only the chart's "label ANSWER | label ANSWER" lines; prose that starts
+    // with a label ("Bussing of client items ...") stays a note.
+    if (!line.includes("|")) {
+      if (line.trim()) kept.push(line.trim());
+      continue;
+    }
     const parts = line.split("|").map((part) => part.trim());
     const left: string[] = [];
     for (const part of parts) {
