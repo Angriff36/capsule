@@ -140,24 +140,25 @@ spacing:
 
 components:
   button-primary:
-    backgroundColor: "{colors.brand}"
-    textColor: "{colors.on-brand}"
+    backgroundColor: "{colors.accent-soft}"
+    textColor: "{colors.ink}"
+    borderColor: "{colors.brand}"
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
     height: 40px
     padding: 0 44px 0 16px
   button-ghost:
-    backgroundColor: "{colors.panel}"
+    backgroundColor: "{colors.inset}"
     textColor: "{colors.ink}"
-    borderColor: "{colors.line}"
+    borderColor: "{colors.ink-2}"
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
     height: 40px
     padding: 0 44px 0 16px
   button-danger:
-    backgroundColor: "{colors.panel}"
+    backgroundColor: "{colors.inset}"
     textColor: "{colors.danger}"
-    borderColor: "{colors.line}"
+    borderColor: "{colors.danger}"
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
     height: 40px
@@ -427,7 +428,7 @@ Semantic color reinforces labels and icons but never carries state alone.
 
 ### Gradient System
 
-Capsule does not use gradients as generic component fills. The current canvas uses a restrained pale-sage field with a soft white radial lift at the upper left. Any future rich gradient must be attached to real culinary media or an intentional full-page atmosphere, never buttons, cards, or status.
+Capsule does not use gradients as generic component fills. The one exception is the ui-layouts "Cross Arrow" button the owner chose (2026-10-14): its pill carries a soft left-to-right fade from `accent-soft` (primary) or `inset` (others) into `panel`. Any other rich gradient must be attached to real culinary media or an intentional full-page atmosphere, never cards or status.
 
 ## Typography
 
@@ -544,7 +545,7 @@ Italic serif breadcrumb, large serif page title, a row of `fact-pair` values, an
 
 ### **`button-primary`**
 
-The ui-layouts "Cross Arrow" button (owner, 2026-10-14: "why would we not just use one of the professional ones from the storyboard like this"): a 40px pill with a 2px border and a soft left-to-right gradient, a 13px medium sentence-case label on the left, and a dark circle on the right whose arrow slides out and back in on hover. Primary uses the brand border and a brand circle; dropdown triggers keep no circle. Use once per immediate decision region. Secondary actions beside it are `text-link`, not a second filled button.
+The ui-layouts "Cross Arrow" button (owner, 2026-10-14: "why would we not just use one of the professional ones from the storyboard like this"): a 40px pill with a 2px border and a soft left-to-right fade (the backgroundColor above fading into `panel`), a 13px medium sentence-case label on the left, and a dark circle on the right whose arrow slides out and back in on hover. Primary uses the brand border and a brand circle; dropdown triggers keep no circle. Use once per immediate decision region. Secondary actions beside it are `text-link`, not a second filled button.
 
 ### **`fact-pair`**
 
