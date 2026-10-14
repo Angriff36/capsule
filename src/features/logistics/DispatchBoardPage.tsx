@@ -1,3 +1,8 @@
+import { MergedSection } from "../../ui/MergedSection";
+import { PackingFloorPage } from "./PackingFloorPage";
+import { ReturnsPage } from "./ReturnsPage";
+import { RoutePlannerPage } from "./RoutePlannerPage";
+import { VehicleSchedulePage } from "./VehicleSchedulePage";
 import { packListName } from "./packListName";
 import { EmbeddedContext } from "../../ui/embedded";
 import { LogisticsOverviewPage } from "./LogisticsOverviewPage";
@@ -241,7 +246,7 @@ export function DispatchBoardPage() {
       <PageHeader
         eyebrow="Logistics · Dispatch"
         title="Dispatch board"
-        lead="Every event going out, soonest first, with what is still open before its trucks leave."
+        lead="Everything leaving the kitchen: the events going out, what is still open before the trucks leave, what is being packed, which vehicle goes where, and what still has to come back."
         facts={[
           { label: "Events", value: loading ? "…" : rows.length },
           { label: "Fix first", value: loading ? "…" : fixTotal },
@@ -503,6 +508,37 @@ export function DispatchBoardPage() {
           })}
         </ul>
       )}
+      {/* The boards that work across events. Each event's own pack list and
+          deliveries live on the event (owner, 2026-10-14). */}
+      <MergedSection
+        id="floor"
+        title="On the packing floor now"
+        summary="Lists being packed or loaded right now, soonest event first."
+        defaultOpen
+      >
+        <PackingFloorPage />
+      </MergedSection>
+      <MergedSection
+        id="vehicles"
+        title="Vehicles by day"
+        summary="Each vehicle's runs for one day, and runs with no vehicle yet."
+      >
+        <VehicleSchedulePage />
+      </MergedSection>
+      <MergedSection
+        id="route"
+        title="Route order"
+        summary="Suggested stop order for one day and vehicle, ready to print."
+      >
+        <RoutePlannerPage />
+      </MergedSection>
+      <MergedSection
+        id="returns"
+        title="Returns"
+        summary="What still has to come back after events, and what was lost or broken."
+      >
+        <ReturnsPage />
+      </MergedSection>
     </div>
   );
 }

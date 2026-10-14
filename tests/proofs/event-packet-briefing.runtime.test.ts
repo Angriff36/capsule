@@ -27,7 +27,7 @@ async function fixture() {
       expectedHeadcount: 200,
       budgetAmount: 12345,
       quotedPrice: 67890,
-      operationalRequirements: "PRIVATE SOURCE MONEY APPROVAL HR",
+      operationalRequirements: "Operations: Pack scullery trash cans and bags",
       stage: "planning",
       version: 1,
       deletedAt: null,
@@ -75,9 +75,13 @@ describe("crew packet briefing boundary", () => {
         "status",
         "urgentAction",
       ]);
-    expect(JSON.stringify(briefing)).not.toContain(
-      "PRIVATE SOURCE MONEY APPROVAL HR",
+    // The battle board is the crew's sheet: its setup notes reach the crew
+    // (owner, 2026-10-14); money and packet internals still do not.
+    expect(briefing.event.operationalRequirements).toBe(
+      "Operations: Pack scullery trash cans and bags",
     );
+    expect(JSON.stringify(briefing)).not.toContain("12345");
+    expect(JSON.stringify(briefing)).not.toContain("67890");
     for (const secret of [
       "snapshot",
       "resolutions",

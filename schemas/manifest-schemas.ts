@@ -2,6 +2,24 @@
 
 import { z } from 'zod';
 
+// Entity: AccountabilitySeat
+export const AccountabilitySeatSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  title: z.string().default(""),
+  roles: z.string().nullable().optional(),
+  personId: z.string().uuid().nullable().optional(),
+  parentSeatId: z.string().uuid().nullable().optional(),
+  sortOrder: z.number().int().default(0),
+  createdByPersonId: z.string().uuid().nullable().optional(),
+  placedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type AccountabilitySeat = z.infer<typeof AccountabilitySeatSchema>;
+
 // Entity: Announcement
 export const AnnouncementSchema = z.object({
   id: z.string().uuid(),
@@ -98,6 +116,21 @@ export const AvailabilityWindowSchema = z.object({
 });
 
 export type AvailabilityWindow = z.infer<typeof AvailabilityWindowSchema>;
+
+// Entity: BookingRule
+export const BookingRuleSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  resource: z.enum(["vehicle", "person", "equipment"]).default("vehicle"),
+  mode: z.enum(["same_day", "overlap", "off"]).default("same_day"),
+  gapMinutes: z.number().int().min(0).default(0),
+  setAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type BookingRule = z.infer<typeof BookingRuleSchema>;
 
 // Entity: Candidate
 export const CandidateSchema = z.object({
@@ -304,6 +337,40 @@ export const CommandAuditRecordSchema = z.object({
 });
 
 export type CommandAuditRecord = z.infer<typeof CommandAuditRecordSchema>;
+
+// Entity: CompanyVision
+export const CompanyVisionSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  coreFocusPurpose: z.string().nullable().optional(),
+  coreFocusNiche: z.string().nullable().optional(),
+  tenYearTarget: z.string().nullable().optional(),
+  tenYearDate: z.coerce.date().nullable().optional(),
+  targetMarket: z.string().nullable().optional(),
+  provenProcess: z.string().nullable().optional(),
+  guarantee: z.string().nullable().optional(),
+  threeYearDate: z.coerce.date().nullable().optional(),
+  threeYearRevenue: z.number().nullable().optional(),
+  threeYearProfit: z.number().nullable().optional(),
+  threeYearMeasurables: z.string().nullable().optional(),
+  oneYearDate: z.coerce.date().nullable().optional(),
+  oneYearRevenue: z.number().nullable().optional(),
+  oneYearProfit: z.number().nullable().optional(),
+  oneYearMeasurables: z.string().nullable().optional(),
+  quarterDate: z.coerce.date().nullable().optional(),
+  quarterRevenue: z.number().nullable().optional(),
+  quarterProfit: z.number().nullable().optional(),
+  quarterMeasurables: z.string().nullable().optional(),
+  peopleBarMaxMixed: z.number().int().nullable().optional(),
+  writtenAt: z.coerce.date().nullable().optional(),
+  writtenByPersonId: z.string().uuid().nullable().optional(),
+  revisedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type CompanyVision = z.infer<typeof CompanyVisionSchema>;
 
 // Entity: Component
 export const ComponentSchema = z.object({
@@ -567,6 +634,24 @@ export const ContractSchema = z.object({
 
 export type Contract = z.infer<typeof ContractSchema>;
 
+// Entity: CoreProcess
+export const CoreProcessSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  name: z.string().default(""),
+  ownerPersonId: z.string().uuid().nullable().optional(),
+  steps: z.string().nullable().optional(),
+  stage: z.enum(["named", "documented", "simplified", "followed_by_all"]).default("named"),
+  sortOrder: z.number().int().default(0),
+  namedAt: z.coerce.date().nullable().optional(),
+  stageSetAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type CoreProcess = z.infer<typeof CoreProcessSchema>;
+
 // Entity: CorrectiveAction
 export const CorrectiveActionSchema = z.object({
   id: z.string().uuid(),
@@ -704,6 +789,21 @@ export const DeckShareLinkSchema = z.object({
 });
 
 export type DeckShareLink = z.infer<typeof DeckShareLinkSchema>;
+
+// Entity: DelegateElevateItem
+export const DelegateElevateItemSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  personId: z.string().uuid().default(""),
+  activity: z.string().default(""),
+  quadrant: z.enum(["love_great", "like_good", "dislike_good", "dislike_not_good"]).default("love_great"),
+  addedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type DelegateElevateItem = z.infer<typeof DelegateElevateItemSchema>;
 
 // Entity: Delivery
 export const DeliverySchema = z.object({
@@ -1220,6 +1320,7 @@ export const EventSchema = z.object({
   linenColorBaskets: z.string().nullable().optional(),
   servingwareKit: z.string().nullable().optional(),
   decorKit: z.string().nullable().optional(),
+  trackerNotes: z.string().nullable().optional(),
   rainPlan: z.string().nullable().optional(),
   setupDiagram: z.string().nullable().optional(),
   venueSurface: z.string().nullable().optional(),
@@ -1310,6 +1411,8 @@ export const EventAssignmentSchema = z.object({
   followsEventTiming: z.boolean().nullable().optional(),
   rideVehicleAssignmentId: z.string().uuid().nullable().optional(),
   meetsAtVenue: z.boolean().nullable().optional(),
+  planX: z.number().int().nullable().optional(),
+  planY: z.number().int().nullable().optional(),
   notes: z.string().nullable().optional(),
   status: z.enum(["assigned", "confirmed", "checked_in", "checked_out", "no_show", "unassigned"]).default("assigned"),
   assignedAt: z.coerce.date().nullable().optional(),
@@ -1546,6 +1649,10 @@ export const EventLayoutSectionSchema = z.object({
   addedAt: z.coerce.date().nullable().optional(),
   sourceTemplateId: z.string().uuid().nullable().optional(),
   sourceTemplateVersion: z.number().int().nullable().optional(),
+  planX: z.number().int().nullable().optional(),
+  planY: z.number().int().nullable().optional(),
+  planWidth: z.number().int().nullable().optional(),
+  planHeight: z.number().int().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2458,6 +2565,8 @@ export const LeadershipItemSchema = z.object({
   openedByPersonId: z.string().uuid().nullable().optional(),
   closedAt: z.coerce.date().nullable().optional(),
   closedByPersonId: z.string().uuid().nullable().optional(),
+  parkedAt: z.coerce.date().nullable().optional(),
+  priority: z.number().int().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2810,6 +2919,21 @@ export const OrganizationComputedSchema = OrganizationSchema.extend({
 
 export type Organization = z.infer<typeof OrganizationSchema>;
 export type OrganizationWithComputed = z.infer<typeof OrganizationComputedSchema>;
+
+// Entity: OrganizationalCheckup
+export const OrganizationalCheckupSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  answers: z.string().default(""),
+  score: z.number().int().default(0),
+  takenAt: z.coerce.date().nullable().optional(),
+  takenByPersonId: z.string().uuid().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type OrganizationalCheckup = z.infer<typeof OrganizationalCheckupSchema>;
 
 // Entity: OrganizationCapabilitySetting
 export const OrganizationCapabilitySettingSchema = z.object({
@@ -3238,6 +3362,22 @@ export const PayrollInputSchema = z.object({
 });
 
 export type PayrollInput = z.infer<typeof PayrollInputSchema>;
+
+// Entity: PeopleAnalyzerScore
+export const PeopleAnalyzerScoreSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  personId: z.string().uuid().default(""),
+  subject: z.string().default(""),
+  score: z.enum(["plus", "plus_minus", "minus"]).default("plus"),
+  ratedAt: z.coerce.date().nullable().optional(),
+  ratedByPersonId: z.string().uuid().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type PeopleAnalyzerScore = z.infer<typeof PeopleAnalyzerScoreSchema>;
 
 // Entity: PerformanceReview
 export const PerformanceReviewSchema = z.object({
@@ -5400,6 +5540,24 @@ export const VenueVendorRelationshipComputedSchema = VenueVendorRelationshipSche
 export type VenueVendorRelationship = z.infer<typeof VenueVendorRelationshipSchema>;
 export type VenueVendorRelationshipWithComputed = z.infer<typeof VenueVendorRelationshipComputedSchema>;
 
+// Entity: VisionItem
+export const VisionItemSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  section: z.enum(["core_value", "differentiator", "three_year", "one_year_goal"]).default("core_value"),
+  text: z.string().default(""),
+  detail: z.string().nullable().optional(),
+  sortOrder: z.number().int().default(0),
+  doneAt: z.coerce.date().nullable().optional(),
+  addedAt: z.coerce.date().nullable().optional(),
+  addedByPersonId: z.string().uuid().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type VisionItem = z.infer<typeof VisionItemSchema>;
+
 // Entity: WasteRecord
 export const WasteRecordSchema = z.object({
   id: z.string().uuid(),
@@ -5466,6 +5624,33 @@ export const WeeklyScheduleNoticeSchema = z.object({
 });
 
 export type WeeklyScheduleNotice = z.infer<typeof WeeklyScheduleNoticeSchema>;
+
+// Command: place on AccountabilitySeat
+export const AccountabilitySeatPlaceParamsSchema = z.object({
+  title: z.string(),
+  roles: z.string().optional(),
+  personId: z.string().min(1).optional(),
+  parentSeatId: z.string().min(1).optional(),
+  sortOrder: z.number().int(),
+});
+
+export type AccountabilitySeatPlaceParams = z.infer<typeof AccountabilitySeatPlaceParamsSchema>;
+
+// Command: remove on AccountabilitySeat
+export const AccountabilitySeatRemoveParamsSchema = z.object({});
+
+export type AccountabilitySeatRemoveParams = z.infer<typeof AccountabilitySeatRemoveParamsSchema>;
+
+// Command: revise on AccountabilitySeat
+export const AccountabilitySeatReviseParamsSchema = z.object({
+  title: z.string(),
+  roles: z.string().optional(),
+  personId: z.string().min(1).optional(),
+  parentSeatId: z.string().min(1).optional(),
+  sortOrder: z.number().int(),
+});
+
+export type AccountabilitySeatReviseParams = z.infer<typeof AccountabilitySeatReviseParamsSchema>;
 
 // Command: post on Announcement
 export const AnnouncementPostParamsSchema = z.object({
@@ -5538,6 +5723,23 @@ export type AvailabilityWindowDeclareParams = z.infer<typeof AvailabilityWindowD
 export const AvailabilityWindowWithdrawParamsSchema = z.object({});
 
 export type AvailabilityWindowWithdrawParams = z.infer<typeof AvailabilityWindowWithdrawParamsSchema>;
+
+// Command: change on BookingRule
+export const BookingRuleChangeParamsSchema = z.object({
+  mode: z.enum(["same_day", "overlap", "off"]),
+  gapMinutes: z.number().int(),
+});
+
+export type BookingRuleChangeParams = z.infer<typeof BookingRuleChangeParamsSchema>;
+
+// Command: start on BookingRule
+export const BookingRuleStartParamsSchema = z.object({
+  resource: z.enum(["vehicle", "person", "equipment"]),
+  mode: z.enum(["same_day", "overlap", "off"]),
+  gapMinutes: z.number().int(),
+});
+
+export type BookingRuleStartParams = z.infer<typeof BookingRuleStartParamsSchema>;
 
 // Command: advance on Candidate
 export const CandidateAdvanceParamsSchema = z.object({
@@ -5820,6 +6022,58 @@ export type ClientPortalLinkCreateParams = z.infer<typeof ClientPortalLinkCreate
 export const ClientPortalLinkRevokeParamsSchema = z.object({});
 
 export type ClientPortalLinkRevokeParams = z.infer<typeof ClientPortalLinkRevokeParamsSchema>;
+
+// Command: revise on CompanyVision
+export const CompanyVisionReviseParamsSchema = z.object({
+  coreFocusPurpose: z.string().optional(),
+  coreFocusNiche: z.string().optional(),
+  tenYearTarget: z.string().optional(),
+  tenYearDate: z.coerce.date().optional(),
+  targetMarket: z.string().optional(),
+  provenProcess: z.string().optional(),
+  guarantee: z.string().optional(),
+  threeYearDate: z.coerce.date().optional(),
+  threeYearRevenue: z.number().optional(),
+  threeYearProfit: z.number().optional(),
+  threeYearMeasurables: z.string().optional(),
+  oneYearDate: z.coerce.date().optional(),
+  oneYearRevenue: z.number().optional(),
+  oneYearProfit: z.number().optional(),
+  oneYearMeasurables: z.string().optional(),
+  quarterDate: z.coerce.date().optional(),
+  quarterRevenue: z.number().optional(),
+  quarterProfit: z.number().optional(),
+  quarterMeasurables: z.string().optional(),
+  peopleBarMaxMixed: z.number().int().optional(),
+});
+
+export type CompanyVisionReviseParams = z.infer<typeof CompanyVisionReviseParamsSchema>;
+
+// Command: write on CompanyVision
+export const CompanyVisionWriteParamsSchema = z.object({
+  coreFocusPurpose: z.string().optional(),
+  coreFocusNiche: z.string().optional(),
+  tenYearTarget: z.string().optional(),
+  tenYearDate: z.coerce.date().optional(),
+  targetMarket: z.string().optional(),
+  provenProcess: z.string().optional(),
+  guarantee: z.string().optional(),
+  threeYearDate: z.coerce.date().optional(),
+  threeYearRevenue: z.number().optional(),
+  threeYearProfit: z.number().optional(),
+  threeYearMeasurables: z.string().optional(),
+  oneYearDate: z.coerce.date().optional(),
+  oneYearRevenue: z.number().optional(),
+  oneYearProfit: z.number().optional(),
+  oneYearMeasurables: z.string().optional(),
+  quarterDate: z.coerce.date().optional(),
+  quarterRevenue: z.number().optional(),
+  quarterProfit: z.number().optional(),
+  quarterMeasurables: z.string().optional(),
+  peopleBarMaxMixed: z.number().int().optional(),
+});
+
+export type CompanyVisionWriteParams = z.infer<typeof CompanyVisionWriteParamsSchema>;
 
 // Command: clearPrimaryImage on Component
 export const ComponentClearPrimaryImageParamsSchema = z.object({});
@@ -6327,6 +6581,37 @@ export const ContractStageClientMergeParamsSchema = z.object({
 
 export type ContractStageClientMergeParams = z.infer<typeof ContractStageClientMergeParamsSchema>;
 
+// Command: remove on CoreProcess
+export const CoreProcessRemoveParamsSchema = z.object({});
+
+export type CoreProcessRemoveParams = z.infer<typeof CoreProcessRemoveParamsSchema>;
+
+// Command: revise on CoreProcess
+export const CoreProcessReviseParamsSchema = z.object({
+  name: z.string(),
+  ownerPersonId: z.string().min(1).optional(),
+  steps: z.string().optional(),
+  sortOrder: z.number().int(),
+});
+
+export type CoreProcessReviseParams = z.infer<typeof CoreProcessReviseParamsSchema>;
+
+// Command: setStage on CoreProcess
+export const CoreProcessSetStageParamsSchema = z.object({
+  stage: z.enum(["named", "documented", "simplified", "followed_by_all"]),
+});
+
+export type CoreProcessSetStageParams = z.infer<typeof CoreProcessSetStageParamsSchema>;
+
+// Command: start on CoreProcess
+export const CoreProcessStartParamsSchema = z.object({
+  name: z.string(),
+  ownerPersonId: z.string().min(1).optional(),
+  sortOrder: z.number().int(),
+});
+
+export type CoreProcessStartParams = z.infer<typeof CoreProcessStartParamsSchema>;
+
 // Command: close on CorrectiveAction
 export const CorrectiveActionCloseParamsSchema = z.object({
   resolutionNotes: z.string(),
@@ -6484,6 +6769,27 @@ export type DeckShareLinkCreateParams = z.infer<typeof DeckShareLinkCreateParams
 export const DeckShareLinkRevokeParamsSchema = z.object({});
 
 export type DeckShareLinkRevokeParams = z.infer<typeof DeckShareLinkRevokeParamsSchema>;
+
+// Command: add on DelegateElevateItem
+export const DelegateElevateItemAddParamsSchema = z.object({
+  personId: z.string().min(1),
+  activity: z.string(),
+  quadrant: z.enum(["love_great", "like_good", "dislike_good", "dislike_not_good"]),
+});
+
+export type DelegateElevateItemAddParams = z.infer<typeof DelegateElevateItemAddParamsSchema>;
+
+// Command: move on DelegateElevateItem
+export const DelegateElevateItemMoveParamsSchema = z.object({
+  quadrant: z.enum(["love_great", "like_good", "dislike_good", "dislike_not_good"]),
+});
+
+export type DelegateElevateItemMoveParams = z.infer<typeof DelegateElevateItemMoveParamsSchema>;
+
+// Command: remove on DelegateElevateItem
+export const DelegateElevateItemRemoveParamsSchema = z.object({});
+
+export type DelegateElevateItemRemoveParams = z.infer<typeof DelegateElevateItemRemoveParamsSchema>;
 
 // Command: cancel on Delivery
 export const DeliveryCancelParamsSchema = z.object({
@@ -7464,6 +7770,13 @@ export const EventSetEventNumberParamsSchema = z.object({
 
 export type EventSetEventNumberParams = z.infer<typeof EventSetEventNumberParamsSchema>;
 
+// Command: setTrackerNotes on Event
+export const EventSetTrackerNotesParamsSchema = z.object({
+  notes: z.string(),
+});
+
+export type EventSetTrackerNotesParams = z.infer<typeof EventSetTrackerNotesParamsSchema>;
+
 // Command: setTravelFee on Event
 export const EventSetTravelFeeParamsSchema = z.object({
   distanceMiles: z.number().optional(),
@@ -7661,6 +7974,14 @@ export type EventAssignmentDeclineParams = z.infer<typeof EventAssignmentDecline
 export const EventAssignmentMarkNoShowParamsSchema = z.object({});
 
 export type EventAssignmentMarkNoShowParams = z.infer<typeof EventAssignmentMarkNoShowParamsSchema>;
+
+// Command: pinOnPlan on EventAssignment
+export const EventAssignmentPinOnPlanParamsSchema = z.object({
+  planX: z.number().optional(),
+  planY: z.number().optional(),
+});
+
+export type EventAssignmentPinOnPlanParams = z.infer<typeof EventAssignmentPinOnPlanParamsSchema>;
 
 // Command: planTiming on EventAssignment
 export const EventAssignmentPlanTimingParamsSchema = z.object({
@@ -8052,10 +8373,25 @@ export const EventLayoutSectionAddParamsSchema = z.object({
 
 export type EventLayoutSectionAddParams = z.infer<typeof EventLayoutSectionAddParamsSchema>;
 
+// Command: placeOnPlan on EventLayoutSection
+export const EventLayoutSectionPlaceOnPlanParamsSchema = z.object({
+  planX: z.number(),
+  planY: z.number(),
+  planWidth: z.number(),
+  planHeight: z.number(),
+});
+
+export type EventLayoutSectionPlaceOnPlanParams = z.infer<typeof EventLayoutSectionPlaceOnPlanParamsSchema>;
+
 // Command: remove on EventLayoutSection
 export const EventLayoutSectionRemoveParamsSchema = z.object({});
 
 export type EventLayoutSectionRemoveParams = z.infer<typeof EventLayoutSectionRemoveParamsSchema>;
+
+// Command: takeOffPlan on EventLayoutSection
+export const EventLayoutSectionTakeOffPlanParamsSchema = z.object({});
+
+export type EventLayoutSectionTakeOffPlanParams = z.infer<typeof EventLayoutSectionTakeOffPlanParamsSchema>;
 
 // Command: update on EventLayoutSection
 export const EventLayoutSectionUpdateParamsSchema = z.object({
@@ -8403,6 +8739,13 @@ export const EventVehicleAssignmentAttachTrailerParamsSchema = z.object({
 });
 
 export type EventVehicleAssignmentAttachTrailerParams = z.infer<typeof EventVehicleAssignmentAttachTrailerParamsSchema>;
+
+// Command: changeDriver on EventVehicleAssignment
+export const EventVehicleAssignmentChangeDriverParamsSchema = z.object({
+  driverId: z.string().min(1).optional(),
+});
+
+export type EventVehicleAssignmentChangeDriverParams = z.infer<typeof EventVehicleAssignmentChangeDriverParamsSchema>;
 
 // Command: clearPreloaded on EventVehicleAssignment
 export const EventVehicleAssignmentClearPreloadedParamsSchema = z.object({});
@@ -9584,6 +9927,11 @@ export const LeadershipItemAddParamsSchema = z.object({
 
 export type LeadershipItemAddParams = z.infer<typeof LeadershipItemAddParamsSchema>;
 
+// Command: bringBack on LeadershipItem
+export const LeadershipItemBringBackParamsSchema = z.object({});
+
+export type LeadershipItemBringBackParams = z.infer<typeof LeadershipItemBringBackParamsSchema>;
+
 // Command: complete on LeadershipItem
 export const LeadershipItemCompleteParamsSchema = z.object({});
 
@@ -9600,6 +9948,18 @@ export const LeadershipItemMarkTrackParamsSchema = z.object({
 });
 
 export type LeadershipItemMarkTrackParams = z.infer<typeof LeadershipItemMarkTrackParamsSchema>;
+
+// Command: park on LeadershipItem
+export const LeadershipItemParkParamsSchema = z.object({});
+
+export type LeadershipItemParkParams = z.infer<typeof LeadershipItemParkParamsSchema>;
+
+// Command: prioritize on LeadershipItem
+export const LeadershipItemPrioritizeParamsSchema = z.object({
+  priority: z.number().int().optional(),
+});
+
+export type LeadershipItemPrioritizeParams = z.infer<typeof LeadershipItemPrioritizeParamsSchema>;
 
 // Command: reopen on LeadershipItem
 export const LeadershipItemReopenParamsSchema = z.object({});
@@ -10187,6 +10547,14 @@ export const OrganizationSuspendParamsSchema = z.object({
 });
 
 export type OrganizationSuspendParams = z.infer<typeof OrganizationSuspendParamsSchema>;
+
+// Command: take on OrganizationalCheckup
+export const OrganizationalCheckupTakeParamsSchema = z.object({
+  answers: z.string(),
+  score: z.number().int(),
+});
+
+export type OrganizationalCheckupTakeParams = z.infer<typeof OrganizationalCheckupTakeParamsSchema>;
 
 // Command: register on OrganizationCapabilitySetting
 export const OrganizationCapabilitySettingRegisterParamsSchema = z.object({
@@ -10927,6 +11295,27 @@ export const PayrollInputPrepareParamsSchema = z.object({
 });
 
 export type PayrollInputPrepareParams = z.infer<typeof PayrollInputPrepareParamsSchema>;
+
+// Command: rate on PeopleAnalyzerScore
+export const PeopleAnalyzerScoreRateParamsSchema = z.object({
+  personId: z.string().min(1),
+  subject: z.string(),
+  score: z.enum(["plus", "plus_minus", "minus"]),
+});
+
+export type PeopleAnalyzerScoreRateParams = z.infer<typeof PeopleAnalyzerScoreRateParamsSchema>;
+
+// Command: rescore on PeopleAnalyzerScore
+export const PeopleAnalyzerScoreRescoreParamsSchema = z.object({
+  score: z.enum(["plus", "plus_minus", "minus"]),
+});
+
+export type PeopleAnalyzerScoreRescoreParams = z.infer<typeof PeopleAnalyzerScoreRescoreParamsSchema>;
+
+// Command: withdraw on PeopleAnalyzerScore
+export const PeopleAnalyzerScoreWithdrawParamsSchema = z.object({});
+
+export type PeopleAnalyzerScoreWithdrawParams = z.infer<typeof PeopleAnalyzerScoreWithdrawParamsSchema>;
 
 // Command: record on PerformanceReview
 export const PerformanceReviewRecordParamsSchema = z.object({
@@ -14187,6 +14576,40 @@ export const VenueVendorRelationshipReviseStatusParamsSchema = z.object({
 });
 
 export type VenueVendorRelationshipReviseStatusParams = z.infer<typeof VenueVendorRelationshipReviseStatusParamsSchema>;
+
+// Command: add on VisionItem
+export const VisionItemAddParamsSchema = z.object({
+  section: z.enum(["core_value", "differentiator", "three_year", "one_year_goal"]),
+  text: z.string(),
+  detail: z.string().optional(),
+  sortOrder: z.number().int(),
+});
+
+export type VisionItemAddParams = z.infer<typeof VisionItemAddParamsSchema>;
+
+// Command: markDone on VisionItem
+export const VisionItemMarkDoneParamsSchema = z.object({});
+
+export type VisionItemMarkDoneParams = z.infer<typeof VisionItemMarkDoneParamsSchema>;
+
+// Command: markNotDone on VisionItem
+export const VisionItemMarkNotDoneParamsSchema = z.object({});
+
+export type VisionItemMarkNotDoneParams = z.infer<typeof VisionItemMarkNotDoneParamsSchema>;
+
+// Command: remove on VisionItem
+export const VisionItemRemoveParamsSchema = z.object({});
+
+export type VisionItemRemoveParams = z.infer<typeof VisionItemRemoveParamsSchema>;
+
+// Command: revise on VisionItem
+export const VisionItemReviseParamsSchema = z.object({
+  text: z.string(),
+  detail: z.string().optional(),
+  sortOrder: z.number().int(),
+});
+
+export type VisionItemReviseParams = z.infer<typeof VisionItemReviseParamsSchema>;
 
 // Command: record on WasteRecord
 export const WasteRecordRecordParamsSchema = z.object({

@@ -2,25 +2,54 @@ import { useState } from "react";
 import {
   useCreateEventVehicleAssignment,
   useCreatePackList,
-  useEventChangeServiceStyle,
+  useEquipmentReservationCancel,
   useEventClearBinderBuilt,
   useEventMarkBinderBuilt,
   useEventSetEventNumber,
+  useEventSetTrackerNotes,
+  useEventUpdateSetupNotes,
   useEventVehicleAssignmentClearPreloaded,
   useEventVehicleAssignmentMarkPreloaded,
   useEventVehicleAssignmentRelease,
 } from "../../../lib/manifest-convex-react";
+import type { Id } from "../../../lib/api";
 import { runBulkItems } from "../../../ui/bulk-select";
 import { useSuccessToast } from "../../../ui/useSuccessToast";
+import { useReserveEquipment } from "../../facilities/equipmentCheckout";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
-import type { TrackerRowActions } from "./TrackerSheetRow";
+import type { BookingResource } from "./bookingConflicts";
+import type { TrackerRowActions } from "./TrackerBoardRow";
 import type { TrackerRow } from "./trackerSheet";
 
+/** A thing about to be booked on the row's event. */
+export interface BookingCandidate {
+  resource: BookingResource;
+  key: string;
+  quantity?: number;
+}
+
+export interface TrackerRowActionsOptions {
+  /** The event's booking window: start and end. */
+  windowOf: (row: TrackerRow) => { start: number; end: number };
+  /**
+   * Warn about anything already booked elsewhere. Resolves true to go ahead
+   * (nothing clashes, or the office chose to book anyway), false to stop.
+   */
+  confirmBookings: (
+    row: TrackerRow,
+    candidates: BookingCandidate[],
+  ) => Promise<"clear" | "override" | "stop">;
+  /** Ask whether to book over the server's "only N free" answer. */
+  confirmOverbook: (message: string) => Promise<boolean>;
+}
+
+const OVERBOOK_REASON = "Booked over a double-booking warning on the tracker";
+
 /**
- * Every write the tracker sheet can make, as one action set per row. One row is
+ * Every write the tracker can make, as one action set per row. One row is
  * busy at a time; a rejected write shows the failure and resets the inputs.
  */
-export function useTrackerRowActions() {
+export function useTrackerRowActions(options: TrackerRowActionsOptions) {
   const assignRig = useCreateEventVehicleAssignment();
   const releaseRig = useEventVehicleAssignmentRelease();
   const markPreloaded = useEventVehicleAssignmentMarkPreloaded();
@@ -28,8 +57,11 @@ export function useTrackerRowActions() {
   const markBinderBuilt = useEventMarkBinderBuilt();
   const clearBinderBuilt = useEventClearBinderBuilt();
   const setEventNumber = useEventSetEventNumber();
-  const changeServiceStyle = useEventChangeServiceStyle();
+  const setTrackerNotes = useEventSetTrackerNotes();
+  const updateSetupNotes = useEventUpdateSetupNotes();
   const openPackList = useCreatePackList();
+  const reserve = useReserveEquipment();
+  const cancelHold = useEquipmentReservationCancel();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   const [resetKey, setResetKey] = useState(0);
@@ -45,12 +77,33 @@ export function useTrackerRowActions() {
     try {
       await work();
       notifySuccess(okMessage);
+      return true;
     } catch (error) {
       setFailure(classifyCommandFailure(error));
       setResetKey((key) => key + 1);
+      return false;
     } finally {
       setBusyId(null);
     }
+  };
+
+  /** Warn first; a "stop" resets the picker so it shows the saved value. */
+  const guarded = async (
+    row: TrackerRow,
+    candidates: BookingCandidate[],
+    work: () => Promise<unknown>,
+    okMessage: string,
+  ) => {
+    const answer = await options.confirmBookings(row, candidates);
+    if (answer === "stop") {
+      setResetKey((key) => key + 1);
+      return;
+    }
+    await run(
+      row,
+      work,
+      answer === "override" ? `${okMessage}, over the warning` : okMessage,
+    );
   };
 
   const actionsFor = (row: TrackerRow): TrackerRowActions => ({
@@ -64,18 +117,6 @@ export function useTrackerRowActions() {
             eventNumber: next || undefined,
           }),
         "Event number saved",
-      ),
-    onServiceStyle: (serviceStyleId, serviceStyleName) =>
-      void run(
-        row,
-        () =>
-          changeServiceStyle({
-            docId: row.id,
-            version: row.version,
-            serviceStyleId,
-            serviceStyleName,
-          }),
-        "Service style saved. Its kit is on the pack list.",
       ),
     onBinderBuilt: (built) =>
       void run(
@@ -94,8 +135,11 @@ export function useTrackerRowActions() {
         "Pack list opened with the style kit",
       ),
     onAddRig: (first) =>
-      void run(
+      void guarded(
         row,
+        [first.vehicleId, first.trailerId]
+          .filter((id): id is string => !!id)
+          .map((key) => ({ resource: "vehicle", key })),
         () => assignRig({ eventId: row.id, ...first }),
         "Attached to the event",
       ),
@@ -103,8 +147,17 @@ export function useTrackerRowActions() {
     // Attach the corrected rig first, then release the old one: a failure in
     // between leaves two visible rigs, never a lost one.
     onChangeRig: (rig, next) =>
-      void run(
+      void guarded(
         row,
+        (
+          [
+            ["vehicle", next.vehicleId, rig.vehicleId],
+            ["vehicle", next.trailerId, rig.trailerId],
+            ["person", next.driverId, rig.driverId],
+          ] as const
+        )
+          .filter(([, picked, before]) => picked != null && picked !== before)
+          .map(([resource, picked]) => ({ resource, key: picked as string })),
         async () => {
           if (next.vehicleId != null || next.trailerId != null) {
             await assignRig({
@@ -135,6 +188,79 @@ export function useTrackerRowActions() {
         row,
         () => releaseRig({ docId: rig.id, version: rig.version }),
         "Taken off the event",
+      ),
+    onAddEquipment: (equipmentId, quantity) =>
+      void (async () => {
+        const answer = await options.confirmBookings(row, [
+          { resource: "equipment", key: equipmentId, quantity },
+        ]);
+        if (answer === "stop") return;
+        const { start, end } = options.windowOf(row);
+        const book = (overbookReason?: string) =>
+          reserve({
+            equipmentId: equipmentId as Id<"equipments">,
+            eventId: row.id as Id<"events">,
+            startsAt: start,
+            endsAt: end,
+            quantity,
+            ...(overbookReason ? { overbookReason } : {}),
+          });
+        setFailure(null);
+        setBusyId(row.id);
+        try {
+          try {
+            await book(answer === "override" ? OVERBOOK_REASON : undefined);
+          } catch (error) {
+            // Holds the tracker cannot see (another month) can still use
+            // the stock up: ask, then book over the count with a reason.
+            const message = error instanceof Error ? error.message : "";
+            if (
+              answer === "override" ||
+              !/free for that time/.test(message) ||
+              !(await options.confirmOverbook(message))
+            )
+              throw error;
+            await book(OVERBOOK_REASON);
+          }
+          notifySuccess("Equipment held for the event");
+        } catch (error) {
+          setFailure(classifyCommandFailure(error));
+        } finally {
+          setBusyId(null);
+        }
+      })(),
+    onRemoveEquipment: (hold) =>
+      void run(
+        row,
+        () =>
+          cancelHold({
+            docId: hold.id,
+            version: hold.version,
+            reason: "Taken off on the event tracker",
+          }),
+        `${hold.name} taken off the event`,
+      ),
+    onDecor: (next) =>
+      void run(
+        row,
+        () =>
+          updateSetupNotes({
+            docId: row.id,
+            version: row.version,
+            decorKit: next,
+          }),
+        "Decor saved",
+      ),
+    onNotes: (next) =>
+      void run(
+        row,
+        () =>
+          setTrackerNotes({
+            docId: row.id,
+            version: row.version,
+            notes: next,
+          }),
+        "Notes saved",
       ),
   });
 

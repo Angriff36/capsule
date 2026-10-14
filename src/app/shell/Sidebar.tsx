@@ -127,10 +127,12 @@ export function Sidebar() {
                   onClick={releaseAfterClick}
                   className={({ isActive }) =>
                     isActive &&
-                    // Events stays quiet on the tracker, which has its own item.
+                    // Events stays quiet on the tracker and the production
+                    // board, which have their own items.
                     !(
                       area.path === "/events" &&
-                      location.pathname.startsWith("/events/tracker")
+                      (location.pathname.startsWith("/events/tracker") ||
+                        location.pathname.startsWith("/events/production"))
                     )
                       ? "active"
                       : undefined

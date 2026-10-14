@@ -64,11 +64,8 @@ export function DonationSummaryPage() {
           <p className="mt-3 max-w-160 text-ink-2">
             Every donation of leftover food in a year, by recipient, with
             weights, values, receipts and handling notes. Print it for the tax
-            file and Good Samaritan Act records. Record leftovers on each{" "}
-            <Link className="text-link" to={FINANCE_ROUTES.closeout}>
-              closeout
-            </Link>
-            .
+            file and Good Samaritan Act records. Record leftovers on each
+            event's closeout, on its Proposal &amp; margin tab.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -132,11 +129,8 @@ export function DonationSummaryPage() {
             <div className="document-empty">
               <p>No donations recorded for {summary.year}.</p>
               <span>
-                Record leftovers from the{" "}
-                <Link className="text-link" to={FINANCE_ROUTES.closeout}>
-                  closeout screen
-                </Link>
-                .
+                Record leftovers on the event's closeout, on its Proposal &amp;
+                margin tab.
               </span>
             </div>
           ) : (
@@ -169,9 +163,13 @@ export function DonationSummaryPage() {
                               .filter(Boolean)
                               .join(" · ") || "—"}
                           </td>
-                          <td>{recipient.donations}</td>
-                          <td>{formatPounds(recipient.weightLb)}</td>
-                          <td>{formatMoneyExact(recipient.estimatedValue)}</td>
+                          <td className="num">{recipient.donations}</td>
+                          <td className="num">
+                            {formatPounds(recipient.weightLb)}
+                          </td>
+                          <td className="num">
+                            {formatMoneyExact(recipient.estimatedValue)}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -211,8 +209,10 @@ export function DonationSummaryPage() {
                           </td>
                           <td>{row.itemDescription}</td>
                           <td>{row.recipientOrganization ?? "—"}</td>
-                          <td>{formatPounds(row.weightLb)}</td>
-                          <td>{formatMoneyExact(row.estimatedValue)}</td>
+                          <td className="num">{formatPounds(row.weightLb)}</td>
+                          <td className="num">
+                            {formatMoneyExact(row.estimatedValue)}
+                          </td>
                           <td>{row.receiptReference ?? "—"}</td>
                           <td>{row.handlingNote ?? "—"}</td>
                         </tr>

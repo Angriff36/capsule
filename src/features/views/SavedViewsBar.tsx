@@ -91,79 +91,81 @@ export function SavedViewsBar<S>({
   const current = views.find((v) => v.id === selected) ?? null;
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <select
-        className="input max-w-56"
-        aria-label="Saved views"
-        value={selected}
-        onChange={(e) => apply(e.target.value)}
-        disabled={busy}
-      >
-        <option value="">
-          {views.length ? "Saved views…" : "No saved views"}
-        </option>
-        {views.map((v) => (
-          <option key={v.id} value={v.id}>
-            {v.isDefault ? "★ " : ""}
-            {v.name}
+    <div>
+      <div className="flex flex-wrap items-center gap-2">
+        <select
+          className="input w-56 max-w-full"
+          aria-label="Saved views"
+          value={selected}
+          onChange={(e) => apply(e.target.value)}
+          disabled={busy}
+        >
+          <option value="">
+            {views.length ? "Saved views…" : "No saved views"}
           </option>
-        ))}
-      </select>
-      <button
-        type="button"
-        className="btn btn-ghost btn-sm"
-        onClick={onSave}
-        disabled={busy}
-      >
-        Save view
-      </button>
-      {current ? (
-        <>
-          {!current.isDefault ? (
+          {views.map((v) => (
+            <option key={v.id} value={v.id}>
+              {v.isDefault ? "★ " : ""}
+              {v.name}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={onSave}
+          disabled={busy}
+        >
+          Save view
+        </button>
+        {current ? (
+          <>
+            {!current.isDefault ? (
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() =>
+                  guardedRun(
+                    () => setDefault(current.id),
+                    "Couldn't make this your default view.",
+                  )
+                }
+                disabled={busy}
+              >
+                Set default
+              </button>
+            ) : null}
             <button
               type="button"
               className="btn btn-ghost btn-sm"
-              onClick={() =>
-                guardedRun(
-                  () => setDefault(current.id),
-                  "Couldn't make this your default view.",
-                )
-              }
+              onClick={() => {
+                void (async () => {
+                  const confirmed = await prompt.askConfirm({
+                    title: "Delete view",
+                    description: `Delete view “${current.name}”? This cannot be undone.`,
+                    confirmLabel: "Delete view",
+                    tone: "danger",
+                  });
+                  if (!confirmed) return;
+                  await guardedRun(async () => {
+                    await remove(current.id);
+                    setSelected("");
+                  }, "Couldn't delete this view.");
+                })();
+              }}
               disabled={busy}
             >
-              Set default
+              Delete
             </button>
-          ) : null}
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm"
-            onClick={() => {
-              void (async () => {
-                const confirmed = await prompt.askConfirm({
-                  title: "Delete view",
-                  description: `Delete view “${current.name}”? This cannot be undone.`,
-                  confirmLabel: "Delete view",
-                  tone: "danger",
-                });
-                if (!confirmed) return;
-                await guardedRun(async () => {
-                  await remove(current.id);
-                  setSelected("");
-                }, "Couldn't delete this view.");
-              })();
-            }}
-            disabled={busy}
-          >
-            Delete
-          </button>
-        </>
-      ) : null}
-      {error ? (
-        <span className="text-sm text-ink-3" role="status">
-          {error}
-        </span>
-      ) : null}
-      <div className="w-full">{host}</div>
+          </>
+        ) : null}
+        {error ? (
+          <span className="text-sm text-ink-3" role="status">
+            {error}
+          </span>
+        ) : null}
+      </div>
+      {host}
     </div>
   );
 }

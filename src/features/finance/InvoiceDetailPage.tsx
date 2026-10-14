@@ -982,9 +982,9 @@ export function InvoiceDetailPage() {
                   <tr key={`${line.description}-${index}`}>
                     <td>{line.description}</td>
                     <td>{formatStatusLabel(line.category)}</td>
-                    <td>{line.quantity}</td>
-                    <td>{usd(line.unitPrice)}</td>
-                    <td>{usd(line.subtotal)}</td>
+                    <td className="num">{line.quantity}</td>
+                    <td className="num">{usd(line.unitPrice)}</td>
+                    <td className="num">{usd(line.subtotal)}</td>
                     <td>
                       {usd(line.taxAmount)}
                       {line.appliedTaxRates.length ? (
@@ -995,7 +995,7 @@ export function InvoiceDetailPage() {
                         </small>
                       ) : null}
                     </td>
-                    <td>{usd(line.total)}</td>
+                    <td className="num">{usd(line.total)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -1259,7 +1259,7 @@ export function InvoiceDetailPage() {
                     <tr key={memo._id}>
                       <td>{String(memo.creditMemoNumber || memo._id)}</td>
                       <td>{String(memo.reason || "—")}</td>
-                      <td>{usd(memo.amount)}</td>
+                      <td className="num">{usd(memo.amount)}</td>
                       <td>
                         {memo.targetInvoiceId ? (
                           <Link
@@ -1600,7 +1600,7 @@ export function InvoiceDetailPage() {
               <tbody>
                 {relatedPayments.map((payment) => (
                   <tr key={payment._id}>
-                    <td>
+                    <td className="num">
                       {formatMoney(
                         Number(payment.amount ?? 0),
                         invoiceCurrencyCode,

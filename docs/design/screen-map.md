@@ -52,7 +52,7 @@ One place edits each fact. Other screens can show it and link to that place.
 | Event stage moves (approve, sales lock, start, finish, cancel) | Event page header action |
 | Event menu lines | Event page › Menu |
 | Event prep tasks for one event | Event page › Prep. Day-to-day prep status: Kitchen › Prep board |
-| Event staffing (assignments) | Event page › Staffing. Weekly shifts: Staff › Roster |
+| Event staffing (assignments) | Event page › Staffing: Shift board (crew list, hour grid by kind of work with drag-to-assign, open shifts, shift details, coverage, event timeline) or Crew list. Weekly shifts: Staff › Roster |
 | Event timeline / run of show | Event page › Timeline (Event Day run view shows and ticks it) |
 | Event guests, client contacts on the event | Event page › Client & guests |
 | Event vehicles, trailers, driver, load marks | Event tracker sheet (calendar hover only shows them) |
@@ -116,8 +116,8 @@ screen merges into X, and the old URL redirects there.
 | Route | Purpose | Main actions | Data | Tabs | Duplicates | Edits | Plan |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `/events` | Events book | Search, sort, stage filter, open | Events by date | 3 (Upcoming / Needs attention / All) | Calendar, tracker | - | Keep |
-| `/workbooks` | Legacy event files, blocking fixes | Import event files | Per-event workbook state | - | Review lives in Event › Overview | - | Keep |
-| `/events/tracker` | Month sheet, two-week board, planning board | Edit vehicle/trailer/driver cells | Month events, vehicles | 3 | Calendar hover vehicles | Vehicles, trailers, driver, load marks | Keep |
+| `/workbooks` | (moved) | - | - | - | Each workbook lives on its event's Overview | - | → `/events` (owner, 2026-10-14) |
+| `/events/tracker` | Tracker (stats, double-booking alert, status tabs; vehicles, drivers, crew, equipment, décor, notes per event; booking rules; equipment stock), two-week board, planning board | Edit vehicle/trailer/driver, equipment, décor, notes cells; book over a warning; edit stock counts | Month events, vehicles, crew, equipment holds | 3 | Calendar hover vehicles | Vehicles, trailers, driver, load marks | Keep |
 | `/events/new` | Create an event | Create event, inline client/venue | Event form | 2 (Form / Guided) | - | Event basics on create | Keep |
 | `/events/import` | Paste BEO / drop TPP CSVs | Create | Parsed preview | - | - | Event + shifts + pack list | Keep |
 | `/events/templates` | Event templates | New template, apply, archive | Templates | - | Template picker in create | Event templates | → Event setup |
@@ -179,12 +179,12 @@ layouts"). To-dos → into Timeline ("Timeline & to-dos"). Result: 11 tabs.
 | Route | Purpose | Main actions | Data | Tabs | Duplicates | Edits | Plan |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `/logistics` | Overview + attention list | Open deliveries | 4 counts | - | Dispatch board | - | → Dispatch board (summary on top) |
-| `/logistics/packs` | All pack lists | Open, Load sheet | Pack lists | - | Packing floor | New pack list | Keep. Gets floor view. |
-| `/logistics/packs/:id` | Pack list page | Generate, add, scan | Items, bins | - | - | Pack items | Keep |
+| `/logistics/packs` | (moved) | - | - | - | Each pack list lives on its event | - | → `/logistics/dispatch#floor` (owner, 2026-10-14) |
+| `/logistics/packs/:id` | (moved) | - | - | - | - | Pack items | → its event `?tab=equipment#pack-list` |
 | `/logistics/pack-templates` | Pack templates | Create, edit | Templates | - | Kits, rules | Templates | Keep as **Pack setup** host |
 | `/logistics/style-kits` | Kit lines per service style | Add line | Kit lines | - | Templates | Kit lines | → Pack setup |
 | `/logistics/pack-rules` | Rules that add items | Add rule | Rules | - | Templates | Rules | → Pack setup |
-| `/logistics/deliveries` | Delivery runs | Schedule delivery, assign | Runs | - | Schedule, route | Runs | Keep. Gets vehicles-by-day. |
+| `/logistics/deliveries` | (moved) | - | - | - | Each event's runs live on its Equipment tab | Runs | → `/logistics/dispatch#vehicles` (owner, 2026-10-14) |
 | `/logistics/dispatch` | What goes out, open items | Trip checks | Events by day | 4 | Deliveries | Trip checks | Keep |
 | `/logistics/returns` | Returned equipment count | Return equipment | Returns | 3 | - | Return counts | Keep |
 | `/logistics/floor` | Lists to pack/load now | Pack this list | Lists being packed | - | Pack lists | Pack status | → Pack lists section |
@@ -231,7 +231,7 @@ layouts"). To-dos → into Timeline ("Timeline & to-dos"). Result: 11 tabs.
 | `/finance/attribution/:id/:mode?` | Split detail | Save | Form | - | - | Split | Keep |
 | `/finance/payments` | Payments | New payment | Payments | - | Invoice page | Payments | Keep (host) |
 | `/finance/payment-methods` | Stored payment methods | New, remove | Methods | - | - | Methods | → Payments section |
-| `/finance/closeout` | Closeouts | Capture, finalize | Folios | - | - | Closeouts | Keep (host) |
+| `/finance/closeout` | (moved) | - | - | - | Each closeout lives on its event's Proposal & margin tab | Closeouts | → `/events` (owner, 2026-10-14) |
 | `/finance/donations` | Yearly donation summary | Year, print | Donations | - | From closeouts | - | → Closeout section |
 | `/finance/payroll` | Payroll inputs | Prepare, finalize | Inputs | - | Tips | Payroll | Keep (host) |
 | `/finance/tips` | Tip pool split | Distribute | Gratuity | - | Payroll rows | Tip rows | → Payroll section |
@@ -260,7 +260,7 @@ layouts"). To-dos → into Timeline ("Timeline & to-dos"). Result: 11 tabs.
 | `/clients/tastings` | Tastings | Book, mark tasted | Tastings | - | Pipeline / proposals | Tastings | → Pipeline section |
 | `/clients/proposals` | Proposals | New, send, PDF | Proposals | - | - | Proposals | Keep (host) |
 | `/clients/proposals/templates` | Proposal templates | New, revise | Templates | - | Proposals | Templates | → Proposals section |
-| `/clients/contracts` | Contracts | Draft, issue invoice | Contracts | - | Client page counts | Contracts | Keep |
+| `/clients/contracts` | (moved) | - | - | - | Each contract lives on its event's Proposal & margin tab | Contracts | → `/events` (owner, 2026-10-14) |
 | `/clients/contracts/:id/document` | Printable contract | Export PDF | Contract text | - | - | - | Keep (print) |
 | `/clients/retention` | Repeat rate + outreach | Call again, complete | Lapsed clients | - | Client list | Outreach tasks | → Clients section |
 | `/clients/inbox` | Client messages | Log, send, make a lead | Threads | - | Client page thread | Messages | Keep |
@@ -358,9 +358,10 @@ were added: `/events/setup` and `/events/:id/proposal`.
 | `/inventory/counts` Counts | Count sessions + opening stock |
 | `/inventory/purchasing` | Weekly drafts and orders + what each event needs (demand) |
 | `/logistics/dispatch` | Overview counts + dispatch board |
-| `/logistics/packs` Pack lists | On the packing floor now, all pack lists, returns |
+| `/logistics/dispatch` Dispatch board | On the packing floor now, vehicles by day, route order, returns |
 | `/logistics/pack-templates` Pack setup | Templates, service style kits, pack rules |
-| `/logistics/deliveries` | Delivery runs, vehicles by day, route order (prints only the route sheet) |
+| Event › Equipment & layouts | The event's pack list and its delivery runs |
+| Event › Proposal & margin | The event's proposal, contract and closeout |
 | `/logistics/fleet` | Vehicles, trailers, service and fuel |
 | `/staff/roster` | Needs attention, shift swaps, roster, pay rates, crew templates |
 | `/staff/time` Time | Time sheet and availability, time off, hours used |
@@ -386,12 +387,12 @@ were added: `/events/setup` and `/events/:id/proposal`.
 ### Area tab strips (after)
 
 - Staff: Roster · Time · Team chat · Skills & training · Performance · Hiring
-- Finance: Invoices · Payments · Closeout · Payroll · More (Tips, Tax, Attribution, Donations)
-- Logistics: Dispatch board · Pack lists · Deliveries · Fleet · Pack setup
+- Finance: Invoices · Payments · Payroll · More (Tips, Tax, Attribution, Donations)
+- Logistics: Dispatch board · Fleet · Pack setup
 - Inventory: Stock · Counts · Waste · Lot trace · Purchasing · Contracts
 - Kitchen: Recipes · Ingredients · Dishes · Menus · Prep board · Production plan
 - Reports: Saved reports · Money · Sales · Tim's KPIs · L10 · Mangia
-- Clients: Pipeline · Accounts · Contracts · Inbox
+- Clients: Pipeline · Accounts · Inbox
 - Facilities: Venues · Equipment
 - Admin: Permissions · Company · Integrations · Announcements · More (Data exports, Imports, Compare with TPP, Match leftover items, Switch from TPP)
 
@@ -419,6 +420,27 @@ it's actually sent out to a client via a manually triggered action."
   sets the event's price). It is not shown as a proposal. A lead's proposal
   made from the Pipeline before any event exists is still saved when made,
   because there is no event to build it from.
+
+#### EOS area (owner, 2026-10-13)
+
+"lets get the rest of the books ideas in there ... so that he can incorporate
+that methodology into mangia via capsule seamlessly". A new side-menu area,
+EOS, holds Gino Wickman's *Traction* tools. The L10 page moved here from
+Reports; the old address redirects.
+
+| Route | Purpose | Edits |
+| --- | --- | --- |
+| `/eos` | The six key components with live numbers; Organizational Checkup; the EOS rhythm; quarterly and annual planning sessions (agenda, live facts, timer) | Checkup results |
+| `/eos/vision` | Vision/Traction Organizer, two pages, edited in place; Rocks (read, live from the L10); long-term issues list | Company vision, core values, uniques, 3-year picture, 1-year goals, parked issues |
+| `/eos/people` | Accountability Chart, People Analyzer, Delegate and Elevate | Seats, people marks, the bar, activities |
+| `/eos/process` | Core processes: named → documented → simplified → followed by all | Core processes and their steps |
+| `/eos/l10` | L10 meeting with meeting mode (timer, agenda strip), top-three issues, Park, to-do completion | Rocks, issues, to-dos, headlines, meeting rating, scorecard targets |
+
+Editing homes: Rocks, issues and to-dos stay edited on the L10; the V/TO
+shows the quarter's Rocks read-only and links there. Long-term issues are
+L10 issues parked out of the week; "To this week's L10" brings one back.
+Count: 5 routes added, 1 route (`/reports/l10`) became a redirect, the
+Reports tab strip lost its L10 tab.
 
 ## Kept on purpose (exceptions)
 
@@ -536,14 +558,15 @@ that now holds the old screen (`src/ui/MergedSection.tsx`).
 | `/finance/money-check` | `/admin/parallel-run#payments` |
 | `/finance/attribution/new` | same URL, now served by `/finance/attribution/:id` |
 | `/reports/comp-master` | `/finance/attribution#comp-master` |
-| `/reports/scorecard` | `/reports/l10#scorecard` |
+| `/reports/scorecard` | `/eos/l10#scorecard` |
+| `/reports/l10` | `/eos/l10` (EOS area, 2026-10-13) |
 | `/reports/avg-event-value` | `/reports/sales#avg-event-value` |
 | `/logistics` | `/logistics/dispatch` |
-| `/logistics/floor` | `/logistics/packs#floor` |
+| `/logistics/floor` | `/logistics/dispatch#floor` |
 | `/logistics/style-kits` | `/logistics/pack-templates#style-kits` |
 | `/logistics/pack-rules` | `/logistics/pack-templates#pack-rules` |
 | `/logistics/maintenance` | `/logistics/fleet#maintenance` |
-| `/logistics/schedule` | `/logistics/deliveries#vehicles` |
+| `/logistics/schedule` | `/logistics/dispatch#vehicles` |
 | `/inventory` | `/inventory/stock` |
 | `/inventory/opening-stock` | `/inventory/counts#opening-stock` |
 | `/inventory/audit` | `/inventory/stock#history` |
@@ -577,8 +600,8 @@ that now holds the old screen (`src/ui/MergedSection.tsx`).
 | `/events/templates` | `/events/setup#templates` (keeps `?fromEvent=`) |
 | `/events/checklists` | `/events/setup#checklists` |
 | `/events/planning/setup` | `/events/setup#planning` (`#stage-moves` still lands) |
-| `/logistics/returns` | `/logistics/packs#returns` (keeps `?show=`) |
-| `/logistics/route` | `/logistics/deliveries#route` |
+| `/logistics/returns` | `/logistics/dispatch#returns` (keeps `?show=`) |
+| `/logistics/route` | `/logistics/dispatch#route` |
 | `/events/:id?tab=guests` | `?tab=client#guests` |
 | `/events/:id?tab=layouts` | `?tab=equipment#layouts` |
 | `/events/:id?tab=todos` | `?tab=timeline#todos` |

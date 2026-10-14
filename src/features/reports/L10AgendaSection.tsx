@@ -1,4 +1,4 @@
-import { Section } from "@/ui/primitives";
+import { EosPanel } from "../eos/EosShared";
 
 /**
  * The weekly meeting's running order and ground rules, as written in the
@@ -6,46 +6,70 @@ import { Section } from "@/ui/primitives";
  * this one on the L10 page follow the same order.
  */
 
-const AGENDA: ReadonlyArray<{ minutes: number; name: string; what: string }> = [
+export const AGENDA: ReadonlyArray<{
+  minutes: number;
+  name: string;
+  what: string;
+  /** The section of the L10 page that holds this part. */
+  anchor: string;
+  /** Its EOS component colour (src/features/eos/eos.css). */
+  tone: string;
+}> = [
   {
     minutes: 5,
     name: "Good news",
     what: "One personal and one work win per person. Sets the tone.",
+    anchor: "wins",
+    tone: "data",
   },
   {
     minutes: 10,
     name: "Scorecard",
     what: "Weekly numbers. Only talk about the ones off track; move anything that needs work to Issues.",
+    anchor: "l10-scorecard",
+    tone: "data",
   },
   {
     minutes: 5,
     name: "Priorities",
     what: "Each 90-day priority: on track, at risk or off track. Quick status; save problems for Issues.",
+    anchor: "rocks",
+    tone: "traction",
   },
   {
     minutes: 5,
     name: "Client headlines",
     what: "Wins and complaints from the past week. Quick hits only.",
+    anchor: "client-headlines",
+    tone: "people",
   },
   {
     minutes: 5,
     name: "People headlines",
     what: "Hiring, recognition, concerns. Keep it in the room.",
+    anchor: "people-headlines",
+    tone: "people",
   },
   {
     minutes: 25,
     name: "Issues",
     what: "One at a time: name the real problem, talk it through, agree the answer.",
+    anchor: "issues",
+    tone: "issues",
   },
   {
     minutes: 5,
     name: "To-dos",
     what: "Who does what by when.",
+    anchor: "todos",
+    tone: "vision",
   },
   {
     minutes: 5,
     name: "Rate the meeting",
     what: "1 to 10. What went well, what would make it better.",
+    anchor: "rating",
+    tone: "traction",
   },
 ];
 
@@ -60,32 +84,37 @@ const RULES = [
 
 export function L10AgendaSection() {
   return (
-    <div className="mt-6">
-      <Section title="Agenda (60 minutes)">
-        <ol className="grid gap-2 p-4 pb-0" data-testid="l10-agenda">
+    <div className="mt-5">
+      <EosPanel
+        tone="traction"
+        eyebrow="Traction"
+        title="Agenda · 60 minutes"
+        lead="Same day, same time, same agenda. Click a part to jump to it."
+      >
+        <ol className="eos-agenda" data-testid="l10-agenda">
           {AGENDA.map((part, index) => (
-            <li key={part.name} className="flex gap-3 text-sm">
-              <span className="w-14 shrink-0 font-semibold text-brand">
-                {part.minutes} min
-              </span>
-              <span>
-                <span className="font-semibold text-ink">
+            <li key={part.name} className={`eos-tone-${part.tone}`}>
+              <a href={`#${part.anchor}`}>
+                <span className="eos-agenda-min">{part.minutes} min</span>
+                <strong>
                   {index + 1}. {part.name}
-                </span>
-                <span className="block text-xs text-ink-2">{part.what}</span>
-              </span>
+                </strong>
+                <span className="eos-agenda-what">{part.what}</span>
+              </a>
             </li>
           ))}
         </ol>
-        <div className="m-4 rounded-sm border border-line bg-inset p-3">
-          <h4 className="text-xs font-semibold text-ink">Meeting rules</h4>
-          <ul className="mt-1 list-disc pl-5 text-xs text-ink-2">
+        <details className="mt-3 rounded-sm border border-line bg-inset px-3 py-2">
+          <summary className="cursor-pointer text-sm font-semibold text-ink">
+            Meeting rules
+          </summary>
+          <ul className="mt-1 list-disc pl-5 text-sm text-ink-2">
             {RULES.map((rule) => (
               <li key={rule}>{rule}</li>
             ))}
           </ul>
-        </div>
-      </Section>
+        </details>
+      </EosPanel>
     </div>
   );
 }

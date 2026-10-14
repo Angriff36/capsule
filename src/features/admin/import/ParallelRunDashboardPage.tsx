@@ -486,8 +486,12 @@ export function ParallelRunDashboardPage() {
                   {comparisonMetrics.map((metric) => (
                     <tr key={metric.label}>
                       <td>{metric.label}</td>
-                      <td>{metric.capsuleCount.toLocaleString()}</td>
-                      <td>{metric.tppCount.toLocaleString()}</td>
+                      <td className="num">
+                        {metric.capsuleCount.toLocaleString()}
+                      </td>
+                      <td className="num">
+                        {metric.tppCount.toLocaleString()}
+                      </td>
                       <td
                         className={metric.diff === 0 ? "text-ok" : "text-warn"}
                       >
@@ -585,10 +589,12 @@ export function ParallelRunDashboardPage() {
                   <tbody>
                     <tr>
                       <td>Total dishes</td>
-                      <td>
+                      <td className="num">
                         {menuCatalogComparison.capsuleTotal.toLocaleString()}
                       </td>
-                      <td>{menuCatalogComparison.tppTotal.toLocaleString()}</td>
+                      <td className="num">
+                        {menuCatalogComparison.tppTotal.toLocaleString()}
+                      </td>
                       <td
                         className={
                           menuCatalogComparison.capsuleTotal -
@@ -614,8 +620,12 @@ export function ParallelRunDashboardPage() {
                     </tr>
                     <tr>
                       <td>TPP items linked to a Capsule dish</td>
-                      <td>{menuCatalogComparison.matched.toLocaleString()}</td>
-                      <td>{menuCatalogComparison.tppTotal.toLocaleString()}</td>
+                      <td className="num">
+                        {menuCatalogComparison.matched.toLocaleString()}
+                      </td>
+                      <td className="num">
+                        {menuCatalogComparison.tppTotal.toLocaleString()}
+                      </td>
                       <td
                         className={
                           menuCatalogComparison.unresolvedLinks === 0
@@ -639,7 +649,7 @@ export function ParallelRunDashboardPage() {
                     </tr>
                     <tr>
                       <td>Capsule dishes without a TPP link</td>
-                      <td>
+                      <td className="num">
                         {menuCatalogComparison.dishesWithoutLink.toLocaleString()}
                       </td>
                       <td>—</td>
@@ -1038,7 +1048,9 @@ export function ParallelRunDashboardPage() {
                               ? new Date(run.startTime).toLocaleDateString()
                               : "—"}
                           </td>
-                          <td>{recordCount.toLocaleString()}</td>
+                          <td className="num">
+                            {recordCount.toLocaleString()}
+                          </td>
                           <td>
                             <Link
                               to={importRunDetailPath(run._id)}

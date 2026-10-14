@@ -5,11 +5,9 @@ import { orgCapabilityNavPolicy } from "../src/app/navigation/OrgCapabilityNavPo
 import { eventDetailPath } from "../src/features/events/eventRoutes";
 
 describe("Event workbooks navigation", () => {
-  it("ships Event Workbooks in primary nav under Operate", () => {
+  it("keeps workbooks on their event, not in the side menu (owner, 2026-10-14)", () => {
     const workbooks = NAV_AREAS.find((area) => area.path === "/workbooks");
-    expect(workbooks).toBeDefined();
-    expect(workbooks?.label).toMatch(/Event Workbooks/);
-    expect(workbooks?.group).toBe("Operate");
+    expect(workbooks).toBeUndefined();
   });
 
   it("leaves the workbooks area ungated by org capability", () => {

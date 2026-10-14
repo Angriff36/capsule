@@ -1,0 +1,353 @@
+/*
+ * The printed battle board (BattleBoardSheet.tsx), laid out like the owner's
+ * "Mangia Battle Board.pdf". A paper sheet with its own pinned colours, so it
+ * reads the same on screen, in dark mode and on paper. Only .bbs prints.
+ */
+.bbs {
+  --bbs-ink: #1f2522;
+  --bbs-ink-2: #3a413d;
+  --bbs-ink-3: #5c635f;
+  --bbs-line: #d6d8d4;
+  --bbs-paper: #f3f2ee;
+  --bbs-green: #2f6f2a;
+  --bbs-orange: #c35a17;
+  --bbs-amber: #b8860b;
+  --bbs-blue: #2f5f9e;
+  --bbs-grey: #5d6360;
+  max-width: 60rem;
+  margin: 0 auto 1rem;
+  padding: 1.5rem 1.75rem 2rem;
+  background: var(--bbs-paper);
+  color: var(--bbs-ink);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.bbs-title {
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid var(--bbs-ink);
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+.bbs-title span {
+  color: var(--bbs-ink-3);
+  font-size: 0.8rem;
+}
+.bbs-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0.6rem 0;
+}
+.bbs-facts dt {
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--bbs-ink-3);
+}
+.bbs-facts dd {
+  margin: 0;
+  font-weight: 700;
+}
+.bbs-summary {
+  margin: 0.4rem 0 0.6rem;
+}
+
+.bbs-section {
+  margin-top: 0.9rem;
+}
+.bbs-kicker {
+  margin-bottom: 0.4rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid var(--bbs-line);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--bbs-ink-3);
+}
+.bbs-para {
+  margin: 0.25rem 0;
+}
+
+/* Responsibilities: three columns of label · tag rows. */
+.bbs-resp {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+.bbs-resp-head {
+  margin-bottom: 0.2rem;
+  padding-bottom: 0.15rem;
+  border-bottom: 1px solid var(--bbs-line);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--bbs-ink-2);
+}
+.bbs-resp-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 1.45rem;
+  border-bottom: 1px dotted var(--bbs-line);
+}
+.bbs-answer {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.3rem;
+  text-align: right;
+}
+.bbs-chip {
+  border-radius: 3px;
+  background: var(--bbs-green);
+  padding: 0.05rem 0.4rem;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.bbs-chip-muted {
+  background: var(--bbs-grey);
+}
+.bbs-no,
+.bbs-none {
+  border-radius: 3px;
+  background: #e4e4e0;
+  padding: 0 0.35rem;
+  color: var(--bbs-ink-3);
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+.bbs-note {
+  color: var(--bbs-ink-3);
+  font-size: 0.68rem;
+}
+
+/* Menu in two columns, notes to the right. */
+.bbs-menu {
+  columns: 2;
+  column-gap: 2rem;
+}
+.bbs-menu-group {
+  break-inside: avoid-column;
+}
+.bbs-menu-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.12rem 0;
+  border-bottom: 1px dotted var(--bbs-line);
+}
+.bbs-menu-row > span {
+  flex: 1 1 45%;
+  min-width: 0;
+}
+.bbs-menu-row em {
+  flex: 1 1 55%;
+  min-width: 0;
+  color: var(--bbs-ink-3);
+  font-size: 0.7rem;
+  text-align: right;
+}
+.bbs-menu-course {
+  font-weight: 700;
+}
+
+.bbs-buffet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+}
+.bbs-plate {
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  padding: 0.05rem 0.45rem;
+}
+.bbs-plate-cold {
+  color: var(--bbs-blue);
+}
+.bbs-plate-hot-0 {
+  color: var(--bbs-green);
+}
+.bbs-plate-hot-1 {
+  color: var(--bbs-amber);
+}
+.bbs-plate-hot-2 {
+  color: var(--bbs-orange);
+}
+
+/* Roster and timeline tables. */
+.bbs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.bbs-table th {
+  padding: 0.25rem 0.4rem;
+  border-bottom: 1px solid var(--bbs-ink);
+  color: var(--bbs-ink-3);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-align: left;
+  text-transform: uppercase;
+}
+.bbs-table td {
+  padding: 0.28rem 0.4rem;
+  border-bottom: 1px dotted var(--bbs-line);
+  vertical-align: top;
+}
+.bbs-roster td:first-child {
+  width: 22%;
+}
+.bbs-open td {
+  color: var(--bbs-orange);
+}
+.bbs-timeline tr td:first-child {
+  border-left: 4px solid transparent;
+}
+.bbs-timeline tr[data-team="foh"] td:first-child {
+  border-left-color: var(--bbs-green);
+}
+.bbs-timeline tr[data-team="boh"] td:first-child {
+  border-left-color: var(--bbs-orange);
+}
+.bbs-timeline tr[data-team="both"] td:first-child {
+  border-left-color: var(--bbs-grey);
+}
+.bbs-time {
+  width: 6.5rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.bbs-task {
+  width: 30%;
+  font-weight: 600;
+}
+.bbs-info td {
+  color: var(--bbs-ink-3);
+  font-style: italic;
+  font-weight: 400;
+}
+.bbs-cat {
+  display: inline-block;
+  border: 1px solid var(--bbs-ink-3);
+  border-radius: 3px;
+  padding: 0 0.3rem;
+  color: var(--bbs-ink-3);
+  font-size: 0.58rem;
+  font-style: normal;
+  letter-spacing: 0.06em;
+}
+.bbs-cat[data-cat="buffet"] {
+  border-color: var(--bbs-green);
+  color: var(--bbs-green);
+}
+.bbs-cat[data-cat="cocktail_hour"],
+.bbs-cat[data-cat="cocktail hour"] {
+  border-color: var(--bbs-blue);
+  color: var(--bbs-blue);
+}
+
+.bbs-contact,
+.bbs-allergens {
+  margin: 0.3rem 0;
+}
+.bbs-allergens {
+  color: var(--bbs-orange);
+}
+.bbs-readiness {
+  margin-top: 0.9rem;
+  border-left: 4px solid var(--bbs-orange);
+  padding: 0.3rem 0.6rem;
+  background: #fbefe5;
+  font-size: 0.72rem;
+}
+.bbs-readiness[data-ready] {
+  border-left-color: var(--bbs-green);
+  background: #e9f1e6;
+}
+.bbs-section .bbs-table + .bbs-table {
+  margin-top: 0.6rem;
+}
+.bbs-hint {
+  margin-top: 0.4rem;
+  color: var(--bbs-orange);
+  font-size: 0.72rem;
+}
+.bbs-hint a {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
+@media print {
+  .bbs-hint {
+    display: none;
+  }
+}
+.bbs-ref {
+  margin-top: 0.6rem;
+}
+.bbs-ref h4 {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--bbs-ink-2);
+}
+.bbs-ref p {
+  margin: 0.05rem 0;
+}
+.bbs-plain td,
+.bbs-plain th {
+  padding: 0.12rem 0.4rem 0.12rem 0;
+}
+
+@media (max-width: 760px) {
+  .bbs {
+    padding: 1rem;
+  }
+  .bbs-facts,
+  .bbs-resp {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .bbs-menu {
+    columns: 1;
+  }
+  .bbs-table {
+    display: block;
+    overflow-x: auto;
+  }
+}
+
+/* Printing: the board page's own rules (BattleBoardPage.css) print only
+   .bbd-doc, which holds this sheet; here the sheet keeps its colours. */
+.bbd-doc.bbs-host {
+  margin: 0;
+  padding: 0;
+  background: none;
+}
+@media print {
+  .bbs {
+    max-width: none;
+    margin: 0;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .bbs-timeline tr,
+  .bbs-roster tr {
+    break-inside: avoid;
+  }
+}
+
+/* The board is a full page, like the paper it replaces; the crew screens
+   around it stay phone-width. */
+.eday-frame:has(.bbs) {
+  max-width: 64rem;
+}

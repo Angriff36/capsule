@@ -5,8 +5,8 @@ import {
   CalendarIcon,
   ChartIcon,
   CoinsIcon,
+  CompassIcon,
   ContactIcon,
-  FileTextIcon,
   FlameIcon,
   GearIcon,
   HomeIcon,
@@ -31,10 +31,10 @@ export const NAV_AREAS: NavArea[] = [
     icon: ChartIcon,
   },
   {
-    path: "/workbooks",
-    label: "Event Workbooks",
+    path: "/events/production",
+    label: "Production board",
     group: "Operate",
-    icon: FileTextIcon,
+    icon: TruckIcon,
   },
   {
     path: "/kitchen",
@@ -83,6 +83,12 @@ export const NAV_AREAS: NavArea[] = [
     label: "Reports",
     group: "Business",
     icon: ChartIcon,
+  },
+  {
+    path: "/eos",
+    label: "EOS",
+    group: "Business",
+    icon: CompassIcon,
   },
   {
     path: "/facilities",

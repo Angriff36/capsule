@@ -116,7 +116,7 @@ export function EventFoodCostPanel({
               {topLines.map((line) => (
                 <tr key={line.ingredientId}>
                   <td>{line.name}</td>
-                  <td className="font-mono">
+                  <td className="font-mono num">
                     {line.unknownRows && !line.cost
                       ? "—"
                       : formatMoney(line.cost)}

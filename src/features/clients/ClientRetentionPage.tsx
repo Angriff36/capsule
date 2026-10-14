@@ -317,7 +317,7 @@ export function ClientRetentionPage() {
             </span>
           </div>
         ) : (
-          <table className="data-table phone-cards">
+          <table className="data-table table-even phone-cards">
             <thead>
               <tr>
                 <th>Client</th>
@@ -337,7 +337,7 @@ export function ClientRetentionPage() {
                       {clientDisplayName(row.clientId, clients ?? [])}
                     </Link>
                   </td>
-                  <td data-label={`${priorYear} events`}>
+                  <td className="num" data-label={`${priorYear} events`}>
                     {row.priorYearEvents}
                   </td>
                   <td data-label={`Last ${priorYear} event`}>
@@ -400,7 +400,7 @@ export function ClientRetentionPage() {
             <span>Open one from the list above.</span>
           </div>
         ) : (
-          <table className="data-table phone-cards">
+          <table className="data-table table-even phone-cards">
             <thead>
               <tr>
                 <th>Client</th>

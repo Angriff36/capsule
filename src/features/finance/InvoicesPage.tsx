@@ -575,7 +575,7 @@ export function InvoicesPage() {
                         </small>
                       </td>
                       <td>{nameForClient(String(row.clientId))}</td>
-                      <td>
+                      <td className="num">
                         {formatMoney(Number(row.amountDue ?? 0), rowCurrency)}
                       </td>
                       <td>

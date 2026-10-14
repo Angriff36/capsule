@@ -3420,6 +3420,186 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-13",
       "reason": "Optional flag (boolean?): the company holds an exclusive contract at this venue (issue #442). Old venues have none and read as not exclusive. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "add.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "add.parameters.capacity",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "add.parameters.description",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "add.parameters.detail",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "add.parameters.name",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "add.parameters.roomType",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "add.parameters.section",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "add.parameters.sortOrder",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "add.parameters.squareFootage",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "add.parameters.text",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "add.parameters.venueId",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "LeadershipItem.parkedAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "Optional date (datetime?): an issue parked on the EOS long-term issues list. Old issues have none and stay in the weekly L10. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "LeadershipItem.priority",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "Optional number (int?): an issue's place in the L10's top three. Old issues have none. The checker reads a nullable field with no default as required."
+    },
+    {
+      "path": "remove.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "revise.entity",
+      "category": "command-entity-changed",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "revise.parameters.capacity",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "revise.parameters.description",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "revise.parameters.detail",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "revise.parameters.name",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "revise.parameters.roomType",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "revise.parameters.sortOrder",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "revise.parameters.squareFootage",
+      "category": "command-parameter-removed",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "revise.parameters.text",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-13",
+      "reason": "The checker matches commands by name across entities: VisionItem (new EOS entity) has add/revise/remove like VenueRoom. VenueRoom's commands are unchanged."
+    },
+    {
+      "path": "EventAssignment.planX",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-14",
+      "reason": "Production board floor plan: optional (nullable) position on the plan; unset = not placed. Existing rows stay valid; the checker reads nullable fields as required."
+    },
+    {
+      "path": "EventAssignment.planY",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-14",
+      "reason": "Production board floor plan: optional (nullable) position on the plan; unset = not placed. Existing rows stay valid; the checker reads nullable fields as required."
+    },
+    {
+      "path": "EventLayoutSection.planX",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-14",
+      "reason": "Production board floor plan: optional (nullable) position on the plan; unset = not placed. Existing rows stay valid; the checker reads nullable fields as required."
+    },
+    {
+      "path": "EventLayoutSection.planY",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-14",
+      "reason": "Production board floor plan: optional (nullable) position on the plan; unset = not placed. Existing rows stay valid; the checker reads nullable fields as required."
+    },
+    {
+      "path": "EventLayoutSection.planWidth",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-14",
+      "reason": "Production board floor plan: optional (nullable) position on the plan; unset = not placed. Existing rows stay valid; the checker reads nullable fields as required."
+    },
+    {
+      "path": "EventLayoutSection.planHeight",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-14",
+      "reason": "Production board floor plan: optional (nullable) position on the plan; unset = not placed. Existing rows stay valid; the checker reads nullable fields as required."
+    },
+    {
+      "path": "Event.trackerNotes",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-14",
+      "reason": "Event tracker Notes cell: optional (nullable) free text; unset = no notes. Existing rows stay valid; the checker reads nullable fields as required."
     }
   ]
 }

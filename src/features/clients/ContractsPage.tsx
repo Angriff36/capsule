@@ -1,4 +1,5 @@
 import { useClientsByIds } from "../../lib/useClientDirectory";
+import { useEventContracts } from "../../lib/useEventRows";
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -31,24 +32,32 @@ const policy = new CrmLifecyclePolicy();
 // Not yet signed, expired or voided.
 const OPEN_STATUSES = ["draft", "sent", "viewed"];
 
-export function ContractsPage() {
+/**
+ * Contracts. With `eventId` it is that event's contracts, on the event's
+ * Proposal & margin tab (owner, 2026-10-14: "just have the shit fucking tied
+ * to the event").
+ */
+export function ContractsPage({ eventId }: { eventId?: string } = {}) {
   const workingId = useWorkingEventId();
+  const eventContracts = useEventContracts(eventId);
   // Every unsigned contract (through the status index), and the newest
   // finished ones a page at a time ("Load more" reads older ones).
   const openContracts = useRowsInStatuses("contracts", OPEN_STATUSES);
   const contractPages = usePagedRows("contracts");
   const contracts =
-    openContracts === undefined || contractPages.rows === undefined
-      ? undefined
-      : [
-          ...new Map(
-            [...openContracts, ...contractPages.rows].map((row) => [
-              row._id,
-              row,
-            ]),
-          ).values(),
-        ];
-  const events = usePickerAndNamedEvents([workingId]);
+    eventId != null
+      ? eventContracts
+      : openContracts === undefined || contractPages.rows === undefined
+        ? undefined
+        : [
+            ...new Map(
+              [...openContracts, ...contractPages.rows].map((row) => [
+                row._id,
+                row,
+              ]),
+            ).values(),
+          ];
+  const events = usePickerAndNamedEvents([eventId ?? workingId]);
   // Only the clients these contracts and events name.
   const clients = useClientsByIds([
     ...(contracts ?? []).map((row) => row.clientId),
@@ -199,34 +208,36 @@ export function ContractsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        title="Contracts"
-        lead={
-          <>
-            Written agreements for booked events. Draft one, send it to your
-            client, and log the signature when it comes back.
-          </>
-        }
-        actions={
-          <>
-            <button
-              className="btn btn-ghost"
-              type="button"
-              onClick={() => setShowTerminal((value) => !value)}
-            >
-              {showTerminal ? "Hide expired/voided" : "Show expired/voided"}
-            </button>
-            <button
-              className="btn btn-primary"
-              type="button"
-              onClick={() => setShowDraft((value) => !value)}
-            >
-              {showDraft ? "Close form" : "Draft contract"}
-            </button>
-          </>
-        }
-      />
-      <ClientsWorkspaceNav />
+      {eventId != null ? null : (
+        <PageHeader
+          title="Contracts"
+          lead={
+            <>
+              Written agreements for booked events. Draft one, send it to your
+              client, and log the signature when it comes back.
+            </>
+          }
+          actions={
+            <>
+              <button
+                className="btn btn-ghost"
+                type="button"
+                onClick={() => setShowTerminal((value) => !value)}
+              >
+                {showTerminal ? "Hide expired/voided" : "Show expired/voided"}
+              </button>
+              <button
+                className="btn btn-primary"
+                type="button"
+                onClick={() => setShowDraft((value) => !value)}
+              >
+                {showDraft ? "Close form" : "Draft contract"}
+              </button>
+            </>
+          }
+        />
+      )}
+      {eventId != null ? null : <ClientsWorkspaceNav />}
       {failure ? <CrmFailureBanner error={failure} /> : null}
       {notice ? (
         <p className="mt-3 text-base text-ink-2" role="status">
@@ -257,30 +268,34 @@ export function ContractsPage() {
             </p>
           ) : (
             <>
-              <label>
-                Event
-                <SearchSelect
-                  key={
-                    draftableEvents.length ? "events-ready" : "events-loading"
-                  }
-                  name="eventId"
-                  required
-                  defaultValue={workingId ?? ""}
-                  placeholder="Search events by name or client…"
-                  options={draftableEvents.map((row) => ({
-                    id: row._id,
-                    label: row.title || "Untitled event",
-                    hint:
-                      [
-                        row.startsAt ? formatDate(row.startsAt) : null,
-                        clientDisplayName(row.clientId, clients),
-                      ]
-                        .filter(Boolean)
-                        .join(" · ") || null,
-                    keywords: clientDisplayName(row.clientId, clients),
-                  }))}
-                />
-              </label>
+              {eventId != null ? (
+                <input type="hidden" name="eventId" value={eventId} />
+              ) : (
+                <label>
+                  Event
+                  <SearchSelect
+                    key={
+                      draftableEvents.length ? "events-ready" : "events-loading"
+                    }
+                    name="eventId"
+                    required
+                    defaultValue={workingId ?? ""}
+                    placeholder="Search events by name or client…"
+                    options={draftableEvents.map((row) => ({
+                      id: row._id,
+                      label: row.title || "Untitled event",
+                      hint:
+                        [
+                          row.startsAt ? formatDate(row.startsAt) : null,
+                          clientDisplayName(row.clientId, clients),
+                        ]
+                          .filter(Boolean)
+                          .join(" · ") || null,
+                      keywords: clientDisplayName(row.clientId, clients),
+                    }))}
+                  />
+                </label>
+              )}
               <label>
                 Title
                 <input
@@ -314,15 +329,29 @@ export function ContractsPage() {
             <p className="eyebrow">Agreements</p>
             <h2>Contracts</h2>
           </div>
-          <span>
-            {`${visibleRows.filter((row) => OPEN_STATUSES.includes(String(row.status))).length} open · ${visibleRows.filter((row) => !OPEN_STATUSES.includes(String(row.status))).length} closed shown`}
-          </span>
+          {eventId != null ? (
+            <button
+              className="btn btn-primary btn-sm"
+              type="button"
+              onClick={() => setShowDraft((value) => !value)}
+            >
+              {showDraft ? "Close form" : "Draft contract"}
+            </button>
+          ) : (
+            <span>
+              {`${visibleRows.filter((row) => OPEN_STATUSES.includes(String(row.status))).length} open · ${visibleRows.filter((row) => !OPEN_STATUSES.includes(String(row.status))).length} closed shown`}
+            </span>
+          )}
         </div>
         {loading ? (
           <TableSkeleton rows={5} />
         ) : visibleRows.length === 0 ? (
           <div className="document-empty">
-            <p>No open contracts.</p>
+            <p>
+              {eventId != null
+                ? "No contract for this event yet."
+                : "No open contracts."}
+            </p>
           </div>
         ) : (
           <table className="data-table phone-cards">
@@ -381,7 +410,9 @@ export function ContractsPage() {
             </tbody>
           </table>
         )}
-        {contracts !== undefined && contractPages.canLoadMore ? (
+        {eventId == null &&
+        contracts !== undefined &&
+        contractPages.canLoadMore ? (
           <div className="px-4 py-3">
             <button
               type="button"

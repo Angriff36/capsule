@@ -8,6 +8,8 @@ const EMPTY: EventMonthRows = {
   reviewFlags: [],
   vehicleAssignments: [],
   numberAssignments: [],
+  equipmentReservations: [],
+  crew: [],
 };
 
 /**

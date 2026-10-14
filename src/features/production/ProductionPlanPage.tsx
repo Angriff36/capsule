@@ -132,10 +132,12 @@ export function ProductionPlanView({
               <div key={group.station} className="mt-4">
                 <h3 className="meta-term">{group.station}</h3>
                 <div className="supply-table-wrap">
-                  <table className="supply-table">
+                  <table className="supply-table table-even">
                     <thead>
                       <tr>
-                        <th scope="col">Recipe / step</th>
+                        <th scope="col" className="col-wide">
+                          Recipe / step
+                        </th>
                         <th scope="col">Events</th>
                         <th scope="col">To make</th>
                         <th scope="col">Made</th>
@@ -175,8 +177,10 @@ export function ProductionPlanView({
                               ))}
                             </ul>
                           </td>
-                          <td>{amount(row.planned, row.unit)}</td>
-                          <td>
+                          <td className="num">
+                            {amount(row.planned, row.unit)}
+                          </td>
+                          <td className="num">
                             {row.made > 0 || row.done
                               ? amount(row.made, row.unit)
                               : "Not yet"}

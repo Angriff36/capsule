@@ -87,12 +87,12 @@ export function InvoiceSignedProposalLines({
                       ? Number(row.quantity)
                       : 1}
                 </td>
-                <td>
+                <td className="num">
                   {basis === "percentage"
                     ? `${Number(row.unitPrice)}%`
                     : usd(row.unitPrice)}
                 </td>
-                <td>{usd(priced.lines[index].amount)}</td>
+                <td className="num">{usd(priced.lines[index].amount)}</td>
               </tr>
             );
           })}

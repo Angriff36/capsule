@@ -77,11 +77,7 @@ export function KpiRecordList({
   ).length;
 
   return (
-    <section className="mt-6 grid gap-3" data-testid="kpi-records">
-      <h2 className="text-sm font-semibold text-ink">
-        Records behind each figure
-      </h2>
-
+    <section className="grid gap-3" data-testid="kpi-records">
       <details data-testid="kpi-records-revenue">
         <summary className="cursor-pointer text-xs text-ink-2">
           Total Revenue: {completed.length} completed events,{" "}
@@ -106,7 +102,7 @@ export function KpiRecordList({
                     </Link>
                   </td>
                   <td>{event.startsAt ? formatDate(event.startsAt) : "—"}</td>
-                  <td>{event.expectedHeadcount ?? "—"}</td>
+                  <td className="num">{event.expectedHeadcount ?? "—"}</td>
                   <td className="text-right">
                     {formatMoney(event.quotedPrice ?? 0)}
                   </td>

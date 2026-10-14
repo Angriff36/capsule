@@ -52,7 +52,10 @@ type PackRow = SoftDeletable & {
   status?: string | null;
   eventId?: string | null;
 };
-type CloseoutRow = SoftDeletable & { status?: string | null };
+type CloseoutRow = SoftDeletable & {
+  status?: string | null;
+  eventId?: unknown;
+};
 
 export interface HomeServiceDeskFacts {
   role: string;
@@ -181,7 +184,7 @@ export class HomeAttentionPolicy {
         id: "open_packs",
         label: "Open pack lists",
         count: openPacks.length,
-        href: "/logistics/packs",
+        href: "/logistics/dispatch#floor",
         detail: "Pack lists not yet dispatched or cancelled.",
       },
       {
@@ -195,7 +198,11 @@ export class HomeAttentionPolicy {
         id: "draft_closeouts",
         label: "Draft closeouts",
         count: draftCloseouts.length,
-        href: "/finance/closeout",
+        // A closeout lives on its event; open the first one waiting.
+        href:
+          draftCloseouts[0]?.eventId != null
+            ? `/events/${String(draftCloseouts[0].eventId)}?tab=margin#closeout`
+            : "/events",
         detail: "Captured closeouts waiting to finalize.",
       },
     ];

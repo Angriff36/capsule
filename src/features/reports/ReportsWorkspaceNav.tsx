@@ -8,7 +8,6 @@ const sections = [
   { label: "Money", path: "/finance/revenue" },
   { label: "Sales", path: "/reports/sales" },
   { label: "Tim's KPIs", path: "/reports/tims-kpis" },
-  { label: "L10", path: "/reports/l10" },
   { label: "Mangia", path: "/reports/mangia" },
 ] as const;
 

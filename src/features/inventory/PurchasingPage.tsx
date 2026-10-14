@@ -611,14 +611,14 @@ export function PurchasingPage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table table-even">
               <thead>
                 <tr>
                   <th>Week start</th>
                   <th>Vendor</th>
-                  <th>Total</th>
-                  <th>State</th>
-                  <th />
+                  <th className="col-num">Total</th>
+                  <th className="col-state">State</th>
+                  <th className="col-action" />
                 </tr>
               </thead>
               <tbody>
@@ -632,7 +632,7 @@ export function PurchasingPage() {
                       </strong>
                     </td>
                     <td>{vendorName(order.vendorId)}</td>
-                    <td className="supply-number">
+                    <td className="supply-number num">
                       {formatMoneyExact(vendorOrderHeaderTotal(order, lines))}
                     </td>
                     <td>
@@ -757,15 +757,15 @@ export function PurchasingPage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table">
+            <table className="supply-table table-even">
               <thead>
                 <tr>
                   <th>Order</th>
                   <th>Vendor</th>
                   <th>Event</th>
-                  <th>Total</th>
-                  <th>State</th>
-                  <th />
+                  <th className="col-num">Total</th>
+                  <th className="col-state">State</th>
+                  <th className="col-action" />
                 </tr>
               </thead>
               <tbody>
@@ -780,7 +780,7 @@ export function PurchasingPage() {
                         ? eventName(order.eventId)
                         : "Weekly / general"}
                     </td>
-                    <td className="supply-number">
+                    <td className="supply-number num">
                       {formatMoneyExact(vendorOrderHeaderTotal(order, lines))}
                     </td>
                     <td>

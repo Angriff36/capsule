@@ -198,30 +198,36 @@ export function WasteCostReportPage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table" data-testid="waste-by-reason">
+            <table
+              className="supply-table waste-table"
+              data-testid="waste-by-reason"
+            >
+              <WasteColumns />
               <thead>
                 <tr>
                   <th>Rank</th>
-                  <th>Reason</th>
-                  <th>Entries</th>
-                  <th>Quantity</th>
-                  <th>Waste value</th>
-                  <th>Share</th>
+                  <th colSpan={2}>Reason</th>
+                  <th className="num">Entries</th>
+                  <th className="num">Quantity</th>
+                  <th className="num">Waste value</th>
+                  <th className="num">Share</th>
                 </tr>
               </thead>
               <tbody>
                 {report.reasonRanking.map((bucket, index) => (
                   <tr key={bucket.key}>
                     <td className="supply-number">{index + 1}</td>
-                    <td>
+                    <td colSpan={2}>
                       <strong>{bucket.label}</strong>
                     </td>
-                    <td className="supply-number">{bucket.entries}</td>
-                    <td>{formatQuantities(bucket.quantities)}</td>
-                    <td className="supply-number">
+                    <td className="supply-number num">{bucket.entries}</td>
+                    <td className="supply-number num">
+                      {formatQuantities(bucket.quantities)}
+                    </td>
+                    <td className="supply-number num">
                       <strong>{formatMoney(bucket.cost)}</strong>
                     </td>
-                    <td className="supply-number">
+                    <td className="supply-number num">
                       {report.totalCost > 0
                         ? `${((bucket.cost / report.totalCost) * 100).toFixed(1)}%`
                         : "—"}
@@ -255,16 +261,20 @@ export function WasteCostReportPage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table" data-testid="waste-by-ingredient">
+            <table
+              className="supply-table waste-table"
+              data-testid="waste-by-ingredient"
+            >
+              <WasteColumns />
               <thead>
                 <tr>
                   <th>Rank</th>
                   <th>Ingredient</th>
-                  <th>Entries</th>
-                  <th>Quantity</th>
                   <th>Top reason</th>
-                  <th>Waste value</th>
-                  <th>Share</th>
+                  <th className="num">Entries</th>
+                  <th className="num">Quantity</th>
+                  <th className="num">Waste value</th>
+                  <th className="num">Share</th>
                 </tr>
               </thead>
               <tbody>
@@ -299,16 +309,20 @@ export function WasteCostReportPage() {
           </div>
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table" data-testid="waste-by-event">
+            <table
+              className="supply-table waste-table"
+              data-testid="waste-by-event"
+            >
+              <WasteColumns />
               <thead>
                 <tr>
                   <th>Rank</th>
                   <th>Event</th>
-                  <th>Entries</th>
-                  <th>Quantity</th>
                   <th>Top reason</th>
-                  <th>Waste value</th>
-                  <th>Share</th>
+                  <th className="num">Entries</th>
+                  <th className="num">Quantity</th>
+                  <th className="num">Waste value</th>
+                  <th className="num">Share</th>
                 </tr>
               </thead>
               <tbody>
@@ -388,20 +402,41 @@ function BucketRow({
       <td>
         <strong>{bucket.label}</strong>
       </td>
-      <td className="supply-number">{bucket.entries}</td>
-      <td>{formatQuantities(bucket.quantities)}</td>
       <td>
         {topReason ? (WASTE_REASON_LABELS[topReason[0]] ?? topReason[0]) : "—"}
       </td>
-      <td className="supply-number">
+      <td className="supply-number num">{bucket.entries}</td>
+      <td className="supply-number num">
+        {formatQuantities(bucket.quantities)}
+      </td>
+      <td className="supply-number num">
         <strong>{formatMoney(bucket.cost)}</strong>
       </td>
-      <td className="supply-number">
+      <td className="supply-number num">
         {totalCost > 0
           ? `${((bucket.cost / totalCost) * 100).toFixed(1)}%`
           : "—"}
       </td>
     </tr>
+  );
+}
+
+/**
+ * One column grid for every table on this page, so Quantity, Waste value and
+ * the last column sit in the same place in each table (owner, 2026-10-13:
+ * "shouldnt all those columns line up and shouldnt everything be consistent").
+ */
+export function WasteColumns() {
+  return (
+    <colgroup>
+      <col className="waste-col-1" />
+      <col className="waste-col-2" />
+      <col className="waste-col-3" />
+      <col className="waste-col-4" />
+      <col className="waste-col-5" />
+      <col className="waste-col-6" />
+      <col className="waste-col-7" />
+    </colgroup>
   );
 }
 

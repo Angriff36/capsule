@@ -3,6 +3,8 @@ import {
   useLeadershipItemComplete,
   useLeadershipItemDrop,
   useLeadershipItemMarkTrack,
+  useLeadershipItemPark,
+  useLeadershipItemPrioritize,
   useLeadershipItemReopen,
   useLeadershipItemSolve,
 } from "@/lib/manifest-convex-react";
@@ -55,6 +57,61 @@ export function RockTrackPicker({
 }
 
 /**
+ * IDS: the team picks this week's top three issues and solves them in that
+ * order. Picking a place another issue holds moves that one off it.
+ */
+export function IssuePriorityPicker({
+  row,
+  issues,
+  busy,
+  run,
+}: {
+  row: LeadershipItemRow;
+  issues: readonly LeadershipItemRow[];
+  busy: boolean;
+  run: Run;
+}) {
+  const prioritize = useLeadershipItemPrioritize();
+  if (row.status !== "open") return <>—</>;
+  return (
+    <select
+      className="input"
+      aria-label={`Top three place: ${row.title}`}
+      value={row.priority ?? ""}
+      disabled={busy}
+      onChange={(event) => {
+        const value = event.target.value
+          ? Number(event.target.value)
+          : undefined;
+        const holder = issues.find(
+          (other) =>
+            other._id !== row._id &&
+            other.status === "open" &&
+            value != null &&
+            other.priority === value,
+        );
+        void run(async () => {
+          if (holder)
+            await prioritize({ docId: holder._id, version: holder.version });
+          await prioritize({
+            docId: row._id,
+            version: row.version,
+            priority: value,
+          });
+        });
+      }}
+    >
+      <option value="">—</option>
+      {[1, 2, 3].map((place) => (
+        <option key={place} value={place}>
+          #{place}
+        </option>
+      ))}
+    </select>
+  );
+}
+
+/**
  * Done / Drop / Reopen for every item. An open issue is solved instead of
  * just closed: the team writes the answer they agreed on. A headline is
  * marked "Heard" once read out.
@@ -72,6 +129,7 @@ export function LeadershipItemActions({
   const dropItem = useLeadershipItemDrop();
   const reopenItem = useLeadershipItemReopen();
   const solveItem = useLeadershipItemSolve();
+  const parkItem = useLeadershipItemPark();
   const [solving, setSolving] = useState(false);
   const [answer, setAnswer] = useState("");
   const ref = { docId: row._id, version: row.version };
@@ -128,14 +186,25 @@ export function LeadershipItemActions({
   return (
     <>
       {row.kind === "issue" ? (
-        <button
-          type="button"
-          className="btn-link btn-link-compact"
-          disabled={busy}
-          onClick={() => setSolving(true)}
-        >
-          Solve
-        </button>
+        <>
+          <button
+            type="button"
+            className="btn-link btn-link-compact"
+            disabled={busy}
+            onClick={() => setSolving(true)}
+          >
+            Solve
+          </button>{" "}
+          <button
+            type="button"
+            className="btn-link btn-link-compact text-ink-2"
+            title="Move it to the long-term issues list on the V/TO"
+            disabled={busy}
+            onClick={() => void run(() => parkItem(ref))}
+          >
+            Park
+          </button>
+        </>
       ) : (
         <button
           type="button"

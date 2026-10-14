@@ -825,7 +825,7 @@ export function TimeSheetPage() {
                       breakMinutes={row.breakMinutes}
                       paidBreakMinutes={row.paidBreakMinutes}
                     />
-                    <td data-label="Hours">
+                    <td className="num" data-label="Hours">
                       {row.clockInAt != null &&
                       row.clockOutAt != null &&
                       row.clockOutAt >= row.clockInAt

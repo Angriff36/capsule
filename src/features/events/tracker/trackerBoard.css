@@ -1,0 +1,590 @@
+/*
+ * The event tracker (TrackerBoard.tsx), laid out after the Banani "Event
+ * Tracker" design: a numbers bar, the double-booking alert, then one card
+ * with status tabs and a wide table of chips. App tokens only.
+ */
+.trk {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+/* Numbers bar: six equal boxes with dividers. */
+.trk-stats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-ledger);
+  background: var(--color-panel);
+}
+.trk-stat {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: 0.125rem;
+  padding: 0.875rem 1.125rem;
+  border-right: 1px solid var(--color-line);
+}
+.trk-stat:last-child {
+  border-right: 0;
+}
+.trk-stat dt {
+  font-size: var(--text-xs);
+  color: var(--color-ink-3);
+}
+.trk-stat dd {
+  margin: 0;
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  color: var(--color-ink);
+}
+.trk-stat[data-tone="brand"] dd {
+  color: var(--color-brand);
+}
+.trk-stat[data-tone="danger"] {
+  background: var(--color-danger-soft);
+}
+.trk-stat[data-tone="danger"] dd {
+  color: var(--color-danger);
+}
+
+/* Double-booking alert. */
+.trk-alert {
+  display: flex;
+  gap: 0.875rem;
+  border: 1px solid color-mix(in srgb, var(--color-danger) 30%, transparent);
+  border-radius: var(--radius-md);
+  background: var(--color-danger-soft);
+  padding: 0.875rem 1.125rem;
+  color: var(--color-danger);
+}
+.trk-alert-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-danger) 14%, transparent);
+}
+.trk-alert h2 {
+  margin-bottom: 0.25rem;
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+.trk-alert ul {
+  display: grid;
+  gap: 0.125rem;
+  margin: 0;
+  padding-left: 1rem;
+  font-size: var(--text-xs);
+}
+.trk-alert-x {
+  align-self: flex-start;
+  color: inherit;
+  opacity: 0.6;
+}
+
+/* Rules and stock panels. */
+.trk-panel {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-ledger);
+  background: var(--color-panel);
+  padding: 1rem 1.125rem;
+}
+.trk-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.trk-panel-head h2 {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-ink);
+}
+.trk-panel-head p {
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+.trk-rules {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+.trk-rule {
+  display: grid;
+  gap: 0.5rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-inset);
+  padding: 0.75rem;
+}
+.trk-rule-gap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+.trk-rule-gap[data-off] {
+  opacity: 0.5;
+}
+.trk-rule-gap .input {
+  width: 5rem;
+}
+.trk-stock-tabs {
+  margin-bottom: 0.5rem;
+}
+.trk-stock {
+  display: grid;
+  max-height: 22rem;
+  overflow-y: auto;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+}
+.trk-stock-row {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) 7rem 6rem;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.375rem 0.75rem;
+  border-bottom: 1px solid var(--color-line);
+  font-size: var(--text-sm);
+}
+.trk-stock-row:last-child {
+  border-bottom: 0;
+}
+.trk-stock-head {
+  position: sticky;
+  top: 0;
+  background: var(--color-inset);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+.trk-stock-head > span:nth-child(n + 3) {
+  text-align: right;
+}
+.trk-stock-name {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.trk-stock-find {
+  width: 14rem;
+}
+.trk-stock-add {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) 6rem auto;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+.trk-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.trk-num[data-short] {
+  color: var(--color-danger);
+  font-weight: 700;
+}
+.trk-notice {
+  font-size: var(--text-sm);
+  color: var(--color-ok);
+}
+
+/* The table card. */
+.trk-card {
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-ledger);
+  background: var(--color-panel);
+}
+.trk-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.625rem 1rem;
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-inset);
+}
+.trk-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+.trk-tabs > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: var(--radius-sm);
+  padding: 0.375rem 0.75rem;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-ink-2);
+}
+.trk-tabs > button[aria-selected="true"] {
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+.trk-count {
+  border-radius: var(--radius-xs);
+  background: var(--color-panel);
+  padding: 0 0.375rem;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.trk-bar-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.trk-bar-tools .btn[aria-pressed="true"] {
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+.trk-month {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+.trk-month > strong {
+  min-width: 8.5rem;
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--color-ink);
+}
+.trk-search {
+  width: 14rem;
+}
+.trk-scroll {
+  overflow-x: auto;
+}
+.trk-table {
+  width: 100%;
+  min-width: 138rem;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+.trk-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 0.5rem 0.625rem;
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-inset);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-ink-3);
+}
+.trk-table td {
+  padding: 0.625rem;
+  border-bottom: 1px solid var(--color-line);
+  vertical-align: top;
+}
+.trk-table tbody tr:nth-child(even) > td {
+  background: color-mix(in srgb, var(--color-inset) 55%, transparent);
+}
+.trk-table tbody tr[data-conflict] > td {
+  background: color-mix(in srgb, var(--color-danger-soft) 55%, transparent);
+}
+.trk-table tbody tr[data-status="cancelled"] > td {
+  color: var(--color-ink-3);
+}
+.trk-table tbody tr[data-busy] {
+  opacity: 0.6;
+}
+.trk-col-num {
+  width: 6.5rem;
+}
+.trk-col-event {
+  width: 14rem;
+}
+.trk-col-date {
+  width: 9.5rem;
+}
+.trk-col-venue {
+  width: 9rem;
+}
+.trk-col-pill {
+  width: 7.5rem;
+}
+.trk-col-pack {
+  width: 9rem;
+}
+.trk-col-rigs {
+  width: 33rem;
+}
+.trk-col-chips {
+  width: 12rem;
+}
+.trk-col-notes {
+  width: 14rem;
+}
+.trk-col-event > small,
+.trk-col-date > small {
+  display: block;
+  margin-top: 0.125rem;
+  font-size: var(--text-xs);
+  color: var(--color-ink-3);
+}
+.trk-col-date > strong {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.trk-title {
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.trk-title:hover {
+  color: var(--color-brand);
+}
+.trk-number {
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs);
+  background: var(--color-inset);
+  padding: 0.125rem 0.375rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-ink-2);
+}
+.trk-number:focus-visible {
+  border-color: var(--color-brand);
+  outline: none;
+}
+
+/* The rig editor, narrower than on the old sheet. */
+.trk .tracker-rig {
+  grid-template-columns: 10rem 8.5rem 8.5rem 4rem;
+}
+
+/* Status and packing pills. */
+.trk-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: var(--radius-pill);
+  padding: 0.125rem 0.625rem;
+  background: var(--color-mute-soft);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--color-ink-2);
+}
+.trk-pill::before {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background: currentColor;
+  content: "";
+}
+.trk-pill[data-status="confirmed"],
+.trk-pill[data-pack="packed"],
+.trk-pill[data-pack="loaded"],
+.trk-pill[data-pack="dispatched"] {
+  background: var(--color-ok-soft);
+  color: var(--color-ok);
+}
+.trk-pill[data-status="pending"],
+.trk-pill[data-pack="packing"],
+.trk-pill[data-pack="question"] {
+  background: var(--color-warn-soft);
+  color: var(--color-warn);
+}
+.trk-pill[data-status="in_progress"] {
+  background: var(--color-info-soft);
+  color: var(--color-info);
+}
+.trk-pill[data-status="cancelled"],
+.trk-pill[data-pack="needs_assistance"] {
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+.trk-link {
+  display: block;
+  margin-top: 0.375rem;
+  font-size: var(--text-xs);
+  color: var(--color-brand);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.trk-binder {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  margin-top: 0.25rem;
+  font-size: var(--text-xs);
+  color: var(--color-ink-2);
+}
+.trk-binder:has(input:checked) {
+  color: var(--color-ok);
+  font-weight: 600;
+}
+
+/* Chips. */
+.trk-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem;
+}
+.trk-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-inset);
+  padding: 0.125rem 0.5rem;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--color-ink);
+}
+.trk-chip[data-tone="people"] {
+  border-color: transparent;
+  background: var(--color-info-soft);
+  color: var(--color-info);
+}
+.trk-chip[data-tone="decor"] {
+  border-color: transparent;
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+}
+.trk-chip[data-warn] {
+  border-color: color-mix(in srgb, var(--color-danger) 35%, transparent);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+.trk-chip-x {
+  margin-left: 0.125rem;
+  color: inherit;
+  opacity: 0.6;
+  line-height: 1;
+}
+.trk-chip-x:hover {
+  opacity: 1;
+}
+.trk-add {
+  white-space: nowrap;
+  border: 1px dashed var(--color-line-2);
+  border-radius: var(--radius-sm);
+  padding: 0.125rem 0.5rem;
+  font-size: var(--text-xs);
+  color: var(--color-ink-3);
+}
+.trk-add:hover:not(:disabled) {
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+.trk-inline-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 4rem;
+  gap: 0.25rem;
+  width: 100%;
+}
+.trk-inline-form .input {
+  min-height: 2rem;
+  font-size: var(--text-xs);
+}
+.trk-text {
+  display: block;
+  width: 100%;
+  min-height: 1.75rem;
+  border: 1px solid transparent;
+  border-radius: var(--radius-xs);
+  padding: 0.125rem;
+  text-align: left;
+}
+.trk-text:hover:not(:disabled) {
+  border-color: var(--color-line-2);
+}
+.trk-text-edit {
+  width: 100%;
+  font-size: var(--text-xs);
+}
+.trk-note {
+  font-size: var(--text-xs);
+  line-height: 1.5;
+  white-space: pre-line;
+  color: var(--color-ink-2);
+}
+.trk-none {
+  font-size: var(--text-xs);
+  color: var(--color-ink-3);
+}
+.trk-empty {
+  padding: 2rem !important;
+  text-align: center;
+  color: var(--color-ink-2);
+}
+.trk-foot {
+  padding: 0.625rem 1rem;
+  border-top: 1px solid var(--color-line);
+  background: var(--color-inset);
+  font-size: var(--text-xs);
+  color: var(--color-ink-3);
+}
+
+@media (max-width: 1100px) {
+  .trk-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .trk-stat:nth-child(3) {
+    border-right: 0;
+  }
+  .trk-stat:nth-child(-n + 3) {
+    border-bottom: 1px solid var(--color-line);
+  }
+  .trk-rules {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  .trk-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .trk-stat {
+    border-bottom: 1px solid var(--color-line);
+  }
+  .trk-stat:nth-child(odd) {
+    border-right: 1px solid var(--color-line);
+  }
+  .trk-stat:nth-child(even) {
+    border-right: 0;
+  }
+  .trk-stat:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+  .trk-search,
+  .trk-stock-find {
+    width: 100%;
+  }
+  .trk-stock-row {
+    grid-template-columns: minmax(0, 1fr) 4.5rem 5rem;
+  }
+  .trk-stock-row > :nth-child(2) {
+    display: none;
+  }
+  .trk-stock-add {
+    grid-template-columns: minmax(0, 1fr) 5rem;
+  }
+}

@@ -1059,6 +1059,8 @@ entity Event mixin TenantScoped, SoftDeletable {
   property linenColorBaskets: string?
   property servingwareKit: string?
   property decorKit: string?
+  // The office's free notes for the event tracker sheet (owner, 2026-10-14).
+  property trackerNotes: string?
   property rainPlan: string?
   property setupDiagram: string?
   // Weather and site setup the Final Lock answers need for an outdoor or
@@ -1895,6 +1897,16 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate tentAndFlooring = tentAndFlooring != null ? tentAndFlooring : self.tentAndFlooring
     mutate handwashing = handwashing != null ? handwashing : self.handwashing
     emit EventSetupNotesUpdated {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // The tracker sheet's Notes cell. "" clears it.
+  command setTrackerNotes(notes: string) {
+    guard self.deletedAt == null
+    mutate trackerNotes = notes
+    emit EventTrackerNotesSet {
       eventId: self.id
       tenantId: self.tenantId
     }
@@ -2768,6 +2780,13 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
   // never touches the template.
   property sourceTemplateId: uuid?
   property sourceTemplateVersion: int?
+  // Where the area sits on the event's floor plan (production board, owner
+  // 2026-10-14), in percent of the plan from its top-left. Unset = not on
+  // the plan yet.
+  property planX: int?
+  property planY: int?
+  property planWidth: int?
+  property planHeight: int?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
@@ -2818,6 +2837,37 @@ entity EventLayoutSection mixin TenantScoped, SoftDeletable {
     mutate type = type != null ? type : self.type
     mutate instructions = instructions != null ? instructions : self.instructions
     mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
+    emit EventLayoutSectionUpdated {
+      sectionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  // Put the area on the floor plan, or move or resize it there.
+  command placeOnPlan(planX: number, planY: number, planWidth: number, planHeight: number) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint placeOnPlanInside: planX >= 0 and planY >= 0 and planX + planWidth <= 100 and planY + planHeight <= 100 "Keep the area inside the floor plan."
+    constraint placeOnPlanSize: planWidth >= 4 and planHeight >= 4 "Make the area a little bigger."
+    mutate planX = planX
+    mutate planY = planY
+    mutate planWidth = planWidth
+    mutate planHeight = planHeight
+    emit EventLayoutSectionUpdated {
+      sectionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  // Take the area off the floor plan; it stays on the event's layout.
+  command takeOffPlan() {
+    guard self.deletedAt == null
+    mutate planX = null
+    mutate planY = null
+    mutate planWidth = null
+    mutate planHeight = null
     emit EventLayoutSectionUpdated {
       sectionId: self.id
       tenantId: self.tenantId
@@ -3242,6 +3292,11 @@ event EventDaySheetUpdated: "event_day_sheet.updated" {
 }
 
 event EventSetupNotesUpdated: "event_setup_notes.updated" {
+  eventId: string
+  tenantId: string
+}
+
+event EventTrackerNotesSet: "event_tracker_notes.set" {
   eventId: string
   tenantId: string
 }

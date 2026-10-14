@@ -37,6 +37,10 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
   // main crew. The event's own truck row is checked on the server.
   property rideVehicleAssignmentId: uuid?
   property meetsAtVenue: boolean?
+  // Where this person stands on the event's floor plan (production board,
+  // owner 2026-10-14), in percent from the plan's top-left. Unset = no pin.
+  property planX: int?
+  property planY: int?
   property encrypted notes: string?
   property required status: EventAssignmentStatus = "assigned"
   property assignedAt: datetime?
@@ -127,6 +131,20 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       eventId: self.eventId
       synchronizeShifts: synchronizeShifts
+    }
+  }
+
+  // Pin the person on the floor plan, or (both omitted) take the pin off.
+  command pinOnPlan(optional planX: number, optional planY: number) {
+    guard self.deletedAt == null
+    constraint pinOnPlanBoth: (planX == null) == (planY == null) "Give both places on the plan, or neither."
+    constraint pinOnPlanInside: planX == null or (planX >= 0 and planX <= 100 and planY >= 0 and planY <= 100) "Keep the pin inside the floor plan."
+    mutate planX = planX
+    mutate planY = planY
+    emit EventAssignmentPinned {
+      eventAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
     }
   }
 
@@ -618,6 +636,12 @@ entity EventStaffNeed mixin TenantScoped, SoftDeletable {
   }
 
   store EventStaffNeed in durable
+}
+
+event EventAssignmentPinned: "event_assignment.pinned" {
+  eventAssignmentId: string
+  tenantId: string
+  eventId: string
 }
 
 event EventAssignmentAssigned: "event_assignment.assigned" {

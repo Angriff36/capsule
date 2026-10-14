@@ -2,6 +2,9 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import {
+  AccountabilitySeatPlaceParamsSchema,
+  AccountabilitySeatRemoveParamsSchema,
+  AccountabilitySeatReviseParamsSchema,
   AnnouncementDismissalDismissParamsSchema,
   AnnouncementPostParamsSchema,
   AnnouncementRemoveParamsSchema,
@@ -11,6 +14,8 @@ import {
   AttachmentSetSurveySelectionParamsSchema,
   AvailabilityWindowDeclareParamsSchema,
   AvailabilityWindowWithdrawParamsSchema,
+  BookingRuleChangeParamsSchema,
+  BookingRuleStartParamsSchema,
   CandidateAdvanceParamsSchema,
   CandidateApplyParamsSchema,
   CandidateHireParamsSchema,
@@ -44,6 +49,8 @@ import {
   ClientSetBirthdayParamsSchema,
   ClientSetEmailPreferenceParamsSchema,
   ClientStageClientMergeParamsSchema,
+  CompanyVisionReviseParamsSchema,
+  CompanyVisionWriteParamsSchema,
   ComponentClearPrimaryImageParamsSchema,
   ComponentComponentAddParamsSchema,
   ComponentComponentAdjustQuantityParamsSchema,
@@ -106,6 +113,10 @@ import {
   ContractSendParamsSchema,
   ContractSignParamsSchema,
   ContractStageClientMergeParamsSchema,
+  CoreProcessRemoveParamsSchema,
+  CoreProcessReviseParamsSchema,
+  CoreProcessSetStageParamsSchema,
+  CoreProcessStartParamsSchema,
   CorrectiveActionCloseParamsSchema,
   CorrectiveActionOpenParamsSchema,
   CreditMemoIssueParamsSchema,
@@ -127,6 +138,9 @@ import {
   DateWaitlistEntryWithdrawParamsSchema,
   DeckShareLinkCreateParamsSchema,
   DeckShareLinkRevokeParamsSchema,
+  DelegateElevateItemAddParamsSchema,
+  DelegateElevateItemMoveParamsSchema,
+  DelegateElevateItemRemoveParamsSchema,
   DeliveryCancelParamsSchema,
   DeliveryConfirmDeliveryParamsSchema,
   DeliveryMarkFailedParamsSchema,
@@ -214,6 +228,7 @@ import {
   EventAssignmentConfirmParamsSchema,
   EventAssignmentDeclineParamsSchema,
   EventAssignmentMarkNoShowParamsSchema,
+  EventAssignmentPinOnPlanParamsSchema,
   EventAssignmentPlanTimingParamsSchema,
   EventAssignmentUnassignParamsSchema,
   EventBeginExecutionParamsSchema,
@@ -276,7 +291,9 @@ import {
   EventIngredientContributionReviseParamsSchema,
   EventIngredientContributionSupersedeParamsSchema,
   EventLayoutSectionAddParamsSchema,
+  EventLayoutSectionPlaceOnPlanParamsSchema,
   EventLayoutSectionRemoveParamsSchema,
+  EventLayoutSectionTakeOffPlanParamsSchema,
   EventLayoutSectionUpdateParamsSchema,
   EventLinkExternalChannelParamsSchema,
   EventLockForSalesParamsSchema,
@@ -294,6 +311,7 @@ import {
   EventRescheduleParamsSchema,
   EventReturnToPlanningParamsSchema,
   EventSetEventNumberParamsSchema,
+  EventSetTrackerNotesParamsSchema,
   EventSetTravelFeeParamsSchema,
   EventSetUpsellPotentialParamsSchema,
   EventStaffNeedApplyApprovedShiftSwapParamsSchema,
@@ -339,6 +357,7 @@ import {
   EventUseCompanyTimingRuleParamsSchema,
   EventVehicleAssignmentAssignParamsSchema,
   EventVehicleAssignmentAttachTrailerParamsSchema,
+  EventVehicleAssignmentChangeDriverParamsSchema,
   EventVehicleAssignmentClearPreloadedParamsSchema,
   EventVehicleAssignmentMarkPreloadedParamsSchema,
   EventVehicleAssignmentPlanLegParamsSchema,
@@ -479,9 +498,12 @@ import {
   LeadStageProposalParamsSchema,
   LeadUpdatePipelineParamsSchema,
   LeadershipItemAddParamsSchema,
+  LeadershipItemBringBackParamsSchema,
   LeadershipItemCompleteParamsSchema,
   LeadershipItemDropParamsSchema,
   LeadershipItemMarkTrackParamsSchema,
+  LeadershipItemParkParamsSchema,
+  LeadershipItemPrioritizeParamsSchema,
   LeadershipItemReopenParamsSchema,
   LeadershipItemReviseParamsSchema,
   LeadershipItemSolveParamsSchema,
@@ -549,6 +571,7 @@ import {
   OrganizationSetBrandLogoParamsSchema,
   OrganizationSetDefaultCurrencyParamsSchema,
   OrganizationSuspendParamsSchema,
+  OrganizationalCheckupTakeParamsSchema,
   PackListAcknowledgePackingRequirementParamsSchema,
   PackListApplyServiceStyleKitParamsSchema,
   PackListCancelParamsSchema,
@@ -636,6 +659,9 @@ import {
   PayrollInputFinalizeParamsSchema,
   PayrollInputMarkVoidedParamsSchema,
   PayrollInputPrepareParamsSchema,
+  PeopleAnalyzerScoreRateParamsSchema,
+  PeopleAnalyzerScoreRescoreParamsSchema,
+  PeopleAnalyzerScoreWithdrawParamsSchema,
   PerformanceReviewRecordParamsSchema,
   PersonAssignRoleParamsSchema,
   PersonChangeAddressParamsSchema,
@@ -1010,6 +1036,11 @@ import {
   VenueVendorRelationshipRetireParamsSchema,
   VenueVendorRelationshipReviseDetailsParamsSchema,
   VenueVendorRelationshipReviseStatusParamsSchema,
+  VisionItemAddParamsSchema,
+  VisionItemMarkDoneParamsSchema,
+  VisionItemMarkNotDoneParamsSchema,
+  VisionItemRemoveParamsSchema,
+  VisionItemReviseParamsSchema,
   WasteRecordRecordParamsSchema,
   WasteRecordVoidRecordParamsSchema,
   WeeklyPurchasingConfigConfigureParamsSchema,
@@ -1026,6 +1057,57 @@ function __convexArgsFromZod(parsed: Record<string, unknown>): Record<string, un
     out[key] = value instanceof Date ? value.getTime() : value;
   }
   return out;
+}
+
+/** Reactive list for AccountabilitySeat. */
+export function useListAccountabilitySeat() {
+  return useQuery(api.queries.listAccountabilitySeat);
+}
+
+/** Reactive get-by-id for AccountabilitySeat. Pass "skip" to suspend. */
+export function useGetAccountabilitySeat(id: string | "skip") {
+  return useQuery(api.queries.getAccountabilitySeat, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for AccountabilitySeat.place. */
+export function useAccountabilitySeatPlace() {
+  const mutate = useMutation(api.mutations.AccountabilitySeat_place);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = AccountabilitySeatPlaceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for AccountabilitySeat.remove. */
+export function useAccountabilitySeatRemove() {
+  const mutate = useMutation(api.mutations.AccountabilitySeat_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = AccountabilitySeatRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for AccountabilitySeat.revise. */
+export function useAccountabilitySeatRevise() {
+  const mutate = useMutation(api.mutations.AccountabilitySeat_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = AccountabilitySeatReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for AccountabilitySeat.place. */
+export function useCreateAccountabilitySeat() {
+  const mutate = useMutation(api.mutations.AccountabilitySeat_createViaPlace);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = AccountabilitySeatPlaceParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
 }
 
 /** Reactive list for Announcement. */
@@ -1228,6 +1310,47 @@ export function useCreateAvailabilityWindow() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = AvailabilityWindowDeclareParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for BookingRule. */
+export function useListBookingRule() {
+  return useQuery(api.queries.listBookingRule);
+}
+
+/** Reactive get-by-id for BookingRule. Pass "skip" to suspend. */
+export function useGetBookingRule(id: string | "skip") {
+  return useQuery(api.queries.getBookingRule, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for BookingRule.change. */
+export function useBookingRuleChange() {
+  const mutate = useMutation(api.mutations.BookingRule_change);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = BookingRuleChangeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for BookingRule.start. */
+export function useBookingRuleStart() {
+  const mutate = useMutation(api.mutations.BookingRule_start);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = BookingRuleStartParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for BookingRule.start. */
+export function useCreateBookingRule() {
+  const mutate = useMutation(api.mutations.BookingRule_createViaStart);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = BookingRuleStartParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -1717,6 +1840,47 @@ export function useListCommandAuditRecord() {
 /** Reactive get-by-id for CommandAuditRecord. Pass "skip" to suspend. */
 export function useGetCommandAuditRecord(id: string | "skip") {
   return useQuery(api.queries.getCommandAuditRecord, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Reactive list for CompanyVision. */
+export function useListCompanyVision() {
+  return useQuery(api.queries.listCompanyVision);
+}
+
+/** Reactive get-by-id for CompanyVision. Pass "skip" to suspend. */
+export function useGetCompanyVision(id: string | "skip") {
+  return useQuery(api.queries.getCompanyVision, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for CompanyVision.revise. */
+export function useCompanyVisionRevise() {
+  const mutate = useMutation(api.mutations.CompanyVision_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = CompanyVisionReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for CompanyVision.write. */
+export function useCompanyVisionWrite() {
+  const mutate = useMutation(api.mutations.CompanyVision_write);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = CompanyVisionWriteParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for CompanyVision.write. */
+export function useCreateCompanyVision() {
+  const mutate = useMutation(api.mutations.CompanyVision_createViaWrite);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = CompanyVisionWriteParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
 }
 
 /** Reactive list for Component. */
@@ -2549,6 +2713,67 @@ export function useCreateContract() {
   };
 }
 
+/** Reactive list for CoreProcess. */
+export function useListCoreProcess() {
+  return useQuery(api.queries.listCoreProcess);
+}
+
+/** Reactive get-by-id for CoreProcess. Pass "skip" to suspend. */
+export function useGetCoreProcess(id: string | "skip") {
+  return useQuery(api.queries.getCoreProcess, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for CoreProcess.remove. */
+export function useCoreProcessRemove() {
+  const mutate = useMutation(api.mutations.CoreProcess_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = CoreProcessRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for CoreProcess.revise. */
+export function useCoreProcessRevise() {
+  const mutate = useMutation(api.mutations.CoreProcess_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = CoreProcessReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for CoreProcess.setStage. */
+export function useCoreProcessSetStage() {
+  const mutate = useMutation(api.mutations.CoreProcess_setStage);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = CoreProcessSetStageParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for CoreProcess.start. */
+export function useCoreProcessStart() {
+  const mutate = useMutation(api.mutations.CoreProcess_start);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = CoreProcessStartParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for CoreProcess.start. */
+export function useCreateCoreProcess() {
+  const mutate = useMutation(api.mutations.CoreProcess_createViaStart);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = CoreProcessStartParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for CorrectiveAction. */
 export function useListCorrectiveAction() {
   return useQuery(api.queries.listCorrectiveAction);
@@ -2860,6 +3085,57 @@ export function useDeckShareLinkRevoke() {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = DeckShareLinkRevokeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Reactive list for DelegateElevateItem. */
+export function useListDelegateElevateItem() {
+  return useQuery(api.queries.listDelegateElevateItem);
+}
+
+/** Reactive get-by-id for DelegateElevateItem. Pass "skip" to suspend. */
+export function useGetDelegateElevateItem(id: string | "skip") {
+  return useQuery(api.queries.getDelegateElevateItem, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for DelegateElevateItem.add. */
+export function useDelegateElevateItemAdd() {
+  const mutate = useMutation(api.mutations.DelegateElevateItem_add);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DelegateElevateItemAddParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DelegateElevateItem.move. */
+export function useDelegateElevateItemMove() {
+  const mutate = useMutation(api.mutations.DelegateElevateItem_move);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DelegateElevateItemMoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DelegateElevateItem.remove. */
+export function useDelegateElevateItemRemove() {
+  const mutate = useMutation(api.mutations.DelegateElevateItem_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DelegateElevateItemRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for DelegateElevateItem.add. */
+export function useCreateDelegateElevateItem() {
+  const mutate = useMutation(api.mutations.DelegateElevateItem_createViaAdd);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = DelegateElevateItemAddParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
 }
 
@@ -4277,6 +4553,16 @@ export function useEventSetEventNumber() {
   };
 }
 
+/** Mutation hook for Event.setTrackerNotes. */
+export function useEventSetTrackerNotes() {
+  const mutate = useMutation(api.mutations.Event_setTrackerNotes);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventSetTrackerNotesParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Event.setTravelFee. */
 export function useEventSetTravelFee() {
   const mutate = useMutation(api.mutations.Event_setTravelFee);
@@ -4515,6 +4801,16 @@ export function useEventAssignmentMarkNoShow() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventAssignmentMarkNoShowParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventAssignment.pinOnPlan. */
+export function useEventAssignmentPinOnPlan() {
+  const mutate = useMutation(api.mutations.EventAssignment_pinOnPlan);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventAssignmentPinOnPlanParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -5127,12 +5423,32 @@ export function useEventLayoutSectionAdd() {
   };
 }
 
+/** Mutation hook for EventLayoutSection.placeOnPlan. */
+export function useEventLayoutSectionPlaceOnPlan() {
+  const mutate = useMutation(api.mutations.EventLayoutSection_placeOnPlan);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventLayoutSectionPlaceOnPlanParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for EventLayoutSection.remove. */
 export function useEventLayoutSectionRemove() {
   const mutate = useMutation(api.mutations.EventLayoutSection_remove);
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventLayoutSectionRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventLayoutSection.takeOffPlan. */
+export function useEventLayoutSectionTakeOffPlan() {
+  const mutate = useMutation(api.mutations.EventLayoutSection_takeOffPlan);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventLayoutSectionTakeOffPlanParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -5710,6 +6026,16 @@ export function useEventVehicleAssignmentAttachTrailer() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventVehicleAssignmentAttachTrailerParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventVehicleAssignment.changeDriver. */
+export function useEventVehicleAssignmentChangeDriver() {
+  const mutate = useMutation(api.mutations.EventVehicleAssignment_changeDriver);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventVehicleAssignmentChangeDriverParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -7511,6 +7837,16 @@ export function useLeadershipItemAdd() {
   };
 }
 
+/** Mutation hook for LeadershipItem.bringBack. */
+export function useLeadershipItemBringBack() {
+  const mutate = useMutation(api.mutations.LeadershipItem_bringBack);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadershipItemBringBackParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for LeadershipItem.complete. */
 export function useLeadershipItemComplete() {
   const mutate = useMutation(api.mutations.LeadershipItem_complete);
@@ -7537,6 +7873,26 @@ export function useLeadershipItemMarkTrack() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = LeadershipItemMarkTrackParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for LeadershipItem.park. */
+export function useLeadershipItemPark() {
+  const mutate = useMutation(api.mutations.LeadershipItem_park);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadershipItemParkParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for LeadershipItem.prioritize. */
+export function useLeadershipItemPrioritize() {
+  const mutate = useMutation(api.mutations.LeadershipItem_prioritize);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = LeadershipItemPrioritizeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -8448,6 +8804,37 @@ export function useCreateOrganization() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = OrganizationRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for OrganizationalCheckup. */
+export function useListOrganizationalCheckup() {
+  return useQuery(api.queries.listOrganizationalCheckup);
+}
+
+/** Reactive get-by-id for OrganizationalCheckup. Pass "skip" to suspend. */
+export function useGetOrganizationalCheckup(id: string | "skip") {
+  return useQuery(api.queries.getOrganizationalCheckup, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for OrganizationalCheckup.take. */
+export function useOrganizationalCheckupTake() {
+  const mutate = useMutation(api.mutations.OrganizationalCheckup_take);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationalCheckupTakeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for OrganizationalCheckup.take. */
+export function useCreateOrganizationalCheckup() {
+  const mutate = useMutation(api.mutations.OrganizationalCheckup_createViaTake);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationalCheckupTakeParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -9610,6 +9997,57 @@ export function useCreatePayrollInput() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = PayrollInputPrepareParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for PeopleAnalyzerScore. */
+export function useListPeopleAnalyzerScore() {
+  return useQuery(api.queries.listPeopleAnalyzerScore);
+}
+
+/** Reactive get-by-id for PeopleAnalyzerScore. Pass "skip" to suspend. */
+export function useGetPeopleAnalyzerScore(id: string | "skip") {
+  return useQuery(api.queries.getPeopleAnalyzerScore, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for PeopleAnalyzerScore.rate. */
+export function usePeopleAnalyzerScoreRate() {
+  const mutate = useMutation(api.mutations.PeopleAnalyzerScore_rate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PeopleAnalyzerScoreRateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PeopleAnalyzerScore.rescore. */
+export function usePeopleAnalyzerScoreRescore() {
+  const mutate = useMutation(api.mutations.PeopleAnalyzerScore_rescore);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PeopleAnalyzerScoreRescoreParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PeopleAnalyzerScore.withdraw. */
+export function usePeopleAnalyzerScoreWithdraw() {
+  const mutate = useMutation(api.mutations.PeopleAnalyzerScore_withdraw);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PeopleAnalyzerScoreWithdrawParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for PeopleAnalyzerScore.rate. */
+export function useCreatePeopleAnalyzerScore() {
+  const mutate = useMutation(api.mutations.PeopleAnalyzerScore_createViaRate);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = PeopleAnalyzerScoreRateParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -15010,6 +15448,77 @@ export function useCreateVenueVendorRelationship() {
   };
 }
 
+/** Reactive list for VisionItem. */
+export function useListVisionItem() {
+  return useQuery(api.queries.listVisionItem);
+}
+
+/** Reactive get-by-id for VisionItem. Pass "skip" to suspend. */
+export function useGetVisionItem(id: string | "skip") {
+  return useQuery(api.queries.getVisionItem, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for VisionItem.add. */
+export function useVisionItemAdd() {
+  const mutate = useMutation(api.mutations.VisionItem_add);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VisionItemAddParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VisionItem.markDone. */
+export function useVisionItemMarkDone() {
+  const mutate = useMutation(api.mutations.VisionItem_markDone);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VisionItemMarkDoneParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VisionItem.markNotDone. */
+export function useVisionItemMarkNotDone() {
+  const mutate = useMutation(api.mutations.VisionItem_markNotDone);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VisionItemMarkNotDoneParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VisionItem.remove. */
+export function useVisionItemRemove() {
+  const mutate = useMutation(api.mutations.VisionItem_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VisionItemRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VisionItem.revise. */
+export function useVisionItemRevise() {
+  const mutate = useMutation(api.mutations.VisionItem_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VisionItemReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for VisionItem.add. */
+export function useCreateVisionItem() {
+  const mutate = useMutation(api.mutations.VisionItem_createViaAdd);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = VisionItemAddParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for WasteRecord. */
 export function useListWasteRecord() {
   return useQuery(api.queries.listWasteRecord);
@@ -15153,4 +15662,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1599 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1654 as const;

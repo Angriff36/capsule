@@ -34,6 +34,10 @@ export interface LeadershipItemRow {
   readonly openedAt?: number | null;
   readonly openedByPersonId?: string | null;
   readonly closedAt?: number | null;
+  /** An issue parked on the long-term (V/TO) issues list. */
+  readonly parkedAt?: number | null;
+  /** Its place in this week's top three to solve (1 first). */
+  readonly priority?: number | null;
   readonly deletedAt?: number | null;
   readonly version?: number;
 }

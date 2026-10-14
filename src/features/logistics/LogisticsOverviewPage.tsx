@@ -92,7 +92,10 @@ export function LogisticsOverviewPage() {
   // Pack lists of events that are already over are history, not work.
   const eventOver = (id: string) => {
     const event = events?.find((row) => row._id === id);
-    return Number(event?.endsAt ?? event?.startsAt ?? Infinity) < now;
+    return (
+      ["cancelled", "completed", "closed_out"].includes(String(event?.stage)) ||
+      Number(event?.endsAt ?? event?.startsAt ?? Infinity) < now
+    );
   };
   const livePackLists = (packLists ?? []).filter(
     (row) =>
@@ -112,8 +115,13 @@ export function LogisticsOverviewPage() {
   const inTransitCount = liveDeliveries.filter(
     (row) => String(row.status) === "in_transit",
   ).length;
+  // Lists due this week, the same ones the packing floor shows.
+  const weekEnd = now + 7 * 86_400_000;
+  const eventStart = (id: string) =>
+    Number(events?.find((row) => row._id === id)?.startsAt ?? Infinity);
   const openPackCount = livePackLists.filter(
-    (row) => String(row.status) !== "dispatched",
+    (row) =>
+      String(row.status) !== "dispatched" && eventStart(row.eventId) < weekEnd,
   ).length;
   const availableVehicleCount = (vehicles ?? []).filter(
     (row) =>
@@ -202,7 +210,7 @@ export function LogisticsOverviewPage() {
           </dd>
         </div>
         <div className="bg-panel px-4 py-3">
-          <dt className="eyebrow">Open pack lists</dt>
+          <dt className="eyebrow">Pack lists due this week</dt>
           <dd className="mt-1 text-xl font-semibold text-ink">
             {loading ? <Skeleton className="h-7 w-12" /> : openPackCount}
           </dd>

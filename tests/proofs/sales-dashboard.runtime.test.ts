@@ -17,6 +17,7 @@ vi.mock("../../src/lib/manifest-convex-react", () => {
     useListProposal: list("proposals"),
     useListClient: list("clients"),
     useListPerson: list("people"),
+    useListReferralSource: list("referralSources"),
   };
 });
 // Seed keys by Convex table, for the scoped and paged reads.
@@ -34,6 +35,10 @@ vi.mock("../../src/lib/financeScopedQueries", async () =>
 
 vi.mock("../../src/features/facilities/useEventsById", () => ({
   useAllEventReportRows: () => seed.events ?? [],
+  // The period funnel on top reads date ranges; these tests prove the
+  // all-time figures below it.
+  useEventsInRange: () => [],
+  useEventRecordsInRange: () => [],
 }));
 vi.mock("../../src/lib/useClientDirectory", () => ({
   useClientDirectory: () => seed.clients ?? [],

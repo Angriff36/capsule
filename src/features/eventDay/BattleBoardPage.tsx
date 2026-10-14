@@ -6,28 +6,26 @@ import type {
 } from "../../lib/eventDayBriefing";
 import { useEventDayBriefing } from "../../lib/eventDayBriefing";
 import type { EventDayBriefing } from "../../lib/eventDayBriefing";
-import { formatCount, formatDate, formatTime } from "../../lib/format";
-import { formatStatusLabel } from "../../lib/statusLabels";
 import { compareActivities } from "../events/EventTimelinePanel";
-import { displayEventMenuNotes } from "../events/eventMenuLineFields";
 import { formatAssigneeLabel } from "../events/timelineAssigneeOptions";
 import {
   deriveDishAllergens,
-  dishAllergenClaim,
   type DishAllergenReport,
 } from "../kitchen/dishAllergens";
 import { CULINARY_ALLERGENS } from "../kitchen/CulinaryAllergenVocabulary";
 import "./BattleBoardPage.css";
+import { BattleBoardSheet } from "./BattleBoardSheet";
+import { useTenantBranding } from "../admin/tenantBranding";
+import type { Id } from "../../lib/api";
+import { useEventTimingPlan } from "../../lib/operational-transactions";
+import { useFinalLock } from "../../lib/eventPacket/useFinalLock";
 import "./EventDay.css";
 import { EventDayNav } from "./EventDayNav";
-import { categoryLabel } from "./runOfShowModel";
 
 /**
  * Battle board — the day-of one-pager, built automatically from the event
- * plan (issue: auto battle board). Everything the Mangia PDF carried, read
- * straight from the briefing seam: layout, menu with recipe-derived
- * allergens, staff, run of show, equipment, deliveries. Print / Save PDF
- * puts it on paper; the document is the only thing that prints.
+ * plan and laid out like the owner's Mangia battle board PDF
+ * (BattleBoardSheet). Print / Save PDF puts only the sheet on paper.
  */
 
 function personLabel(person: EventDayPerson | undefined): string {
@@ -37,21 +35,7 @@ function personLabel(person: EventDayPerson | undefined): string {
   );
 }
 
-function windowLine(
-  start: number | null | undefined,
-  end: number | null | undefined,
-): string {
-  if (start == null) return "—";
-  return end != null
-    ? `${formatTime(start)}–${formatTime(end)}`
-    : formatTime(start);
-}
-
-function allergenLabel(value: string): string {
-  return value.replaceAll("_", " ");
-}
-
-function buildBoard(briefing: EventDayBriefing) {
+export function buildBoard(briefing: EventDayBriefing) {
   const { event, venue } = briefing;
   const people = new Map(briefing.people.map((person) => [person._id, person]));
   const whoLabel = (row: EventDayActivity) =>
@@ -209,7 +193,9 @@ function buildBoard(briefing: EventDayBriefing) {
 export function BattleBoardPage() {
   const { id } = useParams();
   const briefing = useEventDayBriefing(id);
-  const printedAt = useMemo(() => Date.now(), []);
+  const { branding } = useTenantBranding();
+  const plan = useEventTimingPlan(id ? (id as Id<"events">) : null);
+  const { report: finalLock } = useFinalLock((id ?? "") as Id<"events">);
   const board = useMemo(
     () => (briefing ? buildBoard(briefing) : null),
     [briefing],
@@ -238,12 +224,7 @@ export function BattleBoardPage() {
     );
   if (board == null) return null; // unreachable: board is built from briefing
 
-  const { event, venue } = board;
-  const startsAt = typeof event.startsAt === "number" ? event.startsAt : null;
-  const guests =
-    event.expectedHeadcount != null
-      ? `${formatCount(Number(event.expectedHeadcount))} final`
-      : null;
+  const { event } = board;
 
   return (
     <div className="eday">
@@ -266,309 +247,18 @@ export function BattleBoardPage() {
           </button>
         </div>
 
-        <article className="bbd-doc">
-          <header>
-            <p className="bbd-brand">Battle board</p>
-            <h1 className="bbd-title">{String(event.title ?? "Event")}</h1>
-            <dl className="bbd-meta">
-              <div>
-                <dt>Date</dt>
-                <dd>
-                  {startsAt != null
-                    ? `${formatDate(startsAt)} · ${formatTime(startsAt)}`
-                    : "Unscheduled"}
-                </dd>
-              </div>
-              <div>
-                <dt>Guests</dt>
-                <dd>{guests ?? "—"}</dd>
-              </div>
-              <div>
-                <dt>Style</dt>
-                <dd>{event.serviceStyleName ?? event.eventType ?? "—"}</dd>
-              </div>
-              <div>
-                <dt>Venue</dt>
-                <dd>{venue?.name ?? event.venueName ?? "—"}</dd>
-              </div>
-            </dl>
-          </header>
-
-          {board.daySheet.length > 0 ? (
-            <section className="bbd-section">
-              <h2 className="bbd-kicker">Responsibilities</h2>
-              <div className="bbd-sheet">
-                {board.daySheet.map(([label, value]) => (
-                  <div className="bbd-sheet-row" key={label}>
-                    <span className="bbd-sheet-label">{label}</span>
-                    <span className="bbd-sheet-value">{value}</span>
-                  </div>
-                ))}
-              </div>
-            </section>
-          ) : null}
-
-          {board.buffetCold.length > 0 || board.buffetHot.length > 0 ? (
-            <section className="bbd-section">
-              <h2 className="bbd-kicker">Buffet layout</h2>
-              <p className="bbd-note">
-                {[
-                  board.buffetCold.length > 0
-                    ? `COLD: ${board.buffetCold}`
-                    : null,
-                  board.buffetHot.length > 0 ? `HOT: ${board.buffetHot}` : null,
-                ]
-                  .filter(Boolean)
-                  .join("  ·  ")}
-              </p>
-            </section>
-          ) : null}
-
-          {board.layout.length > 0 ||
-          board.venueTraits.length > 0 ||
-          board.venueNotes.length > 0 ? (
-            <section className="bbd-section">
-              <h2 className="bbd-kicker">Layout &amp; locations</h2>
-              {board.layout.map((row) => (
-                <div key={row._id}>
-                  <p className="bbd-note-label">
-                    {String(row.type ?? "Section")}
-                  </p>
-                  {String(row.instructions ?? "").trim().length > 0 ? (
-                    <p className="bbd-note">{String(row.instructions)}</p>
-                  ) : null}
-                </div>
-              ))}
-              {board.venueTraits.length > 0 ? (
-                <p className="bbd-note">
-                  On site: {board.venueTraits.join(" · ")}
-                </p>
-              ) : null}
-              {board.venueNotes.map(([label, text]) => (
-                <div key={label}>
-                  <p className="bbd-note-label">{label}</p>
-                  <p className="bbd-note">{String(text)}</p>
-                </div>
-              ))}
-            </section>
-          ) : null}
-
-          {board.courses.size > 0 ? (
-            <section className="bbd-section">
-              <h2 className="bbd-kicker">Menu</h2>
-              {board.menuAllergens.length > 0 ? (
-                <p className="bbd-banner">
-                  Menu contains{" "}
-                  {board.menuAllergens
-                    .map((allergen) => allergen.label)
-                    .join(" · ")}
-                </p>
-              ) : null}
-              {[...board.courses.entries()].map(([course, list]) => (
-                <div key={course}>
-                  <p className="bbd-note-label">{course}</p>
-                  {list.map((row) => {
-                    const dish = briefing.dishes.find(
-                      (item) => item._id === row.dishId,
-                    );
-                    const report = dish
-                      ? (board.reports.get(String(dish._id)) ?? null)
-                      : null;
-                    const claim = dishAllergenClaim(report);
-                    const instructions = displayEventMenuNotes(
-                      row.specialInstructions,
-                    );
-                    return (
-                      <div className="bbd-row" key={row._id}>
-                        <span className="bbd-main">
-                          <span className="bbd-task">
-                            {dish?.name ?? "Dish"}
-                            {row.quantityServings != null
-                              ? ` · ${row.quantityServings} srv`
-                              : ""}
-                          </span>
-                          {claim === "contains" && report ? (
-                            <span className="bbd-sub">
-                              Contains{" "}
-                              {report.codes.map(allergenLabel).join(", ")}
-                            </span>
-                          ) : null}
-                          {instructions ? (
-                            <span className="bbd-sub">{instructions}</span>
-                          ) : null}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              ))}
-            </section>
-          ) : null}
-
-          {board.timeline.length > 0 ? (
-            <section className="bbd-section">
-              <h2 className="bbd-kicker">Run of show</h2>
-              {board.timeline.map((row) => {
-                const done = row.completedAt != null;
-                const notes = [row.notes, row.siteNotes]
-                  .map((part) => String(part ?? "").trim())
-                  .filter(Boolean)
-                  .join(" · ");
-                const who = board.whoLabel(row);
-                const category = categoryLabel(row.category);
-                return (
-                  <div
-                    className={`bbd-row${done ? " bbd-row-done" : ""}`}
-                    key={row._id}
-                  >
-                    <span className="bbd-time">
-                      {row.startsAt != null
-                        ? formatTime(row.startsAt)
-                        : "Time not set"}
-                    </span>
-                    <span className="bbd-main">
-                      <span className="bbd-task">
-                        {String(row.name ?? "Task")}
-                        {category ? (
-                          <span className="bbd-chip">{category}</span>
-                        ) : null}
-                      </span>
-                      {notes ? <span className="bbd-sub">{notes}</span> : null}
-                      {who.trim().length > 0 ? (
-                        <span className="bbd-who">{who}</span>
-                      ) : null}
-                    </span>
-                    {done ? (
-                      <span className="bbd-done-flag">
-                        ✓ {formatTime(row.completedAt)}
-                      </span>
-                    ) : null}
-                  </div>
-                );
-              })}
-            </section>
-          ) : null}
-
-          {board.staff.length > 0 || board.staffNeeds.length > 0 ? (
-            <section className="bbd-section">
-              <h2 className="bbd-kicker">Staff roster</h2>
-              <div className="bbd-grid">
-                <span className="bbd-grid-head">Name</span>
-                <span className="bbd-grid-head">Role</span>
-                <span className="bbd-grid-head">Shift</span>
-                <span className="bbd-grid-head">Status</span>
-                {board.staff.map((row) => (
-                  <span className="bbd-grid-row bbd-grid" key={row._id}>
-                    <span>
-                      {personLabel(board.people.get(row.personId ?? ""))}
-                    </span>
-                    <span>{String(row.role ?? "")}</span>
-                    <span>{windowLine(row.startsAt, row.endsAt)}</span>
-                    <span>{formatStatusLabel(String(row.status ?? ""))}</span>
-                  </span>
-                ))}
-                {board.staffNeeds.map((row) => (
-                  <span className="bbd-grid-row bbd-grid" key={row._id}>
-                    <span>— unfilled —</span>
-                    <span>{String(row.role ?? "")}</span>
-                    <span>{windowLine(row.startsAt, row.endsAt)}</span>
-                    <span>{formatStatusLabel(String(row.status ?? ""))}</span>
-                  </span>
-                ))}
-              </div>
-            </section>
-          ) : null}
-
-          {board.equipment.length > 0 || board.packLists.length > 0 ? (
-            <section className="bbd-section">
-              <h2 className="bbd-kicker">Equipment &amp; pack</h2>
-              {board.equipment.map((row) => (
-                <div className="bbd-row" key={row._id}>
-                  <span className="bbd-main">
-                    <span className="bbd-task">
-                      {board.equipmentName(row.equipmentId)}
-                      {row.quantity != null ? ` · Qty ${row.quantity}` : ""}
-                    </span>
-                    <span className="bbd-sub">
-                      {[
-                        windowLine(row.startsAt, row.endsAt),
-                        formatStatusLabel(String(row.status ?? "")),
-                      ]
-                        .filter(Boolean)
-                        .join(" · ")}
-                    </span>
-                  </span>
-                </div>
-              ))}
-              {board.packLists.map((list) => {
-                const items = briefing.packListItems.filter(
-                  (item) =>
-                    item.packListId === list._id && item.deletedAt == null,
-                );
-                return (
-                  <div key={list._id}>
-                    <p className="bbd-note-label">
-                      {String(list.name ?? "Pack list")} ·{" "}
-                      {formatStatusLabel(String(list.status ?? ""))}
-                    </p>
-                    {items.map((item) => (
-                      <p className="bbd-note" key={item._id}>
-                        {String(item.description ?? "Item")}
-                        {item.requiredQuantity != null
-                          ? ` — ${item.requiredQuantity} ${item.unit ?? ""}`
-                          : ""}
-                        {String(item.status) === "missing" ? " (missing)" : ""}
-                        {String(item.status) === "packed" ? " (packed)" : ""}
-                      </p>
-                    ))}
-                  </div>
-                );
-              })}
-            </section>
-          ) : null}
-
-          {board.deliveries.length > 0 ? (
-            <section className="bbd-section">
-              <h2 className="bbd-kicker">Deliveries &amp; vehicles</h2>
-              {board.deliveries.map((row) => {
-                const vehicle = briefing.vehicles.find(
-                  (item) => item._id === row.vehicleId,
-                );
-                const driver = personLabel(
-                  board.people.get(row.driverId ?? ""),
-                );
-                return (
-                  <div className="bbd-row" key={row._id}>
-                    <span className="bbd-main">
-                      <span className="bbd-task">
-                        {String(row.destination ?? "Delivery")}
-                      </span>
-                      <span className="bbd-sub">
-                        {[
-                          windowLine(row.windowStartsAt, row.windowEndsAt),
-                          driver,
-                          vehicle
-                            ? [vehicle.make, vehicle.model]
-                                .filter(Boolean)
-                                .join(" ") || "Vehicle"
-                            : null,
-                          formatStatusLabel(String(row.status ?? "")),
-                        ]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </span>
-                    </span>
-                  </div>
-                );
-              })}
-            </section>
-          ) : null}
-
-          <footer className="bbd-foot">
-            Built from the event plan · Capsule battle board · printed{" "}
-            {formatDate(printedAt)} {formatTime(printedAt)}
-          </footer>
-        </article>
+        <div className="bbd-doc bbs-host">
+          <BattleBoardSheet
+            briefing={briefing}
+            board={board}
+            companyName={branding.displayName || "Mangia Catering Co."}
+            finalLock={finalLock?.answers}
+            timing={
+              (plan as { event?: Record<string, unknown> } | null | undefined)
+                ?.event ?? null
+            }
+          />
+        </div>
 
         <EventDayNav eventId={String(event._id)} active="board" />
       </div>

@@ -1,7 +1,6 @@
 export const FINANCE_SECTIONS = [
   { key: "invoices", label: "Invoices", path: "/finance/invoices" },
   { key: "payments", label: "Payments", path: "/finance/payments" },
-  { key: "closeout", label: "Closeout", path: "/finance/closeout" },
   { key: "payroll", label: "Payroll", path: "/finance/payroll" },
 ] as const;
 
@@ -50,8 +49,8 @@ export const FINANCE_ROUTES = {
     mode ? `/finance/attribution/${id}/${mode}` : `/finance/attribution/${id}`,
   salesDashboard: "/reports/sales",
   timsKpis: "/reports/tims-kpis",
-  scorecard: "/reports/l10#scorecard",
-  l10: "/reports/l10",
+  scorecard: "/eos/l10#scorecard",
+  l10: "/eos/l10",
   avgEventValue: "/reports/sales#avg-event-value",
   compMaster: "/finance/attribution#comp-master",
   mangia: "/reports/mangia",

@@ -6,7 +6,6 @@ export const CLIENTS_PIPELINE_SECTION = {
 
 export const CLIENTS_SECTIONS = [
   { key: "accounts", label: "Accounts", path: "/clients" },
-  { key: "contracts", label: "Contracts", path: "/clients/contracts" },
   { key: "inbox", label: "Inbox", path: "/clients/inbox" },
 ] as const;
 

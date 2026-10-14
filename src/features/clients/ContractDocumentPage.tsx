@@ -52,8 +52,8 @@ function Section({ label, children }: { label: string; children: ReactNode }) {
 function Row({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="flex gap-2 py-0.5">
-      <span className="w-44 shrink-0 text-ink-2">{label}</span>
-      <span>{value}</span>
+      <span className="w-32 shrink-0 text-ink-2 sm:w-44">{label}</span>
+      <span className="min-w-0">{value}</span>
     </div>
   );
 }
@@ -162,8 +162,11 @@ export function ContractDocumentPage() {
           </p>
         </div>
         <div className="supply-row-actions">
-          <Link className="btn btn-ghost" to={CLIENTS_ROUTES.contracts}>
-            Back to contracts
+          <Link
+            className="btn btn-ghost"
+            to={`/events/${String(contract.eventId)}?tab=margin#contract`}
+          >
+            Back to the event
           </Link>
           <button
             className="btn btn-primary"
@@ -176,7 +179,7 @@ export function ContractDocumentPage() {
       </header>
 
       <article
-        className="contract-document print-sheet mx-auto mt-6 max-w-200 bg-white p-8 text-ink print:mt-0 print:max-w-none"
+        className="contract-document print-sheet mx-auto mt-6 max-w-200 bg-white p-5 text-ink [overflow-wrap:anywhere] sm:p-8 print:mt-0 print:max-w-none"
         style={
           {
             "--document-primary": branding.primaryColor,
@@ -184,7 +187,7 @@ export function ContractDocumentPage() {
           } as CSSProperties
         }
       >
-        <header className="mb-8 flex items-start justify-between gap-6 border-b-2 border-[var(--document-primary)] pb-5">
+        <header className="mb-8 flex flex-wrap items-start justify-between gap-6 border-b-2 border-[var(--document-primary)] pb-5">
           <div>
             {branding.logoUrl ? (
               <img

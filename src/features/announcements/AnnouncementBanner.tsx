@@ -122,12 +122,12 @@ export function AnnouncementBanner() {
         </p>
       ) : null}
       <ul className="mx-auto max-w-[1440px] divide-y divide-line max-xl:px-8 max-md:px-5">
-        {(expanded ? visible : visible.slice(0, 1)).map((a) => {
+        {(expanded ? visible : visible.slice(0, 1)).map((a, index) => {
           const style = categoryStyle(String(a.category));
           return (
             <li
               key={a._id}
-              className={`flex items-start gap-3 px-4 py-2.5 border-l-4 ${style.bar}`}
+              className={`flex flex-wrap items-start gap-x-3 gap-y-1 px-4 py-2 border-l-4 ${style.bar}`}
               data-testid="announcement-banner"
               data-category={a.category}
             >
@@ -136,17 +136,27 @@ export function AnnouncementBanner() {
               >
                 {style.label}
               </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold leading-snug text-ink">
-                  {a.title}
-                </p>
-                <p className="mt-0.5 text-sm leading-relaxed text-ink-2">
-                  {a.body}
-                </p>
-                <p className="mt-0.5 text-2xs text-ink-3">
-                  Until {dateFormat.format(a.expiresAt as number)}
-                </p>
-              </div>
+              {/* One line on wide screens: the notice sits above every page. */}
+              <p className="min-w-0 flex-1 text-sm leading-snug text-ink-2">
+                <span className="font-semibold text-ink">{a.title}</span>
+                {" — "}
+                {a.body}{" "}
+                <span className="whitespace-nowrap text-2xs text-ink-3">
+                  · Until {dateFormat.format(a.expiresAt as number)}
+                </span>
+              </p>
+              {index === 0 && visible.length > 1 ? (
+                <button
+                  type="button"
+                  className="shrink-0 cursor-pointer text-sm font-medium whitespace-nowrap text-brand hover:underline max-md:order-last max-md:w-full max-md:text-left"
+                  aria-expanded={expanded}
+                  onClick={() => setExpanded((open) => !open)}
+                >
+                  {expanded
+                    ? "Show fewer"
+                    : `${visible.length - 1} more ${visible.length - 1 === 1 ? "notice" : "notices"}`}
+                </button>
+              ) : null}
               <button
                 type="button"
                 onClick={() => dismiss(String(a._id))}
@@ -158,20 +168,6 @@ export function AnnouncementBanner() {
             </li>
           );
         })}
-        {visible.length > 1 ? (
-          <li className="px-4 py-1.5">
-            <button
-              type="button"
-              className="cursor-pointer text-sm font-medium text-brand hover:underline"
-              aria-expanded={expanded}
-              onClick={() => setExpanded((open) => !open)}
-            >
-              {expanded
-                ? "Show fewer notices"
-                : `Show ${visible.length - 1} more ${visible.length - 1 === 1 ? "notice" : "notices"}`}
-            </button>
-          </li>
-        ) : null}
       </ul>
     </div>
   );

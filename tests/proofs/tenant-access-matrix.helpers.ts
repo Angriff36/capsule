@@ -295,6 +295,8 @@ const LINK_TABLE: Record<string, string> = {
   formEscalatedById: "people",
   photoStorageId: "@file",
   parentId: "events",
+  // EOS Accountability Chart: the seat a seat reports to.
+  parentSeatId: "accountabilitySeats",
   partEquipmentId: "equipments",
   partnerClientId: "clients",
   partnerPersonId: "people",

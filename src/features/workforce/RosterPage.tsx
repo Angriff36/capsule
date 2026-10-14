@@ -758,14 +758,14 @@ export function RosterPage() {
           />
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table phone-cards">
+            <table className="supply-table table-even phone-cards">
               <thead>
                 <tr>
                   <th>Event</th>
                   <th>Person</th>
                   <th>Role</th>
-                  <th>State</th>
-                  <th aria-label="Actions" />
+                  <th className="col-state">State</th>
+                  <th className="col-action" aria-label="Actions" />
                 </tr>
               </thead>
               <tbody>
@@ -1129,14 +1129,14 @@ export function RosterPage() {
           />
         ) : (
           <div className="supply-table-wrap">
-            <table className="supply-table phone-cards">
+            <table className="supply-table table-even phone-cards">
               <thead>
                 <tr>
                   <th>Person</th>
                   <th>Event</th>
                   <th>Window</th>
-                  <th>State</th>
-                  <th aria-label="Actions" />
+                  <th className="col-state">State</th>
+                  <th className="col-action" aria-label="Actions" />
                 </tr>
               </thead>
               <tbody>

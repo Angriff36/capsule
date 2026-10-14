@@ -49,6 +49,7 @@ import { EventStaffTravelSelect } from "./EventStaffTravelSelect";
 import { useEventRouteLegs } from "../../lib/useEventRouteLegs";
 import { useAutoFillEventStaffNeeds } from "../../lib/workforceScheduling";
 import { askStaffNeedDemand } from "./staffNeedDemandPrompt";
+import { ShiftBoard } from "./shiftBoard/ShiftBoard";
 import { autoFillSummary } from "./eventStaffNeedDemand";
 import type { Id } from "../../lib/api";
 import { collectStaffRoles } from "./EventStaffingRoleSelect";
@@ -97,6 +98,7 @@ export function EventStaffingTab({ eventId }: Props) {
   const leaveWaitlist = useStaffNeedWaitlistEntryLeave();
   const autoFill = useAutoFillEventStaffNeeds();
   const [autoFillNote, setAutoFillNote] = useState<string | null>(null);
+  const [view, setView] = useState<"board" | "list">("board");
   const routeLegs = useEventRouteLegs(eventId as Id<"events">);
   const trucks = (routeLegs?.legs ?? []).filter((leg) => leg.kind === "rig");
   const [busy, setBusy] = useState<string | null>(null);
@@ -386,6 +388,34 @@ export function EventStaffingTab({ eventId }: Props) {
     );
   };
 
+  const askCancelNeed = (need: EventStaffNeedRow) => {
+    void (async () => {
+      const reason = await prompt.askReason({
+        title:
+          need.status === "filled"
+            ? "Remove covered request"
+            : "Cancel open shift",
+        description:
+          need.status === "filled"
+            ? "Remove this staffing requirement and its future coverage. Other assigned roles and hours already entered stay intact."
+            : "Say why this open shift is coming down.",
+        label: "Cancellation reason",
+        placeholder: "e.g. Covered by a reassignment",
+        confirmLabel:
+          need.status === "filled" ? "Remove coverage" : "Cancel shift",
+        tone: "danger",
+      });
+      if (!reason) return;
+      void run(`cancel:${need._id}`, () =>
+        cancelNeed({
+          docId: need._id,
+          version: need.version,
+          reason,
+        }),
+      );
+    })();
+  };
+
   if (
     assignments === undefined ||
     needs === undefined ||
@@ -461,7 +491,89 @@ export function EventStaffingTab({ eventId }: Props) {
       ) : null}
       {host}
 
-      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_18.5rem]">
+      <div className="sb-view-switch" role="tablist" aria-label="Staffing view">
+        {(
+          [
+            ["board", "Shift board"],
+            ["list", "Crew list"],
+          ] as const
+        ).map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            role="tab"
+            aria-selected={view === key}
+            onClick={() => setView(key)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {view === "board" ? (
+        <ShiftBoard
+          roster={rosterWithShifts}
+          needs={eventNeeds as EventStaffNeedRow[]}
+          people={people ?? []}
+          activities={(activities ?? []).filter(
+            (row) => row.eventId === eventId,
+          )}
+          crewWindow={crewWindow}
+          conflictsFor={conflictsFor}
+          canManage={canManage}
+          busy={busy != null}
+          onAssign={(personId, role, span) => {
+            void (async () => {
+              const clash = conflictsFor(
+                personId,
+                span
+                  ? [{ startsAt: span.start, endsAt: span.end }]
+                  : [crewWindow],
+              );
+              if (
+                (clash.overlappingShifts.length > 0 ||
+                  clash.approvedOff.length > 0) &&
+                !(await prompt.askConfirm({
+                  title: "Already busy",
+                  description: `${people?.find((row) => row._id === personId) ? personLabel(people.find((row) => row._id === personId)!) : "This person"} ${clash.overlappingShifts.length ? "works another shift" : "has approved time off"} then. Put them on this event anyway?`,
+                  confirmLabel: "Assign anyway",
+                  cancelLabel: "Pick someone else",
+                  tone: "danger",
+                }))
+              )
+                return;
+              void run(`assign:${personId}`, () =>
+                createAssignment({
+                  eventId,
+                  personId,
+                  role,
+                  startsAt: span?.start,
+                  endsAt: span?.end,
+                }),
+              );
+            })();
+          }}
+          onFill={(need, personId) =>
+            void run(`fill:${need._id}`, () =>
+              fillNeed({ docId: need._id, version: need.version, personId }),
+            )
+          }
+          onUnassign={(entry) => {
+            const target = entry.unassign;
+            if (!target) return;
+            void run(`unassign:${target.docId}`, () =>
+              unassign({ docId: target.docId, version: target.version }),
+            );
+          }}
+          onCancelNeed={askCancelNeed}
+          timingControl={timingControl}
+        />
+      ) : null}
+
+      <div
+        className="grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_18.5rem]"
+        hidden={view !== "list"}
+      >
         <div className="flex min-w-0 flex-col gap-4">
           {canManage ? (
             <EventStaffingAddForm
@@ -557,35 +669,7 @@ export function EventStaffingTab({ eventId }: Props) {
                 releaseClaim({ docId: need._id, version: need.version }),
               )
             }
-            onCancel={(need) => {
-              void (async () => {
-                const reason = await prompt.askReason({
-                  title:
-                    need.status === "filled"
-                      ? "Remove covered request"
-                      : "Cancel open shift",
-                  description:
-                    need.status === "filled"
-                      ? "Remove this staffing requirement and its future coverage. Other assigned roles and hours already entered stay intact."
-                      : "Say why this open shift is coming down.",
-                  label: "Cancellation reason",
-                  placeholder: "e.g. Covered by a reassignment",
-                  confirmLabel:
-                    need.status === "filled"
-                      ? "Remove coverage"
-                      : "Cancel shift",
-                  tone: "danger",
-                });
-                if (!reason) return;
-                void run(`cancel:${need._id}`, () =>
-                  cancelNeed({
-                    docId: need._id,
-                    version: need.version,
-                    reason,
-                  }),
-                );
-              })();
-            }}
+            onCancel={askCancelNeed}
             onChangeCoverage={(need) => {
               void (async () => {
                 const draft = coverageDrafts[need._id];

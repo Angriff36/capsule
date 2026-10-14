@@ -433,7 +433,7 @@ export function QuoteSubmissionsReviewPage() {
               {(sub.menuPreferences ||
                 sub.dietaryRestrictions ||
                 sub.notes) && (
-                <dl className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                <dl className="mt-2 grid grid-cols-1 gap-2 text-xs [overflow-wrap:anywhere] sm:grid-cols-3">
                   {sub.menuPreferences && (
                     <div>
                       <dt className="text-2xs uppercase text-ink-3">

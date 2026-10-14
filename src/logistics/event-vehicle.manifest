@@ -227,6 +227,23 @@ entity EventVehicleAssignment mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Put a different driver on this run, or (omitted) leave it without one.
+  // The rig keeps its riders and its load.
+  command changeDriver(optional driverId: uuid) {
+    guard self.assignedAt != null
+    guard self.releasedAt == null
+    guard self.deletedAt == null
+    mutate driverId = driverId
+    emit EventVehicleAssigned {
+      eventVehicleAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      vehicleId: self.vehicleId
+      trailerId: self.trailerId
+      driverId: driverId
+    }
+  }
+
   // Take the rig off the event. The row stays as history.
   command release() {
     guard self.assignedAt != null
@@ -291,6 +308,75 @@ event EventVehicleReleased: "event_vehicle.released" {
   eventId: string
   vehicleId: string?
   trailerId: string?
+}
+
+// When the event tracker warns that a truck, a person or a piece of equipment
+// is already booked on another event (owner, 2026-10-14: "customizable rules
+// and overrides that initially warn you ... so that you can book on the same
+// day but different times"). One row per kind of thing; no row means warn on
+// the same day. A warning never blocks: the office can book anyway.
+enum BookingResource {
+  vehicle
+  person
+  equipment
+}
+
+enum BookingWarnMode {
+  same_day
+  overlap
+  off
+}
+
+entity BookingRule mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required resource: BookingResource = "vehicle"
+  property required mode: BookingWarnMode = "same_day"
+  // With "overlap": the gap two bookings need between them (load, travel).
+  property required gapMinutes: int = 0
+  property setAt: datetime?
+
+  constraint bookingRuleGap: self.gapMinutes >= 0 "The gap between bookings can't be negative."
+
+  default policy bookingRuleRead read: roleAllows(user.role, "staffAccess") "Everyone may see the booking rules"
+  default policy bookingRuleWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event, sales, logistics and managers may update the booking rules"
+  default policy bookingRuleExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") or roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Event, sales, logistics and managers may change the booking rules"
+
+  command start(resource: BookingResource, mode: BookingWarnMode, gapMinutes: int) {
+    guard self.setAt == null
+    guard self.deletedAt == null
+    constraint startBookingRuleGap: gapMinutes >= 0 "The gap between bookings can't be negative."
+    mutate resource = resource
+    mutate mode = mode
+    mutate gapMinutes = gapMinutes
+    mutate setAt = now()
+    emit BookingRuleSet {
+      bookingRuleId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command change(mode: BookingWarnMode, gapMinutes: int) {
+    guard self.setAt != null
+    guard self.deletedAt == null
+    constraint changeBookingRuleGap: gapMinutes >= 0 "The gap between bookings can't be negative."
+    mutate mode = mode
+    mutate gapMinutes = gapMinutes
+    mutate setAt = now()
+    emit BookingRuleSet {
+      bookingRuleId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store BookingRule in durable
+}
+
+event BookingRuleSet: "booking_rule.set" {
+  bookingRuleId: string
+  tenantId: string
 }
 
 // A cancelled event gives its rigs back.

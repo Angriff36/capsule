@@ -1,0 +1,707 @@
+// The rest of EOS (Gino Wickman, "Traction"), next to the L10 records in
+// leadership.manifest (owner, 2026-10-13: "lets get the rest of the books
+// ideas in there ... so that he can incorporate that methodology into mangia
+// via capsule seamlessly").
+//
+// CompanyVision: the one Vision/Traction Organizer of the company - core
+// focus, 10-year target, marketing strategy, 3-year picture, 1-year plan and
+// this quarter's numbers. One live row per company, revised in place. List
+// parts of the V/TO (core values, the three uniques, what the 3-year picture
+// looks like, the 1-year goals) are VisionItem rows.
+//
+// AccountabilitySeat: one seat on the Accountability Chart - the function, its
+// roles (one per line), who sits in it and the seat it reports to.
+//
+// PeopleAnalyzerScore: one mark for one person on one core value (subject =
+// the VisionItem id) or on Gets it / Wants it / Capacity to do it (subject =
+// "gets" / "wants" / "capacity"). One live row per person and subject.
+//
+// CoreProcess: one of the company's core processes and how far it is along
+// documented -> simplified -> followed by all.
+//
+// DelegateElevateItem: one activity a person does, placed in one of the four
+// Delegate and Elevate quadrants.
+//
+// OrganizationalCheckup: one taking of the 20-statement checkup; answers are
+// twenty digits 1 to 5 in statement order and score is the percent.
+
+use "../foundation/base.manifest"
+use "../identity/person.manifest"
+
+enum VisionItemSection {
+  core_value
+  differentiator
+  three_year
+  one_year_goal
+}
+
+enum PeopleScore {
+  plus
+  plus_minus
+  minus
+}
+
+enum CoreProcessStage {
+  named
+  documented
+  simplified
+  followed_by_all
+}
+
+enum DelegateQuadrant {
+  love_great
+  like_good
+  dislike_good
+  dislike_not_good
+}
+
+entity CompanyVision mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property coreFocusPurpose: string?
+  property coreFocusNiche: string?
+  property tenYearTarget: string?
+  property tenYearDate: datetime?
+  property targetMarket: string?
+  property provenProcess: string?
+  property guarantee: string?
+  property threeYearDate: datetime?
+  property threeYearRevenue: decimal(14, 2)?
+  property threeYearProfit: decimal(14, 2)?
+  property threeYearMeasurables: string?
+  property oneYearDate: datetime?
+  property oneYearRevenue: decimal(14, 2)?
+  property oneYearProfit: decimal(14, 2)?
+  property oneYearMeasurables: string?
+  property quarterDate: datetime?
+  property quarterRevenue: decimal(14, 2)?
+  property quarterProfit: decimal(14, 2)?
+  property quarterMeasurables: string?
+  property peopleBarMaxMixed: int?
+  property writtenAt: datetime?
+  property writtenByPersonId: uuid?
+  property revisedAt: datetime?
+
+  ref writtenBy: Person fields [tenantId, writtenByPersonId] references [tenantId, id]
+
+  default policy companyVisionRead read: roleAllows(user.role, "staffAccess") "Everyone may see the company vision"
+  default policy companyVisionWrite write: roleAllows(user.role, "manageAccess") "Managers may update the company vision"
+  default policy companyVisionExecute execute: roleAllows(user.role, "manageAccess") "Managers may change the company vision"
+
+  command write(
+    optional coreFocusPurpose: string,
+    optional coreFocusNiche: string,
+    optional tenYearTarget: string,
+    optional tenYearDate: datetime,
+    optional targetMarket: string,
+    optional provenProcess: string,
+    optional guarantee: string,
+    optional threeYearDate: datetime,
+    optional threeYearRevenue: decimal(14, 2),
+    optional threeYearProfit: decimal(14, 2),
+    optional threeYearMeasurables: string,
+    optional oneYearDate: datetime,
+    optional oneYearRevenue: decimal(14, 2),
+    optional oneYearProfit: decimal(14, 2),
+    optional oneYearMeasurables: string,
+    optional quarterDate: datetime,
+    optional quarterRevenue: decimal(14, 2),
+    optional quarterProfit: decimal(14, 2),
+    optional quarterMeasurables: string,
+    optional peopleBarMaxMixed: int
+  ) {
+    guard self.writtenAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate coreFocusPurpose = coreFocusPurpose
+    mutate coreFocusNiche = coreFocusNiche
+    mutate tenYearTarget = tenYearTarget
+    mutate tenYearDate = tenYearDate
+    mutate targetMarket = targetMarket
+    mutate provenProcess = provenProcess
+    mutate guarantee = guarantee
+    mutate threeYearDate = threeYearDate
+    mutate threeYearRevenue = threeYearRevenue
+    mutate threeYearProfit = threeYearProfit
+    mutate threeYearMeasurables = threeYearMeasurables
+    mutate oneYearDate = oneYearDate
+    mutate oneYearRevenue = oneYearRevenue
+    mutate oneYearProfit = oneYearProfit
+    mutate oneYearMeasurables = oneYearMeasurables
+    mutate quarterDate = quarterDate
+    mutate quarterRevenue = quarterRevenue
+    mutate quarterProfit = quarterProfit
+    mutate quarterMeasurables = quarterMeasurables
+    mutate peopleBarMaxMixed = peopleBarMaxMixed
+    mutate writtenAt = now()
+    mutate writtenByPersonId = user.personId
+    mutate revisedAt = now()
+    emit CompanyVisionWritten {
+      companyVisionId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command revise(
+    optional coreFocusPurpose: string,
+    optional coreFocusNiche: string,
+    optional tenYearTarget: string,
+    optional tenYearDate: datetime,
+    optional targetMarket: string,
+    optional provenProcess: string,
+    optional guarantee: string,
+    optional threeYearDate: datetime,
+    optional threeYearRevenue: decimal(14, 2),
+    optional threeYearProfit: decimal(14, 2),
+    optional threeYearMeasurables: string,
+    optional oneYearDate: datetime,
+    optional oneYearRevenue: decimal(14, 2),
+    optional oneYearProfit: decimal(14, 2),
+    optional oneYearMeasurables: string,
+    optional quarterDate: datetime,
+    optional quarterRevenue: decimal(14, 2),
+    optional quarterProfit: decimal(14, 2),
+    optional quarterMeasurables: string,
+    optional peopleBarMaxMixed: int
+  ) {
+    guard self.writtenAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate coreFocusPurpose = coreFocusPurpose
+    mutate coreFocusNiche = coreFocusNiche
+    mutate tenYearTarget = tenYearTarget
+    mutate tenYearDate = tenYearDate
+    mutate targetMarket = targetMarket
+    mutate provenProcess = provenProcess
+    mutate guarantee = guarantee
+    mutate threeYearDate = threeYearDate
+    mutate threeYearRevenue = threeYearRevenue
+    mutate threeYearProfit = threeYearProfit
+    mutate threeYearMeasurables = threeYearMeasurables
+    mutate oneYearDate = oneYearDate
+    mutate oneYearRevenue = oneYearRevenue
+    mutate oneYearProfit = oneYearProfit
+    mutate oneYearMeasurables = oneYearMeasurables
+    mutate quarterDate = quarterDate
+    mutate quarterRevenue = quarterRevenue
+    mutate quarterProfit = quarterProfit
+    mutate quarterMeasurables = quarterMeasurables
+    mutate peopleBarMaxMixed = peopleBarMaxMixed
+    mutate revisedAt = now()
+    emit CompanyVisionRevised {
+      companyVisionId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store CompanyVision in durable
+}
+
+entity VisionItem mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required section: VisionItemSection = "core_value"
+  property required text: string = ""
+  property detail: string?
+  property required sortOrder: int = 0
+  property doneAt: datetime?
+  property addedAt: datetime?
+  property addedByPersonId: uuid?
+
+  ref addedBy: Person fields [tenantId, addedByPersonId] references [tenantId, id]
+
+  constraint visionItemText: self.addedAt == null or length(trim(self.text)) > 0 "Write something first."
+
+  default policy visionItemRead read: roleAllows(user.role, "staffAccess") "Everyone may see the core values and the plan"
+  default policy visionItemWrite write: roleAllows(user.role, "manageAccess") "Managers may update the core values and the plan"
+  default policy visionItemExecute execute: roleAllows(user.role, "manageAccess") "Managers may change the core values and the plan"
+
+  command add(section: VisionItemSection, text: string, optional detail: string, sortOrder: int) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint addVisionText: length(trim(text)) > 0 "Write something first."
+    mutate section = section
+    mutate text = text
+    mutate detail = detail
+    mutate sortOrder = sortOrder
+    mutate addedAt = now()
+    mutate addedByPersonId = user.personId
+    emit VisionItemAdded {
+      visionItemId: self.id
+      tenantId: self.tenantId
+      section: section
+    }
+  }
+
+  command revise(text: string, optional detail: string, sortOrder: int) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint reviseVisionText: length(trim(text)) > 0 "Write something first."
+    mutate text = text
+    mutate detail = detail
+    mutate sortOrder = sortOrder
+    emit VisionItemRevised {
+      visionItemId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command markDone() {
+    guard self.doneAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate doneAt = now()
+    emit VisionItemDone {
+      visionItemId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command markNotDone() {
+    guard self.doneAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate doneAt = null
+    emit VisionItemNotDone {
+      visionItemId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command remove() {
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate deletedAt = now()
+    emit VisionItemRemoved {
+      visionItemId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store VisionItem in durable
+}
+
+entity AccountabilitySeat mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required title: string = ""
+  property roles: string?
+  property personId: uuid?
+  property parentSeatId: uuid?
+  property required sortOrder: int = 0
+  property createdByPersonId: uuid?
+  property placedAt: datetime?
+
+  ref person: Person fields [tenantId, personId] references [tenantId, id]
+  ref createdBy: Person fields [tenantId, createdByPersonId] references [tenantId, id]
+
+  constraint seatTitle: self.placedAt == null or length(trim(self.title)) > 0 "Name the seat."
+
+  default policy accountabilitySeatRead read: roleAllows(user.role, "staffAccess") "Everyone may see the Accountability Chart"
+  default policy accountabilitySeatWrite write: roleAllows(user.role, "manageAccess") "Managers may update the Accountability Chart"
+  default policy accountabilitySeatExecute execute: roleAllows(user.role, "manageAccess") "Managers may change the Accountability Chart"
+
+  command place(
+    title: string,
+    optional roles: string,
+    optional personId: uuid,
+    optional parentSeatId: uuid,
+    sortOrder: int
+  ) {
+    guard self.placedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint placeSeatTitle: length(trim(title)) > 0 "Name the seat."
+    mutate title = title
+    mutate roles = roles
+    mutate personId = personId
+    mutate parentSeatId = parentSeatId
+    mutate sortOrder = sortOrder
+    mutate placedAt = now()
+    mutate createdByPersonId = user.personId
+    emit AccountabilitySeatPlaced {
+      accountabilitySeatId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command revise(
+    title: string,
+    optional roles: string,
+    optional personId: uuid,
+    optional parentSeatId: uuid,
+    sortOrder: int
+  ) {
+    guard self.placedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint reviseSeatTitle: length(trim(title)) > 0 "Name the seat."
+    mutate title = title
+    mutate roles = roles
+    mutate personId = personId
+    mutate parentSeatId = parentSeatId
+    mutate sortOrder = sortOrder
+    emit AccountabilitySeatRevised {
+      accountabilitySeatId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command remove() {
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate deletedAt = now()
+    emit AccountabilitySeatRemoved {
+      accountabilitySeatId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store AccountabilitySeat in durable
+}
+
+entity PeopleAnalyzerScore mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required personId: uuid = ""
+  property required subject: string = ""
+  property required score: PeopleScore = "plus"
+  property ratedAt: datetime?
+  property ratedByPersonId: uuid?
+
+  ref person: Person fields [tenantId, personId] references [tenantId, id]
+  ref ratedBy: Person fields [tenantId, ratedByPersonId] references [tenantId, id]
+
+  default policy peopleAnalyzerRead read: roleAllows(user.role, "manageAccess") "Managers may see the People Analyzer"
+  default policy peopleAnalyzerWrite write: roleAllows(user.role, "manageAccess") "Managers may update the People Analyzer"
+  default policy peopleAnalyzerExecute execute: roleAllows(user.role, "manageAccess") "Managers may score people"
+
+  command rate(personId: uuid, subject: string, score: PeopleScore) {
+    guard self.ratedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint rateSubject: length(trim(subject)) > 0 "Pick what this mark is for."
+    mutate personId = personId
+    mutate subject = subject
+    mutate score = score
+    mutate ratedAt = now()
+    mutate ratedByPersonId = user.personId
+    emit PeopleAnalyzerScored {
+      peopleAnalyzerScoreId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command rescore(score: PeopleScore) {
+    guard self.ratedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate score = score
+    mutate ratedAt = now()
+    mutate ratedByPersonId = user.personId
+    emit PeopleAnalyzerRescored {
+      peopleAnalyzerScoreId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command withdraw() {
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate deletedAt = now()
+    emit PeopleAnalyzerCleared {
+      peopleAnalyzerScoreId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store PeopleAnalyzerScore in durable
+}
+
+entity CoreProcess mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required name: string = ""
+  property ownerPersonId: uuid?
+  property steps: string?
+  property required stage: CoreProcessStage = "named"
+  property required sortOrder: int = 0
+  property namedAt: datetime?
+  property stageSetAt: datetime?
+
+  ref owner: Person fields [tenantId, ownerPersonId] references [tenantId, id]
+
+  constraint coreProcessName: self.namedAt == null or length(trim(self.name)) > 0 "Name the process."
+
+  default policy coreProcessRead read: roleAllows(user.role, "staffAccess") "Everyone may see the core processes"
+  default policy coreProcessWrite write: roleAllows(user.role, "manageAccess") "Managers may update the core processes"
+  default policy coreProcessExecute execute: roleAllows(user.role, "manageAccess") "Managers may change the core processes"
+
+  command start(name: string, optional ownerPersonId: uuid, sortOrder: int) {
+    guard self.namedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint nameProcess: length(trim(name)) > 0 "Name the process."
+    mutate name = name
+    mutate ownerPersonId = ownerPersonId
+    mutate sortOrder = sortOrder
+    mutate stage = "named"
+    mutate namedAt = now()
+    mutate stageSetAt = now()
+    emit CoreProcessNamed {
+      coreProcessId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command revise(name: string, optional ownerPersonId: uuid, optional steps: string, sortOrder: int) {
+    guard self.namedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint reviseProcessName: length(trim(name)) > 0 "Name the process."
+    mutate name = name
+    mutate ownerPersonId = ownerPersonId
+    mutate steps = steps
+    mutate sortOrder = sortOrder
+    emit CoreProcessRevised {
+      coreProcessId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command setStage(stage: CoreProcessStage) {
+    guard self.namedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate stage = stage
+    mutate stageSetAt = now()
+    emit CoreProcessStageSet {
+      coreProcessId: self.id
+      tenantId: self.tenantId
+      stage: stage
+    }
+  }
+
+  command remove() {
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate deletedAt = now()
+    emit CoreProcessRemoved {
+      coreProcessId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store CoreProcess in durable
+}
+
+entity DelegateElevateItem mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required personId: uuid = ""
+  property required activity: string = ""
+  property required quadrant: DelegateQuadrant = "love_great"
+  property addedAt: datetime?
+
+  ref person: Person fields [tenantId, personId] references [tenantId, id]
+
+  constraint delegateActivity: self.addedAt == null or length(trim(self.activity)) > 0 "Name the activity."
+
+  default policy delegateElevateRead read: roleAllows(user.role, "manageAccess") "Managers may see Delegate and Elevate"
+  default policy delegateElevateWrite write: roleAllows(user.role, "manageAccess") "Managers may update Delegate and Elevate"
+  default policy delegateElevateExecute execute: roleAllows(user.role, "manageAccess") "Managers may change Delegate and Elevate"
+
+  command add(personId: uuid, activity: string, quadrant: DelegateQuadrant) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint addActivity: length(trim(activity)) > 0 "Name the activity."
+    mutate personId = personId
+    mutate activity = activity
+    mutate quadrant = quadrant
+    mutate addedAt = now()
+    emit DelegateElevateAdded {
+      delegateElevateItemId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command move(quadrant: DelegateQuadrant) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate quadrant = quadrant
+    emit DelegateElevateMoved {
+      delegateElevateItemId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command remove() {
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate deletedAt = now()
+    emit DelegateElevateRemoved {
+      delegateElevateItemId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store DelegateElevateItem in durable
+}
+
+entity OrganizationalCheckup mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required answers: string = ""
+  property required score: int = 0
+  property takenAt: datetime?
+  property takenByPersonId: uuid?
+
+  ref takenBy: Person fields [tenantId, takenByPersonId] references [tenantId, id]
+
+  default policy organizationalCheckupRead read: roleAllows(user.role, "manageAccess") "Managers may see checkup results"
+  default policy organizationalCheckupWrite write: roleAllows(user.role, "manageAccess") "Managers may update checkup results"
+  default policy organizationalCheckupExecute execute: roleAllows(user.role, "manageAccess") "Managers may take the checkup"
+
+  command take(answers: string, score: int) {
+    guard self.takenAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint checkupAnswers: length(answers) == 20 "Answer all 20 statements."
+    constraint checkupScore: score >= 0 and score <= 100 "The score is a percent from 0 to 100."
+    mutate answers = answers
+    mutate score = score
+    mutate takenAt = now()
+    mutate takenByPersonId = user.personId
+    emit OrganizationalCheckupTaken {
+      organizationalCheckupId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store OrganizationalCheckup in durable
+}
+
+event CompanyVisionWritten: "company_vision.written" {
+  companyVisionId: string
+  tenantId: string
+}
+
+event CompanyVisionRevised: "company_vision.revised" {
+  companyVisionId: string
+  tenantId: string
+}
+
+event VisionItemAdded: "vision_item.added" {
+  visionItemId: string
+  tenantId: string
+  section: string
+}
+
+event VisionItemRevised: "vision_item.revised" {
+  visionItemId: string
+  tenantId: string
+}
+
+event VisionItemDone: "vision_item.done" {
+  visionItemId: string
+  tenantId: string
+}
+
+event VisionItemNotDone: "vision_item.not_done" {
+  visionItemId: string
+  tenantId: string
+}
+
+event VisionItemRemoved: "vision_item.removed" {
+  visionItemId: string
+  tenantId: string
+}
+
+event AccountabilitySeatPlaced: "accountability_seat.placed" {
+  accountabilitySeatId: string
+  tenantId: string
+}
+
+event AccountabilitySeatRevised: "accountability_seat.revised" {
+  accountabilitySeatId: string
+  tenantId: string
+}
+
+event AccountabilitySeatRemoved: "accountability_seat.removed" {
+  accountabilitySeatId: string
+  tenantId: string
+}
+
+event PeopleAnalyzerScored: "people_analyzer.scored" {
+  peopleAnalyzerScoreId: string
+  tenantId: string
+}
+
+event PeopleAnalyzerRescored: "people_analyzer.rescored" {
+  peopleAnalyzerScoreId: string
+  tenantId: string
+}
+
+event PeopleAnalyzerCleared: "people_analyzer.cleared" {
+  peopleAnalyzerScoreId: string
+  tenantId: string
+}
+
+event CoreProcessNamed: "core_process.named" {
+  coreProcessId: string
+  tenantId: string
+}
+
+event CoreProcessRevised: "core_process.revised" {
+  coreProcessId: string
+  tenantId: string
+}
+
+event CoreProcessStageSet: "core_process.stage_set" {
+  coreProcessId: string
+  tenantId: string
+  stage: string
+}
+
+event CoreProcessRemoved: "core_process.removed" {
+  coreProcessId: string
+  tenantId: string
+}
+
+event DelegateElevateAdded: "delegate_elevate.added" {
+  delegateElevateItemId: string
+  tenantId: string
+}
+
+event DelegateElevateMoved: "delegate_elevate.moved" {
+  delegateElevateItemId: string
+  tenantId: string
+}
+
+event DelegateElevateRemoved: "delegate_elevate.removed" {
+  delegateElevateItemId: string
+  tenantId: string
+}
+
+event OrganizationalCheckupTaken: "organizational_checkup.taken" {
+  organizationalCheckupId: string
+  tenantId: string
+}

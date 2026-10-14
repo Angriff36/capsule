@@ -136,7 +136,9 @@ export function SkillsMatrixPanel({
               <tr>
                 <th>Person</th>
                 {modules.map((module) => (
-                  <th key={module._id}>{module.name}</th>
+                  <th key={module._id} className="text-center">
+                    {module.name}
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -152,7 +154,11 @@ export function SkillsMatrixPanel({
                     // and the button's name give the level word.
                     const label = found ? String(found.level) : "Rate";
                     return (
-                      <td key={module._id} data-label={module.name}>
+                      <td
+                        key={module._id}
+                        className="text-center"
+                        data-label={module.name}
+                      >
                         <button
                           type="button"
                           className="btn btn-ghost btn-sm"
@@ -177,7 +183,11 @@ export function SkillsMatrixPanel({
                 {modules.map((module) => {
                   const trainers = trainersFor(rows, personIds, module._id);
                   return (
-                    <td key={module._id} data-label={`${module.name} trainers`}>
+                    <td
+                      key={module._id}
+                      className="text-center"
+                      data-label={`${module.name} trainers`}
+                    >
                       {trainers.length === 0
                         ? "No trainer yet"
                         : trainers

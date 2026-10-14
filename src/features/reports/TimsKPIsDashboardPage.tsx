@@ -5,10 +5,6 @@ import {
   eventServiceStyleKey,
   eventServiceStyleLabel,
 } from "../events/eventServiceStyle";
-import {
-  DashboardGrid,
-  type DashboardGridSize,
-} from "@/ui/charts/DashboardGrid";
 import { StatCard } from "@/ui/charts/StatCard";
 import { BarChart } from "@/ui/charts/BarChart";
 import { LineChart } from "@/ui/charts/LineChart";
@@ -32,6 +28,7 @@ import {
   useProposalsByIds,
 } from "@/lib/financeScopedQueries";
 import { KpiRecordList } from "./KpiRecordList";
+import { EosPanel } from "../eos/EosShared";
 import { TimsScorecardSection } from "./TimsScorecardSection";
 
 /**
@@ -64,7 +61,7 @@ export function TimsKPIsDashboardPage() {
   if (requested) return <TimsKPIsDashboardBody />;
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader title={TITLE} lead={LEAD} />
+      <PageHeader eyebrow="EOS · Data" title={TITLE} lead={LEAD} />
       <p className="mt-3 max-w-160 text-ink-2">
         These figures add up every event, closeout and lead on file.
       </p>
@@ -312,205 +309,9 @@ function TimsKPIsDashboardBody() {
       }));
   }, [events]);
 
-  const dashboardItems: Array<{
-    id: string;
-    size: DashboardGridSize;
-    content: React.ReactNode;
-    title?: string;
-  }> = [
-    // KPI Summary Cards
-    {
-      id: "total-revenue",
-      size: "small",
-      content: (
-        <StatCard
-          title="Total Revenue"
-          main={{
-            label: "Revenue",
-            value: revenueMetrics?.totalRevenue || 0,
-            format: "currency" as const,
-          }}
-          rows={[
-            {
-              label: "Completed Events",
-              value: revenueMetrics?.completedEvents || 0,
-              format: "number" as const,
-            },
-            {
-              label: "Avg Event Value",
-              value: revenueMetrics?.avgEventValue || 0,
-              format: "currency" as const,
-            },
-          ]}
-          tone="brand"
-          isLive
-        />
-      ),
-    },
-    {
-      id: "food-cost-pct",
-      size: "small",
-      content: (
-        <StatCard
-          title="Food Cost %"
-          main={{
-            label: "Actual",
-            value: percentText(foodCostMetrics.actualFoodCostPct),
-          }}
-          rows={[
-            {
-              label: "Budgeted",
-              value: percentText(foodCostMetrics.budgetedFoodCostPct),
-            },
-            {
-              label: "Variance",
-              value: foodCostMetrics.costVariance ?? NOT_KNOWN,
-              format: "currency" as const,
-            },
-          ]}
-          tone={
-            foodCostMetrics.costVariance && foodCostMetrics.costVariance > 0
-              ? "warn"
-              : "ok"
-          }
-          isLive
-        />
-      ),
-    },
-    {
-      id: "profit-margin",
-      size: "small",
-      content: (
-        <StatCard
-          title="Profit Rate"
-          main={{
-            label: "Rate",
-            value: percentText(foodCostMetrics.profitRate),
-          }}
-          rows={[
-            {
-              label: "Closeouts",
-              value: foodCostMetrics.closeoutCount,
-              format: "number" as const,
-            },
-            {
-              label: "Avg Profit/Event",
-              value: foodCostMetrics.avgProfit,
-              format: "currency" as const,
-            },
-          ]}
-          tone="accent"
-          isLive
-        />
-      ),
-    },
-    {
-      id: "conversion-rate",
-      size: "small",
-      content: (
-        <StatCard
-          title="Lead Conversion"
-          main={{
-            label: "Rate",
-            value: percentText(pipelineMetrics.conversionRate),
-          }}
-          rows={[
-            {
-              label: "Total Leads",
-              value: pipelineMetrics.totalLeads,
-              format: "number" as const,
-            },
-            {
-              label: "Qualified",
-              value: percentText(pipelineMetrics.qualifiedRate),
-            },
-          ]}
-          tone="info"
-          isLive
-        />
-      ),
-    },
-    // Charts
-    {
-      id: "monthly-revenue-trend",
-      size: "large",
-      content: (
-        <LineChart
-          data={monthlyRevenueData}
-          xAxisKey="month"
-          series={[
-            {
-              dataKey: "revenue",
-              name: "Revenue",
-              color: "var(--color-info)",
-            },
-          ]}
-          height={250}
-          formatYAxis={formatMoney}
-        />
-      ),
-      title: "Monthly Revenue Trend",
-    },
-    {
-      id: "venue-performance",
-      size: "medium",
-      content: (
-        <BarChart
-          data={venuePerformanceData}
-          xAxisKey="venue"
-          series={[
-            { dataKey: "revenue", name: "Revenue", color: "var(--color-ok)" },
-          ]}
-          height={300}
-          orientation="horizontal"
-          formatYAxis={formatMoney}
-        />
-      ),
-      title: "Venue Revenue Performance",
-    },
-    {
-      id: "service-style-mix",
-      size: "medium",
-      content: (
-        <BarChart
-          data={serviceStyleData}
-          xAxisKey="serviceStyle"
-          series={[
-            {
-              dataKey: "revenue",
-              name: "Revenue",
-              color: "var(--color-brand)",
-            },
-          ]}
-          height={300}
-          formatYAxis={formatMoney}
-        />
-      ),
-      title: "Revenue by Service Style",
-    },
-    // Tables
-    {
-      id: "top-events",
-      size: "full",
-      content: (
-        <TableDisplay
-          columns={[
-            { key: "title", header: "Event", type: "string" as const },
-            { key: "revenue", header: "Revenue", type: "currency" as const },
-            { key: "headcount", header: "Guests", type: "number" as const },
-            { key: "date", header: "Date", type: "string" as const },
-          ]}
-          data={topEventsData}
-          height={250}
-        />
-      ),
-      title: "Top Performing Events (Revenue)",
-    },
-  ];
-
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader title={TITLE} lead={LEAD} />
+      <PageHeader eyebrow="EOS · Data" title={TITLE} lead={LEAD} />
 
       {events?.length === 0 ? (
         <div data-testid="dashboard-empty">
@@ -525,46 +326,201 @@ function TimsKPIsDashboardBody() {
         <TimsScorecardSection events={events} now={now} />
       ) : null}
 
-      <DashboardGrid items={dashboardItems} />
-
-      <KpiRecordList
-        events={events ?? []}
-        closeouts={closeouts ?? []}
-        leads={leads ?? []}
-        acceptedProposals={acceptedProposalIds(proposals)}
-      />
-
-      {/* Reconciliation Note */}
-      <div className="mt-6 rounded-sm border border-line bg-inset p-4">
-        <h4 className="text-xs font-semibold text-ink">
-          Where these numbers come from
-        </h4>
-        <p className="mt-1 text-xs text-ink-2">
-          Every number updates live from your own data. Revenue comes from
-          completed events' quoted prices. Food cost percentages come from event
-          closeouts, comparing actual against budgeted. Lead numbers come from
-          your sales pipeline.
-        </p>
+      <div className="mt-5">
+        <EosPanel
+          tone="vision"
+          eyebrow="All time"
+          title="Money and leads"
+          lead="Every completed event, closeout and lead on file."
+        >
+          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <StatCard
+              title="Total Revenue"
+              main={{
+                label: "Revenue",
+                value: revenueMetrics?.totalRevenue || 0,
+                format: "currency" as const,
+              }}
+              rows={[
+                {
+                  label: "Completed Events",
+                  value: revenueMetrics?.completedEvents || 0,
+                  format: "number" as const,
+                },
+                {
+                  label: "Avg Event Value",
+                  value: revenueMetrics?.avgEventValue || 0,
+                  format: "currency" as const,
+                },
+              ]}
+              tone="brand"
+              isLive
+            />
+            <StatCard
+              title="Food Cost %"
+              main={{
+                label: "Actual",
+                value: percentText(foodCostMetrics.actualFoodCostPct),
+              }}
+              rows={[
+                {
+                  label: "Budgeted",
+                  value: percentText(foodCostMetrics.budgetedFoodCostPct),
+                },
+                {
+                  label: "Variance",
+                  value: foodCostMetrics.costVariance ?? NOT_KNOWN,
+                  format: "currency" as const,
+                },
+              ]}
+              tone={
+                foodCostMetrics.costVariance && foodCostMetrics.costVariance > 0
+                  ? "warn"
+                  : "ok"
+              }
+              isLive
+            />
+            <StatCard
+              title="Profit Rate"
+              main={{
+                label: "Rate",
+                value: percentText(foodCostMetrics.profitRate),
+              }}
+              rows={[
+                {
+                  label: "Closeouts",
+                  value: foodCostMetrics.closeoutCount,
+                  format: "number" as const,
+                },
+                {
+                  label: "Avg Profit/Event",
+                  value: foodCostMetrics.avgProfit,
+                  format: "currency" as const,
+                },
+              ]}
+              tone="accent"
+              isLive
+            />
+            <StatCard
+              title="Lead Conversion"
+              main={{
+                label: "Rate",
+                value: percentText(pipelineMetrics.conversionRate),
+              }}
+              rows={[
+                {
+                  label: "Total Leads",
+                  value: pipelineMetrics.totalLeads,
+                  format: "number" as const,
+                },
+                {
+                  label: "Qualified",
+                  value: percentText(pipelineMetrics.qualifiedRate),
+                },
+              ]}
+              tone="info"
+              isLive
+            />
+          </div>
+        </EosPanel>
       </div>
 
-      <MetricDefinitionList
-        metricIds={[
-          "dashboard.win_rate",
-          "dashboard.pipeline_value",
-          "dashboard.weighted_forecast",
-          "dashboard.booked_ahead",
-          "dashboard.lost_revenue",
-          "dashboard.completed_revenue",
-          "dashboard.completed_events",
-          "dashboard.completed_average",
-          "dashboard.food_cost_percent",
-          "dashboard.food_cost_budget",
-          "dashboard.profitable_share",
-          "dashboard.lead_conversion",
-          "dashboard.lead_qualified",
-          "dashboard.leads",
-        ]}
-      />
+      <div className="mt-5">
+        <EosPanel tone="people" eyebrow="Trend" title="Revenue by month">
+          <LineChart
+            data={monthlyRevenueData}
+            xAxisKey="month"
+            series={[
+              {
+                dataKey: "revenue",
+                name: "Revenue",
+                color: "var(--color-info)",
+              },
+            ]}
+            height={250}
+            formatYAxis={formatMoney}
+          />
+        </EosPanel>
+      </div>
+
+      <div className="mt-5 grid gap-5 lg:grid-cols-2">
+        <EosPanel tone="data" eyebrow="Where" title="Revenue by venue">
+          <BarChart
+            data={venuePerformanceData}
+            xAxisKey="venue"
+            series={[
+              { dataKey: "revenue", name: "Revenue", color: "var(--color-ok)" },
+            ]}
+            height={300}
+            orientation="horizontal"
+            formatYAxis={formatMoney}
+          />
+        </EosPanel>
+        <EosPanel tone="vision" eyebrow="How" title="Revenue by service style">
+          <BarChart
+            data={serviceStyleData}
+            xAxisKey="serviceStyle"
+            series={[
+              {
+                dataKey: "revenue",
+                name: "Revenue",
+                color: "var(--color-brand)",
+              },
+            ]}
+            height={300}
+            formatYAxis={formatMoney}
+          />
+        </EosPanel>
+      </div>
+
+      <div className="mt-5">
+        <EosPanel tone="traction" eyebrow="Best" title="Top events by revenue">
+          <TableDisplay
+            columns={[
+              { key: "title", header: "Event", type: "string" as const },
+              { key: "revenue", header: "Revenue", type: "currency" as const },
+              { key: "headcount", header: "Guests", type: "number" as const },
+              { key: "date", header: "Date", type: "string" as const },
+            ]}
+            data={topEventsData}
+            height={250}
+          />
+        </EosPanel>
+      </div>
+
+      <div className="mt-5">
+        <EosPanel
+          tone="process"
+          eyebrow="Check a number"
+          title="Records behind each figure"
+          lead="Open a line to see every record a figure adds up, and how each number is counted."
+        >
+          <KpiRecordList
+            events={events ?? []}
+            closeouts={closeouts ?? []}
+            leads={leads ?? []}
+            acceptedProposals={acceptedProposalIds(proposals)}
+          />
+          <MetricDefinitionList
+            metricIds={[
+              "dashboard.win_rate",
+              "dashboard.pipeline_value",
+              "dashboard.weighted_forecast",
+              "dashboard.booked_ahead",
+              "dashboard.lost_revenue",
+              "dashboard.completed_revenue",
+              "dashboard.completed_events",
+              "dashboard.completed_average",
+              "dashboard.food_cost_percent",
+              "dashboard.food_cost_budget",
+              "dashboard.profitable_share",
+              "dashboard.lead_conversion",
+              "dashboard.lead_qualified",
+              "dashboard.leads",
+            ]}
+          />
+        </EosPanel>
+      </div>
     </div>
   );
 }

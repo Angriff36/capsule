@@ -1,0 +1,942 @@
+/* EOS pages. Each of the six components keeps one tone on every page, so a
+   box's colour tells you which part of EOS you are in (owner, 2026-10-13:
+   "more distinct coloring to clearly define boundaries"). */
+
+.eos-tone-vision {
+  --tone: var(--color-accent);
+}
+.eos-tone-people {
+  --tone: var(--color-info);
+}
+.eos-tone-data {
+  --tone: var(--color-ok);
+}
+.eos-tone-issues {
+  --tone: var(--color-danger);
+}
+.eos-tone-process {
+  --tone: var(--color-chat-plum);
+}
+.eos-tone-traction {
+  --tone: var(--color-chat-teal);
+}
+[class*="eos-tone-"],
+[class*="eos-tile-"] {
+  --tone-soft: color-mix(in srgb, var(--tone) 9%, var(--color-panel));
+  --tone-line: color-mix(in srgb, var(--tone) 35%, var(--color-line));
+}
+
+.eos-stack {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+/* A panel in a component's tone: tone top rule, soft tone header. */
+.eos-panel {
+  border: 1px solid var(--tone-line, var(--color-line));
+  border-top: 4px solid var(--tone, var(--color-accent));
+  border-radius: var(--radius-md);
+  background: var(--color-panel);
+  min-width: 0;
+}
+.eos-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--tone-line, var(--color-line));
+  background: var(--tone-soft, var(--color-inset));
+}
+.eos-panel-head h2,
+.eos-panel-head h3 {
+  margin: 0;
+  color: var(--color-ink);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+.eos-panel-head p {
+  margin: 0.15rem 0 0;
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+}
+.eos-panel-body {
+  padding: 1rem;
+}
+.eos-eyebrow {
+  color: var(--tone, var(--color-ink-3));
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Overview: the six components. */
+.eos-components {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+.eos-component {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 0.6rem;
+  border: 1px solid var(--tone-line);
+  border-top: 4px solid var(--tone);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  background: var(--tone-soft);
+  color: var(--color-ink);
+  text-decoration: none;
+  transition:
+    border-color 140ms ease,
+    transform 140ms ease,
+    box-shadow 140ms ease;
+}
+.eos-component:hover,
+.eos-component:focus-visible {
+  border-color: var(--tone);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--tone) 14%, transparent);
+}
+.eos-component h3 {
+  margin: 0;
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+.eos-component-question {
+  margin: 0;
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+}
+.eos-component-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: var(--text-sm);
+  color: var(--color-ink-2);
+}
+.eos-component-stat strong {
+  color: var(--tone);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+}
+.eos-component-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  border-top: 1px solid var(--tone-line);
+  padding-top: 0.5rem;
+  color: var(--color-ink-3);
+  font-size: var(--text-xs);
+}
+.eos-bar {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: color-mix(
+    in srgb,
+    var(--tone, var(--color-ink-3)) 15%,
+    var(--color-panel)
+  );
+  overflow: hidden;
+}
+.eos-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--tone, var(--color-accent));
+  transition: width 300ms ease;
+}
+
+/* Checkup */
+.eos-checkup-hero {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 1.25rem;
+}
+.eos-ring {
+  position: relative;
+  width: 112px;
+  height: 112px;
+}
+.eos-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.eos-ring circle {
+  transition: stroke-dashoffset 400ms ease;
+}
+.eos-ring-label {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  text-align: center;
+}
+.eos-ring-label strong {
+  font-family: var(--font-mono);
+  font-size: var(--text-3xl);
+  line-height: 1;
+}
+.eos-ring-label span {
+  color: var(--color-ink-3);
+  font-size: var(--text-xs);
+}
+.eos-statement {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  border-left: 4px solid var(--tone);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.75rem;
+  background: var(--tone-soft);
+}
+.eos-statement p {
+  margin: 0;
+  font-size: var(--text-base);
+}
+.eos-scale {
+  display: flex;
+  gap: 0.25rem;
+}
+.eos-scale button {
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--tone-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-panel);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  cursor: pointer;
+}
+.eos-scale button[aria-pressed="true"] {
+  border-color: var(--tone);
+  background: var(--tone);
+  color: var(--color-panel);
+}
+
+/* V/TO */
+.eos-vto {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  align-items: start;
+}
+.eos-vto-block {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr);
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--tone-line);
+}
+.eos-vto-block:last-child {
+  border-bottom: 0;
+}
+.eos-vto-block > h3 {
+  margin: 0;
+  color: var(--tone);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.eos-vto-block > h3 small {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--color-ink-3);
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* Click-to-edit text */
+.eos-field {
+  display: block;
+  width: 100%;
+  min-height: 2rem;
+  border: 1px dashed transparent;
+  border-radius: var(--radius-xs);
+  padding: 0.3rem 0.45rem;
+  background: transparent;
+  color: var(--color-ink);
+  font: inherit;
+  font-size: var(--text-base);
+  text-align: left;
+  white-space: pre-line;
+  cursor: text;
+}
+.eos-field:hover,
+.eos-field:focus-visible {
+  border-color: var(--tone-line, var(--color-line-2));
+  background: var(--tone-soft, var(--color-inset));
+}
+.eos-field-empty {
+  color: var(--color-ink-3);
+  font-style: italic;
+}
+.eos-field-label {
+  display: block;
+  color: var(--color-ink-3);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+.eos-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr));
+  gap: 0.5rem;
+}
+
+/* Lists (core values, uniques, goals) */
+.eos-list {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.eos-list-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.5rem;
+  border-radius: var(--radius-sm);
+  padding: 0.15rem 0.25rem;
+}
+.eos-list-row:hover {
+  background: var(--tone-soft, var(--color-inset));
+}
+.eos-list-index {
+  display: grid;
+  place-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-top: 0.2rem;
+  border-radius: var(--radius-pill);
+  background: var(--tone);
+  color: var(--color-panel);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+.eos-list-row.is-done .eos-field {
+  color: var(--color-ink-3);
+  text-decoration: line-through;
+}
+.eos-row-tools {
+  display: flex;
+  gap: 0.1rem;
+  opacity: 0.35;
+  transition: opacity 120ms ease;
+}
+.eos-list-row:hover .eos-row-tools,
+.eos-row-tools:focus-within {
+  opacity: 1;
+}
+.eos-icon-btn {
+  display: grid;
+  place-content: center;
+  min-width: 1.9rem;
+  height: 1.9rem;
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  color: var(--color-ink-2);
+  font-size: var(--text-base);
+  cursor: pointer;
+}
+.eos-icon-btn:hover {
+  background: var(--color-inset);
+  color: var(--color-ink);
+}
+.eos-add {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+.eos-add .input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Accountability Chart */
+.eos-chart {
+  overflow-x: auto;
+  padding: 0.5rem 0 1rem;
+}
+.eos-tree {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0;
+  padding: 1.25rem 0 0;
+  list-style: none;
+}
+.eos-chart > .eos-tree {
+  padding-top: 0;
+}
+.eos-tree > li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.eos-tree .eos-tree::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 1.25rem;
+  border-left: 2px solid var(--tone-line);
+}
+.eos-tree .eos-tree > li::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  border-top: 2px solid var(--tone-line);
+}
+.eos-tree .eos-tree > li:first-child::before {
+  left: 50%;
+}
+.eos-tree .eos-tree > li:last-child::before {
+  right: 50%;
+}
+.eos-tree .eos-tree > li:only-child::before {
+  display: none;
+}
+.eos-tree .eos-tree > li > .eos-seat {
+  margin-top: 1.25rem;
+}
+.eos-tree .eos-tree > li::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 1.25rem;
+  border-left: 2px solid var(--tone-line);
+}
+.eos-seat {
+  margin-top: 1.25rem;
+}
+.eos-chart ul ul > li::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 1.25rem;
+  border-left: 2px solid var(--tone-line);
+}
+.eos-seat {
+  width: 15rem;
+  border: 1px solid var(--tone-line);
+  border-top: 4px solid var(--tone);
+  border-radius: var(--radius-md);
+  background: var(--color-panel);
+  text-align: left;
+}
+.eos-seat.is-open {
+  border-style: dashed;
+}
+.eos-seat-head {
+  padding: 0.6rem 0.75rem;
+  background: var(--tone-soft);
+  border-bottom: 1px solid var(--tone-line);
+}
+.eos-seat-head strong {
+  display: block;
+  font-size: var(--text-base);
+}
+.eos-seat-person {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+}
+.eos-avatar {
+  display: grid;
+  place-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  flex: none;
+  border-radius: var(--radius-pill);
+  background: var(--tone);
+  color: var(--color-panel);
+  font-size: var(--text-xs);
+  font-weight: 700;
+}
+.eos-roles {
+  display: block;
+  margin: 0;
+  padding: 0.5rem 0.75rem 0.5rem 1.75rem;
+  list-style: disc;
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+}
+.eos-seat-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem 0.4rem;
+  border-top: 1px solid var(--color-line);
+}
+
+/* People Analyzer */
+.eos-analyzer th.eos-rot {
+  min-width: 4.5rem;
+  white-space: normal;
+  text-align: center;
+}
+.eos-mark {
+  min-width: 2.75rem;
+  height: 2.25rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-panel);
+  color: var(--color-ink-3);
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  font-weight: 600;
+  cursor: pointer;
+}
+.eos-mark[data-score="plus"] {
+  border-color: var(--color-ok);
+  background: var(--color-ok-soft);
+  color: var(--color-ok);
+}
+.eos-mark[data-score="plus_minus"] {
+  border-color: var(--color-warn);
+  background: var(--color-warn-soft);
+  color: var(--color-warn);
+}
+.eos-mark[data-score="minus"] {
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+/* Delegate and Elevate */
+.eos-quadrants {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+.eos-quadrant {
+  min-height: 9rem;
+  border: 1px solid var(--tone-line);
+  border-top: 4px solid var(--tone);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.75rem;
+  background: var(--tone-soft);
+}
+.eos-quadrant.is-target {
+  outline: 2px dashed var(--tone);
+  outline-offset: 2px;
+}
+.eos-quadrant h4 {
+  margin: 0;
+  font-size: var(--text-base);
+}
+.eos-quadrant p {
+  margin: 0 0 0.4rem;
+  color: var(--color-ink-3);
+  font-size: var(--text-xs);
+}
+.eos-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.eos-activity {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  border: 1px solid var(--tone-line);
+  border-radius: var(--radius-sm);
+  padding: 0.15rem 0.2rem 0.15rem 0.5rem;
+  background: var(--color-panel);
+  font-size: var(--text-sm);
+  cursor: grab;
+}
+
+/* Core processes */
+.eos-stepper {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.25rem;
+}
+.eos-step {
+  position: relative;
+  border: 1px solid var(--tone-line);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.5rem;
+  background: var(--color-panel);
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.eos-step.is-reached {
+  border-color: var(--tone);
+  background: var(--tone);
+  color: var(--color-panel);
+}
+.eos-step:disabled {
+  cursor: default;
+}
+
+/* L10 stat tiles */
+.eos-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+.eos-stat {
+  border: 1px solid var(--tone-line);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.85rem;
+  background: var(--tone-soft);
+}
+.eos-stat h3 {
+  margin: 0;
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  font-weight: 400;
+}
+.eos-stat strong,
+.eos-stat .eos-stat-value {
+  display: block;
+  color: var(--tone);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: 1.1;
+}
+.eos-stat span {
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+}
+
+.eos-stat-label {
+  display: block;
+  color: var(--color-ink);
+  font-weight: 600;
+}
+.eos-stat small {
+  display: block;
+  color: var(--color-ink-3);
+  font-size: var(--text-xs);
+}
+.eos-tile-brand {
+  --tone: var(--color-accent);
+}
+.eos-tile-ok {
+  --tone: var(--color-ok);
+}
+.eos-tile-info {
+  --tone: var(--color-info);
+}
+.eos-tile-warn {
+  --tone: var(--color-warn);
+  --tone-line: color-mix(in srgb, var(--color-warn) 35%, var(--color-line));
+  --tone-soft: color-mix(in srgb, var(--color-warn) 9%, var(--color-panel));
+}
+
+/* L10 agenda tiles */
+.eos-agenda {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.eos-agenda a {
+  display: grid;
+  gap: 0.15rem;
+  height: 100%;
+  border: 1px solid var(--tone-line);
+  border-left: 4px solid var(--tone);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.7rem;
+  background: var(--tone-soft);
+  color: var(--color-ink);
+  text-decoration: none;
+  transition:
+    border-color 140ms ease,
+    transform 140ms ease;
+}
+.eos-agenda a:hover,
+.eos-agenda a:focus-visible {
+  border-color: var(--tone);
+  transform: translateY(-1px);
+}
+.eos-agenda strong {
+  font-size: var(--text-base);
+}
+.eos-agenda-min {
+  color: var(--tone);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+.eos-agenda-what {
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+}
+
+/* L10 meeting mode */
+.eos-meeting {
+  position: sticky;
+  top: 0.5rem;
+  z-index: 5;
+  border: 1px solid var(--tone-line);
+  border-top: 4px solid var(--tone);
+  border-radius: var(--radius-md);
+  background: var(--color-panel);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--tone) 12%, transparent);
+}
+.eos-meeting-strip {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--tone-line);
+  background: var(--tone-soft);
+}
+.eos-meeting-strip button {
+  flex: none;
+  border: 1px solid var(--tone-line);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.6rem;
+  background: var(--color-panel);
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.eos-meeting-strip button[aria-current="step"] {
+  border-color: var(--tone);
+  background: var(--tone);
+  color: var(--color-panel);
+}
+.eos-meeting-strip button.is-past {
+  color: var(--color-ink-3);
+  text-decoration: line-through;
+}
+.eos-meeting-now {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+}
+.eos-timer {
+  font-family: var(--font-mono);
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  line-height: 1;
+}
+.eos-timer.is-over {
+  color: var(--color-danger);
+}
+
+/* Quarterly and annual planning sessions (PlanningSession.tsx) */
+.eos-switch {
+  display: inline-flex;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-panel);
+  padding: 0.125rem;
+}
+.eos-switch > button {
+  min-height: 2.25rem;
+  padding: 0.25rem 1rem;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-ink-2);
+}
+.eos-switch > button[aria-pressed="true"] {
+  background: var(--tone);
+  color: var(--color-panel);
+}
+.eos-switch > button:disabled:not([aria-pressed="true"]) {
+  opacity: 0.45;
+}
+.eos-session-now {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid var(--tone-line);
+  border-left: 4px solid var(--tone);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  background: var(--tone-soft);
+}
+.eos-session-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.eos-session-steps > li {
+  display: grid;
+  align-content: space-between;
+  gap: 0.4rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.75rem;
+  background: var(--color-panel);
+}
+.eos-session-steps > li.is-now {
+  border-color: var(--tone);
+  box-shadow: 0 0 0 1px var(--tone);
+}
+.eos-session-steps > li.is-past {
+  opacity: 0.6;
+}
+.eos-session-fact a {
+  margin-left: auto;
+}
+.eos-session-step {
+  display: flex;
+  gap: 0.6rem;
+  width: 100%;
+  text-align: left;
+  color: var(--color-ink);
+}
+.eos-session-step:disabled {
+  cursor: default;
+}
+.eos-session-num {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--tone-soft);
+  color: var(--tone);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+.eos-session-time {
+  margin-left: 0.5rem;
+  color: var(--color-ink-3);
+  font-size: var(--text-sm);
+}
+.eos-session-fact {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0 0 0 2.2rem;
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+}
+@media (max-width: 640px) {
+  .eos-session-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .eos-stats,
+  .eos-agenda {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .eos-components {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .eos-vto {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .eos-tree {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 0.75rem 0 0 1rem;
+  }
+  .eos-chart > .eos-tree {
+    padding-left: 0;
+  }
+  .eos-tree .eos-tree::before,
+  .eos-tree .eos-tree > li::before,
+  .eos-tree .eos-tree > li::after {
+    display: none;
+  }
+  .eos-tree > li {
+    align-items: stretch;
+  }
+  .eos-tree .eos-tree > li > .eos-seat {
+    margin-top: 0;
+    border-left: 4px solid var(--tone-line);
+  }
+  .eos-seat {
+    width: 100%;
+  }
+  .eos-components,
+  .eos-quadrants {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .eos-vto-block {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
+  }
+  .eos-statement {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .eos-stepper {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .eos-checkup-hero {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: start;
+  }
+  .eos-row-tools {
+    opacity: 1;
+  }
+  .eos-timer {
+    font-size: var(--text-2xl);
+  }
+}
+
+/* One-row add form under each L10 list */
+.eos-quickadd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.5rem 0.75rem;
+  border-top: 1px dashed var(--tone-line);
+  padding-top: 0.75rem;
+}
+.eos-quickadd > * {
+  flex: 1 1 10rem;
+  min-width: 0;
+}
+.eos-quickadd > .eos-quickadd-main {
+  flex: 3 1 16rem;
+}
+.eos-quickadd > :last-child {
+  flex: 0 0 auto;
+}

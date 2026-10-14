@@ -57,24 +57,27 @@ const policy = new CloseoutLifecyclePolicy();
 const note = (data: FormData, name: string) =>
   String(data.get(name) || "").trim() || undefined;
 
-export function CloseoutPage() {
+/**
+ * Event closeouts. With `eventId` it is that event's closeout, on the event's
+ * Proposal & margin tab (owner, 2026-10-14: "just have the shit fucking tied
+ * to the event").
+ */
+export function CloseoutPage({ eventId }: { eventId?: string } = {}) {
   const eventScope = useWorkingEventScope("closeout");
+  const scopeId = eventId ?? eventScope.scopeId;
+  const workingId = eventId ?? eventScope.workingId;
   const authStatus = useAuthStatus();
-  const [showFinalized, setShowFinalized] = useState(false);
+  const [showFinalized, setShowFinalized] = useState(eventId != null);
   // Only the closeouts shown: the working event's, else every unfinished
   // one (through the status index), plus (finalized shown) the newest page
   // with "Load more".
-  const eventCloseouts = useCloseoutsForEvents(
-    eventScope.scopeId ? [eventScope.scopeId] : undefined,
-  );
-  const draftCloseouts = useCloseoutsInStatus(
-    eventScope.scopeId ? null : "draft",
-  );
+  const eventCloseouts = useCloseoutsForEvents(scopeId ? [scopeId] : undefined);
+  const draftCloseouts = useCloseoutsInStatus(scopeId ? null : "draft");
   const pagedCloseouts = usePagedRows(
     "eventCloseouts",
-    !eventScope.scopeId && showFinalized,
+    !scopeId && showFinalized,
   );
-  const closeouts = eventScope.scopeId
+  const closeouts = scopeId
     ? eventCloseouts
     : draftCloseouts === undefined ||
         (showFinalized && pagedCloseouts.rows === undefined)
@@ -88,9 +91,7 @@ export function CloseoutPage() {
           ).values(),
         ];
   const events = usePickerAndNamedEvents(
-    closeouts
-      ? [eventScope.workingId, ...closeouts.map((row) => row.eventId)]
-      : undefined,
+    closeouts ? [workingId, ...closeouts.map((row) => row.eventId)] : undefined,
   );
   const captureCloseout = useCaptureCloseoutFromSources();
   const correctCloseout = useCorrectCloseoutFromSources();
@@ -115,9 +116,7 @@ export function CloseoutPage() {
     (row) => row.deletedAt == null,
   );
   const scopedCloseouts = activeCloseouts.filter(
-    (row) =>
-      eventScope.scopeId == null ||
-      String(row.eventId ?? "") === eventScope.scopeId,
+    (row) => scopeId == null || String(row.eventId ?? "") === scopeId,
   );
   const visibleRows = showFinalized
     ? scopedCloseouts
@@ -142,7 +141,9 @@ export function CloseoutPage() {
       .map((row) => String(row.eventId)),
   );
   const capturableEvents = candidateEvents.filter(
-    (event) => !closedOutEventIds.has(event._id),
+    (event) =>
+      !closedOutEventIds.has(event._id) &&
+      (eventId == null || event._id === eventId),
   );
   // Billing for the closeouts shown only.
   const invoices = useInvoicesForEvents(
@@ -189,8 +190,8 @@ export function CloseoutPage() {
   const openCapture = () => {
     setDraft(null);
     setSelectedEventId(
-      capturableEvents.some((event) => event._id === eventScope.workingId)
-        ? eventScope.workingId
+      capturableEvents.some((event) => event._id === workingId)
+        ? workingId
         : null,
     );
     setShowCapture(true);
@@ -279,38 +280,40 @@ export function CloseoutPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <PageHeader
-        title="Event closeouts"
-        lead={
-          <>
-            Capture revenue, cost, and headcount for a closed-out event, then
-            finalize to freeze the folio. The numbers come from the event's
-            invoices, payments, deliveries, clocked time, rentals and guest
-            check-ins; you only fill in what they can't answer.
-          </>
-        }
-        actions={
-          <>
-            <button
-              className="btn btn-ghost"
-              type="button"
-              onClick={() => setShowFinalized((value) => !value)}
-            >
-              {showFinalized ? "Hide finalized" : "Show finalized"}
-            </button>
-            <button
-              className="btn btn-primary"
-              type="button"
-              onClick={() =>
-                showCapture ? setShowCapture(false) : openCapture()
-              }
-            >
-              {showCapture ? "Close form" : "Capture closeout"}
-            </button>
-          </>
-        }
-      />
-      <FinanceWorkspaceNav />
+      {eventId != null ? null : (
+        <PageHeader
+          title="Event closeouts"
+          lead={
+            <>
+              Capture revenue, cost, and headcount for a closed-out event, then
+              finalize to freeze the folio. The numbers come from the event's
+              invoices, payments, deliveries, clocked time, rentals and guest
+              check-ins; you only fill in what they can't answer.
+            </>
+          }
+          actions={
+            <>
+              <button
+                className="btn btn-ghost"
+                type="button"
+                onClick={() => setShowFinalized((value) => !value)}
+              >
+                {showFinalized ? "Hide finalized" : "Show finalized"}
+              </button>
+              <button
+                className="btn btn-primary"
+                type="button"
+                onClick={() =>
+                  showCapture ? setShowCapture(false) : openCapture()
+                }
+              >
+                {showCapture ? "Close form" : "Capture closeout"}
+              </button>
+            </>
+          }
+        />
+      )}
+      {eventId != null ? null : <FinanceWorkspaceNav />}
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (
         <p className="mt-3 text-base text-ink-2" role="status">
@@ -354,18 +357,32 @@ export function CloseoutPage() {
         />
       ) : null}
 
-      <WorkingEventScopeNote scope={eventScope} noun="closeouts" />
+      {eventId != null ? null : (
+        <WorkingEventScopeNote scope={eventScope} noun="closeouts" />
+      )}
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
             <p className="eyebrow">Reconciliation</p>
             <h2>Closeout folios</h2>
           </div>
-          <span>
-            {showFinalized && !eventScope.scopeId
-              ? `${visibleRows.filter((row) => String(row.status) !== "finalized").length} open · ${visibleRows.filter((row) => String(row.status) === "finalized").length} finalized shown`
-              : formatCountNoun(visibleRows.length, "closeout")}
-          </span>
+          {eventId != null ? (
+            <button
+              className="btn btn-primary btn-sm"
+              type="button"
+              onClick={() =>
+                showCapture ? setShowCapture(false) : openCapture()
+              }
+            >
+              {showCapture ? "Close form" : "Capture closeout"}
+            </button>
+          ) : (
+            <span>
+              {showFinalized && !scopeId
+                ? `${visibleRows.filter((row) => String(row.status) !== "finalized").length} open · ${visibleRows.filter((row) => String(row.status) === "finalized").length} finalized shown`
+                : formatCountNoun(visibleRows.length, "closeout")}
+            </span>
+          )}
         </div>
         {loading ? (
           <TableSkeleton rows={5} />
@@ -435,18 +452,20 @@ export function CloseoutPage() {
                           ) : null}
                           <CloseoutRevenueNote row={row} billing={billing} />
                         </td>
-                        <td>{formatMoneyExact(billing.billedTotal)}</td>
-                        <td>
+                        <td className="num">
+                          {formatMoneyExact(billing.billedTotal)}
+                        </td>
+                        <td className="num">
                           {isCloseoutListProfitPending(row)
                             ? "—"
                             : formatMoneyExact(Number(row.actualRevenue ?? 0))}
                         </td>
-                        <td>
+                        <td className="num">
                           {listedCost == null
                             ? "—"
                             : formatMoneyExact(listedCost)}
                         </td>
-                        <td>
+                        <td className="num">
                           {isCloseoutListProfitPending(row)
                             ? "—"
                             : formatMoneyExact(Number(row.grossProfit ?? 0))}
@@ -627,7 +646,7 @@ export function CloseoutPage() {
             </table>
           </div>
         )}
-        {!eventScope.scopeId && showFinalized && pagedCloseouts.canLoadMore ? (
+        {!scopeId && showFinalized && pagedCloseouts.canLoadMore ? (
           <div className="px-4 py-3">
             <button
               type="button"

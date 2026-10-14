@@ -1,4 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { ContractsPage } from "../clients/ContractsPage";
+import { CloseoutPage } from "../finance/CloseoutPage";
+import { EventPackListSection } from "./EventPackListSection";
+import { DeliveriesPage } from "../logistics/DeliveriesPage";
 import { MergedSection } from "../../ui/MergedSection";
 import { ProposalsPage } from "../clients/ProposalsPage";
 import { venueDetailPath } from "../facilities/facilitiesRoutes";
@@ -717,6 +721,10 @@ function EventDetailContent({
         <EventTabErrorBoundary tabLabel="Equipment" key="equipment">
           <div className="space-y-6">
             <EventRequirementsPanel eventId={event._id} />
+            <EventPackListSection eventId={event._id} />
+            <section id="deliveries" className="scroll-mt-20">
+              <DeliveriesPage eventId={event._id} />
+            </section>
             <EventEquipmentPanel
               eventId={event._id}
               startsAt={event.startsAt}
@@ -832,7 +840,22 @@ function EventDetailContent({
             >
               <ProposalsPage eventId={event._id} />
             </MergedSection>
+            <MergedSection
+              id="contract"
+              title="Contract"
+              summary="The agreement for this event: draft it, send it, log the signature."
+              defaultOpen
+            >
+              <ContractsPage eventId={event._id} />
+            </MergedSection>
             <EventMarginTab eventId={event._id} />
+            <MergedSection
+              id="closeout"
+              title="Closeout"
+              summary="After the event: capture what it really earned and cost, then finalize."
+            >
+              <CloseoutPage eventId={event._id} />
+            </MergedSection>
           </div>
         </EventTabErrorBoundary>
       ) : null}

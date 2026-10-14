@@ -106,7 +106,9 @@ export function EventEquipmentSheet({
                     <span>{row.assetTag}</span>
                   </td>
                   <td className="equipment-sheet__muted">{row.category}</td>
-                  <td className="equipment-sheet__numeric">{row.quantity}</td>
+                  <td className="equipment-sheet__numeric num">
+                    {row.quantity}
+                  </td>
                   <td>
                     <div className="equipment-sheet__window">
                       <span>

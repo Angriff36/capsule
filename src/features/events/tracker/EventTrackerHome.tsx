@@ -4,10 +4,10 @@ import { eventsIndexPath } from "../eventRoutes";
 import "../../home/HomeCalendar.css";
 import "../EventTracker.css";
 import { PlanningBoardPage } from "../planning/PlanningBoardPage";
-import { EventTrackerSheet } from "./EventTrackerSheet";
+import { TrackerBoard } from "./TrackerBoard";
 
 const VIEWS = [
-  { key: "sheet", label: "Month sheet" },
+  { key: "sheet", label: "Tracker" },
   { key: "board", label: "Two-week board" },
   { key: "plan", label: "Planning board" },
 ] as const;
@@ -77,9 +77,9 @@ export function EventTrackerHome() {
             Event tracker
           </h1>
           <p className="mt-2 text-base text-ink-2">
-            One month, one row for each event. Attach vehicles, trailers and a
-            driver, mark the load and the binder, and see the pack status. Edit
-            in the cell.
+            One month, one row for each event: trucks and drivers, crew,
+            equipment, decor and notes. Edit in the cell. It warns before
+            anything is double-booked.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -97,7 +97,7 @@ export function EventTrackerHome() {
           </Link>
         </div>
       </div>
-      <EventTrackerSheet />
+      <TrackerBoard />
     </div>
   );
 }

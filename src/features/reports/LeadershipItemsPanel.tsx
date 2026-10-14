@@ -1,14 +1,17 @@
 import { useState, type FormEvent } from "react";
 import { useCreateLeadershipItem } from "@/lib/manifest-convex-react";
-import { Section, StatusChip } from "@/ui/primitives";
+import { StatusChip } from "@/ui/primitives";
+import { EosPanel } from "../eos/EosShared";
 import { CHIP_TONE_CLASS } from "@/lib/statusLabels";
 import { formatDate } from "@/lib/format";
 import { BoundedDateInput } from "@/ui/BoundedDateInputs";
 import { ReportsFailureBanner } from "./ReportsFailureBanner";
 import {
+  IssuePriorityPicker,
   LeadershipItemActions,
   RockTrackPicker,
 } from "./LeadershipItemActions";
+import { todoCompletion } from "../eos/eosModel";
 import {
   LEADERSHIP_KIND_LABEL,
   isOverdue,
@@ -51,7 +54,7 @@ const KINDS: ReadonlyArray<{
     title: "Issues",
     empty: "No open issues.",
     placeholder: "What needs solving",
-    hint: "One at a time: name the real problem, talk it through, then write the answer you agreed on.",
+    hint: "Pick the top three, then one at a time: identify the real problem, discuss it, solve it and write the answer. Park what can wait for the quarter.",
   },
   {
     kind: "todo",
@@ -60,6 +63,25 @@ const KINDS: ReadonlyArray<{
     placeholder: "Who does what before next week",
   },
 ];
+
+/** In-page anchors the L10 meeting mode scrolls to. */
+/** Each list in its EOS component's colour (see src/features/eos/eos.css). */
+const KIND_TONE: Record<LeadershipItemKind, { tone: string; eyebrow: string }> =
+  {
+    rock: { tone: "traction", eyebrow: "Traction" },
+    client_headline: { tone: "people", eyebrow: "Headlines" },
+    people_headline: { tone: "people", eyebrow: "Headlines" },
+    issue: { tone: "issues", eyebrow: "Issues · IDS" },
+    todo: { tone: "vision", eyebrow: "To-dos" },
+  };
+
+export const LEADERSHIP_ANCHOR: Record<LeadershipItemKind, string> = {
+  rock: "rocks",
+  client_headline: "client-headlines",
+  people_headline: "people-headlines",
+  issue: "issues",
+  todo: "todos",
+};
 
 /** Closed items stay on the board for two weeks, so last week's are reviewed. */
 const RECENTLY_CLOSED_DAYS = 14;
@@ -127,14 +149,16 @@ export function LeadershipItemsPanel({
 
   const closedSince =
     now.getTime() - RECENTLY_CLOSED_DAYS * 24 * 60 * 60 * 1000;
+  // Parked issues wait on the V/TO's long-term list, out of the week.
   const shown = liveItems(items).filter(
     (row) =>
-      row.status === "open" ||
+      (row.status === "open" && row.parkedAt == null) ||
       (row.closedAt != null && row.closedAt >= closedSince),
   );
+  const todos = todoCompletion(liveItems(items), now.getTime());
 
   return (
-    <div className="mt-6 grid gap-6" data-testid="leadership-items">
+    <div className="mt-5 grid gap-5" data-testid="leadership-items">
       {failure ? <ReportsFailureBanner error={failure} /> : null}
       {KINDS.map(({ kind, title, empty, placeholder, hint }) => {
         const isHeadline =
@@ -144,146 +168,191 @@ export function LeadershipItemsPanel({
           .sort(
             (a, b) =>
               (a.status === "open" ? 0 : 1) - (b.status === "open" ? 0 : 1) ||
+              (a.priority ?? Infinity) - (b.priority ?? Infinity) ||
               (a.dueAt ?? Infinity) - (b.dueAt ?? Infinity),
           );
         return (
-          <Section key={kind} title={title}>
-            {hint ? (
-              <p className="mb-2 px-3 pt-2 text-xs text-ink-2">{hint}</p>
-            ) : null}
-            {rows.length === 0 ? (
-              <p className="text-xs text-ink-2">{empty}</p>
-            ) : (
-              <div className="supply-table-wrap">
-                <table
-                  className="supply-table"
-                  data-testid={`leadership-${kind}`}
-                >
-                  <thead>
-                    <tr>
-                      <th>{LEADERSHIP_KIND_LABEL[kind]}</th>
-                      {kind === "issue" ? <th>Added by</th> : null}
-                      <th>{isHeadline ? "From" : "Owner"}</th>
-                      {isHeadline ? null : <th>Due</th>}
-                      {kind === "rock" ? <th>This week</th> : null}
-                      <th>Status</th>
-                      <th className="text-right">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.map((row) => (
-                      <tr key={row._id}>
-                        <td>
-                          {row.title}
-                          {row.notes ? (
-                            <span className="block text-xs text-ink-2">
-                              {row.notes}
-                            </span>
-                          ) : null}
-                          {row.solution ? (
-                            <span className="block text-xs text-ok">
-                              Answer: {row.solution}
-                            </span>
-                          ) : null}
-                        </td>
-                        {kind === "issue" ? (
-                          <td>{personName(row.openedByPersonId)}</td>
-                        ) : null}
-                        <td>{personName(row.ownerPersonId)}</td>
-                        {isHeadline ? null : (
-                          <td
-                            className={isOverdue(row, now) ? "text-danger" : ""}
-                          >
-                            {row.dueAt ? formatDate(row.dueAt) : "—"}
-                            {isOverdue(row, now) ? " (late)" : ""}
-                          </td>
-                        )}
-                        {kind === "rock" ? (
-                          <td>
-                            <RockTrackPicker row={row} busy={busy} run={run} />
-                          </td>
-                        ) : null}
-                        <td>
-                          <StatusChip
-                            status={
-                              row.status === "open"
-                                ? "Open"
-                                : row.status === "dropped"
-                                  ? "Dropped"
-                                  : isHeadline
-                                    ? "Heard"
-                                    : kind === "issue"
-                                      ? "Solved"
-                                      : "Done"
-                            }
-                            color={
-                              row.status === "open"
-                                ? CHIP_TONE_CLASS.warn
-                                : row.status === "done"
-                                  ? CHIP_TONE_CLASS.ok
-                                  : CHIP_TONE_CLASS.mute
-                            }
-                          />
-                        </td>
-                        <td className="text-right">
-                          <LeadershipItemActions
-                            row={row}
-                            busy={busy}
-                            run={run}
-                          />
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-            <form
-              className="supply-form-grid mt-3"
-              onSubmit={(event) => submit(event, kind)}
+          <div
+            key={kind}
+            id={LEADERSHIP_ANCHOR[kind]}
+            className="min-w-0 scroll-mt-48"
+          >
+            <EosPanel
+              tone={KIND_TONE[kind].tone}
+              eyebrow={KIND_TONE[kind].eyebrow}
+              title={title}
+              lead={hint}
             >
-              <label className="field-label">
-                Add {LEADERSHIP_KIND_LABEL[kind].toLowerCase()}
-                <input
-                  name="title"
-                  className="input"
-                  placeholder={placeholder}
-                  required
-                />
-              </label>
-              {kind === "issue" ? (
-                <label className="field-label">
-                  The real problem (optional)
-                  <input name="notes" className="input" />
-                </label>
+              {kind === "todo" && todos.total > 0 ? (
+                <p className="mb-3 text-sm text-ink-2">
+                  Last 7 days: {todos.done} of {todos.total} done (
+                  <strong
+                    className={
+                      (todos.percent ?? 0) >= 90 ? "text-ok" : "text-warn"
+                    }
+                  >
+                    {todos.percent}%
+                  </strong>
+                  ). EOS aims for 90%.
+                </p>
               ) : null}
-              <label className="field-label">
-                {isHeadline ? "From" : "Owner"}
-                <select name="ownerPersonId" className="input" defaultValue="">
-                  <option value="">
-                    {isHeadline ? "Not noted" : "No owner"}
-                  </option>
-                  {people.map((person) => (
-                    <option key={person._id} value={person._id}>
-                      {`${person.givenName} ${person.familyName}`.trim()}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              {isHeadline ? null : (
-                <label className="field-label">
-                  Due (optional)
-                  <BoundedDateInput name="dueAt" className="input" />
-                </label>
+              {rows.length === 0 ? (
+                <p className="text-sm text-ink-3">{empty}</p>
+              ) : (
+                <div className="supply-table-wrap">
+                  <table
+                    className="supply-table table-even"
+                    data-testid={`leadership-${kind}`}
+                  >
+                    <thead>
+                      <tr>
+                        <th className="col-wide">
+                          {LEADERSHIP_KIND_LABEL[kind]}
+                        </th>
+                        {kind === "issue" ? <th>Top 3</th> : null}
+                        {kind === "issue" ? <th>Added by</th> : null}
+                        <th>{isHeadline ? "From" : "Owner"}</th>
+                        {isHeadline ? null : <th>Due</th>}
+                        {kind === "rock" ? <th>This week</th> : null}
+                        <th className="col-state">Status</th>
+                        <th className="col-action text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map((row) => (
+                        <tr key={row._id}>
+                          <td>
+                            {row.title}
+                            {row.notes ? (
+                              <span className="block text-xs text-ink-2">
+                                {row.notes}
+                              </span>
+                            ) : null}
+                            {row.solution ? (
+                              <span className="block text-xs text-ok">
+                                Answer: {row.solution}
+                              </span>
+                            ) : null}
+                          </td>
+                          {kind === "issue" ? (
+                            <td>
+                              <IssuePriorityPicker
+                                row={row}
+                                issues={rows}
+                                busy={busy}
+                                run={run}
+                              />
+                            </td>
+                          ) : null}
+                          {kind === "issue" ? (
+                            <td>{personName(row.openedByPersonId)}</td>
+                          ) : null}
+                          <td>{personName(row.ownerPersonId)}</td>
+                          {isHeadline ? null : (
+                            <td
+                              className={
+                                isOverdue(row, now) ? "text-danger" : ""
+                              }
+                            >
+                              {row.dueAt ? formatDate(row.dueAt) : "—"}
+                              {isOverdue(row, now) ? " (late)" : ""}
+                            </td>
+                          )}
+                          {kind === "rock" ? (
+                            <td>
+                              <RockTrackPicker
+                                row={row}
+                                busy={busy}
+                                run={run}
+                              />
+                            </td>
+                          ) : null}
+                          <td>
+                            <StatusChip
+                              status={
+                                row.status === "open"
+                                  ? "Open"
+                                  : row.status === "dropped"
+                                    ? "Dropped"
+                                    : isHeadline
+                                      ? "Heard"
+                                      : kind === "issue"
+                                        ? "Solved"
+                                        : "Done"
+                              }
+                              color={
+                                row.status === "open"
+                                  ? CHIP_TONE_CLASS.warn
+                                  : row.status === "done"
+                                    ? CHIP_TONE_CLASS.ok
+                                    : CHIP_TONE_CLASS.mute
+                              }
+                            />
+                          </td>
+                          <td className="text-right">
+                            <LeadershipItemActions
+                              row={row}
+                              busy={busy}
+                              run={run}
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
-              <div className="field-label">
-                <span>&nbsp;</span>
-                <button className="btn btn-secondary" disabled={busy}>
-                  Add
-                </button>
-              </div>
-            </form>
-          </Section>
+              <form
+                className="eos-quickadd mt-3"
+                onSubmit={(event) => submit(event, kind)}
+              >
+                <label className="field-label eos-quickadd-main">
+                  Add {LEADERSHIP_KIND_LABEL[kind].toLowerCase()}
+                  <input
+                    name="title"
+                    className="input"
+                    placeholder={placeholder}
+                    required
+                  />
+                </label>
+                {kind === "issue" ? (
+                  <label className="field-label">
+                    The real problem (optional)
+                    <input name="notes" className="input" />
+                  </label>
+                ) : null}
+                <label className="field-label">
+                  {isHeadline ? "From" : "Owner"}
+                  <select
+                    name="ownerPersonId"
+                    className="input"
+                    defaultValue=""
+                  >
+                    <option value="">
+                      {isHeadline ? "Not noted" : "No owner"}
+                    </option>
+                    {people.map((person) => (
+                      <option key={person._id} value={person._id}>
+                        {`${person.givenName} ${person.familyName}`.trim()}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {isHeadline ? null : (
+                  <label className="field-label">
+                    Due (optional)
+                    <BoundedDateInput name="dueAt" className="input" />
+                  </label>
+                )}
+                <div className="field-label">
+                  <span>&nbsp;</span>
+                  <button className="btn btn-secondary" disabled={busy}>
+                    Add
+                  </button>
+                </div>
+              </form>
+            </EosPanel>
+          </div>
         );
       })}
     </div>

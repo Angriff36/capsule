@@ -40,3 +40,47 @@
     border-left: 0;
   }
 }
+
+/* Every table on the page shares one column grid (WasteColumns), so the
+   number columns line up from table to table. Numbers sit on the right. */
+.waste-table .num {
+  text-align: right;
+}
+.waste-table td.num strong {
+  font-weight: 600;
+}
+
+@media (min-width: 721px) {
+  .waste-table {
+    width: 100%;
+    table-layout: fixed;
+  }
+  .waste-table .waste-col-1 {
+    width: 10%;
+  }
+  .waste-table .waste-col-2 {
+    width: 26%;
+  }
+  .waste-table .waste-col-3 {
+    width: 16%;
+  }
+  .waste-table .waste-col-4 {
+    width: 16%;
+  }
+  .waste-table .waste-col-5 {
+    width: 12%;
+  }
+  .waste-table .waste-col-6 {
+    width: 11%;
+  }
+  .waste-table .waste-col-7 {
+    width: 9%;
+  }
+  .waste-table td {
+    overflow-wrap: anywhere;
+  }
+}
+
+.waste-table td.num .supply-row-actions {
+  justify-content: flex-end;
+}

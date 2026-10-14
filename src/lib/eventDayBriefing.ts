@@ -70,6 +70,13 @@ export type EventDayEvent = {
   waterOnsite: string | null;
   buffetColdPlates: string | null;
   buffetHotPlates: string | null;
+  serviceRequirements?: string | null;
+  eventNumber?: string | null;
+  operationalRequirements?: string | null;
+  servingwareKit?: string | null;
+  decorKit?: string | null;
+  linenColorTables?: string | null;
+  linenColorBaskets?: string | null;
   clientId: string | null;
   primaryContactName: string | null;
   primaryContactEmail: string | null;
@@ -282,8 +289,31 @@ export type EventDayComponent = {
   declaredAllergens: string[];
 };
 
+export type EventDayRental = {
+  _id: string;
+  description: string | null;
+  quantity: number | null;
+  countUnit: string | null;
+  vendorName: string | null;
+};
+
+export type EventDayRig = {
+  _id: string;
+  vehicleName: string | null;
+  trailerName: string | null;
+  driverId: string | null;
+  loadingZone: string | null;
+  preloadedAt: number | null;
+  riderCount: number;
+  loadedLineCount: number;
+};
+
 export type EventDayBriefing = {
   packetReadiness: EventDayPacketReadiness;
+  /** Rental order lines for the event (not cancelled), with the vendor name. */
+  rentals?: EventDayRental[];
+  /** Trucks on the event now, with riders and loaded pack lines counted. */
+  rigs?: EventDayRig[];
   event: EventDayEvent;
   venue: EventDayVenue | null;
   assignments: EventDayAssignment[];

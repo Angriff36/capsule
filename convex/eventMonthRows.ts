@@ -19,6 +19,10 @@ export type EventMonthRows = {
     isReleased: boolean;
   })[];
   numberAssignments: Doc<"eventNumberAssignments">[];
+  /** Equipment held for the events (the tracker's Equipment column). */
+  equipmentReservations: Doc<"equipmentReservations">[];
+  /** Crew on the events, without their private notes. */
+  crew: Omit<Doc<"eventAssignments">, "notes">[];
 };
 
 /** Rows of these events (ids past MENU_EVENTS_CAP are ignored). */
@@ -33,7 +37,16 @@ export const forEvents = query({
       reviewFlags: [],
       vehicleAssignments: [],
       numberAssignments: [],
+      equipmentReservations: [],
+      crew: [],
     };
+    // Each kind keeps its own generated read rule.
+    const seesEquipment = canRead(auth, [
+      "inventoryAccess",
+      "logisticsAccess",
+      "eventManageAccess",
+    ]);
+    const seesCrew = canRead(auth, ["workforceAccess", "workforceSelfAccess"]);
     for (const raw of [...new Set(eventIds)].slice(0, MENU_EVENTS_CAP)) {
       const eventId = ctx.db.normalizeId("events", raw);
       if (!eventId) continue;
@@ -66,6 +79,27 @@ export const forEvents = query({
         .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
         .collect())
         if (number.tenantId === tenantId) rows.numberAssignments.push(number);
+      if (seesEquipment)
+        for (const hold of await ctx.db
+          .query("equipmentReservations")
+          .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+          .collect())
+          if (
+            hold.tenantId === tenantId &&
+            hold.deletedAt == null &&
+            hold.cancelledAt == null
+          )
+            rows.equipmentReservations.push(hold);
+      if (seesCrew)
+        for (const person of await ctx.db
+          .query("eventAssignments")
+          .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+          .collect()) {
+          if (person.tenantId !== tenantId || person.deletedAt != null)
+            continue;
+          const { notes: _notes, ...rest } = person;
+          rows.crew.push(rest);
+        }
     }
     return rows;
   },

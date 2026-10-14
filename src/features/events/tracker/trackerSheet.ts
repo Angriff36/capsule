@@ -51,6 +51,11 @@ export interface TrackerRow {
   /** The typed or given number; empty when the row has neither. */
   storedEventNumber: string;
   startsAt: number | null;
+  endsAt: number | null;
+  venue: string;
+  /** The decor kit, one item per comma or line. */
+  decor: string;
+  notes: string;
   title: string;
   client: string;
   guests: number;
@@ -122,6 +127,7 @@ export function buildTrackerRows(
   sources: TrackerSources,
   monthStart: number,
   monthEnd: number,
+  includeCancelled = false,
 ): TrackerRow[] {
   const invoiceByEvent = new Map<string, string>();
   for (const invoice of sources.invoices) {
@@ -209,7 +215,7 @@ export function buildTrackerRows(
     .filter(
       (event) =>
         event.deletedAt == null &&
-        String(event.stage) !== "cancelled" &&
+        (includeCancelled || String(event.stage) !== "cancelled") &&
         event.startsAt != null &&
         event.startsAt >= monthStart &&
         event.startsAt < monthEnd,
@@ -226,6 +232,10 @@ export function buildTrackerRows(
         eventNumber: eventNumberLabel(stored, invoiceByEvent.get(event._id)),
         storedEventNumber: stored,
         startsAt: event.startsAt ?? null,
+        endsAt: event.endsAt ?? null,
+        venue: event.venueName?.trim() ?? "",
+        decor: event.decorKit?.trim() ?? "",
+        notes: event.trackerNotes?.trim() ?? "",
         title: event.title || "Untitled event",
         client: clientDisplayName(event.clientId, sources.clients),
         guests: event.expectedHeadcount ?? 0,

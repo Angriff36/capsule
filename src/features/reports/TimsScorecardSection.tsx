@@ -1,9 +1,7 @@
 import { useMemo } from "react";
 import type { SalesEvent } from "./mangia/salesFigures";
+import { EosPanel } from "../eos/EosShared";
 import {
-  FigureRow,
-  Note,
-  ReportSection,
   change,
   dayText,
   money,
@@ -93,25 +91,30 @@ export function TimsScorecardSection({
   };
 
   return (
-    <div data-testid="tims-scorecard">
-      <ReportSection title="L10 sales scorecard" period={ytdText}>
-        <FigureRow
-          figures={TIMS_KPIS.slice(0, 4).map((kpi) => ({
-            title: kpi.title,
-            ...figures[kpi.id],
-          }))}
-        />
-        <FigureRow
-          figures={TIMS_KPIS.slice(4).map((kpi) => ({
-            title: kpi.title,
-            ...figures[kpi.id],
-          }))}
-        />
-        <Note>
-          Counted the way Tim's {TIMS_SCORECARD_SOURCE} counts them. Confirmed
-          events count in full and open quotes at half in the forecast.
-        </Note>
-      </ReportSection>
+    <div data-testid="tims-scorecard" className="mt-5">
+      <EosPanel
+        tone="data"
+        eyebrow="Data · weekly"
+        title="L10 sales scorecard"
+        lead={`Year to date, ${ytdText}. Counted the way Tim's ${TIMS_SCORECARD_SOURCE} counts them; open quotes count at half in the forecast.`}
+      >
+        <div className="eos-stats">
+          {TIMS_KPIS.map((kpi) => {
+            const figure = figures[kpi.id];
+            return (
+              <div
+                key={kpi.id}
+                className={`eos-stat${figure.tone ? ` eos-tile-${figure.tone}` : ""}`}
+              >
+                <span className="eos-stat-label">{kpi.title}</span>
+                <strong>{figure.value}</strong>
+                <small>{figure.detail}</small>
+                <small>{figure.period}</small>
+              </div>
+            );
+          })}
+        </div>
+      </EosPanel>
     </div>
   );
 }

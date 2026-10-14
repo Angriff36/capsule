@@ -21,7 +21,6 @@ import { EventCapacityPlannerPage } from "../features/events/EventCapacityPlanne
 import { EventCreatePage } from "../features/events/EventCreatePage";
 import { EventDetailPage } from "../features/events/EventDetailPage";
 import { EventImportPage } from "../features/events/import/EventImportPage";
-import { EventWorkbooksPage } from "../features/events/packet/EventWorkbooksPage";
 import { EventsListPage } from "../features/events/EventsListPage";
 import { EventTrackerHome } from "../features/events/tracker/EventTrackerHome";
 import { EventSetupPage } from "../features/events/EventSetupPage";
@@ -149,24 +148,19 @@ const CandidatesPage = lazy(() =>
     default: module.CandidatesPage,
   })),
 );
-const PackListsPage = lazy(() =>
-  import("../features/logistics/PackListsPage").then((module) => ({
-    default: module.PackListsPage,
-  })),
+const ProductionBoardPage = lazy(() =>
+  import("../features/events/production/ProductionBoardPage").then(
+    (module) => ({ default: module.ProductionBoardPage }),
+  ),
 );
-const PackListDetailPage = lazy(() =>
-  import("../features/logistics/PackListDetailPage").then((module) => ({
-    default: module.PackListDetailPage,
+const PackListOnEvent = lazy(() =>
+  import("../features/logistics/PackListOnEvent").then((module) => ({
+    default: module.PackListOnEvent,
   })),
 );
 const PackListTemplatesPage = lazy(() =>
   import("../features/logistics/PackListTemplatesPage").then((module) => ({
     default: module.PackListTemplatesPage,
-  })),
-);
-const DeliveriesPage = lazy(() =>
-  import("../features/logistics/DeliveriesPage").then((module) => ({
-    default: module.DeliveriesPage,
   })),
 );
 const VehicleFleetPage = lazy(() =>
@@ -214,11 +208,6 @@ const PaymentsPage = lazy(() =>
     default: module.PaymentsPage,
   })),
 );
-const CloseoutPage = lazy(() =>
-  import("../features/finance/CloseoutPage").then((module) => ({
-    default: module.CloseoutPage,
-  })),
-);
 const DonationSummaryPage = lazy(() =>
   import("../features/finance/DonationSummaryPage").then((module) => ({
     default: module.DonationSummaryPage,
@@ -249,6 +238,31 @@ const TimsKPIsDashboardPage = lazy(() =>
     default: module.TimsKPIsDashboardPage,
   })),
 );
+const EosOverviewPage = lazy(() =>
+  import("../features/eos/EosOverviewPage").then((module) => ({
+    default: module.EosOverviewPage,
+  })),
+);
+const VisionTractionPage = lazy(() =>
+  import("../features/eos/VisionTractionPage").then((module) => ({
+    default: module.VisionTractionPage,
+  })),
+);
+const EosPeoplePage = lazy(() =>
+  import("../features/eos/PeoplePage").then((module) => ({
+    default: module.PeoplePage,
+  })),
+);
+const CoreProcessesPage = lazy(() =>
+  import("../features/eos/CoreProcessesPage").then((module) => ({
+    default: module.CoreProcessesPage,
+  })),
+);
+const EosTabs = lazy(() =>
+  import("../features/eos/EosShared").then((module) => ({
+    default: module.EosTabs,
+  })),
+);
 const L10DashboardPage = lazy(() =>
   import("../features/reports/L10DashboardPage").then((module) => ({
     default: module.L10DashboardPage,
@@ -272,11 +286,6 @@ const ClientDetailPage = lazy(() =>
 const ProposalsPage = lazy(() =>
   import("../features/clients/ProposalsPage").then((module) => ({
     default: module.ProposalsPage,
-  })),
-);
-const ContractsPage = lazy(() =>
-  import("../features/clients/ContractsPage").then((module) => ({
-    default: module.ContractsPage,
   })),
 );
 const LeadPipelinePage = lazy(() =>
@@ -580,8 +589,19 @@ export function App() {
             <Route index element={<HomeCalendarPage />} />
             <Route path="/today" element={<MovedRoute to="/" />} />
             <Route path="/events" element={<EventsListPage />} />
-            <Route path="/workbooks" element={<EventWorkbooksPage />} />
+            {/* A workbook belongs to its event: it lives on the event's
+                Overview (owner, 2026-10-14). */}
+            <Route path="/workbooks" element={<MovedRoute to="/events" />} />
             <Route path="/events/tracker" element={<EventTrackerHome />} />
+            {/* The production meeting, one event at a time (owner, 2026-10-14). */}
+            <Route
+              path="/events/production"
+              element={
+                <SupplyRoute>
+                  <ProductionBoardPage />
+                </SupplyRoute>
+              }
+            />
             <Route path="/events/new" element={<EventCreatePage />} />
             <Route path="/events/import" element={<EventImportPage />} />
             <Route path="/events/setup" element={<EventSetupPage />} />
@@ -878,19 +898,17 @@ export function App() {
               path="/logistics/packlists/:id"
               element={<RedirectPackListAlias />}
             />
+            {/* Each event's pack list lives on the event (owner, 2026-10-14);
+                the packing floor and returns are on the dispatch board. */}
             <Route
               path="/logistics/packs"
-              element={
-                <SupplyRoute>
-                  <PackListsPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/logistics/dispatch" hash="floor" />}
             />
             <Route
               path="/logistics/packs/:id"
               element={
                 <SupplyRoute>
-                  <PackListDetailPage />
+                  <PackListOnEvent />
                 </SupplyRoute>
               }
             />
@@ -916,11 +934,7 @@ export function App() {
             />
             <Route
               path="/logistics/deliveries"
-              element={
-                <SupplyRoute>
-                  <DeliveriesPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/logistics/dispatch" hash="vehicles" />}
             />
             <Route
               path="/logistics/dispatch"
@@ -932,21 +946,19 @@ export function App() {
             />
             <Route
               path="/logistics/returns"
-              element={<MovedRoute to="/logistics/packs" hash="returns" />}
+              element={<MovedRoute to="/logistics/dispatch" hash="returns" />}
             />
             <Route
               path="/logistics/floor"
-              element={<MovedRoute to="/logistics/packs" hash="floor" />}
+              element={<MovedRoute to="/logistics/dispatch" hash="floor" />}
             />
             <Route
               path="/logistics/schedule"
-              element={
-                <MovedRoute to="/logistics/deliveries" hash="vehicles" />
-              }
+              element={<MovedRoute to="/logistics/dispatch" hash="vehicles" />}
             />
             <Route
               path="/logistics/route"
-              element={<MovedRoute to="/logistics/deliveries" hash="route" />}
+              element={<MovedRoute to="/logistics/dispatch" hash="route" />}
             />
             <Route
               path="/logistics/fleet"
@@ -1046,13 +1058,10 @@ export function App() {
                 <MovedRoute to="/finance/payments" hash="payment-methods" />
               }
             />
+            {/* Each event's closeout lives on its Proposal & margin tab. */}
             <Route
               path="/finance/closeout"
-              element={
-                <SupplyRoute>
-                  <CloseoutPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/events" />}
             />
             <Route
               path="/finance/donations"
@@ -1107,13 +1116,46 @@ export function App() {
             />
             <Route
               path="/reports/scorecard"
-              element={<MovedRoute to="/reports/l10" hash="scorecard" />}
+              element={<MovedRoute to="/eos/l10" hash="scorecard" />}
             />
+            <Route path="/reports/l10" element={<MovedRoute to="/eos/l10" />} />
             <Route
-              path="/reports/l10"
+              path="/eos"
               element={
                 <SupplyRoute>
-                  <ReportsWorkspaceNav />
+                  <EosOverviewPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/eos/vision"
+              element={
+                <SupplyRoute>
+                  <VisionTractionPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/eos/people"
+              element={
+                <SupplyRoute>
+                  <EosPeoplePage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/eos/process"
+              element={
+                <SupplyRoute>
+                  <CoreProcessesPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/eos/l10"
+              element={
+                <SupplyRoute>
+                  <EosTabs />
                   <L10DashboardPage />
                 </SupplyRoute>
               }
@@ -1166,13 +1208,10 @@ export function App() {
               path="/clients/tastings"
               element={<MovedRoute to="/clients/pipeline" hash="tastings" />}
             />
+            {/* Each contract lives on its event's Proposal & margin tab. */}
             <Route
               path="/clients/contracts"
-              element={
-                <SupplyRoute>
-                  <ContractsPage />
-                </SupplyRoute>
-              }
+              element={<MovedRoute to="/events" />}
             />
             <Route
               path="/clients/contracts/:id/document"

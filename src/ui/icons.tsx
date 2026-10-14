@@ -74,6 +74,12 @@ export const BuildingIcon = icon(
 export const ChartIcon = icon(
   <path d="M2.5 13.5h11M4 11V7M7.3 11V4.5M10.6 11V8.5M13 11V3" />,
 );
+export const CompassIcon = icon(
+  <>
+    <circle cx="8" cy="8" r="6.25" />
+    <path d="m10.6 5.4-1.5 3.7-3.7 1.5 1.5-3.7z" />
+  </>,
+);
 export const GearIcon = icon(
   <>
     <circle cx="8" cy="8" r="2" />

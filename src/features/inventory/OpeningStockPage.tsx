@@ -289,7 +289,7 @@ export function OpeningStockPage() {
                             ? "No amount"
                             : `${amount(row.quantity)} ${row.sourceUnit || "(no unit)"}`}
                         </td>
-                        <td data-label="In catalog unit">
+                        <td className="num" data-label="In catalog unit">
                           {row.catalogQuantity == null
                             ? "—"
                             : `${amount(row.catalogQuantity)} ${unitOf.get(String(row.ingredientId)) ?? ""}`}

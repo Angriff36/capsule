@@ -156,7 +156,7 @@ export function ApiKeysPage() {
                 <th className="th">Name</th>
                 <th className="th">Created</th>
                 <th className="th">Last used</th>
-                <th className="th" />
+                <th className="th text-right" />
               </tr>
             </thead>
             <tbody>
@@ -187,7 +187,7 @@ export function ApiKeysPage() {
       </Section>
 
       <Section title="How an agent uses a key">
-        <p className="text-ink-2">
+        <p className="text-ink-2 [overflow-wrap:anywhere]">
           Send <code>Authorization: Bearer &lt;key&gt;</code> to{" "}
           <code>{base}/commands</code> to list commands, then{" "}
           <code>

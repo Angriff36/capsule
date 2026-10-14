@@ -444,10 +444,14 @@ export function StaffUtilizationDashboard({
                             {row.confirmedRecordCount} confirmed time entries
                           </small>
                         </td>
-                        <td>{formatHours(row.scheduledHours)}</td>
-                        <td>{formatHours(row.billableHours)}</td>
-                        <td>{formatHours(row.totalHours)}</td>
-                        <td>
+                        <td className="num">
+                          {formatHours(row.scheduledHours)}
+                        </td>
+                        <td className="num">
+                          {formatHours(row.billableHours)}
+                        </td>
+                        <td className="num">{formatHours(row.totalHours)}</td>
+                        <td className="num">
                           <strong className="staff-utilization-percent">
                             {row.utilizationPercent == null
                               ? "—"

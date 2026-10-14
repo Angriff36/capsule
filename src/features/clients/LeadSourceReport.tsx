@@ -87,9 +87,12 @@ export function LeadSourceReport({ leads }: { leads: SourceLead[] }) {
           {rows.map((row) => (
             <tr key={row.source} data-testid={`source-row-${row.source}`}>
               <th scope="row">{formatStatusLabel(row.source)}</th>
-              <td>{row.count}</td>
+              <td className="num">{row.count}</td>
               <td>{row.converted}</td>
-              <td data-testid={`source-conversion-${row.source}`}>
+              <td
+                className="num"
+                data-testid={`source-conversion-${row.source}`}
+              >
                 {percent.format(
                   row.count === 0 ? 0 : row.converted / row.count,
                 )}

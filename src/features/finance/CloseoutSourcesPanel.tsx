@@ -107,8 +107,8 @@ export function CloseoutSourcesPanel({
                 <strong>{line.label}</strong>
                 <RecordList line={line} />
               </td>
-              <td>{amount(line, line.planned)}</td>
-              <td>{amount(line, line.actual)}</td>
+              <td className="num">{amount(line, line.planned)}</td>
+              <td className="num">{amount(line, line.actual)}</td>
               <td>
                 {line.complete ? (
                   <span className="text-sm text-ink-2">Complete</span>

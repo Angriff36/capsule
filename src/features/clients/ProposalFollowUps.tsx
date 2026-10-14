@@ -108,7 +108,7 @@ export function ProposalFollowUps({
       ) : shown?.length === 0 ? (
         <p className="p-4 text-base text-ink-2">Nothing is due today.</p>
       ) : (
-        <table className="data-table phone-cards">
+        <table className="data-table table-even phone-cards">
           <thead>
             <tr>
               <th>Proposal</th>

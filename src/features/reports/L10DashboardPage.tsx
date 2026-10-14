@@ -1,19 +1,16 @@
 import { useMemo } from "react";
 import { MergedSection } from "@/ui/MergedSection";
 import { CompanyScorecardDashboardPage } from "./CompanyScorecardDashboardPage";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { L10MeetingRunner, useL10Meeting } from "../eos/L10MeetingRunner";
 import {
   useListLeadershipItem,
   useListLeadershipMeeting,
   useListPerson,
   useListScorecardTarget,
 } from "@/lib/manifest-convex-react";
-import {
-  DashboardGrid,
-  type DashboardGridSize,
-} from "@/ui/charts/DashboardGrid";
-import { StatCard } from "@/ui/charts/StatCard";
-import { PageHeader, Section, EmptyState } from "@/ui/primitives";
+import { PageHeader, EmptyState, StatusChip } from "@/ui/primitives";
+import { EosPanel } from "../eos/EosShared";
 import { formatDate, formatMoney } from "@/lib/format";
 import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import {
@@ -42,6 +39,7 @@ import {
   useLeadsInRange,
 } from "@/lib/financeScopedQueries";
 import { LeadershipItemsPanel } from "./LeadershipItemsPanel";
+import { SalesFunnelSection } from "./SalesFunnelSection";
 import { L10AgendaSection } from "./L10AgendaSection";
 import { L10MeetingRating } from "./L10MeetingRating";
 import { useScorecardSources } from "./useScorecardSources";
@@ -61,6 +59,8 @@ import type { ScorecardPerson } from "./ScorecardTargetEditor";
 
 export function L10DashboardPage() {
   const now = useMemo(() => new Date(), []);
+  const [params, setParams] = useSearchParams();
+  const meeting = useL10Meeting(params.get("meeting") === "1");
   // Every figure here is this month or one of the last eight weeks.
   const eventWindow = useMemo(() => {
     const week = weekStartOf(now);
@@ -215,104 +215,49 @@ export function L10DashboardPage() {
     };
   }, [events, closeouts, leads]);
 
-  const dashboardItems: Array<{
-    id: string;
-    size: DashboardGridSize;
-    content: React.ReactNode;
-    title?: string;
-  }> = [
-    // Weekly wins
-    {
-      id: "wins-header",
-      size: "full",
-      content: (
-        <div className="rounded-sm border-2 border-ok/30 bg-ok-soft p-4">
-          <h3 className="font-semibold text-ok">This Week's Wins</h3>
-          <div className="mt-3 grid grid-cols-4 gap-4">
-            <div>
-              <p className="text-xl font-bold text-ok">
-                {weeklyWins.completedEvents}
-              </p>
-              <p className="text-xs text-ok">Events Completed</p>
-            </div>
-            <div>
-              <p className="text-xl font-bold text-ok">
-                {formatMoney(weeklyWins.revenue)}
-              </p>
-              <p className="text-xs text-ok">Completed revenue</p>
-            </div>
-            <div>
-              <p className="text-xl font-bold text-ok">{weeklyWins.newLeads}</p>
-              <p className="text-xs text-ok">New Leads</p>
-            </div>
-            <div>
-              <p className="text-xl font-bold text-ok">
-                {weeklyWins.convertedLeads}
-              </p>
-              <p className="text-xs text-ok">Converted</p>
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    // Scorecard metrics
-    {
-      id: "monthly-revenue-kpi",
-      size: "small",
-      content: (
-        <StatCard
-          title="Monthly Revenue"
-          main={{
-            value: scorecardMetrics.monthlyRevenue,
-            format: "currency" as const,
-          }}
-          rows={[
-            {
-              label: "Events Booked",
-              value: scorecardMetrics.eventsBooked,
-              format: "number" as const,
-            },
-          ]}
-          tone="brand"
-          isLive
-        />
-      ),
-    },
-    {
-      id: "food-cost-kpi",
-      size: "small",
-      content: (
-        <StatCard
-          title="Food Cost %"
-          main={{
-            value: percentText(scorecardMetrics.foodCostPct),
-          }}
-          isLive
-        />
-      ),
-    },
-    {
-      id: "leads-kpi",
-      size: "small",
-      content: (
-        <StatCard
-          title="New Leads"
-          main={{ value: scorecardMetrics.newLeads, format: "number" as const }}
-          tone="info"
-          isLive
-        />
-      ),
-    },
-  ];
+  const STATUS_TONE: Record<string, string> = {
+    on_track: "chip-tone-ok",
+    caution: "chip-tone-warn",
+    off_track: "chip-tone-danger",
+  };
 
   return (
     <div className="operations-stage supply-stage">
       <PageHeader
-        title="L10 Meeting Dashboard"
-        lead="Your weekly leadership meeting: this week's wins, the scorecard against its targets, priorities, headlines, issues, to-dos, the meeting's rating, and the last eight weeks."
+        eyebrow="EOS · Traction"
+        title="L10 meeting"
+        lead="The weekly leadership meeting, in agenda order: wins, scorecard, Rocks, headlines, issues, to-dos and the rating. Start meeting mode to run it with a timer."
+        actions={
+          meeting.state ? null : (
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={meeting.start}
+            >
+              Start meeting
+            </button>
+          )
+        }
       />
 
-      <L10AgendaSection />
+      {meeting.state ? (
+        <L10MeetingRunner
+          state={meeting.state}
+          go={meeting.go}
+          end={() => {
+            meeting.end();
+            setParams(
+              (current) => {
+                current.delete("meeting");
+                return current;
+              },
+              { replace: true },
+            );
+          }}
+        />
+      ) : (
+        <L10AgendaSection />
+      )}
 
       {events?.length === 0 ? (
         <div data-testid="dashboard-empty">
@@ -323,10 +268,61 @@ export function L10DashboardPage() {
         </div>
       ) : null}
 
-      <DashboardGrid items={dashboardItems} />
+      <div id="wins" className="mt-5 scroll-mt-48">
+        <EosPanel
+          tone="data"
+          eyebrow="Good news"
+          title="This week's wins"
+          lead="Open the meeting on what went right: one personal and one work win each."
+        >
+          <div className="eos-stats">
+            <Stat
+              value={String(weeklyWins.completedEvents)}
+              label="Events completed"
+            />
+            <Stat
+              value={formatMoney(weeklyWins.revenue)}
+              label="Completed revenue"
+            />
+            <Stat value={String(weeklyWins.newLeads)} label="New leads" />
+            <Stat
+              value={String(weeklyWins.convertedLeads)}
+              label="Leads converted"
+            />
+          </div>
+        </EosPanel>
+      </div>
 
-      <div className="mt-6">
-        <Section title="Scorecard">
+      <div id="l10-scorecard" className="mt-5 scroll-mt-48">
+        <EosPanel
+          tone="data"
+          eyebrow="Data"
+          title="Scorecard"
+          lead="Only talk about the numbers off track; move anything that needs work to Issues."
+          actions={
+            <Link to={FINANCE_ROUTES.scorecard} className="btn btn-ghost">
+              Set targets and owners
+            </Link>
+          }
+        >
+          <div className="eos-stats mb-4">
+            <Stat
+              value={formatMoney(scorecardMetrics.monthlyRevenue)}
+              label="Revenue booked this month"
+            />
+            <Stat
+              value={String(scorecardMetrics.eventsBooked)}
+              label="Events booked this month"
+            />
+            <Stat
+              value={percentText(scorecardMetrics.foodCostPct)}
+              label="Food cost this month"
+            />
+            <Stat
+              value={String(scorecardMetrics.newLeads)}
+              label="New leads this month"
+            />
+          </div>
           <div className="supply-table-wrap">
             <table className="supply-table" data-testid="l10-scorecard">
               <thead>
@@ -351,7 +347,7 @@ export function L10DashboardPage() {
                         )
                       </span>
                     </td>
-                    <td>
+                    <td className="num">
                       {row.target
                         ? formatScorecardValue(
                             row.target.target,
@@ -359,26 +355,38 @@ export function L10DashboardPage() {
                           )
                         : "Not set"}
                     </td>
-                    <td>
+                    <td className="font-mono num">
                       {row.actual == null
                         ? NOT_KNOWN
                         : formatScorecardValue(row.actual, row.measure.unit)}
                     </td>
                     <td>{personName(row.target?.ownerPersonId)}</td>
-                    <td>{SCORECARD_STATUS_LABEL[row.status]}</td>
+                    <td>
+                      <StatusChip
+                        status={row.status}
+                        color={STATUS_TONE[row.status] ?? "chip-tone-mute"}
+                        label={SCORECARD_STATUS_LABEL[row.status]}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <p className="mt-2 text-xs text-ink-2">
-            Set targets and owners on the{" "}
-            <Link to={FINANCE_ROUTES.scorecard} className="btn-link">
-              Company Scorecard
-            </Link>
-            .
-          </p>
-        </Section>
+        </EosPanel>
+      </div>
+
+      {/* The sales funnel, reviewed in the meeting with the scorecard (owner,
+          2026-10-14: "i wanted this screen in for the production meetings"). */}
+      <div id="sales-funnel" className="mt-5 scroll-mt-48">
+        <MergedSection
+          id="l10-sales-funnel"
+          title="Sales funnel"
+          summary="Inquiries to won and lost, goals, deals to close and why we lose, for the whole company or one salesperson."
+          defaultOpen
+        >
+          <SalesFunnelSection />
+        </MergedSection>
       </div>
 
       <LeadershipItemsPanel
@@ -387,14 +395,21 @@ export function L10DashboardPage() {
         now={now}
       />
 
-      <L10MeetingRating
-        meetings={(meetings ?? []) as LeadershipMeetingRow[]}
-        people={activePeople}
-        now={now}
-      />
+      <div id="rating" className="scroll-mt-48">
+        <L10MeetingRating
+          meetings={(meetings ?? []) as LeadershipMeetingRow[]}
+          people={activePeople}
+          now={now}
+        />
+      </div>
 
-      <div className="mt-6">
-        <Section title="Meeting history (last 8 weeks)">
+      <div className="mt-5">
+        <EosPanel
+          tone="traction"
+          eyebrow="Traction"
+          title="The last eight weeks"
+          lead="What was added and closed each week, next to the business it ran."
+        >
           <div className="supply-table-wrap">
             <table className="supply-table" data-testid="l10-history">
               <thead>
@@ -413,13 +428,15 @@ export function L10DashboardPage() {
                 {history.map((week) => (
                   <tr key={week.weekStart}>
                     <td>{formatDate(week.weekStart)}</td>
-                    <td>{week.opened}</td>
-                    <td>{week.done}</td>
-                    <td>{week.dropped}</td>
-                    <td>{week.completedEvents}</td>
-                    <td>{formatMoney(week.completedRevenue)}</td>
-                    <td>{week.newLeads}</td>
-                    <td>
+                    <td className="num">{week.opened}</td>
+                    <td className="num">{week.done}</td>
+                    <td className="num">{week.dropped}</td>
+                    <td className="num">{week.completedEvents}</td>
+                    <td className="num">
+                      {formatMoney(week.completedRevenue)}
+                    </td>
+                    <td className="num">{week.newLeads}</td>
+                    <td className="num">
                       {week.meetingRating == null
                         ? "—"
                         : `${week.meetingRating} / 10`}
@@ -429,18 +446,7 @@ export function L10DashboardPage() {
               </tbody>
             </table>
           </div>
-        </Section>
-      </div>
-
-      {/* L10 Framework Note */}
-      <div className="mt-6 rounded-sm border border-line bg-inset p-4">
-        <h4 className="text-xs font-semibold text-ink">About L10 Meetings</h4>
-        <p className="mt-1 text-xs text-ink-2">
-          The L10 is a weekly 60-minute leadership meeting to review the
-          business, solve issues, and stay aligned on priorities. Scorecard
-          numbers track business health, and wins open the meeting on what went
-          right this week.
-        </p>
+        </EosPanel>
       </div>
 
       <MetricDefinitionList
@@ -460,6 +466,15 @@ export function L10DashboardPage() {
       >
         <CompanyScorecardDashboardPage />
       </MergedSection>
+    </div>
+  );
+}
+
+function Stat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="eos-stat">
+      <span className="eos-stat-value font-mono">{value}</span>
+      <h3>{label}</h3>
     </div>
   );
 }

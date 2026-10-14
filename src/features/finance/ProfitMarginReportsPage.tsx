@@ -63,10 +63,10 @@ function resultCount(
 function MetricsCells({ metrics }: { metrics: ProfitMetrics }) {
   return (
     <>
-      <td>{formatMoney(metrics.revenue)}</td>
-      <td>{formatMoney(metrics.totalCost)}</td>
-      <td>{formatMoney(metrics.grossProfit)}</td>
-      <td>{percent(metrics.grossMarginPercent)}</td>
+      <td className="num">{formatMoney(metrics.revenue)}</td>
+      <td className="num">{formatMoney(metrics.totalCost)}</td>
+      <td className="num">{formatMoney(metrics.grossProfit)}</td>
+      <td className="num">{percent(metrics.grossMarginPercent)}</td>
       <td className={metrics.netProfit < 0 ? "is-negative" : "is-positive"}>
         {formatMoney(metrics.netProfit)}
         {metrics.costMissingCount > 0 ? (
@@ -127,7 +127,7 @@ function ProfitResultsTable({
                     {row.clientName}
                     <small>{row.segmentLabel}</small>
                   </td>
-                  <td>{row.eventCount}</td>
+                  <td className="num">{row.eventCount}</td>
                   <MetricsCells metrics={row} />
                 </tr>
               ))
@@ -139,7 +139,7 @@ function ProfitResultsTable({
                     <strong>{row.clientName}</strong>
                   </td>
                   <td>{row.segmentLabel}</td>
-                  <td>{row.eventCount}</td>
+                  <td className="num">{row.eventCount}</td>
                   <MetricsCells metrics={row} />
                 </tr>
               ))
@@ -150,7 +150,7 @@ function ProfitResultsTable({
                   <td>
                     <strong>{row.label}</strong>
                   </td>
-                  <td>{row.eventCount}</td>
+                  <td className="num">{row.eventCount}</td>
                   <MetricsCells metrics={row} />
                 </tr>
               ))

@@ -24,6 +24,8 @@ import { packCategoryLabel } from "./packLineExplanation";
 import "./DispatchBoard.css";
 
 const OPEN_LINES_SHOWN = 6;
+/** How far ahead a list nobody has started shows on the floor. */
+const FLOOR_AHEAD_MS = 7 * 86_400_000;
 /** Pack lists the warehouse still has to pack or load. */
 const FLOOR_STATUSES = ["draft", "packing", "packed"] as const;
 
@@ -66,60 +68,81 @@ export function PackingFloorPage() {
 
   const rows = useMemo(() => {
     if (loading) return [];
-    return (packLists ?? [])
-      .filter(
-        (list) =>
-          list.deletedAt == null &&
-          ["draft", "packing", "packed"].includes(String(list.status)),
-      )
-      .map((list) => {
-        const event = (events ?? []).find((row) => row._id === list.eventId);
-        const lines = (packLines ?? []).filter(
-          (line) =>
-            line.deletedAt == null &&
-            line.listedAt != null &&
-            line.retiredAt == null &&
-            line.excludedAt == null &&
-            line.packListId === list._id,
-        );
-        let toPack = 0;
-        let packed = 0;
-        for (const line of lines) {
-          const required = Number(line.requiredQuantity) || 0;
-          toPack += required;
-          packed += Math.min(Number(line.packedQuantity) || 0, required);
-        }
-        const open = lines.filter(
-          (line) =>
-            String(line.status) === "listed" &&
-            Number(line.packedQuantity) < Number(line.requiredQuantity),
-        );
-        const missing = lines.filter(
-          (line) => String(line.status) === "missing",
-        );
-        const packers = [
-          ...new Set(
-            lines
-              .map((line) => line.packedByPersonId)
-              .filter((id): id is string => id != null),
-          ),
-        ];
-        return {
-          list,
-          event,
-          lines,
-          open,
-          missing,
-          packers,
-          percent: toPack > 0 ? Math.round((packed / toPack) * 100) : null,
-        };
-      })
-      .filter((row) => row.event != null && row.event.deletedAt == null)
-      .sort(
-        (a, b) =>
-          Number(a.event?.startsAt ?? Infinity) -
-          Number(b.event?.startsAt ?? Infinity),
-      );
+    return (
+      (packLists ?? [])
+        .filter(
+          (list) =>
+            list.deletedAt == null &&
+            ["draft", "packing", "packed"].includes(String(list.status)),
+        )
+        .map((list) => {
+          const event = (events ?? []).find((row) => row._id === list.eventId);
+          const lines = (packLines ?? []).filter(
+            (line) =>
+              line.deletedAt == null &&
+              line.listedAt != null &&
+              line.retiredAt == null &&
+              line.excludedAt == null &&
+              line.packListId === list._id,
+          );
+          let toPack = 0;
+          let packed = 0;
+          for (const line of lines) {
+            const required = Number(line.requiredQuantity) || 0;
+            toPack += required;
+            packed += Math.min(Number(line.packedQuantity) || 0, required);
+          }
+          const open = lines.filter(
+            (line) =>
+              String(line.status) === "listed" &&
+              Number(line.packedQuantity) < Number(line.requiredQuantity),
+          );
+          const missing = lines.filter(
+            (line) => String(line.status) === "missing",
+          );
+          const packers = [
+            ...new Set(
+              lines
+                .map((line) => line.packedByPersonId)
+                .filter((id): id is string => id != null),
+            ),
+          ];
+          return {
+            list,
+            event,
+            lines,
+            open,
+            missing,
+            packers,
+            percent: toPack > 0 ? Math.round((packed / toPack) * 100) : null,
+          };
+        })
+        .filter((row) => row.event != null && row.event.deletedAt == null)
+        // The floor is today's work (owner, 2026-10-14: "why are there a bunch
+        // of old events showing"): never an event that is over or cancelled,
+        // and a list nobody has started only when its event is a week away.
+        .filter((row) => {
+          const event = row.event!;
+          const now = Date.now();
+          if (
+            ["cancelled", "completed", "closed_out"].includes(
+              String(event.stage),
+            )
+          )
+            return false;
+          if (Number(event.endsAt ?? event.startsAt ?? Infinity) < now)
+            return false;
+          return (
+            String(row.list.status) !== "draft" ||
+            Number(event.startsAt ?? Infinity) < now + FLOOR_AHEAD_MS
+          );
+        })
+        .sort(
+          (a, b) =>
+            Number(a.event?.startsAt ?? Infinity) -
+            Number(b.event?.startsAt ?? Infinity),
+        )
+    );
   }, [loading, events, packLists, packLines]);
 
   const permissions = new Set(resolveManifestPolicies(authStatus?.role ?? ""));

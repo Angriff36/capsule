@@ -55,14 +55,18 @@ export function ReconciliationTables({
                 <tr key={`${row.period}|${row.currency}`}>
                   <td>{row.period}</td>
                   <td>{row.currency}</td>
-                  <td>{money(row.sourceTotal, row.currency)}</td>
-                  <td>{money(row.ledgerTotal, row.currency)}</td>
+                  <td className="num">
+                    {money(row.sourceTotal, row.currency)}
+                  </td>
+                  <td className="num">
+                    {money(row.ledgerTotal, row.currency)}
+                  </td>
                   <td
                     className={row.difference === 0 ? "text-ok" : "text-danger"}
                   >
                     {money(row.difference, row.currency)}
                   </td>
-                  <td>
+                  <td className="num">
                     {row.excludedCount > 0
                       ? `${row.excludedCount} rows · ${money(row.excludedTotal, row.currency)}`
                       : "—"}
@@ -95,10 +99,14 @@ export function ReconciliationTables({
                   <td>{row.period}</td>
                   <td>{row.currency}</td>
                   <td>{RECONCILIATION_RESULT_LABEL[row.result]}</td>
-                  <td>{row.count}</td>
-                  <td>{money(row.sourceTotal, row.currency)}</td>
-                  <td>{money(row.ledgerTotal, row.currency)}</td>
-                  <td>{money(row.difference, row.currency)}</td>
+                  <td className="num">{row.count}</td>
+                  <td className="num">
+                    {money(row.sourceTotal, row.currency)}
+                  </td>
+                  <td className="num">
+                    {money(row.ledgerTotal, row.currency)}
+                  </td>
+                  <td className="num">{money(row.difference, row.currency)}</td>
                 </tr>
               ))}
             </tbody>
@@ -143,8 +151,12 @@ export function ReconciliationTables({
                         ? (paymentLabel?.(line.paymentId) ?? line.paymentId)
                         : "—"}
                     </td>
-                    <td>{money(line.sourceAmount, line.currency)}</td>
-                    <td>{money(line.ledgerAmount, line.currency)}</td>
+                    <td className="num">
+                      {money(line.sourceAmount, line.currency)}
+                    </td>
+                    <td className="num">
+                      {money(line.ledgerAmount, line.currency)}
+                    </td>
                     <td>
                       {line.actualAt === null ? "—" : formatDate(line.actualAt)}
                     </td>

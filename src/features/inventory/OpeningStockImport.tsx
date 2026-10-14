@@ -119,7 +119,7 @@ export function OpeningStockImport() {
           />
           Every row on this sheet was counted by hand
         </label>
-        <label className="field-label max-w-full min-w-0">
+        <label className="field-label max-w-full min-w-0 grid-cols-1">
           Count sheet
           <input
             type="file"
