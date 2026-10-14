@@ -12,6 +12,7 @@ import {
   type AppPalette,
   type PaletteMode,
 } from "./appPalette";
+import { randomPalette } from "./randomPalette";
 
 const MODES = [
   { value: "light", label: "Light mode" },
@@ -110,8 +111,9 @@ export function AppColorsSection({
       <div className="grid gap-4 p-4">
         <p className="text-sm text-ink-2">
           The colors of Capsule itself, for everyone in the company. A change
-          shows on the whole app at once, so you can judge it by eye. Save keeps
-          it; leaving this page without saving puts the saved colors back.
+          shows on the whole app at once, so you can judge it by eye. Randomize
+          tries a new light and dark set that stays easy to read. Save keeps it;
+          leaving this page without saving puts the saved colors back.
         </p>
         <ul className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
           {PALETTE_TOKENS.map(({ token, label, hint }) => {
@@ -182,6 +184,14 @@ export function AppColorsSection({
             onClick={() => void save(draft)}
           >
             {busy ? "Saving…" : "Save colors"}
+          </button>
+          <button
+            type="button"
+            className="btn btn-ghost"
+            disabled={!canEdit || busy}
+            onClick={() => setDraft(randomPalette())}
+          >
+            Randomize
           </button>
           <button
             type="button"
