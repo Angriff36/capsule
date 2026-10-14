@@ -74,7 +74,7 @@ export function LiveReportData(props: LiveReportDataProps) {
       <div className="document-empty">
         <p>This report covers all time.</p>
         <span>It adds up every record on file.</span>
-        <div className="mt-3 flex justify-center">
+        <div className="mt-3 flex">
           <button
             type="button"
             className="btn btn-primary btn-sm"

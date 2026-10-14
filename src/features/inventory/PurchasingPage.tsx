@@ -742,7 +742,7 @@ export function PurchasingPage() {
               Weekly drafts appear here automatically once you approve an event
               with dishes. Add a vendor to be ready.
             </span>
-            <div className="mt-3 flex justify-center gap-2">
+            <div className="mt-3 flex gap-2">
               <Link to="/events" className="btn btn-primary btn-sm">
                 Go to events
               </Link>

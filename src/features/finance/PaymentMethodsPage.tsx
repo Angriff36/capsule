@@ -287,7 +287,7 @@ export function PaymentMethodsPage() {
           <div className="document-empty">
             <p>No payment methods yet.</p>
             <span>Register an instrument for a client before collecting.</span>
-            <div className="mt-3 flex justify-center">
+            <div className="mt-3 flex">
               {showRegister ? null : (
                 <button
                   type="button"

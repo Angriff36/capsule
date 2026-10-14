@@ -388,7 +388,7 @@ function SavedReportsPage() {
               <span>
                 Create one to open live operational results immediately.
               </span>
-              <div className="mt-3 flex justify-center">
+              <div className="mt-3 flex">
                 {showCreate ? null : (
                   <button
                     type="button"

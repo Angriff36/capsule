@@ -1,7 +1,7 @@
 .training-stage {
-  --training-ink: #17382e;
-  --training-mint: #d8eee2;
-  --training-lime: #d6ef72;
+  --training-ink: var(--color-ink);
+  --training-mint: var(--color-brand-soft);
+  --training-lime: #f0a271;
   --training-coral: #f28b63;
   --training-paper: #fffdf6;
   gap: 1.35rem;
@@ -51,8 +51,8 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   border: 1px solid var(--color-line);
-  background: var(--training-ink);
-  color: #f8fff9;
+  background: #1c1c1f;
+  color: #f1f1f3;
 }
 
 .training-scoreboard > div {

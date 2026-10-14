@@ -1,5 +1,5 @@
 .capacity-planner {
-  --capacity-spruce: #224b43;
+  --capacity-spruce: var(--color-ink);
   --capacity-celadon: #dce9dc;
   --capacity-saffron: #d69346;
   --capacity-coral: #b24a37;

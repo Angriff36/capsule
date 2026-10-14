@@ -106,7 +106,7 @@ export function PackListItemTable({
           Add equipment or dish lines while the list is draft or packing.
         </span>
         {canAddItems ? (
-          <div className="mt-3 flex justify-center">
+          <div className="mt-3 flex">
             <button
               type="button"
               className="btn btn-primary btn-sm"

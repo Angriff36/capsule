@@ -266,7 +266,7 @@ export function PurchasingQueueSplit({
           <div className="document-empty">
             <p>No vendors yet.</p>
             <span>Add a supplier before opening an order folio.</span>
-            <div className="mt-3 flex justify-center">
+            <div className="mt-3 flex">
               <button
                 type="button"
                 className="btn btn-primary btn-sm"
