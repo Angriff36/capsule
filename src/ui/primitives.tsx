@@ -1,8 +1,6 @@
 import type { ReactNode } from "react";
 import { type EventStage, STAGE_LABEL } from "../features/events/eventStatus";
 import { formatStatusLabel, statusChipClass } from "../lib/statusLabels";
-import { ChevronDownIcon } from "./icons";
-import { useDismissibleMenu } from "./useDismissibleMenu";
 
 const STAGE_CHIP: Record<EventStage, string> = {
   quote: "chip-tone-mute",
@@ -127,36 +125,6 @@ export function PageHeader({
       ) : null}
     </header>
   );
-}
-
-/**
- * "More ▾" overflow for secondary and destructive actions. Children are the
- * menu items (buttons or links); give destructive ones `action-menu-danger`
- * and put an <ActionMenuRule /> before them.
- */
-export function ActionMenu({
-  label = "More",
-  children,
-}: {
-  label?: string;
-  children: ReactNode;
-}) {
-  const menuRef = useDismissibleMenu({ closeOnSelect: true });
-  return (
-    <details ref={menuRef} className="action-menu">
-      <summary className="btn btn-ghost">
-        {label}
-        <ChevronDownIcon width={12} height={12} />
-      </summary>
-      <div className="action-menu-list" role="menu">
-        {children}
-      </div>
-    </details>
-  );
-}
-
-export function ActionMenuRule() {
-  return <div className="action-menu-rule" role="separator" />;
 }
 
 export function Section({

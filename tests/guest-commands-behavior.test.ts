@@ -9,6 +9,8 @@ import {
   input,
   button,
   click,
+  openMenu,
+  menuItem,
 } from "./support/mounted-app";
 import { EventGuestPanel } from "../src/features/events/EventGuestPanel";
 import type { Id } from "../src/lib/api";
@@ -77,8 +79,10 @@ it.each([
     backend.values.set("queries:listEventGuestByEventId", [guest]);
     const action = command(hook);
     await mount(page());
-    await click(container.querySelector<HTMLElement>("summary")!);
-    await click(button(label));
+    await openMenu(
+      container.querySelector<HTMLElement>("button[aria-haspopup='menu']")!,
+    );
+    await click(menuItem(label));
     if (value !== null) {
       expect(action).not.toHaveBeenCalled();
       input("value", value);

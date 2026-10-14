@@ -2,7 +2,12 @@
 import { act, createElement } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, expect, it, vi } from "vitest";
-import { ActionMenu } from "../src/ui/primitives";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../src/ui/DropdownMenu";
 import { RecordPreviewSheet } from "../src/ui/RecordPreviewSheet";
 
 // AC-171: nested dialogs keep Escape ownership. The innermost open thing
@@ -28,9 +33,20 @@ function mountSheet(onClose: () => void) {
         open: true,
         title: "Dana Reyes",
         onClose,
-        children: createElement(ActionMenu, {
-          children: createElement("button", { type: "button" }, "Archive"),
-        }),
+        children: createElement(
+          DropdownMenu,
+          null,
+          createElement(
+            DropdownMenuTrigger,
+            { asChild: true },
+            createElement("button", { type: "button" }, "More"),
+          ),
+          createElement(
+            DropdownMenuContent,
+            null,
+            createElement(DropdownMenuItem, null, "Archive"),
+          ),
+        ),
       }),
     ),
   );
@@ -48,20 +64,35 @@ function escape(target: EventTarget = document.activeElement ?? document) {
   return event;
 }
 
-it("an open menu inside a sheet takes the first Escape and keeps the sheet open", () => {
+it("an open menu inside a sheet takes the first Escape and keeps the sheet open", async () => {
   const onClose = vi.fn();
   mountSheet(onClose);
-  const menu = document.querySelector<HTMLDetailsElement>("details")!;
-  menu.open = true;
+  const trigger = document.querySelector<HTMLButtonElement>(
+    "button[aria-haspopup='menu']",
+  )!;
+  act(() => {
+    trigger.focus();
+    trigger.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Enter",
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+  });
+  expect(document.querySelector("[role='menu']")).not.toBeNull();
 
-  const first = escape(menu.querySelector("button")!);
-  expect(menu.open).toBe(false);
+  const first = escape(document.querySelector("[role='menuitem']")!);
+  expect(document.querySelector("[role='menu']")).toBeNull();
   // The press is marked as used, so a native <dialog> around it does not
   // cancel either.
   expect(first.defaultPrevented).toBe(true);
   expect(onClose).not.toHaveBeenCalled();
   // Focus goes back to the menu button, still inside the sheet.
-  expect(document.activeElement).toBe(menu.querySelector("summary"));
+  await act(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+  });
+  expect(document.activeElement).toBe(trigger);
 
   escape();
   expect(onClose).toHaveBeenCalledTimes(1);

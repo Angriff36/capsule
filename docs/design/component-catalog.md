@@ -70,10 +70,11 @@ Submenus are available for existing nested action needs; prefer a flat menu when
 that makes the task easier. Use a native select or the appropriate searchable
 picker for form values, rather than treating an action menu as a combobox.
 
-The Events index's More menu is a production example. Older `ActionMenu` callers
-in `primitives.tsx` still use native details; use `DropdownMenu` for new action
-menus and migrate those callers when changing their menus. Keep their existing
-actions, command handling, and permission behavior intact.
+The Events index's More menu and the event page's More menu are production
+examples. `ActionMenu` is gone; the remaining native `<details>` menus
+(chat appearance, recents, top bar, notification tray) use `useDismissibleMenu`.
+Use `DropdownMenu` for new action menus and keep existing actions, command
+handling, and permission behavior intact when migrating one.
 
 ## UI Layouts components
 

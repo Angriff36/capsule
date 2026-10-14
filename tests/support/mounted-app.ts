@@ -1672,3 +1672,24 @@ export async function submit(form: HTMLFormElement) {
     ),
   );
 }
+/** Radix menus open on keyboard Enter or pointerdown, not a plain click. */
+export async function openMenu(trigger: HTMLElement) {
+  await act(async () => {
+    trigger.focus();
+    trigger.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        key: "Enter",
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+  });
+}
+/** The open Radix menu item with this label (menus render in a portal). */
+export function menuItem(text: string) {
+  const matches = [
+    ...document.body.querySelectorAll<HTMLElement>("[role='menuitem']"),
+  ].filter((node) => node.textContent?.trim() === text);
+  expect(matches, `Expected one menu item: ${text}`).toHaveLength(1);
+  return matches[0]!;
+}

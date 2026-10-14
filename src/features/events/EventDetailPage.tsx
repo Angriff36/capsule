@@ -7,7 +7,7 @@ import { MergedSection } from "../../ui/MergedSection";
 import { ProposalsPage } from "../clients/ProposalsPage";
 import { venueDetailPath } from "../facilities/facilitiesRoutes";
 import { useClientsByIds } from "../../lib/useClientDirectory";
-import { AllergenBriefingButton } from "./AllergenBriefingButton";
+import { ALLERGEN_BRIEFING_HASH } from "./AllergenBriefingButton";
 import {
   Link,
   useLocation,
@@ -55,12 +55,19 @@ import {
   useEventStaffNeedRows,
 } from "../../lib/eventScopedQueries";
 import { useTrackRecent } from "../../lib/recents";
-import { DownloadIcon } from "../../ui/icons";
+import { ChevronDownIcon, DownloadIcon } from "../../ui/icons";
 import { eventVenueLabel, useIsPickupEvent } from "./eventVenueLabel";
 import { useCascadeReceiptToast } from "./useCascadeReceiptToast";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
-import { ActionMenu, ActionMenuRule, ErrorState } from "../../ui/primitives";
+import { ErrorState } from "../../ui/primitives";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../ui/DropdownMenu";
 import { reportActionOk } from "../../ui/action-result";
 import { useSuccessToast } from "../../ui/useSuccessToast";
 import { StickyRecordHeader } from "../../ui/StickyRecordHeader";
@@ -70,7 +77,7 @@ import { WalkieToggle } from "../chat/WalkieToggle";
 import { useWalkieReceiver } from "../chat/useWalkieReceiver";
 import { useChatIdentity } from "../chat/useTeamChat";
 import { chatChannelKey, type ChatChannel } from "../chat/chatTypes";
-import { EventClientPortalShare } from "../clientPortal/EventClientPortalShare";
+import { useEventClientPortalShare } from "../clientPortal/EventClientPortalShare";
 import { ClientPreviewCard } from "../clients/ClientPreviewCard";
 import { HoverPreview } from "../../ui/HoverPreview";
 import { downloadBeoPdf } from "./beoPdf";
@@ -457,6 +464,8 @@ function EventDetailContent({
             activity.eventId === event._id && activity.deletedAt == null,
         ).length;
 
+  const clientPortalShare = useEventClientPortalShare(event._id);
+
   const headerActions = [
     <WalkieToggle key="walkie" channelKey={eventChannelKey} />,
     ...(headerPrimary
@@ -482,82 +491,86 @@ function EventDetailContent({
       <DownloadIcon width={14} height={14} />
       Export BEO
     </button>,
-    <ActionMenu key="more">
-      {mobile ? (
-        <Link
-          key="edit-details"
-          to={`${eventDetailPath(event._id, "overview")}#event-setup-basics`}
-        >
-          Edit event details
-        </Link>
-      ) : null}
-      <EventClientPortalShare key="client-portal-share" eventId={event._id} />
-      {menuStageActions.map((action) => (
-        <button
-          key={action.key}
-          type="button"
-          className="btn btn-ghost"
-          disabled={busy}
-          onClick={() => runAction(action.key)}
-        >
-          {action.label}
+    <DropdownMenu key="more">
+      <DropdownMenuTrigger asChild>
+        <button type="button" className="btn btn-ghost">
+          More
+          <ChevronDownIcon width={12} height={12} />
         </button>
-      ))}
-      <a
-        key="create-proposal"
-        className="btn btn-ghost"
-        href={`/events/${event._id}/proposal`}
-        target="_blank"
-        rel="noopener"
-      >
-        Proposal
-      </a>
-      <Link
-        key="save-as-template"
-        className="btn btn-ghost"
-        to={`/events/setup?fromEvent=${event._id}#templates`}
-      >
-        Save as template
-      </Link>
-      <AllergenBriefingButton key="allergen-briefing" />
-      <Link
-        key="print-map"
-        className="btn btn-ghost"
-        to={`/events/${event._id}/map?print=1`}
-      >
-        Print map
-      </Link>
-      <Link
-        key="map-to-chat"
-        className="btn btn-ghost"
-        to={`/events/${event._id}/map`}
-      >
-        Send map and layouts to team chat
-      </Link>
-      {dangerActions.length > 0 ? <ActionMenuRule /> : null}
-      {dangerActions.map((action) => (
-        <button
-          key={action.key}
-          type="button"
-          disabled={busy}
-          onClick={() => runAction(action.key)}
-          className="action-menu-danger"
-        >
-          {action.label}
-        </button>
-      ))}
-      <EventDuplicateMenuItem event={event} busy={busy} run={run} />
-      <EventArchiveMenuItems
-        event={event}
-        busy={busy}
-        version={version}
-        run={run}
-        onArchive={() => {
-          setReasonFor("archive");
-          setReason("");
-        }}
-      />
-    </ActionMenu>,
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        {mobile ? (
+          <DropdownMenuItem asChild>
+            <Link
+              to={`${eventDetailPath(event._id, "overview")}#event-setup-basics`}
+            >
+              Edit event details
+            </Link>
+          </DropdownMenuItem>
+        ) : null}
+        {clientPortalShare.menuItems}
+        {menuStageActions.map((action) => (
+          <DropdownMenuItem
+            key={action.key}
+            disabled={busy}
+            onSelect={() => runAction(action.key)}
+          >
+            {action.label}
+          </DropdownMenuItem>
+        ))}
+        <DropdownMenuItem asChild>
+          <a
+            href={`/events/${event._id}/proposal`}
+            target="_blank"
+            rel="noopener"
+          >
+            Proposal
+          </a>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to={`/events/setup?fromEvent=${event._id}#templates`}>
+            Save as template
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link
+            to={`${location.pathname}${location.search}${ALLERGEN_BRIEFING_HASH}`}
+          >
+            Allergen briefing
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to={`/events/${event._id}/map?print=1`}>Print map</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link to={`/events/${event._id}/map`}>
+            Send map and layouts to team chat
+          </Link>
+        </DropdownMenuItem>
+        {dangerActions.length > 0 ? <DropdownMenuSeparator /> : null}
+        {dangerActions.map((action) => (
+          <DropdownMenuItem
+            key={action.key}
+            variant="destructive"
+            disabled={busy}
+            onSelect={() => runAction(action.key)}
+          >
+            {action.label}
+          </DropdownMenuItem>
+        ))}
+        <EventDuplicateMenuItem event={event} busy={busy} run={run} />
+        <EventArchiveMenuItems
+          event={event}
+          busy={busy}
+          version={version}
+          run={run}
+          onArchive={() => {
+            setReasonFor("archive");
+            setReason("");
+          }}
+        />
+      </DropdownMenuContent>
+    </DropdownMenu>,
   ];
 
   const overviewProps = {
@@ -864,6 +877,7 @@ function EventDetailContent({
 
   return (
     <div ref={sectionScopeRef}>
+      {clientPortalShare.host}
       <StickyRecordHeader
         title={event.title}
         facts={[

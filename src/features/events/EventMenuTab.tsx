@@ -44,8 +44,15 @@ import { EventMenuLineKitchen } from "./EventMenuLineKitchen";
 import { EventUnresolvedMaterialsNotice } from "./EventUnresolvedMaterialsNotice";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
-import { ActionMenu, ActionMenuRule, Skeleton } from "../../ui/primitives";
-import { PlusIcon } from "../../ui/icons";
+import { Skeleton } from "../../ui/primitives";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../ui/DropdownMenu";
+import { ChevronDownIcon, PlusIcon } from "../../ui/icons";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import type { EventStockShortage } from "./EventStockReservationCoordinator";
 import { TemplateStockSyncLifecycle } from "./TemplateStockSyncLifecycle";
@@ -1310,91 +1317,96 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                             }
                             compact
                           />
-                          <ActionMenu>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setOpenRecipeId((current) =>
-                                  current === selection._id
-                                    ? null
-                                    : selection._id,
-                                )
-                              }
-                            >
-                              {recipeOpen
-                                ? "Hide recipe"
-                                : "Edit recipe on this menu"}
-                            </button>
-                            <button
-                              type="button"
-                              disabled={busy != null}
-                              onClick={() => {
-                                void (async () => {
-                                  const current =
-                                    Number(
-                                      (
-                                        selection as {
-                                          headcountOverride?: number;
-                                        }
-                                      ).headcountOverride,
-                                    ) || 0;
-                                  const values = await prompt.askFields({
-                                    title: "Food-cost headcount",
-                                    description:
-                                      "Guests this dish is costed for. 0 uses the event guest count.",
-                                    fields: [
-                                      {
-                                        name: "headcountOverride",
-                                        label: "Headcount override",
-                                        defaultValue: String(current),
-                                        inputType: "number",
-                                        required: true,
-                                      },
-                                    ],
-                                    confirmLabel: "Save headcount",
-                                  });
-                                  if (!values) return;
-                                  const override = Number(
-                                    values.headcountOverride,
-                                  );
-                                  if (
-                                    !Number.isFinite(override) ||
-                                    override < 0
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button type="button" className="btn btn-ghost">
+                                More
+                                <ChevronDownIcon width={12} height={12} />
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem
+                                onSelect={() =>
+                                  setOpenRecipeId((current) =>
+                                    current === selection._id
+                                      ? null
+                                      : selection._id,
                                   )
-                                    return;
-                                  void run(`override:${selection._id}`, () =>
-                                    setHeadcountOverride({
+                                }
+                              >
+                                {recipeOpen
+                                  ? "Hide recipe"
+                                  : "Edit recipe on this menu"}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                disabled={busy != null}
+                                onSelect={() => {
+                                  void (async () => {
+                                    const current =
+                                      Number(
+                                        (
+                                          selection as {
+                                            headcountOverride?: number;
+                                          }
+                                        ).headcountOverride,
+                                      ) || 0;
+                                    const values = await prompt.askFields({
+                                      title: "Food-cost headcount",
+                                      description:
+                                        "Guests this dish is costed for. 0 uses the event guest count.",
+                                      fields: [
+                                        {
+                                          name: "headcountOverride",
+                                          label: "Headcount override",
+                                          defaultValue: String(current),
+                                          inputType: "number",
+                                          required: true,
+                                        },
+                                      ],
+                                      confirmLabel: "Save headcount",
+                                    });
+                                    if (!values) return;
+                                    const override = Number(
+                                      values.headcountOverride,
+                                    );
+                                    if (
+                                      !Number.isFinite(override) ||
+                                      override < 0
+                                    )
+                                      return;
+                                    void run(`override:${selection._id}`, () =>
+                                      setHeadcountOverride({
+                                        docId: selection._id,
+                                        version: selection.version,
+                                        headcountOverride: override,
+                                      }),
+                                    );
+                                  })();
+                                }}
+                              >
+                                Set food-cost headcount
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                variant="destructive"
+                                disabled={busy != null}
+                                onSelect={() => {
+                                  // Choosing "Remove event dish" from this
+                                  // menu is the confirmation; no typed reason
+                                  // for a routine, reversible menu edit.
+                                  void run(`remove:${selection._id}`, () =>
+                                    removeDish({
                                       docId: selection._id,
                                       version: selection.version,
-                                      headcountOverride: override,
+                                      reason: "Removed from event menu",
                                     }),
                                   );
-                                })();
-                              }}
-                            >
-                              Set food-cost headcount
-                            </button>
-                            <ActionMenuRule />
-                            <button
-                              type="button"
-                              className="action-menu-danger"
-                              disabled={busy != null}
-                              onClick={() => {
-                                // Choosing "Remove event dish" from this
-                                // menu is the confirmation; no typed reason
-                                // for a routine, reversible menu edit.
-                                void run(`remove:${selection._id}`, () =>
-                                  removeDish({
-                                    docId: selection._id,
-                                    version: selection.version,
-                                    reason: "Removed from event menu",
-                                  }),
-                                );
-                              }}
-                            >
-                              Remove from menu
-                            </button>
-                          </ActionMenu>
+                                }}
+                              >
+                                Remove from menu
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </form>
                       {recipeOpen ? (

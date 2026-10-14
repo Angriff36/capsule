@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useActionPrompt } from "../../ui/action-prompt";
-import { ActionMenuRule } from "../../ui/primitives";
+import { DropdownMenuItem, DropdownMenuSeparator } from "../../ui/DropdownMenu";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import type { KitchenSection } from "./kitchenRoutes";
 
@@ -112,25 +112,35 @@ export function KitchenCatalogLifecycleButtons({
 
   const safe = actions.filter((action) => !DESTRUCTIVE.has(action.key));
   const destructive = actions.filter((action) => DESTRUCTIVE.has(action.key));
-  const button = (action: { key: string; label: string }, danger: boolean) => (
-    <button
-      key={action.key}
-      type="button"
-      className={
-        render ? (danger ? "action-menu-danger" : "") : "btn btn-ghost btn-sm"
-      }
-      disabled={busy != null}
-      onClick={() => invoke(action.key)}
-    >
-      {busy === `${item._id}:${action.key}` ? "Working…" : action.label}
-    </button>
-  );
+  const label = (action: { key: string; label: string }) =>
+    busy === `${item._id}:${action.key}` ? "Working…" : action.label;
+  const button = (action: { key: string; label: string }, danger: boolean) =>
+    render ? (
+      <DropdownMenuItem
+        key={action.key}
+        variant={danger ? "destructive" : "default"}
+        disabled={busy != null}
+        onSelect={() => invoke(action.key)}
+      >
+        {label(action)}
+      </DropdownMenuItem>
+    ) : (
+      <button
+        key={action.key}
+        type="button"
+        className="btn btn-ghost btn-sm"
+        disabled={busy != null}
+        onClick={() => invoke(action.key)}
+      >
+        {label(action)}
+      </button>
+    );
   const buttons =
     actions.length === 0 ? null : (
       <>
         {safe.map((action) => button(action, false))}
         {render && safe.length > 0 && destructive.length > 0 ? (
-          <ActionMenuRule />
+          <DropdownMenuSeparator />
         ) : null}
         {destructive.map((action) => button(action, true))}
       </>

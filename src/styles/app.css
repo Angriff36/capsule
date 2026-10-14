@@ -3228,6 +3228,7 @@
 }
 
 .tpp-parameter-grid label,
+.tpp-parameter-field,
 .tpp-date-range label {
   display: grid;
   gap: 0.3rem;
@@ -4025,14 +4026,12 @@ div.tpp-parameter-wide {
     color-mix(in srgb, var(--color-accent) 18%, transparent);
 }
 
-.component-import-mode-switch,
-.component-import-mobile-tabs {
+.component-import-mode-switch {
   display: inline-flex;
   gap: 0.35rem;
 }
 
-.component-import-mode-switch button,
-.component-import-mobile-tabs button {
+.component-import-mode-switch button {
   border: 1px solid var(--color-line-2);
   background: var(--color-inset);
   padding: 0.35rem 0.65rem;
@@ -4041,8 +4040,7 @@ div.tpp-parameter-wide {
   letter-spacing: 0.06em;
 }
 
-.component-import-mode-switch button.is-active,
-.component-import-mobile-tabs button.is-active {
+.component-import-mode-switch button.is-active {
   border-color: var(--color-accent-deep);
   background: var(--color-accent-soft);
 }
@@ -5445,7 +5443,7 @@ div.tpp-parameter-wide {
   align-items: center;
   gap: 0.45rem;
 }
-.sticky-record-header .action-menu-list button.is-active {
+.capsule-dropdown-item.is-active {
   background: var(--color-brand-soft);
   color: var(--color-brand);
 }

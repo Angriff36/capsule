@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { useEventReactivate } from "../../lib/manifest-convex-react";
-import { ActionMenuRule } from "../../ui/primitives";
+import { DropdownMenuItem, DropdownMenuSeparator } from "../../ui/DropdownMenu";
 import { EventArchiveVisibility } from "./eventArchiveVisibility";
 
 /**
@@ -26,32 +26,29 @@ export function EventArchiveMenuItems({
   const archived = EventArchiveVisibility.isArchived(event);
   return (
     <Fragment>
-      <ActionMenuRule />
+      <DropdownMenuSeparator />
       {archived ? (
-        <button
+        <DropdownMenuItem
           key="event-reactivate"
-          type="button"
           disabled={busy}
-          onClick={() =>
+          onSelect={() =>
             run(
               () => reactivate({ docId: event._id, version }),
               "Event brought back",
             )
           }
-          className="btn btn-ghost"
         >
           Bring back
-        </button>
+        </DropdownMenuItem>
       ) : (
-        <button
+        <DropdownMenuItem
           key="event-archive"
-          type="button"
+          variant="destructive"
           disabled={busy}
-          onClick={onArchive}
-          className="action-menu-danger"
+          onSelect={onArchive}
         >
           Archive event
-        </button>
+        </DropdownMenuItem>
       )}
     </Fragment>
   );

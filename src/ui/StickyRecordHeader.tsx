@@ -7,7 +7,13 @@ import {
   type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
-import { ActionMenu } from "./primitives";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "./DropdownMenu";
+import { ChevronDownIcon } from "./icons";
 
 export type StickyRecordFact = {
   label: string;
@@ -239,18 +245,25 @@ export function StickyRecordHeader({
       </dl>
       <div className="sticky-record-header-controls">
         {sections.length >= 4 ? (
-          <ActionMenu label="Jump to">
-            {sections.map((section) => (
-              <button
-                key={section.id}
-                type="button"
-                className={activeId === section.id ? "is-active" : undefined}
-                onClick={() => scrollToSection(section.id)}
-              >
-                {section.label}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button type="button" className="btn btn-ghost">
+                Jump to
+                <ChevronDownIcon width={12} height={12} />
               </button>
-            ))}
-          </ActionMenu>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {sections.map((section) => (
+                <DropdownMenuItem
+                  key={section.id}
+                  className={activeId === section.id ? "is-active" : undefined}
+                  onSelect={() => scrollToSection(section.id)}
+                >
+                  {section.label}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         ) : null}
         {actions ? (
           <div className="sticky-record-header-actions">{actions}</div>

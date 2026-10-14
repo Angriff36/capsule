@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { DropdownMenuItem } from "../../ui/DropdownMenu";
 import { type Id } from "../../lib/api";
 import { useEventDuplicate } from "../../lib/useEventDuplicate";
 import { eventDetailPath } from "./eventRoutes";
@@ -19,12 +20,10 @@ export function EventDuplicateMenuItem({
   const duplicate = useEventDuplicate();
   const navigate = useNavigate();
   return (
-    <button
-      type="button"
+    <DropdownMenuItem
       disabled={busy}
       data-testid="event-duplicate"
-      className="btn btn-ghost"
-      onClick={() =>
+      onSelect={() =>
         run(async () => {
           const result = await duplicate({
             sourceEventId: event._id as Id<"events">,
@@ -34,6 +33,6 @@ export function EventDuplicateMenuItem({
       }
     >
       Duplicate event
-    </button>
+    </DropdownMenuItem>
   );
 }
