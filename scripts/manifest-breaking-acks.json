@@ -3600,6 +3600,12 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-14",
       "reason": "Event tracker Notes cell: optional (nullable) free text; unset = no notes. Existing rows stay valid; the checker reads nullable fields as required."
+    },
+    {
+      "path": "Organization.appPaletteJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-14",
+      "reason": "App colors on the Branding page (owner, 2026-10-14): optional; unset reads as the DESIGN.md colors. Stored companies need no backfill."
     }
   ]
 }

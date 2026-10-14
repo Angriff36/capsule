@@ -2731,6 +2731,7 @@ export default defineSchema({
     timingLoadRulesJson: v.optional(v.union(v.string(), v.null())),
     planningChecksJson: v.optional(v.union(v.string(), v.null())),
     stageMovesByHandJson: v.optional(v.union(v.string(), v.null())),
+    appPaletteJson: v.optional(v.union(v.string(), v.null())),
     equipmentFieldsJson: v.optional(v.union(v.string(), v.null())),
     emailSenderName: v.optional(v.union(v.string(), v.null())),
     emailReplyTo: v.optional(v.union(v.string(), v.null())),

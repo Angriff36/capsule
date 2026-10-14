@@ -223,6 +223,12 @@ entity Organization mixin TenantScoped, SoftDeletable {
   // its conditions are met. Unset = only the sales lock is by hand.
   property stageMovesByHandJson: string?
 
+  // The app's own colors, set on the Branding page (owner, 2026-10-14): a
+  // JSON map of light and dark color tokens, {"light": {"brand": "#b04f18"},
+  // "dark": {...}}, read by src/features/admin/appPalette.ts. Unset = the
+  // DESIGN.md colors.
+  property appPaletteJson: string?
+
   // The fields each equipment category asks for: {"Ovens": ["Fuel", "Burners"]}.
   property equipmentFieldsJson: string?
 
@@ -435,6 +441,17 @@ entity Organization mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // The app's colors for everyone in the company. Empty goes back to the
+  // DESIGN.md colors.
+  command configureAppPalette(optional paletteJson: string) {
+    guard self.deletedAt == null
+    mutate appPaletteJson = paletteJson
+    emit OrganizationAppPaletteConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   // Which event stages stay a person's step. Empty goes back to the default.
   command configureStageMoves(optional byHandJson: string) {
     guard self.deletedAt == null
@@ -600,6 +617,11 @@ event OrganizationTimingPolicyConfigured: "organization.timing_policy_configured
 }
 
 event OrganizationEquipmentFieldsConfigured: "organization.equipment_fields_configured" {
+  organizationId: string
+  tenantId: string
+}
+
+event OrganizationAppPaletteConfigured: "organization.app_palette_configured" {
   organizationId: string
   tenantId: string
 }

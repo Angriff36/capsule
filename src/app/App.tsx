@@ -42,6 +42,7 @@ import { ErrorState, TableSkeleton } from "../ui/primitives";
 import { ActionResultHost } from "../ui/action-result";
 import { AuthGate } from "./AuthGate";
 import { AppShell } from "./shell/AppShell";
+import { AppPaletteSync } from "../features/admin/AppPaletteSync";
 import { RouteErrorBoundary } from "./shell/RouteErrorBoundary";
 
 const StockBookPage = lazy(() =>
@@ -527,6 +528,7 @@ export function App() {
   return (
     <AppErrorBoundary>
       <AuthGate>
+        <AppPaletteSync />
         <WorkingEventRouteSync />
         <ReviewerToolbar />
         <Routes>

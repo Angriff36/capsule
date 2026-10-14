@@ -2899,6 +2899,7 @@ export const OrganizationSchema = z.object({
   timingLoadRulesJson: z.string().nullable().optional(),
   planningChecksJson: z.string().nullable().optional(),
   stageMovesByHandJson: z.string().nullable().optional(),
+  appPaletteJson: z.string().nullable().optional(),
   equipmentFieldsJson: z.string().nullable().optional(),
   emailSenderName: z.string().nullable().optional(),
   emailReplyTo: z.string().nullable().optional(),
@@ -10404,6 +10405,13 @@ export const OperatingLocationReviseParamsSchema = z.object({
 });
 
 export type OperatingLocationReviseParams = z.infer<typeof OperatingLocationReviseParamsSchema>;
+
+// Command: configureAppPalette on Organization
+export const OrganizationConfigureAppPaletteParamsSchema = z.object({
+  paletteJson: z.string().optional(),
+});
+
+export type OrganizationConfigureAppPaletteParams = z.infer<typeof OrganizationConfigureAppPaletteParamsSchema>;
 
 // Command: configureBranding on Organization
 export const OrganizationConfigureBrandingParamsSchema = z.object({
