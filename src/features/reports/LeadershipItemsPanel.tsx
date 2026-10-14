@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useCreateLeadershipItem } from "@/lib/manifest-convex-react";
-import { Section, StatusChip } from "@/ui/primitives";
+import { StatusChip } from "@/ui/primitives";
+import { EosPanel } from "../eos/EosShared";
 import { CHIP_TONE_CLASS } from "@/lib/statusLabels";
 import { formatDate } from "@/lib/format";
 import { BoundedDateInput } from "@/ui/BoundedDateInputs";
@@ -64,6 +65,16 @@ const KINDS: ReadonlyArray<{
 ];
 
 /** In-page anchors the L10 meeting mode scrolls to. */
+/** Each list in its EOS component's colour (see src/features/eos/eos.css). */
+const KIND_TONE: Record<LeadershipItemKind, { tone: string; eyebrow: string }> =
+  {
+    rock: { tone: "traction", eyebrow: "Traction" },
+    client_headline: { tone: "people", eyebrow: "Headlines" },
+    people_headline: { tone: "people", eyebrow: "Headlines" },
+    issue: { tone: "issues", eyebrow: "Issues · IDS" },
+    todo: { tone: "vision", eyebrow: "To-dos" },
+  };
+
 export const LEADERSHIP_ANCHOR: Record<LeadershipItemKind, string> = {
   rock: "rocks",
   client_headline: "client-headlines",
@@ -147,7 +158,7 @@ export function LeadershipItemsPanel({
   const todos = todoCompletion(liveItems(items), now.getTime());
 
   return (
-    <div className="mt-6 grid gap-6" data-testid="leadership-items">
+    <div className="mt-5 grid gap-5" data-testid="leadership-items">
       {failure ? <ReportsFailureBanner error={failure} /> : null}
       {KINDS.map(({ kind, title, empty, placeholder, hint }) => {
         const isHeadline =
@@ -166,12 +177,14 @@ export function LeadershipItemsPanel({
             id={LEADERSHIP_ANCHOR[kind]}
             className="min-w-0 scroll-mt-48"
           >
-            <Section title={title}>
-              {hint ? (
-                <p className="mb-2 px-3 pt-2 text-xs text-ink-2">{hint}</p>
-              ) : null}
+            <EosPanel
+              tone={KIND_TONE[kind].tone}
+              eyebrow={KIND_TONE[kind].eyebrow}
+              title={title}
+              lead={hint}
+            >
               {kind === "todo" && todos.total > 0 ? (
-                <p className="mb-2 px-3 pt-2 text-xs text-ink-2">
+                <p className="mb-3 text-sm text-ink-2">
                   Last 7 days: {todos.done} of {todos.total} done (
                   <strong
                     className={
@@ -184,7 +197,7 @@ export function LeadershipItemsPanel({
                 </p>
               ) : null}
               {rows.length === 0 ? (
-                <p className="text-xs text-ink-2">{empty}</p>
+                <p className="text-sm text-ink-3">{empty}</p>
               ) : (
                 <div className="supply-table-wrap">
                   <table
@@ -288,10 +301,10 @@ export function LeadershipItemsPanel({
                 </div>
               )}
               <form
-                className="supply-form-grid mt-3"
+                className="eos-quickadd mt-3"
                 onSubmit={(event) => submit(event, kind)}
               >
-                <label className="field-label">
+                <label className="field-label eos-quickadd-main">
                   Add {LEADERSHIP_KIND_LABEL[kind].toLowerCase()}
                   <input
                     name="title"
@@ -336,7 +349,7 @@ export function LeadershipItemsPanel({
                   </button>
                 </div>
               </form>
-            </Section>
+            </EosPanel>
           </div>
         );
       })}

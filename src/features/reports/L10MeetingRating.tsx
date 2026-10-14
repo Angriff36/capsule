@@ -3,7 +3,7 @@ import {
   useCreateLeadershipMeeting,
   useLeadershipMeetingRevise,
 } from "@/lib/manifest-convex-react";
-import { Section } from "@/ui/primitives";
+import { EosPanel } from "../eos/EosShared";
 import { BoundedDateInput } from "@/ui/BoundedDateInputs";
 import { formatDate } from "@/lib/format";
 import { ReportsFailureBanner } from "./ReportsFailureBanner";
@@ -46,8 +46,14 @@ export function L10MeetingRating({
   );
   // Remount the form when this week's saved meeting changes, so it shows it.
   return (
-    <div className="mt-6">
-      <Section title="Rate the meeting">
+    <div className="mt-5">
+      <EosPanel
+        tone="traction"
+        eyebrow="Conclude"
+        title="Rate the meeting"
+        lead="Recap the to-dos, then each person rates the meeting 1 to 10."
+        bodyClassName=""
+      >
         <MeetingForm
           key={`${thisWeek?._id ?? "new"}:${thisWeek?.version ?? 0}`}
           saved={thisWeek}
@@ -63,7 +69,7 @@ export function L10MeetingRating({
               : record(fields)
           }
         />
-      </Section>
+      </EosPanel>
     </div>
   );
 }

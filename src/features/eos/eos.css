@@ -595,6 +595,74 @@
   cursor: default;
 }
 
+/* L10 stat tiles */
+.eos-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+.eos-stat {
+  border: 1px solid var(--tone-line);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.85rem;
+  background: var(--tone-soft);
+}
+.eos-stat strong {
+  display: block;
+  color: var(--tone);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: 1.1;
+}
+.eos-stat span {
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+}
+
+/* L10 agenda tiles */
+.eos-agenda {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.eos-agenda a {
+  display: grid;
+  gap: 0.15rem;
+  height: 100%;
+  border: 1px solid var(--tone-line);
+  border-left: 4px solid var(--tone);
+  border-radius: var(--radius-sm);
+  padding: 0.55rem 0.7rem;
+  background: var(--tone-soft);
+  color: var(--color-ink);
+  text-decoration: none;
+  transition:
+    border-color 140ms ease,
+    transform 140ms ease;
+}
+.eos-agenda a:hover,
+.eos-agenda a:focus-visible {
+  border-color: var(--tone);
+  transform: translateY(-1px);
+}
+.eos-agenda strong {
+  font-size: var(--text-base);
+}
+.eos-agenda-min {
+  color: var(--tone);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+.eos-agenda-what {
+  color: var(--color-ink-2);
+  font-size: var(--text-sm);
+}
+
 /* L10 meeting mode */
 .eos-meeting {
   position: sticky;
@@ -652,6 +720,10 @@
 }
 
 @media (max-width: 900px) {
+  .eos-stats,
+  .eos-agenda {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
   .eos-components {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -709,4 +781,24 @@
   .eos-timer {
     font-size: var(--text-2xl);
   }
+}
+
+/* One-row add form under each L10 list */
+.eos-quickadd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 0.5rem 0.75rem;
+  border-top: 1px dashed var(--tone-line);
+  padding-top: 0.75rem;
+}
+.eos-quickadd > * {
+  flex: 1 1 10rem;
+  min-width: 0;
+}
+.eos-quickadd > .eos-quickadd-main {
+  flex: 3 1 16rem;
+}
+.eos-quickadd > :last-child {
+  flex: 0 0 auto;
 }

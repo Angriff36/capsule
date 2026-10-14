@@ -9,12 +9,8 @@ import {
   useListPerson,
   useListScorecardTarget,
 } from "@/lib/manifest-convex-react";
-import {
-  DashboardGrid,
-  type DashboardGridSize,
-} from "@/ui/charts/DashboardGrid";
-import { StatCard } from "@/ui/charts/StatCard";
-import { PageHeader, Section, EmptyState } from "@/ui/primitives";
+import { PageHeader, EmptyState, StatusChip } from "@/ui/primitives";
+import { EosPanel } from "../eos/EosShared";
 import { formatDate, formatMoney } from "@/lib/format";
 import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import {
@@ -218,95 +214,11 @@ export function L10DashboardPage() {
     };
   }, [events, closeouts, leads]);
 
-  const dashboardItems: Array<{
-    id: string;
-    size: DashboardGridSize;
-    content: React.ReactNode;
-    title?: string;
-  }> = [
-    // Weekly wins
-    {
-      id: "wins-header",
-      size: "full",
-      content: (
-        <div className="rounded-sm border-2 border-ok/30 bg-ok-soft p-4">
-          <h3 className="font-semibold text-ok">This Week's Wins</h3>
-          <div className="mt-3 grid grid-cols-4 gap-4">
-            <div>
-              <p className="text-xl font-bold text-ok">
-                {weeklyWins.completedEvents}
-              </p>
-              <p className="text-xs text-ok">Events Completed</p>
-            </div>
-            <div>
-              <p className="text-xl font-bold text-ok">
-                {formatMoney(weeklyWins.revenue)}
-              </p>
-              <p className="text-xs text-ok">Completed revenue</p>
-            </div>
-            <div>
-              <p className="text-xl font-bold text-ok">{weeklyWins.newLeads}</p>
-              <p className="text-xs text-ok">New Leads</p>
-            </div>
-            <div>
-              <p className="text-xl font-bold text-ok">
-                {weeklyWins.convertedLeads}
-              </p>
-              <p className="text-xs text-ok">Converted</p>
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    // Scorecard metrics
-    {
-      id: "monthly-revenue-kpi",
-      size: "small",
-      content: (
-        <StatCard
-          title="Monthly Revenue"
-          main={{
-            value: scorecardMetrics.monthlyRevenue,
-            format: "currency" as const,
-          }}
-          rows={[
-            {
-              label: "Events Booked",
-              value: scorecardMetrics.eventsBooked,
-              format: "number" as const,
-            },
-          ]}
-          tone="brand"
-          isLive
-        />
-      ),
-    },
-    {
-      id: "food-cost-kpi",
-      size: "small",
-      content: (
-        <StatCard
-          title="Food Cost %"
-          main={{
-            value: percentText(scorecardMetrics.foodCostPct),
-          }}
-          isLive
-        />
-      ),
-    },
-    {
-      id: "leads-kpi",
-      size: "small",
-      content: (
-        <StatCard
-          title="New Leads"
-          main={{ value: scorecardMetrics.newLeads, format: "number" as const }}
-          tone="info"
-          isLive
-        />
-      ),
-    },
-  ];
+  const STATUS_TONE: Record<string, string> = {
+    on_track: "chip-tone-ok",
+    caution: "chip-tone-warn",
+    off_track: "chip-tone-danger",
+  };
 
   return (
     <div className="operations-stage supply-stage">
@@ -355,12 +267,61 @@ export function L10DashboardPage() {
         </div>
       ) : null}
 
-      <div id="wins" className="scroll-mt-48">
-        <DashboardGrid items={dashboardItems} />
+      <div id="wins" className="mt-5 scroll-mt-48">
+        <EosPanel
+          tone="data"
+          eyebrow="Good news"
+          title="This week's wins"
+          lead="Open the meeting on what went right: one personal and one work win each."
+        >
+          <div className="eos-stats">
+            <Stat
+              value={String(weeklyWins.completedEvents)}
+              label="Events completed"
+            />
+            <Stat
+              value={formatMoney(weeklyWins.revenue)}
+              label="Completed revenue"
+            />
+            <Stat value={String(weeklyWins.newLeads)} label="New leads" />
+            <Stat
+              value={String(weeklyWins.convertedLeads)}
+              label="Leads converted"
+            />
+          </div>
+        </EosPanel>
       </div>
 
-      <div id="l10-scorecard" className="mt-6 scroll-mt-48">
-        <Section title="Scorecard">
+      <div id="l10-scorecard" className="mt-5 scroll-mt-48">
+        <EosPanel
+          tone="data"
+          eyebrow="Data"
+          title="Scorecard"
+          lead="Only talk about the numbers off track; move anything that needs work to Issues."
+          actions={
+            <Link to={FINANCE_ROUTES.scorecard} className="btn btn-ghost">
+              Set targets and owners
+            </Link>
+          }
+        >
+          <div className="eos-stats mb-4">
+            <Stat
+              value={formatMoney(scorecardMetrics.monthlyRevenue)}
+              label="Revenue booked this month"
+            />
+            <Stat
+              value={String(scorecardMetrics.eventsBooked)}
+              label="Events booked this month"
+            />
+            <Stat
+              value={percentText(scorecardMetrics.foodCostPct)}
+              label="Food cost this month"
+            />
+            <Stat
+              value={String(scorecardMetrics.newLeads)}
+              label="New leads this month"
+            />
+          </div>
           <div className="supply-table-wrap">
             <table className="supply-table" data-testid="l10-scorecard">
               <thead>
@@ -393,26 +354,25 @@ export function L10DashboardPage() {
                           )
                         : "Not set"}
                     </td>
-                    <td>
+                    <td className="font-mono">
                       {row.actual == null
                         ? NOT_KNOWN
                         : formatScorecardValue(row.actual, row.measure.unit)}
                     </td>
                     <td>{personName(row.target?.ownerPersonId)}</td>
-                    <td>{SCORECARD_STATUS_LABEL[row.status]}</td>
+                    <td>
+                      <StatusChip
+                        status={row.status}
+                        color={STATUS_TONE[row.status] ?? "chip-tone-mute"}
+                        label={SCORECARD_STATUS_LABEL[row.status]}
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <p className="mt-2 text-xs text-ink-2">
-            Set targets and owners on the{" "}
-            <Link to={FINANCE_ROUTES.scorecard} className="btn-link">
-              Company Scorecard
-            </Link>
-            .
-          </p>
-        </Section>
+        </EosPanel>
       </div>
 
       <LeadershipItemsPanel
@@ -429,8 +389,13 @@ export function L10DashboardPage() {
         />
       </div>
 
-      <div className="mt-6">
-        <Section title="Meeting history (last 8 weeks)">
+      <div className="mt-5">
+        <EosPanel
+          tone="traction"
+          eyebrow="Traction"
+          title="The last eight weeks"
+          lead="What was added and closed each week, next to the business it ran."
+        >
           <div className="supply-table-wrap">
             <table className="supply-table" data-testid="l10-history">
               <thead>
@@ -465,18 +430,7 @@ export function L10DashboardPage() {
               </tbody>
             </table>
           </div>
-        </Section>
-      </div>
-
-      {/* L10 Framework Note */}
-      <div className="mt-6 rounded-sm border border-line bg-inset p-4">
-        <h4 className="text-xs font-semibold text-ink">About L10 Meetings</h4>
-        <p className="mt-1 text-xs text-ink-2">
-          The L10 is a weekly 60-minute leadership meeting to review the
-          business, solve issues, and stay aligned on priorities. Scorecard
-          numbers track business health, and wins open the meeting on what went
-          right this week.
-        </p>
+        </EosPanel>
       </div>
 
       <MetricDefinitionList
@@ -496,6 +450,15 @@ export function L10DashboardPage() {
       >
         <CompanyScorecardDashboardPage />
       </MergedSection>
+    </div>
+  );
+}
+
+function Stat({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="eos-stat">
+      <strong>{value}</strong>
+      <span>{label}</span>
     </div>
   );
 }

@@ -2,18 +2,6 @@ import { useEffect, useState } from "react";
 import { AGENDA } from "../reports/L10AgendaSection";
 import "./eos.css";
 
-/** Where each agenda part lives on the L10 page, in agenda order. */
-const ANCHORS = [
-  "wins",
-  "l10-scorecard",
-  "rocks",
-  "client-headlines",
-  "people-headlines",
-  "issues",
-  "todos",
-  "rating",
-] as const;
-
 const KEY = "capsule.l10.meeting";
 
 type MeetingState = { startedAt: number; part: number; partStartedAt: number };
@@ -44,7 +32,7 @@ function clock(ms: number): string {
 }
 
 function scrollTo(part: number) {
-  const id = ANCHORS[part];
+  const id = AGENDA[part]?.anchor;
   if (!id) return;
   document
     .getElementById(id)
