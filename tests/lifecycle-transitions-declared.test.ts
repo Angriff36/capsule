@@ -49,6 +49,8 @@ const FREE_OR_COMMAND_GUARDED: Record<string, string> = {
   "QuoteSubmission.status":
     "every command guards its starting status (pending, processing, failed)",
   "SyncError.status": "a person marks it fixed or opens it again",
+  "CoreProcess.stage":
+    "EOS: a manager moves a core process to any of its four stages, back as well as forward, as the team finds it is or is not followed",
   "PageFeedback.status":
     "an admin marks a screen comment resolved or opens it again; each command guards its starting status",
   "CutoverDecision.status":
