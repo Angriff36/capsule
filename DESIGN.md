@@ -90,7 +90,7 @@ typography:
   button:
     fontFamily: DM Sans Variable
     fontSize: 13px
-    fontWeight: 600
+    fontWeight: 500
     lineHeight: 1.25
     letterSpacing: 0
   label:
@@ -143,25 +143,25 @@ components:
     backgroundColor: "{colors.brand}"
     textColor: "{colors.on-brand}"
     typography: "{typography.button}"
-    rounded: "{rounded.md}"
-    height: 36px
-    padding: 0 14px
+    rounded: "{rounded.pill}"
+    height: 40px
+    padding: 0 44px 0 16px
   button-ghost:
     backgroundColor: "{colors.panel}"
     textColor: "{colors.ink}"
     borderColor: "{colors.line}"
     typography: "{typography.button}"
-    rounded: "{rounded.md}"
-    height: 36px
-    padding: 0 14px
+    rounded: "{rounded.pill}"
+    height: 40px
+    padding: 0 44px 0 16px
   button-danger:
     backgroundColor: "{colors.panel}"
     textColor: "{colors.danger}"
     borderColor: "{colors.line}"
     typography: "{typography.button}"
-    rounded: "{rounded.md}"
-    height: 36px
-    padding: 0 14px
+    rounded: "{rounded.pill}"
+    height: 40px
+    padding: 0 44px 0 16px
   text-link:
     backgroundColor: transparent
     textColor: "{colors.brand}"
@@ -452,7 +452,7 @@ The serif creates identity; Archivo carries controls and dense information; IBM 
 | Breadcrumb      | Iowan Old Style |    19px | 400 it |        1.30 |              0 | Route context above a page title.        |
 | Body Large      | Archivo         |    16px |    400 |        1.70 |              0 | Page descriptions and important help.    |
 | Body            | Archivo         |    15px |    400 |        1.60 |              0 | Default interface and document copy.     |
-| Button          | DM Sans         |    13px |    600 |        1.25 |              0 | Primary and secondary actions, sentence case.|
+| Button          | DM Sans         |    13px |    500 |        1.25 |              0 | Primary and secondary actions, sentence case.|
 | Label           | Archivo         |    14px |    700 |        1.40 |         0.04em | `fact-pair` labels, uppercase.           |
 | Eyebrow         | Archivo         |    14px |    700 |        1.40 |         0.09em | `section-rule` labels, uppercase.        |
 | Mono Data       | IBM Plex Mono   |    15px |    500 |        1.40 |         0.02em | Times, money, counts, and relative time. |
@@ -544,7 +544,7 @@ Italic serif breadcrumb, large serif page title, a row of `fact-pair` values, an
 
 ### **`button-primary`**
 
-Filled brand action, 36px high (40px on phones), 8px corners, a hairline border and a soft shadow, with a 13px semibold sentence-case label and normal tracking (owner, 2026-10-14: the uppercase pills were "ugly as shit"; the look follows the ui-layouts outline buttons). Use once per immediate decision region. Secondary actions beside it are `text-link`, not a second filled button.
+The ui-layouts "Cross Arrow" button (owner, 2026-10-14: "why would we not just use one of the professional ones from the storyboard like this"): a 40px pill with a 2px border and a soft left-to-right gradient, a 13px medium sentence-case label on the left, and a dark circle on the right whose arrow slides out and back in on hover. Primary uses the brand border and a brand circle; dropdown triggers keep no circle. Use once per immediate decision region. Secondary actions beside it are `text-link`, not a second filled button.
 
 ### **`fact-pair`**
 
@@ -560,11 +560,11 @@ Exceptions and open decisions sit in a pale-sage band that bleeds the full width
 
 ### **`button-ghost`**
 
-White secondary action with a hairline border, same shape and label as `button-primary`. Hover uses the soft inset surface. It must remain visibly secondary to the filled primary action.
+Same Cross Arrow pill as `button-primary` with an ink border and an ink circle. It must remain visibly secondary to the filled primary action.
 
 ### **`button-danger`**
 
-White action with danger text and a hairline border that turns danger on hover. Destructive actions stay separate from routine primary actions and require explicit confirmation.
+Same Cross Arrow pill with a danger border, danger text and a danger circle. Destructive actions stay separate from routine primary actions and require explicit confirmation.
 
 ### **`text-link`**
 

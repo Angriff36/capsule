@@ -145,8 +145,7 @@
 .dark .capsule-mark,
 .dark .clear-check,
 .dark .schedule-notice-count,
-.dark .revenue-switch button[aria-pressed="true"],
-.dark .btn-primary {
+.dark .revenue-switch button[aria-pressed="true"] {
   color: var(--color-canvas);
 }
 .dark .app-canvas {
@@ -187,27 +186,103 @@
   }
 }
 
+/* The Cross Arrow button's arrow, drawn as a mask over its circle. */
+:root {
+  --btn-arrow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 15 15'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M3.64645 11.3536C3.45118 11.1583 3.45118 10.8417 3.64645 10.6465L10.2929 4L6 4C5.72386 4 5.5 3.77614 5.5 3.5C5.5 3.22386 5.72386 3 6 3L11.5 3C11.6326 3 11.7598 3.05268 11.8536 3.14645C11.9473 3.24022 12 3.36739 12 3.5L12 9.00001C12 9.27615 11.7761 9.50001 11.5 9.50001C11.2239 9.50001 11 9.27615 11 9.00001V4.70711L4.35355 11.3536C4.15829 11.5488 3.84171 11.5488 3.64645 11.3536Z'/%3E%3C/svg%3E");
+}
+
 @layer components {
-  /* Buttons after the ui-layouts outline buttons (owner, 2026-10-14: the
-     uppercase pills were "ugly as shit"): sentence case, normal tracking,
-     8px corners, a hairline border and a soft shadow. Phones keep 40px. */
+  /* Buttons are the ui-layouts "Cross Arrow" button (owner, 2026-10-14:
+     "why would we not just use one of the professional ones from the
+     storyboard like this"): a pill with a 2px border and a soft gradient,
+     the label on the left, a dark circle on the right whose arrow slides out
+     and back in on hover. Dropdown triggers keep no circle (their chevron
+     already says what they do). */
   .btn {
-    @apply inline-flex min-h-10 cursor-pointer items-center justify-center gap-1.5 rounded-md border px-3.5 py-1 text-center text-sm leading-tight font-semibold shadow-[0_1px_2px_rgb(15_15_17/0.06)] transition-colors duration-150 select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-45 md:min-h-9;
+    @apply relative inline-flex min-h-10 cursor-pointer items-center gap-1.5 rounded-full border-2 border-ink-2 py-1 pl-4 text-left text-sm leading-tight font-medium text-ink transition-colors duration-200 select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-45;
+    background-image: linear-gradient(
+      to right,
+      var(--color-inset),
+      var(--color-panel)
+    );
+  }
+  /* Room for the arrow circle wins over any screen's own padding. */
+  .btn {
+    padding-inline-end: var(--btn-end, 2.75rem) !important;
+  }
+  .btn::after,
+  .btn::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 3px;
+    width: 1.875rem;
+    height: 1.875rem;
+    border-radius: 9999px;
+    translate: 0 -50%;
+    pointer-events: none;
+  }
+  .btn::after {
+    background: var(--btn-circle, var(--color-ink));
+  }
+  .btn::before {
+    z-index: 1;
+    background: var(--btn-arrow, var(--color-panel));
+    mask-image: var(--btn-arrow-icon), var(--btn-arrow-icon);
+    mask-repeat: no-repeat;
+    mask-size: 1rem;
+    mask-position:
+      center,
+      calc(50% - 1.25rem) calc(50% + 1.25rem);
+    transition: mask-position 200ms ease;
+  }
+  .btn:hover:not(:disabled)::before {
+    mask-position:
+      calc(50% + 1.25rem) calc(50% - 1.25rem),
+      center;
+  }
+  .btn[aria-haspopup] {
+    --btn-end: 1rem;
+  }
+  .btn[aria-haspopup]::before,
+  .btn[aria-haspopup]::after {
+    content: none;
   }
   .btn-primary {
-    @apply border-brand bg-brand text-on-brand hover:border-accent-deep hover:bg-accent-deep;
+    @apply border-brand text-ink;
+    --btn-circle: var(--color-brand);
+    --btn-arrow: var(--color-on-brand);
+    background-image: linear-gradient(
+      to right,
+      var(--color-brand-soft),
+      var(--color-panel)
+    );
   }
   .btn-ghost {
-    @apply border-line bg-panel text-ink hover:border-line-2 hover:bg-inset;
+    @apply border-ink-2 text-ink;
   }
   .btn-secondary {
-    @apply border-line bg-panel text-brand hover:border-brand/40 hover:bg-brand-soft;
+    @apply border-brand text-brand;
+    --btn-circle: var(--color-brand);
+    --btn-arrow: var(--color-on-brand);
   }
   .btn-danger {
-    @apply border-line bg-panel text-danger hover:border-danger/40 hover:bg-danger-soft;
+    @apply border-danger text-danger;
+    --btn-circle: var(--color-danger);
+    --btn-arrow: var(--color-on-brand);
   }
   .btn-sm {
-    @apply min-h-8 px-3 text-sm;
+    --btn-end: 2.25rem;
+    @apply min-h-8 pl-3 text-sm;
+  }
+  .btn-sm::after,
+  .btn-sm::before {
+    width: 1.5rem;
+    height: 1.5rem;
+    right: 2px;
+  }
+  .btn-sm::before {
+    mask-size: 0.8125rem;
   }
   /* Every file picker gets the small ghost button look. The browser's own
      grey "Choose File" box read as plain text on a phone, on every import. */
