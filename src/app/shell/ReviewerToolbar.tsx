@@ -18,6 +18,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { reportActionFail, reportActionOk } from "../../ui/action-result";
+import { ReviewerToolbarCommentRow } from "./ReviewerToolbarCommentRow";
 
 /** Capsule roles that leave screen comments. */
 const REVIEWER_ROLES = new Set(["owner", "admin", "system"]);
@@ -29,12 +30,6 @@ const KINDS: { value: Kind; label: string }[] = [
   { value: "missing", label: "Something is missing" },
   { value: "broken", label: "Something is broken" },
 ];
-
-const KIND_LABEL: Record<string, string> = {
-  improvement: "Improve",
-  missing: "Missing",
-  broken: "Broken",
-};
 
 type Feedback = {
   _id: Id<"pageFeedbacks">;
@@ -155,13 +150,6 @@ function useLayoutTick(active: boolean): number {
   return tick;
 }
 
-const timeFormat = new Intl.DateTimeFormat(undefined, {
-  month: "short",
-  day: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
-});
-
 /**
  * Screen comments for admins (Ryan 2026-10-13: "allow any admins in capsule
  * to comment on anything on the page ... bypass vercel automatically. have it
@@ -194,6 +182,9 @@ function FeedbackLayer() {
   const [scope, setScope] = useState<"page" | "all">("page");
   const [showResolved, setShowResolved] = useState(false);
   const [focusId, setFocusId] = useState<string | null>(null);
+  const [addressingId, setAddressingId] = useState<string | null>(null);
+  const [workingIds, setWorkingIds] = useState<Record<string, true>>({});
+  const [failById, setFailById] = useState<Record<string, string>>({});
   const textRef = useRef<HTMLTextAreaElement>(null);
 
   const path = location.pathname;
@@ -294,25 +285,45 @@ function FeedbackLayer() {
   };
 
   const sendToClaude = async (id: Id<"pageFeedbacks">) => {
+    setAddressingId(id);
+    setFailById((prev) => {
+      const next = { ...prev };
+      delete next[id];
+      return next;
+    });
     try {
       const result = await fileIssue({ id });
       if ("issueUrl" in result) {
-        reportActionOk("Comment saved and sent to Claude.", [
-          { label: "Open the GitHub issue", href: result.issueUrl },
-        ]);
+        if (result.started) {
+          setWorkingIds((prev) => ({ ...prev, [id]: true }));
+          reportActionOk("Claude is working on this.", [
+            { label: "Open the GitHub issue", href: result.issueUrl },
+          ]);
+        } else {
+          reportActionOk("Sent. Claude is not set up on this computer.", [
+            { label: "Open the GitHub issue", href: result.issueUrl },
+          ]);
+        }
       } else if (result.skipped === "no-token") {
-        reportActionOk(
-          "Comment saved. It was not sent to Claude: the GitHub key is not set up on this server.",
+        setFailById((prev) => ({
+          ...prev,
+          [id]: "Could not send. This computer has no GitHub key.",
+        }));
+        reportActionFail(
+          "This was not sent to Claude: the GitHub key is not set up on this server.",
         );
       } else {
-        reportActionOk("Comment saved.");
+        reportActionOk("The comment is saved in Capsule.");
       }
     } catch (error) {
-      reportActionFail(
+      const message =
         error instanceof Error
           ? error.message
-          : "Comment saved, but it was not sent to Claude. Try again.",
-      );
+          : "Comment saved, but it was not sent to Claude. Try again.";
+      setFailById((prev) => ({ ...prev, [id]: message }));
+      reportActionFail(message);
+    } finally {
+      setAddressingId(null);
     }
   };
 
@@ -566,120 +577,45 @@ function FeedbackLayer() {
                 const offScreen =
                   here && row.status === "open" && !pinPoint(row);
                 return (
-                  <li
+                  <ReviewerToolbarCommentRow
                     key={row._id}
-                    className={`border-b border-line px-4 py-3 ${focusId === row._id ? "bg-accent-soft" : ""}`}
-                  >
-                    <div className="mb-1 flex items-center gap-2 text-xs text-ink-3">
-                      {number ? (
-                        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-accent text-xs font-semibold text-on-brand">
-                          {number}
-                        </span>
-                      ) : null}
-                      <span className="font-semibold text-ink">
-                        {KIND_LABEL[row.kind] ?? row.kind}
-                      </span>
-                      <span>
-                        {row.leftByName ?? "An admin"}
-                        {row.leftAt
-                          ? ` · ${timeFormat.format(row.leftAt)}`
-                          : ""}
-                      </span>
-                      {row.status === "resolved" ? (
-                        <span>· Resolved</span>
-                      ) : null}
-                    </div>
-                    <p className="whitespace-pre-wrap">{row.body}</p>
-                    {!here ? (
-                      <a
-                        href={row.pagePath}
-                        className="mt-1 block truncate text-xs text-accent-deep underline"
-                      >
-                        {row.pageTitle || row.pagePath}
-                      </a>
-                    ) : offScreen ? (
-                      <p className="mt-1 text-xs text-ink-3">
-                        The spot is not on the screen right now.
-                      </p>
-                    ) : null}
-                    <div className="mt-2 flex flex-wrap gap-3 text-xs">
-                      {here ? (
-                        <button
-                          type="button"
-                          className="underline"
-                          onClick={() => show(row)}
-                        >
-                          Show
-                        </button>
-                      ) : null}
-                      {row.issueUrl ? (
-                        <a
-                          href={row.issueUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="underline"
-                        >
-                          Issue #{row.issueNumber}
-                        </a>
-                      ) : (
-                        <button
-                          type="button"
-                          className="underline"
-                          onClick={() => void sendToClaude(row._id)}
-                        >
-                          Send to Claude
-                        </button>
-                      )}
-                      {row.status === "open" ? (
-                        <button
-                          type="button"
-                          className="underline"
-                          onClick={() =>
-                            void act(
-                              () =>
-                                resolve({
-                                  docId: row._id,
-                                  version: row.version,
-                                }),
-                              "Comment resolved.",
-                            )
-                          }
-                        >
-                          Resolve
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          className="underline"
-                          onClick={() =>
-                            void act(
-                              () =>
-                                reopen({
-                                  docId: row._id,
-                                  version: row.version,
-                                }),
-                              "Comment opened again.",
-                            )
-                          }
-                        >
-                          Open again
-                        </button>
-                      )}
-                      <button
-                        type="button"
-                        className="text-danger underline"
-                        onClick={() =>
-                          void act(
-                            () =>
-                              remove({ docId: row._id, version: row.version }),
-                            "Comment removed.",
-                          )
-                        }
-                      >
-                        Remove
-                      </button>
-                    </div>
-                  </li>
+                    row={row}
+                    here={here}
+                    focused={focusId === row._id}
+                    number={number}
+                    offScreen={offScreen}
+                    addressing={addressingId === row._id}
+                    working={workingIds[row._id] === true}
+                    fail={failById[row._id]}
+                    onShow={() => show(row)}
+                    onAddress={() => void sendToClaude(row._id)}
+                    onResolve={() =>
+                      void act(
+                        () =>
+                          resolve({
+                            docId: row._id,
+                            version: row.version,
+                          }),
+                        "Comment resolved.",
+                      )
+                    }
+                    onReopen={() =>
+                      void act(
+                        () =>
+                          reopen({
+                            docId: row._id,
+                            version: row.version,
+                          }),
+                        "Comment opened again.",
+                      )
+                    }
+                    onRemove={() =>
+                      void act(
+                        () => remove({ docId: row._id, version: row.version }),
+                        "Comment removed.",
+                      )
+                    }
+                  />
                 );
               })
             )}
