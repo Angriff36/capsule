@@ -35,6 +35,7 @@ function ports(
     event?: "reject" | "unknown";
     dish?: "reject" | "unknown";
     failDish?: string;
+    failPackage?: boolean;
   } = {},
 ) {
   const calls: string[] = [];
@@ -59,6 +60,11 @@ function ports(
     createAssignment: vi.fn(async (args: any) => {
       calls.push(`staff:${args.idempotencyKey}`);
       return { docId: args.idempotencyKey };
+    }),
+    applyPackage: vi.fn(async (args: any) => {
+      calls.push(`package:${args.operationKey}`);
+      if (options.failPackage) throw new Error("package API unavailable");
+      return { savedDishIds: [] };
     }),
     setWorkingEvent: vi.fn((id: string) => calls.push(`working:${id}`)),
   };
@@ -110,7 +116,7 @@ describe("event creation wizard", () => {
     ).toBe("Incomplete");
     expect(eventWizardStepState("Staffing", empty)).toBe("Not started");
     expect(validateEventWizardStep("Menu & dishes", empty)).toContain(
-      "Add at least one dish, or choose Skip for now.",
+      "Add at least one dish or a package, or choose Skip for now.",
     );
   });
 
@@ -260,4 +266,56 @@ describe("event creation wizard", () => {
     expect(eventWizardFingerprint({ b: 2, a: 1 })).toBe(
       eventWizardFingerprint({ a: 1, b: 2 }),
     ));
+
+  it("adds a picked catering package after the dishes, with its own servings, notes and price", async () => {
+    const subject: EventWizardDraft = {
+      ...draft(),
+      cateringPackage: {
+        packageId: "wedding-buffet",
+        selections: [{ recipeId: "r-1", servings: 25, notes: "No nuts" }],
+        pricePerGuest: "42.5",
+      },
+    };
+    expect(
+      validateEventWizardStep("Menu & dishes", { ...subject, dishes: [] }),
+    ).toEqual([]);
+    expect(
+      eventWizardCreateErrors({
+        ...subject,
+        cateringPackage: {
+          ...subject.cateringPackage!,
+          selections: [{ recipeId: "r-1", servings: 0, notes: "" }],
+        },
+      }),
+    ).toContain(
+      "Menu & dishes: Each package dish needs servings of 1 or more.",
+    );
+    const failing = ports({ failPackage: true });
+    const updates: EventWizardDraft["commitProgress"][] = [];
+    await expect(
+      commitEventWizard(failing, subject, (next) => updates.push(next)),
+    ).rejects.toThrow("Could not add the catering package");
+    expect(failing.calls).toContain("package:draft-1:package");
+    expect(failing.calls).not.toContain("staff:draft-1:staff:chef");
+    const fake = ports();
+    await commitEventWizard(
+      fake,
+      { ...subject, commitProgress: updates.at(-1)! },
+      (next) => updates.push(next),
+    );
+    // A rejected package gets a fresh key; saved dishes are not sent again.
+    expect(fake.calls).toEqual([
+      "working:event-1",
+      "package:draft-1:package:a1",
+      "staff:draft-1:staff:chef",
+    ]);
+    expect(fake.applyPackage).toHaveBeenCalledWith({
+      eventId: "event-1",
+      packageId: "wedding-buffet",
+      selections: [{ recipeId: "r-1", servings: 25, notes: "No nuts" }],
+      pricePerGuest: 42.5,
+      operationKey: "draft-1:package:a1",
+    });
+    expect(updates.at(-1)?.cateringPackage?.status).toBe("saved");
+  });
 });

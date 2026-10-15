@@ -1513,6 +1513,12 @@ Screens (74): `events/CompleteDraftPlanningPanel.tsx`, `events/dashboard/EventDa
 - `lib.eventPacket.commands.resolveOperationalIssue` - mutation; authored step; live reads update by themselves
 - `lib.eventPacket.commands.revisionUrl` - query; live read, updates by itself
 - `lib.eventPacket.commands.sourceUrl` - query; live read, updates by itself
+- `lib.operationalTransactions.applyCateringPackage` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.eventTimingPlan` - query; live read, updates by itself
+- `lib.operationalTransactions.issueEventStock` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.materializeEventMenuTemplate` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.reorderEventTimeline` - mutation; authored step; live reads update by themselves
+- `lib.operationalTransactions.scheduleEventTimeline` - mutation; authored step; live reads update by themselves
 - `lib.proposalEventCreation.createEventFromAcceptedProposal` - mutation; authored step; live reads update by themselves
 - `lib.proposalPreview.previewProposalFromEvent` - query; live read, updates by itself
 - `logisticsWindow.deliveriesByStatus` - query; live read, updates by itself

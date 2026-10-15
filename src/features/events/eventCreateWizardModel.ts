@@ -1,3 +1,5 @@
+import type { CateringSelection } from "../../data/cateringPackages";
+
 export const EVENT_WIZARD_STEPS = [
   "Basics",
   "Client & headcount",
@@ -15,6 +17,13 @@ export type EventWizardDish = {
   /** Notes for the kitchen on this dish (changes, plating, allergies). */
   notes?: string;
 };
+/** A catering package from the menu books, with the dishes picked from it. */
+export type EventWizardPackage = {
+  packageId: string;
+  selections: CateringSelection[];
+  /** Goes on the event's price list as one per-guest line. Empty adds no line. */
+  pricePerGuest: string;
+};
 export type EventWizardStaff = {
   lineId: string;
   personId: string;
@@ -31,6 +40,7 @@ export type EventWizardCommitProgress = {
   event?: EventWizardCommitEntry;
   dishes: Record<string, EventWizardCommitEntry>;
   staff: Record<string, EventWizardCommitEntry>;
+  cateringPackage?: EventWizardCommitEntry;
   /** Counters ensure a confirmed rejected key is never reused. */
   retryAttempts: Record<string, number>;
 };
@@ -65,6 +75,8 @@ export type EventWizardDraft = {
   budgetAmount: string;
   quotedPrice: string;
   dishes: EventWizardDish[];
+  /** Drafts saved before packages were offered have none. */
+  cateringPackage?: EventWizardPackage;
   staff: EventWizardStaff[];
   skipped: EventWizardStep[];
   completed: EventWizardStep[];
@@ -93,6 +105,19 @@ const isLine = (
   fields.every((field) => typeof value[field] === "string") &&
   optional.every(
     (field) => value[field] === undefined || typeof value[field] === "string",
+  );
+
+const isPackage = (value: unknown): value is EventWizardPackage =>
+  isRecord(value) &&
+  typeof value.packageId === "string" &&
+  typeof value.pricePerGuest === "string" &&
+  Array.isArray(value.selections) &&
+  value.selections.every(
+    (line) =>
+      isRecord(line) &&
+      typeof line.recipeId === "string" &&
+      typeof line.servings === "number" &&
+      typeof line.notes === "string",
   );
 
 /** Reject malformed browser state before it can enter the controlled wizard. */
@@ -131,12 +156,15 @@ export function parseEventWizardDraft(value: unknown): EventWizardDraft | null {
     !value.skipped.every(isStep) ||
     !Array.isArray(value.completed) ||
     !value.completed.every(isStep) ||
-    !isRecord(value.commitProgress)
+    !isRecord(value.commitProgress) ||
+    (value.cateringPackage !== undefined && !isPackage(value.cateringPackage))
   )
     return null;
-  const { event, dishes, staff, retryAttempts } = value.commitProgress;
+  const { event, dishes, staff, cateringPackage, retryAttempts } =
+    value.commitProgress;
   if (
     (event !== undefined && !isCommitEntry(event)) ||
+    (cateringPackage !== undefined && !isCommitEntry(cateringPackage)) ||
     !isRecord(dishes) ||
     !Object.values(dishes).every(isCommitEntry) ||
     !isRecord(staff) ||
@@ -221,9 +249,15 @@ function clientHeadcountErrors(draft: EventWizardDraft): string[] {
       : "",
   ].filter(Boolean);
 }
+/** A package counts as menu work once one is picked. */
+export function eventWizardHasPackage(draft: EventWizardDraft): boolean {
+  return !!draft.cateringPackage?.packageId;
+}
 /** Populated lines must be valid even when their optional step was skipped. */
 export function dishLineErrors(draft: EventWizardDraft): string[] {
   const ids = draft.dishes.map((dish) => dish.dishId);
+  const pack = draft.cateringPackage;
+  const packPrice = pack?.pricePerGuest.trim() ?? "";
   return [
     draft.dishes.some((dish) => !dish.dishId)
       ? "Each dish needs a catalog dish."
@@ -237,6 +271,14 @@ export function dishLineErrors(draft: EventWizardDraft): string[] {
         ),
     )
       ? "Servings must be a whole number of zero or more."
+      : "",
+    pack?.selections.some(
+      (line) => !(Number.isInteger(line.servings) && line.servings >= 1),
+    )
+      ? "Each package dish needs servings of 1 or more."
+      : "",
+    packPrice && !(Number.isFinite(Number(packPrice)) && Number(packPrice) >= 0)
+      ? "Package price per guest must be zero or more."
       : "",
   ].filter(Boolean);
 }
@@ -262,8 +304,8 @@ export function validateEventWizardStep(
   if (step === "Client & headcount") return clientHeadcountErrors(draft);
   if (step === "Menu & dishes")
     return [
-      draft.dishes.length === 0
-        ? "Add at least one dish, or choose Skip for now."
+      draft.dishes.length === 0 && !eventWizardHasPackage(draft)
+        ? "Add at least one dish or a package, or choose Skip for now."
         : "",
       ...dishLineErrors(draft),
     ].filter(Boolean);
@@ -308,7 +350,8 @@ export function eventWizardStepState(
       : "Incomplete";
   // Lines added by jumping straight to another step still count as done.
   const filled =
-    (step === "Menu & dishes" && draft.dishes.length > 0) ||
+    (step === "Menu & dishes" &&
+      (draft.dishes.length > 0 || eventWizardHasPackage(draft))) ||
     (step === "Staffing" && draft.staff.length > 0);
   if (filled && validateEventWizardStep(step, draft).length === 0)
     return "Complete";
@@ -330,7 +373,8 @@ export function eventWizardUnlocks(
   ].filter(Boolean);
   // A pickup needs no venue: the client comes to the kitchen.
   const venue = draft.venueId || draft.pickup ? [] : ["venue"],
-    dishes = draft.dishes.length ? [] : ["dishes"],
+    dishes =
+      draft.dishes.length || eventWizardHasPackage(draft) ? [] : ["dishes"],
     staff = draft.staff.length ? [] : ["staff"];
   return [
     {
@@ -406,7 +450,7 @@ export function eventWizardStepInputs(
     return [
       {
         input: "Dishes",
-        filled: draft.dishes.length > 0,
+        filled: draft.dishes.length > 0 || eventWizardHasPackage(draft),
         unlocks:
           "Generates ingredient demand, prep lists, and allergen checks. Without dishes, no prep list is made.",
       },
