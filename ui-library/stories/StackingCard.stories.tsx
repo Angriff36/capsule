@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { libraryFrame } from "../LibraryFrame";
-import { ScrollFrame } from "../components/motion-scroll-frame";
+import { LenisScrollFrame } from "../components/lenis-scroll-frame";
 import StackingCard from "../components/stacking-card";
 
 const meta: Meta = {
@@ -10,7 +10,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          "ui-layouts Stacking Card (https://ui-layouts.com/components/stacking-card): cards stick to the top and stack up, shrinking slightly as you scroll. The original also wraps the page in Lenis smooth scrolling; that wrapper is not included.",
+          "ui-layouts Stacking Card (https://ui-layouts.com/components/stacking-card): cards stick to the top and stack up, shrinking slightly as you scroll. Wrapped in Lenis smooth scrolling like the original.",
       },
     },
   },
@@ -20,8 +20,8 @@ type Story = StoryObj;
 
 export const Default: Story = {
   render: () => (
-    <ScrollFrame height={560}>
+    <LenisScrollFrame height={560}>
       {(container) => <StackingCard container={container} />}
-    </ScrollFrame>
+    </LenisScrollFrame>
   ),
 };

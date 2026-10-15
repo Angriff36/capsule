@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { libraryFrame } from "../LibraryFrame";
-import { ScrollFrame } from "../components/motion-scroll-frame";
+import { LenisScrollFrame } from "../components/lenis-scroll-frame";
 import {
   StickyElement,
   StickyGallery,
@@ -14,7 +14,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          "ui-layouts Sticky Scroll (https://ui-layouts.com/components/sticky-scroll): three layouts built on CSS position: sticky. The originals wrap the page in Lenis smooth scrolling; that wrapper is not included.",
+          "ui-layouts Sticky Scroll (https://ui-layouts.com/components/sticky-scroll): three layouts built on CSS position: sticky. Wrapped in Lenis smooth scrolling like the originals.",
       },
     },
   },
@@ -25,22 +25,26 @@ type Story = StoryObj;
 export const StickyElementStory: Story = {
   name: "Sticky element",
   render: () => (
-    <ScrollFrame height={560}>{() => <StickyElement />}</ScrollFrame>
+    <LenisScrollFrame height={560}>
+      {() => <StickyElement bounded />}
+    </LenisScrollFrame>
   ),
 };
 
 export const StickyGalleryStory: Story = {
   name: "Sticky gallery",
   render: () => (
-    <ScrollFrame height={560}>{() => <StickyGallery />}</ScrollFrame>
+    <LenisScrollFrame height={560}>
+      {() => <StickyGallery bounded />}
+    </LenisScrollFrame>
   ),
 };
 
 export const StickyHeroSectionStory: Story = {
   name: "Sticky hero section",
   render: () => (
-    <ScrollFrame height={560}>
+    <LenisScrollFrame height={560}>
       {(container) => <StickyHeroSection container={container} />}
-    </ScrollFrame>
+    </LenisScrollFrame>
   ),
 };

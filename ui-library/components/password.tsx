@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
+import { Info } from "lucide-react";
 import { Check, CheckCheck, Eye, EyeOff, X } from "../lib/icons-forms";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 
 const PASSWORD_REQUIREMENTS = [
   { regex: /.{8,}/, text: "At least 8 characters" },
@@ -235,6 +237,227 @@ export const PasswordStrengthSegments = () => {
         requirements={strength.requirements}
         MetIcon={CheckCheck}
       />
+    </div>
+  );
+};
+
+const HOVER_ICON_COLORS = {
+  0: "text-red-500",
+  1: "text-orange-500",
+  2: "text-yellow-500",
+  3: "text-green-500",
+  4: "text-amber-700",
+  5: "text-emerald-500",
+} satisfies Record<StrengthScore, string>;
+
+const BORDER_COLORS = {
+  0: "border-border",
+  1: "border-red-500",
+  2: "border-orange-500",
+  3: "border-amber-500",
+  4: "border-green-400",
+  5: "border-emerald-500",
+} satisfies Record<StrengthScore, string>;
+
+function RequirementsHoverCard({
+  iconClass,
+  contentClass,
+  MetIcon,
+  requirements,
+}: {
+  iconClass: string;
+  contentClass: string;
+  MetIcon: typeof Check;
+  requirements: Requirement[];
+}) {
+  return (
+    <HoverCard openDelay={200}>
+      <HoverCardTrigger>
+        <Info
+          size={20}
+          className={`cursor-pointer  ${iconClass} transition-all `}
+        />
+      </HoverCardTrigger>
+      <HoverCardContent className={contentClass}>
+        <RequirementList requirements={requirements} MetIcon={MetIcon} />
+      </HoverCardContent>
+    </HoverCard>
+  );
+}
+
+export const PasswordHoverIndicator = () => {
+  const [password, setPassword] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
+  const strength = usePasswordStrength(password);
+
+  return (
+    <div className="w-96 mx-auto py-12">
+      <form className="space-y-2">
+        <div className="flex justify-between">
+          <label htmlFor="password" className="block text-sm font-medium">
+            Password
+          </label>
+          <RequirementsHoverCard
+            iconClass={HOVER_ICON_COLORS[strength.score]}
+            contentClass="bg-muted"
+            MetIcon={CheckCheck}
+            requirements={strength.requirements}
+          />
+        </div>
+        <div className="relative">
+          <input
+            id="password"
+            type={isVisible ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            aria-invalid={strength.score < 4}
+            aria-describedby="password-strength"
+            className="w-full p-2 border-2 rounded-md bg-muted outline-hidden focus-within:border-blue-700 transition"
+          />
+          <button
+            type="button"
+            onClick={() => setIsVisible((prev) => !prev)}
+            aria-label={isVisible ? "Hide password" : "Show password"}
+            className="absolute inset-y-0 right-0 outline-hidden flex items-center justify-center w-9 text-muted-foreground/80 hover:text-foreground  "
+          >
+            {isVisible ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        </div>
+      </form>
+      <div className="flex gap-2 w-full justify-between mt-2">
+        {SEGMENT_COLORS.map((color, index) => (
+          <span
+            key={color}
+            className={`${strength.score >= index + 1 ? color : "bg-border"}  p-1 rounded-full w-full`}
+          ></span>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const INLINE_INPUT_CLASS =
+  "cursor-pointer transition-all w-full p-2 border-2 rounded-md dark:bg-neutral-950 bg-neutral-50 outline-hidden";
+
+export const PasswordInlineIndicator = () => {
+  const [password, setPassword] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
+  const strength = usePasswordStrength(password);
+
+  return (
+    <div className="w-96 mx-auto py-14">
+      <form className="space-y-2">
+        <div className="flex justify-between">
+          <label htmlFor="password" className="block text-sm font-medium">
+            Password
+          </label>
+          <RequirementsHoverCard
+            iconClass={BORDER_COLORS[strength.score]}
+            contentClass="dark:bg-neutral-950 bg-neutral-50"
+            MetIcon={Check}
+            requirements={strength.requirements}
+          />
+        </div>
+        <div className="relative">
+          <input
+            id="password"
+            type={isVisible ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            aria-invalid={strength.score < 4}
+            aria-describedby="password-strength"
+            className={`${BORDER_COLORS[strength.score]} ${INLINE_INPUT_CLASS}`}
+          />
+          <button
+            type="button"
+            onClick={() => setIsVisible((prev) => !prev)}
+            aria-label={isVisible ? "Hide password" : "Show password"}
+            className="absolute inset-y-0 right-0 outline-hidden flex items-center justify-center w-9 text-muted-foreground/80 hover:text-foreground  "
+          >
+            {isVisible ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export const PasswordConfirmCheck = () => {
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isVisible, setIsVisible] = useState(false);
+  const strength = usePasswordStrength(password);
+  const isMatch =
+    confirmPassword === ""
+      ? null
+      : password !== "" && confirmPassword === password;
+
+  return (
+    <div className="w-96 mx-auto py-12">
+      <form className="space-y-4">
+        <div className="flex justify-between">
+          <label htmlFor="password" className="block text-sm font-medium">
+            Password
+          </label>
+          <RequirementsHoverCard
+            iconClass={BORDER_COLORS[strength.score]}
+            contentClass="dark:bg-neutral-950 bg-neutral-50"
+            MetIcon={Check}
+            requirements={strength.requirements}
+          />
+        </div>
+        <div className="relative">
+          <input
+            id="password"
+            type={isVisible ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
+            aria-invalid={strength.score < 4}
+            aria-describedby="password-strength"
+            className={`${BORDER_COLORS[strength.score]} ${INLINE_INPUT_CLASS}`}
+          />
+          <button
+            type="button"
+            onClick={() => setIsVisible((prev) => !prev)}
+            aria-label={isVisible ? "Hide password" : "Show password"}
+            className="absolute inset-y-0 right-0 outline-hidden flex items-center justify-center w-9 text-muted-foreground/80 hover:text-foreground"
+          >
+            {isVisible ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        </div>
+
+        <div>
+          <label
+            htmlFor="confirm-password"
+            className="block text-sm font-medium"
+          >
+            Confirm Password
+          </label>
+          <input
+            id="confirm-password"
+            type={isVisible ? "text" : "password"}
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            placeholder="Confirm Password"
+            aria-invalid={
+              confirmPassword !== "" ? isMatch === false : undefined
+            }
+            className={`cursor-pointer w-full p-2 border-2 rounded-md dark:bg-neutral-950 bg-neutral-50 outline-hidden transition-all ${
+              confirmPassword === ""
+                ? ""
+                : isMatch
+                  ? "border-green-400"
+                  : "border-red-500"
+            }`}
+          />
+          {confirmPassword !== "" && isMatch === false && (
+            <p className="text-red-500 text-sm mt-1">Passwords do not match</p>
+          )}
+        </div>
+      </form>
     </div>
   );
 };

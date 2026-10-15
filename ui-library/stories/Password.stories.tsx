@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { libraryFrame } from "../LibraryFrame";
 import {
+  PasswordConfirmCheck,
+  PasswordHoverIndicator,
+  PasswordInlineIndicator,
   PasswordInput,
   PasswordStrengthBar,
   PasswordStrengthSegments,
@@ -13,7 +16,7 @@ const meta: Meta = {
     docs: {
       description: {
         component:
-          "ui-layouts Password (https://ui-layouts.com/components/password): password fields with a show/hide toggle and strength meters. The docs' hover-card variants need @radix-ui/react-hover-card and are not ported.",
+          "ui-layouts Password (https://ui-layouts.com/components/password): password fields with a show/hide toggle and strength meters. Hover Indicator, Inline Indicator and Confirm Pass show the requirement list in a hover card.",
       },
     },
   },
@@ -26,3 +29,10 @@ export const StrengthBar: Story = { render: () => <PasswordStrengthBar /> };
 export const StrengthSegments: Story = {
   render: () => <PasswordStrengthSegments />,
 };
+export const HoverIndicator: Story = {
+  render: () => <PasswordHoverIndicator />,
+};
+export const InlineIndicator: Story = {
+  render: () => <PasswordInlineIndicator />,
+};
+export const ConfirmPass: Story = { render: () => <PasswordConfirmCheck /> };

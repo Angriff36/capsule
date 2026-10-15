@@ -1,0 +1,26 @@
+/* Shiki output for the Code components: light theme by default, the dark
+   theme's colors (--shiki-dark) when an ancestor has the .dark class. */
+.uil-code .shiki {
+  overflow-x: auto;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+.dark .uil-code .shiki,
+.dark .uil-code .shiki span {
+  color: var(--shiki-dark) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+.dark .uil-code .shiki {
+  background-color: var(--shiki-dark-bg) !important;
+}
+.uil-code .cliblocks .shiki {
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  padding-block: 0.75rem;
+  font-size: 1.125rem;
+  background-color: var(--color-card) !important;
+}

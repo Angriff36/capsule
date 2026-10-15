@@ -6,6 +6,7 @@ import {
   useTransform,
 } from "motion/react";
 import { type RefObject, useRef } from "react";
+import { LenisRoot } from "./lenis-scroll-frame";
 
 const projects = [
   {
@@ -64,45 +65,47 @@ export default function StackingCard({
     offset: ["start start", "end end"],
   });
   return (
-    <main className="bg-black" ref={container}>
-      <>
-        <section className="text-white  h-[70vh]  w-full bg-slate-950  grid place-content-center relative">
-          <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-size-[54px_54px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+    <LenisRoot bounded={scrollBox !== undefined}>
+      <main className="bg-black" ref={container}>
+        <>
+          <section className="text-white  h-[70vh]  w-full bg-slate-950  grid place-content-center relative">
+            <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-size-[54px_54px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
 
-          <h1 className="2xl:text-7xl text-5xl px-8 font-semibold text-center tracking-tight leading-[120%]">
-            Stacking Cards Using <br /> Motion. Scroll down! 👇
-          </h1>
+            <h1 className="2xl:text-7xl text-5xl px-8 font-semibold text-center tracking-tight leading-[120%]">
+              Stacking Cards Using <br /> Motion. Scroll down! 👇
+            </h1>
+          </section>
+        </>
+
+        <section className="text-white   w-full bg-slate-950  ">
+          {projects.map((project, i) => {
+            const targetScale = 1 - (projects.length - i) * 0.05;
+            return (
+              <Card
+                key={`p_${i}`}
+                i={i}
+                url={project.link}
+                src={project.src}
+                title={project.title}
+                color={project.color}
+                description={project.description}
+                progress={scrollYProgress}
+                range={[i * 0.25, 1]}
+                targetScale={targetScale}
+                scrollBox={scrollBox}
+              />
+            );
+          })}
         </section>
-      </>
 
-      <section className="text-white   w-full bg-slate-950  ">
-        {projects.map((project, i) => {
-          const targetScale = 1 - (projects.length - i) * 0.05;
-          return (
-            <Card
-              key={`p_${i}`}
-              i={i}
-              url={project.link}
-              src={project.src}
-              title={project.title}
-              color={project.color}
-              description={project.description}
-              progress={scrollYProgress}
-              range={[i * 0.25, 1]}
-              targetScale={targetScale}
-              scrollBox={scrollBox}
-            />
-          );
-        })}
-      </section>
-
-      <footer className="group bg-slate-950 ">
-        <h1 className="text-[16vw]  translate-y-20 leading-[100%] uppercase font-semibold text-center bg-linear-to-r from-neutral-400 to-neutral-800 bg-clip-text text-transparent transition-all ease-linear">
-          ui-layout
-        </h1>
-        <div className="bg-black h-40 relative z-10 grid place-content-center text-2xl rounded-tr-full rounded-tl-full"></div>
-      </footer>
-    </main>
+        <footer className="group bg-slate-950 ">
+          <h1 className="text-[16vw]  translate-y-20 leading-[100%] uppercase font-semibold text-center bg-linear-to-r from-neutral-400 to-neutral-800 bg-clip-text text-transparent transition-all ease-linear">
+            ui-layout
+          </h1>
+          <div className="bg-black h-40 relative z-10 grid place-content-center text-2xl rounded-tr-full rounded-tl-full"></div>
+        </footer>
+      </main>
+    </LenisRoot>
   );
 }
 

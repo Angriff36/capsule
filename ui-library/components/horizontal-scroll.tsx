@@ -6,6 +6,7 @@ import {
   useTransform,
 } from "motion/react";
 import { type RefObject, useRef } from "react";
+import { LenisRoot } from "./lenis-scroll-frame";
 
 const slides = [
   {
@@ -122,32 +123,34 @@ export default function HorizontalScroll({
   });
 
   return (
-    <main>
-      <article>
-        <header className="text-white relative  w-full bg-slate-950  grid place-content-center  h-[80vh]">
-          <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-size-[14px_24px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+    <LenisRoot bounded={container !== undefined}>
+      <main>
+        <article>
+          <header className="text-white relative  w-full bg-slate-950  grid place-content-center  h-[80vh]">
+            <div className="absolute bottom-0 left-0 right-0 top-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-size-[14px_24px] mask-[radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
 
-          <h1 className="text-6xl font-bold text-center tracking-tight">
-            I know You Love to Scroll <br />
-            So Scroll
-          </h1>
-        </header>
-        <section ref={section} className="h-[500vh] relative">
-          <Track
-            progress={scrollYProgress}
-            section={section}
-            container={container}
-          />
-        </section>
-        <footer className="bg-red-600 font-medium text-white grid place-content-center h-[80vh]">
-          <p>
-            Inspired By{" "}
-            <a target="_blank" href="https://twitter.com/mattgperry">
-              Matt Perry
-            </a>
-          </p>
-        </footer>
-      </article>
-    </main>
+            <h1 className="text-6xl font-bold text-center tracking-tight">
+              I know You Love to Scroll <br />
+              So Scroll
+            </h1>
+          </header>
+          <section ref={section} className="h-[500vh] relative">
+            <Track
+              progress={scrollYProgress}
+              section={section}
+              container={container}
+            />
+          </section>
+          <footer className="bg-red-600 font-medium text-white grid place-content-center h-[80vh]">
+            <p>
+              Inspired By{" "}
+              <a target="_blank" href="https://twitter.com/mattgperry">
+                Matt Perry
+              </a>
+            </p>
+          </footer>
+        </article>
+      </main>
+    </LenisRoot>
   );
 }
