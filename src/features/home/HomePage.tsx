@@ -13,14 +13,12 @@ import {
 const policy = new HomeAttentionPolicy();
 const DAY_MS = 86_400_000;
 
-/** The lanes that mean somebody has to decide something today. */
-const DECISION_LANES = new Set(["open_prep", "open_packs", "open_invoices"]);
-
-function severityOf(item: HomeAttentionItem): "danger" | "warn" {
-  return item.id === "open_prep" || item.id === "open_packs"
-    ? "danger"
-    : "warn";
-}
+/**
+ * The lanes that mean somebody has to decide something today. Prep tasks and
+ * pack lists belong to their event and show on its page, never as a
+ * company-wide count here (Ryan, issue #445).
+ */
+const DECISION_LANES = new Set(["open_invoices"]);
 
 function startOfDay(ms: number): number {
   const d = new Date(ms);
@@ -33,15 +31,6 @@ function timeOf(startsAt: number | null): string {
   return new Date(startsAt).toLocaleTimeString(undefined, {
     hour: "numeric",
     minute: "2-digit",
-  });
-}
-
-function dayOf(startsAt: number | null): string {
-  if (startsAt == null) return "TBC";
-  return new Date(startsAt).toLocaleDateString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
   });
 }
 
@@ -72,6 +61,7 @@ function Fact({ label, value }: { label: string; value: string }) {
   );
 }
 
+/** One of today's services; the whole row opens the event (issue #446). */
 function ServiceRow({
   service,
   next,
@@ -80,7 +70,10 @@ function ServiceRow({
   next: boolean;
 }) {
   return (
-    <div className="grid grid-cols-[120px_minmax(0,1fr)_auto] items-center gap-x-6 border-t border-line py-4 max-md:grid-cols-1 max-md:gap-y-2">
+    <Link
+      to={service.href}
+      className="group grid grid-cols-[120px_minmax(0,1fr)_auto] items-center gap-x-6 border-t border-line py-4 max-md:grid-cols-1 max-md:gap-y-2"
+    >
       <div>
         <div className="font-mono text-base font-semibold text-ink">
           {timeOf(service.startsAt)}
@@ -92,12 +85,9 @@ function ServiceRow({
         ) : null}
       </div>
       <div>
-        <Link
-          to={service.href}
-          className="font-display text-xl text-ink hover:underline"
-        >
+        <span className="font-display text-xl text-ink group-hover:underline">
           {service.title}
-        </Link>
+        </span>
         {service.readiness.length > 0 ? (
           <div className="fact-row mt-1">
             <Fact label="Readiness" value={service.readiness.join(" · ")} />
@@ -108,11 +98,9 @@ function ServiceRow({
         <span className="chip-meta capitalize">
           {service.stage.replace(/_/g, " ")}
         </span>
-        <Link to={service.href} className="btn btn-ghost btn-sm">
-          Open brief
-        </Link>
+        <span className="btn btn-ghost btn-sm">Open brief</span>
       </div>
-    </div>
+    </Link>
   );
 }
 
@@ -123,16 +111,9 @@ function Decision({
   item: HomeAttentionItem;
   capped: boolean;
 }) {
-  const severity = severityOf(item);
   return (
     <div>
-      <span
-        className={`chip-state ${
-          severity === "danger" ? "chip-state-danger" : "chip-state-warn"
-        }`}
-      >
-        {severity === "danger" ? "Blocking" : "Open"}
-      </span>
+      <span className="chip-state chip-state-warn">Open</span>
       <Link
         to={item.href}
         className="font-display mt-3 block text-2xl leading-tight text-ink hover:text-brand"
@@ -154,8 +135,8 @@ function Decision({
 }
 
 /**
- * Today's service — the operator's home. It answers, in order: what needs a
- * decision now, what is running today, and what is coming next. Every number
+ * Today's service — the operator's home. It answers what needs a decision
+ * now and, when there is any, which services run today. Every number
  * comes from HomeAttentionPolicy, so it is a queryable fact rather than a
  * dashboard estimate.
  */
@@ -197,14 +178,8 @@ export function HomePage() {
       s.startsAt >= startOfToday &&
       s.startsAt < endOfToday,
   );
-  const later = snapshot.upcoming.filter(
-    (s) => s.startsAt == null || s.startsAt >= endOfToday,
-  );
   const decisions = snapshot.attention.filter(
     (item) => DECISION_LANES.has(item.id) && item.count > 0,
-  );
-  const thisWeek = snapshot.attention.find(
-    (item) => item.id === "services_this_week",
   );
 
   return (
@@ -222,16 +197,14 @@ export function HomePage() {
           <h1 className="font-display mt-1 text-4xl leading-none tracking-tight text-ink">
             Today’s service
           </h1>
-          <div className="fact-row mt-3">
-            <Fact label="Today" value={`${snapshot.todayCount} services`} />
-            <Fact label="This week" value={String(thisWeek?.count ?? 0)} />
-            {today[0] ? (
+          {today[0] ? (
+            <div className="fact-row mt-3">
               <Fact
                 label="Next"
                 value={`${timeOf(today[0].startsAt)} · ${today[0].title}`}
               />
-            ) : null}
-          </div>
+            </div>
+          ) : null}
         </div>
         <Link to={eventsIndexPath()} className="btn btn-primary">
           All events
@@ -262,55 +235,13 @@ export function HomePage() {
         )}
       </div>
 
-      <div className="mt-7">
-        <SectionRule
-          label="Today’s services"
-          trailing={today.length === 0 ? "none scheduled" : undefined}
-        />
-        {today.length === 0 ? (
-          <p className="mt-3 text-base text-ink-2">
-            No service is scheduled for today.{" "}
-            <Link to={eventsIndexPath()} className="text-brand underline">
-              Open the events book
-            </Link>
-            .
-          </p>
-        ) : (
+      {today.length > 0 ? (
+        <div className="mt-7">
+          <SectionRule label="Today’s services" />
           <div className="mt-1">
             {today.map((service, i) => (
               <ServiceRow key={service.id} service={service} next={i === 0} />
             ))}
-          </div>
-        )}
-      </div>
-
-      {later.length > 0 ? (
-        <div className="mt-7">
-          <SectionRule
-            label="Coming up"
-            trailing={
-              snapshot.weekAheadCount > 0
-                ? `${snapshot.weekAheadCount} in the next 7 days`
-                : "none in the next 7 days"
-            }
-          />
-          <div className="fact-row mt-3 gap-x-8">
-            {later.slice(0, 5).map((service) => (
-              <Link
-                key={service.id}
-                to={service.href}
-                className="fact hover:underline"
-              >
-                <b>{dayOf(service.startsAt)}</b>
-                {service.title}
-              </Link>
-            ))}
-            <Link
-              to={eventsIndexPath()}
-              className="text-brand ml-auto text-base underline underline-offset-4"
-            >
-              Open the week
-            </Link>
           </div>
         </div>
       ) : null}
