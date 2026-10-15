@@ -3,7 +3,7 @@ import { CheckIcon } from "./icons";
 
 /** One row of the "next steps" list under an empty state. */
 export interface EmptyStateStep {
-  label: string;
+  label: ReactNode;
   /** Already true in the data. Shows an ok check and muted text. */
   done?: boolean;
   /** Button or link that does this step; shown on the right while open. */
@@ -24,7 +24,7 @@ export function EmptyState({
   steps,
 }: {
   title: string;
-  hint?: string;
+  hint?: ReactNode;
   /** Optional CTA(s) answering "so what do I do now?" — buttons or links. */
   action?: ReactNode;
   /** Numbered next steps, in order; done ones show a check. */
@@ -42,7 +42,7 @@ export function EmptyState({
         <ol className="grid">
           {steps.map((step, index) => (
             <li
-              key={`${index}-${step.label}`}
+              key={`step-${index}`}
               className={`flex min-h-11 items-center gap-3 border-t border-line py-2.5 text-base ${
                 step.done ? "text-ink-3" : "text-ink"
               }`}

@@ -490,12 +490,12 @@ export const PAGE_GUIDES: PageGuide[] = [
   },
   {
     prefix: "/eos/people",
-    title: "Right people, right seats",
+    title: "Who does each job",
     purpose:
-      "The Accountability Chart, the People Analyzer and Delegate and Elevate.",
+      "The job chart first; scoring and handing work off after names are in.",
     steps: [
-      "Draw the seats first, then put people in them.",
-      "Score each person against the core values and their seat.",
+      "Put one person in each box.",
+      "Scoring and handing work off appear after every box has a person.",
     ],
   },
   {
@@ -518,9 +518,9 @@ export const PAGE_GUIDES: PageGuide[] = [
     prefix: "/eos",
     title: "EOS",
     purpose:
-      "The six parts of the business from Traction, each with its live number.",
+      "Write where you are going, put names on the jobs, then run a weekly meeting.",
     steps: [
-      "Take the Organizational Checkup, then open the weakest part first.",
+      "Type why Mangia exists in the box on Start here, then do the rest in order.",
     ],
   },
   {

@@ -367,6 +367,8 @@
 
 /* Accountability Chart */
 .eos-chart {
+  display: flex;
+  justify-content: center;
   overflow-x: auto;
   padding: 0.5rem 0 1rem;
 }
@@ -380,6 +382,8 @@
   list-style: none;
 }
 .eos-chart > .eos-tree {
+  width: max-content;
+  margin: 0 auto;
   padding-top: 0;
 }
 .eos-tree > li {
@@ -939,4 +943,16 @@
 }
 .eos-quickadd > :last-child {
   flex: 0 0 auto;
+}
+
+.eos-jargon {
+  cursor: help;
+  font-style: normal;
+  text-decoration: underline dotted;
+  text-decoration-color: var(--color-ink-3);
+  text-underline-offset: 0.18em;
+}
+.eos-jargon:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
