@@ -1,7 +1,7 @@
 import { useClientSearch, useClientsByIds } from "../../lib/useClientDirectory";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { formatMoney } from "../../lib/format";
+import { formatMoney, formatMoneyExact } from "../../lib/format";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { addLocalDateTimeHours } from "../../ui/naturalDate";
 import { SearchSelect } from "../../ui/SearchSelect";
@@ -1114,7 +1114,7 @@ function ReviewStep({
               )?.name ?? draft.cateringPackage.packageId}{" "}
               · {draft.cateringPackage.selections.length} dishes
               {Number(draft.cateringPackage.pricePerGuest) > 0
-                ? ` · ${formatMoney(Number(draft.cateringPackage.pricePerGuest))} per guest`
+                ? ` · ${formatMoneyExact(Number(draft.cateringPackage.pricePerGuest))} per guest`
                 : ""}
             </p>
           ) : null}
