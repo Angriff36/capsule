@@ -175,7 +175,7 @@ including why `diagram -o diagrams` fails ownership):
 bun run check
 ```
 
-Runs `scripts/check-gate.ts`. Independent checks run together after a fast illegal-tree wave (toolchain, secrets, ownership, then proof emit/check). Storybook, design-vocab, and Manifest fmt/scan/breaking skip only when the change set proves they cannot fire (`CAPSULE_CHECK_FULL=1` turns skips off). Every other gate still always runs.
+Runs `scripts/check-gate.ts`. Wave 0 (toolchain, secrets, format, ownership) is sequential and stops on the first failure. Wave 1 and wave 2 then run independent checks together. Storybook, design-vocab, the Manifest cluster, and the registry pin skip only when the change set proves they cannot fire (`CAPSULE_CHECK_FULL=1` turns skips off). Typecheck, tests+coverage, and the UI build always run. Proof emit then proof check stay a pair inside wave 1.
 
 ### Individual gates
 

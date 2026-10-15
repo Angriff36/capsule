@@ -3,8 +3,9 @@ import type { CheckChangeSet } from "./CheckChangeSet";
 export type SkipDecision = { skip: false } | { skip: true; reason: string };
 
 /**
- * Specialized checks may skip only when the change set proves they cannot
- * fire. Anything we cannot prove stays on.
+ * Specialized checks skip only when the change set proves they cannot fire.
+ * Always-on gates (toolchain, secrets, format, ownership, typecheck, tests,
+ * UI build) are not listed here.
  */
 export class CheckSkipPolicy {
   constructor(private readonly changes: CheckChangeSet) {}
@@ -15,7 +16,6 @@ export class CheckSkipPolicy {
       (path) =>
         path === "package.json" ||
         path === "bun.lock" ||
-        path === "vite.config.ts" ||
         path.startsWith(".storybook/") ||
         path.startsWith("src/ui/") ||
         path.startsWith("src/styles/") ||
@@ -32,28 +32,23 @@ export class CheckSkipPolicy {
         path === "DESIGN.md" ||
         path === "design-contract-exceptions.json" ||
         path === "scripts/check-design-vocab.ts" ||
+        path.startsWith("src/styles/") ||
         isSrcScanTarget(path),
     );
   }
 
-  manifestFmtScan(): SkipDecision {
-    return this.decide(
-      "manifest fmt/scan",
-      (path) => path.endsWith(".manifest") || path === "manifest.config.yaml",
-    );
+  /** fmt, scan, breaking, completeness, wiring, integration. */
+  manifestCluster(): SkipDecision {
+    return this.decide("manifest cluster", isManifestClusterPath);
   }
 
-  manifestBreaking(): SkipDecision {
+  manifestRegistry(): SkipDecision {
     return this.decide(
-      "manifest-breaking",
+      "manifest-registry",
       (path) =>
-        path.endsWith(".manifest") ||
-        path === "manifest.config.yaml" ||
-        path === "scripts/manifest-breaking-acks.json" ||
-        path === "scripts/check-manifest-breaking.ts" ||
-        path.startsWith("scripts/manifest-builder/") ||
         path === "package.json" ||
-        path === "bun.lock",
+        path === "bun.lock" ||
+        path === "scripts/check-manifest-registry-pin.ts",
     );
   }
 
@@ -81,4 +76,20 @@ function directoryOf(path: string): string {
 function isSrcScanTarget(path: string): boolean {
   if (!path.startsWith("src/")) return false;
   return /\.(tsx?|css)$/.test(path);
+}
+
+function isManifestClusterPath(path: string): boolean {
+  return (
+    path.endsWith(".manifest") ||
+    path === "manifest.config.yaml" ||
+    path === "scripts/manifest-breaking-acks.json" ||
+    path === "scripts/manifest-completeness-tracked.json" ||
+    path.startsWith("scripts/check-manifest-") ||
+    path.startsWith("scripts/manifest-builder/") ||
+    path.startsWith("generated/proof/") ||
+    path.startsWith("wiring/") ||
+    path.startsWith("src/generated/") ||
+    path === "src/agent/CapsuleStaffActionOffer.ts" ||
+    path === "src/agent/CapsuleLiveEventPrepStateLoader.ts"
+  );
 }

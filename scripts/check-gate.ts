@@ -1,9 +1,12 @@
 /**
  * Authoritative `bun run check` runner.
  *
- * Same checks as before. Independent checks run together. Storybook, design
- * vocab, and Manifest fmt/scan/breaking skip only when the change set proves
- * they cannot be affected. CAPSULE_CHECK_FULL=1 turns skips off.
+ * Same checks as before. Wave 0 is sequential and stops on the first failure.
+ * Wave 1 runs independent checks together. Wave 2 overlaps at most two heavy
+ * jobs so coverage never shares the box with two Vite builds. Storybook, design vocab,
+ * Manifest cluster, and the registry pin skip only when the change set proves
+ * they cannot be affected. CAPSULE_CHECK_FULL=1 turns skips off. Proof emit
+ * then proof check stay a pair inside wave 1.
  */
 import { resolve } from "node:path";
 import { CheckGatePlan } from "./check-gate/CheckGatePlan";
