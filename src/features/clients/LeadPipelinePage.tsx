@@ -1080,7 +1080,7 @@ export function LeadPipelinePage() {
       ) : (
         <button
           type="button"
-          className="btn btn-ghost btn-sm mt-4"
+          className="btn btn-ghost btn-sm mt-4 self-start"
           onClick={() => setShowSources(true)}
         >
           Show lead sources (all time)
