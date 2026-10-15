@@ -64,13 +64,12 @@
 .tax-config-grid {
   display: grid;
   grid-template-columns: minmax(280px, 0.72fr) minmax(420px, 1.28fr);
-  align-items: start;
+  /* Both cards end on the same line, so the pair reads as one balanced row. */
+  align-items: stretch;
   gap: 1.5rem;
 }
 
 .tax-rate-form {
-  position: sticky;
-  top: 1rem;
   border-left: 4px solid var(--color-brand);
   background: var(--color-panel);
 }
