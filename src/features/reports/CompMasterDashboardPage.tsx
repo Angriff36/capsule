@@ -255,7 +255,7 @@ export function CompMasterDashboardPage() {
       {showAllTime ? null : (
         <button
           type="button"
-          className="btn btn-ghost btn-sm mb-4"
+          className="btn btn-ghost btn-sm mb-4 self-start justify-self-start"
           onClick={() => setShowAllTime(true)}
         >
           Show all-time commission
