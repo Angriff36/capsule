@@ -10,6 +10,10 @@ export type EventWizardDish = {
   lineId: string;
   dishId: string;
   dishName: string;
+  /** Servings for this dish. Empty follows the event headcount. */
+  servings?: string;
+  /** Notes for the kitchen on this dish (changes, plating, allergies). */
+  notes?: string;
 };
 export type EventWizardStaff = {
   lineId: string;
@@ -80,8 +84,16 @@ const isCommitEntry = (value: unknown): value is EventWizardCommitEntry =>
   typeof value.fingerprint === "string" &&
   (value.status === "attempted" || value.status === "saved") &&
   (value.docId === undefined || typeof value.docId === "string");
-const isLine = (value: unknown, fields: readonly string[]) =>
-  isRecord(value) && fields.every((field) => typeof value[field] === "string");
+const isLine = (
+  value: unknown,
+  fields: readonly string[],
+  optional: readonly string[] = [],
+) =>
+  isRecord(value) &&
+  fields.every((field) => typeof value[field] === "string") &&
+  optional.every(
+    (field) => value[field] === undefined || typeof value[field] === "string",
+  );
 
 /** Reject malformed browser state before it can enter the controlled wizard. */
 export function parseEventWizardDraft(value: unknown): EventWizardDraft | null {
@@ -109,7 +121,7 @@ export function parseEventWizardDraft(value: unknown): EventWizardDraft | null {
   if (
     !Array.isArray(value.dishes) ||
     !value.dishes.every((line) =>
-      isLine(line, ["lineId", "dishId", "dishName"]),
+      isLine(line, ["lineId", "dishId", "dishName"], ["servings", "notes"]),
     ) ||
     !Array.isArray(value.staff) ||
     !value.staff.every((line) =>
@@ -217,6 +229,15 @@ export function dishLineErrors(draft: EventWizardDraft): string[] {
       ? "Each dish needs a catalog dish."
       : "",
     new Set(ids).size !== ids.length ? "Add each dish only once." : "",
+    draft.dishes.some(
+      (dish) =>
+        !!dish.servings?.trim() &&
+        !(
+          Number.isInteger(Number(dish.servings)) && Number(dish.servings) >= 0
+        ),
+    )
+      ? "Servings must be a whole number of zero or more."
+      : "",
   ].filter(Boolean);
 }
 /** Populated lines must be valid even when their optional step was skipped. */
@@ -267,6 +288,15 @@ export function eventWizardCreateErrors(draft: EventWizardDraft): string[] {
   ];
 }
 export const eventWizardRequiredErrors = eventWizardCreateErrors;
+/** The servings a dish line is saved with: its own count, else the headcount. */
+export function eventWizardDishServings(
+  line: EventWizardDish,
+  draft: Pick<EventWizardDraft, "expectedHeadcount">,
+): number {
+  return line.servings?.trim()
+    ? Number(line.servings)
+    : Number(draft.expectedHeadcount);
+}
 export function eventWizardStepState(
   step: EventWizardStep,
   draft: EventWizardDraft,

@@ -28,6 +28,7 @@ import {
   createEventWizardDraft,
   EVENT_WIZARD_STEPS,
   eventWizardCreateErrors,
+  eventWizardDishServings,
   eventWizardStepInputs,
   eventWizardStepState,
   eventWizardUnlocks,
@@ -38,6 +39,11 @@ import {
 } from "./eventCreateWizardModel";
 import { DateHoldCollisionNotice } from "../sales/DateHoldCollisionNotice";
 import { ClientSearchSelect } from "../clients/ClientSearchSelect";
+import {
+  dishKindLabel,
+  WizardDishLineFields,
+  WizardMenuPrice,
+} from "./EventWizardMenuEditor";
 
 const DRAFT_KEY = "capsule.event-create-wizard.active";
 /** An explicitly saved draft survives closing the tab; the active key is per tab. */
@@ -255,6 +261,9 @@ export function EventCreateWizard({
     <section className="space-y-4" data-testid="event-create-wizard">
       <div className="card p-4">
         <p className="eyebrow">Guided setup</p>
+        <h2 className="mt-1 text-lg font-semibold text-ink" aria-live="polite">
+          Step {step + 1} of {EVENT_WIZARD_STEPS.length}: {currentStep}
+        </h2>
         <ol
           className="mt-3 grid gap-2 sm:grid-cols-5"
           aria-label="Event setup steps"
@@ -263,13 +272,16 @@ export function EventCreateWizard({
             <li key={label}>
               <button
                 type="button"
-                className="btn btn-ghost w-full text-left"
+                className={`btn ${index === step ? "btn-primary" : "btn-ghost"} w-full text-left`}
+                aria-current={index === step ? "step" : undefined}
                 disabled={busy}
                 onClick={() => setStep(index)}
               >
                 {index + 1}. {label}{" "}
-                <span className="text-ink-3">
-                  {eventWizardStepState(label, draft)}
+                <span className={index === step ? undefined : "text-ink-3"}>
+                  {index === step
+                    ? "You are here"
+                    : eventWizardStepState(label, draft)}
                 </span>
               </button>
             </li>
@@ -330,7 +342,12 @@ export function EventCreateWizard({
             />
           ) : null}
           {currentStep === "Menu & dishes" ? (
-            <DishStep draft={draft} dishes={activeDishes} update={update} />
+            <DishStep
+              draft={draft}
+              dishes={activeDishes}
+              update={update}
+              locked={!!eventProgress}
+            />
           ) : null}
           {currentStep === "Staffing" ? (
             <StaffStep draft={draft} people={activePeople} update={update} />
@@ -705,11 +722,22 @@ function DishStep({
   draft,
   dishes,
   update,
+  locked,
 }: {
   draft: EventWizardDraft;
   dishes: readonly any[];
   update: (changes: Partial<EventWizardDraft>) => void;
+  locked: boolean;
 }) {
+  const changeLine = (
+    id: string,
+    changes: Partial<EventWizardDraft["dishes"][number]>,
+  ) =>
+    update({
+      dishes: draft.dishes.map((line) =>
+        line.lineId === id ? { ...line, ...changes } : line,
+      ),
+    });
   const menus = useListMenu();
   const menuDishes = useListMenuDish();
   const add = (id: string) => {
@@ -790,48 +818,55 @@ function DishStep({
           options={dishes.map((dish) => ({
             id: dish._id,
             label: dish.name,
+            hint: dishKindLabel(dish.kind),
           }))}
         />
       </label>
       {draft.dishes.length ? (
         <ul className="divide-y divide-line">
           {draft.dishes.map((dish) => (
-            <li
-              key={dish.lineId}
-              className="flex items-center justify-between py-2"
-            >
-              <span>
-                {dish.dishName}{" "}
-                {draft.commitProgress.dishes[dish.lineId] ? (
-                  <span
-                    className={
-                      draft.commitProgress.dishes[dish.lineId].status ===
+            <li key={dish.lineId} className="py-2">
+              <div className="flex items-center justify-between gap-2">
+                <span>
+                  {dish.dishName}{" "}
+                  {draft.commitProgress.dishes[dish.lineId] ? (
+                    <span
+                      className={
+                        draft.commitProgress.dishes[dish.lineId].status ===
+                        "saved"
+                          ? "text-success"
+                          : "text-warning"
+                      }
+                    >
+                      {draft.commitProgress.dishes[dish.lineId].status ===
                       "saved"
-                        ? "text-success"
-                        : "text-warning"
+                        ? "Saved"
+                        : "May already be saved — choose Retry to confirm"}
+                    </span>
+                  ) : null}
+                </span>
+                {draft.commitProgress.dishes[dish.lineId] ? null : (
+                  <button
+                    type="button"
+                    className="text-link"
+                    onClick={() =>
+                      update({
+                        dishes: draft.dishes.filter(
+                          (item) => item.lineId !== dish.lineId,
+                        ),
+                      })
                     }
                   >
-                    {draft.commitProgress.dishes[dish.lineId].status === "saved"
-                      ? "Saved"
-                      : "May already be saved — choose Retry to confirm"}
-                  </span>
-                ) : null}
-              </span>
-              {draft.commitProgress.dishes[dish.lineId] ? null : (
-                <button
-                  type="button"
-                  className="text-link"
-                  onClick={() =>
-                    update({
-                      dishes: draft.dishes.filter(
-                        (item) => item.lineId !== dish.lineId,
-                      ),
-                    })
-                  }
-                >
-                  Remove
-                </button>
-              )}
+                    Remove
+                  </button>
+                )}
+              </div>
+              <WizardDishLineFields
+                line={dish}
+                headcount={draft.expectedHeadcount}
+                locked={!!draft.commitProgress.dishes[dish.lineId]}
+                onChange={(changes) => changeLine(dish.lineId, changes)}
+              />
             </li>
           ))}
         </ul>
@@ -840,6 +875,7 @@ function DishStep({
           No dishes selected. Choose Skip for now to mark this incomplete.
         </p>
       )}
+      <WizardMenuPrice draft={draft} locked={locked} update={update} />
     </div>
   );
 }
@@ -1057,10 +1093,12 @@ function ReviewStep({
               ? draft.dishes
                   .map(
                     (dish) =>
-                      dishes.find((item) => item._id === dish.dishId)?.name ??
-                      dish.dishName,
+                      `${
+                        dishes.find((item) => item._id === dish.dishId)?.name ??
+                        dish.dishName
+                      } (${eventWizardDishServings(dish, draft)} servings)`,
                   )
-                  .join(", ") + ` (${draft.expectedHeadcount} servings each)`
+                  .join(", ")
               : "Incomplete: no dishes"}
           </p>
         </div>

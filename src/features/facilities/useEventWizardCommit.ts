@@ -8,6 +8,7 @@ import {
   eventWizardCreateErrors,
   eventWizardFingerprint,
   type EventWizardCommitEntry,
+  eventWizardDishServings,
   type EventWizardCommitProgress,
   type EventWizardDraft,
 } from "../events/eventCreateWizardModel";
@@ -68,6 +69,19 @@ const entryKey = (
     retry = progress.retryAttempts[name] ?? 0;
   return retry ? `${base}:a${retry}` : base;
 };
+/** Kitchen notes go with the dish only when entered, so older drafts keep their fingerprints. */
+const dishArgs = (
+  eventId: string,
+  line: EventWizardDraft["dishes"][number],
+  draft: EventWizardDraft,
+) => ({
+  eventId,
+  dishId: line.dishId,
+  dishName: line.dishName,
+  quantityServings: eventWizardDishServings(line, draft),
+  headcountOverride: 0,
+  ...(line.notes?.trim() ? { specialInstructions: line.notes.trim() } : {}),
+});
 const commandArgs = (args: Record<string, unknown>, key: string) => ({
   ...args,
   idempotencyKey: key,
@@ -149,13 +163,7 @@ function preflightEventWizard(draft: EventWizardDraft) {
   const staff: PreparedLine<EventWizardDraft["staff"][number]>[] = [];
   if (savedEvent) {
     for (const line of draft.dishes) {
-      const args = {
-        eventId: savedEvent,
-        dishId: line.dishId,
-        dishName: line.dishName,
-        quantityServings: Number(draft.expectedHeadcount),
-        headcountOverride: 0,
-      };
+      const args = dishArgs(savedEvent, line, draft);
       const entry = progress.dishes[line.lineId];
       if (entry && entry.fingerprint !== eventWizardFingerprint(args))
         problems.push(
@@ -263,13 +271,7 @@ export async function commitEventWizard(
     ? prepared.dishes
     : draft.dishes.map((line) => ({
         line,
-        args: {
-          eventId: event.docId!,
-          dishId: line.dishId,
-          dishName: line.dishName,
-          quantityServings: Number(draft.expectedHeadcount),
-          headcountOverride: 0,
-        },
+        args: dishArgs(event.docId!, line, draft),
       }));
   for (const { line: dish, args } of preparedDishes) {
     const fingerprint = eventWizardFingerprint(args);
