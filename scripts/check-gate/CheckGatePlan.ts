@@ -72,7 +72,7 @@ function wave2(skip: CheckSkipPolicy): CheckWave {
     name: "wave 2 (slow independent gates)",
     maxConcurrent: 2,
     tasks: [
-      { id: "test:coverage", argv: ["run", "test:coverage"], env: testEnv },
+      ...wave2TestTasks(skip, testEnv),
       {
         id: "check:access-matrix",
         argv: ["run", "check:access-matrix"],
@@ -82,6 +82,44 @@ function wave2(skip: CheckSkipPolicy): CheckWave {
       maybe("check:storybook", skip.storybook()),
     ],
   };
+}
+
+function wave2TestTasks(
+  skip: CheckSkipPolicy,
+  testEnv: Record<string, string>,
+): CheckTask[] {
+  const coverage = skip.coverage();
+  const proofs = skip.runtimeProofs();
+  if (!coverage.skip && !proofs.skip) {
+    return [
+      {
+        id: "test:coverage",
+        argv: ["run", "test:coverage"],
+        env: { ...testEnv, CAPSULE_TEST_PROOFS: "1" },
+      },
+    ];
+  }
+  const tasks: CheckTask[] = [];
+  if (coverage.skip) {
+    tasks.push({
+      id: "test:coverage",
+      argv: ["run", "test:coverage"],
+      skip: coverage,
+    });
+    tasks.push({ id: "test", argv: ["run", "test"], env: testEnv });
+  } else {
+    tasks.push({
+      id: "test:coverage",
+      argv: ["run", "test:coverage"],
+      env: testEnv,
+    });
+  }
+  tasks.push(
+    maybe("test:proofs", proofs, {
+      env: { ...testEnv, CAPSULE_TEST_PROOFS: "1" },
+    }),
+  );
+  return tasks;
 }
 
 /** Leave cores for vite/storybook when those run beside coverage. */
@@ -100,8 +138,9 @@ function script(id: string): CheckTask {
 function maybe(
   id: string,
   decision: { skip: false } | { skip: true; reason: string },
+  extra?: { env?: Record<string, string> },
 ): CheckTask {
   const argv = ["run", id];
   if (decision.skip) return { id, argv, skip: decision };
-  return { id, argv };
+  return { id, argv, env: extra?.env };
 }

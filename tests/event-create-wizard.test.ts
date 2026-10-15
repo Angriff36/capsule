@@ -232,6 +232,30 @@ describe("event creation wizard", () => {
   ])("keeps prefilled booking routes on the long form", (params) => {
     expect(guidedEventCreateAvailable(params)).toBe(false);
   });
+  it("saves each dish with its own servings and kitchen notes", async () => {
+    const subject = draft();
+    subject.dishes = [
+      { ...subject.dishes[0], servings: "12", notes: " No nuts " },
+      { ...subject.dishes[1], servings: "" },
+    ];
+    const fake = ports();
+    await commitEventWizard(fake, subject, () => undefined);
+    expect(fake.createDish.mock.calls[0][0]).toMatchObject({
+      quantityServings: 12,
+      specialInstructions: "No nuts",
+    });
+    expect(fake.createDish.mock.calls[1][0].quantityServings).toBe(40);
+    expect(fake.createDish.mock.calls[1][0]).not.toHaveProperty(
+      "specialInstructions",
+    );
+  });
+  it("rejects servings that are not a whole number", () => {
+    const subject = draft();
+    subject.dishes = [{ ...subject.dishes[0], servings: "2.5" }];
+    expect(validateEventWizardStep("Menu & dishes", subject)).toContain(
+      "Servings must be a whole number of zero or more.",
+    );
+  });
   it("has stable payload fingerprints", () =>
     expect(eventWizardFingerprint({ b: 2, a: 1 })).toBe(
       eventWizardFingerprint({ a: 1, b: 2 }),

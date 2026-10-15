@@ -19,6 +19,8 @@ import {
   type ScorecardTargetRow,
 } from "../reports/scorecardMeasures";
 import { useScorecardSources } from "../reports/useScorecardSources";
+import { EosJourney } from "./EosJourney";
+import { EosStartHere } from "./EosStartHere";
 import { EosTabs, ProgressBar } from "./EosShared";
 import {
   EOS_COMPONENTS,
@@ -31,6 +33,7 @@ import {
 } from "./eosModel";
 import { OrganizationalCheckup } from "./OrganizationalCheckup";
 import { PlanningSession } from "./PlanningSession";
+import { useEosJourney } from "./useEosJourney";
 import { useCompanyVision, useEosViewer, useVisionItems } from "./useEosData";
 
 type Stat = {
@@ -41,12 +44,13 @@ type Stat = {
 };
 
 /**
- * EOS home: the six key components as six boxes, each with its live number
- * and a way in, then the Organizational Checkup and the EOS rhythm.
+ * EOS home: four things in Traction order, then the six parts as boxes.
+ * Checkup and quarterly planning wait until seats have names.
  */
 export function EosOverviewPage() {
   const now = useMemo(() => new Date(), []);
   const { canEdit } = useEosViewer();
+  const journey = useEosJourney(now);
   const vision = useCompanyVision();
   const items = useVisionItems();
   const seats = useListAccountabilitySeat();
@@ -62,21 +66,7 @@ export function EosOverviewPage() {
   );
 
   const stats = useMemo((): Record<EosComponent, Stat> => {
-    const section = (name: string) =>
-      (items ?? []).filter((row) => row.section === name).length;
-    const parts = [
-      section("core_value") > 0,
-      !!vision?.coreFocusPurpose,
-      !!vision?.coreFocusNiche,
-      !!vision?.tenYearTarget,
-      !!vision?.targetMarket,
-      section("differentiator") > 0,
-      !!vision?.provenProcess,
-      !!vision?.guarantee,
-      vision?.threeYearDate != null || section("three_year") > 0,
-      vision?.oneYearDate != null || section("one_year_goal") > 0,
-    ];
-    const written = parts.filter(Boolean).length;
+    const written = EosJourney.countVisionParts(vision, items);
 
     const liveSeats = (seats ?? []).filter((row) => row.placedAt != null);
     const openSeats = liveSeats.filter((row) => !row.personId).length;
@@ -129,10 +119,10 @@ export function EosOverviewPage() {
             : ((liveSeats.length - openSeats) / liveSeats.length) * 100,
         note:
           liveSeats.length === 0
-            ? "Draw the Accountability Chart"
+            ? "Draw the job chart"
             : openSeats === 0
-              ? "Every seat filled"
-              : `${openSeats} open seat${openSeats === 1 ? "" : "s"}`,
+              ? "Everyone named"
+              : `${openSeats} with no one yet`,
       },
       data: {
         value: `${onTrack}/${tracked.length}`,
@@ -181,20 +171,14 @@ export function EosOverviewPage() {
       <PageHeader
         eyebrow="EOS · Entrepreneurial Operating System"
         title="How Mangia runs"
-        lead="The six parts of the business from Traction, each with its live number. Open a box to work on that part."
+        lead="Do the four steps below, in order."
         facts={[
           { label: "Quarter", value: quarterLabel(now) },
           { label: "Days left", value: daysLeftInQuarter(now) },
         ]}
-        actions={
-          canEdit ? (
-            <Link to={`${EOS_PATHS.l10}?meeting=1`} className="btn btn-primary">
-              Start this week's L10
-            </Link>
-          ) : null
-        }
       />
       <div className="eos-stack">
+        {journey ? <EosStartHere journey={journey} canEdit={canEdit} /> : null}
         <div className="eos-components">
           {EOS_COMPONENTS.map((component) => {
             const stat = stats[component.key];
@@ -229,7 +213,6 @@ export function EosOverviewPage() {
             );
           })}
         </div>
-        <OrganizationalCheckup />
         <section className="eos-panel eos-tone-traction">
           <div className="eos-panel-head">
             <div>
@@ -247,26 +230,47 @@ export function EosOverviewPage() {
             <Rhythm
               when="Every 90 days"
               what="Close out the Rocks, set new ones, work the long-term issues, retake the checkup."
-              to="?session=quarterly#planning-session"
-              action="Plan the quarterly session"
+              to={
+                journey?.showLaterTools()
+                  ? "?session=quarterly#planning-session"
+                  : null
+              }
+              action={
+                journey?.showLaterTools()
+                  ? "Plan the quarterly session"
+                  : "After seats have names"
+              }
             />
             <Rhythm
               when="Every year"
               what="Review the V/TO, set the 1-year plan and goals, check the People Analyzer."
-              to="?session=annual#planning-session"
-              action="Plan the annual session"
+              to={
+                journey?.showLaterTools()
+                  ? "?session=annual#planning-session"
+                  : null
+              }
+              action={
+                journey?.showLaterTools()
+                  ? "Plan the annual session"
+                  : "After seats have names"
+              }
             />
           </div>
         </section>
-        <PlanningSession
-          rows={leadership ?? []}
-          visionWritten={stats.vision.progress! / 10}
-          oneYearGoals={
-            (items ?? []).filter((row) => row.section === "one_year_goal")
-              .length
-          }
-          now={now}
-        />
+        {journey?.showLaterTools() ? (
+          <>
+            <OrganizationalCheckup />
+            <PlanningSession
+              rows={leadership ?? []}
+              visionWritten={stats.vision.progress! / 10}
+              oneYearGoals={
+                (items ?? []).filter((row) => row.section === "one_year_goal")
+                  .length
+              }
+              now={now}
+            />
+          </>
+        ) : null}
       </div>
     </div>
   );
@@ -280,16 +284,20 @@ function Rhythm({
 }: {
   when: string;
   what: string;
-  to: string;
+  to: string | null;
   action: string;
 }) {
   return (
     <div className="rounded-sm border border-line bg-inset p-3">
       <p className="font-semibold text-ink">{when}</p>
       <p className="mt-1 text-sm text-ink-2">{what}</p>
-      <Link to={to} className="btn-link mt-2 inline-block text-sm">
-        {action} →
-      </Link>
+      {to ? (
+        <Link to={to} className="btn-link mt-2 inline-block text-sm">
+          {action} →
+        </Link>
+      ) : (
+        <p className="mt-2 text-sm text-ink-3">{action}</p>
+      )}
     </div>
   );
 }

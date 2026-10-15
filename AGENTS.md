@@ -73,11 +73,12 @@ bun run typecheck
 bun run format           # prettier --write .
 bun run format:check     # prettier --check .
 bun run secrets
-bun run test             # or bunx vitest run <files>; bare bun test cannot run tests/proofs (no vite import.meta.glob)
-bun run test:coverage    # vitest + coverage ratchet
+bun run test             # unit tests; runtime proofs stay out unless CAPSULE_TEST_PROOFS=1
+bun run test:coverage    # unit tests + auth/nav coverage ratchet
+bun run test:proofs      # runtime proof catalog (slow; not part of a UI-only check)
 bun run build
 bun run baseline:decay   # monthly hygiene checks
-bun run check            # scripts/check-gate.ts — same gates, fail-fast then parallel. Wave 0 sequential: toolchain, secrets, format:check, ownership (stop on first failure). Wave 0b sequential: proof:emit then check:proof (writes generated/proof before integration reads it). Wave 1 parallel: typecheck, design-vocab, manifest-registry, manifest-breaking / fmt / scan / completeness / wiring-drift / integration, baseline:decay. Wave 2 parallel: test:coverage, access-matrix (only when a sign-in or access rule changed; CAPSULE_ACCESS_MATRIX=1 forces it), build, storybook. Storybook, design-vocab, Manifest fmt/scan/breaking, and the registry pin skip only when the diff cannot affect them. Completeness, wiring-drift, and Manifest integration always run. CAPSULE_CHECK_FULL=1 runs every specialized check.
+bun run check            # scripts/check-gate.ts — same gates, fail-fast then parallel. Wave 0 sequential: toolchain, secrets, format:check, ownership (stop on first failure). Wave 0b sequential: proof:emit then check:proof (writes generated/proof before integration reads it). Wave 1 parallel: typecheck, design-vocab, manifest-registry, manifest-breaking / fmt / scan / completeness / wiring-drift / integration, baseline:decay. Wave 2 parallel: unit tests (or test:coverage when auth/nav changed), test:proofs only when Convex/manifests/proofs/agent changed, access-matrix (only when a sign-in or access rule changed; CAPSULE_ACCESS_MATRIX=1 forces it), build, storybook. Storybook, design-vocab, Manifest fmt/scan/breaking, the registry pin, runtime proofs, and the coverage ratchet skip when the diff cannot affect them. Completeness, wiring-drift, and Manifest integration always run. CAPSULE_CHECK_FULL=1 runs every specialized check.
 bun run codegen          # convex codegen
 bun run manifest:regen      # only regen entry — Builder apply when conflict-free
 bun run seed             # requires Convex URL

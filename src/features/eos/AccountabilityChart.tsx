@@ -14,9 +14,9 @@ type Seat = Doc<"accountabilitySeats">;
 type Person = ReturnType<typeof useActivePeople>[number];
 
 /**
- * The Accountability Chart: seats, not people, drawn as a tree. Each seat
- * shows who sits in it and its roles; click Edit on a seat to change it in
- * place, or "+ Seat below" to grow the chart.
+ * The Accountability Chart: jobs, not people, drawn as a tree. Each box
+ * shows who does that job and its roles; click Edit to change it in place,
+ * or "+ Job below" to grow the chart.
  */
 export function AccountabilityChart() {
   const seats = useListAccountabilitySeat();
@@ -111,8 +111,8 @@ export function AccountabilityChart() {
         seats === undefined
           ? "Loading…"
           : live.length === 0
-            ? "Seats first, then people. Who owns each function of Mangia?"
-            : `${live.length} seats · ${open === 0 ? "every seat filled" : `${open} open`}`
+            ? "Jobs first, then people. Who owns each part of Mangia?"
+            : `${live.length} jobs · ${open === 0 ? "everyone named" : `${open} with no one yet`}`
       }
       actions={
         canEdit && live.length > 0 ? (
@@ -121,7 +121,7 @@ export function AccountabilityChart() {
             className="btn btn-secondary"
             onClick={() => setAdding("root")}
           >
-            + Top seat
+            + Top job
           </button>
         ) : null
       }
@@ -130,9 +130,8 @@ export function AccountabilityChart() {
       {seats !== undefined && live.length === 0 ? (
         <div className="grid gap-3">
           <p className="text-base text-ink-2">
-            EOS starts every company with the same five seats: Visionary,
-            Integrator, and the three major functions under it. Start from
-            those, then rename and add seats to fit Mangia.
+            Start with five jobs: Visionary, Integrator, and the three functions
+            under them. Rename them to fit Mangia.
           </p>
           {canEdit ? (
             <div className="flex flex-wrap gap-2">
@@ -203,7 +202,7 @@ function SeatCard({
               {who}
             </>
           ) : (
-            <span className="text-warn">Open seat</span>
+            <span className="text-warn">No one yet</span>
           )}
         </span>
       </div>
@@ -230,7 +229,7 @@ function SeatCard({
             className="btn-link btn-link-compact"
             onClick={onAdd}
           >
-            + Seat below
+            + Job below
           </button>
         </div>
       ) : null}
@@ -307,7 +306,7 @@ function SeatEditor({
       }}
     >
       <label className="field-label">
-        Seat
+        Job title
         <input
           className="input"
           value={title}
@@ -318,13 +317,13 @@ function SeatEditor({
         />
       </label>
       <label className="field-label">
-        Who sits here
+        Who does this job
         <select
           className="input"
           value={personId}
           onChange={(event) => setPersonId(event.target.value)}
         >
-          <option value="">Open seat</option>
+          <option value="">No one yet</option>
           {people.map((person) => (
             <option key={person._id} value={person._id}>
               {`${person.givenName} ${person.familyName}`.trim()}
@@ -384,7 +383,7 @@ function SeatEditor({
               })
             }
           >
-            Remove seat
+            Remove job
           </button>
         ) : null}
       </div>

@@ -175,7 +175,7 @@ including why `diagram -o diagrams` fails ownership):
 bun run check
 ```
 
-Runs `scripts/check-gate.ts`. Wave 0 (toolchain, secrets, format, ownership) is sequential and stops on the first failure. Wave 0b emits proof files then checks them before Manifest integration reads those files. Wave 1 and wave 2 then run independent checks together. Storybook, design-vocab, Manifest fmt/scan/breaking, and the registry pin skip only when the change set proves they cannot fire (`CAPSULE_CHECK_FULL=1` turns skips off). Completeness, wiring-drift, and Manifest integration always run. Typecheck, tests+coverage, and the UI build always run.
+Runs `scripts/check-gate.ts`. Wave 0 (toolchain, secrets, format, ownership) is sequential and stops on the first failure. Wave 0b emits proof files then checks them before Manifest integration reads those files. Wave 1 and wave 2 then run independent checks together. Storybook, design-vocab, Manifest fmt/scan/breaking, the registry pin, runtime proofs, and the coverage ratchet skip only when the change set proves they cannot fire (`CAPSULE_CHECK_FULL=1` turns skips off). Completeness, wiring-drift, and Manifest integration always run. Typecheck, unit tests, and the UI build always run.
 
 ### Individual gates
 
@@ -185,9 +185,9 @@ bun run typecheck              # tsc --noEmit
 bun run format                 # prettier --write .
 bun run format:check           # prettier --check .
 bun run secrets                # secret scan (must stay green)
-bun run test                   # vitest run (all tests)
-bun run test:coverage          # vitest + coverage ratchet
-bun run test:proofs            # runtime proof + integration guard subset
+bun run test                   # vitest run (unit tests; proofs excluded)
+bun run test:coverage          # unit tests + auth/nav coverage ratchet
+bun run test:proofs            # runtime proof catalog (opt in; CAPSULE_CHECK_FULL=1 in check)
 bun run build                  # vite production build
 bun run baseline:decay         # monthly hygiene / root-cap checks
 ```

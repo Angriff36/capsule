@@ -214,6 +214,21 @@ const watchIgnored = [
   "**/CLAUDE.md",
 ];
 
+function vitestExclude(): string[] {
+  const exclude = [...configDefaults.exclude];
+  const runMatrix = process.env.CAPSULE_ACCESS_MATRIX === "1";
+  const askedForProofs = process.argv.some((arg) =>
+    arg.replace(/\\/g, "/").includes("tests/proofs"),
+  );
+  const runProofs =
+    askedForProofs ||
+    process.env.CAPSULE_TEST_PROOFS === "1" ||
+    process.env.CAPSULE_CHECK_FULL === "1";
+  if (!runMatrix) exclude.push("tests/proofs/tenant-access-matrix.*");
+  if (!runProofs && !runMatrix) exclude.push("tests/proofs/**");
+  return exclude;
+}
+
 export default defineConfig(({ mode }) => ({
   // host: true → listen on 0.0.0.0 so both http://localhost:7811 and
   // http://127.0.0.1:7811 work. Pinning only 127.0.0.1 broke "localhost";
@@ -290,12 +305,11 @@ export default defineConfig(({ mode }) => ({
       Number(process.env.CAPSULE_TEST_WORKERS) ||
       Math.min(8, availableParallelism()),
     include: ["tests/**/*.test.ts"],
-    // The tenant access matrix runs for minutes on every core, so plain
-    // test runs leave it out. `bun run check:access-matrix` runs it with
+    // Runtime proofs and the tenant access matrix each take minutes. Plain
+    // `bun run test` leaves them out. `bun run test:proofs` sets
+    // CAPSULE_TEST_PROOFS=1; `bun run check:access-matrix` sets
     // CAPSULE_ACCESS_MATRIX=1 when a sign-in or access rule changed.
-    exclude: process.env.CAPSULE_ACCESS_MATRIX
-      ? [...configDefaults.exclude]
-      : [...configDefaults.exclude, "tests/proofs/tenant-access-matrix.*"],
+    exclude: vitestExclude(),
     environmentMatchGlobs: [["tests/proofs/**", "edge-runtime"]],
     server: { deps: { inline: ["convex-test"] } },
     coverage: {
