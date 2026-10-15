@@ -19,8 +19,6 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
-    "ui-library/**/*.ts",
-    "ui-library/**/*.tsx",
     "convex/**/*.ts",
     "api/**/*.ts",
     "tests/**/*.ts",
