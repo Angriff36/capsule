@@ -12,15 +12,17 @@
 #    review ALREADY approved this branch (AGENTS.md merge gate) and the name is
 #    passed on. With no --reviewer this script runs the documented primary
 #    review (Codex gpt-5.6-terra by default) and continues only on `VERDICT: APPROVE`.
-# 2. Takes the [release] commit on origin/main and waits until the production
-#    address serves the Vercel build OF that commit (<site>/version.json).
-# 3. scripts/release-backend-scope.ts decides if anything since the previous
-#    [release] commit changed the backend. Frontend-only: PASS, stop.
-# 4. Backend changed: SSH to the production box, find the production Capsule
-#    checkout by its git origin (no path is assumed), fast-forward main, require
-#    HEAD == the release sha, and run scripts/deploy-backend.sh --expect <sha>
-#    with --verify for the list queries that the release added.
-# 5. One last line: RESULT: PASS ... or RESULT: FAIL ...
+# 2. Takes the [release] commit on origin/main. scripts/release-backend-scope.ts
+#    decides if anything since the previous [release] commit changed the backend.
+# 3. Waits until the production address serves the Vercel build OF that commit
+#    (<site>/version.json). If the backend changed, SSH to the production box
+#    after that wait (find the checkout by git origin, fast-forward main,
+#    require HEAD == the release sha, run scripts/deploy-backend.sh --expect
+#    <sha> with --verify for the list queries that the release added). A failed
+#    website wait must not leave a new backend behind an old UI.
+# 4. One last line: RESULT: PASS ... or RESULT: FAIL ...
+#    Both deploys must succeed when the backend changed. A FAIL after the
+#    release is retryable on main; each deploy is idempotent.
 #
 # Run again after a failure: on `main`, at the [release] commit, it skips step
 # 1 and continues from step 2 (the backend deploy is idempotent).
@@ -173,31 +175,37 @@ receipt() {
     || echo "deploy-production: receipt gathering failed (above); the deploy itself is done."
 }
 
-# 2. The Vercel production deployment for that commit.
-bun scripts/verify-vercel-release.ts --sha "$sha" --wait "$VERCEL_WAIT_SECONDS" || fail "the Vercel production deployment for $sha did not succeed (above)"
-
-# 3. Does this release change the backend?
+# 2. Does this release change the backend? Cheap, local, before any wait.
 scope="$(bun scripts/release-backend-scope.ts --sha "$sha")" || fail "cannot decide if $sha changes the backend (above)"
 echo "$scope" | sed 's/^/deploy-production: scope /'
+backend_needed=0
+verify=""
 case "$scope" in
-  *"backend=unchanged"*)
-    receipt
-    echo ""
-    echo "RESULT: PASS - frontend deployed at $sha; backend unchanged"
-    exit 0
+  *"backend=unchanged"*) ;;
+  *"backend=required"*)
+    backend_needed=1
+    verify="$(printf '%s\n' "$scope" | sed -n 's/^verify=//p' | tr -d '\r')"
+    # '\n' matters: an empty list is a valid answer, and grep matches nothing on zero lines.
+    printf '%s\n' "$verify" | grep -Eq '^[A-Za-z0-9_,]*$' || fail "unexpected --verify list: $verify"
     ;;
-  *"backend=required"*) ;;
   *) fail "scripts/release-backend-scope.ts gave no answer" ;;
 esac
-verify="$(printf '%s\n' "$scope" | sed -n 's/^verify=//p' | tr -d '\r')"
-# '\n' matters: an empty list is a valid answer, and grep matches nothing on zero lines.
-printf '%s\n' "$verify" | grep -Eq '^[A-Za-z0-9_,]*$' || fail "unexpected --verify list: $verify"
 
-# 4. The backend deploy, ON the production box. The remote script is fixed text;
-#    only the sha and the query list (both checked above) are passed to it.
-echo "deploy-production: backend deploy on $PROD_SSH"
+# 3. Wait until Vercel serves this commit. Only then deploy the backend, so a
+#    failed website wait cannot leave a new backend behind an old UI.
 remote_log=.artifacts/deploy-production-backend.log
-ssh -o BatchMode=yes -o ConnectTimeout=20 "$PROD_SSH" bash -l -s -- "$sha" "$ORIGIN_MATCH" "$verify" <<'REMOTE' 2>&1 | tee "$remote_log"
+if [ "$backend_needed" = 1 ]; then
+  echo "deploy-production: waiting for Vercel, then backend on $PROD_SSH"
+else
+  echo "deploy-production: waiting for Vercel (backend unchanged)"
+fi
+
+bun scripts/verify-vercel-release.ts --sha "$sha" --wait "$VERCEL_WAIT_SECONDS" \
+  || fail "the Vercel production deployment for $sha did not succeed (above)"
+
+if [ "$backend_needed" = 1 ]; then
+  echo "deploy-production: backend deploy on $PROD_SSH"
+  ssh -o BatchMode=yes -o ConnectTimeout=20 "$PROD_SSH" bash -l -s -- "$sha" "$ORIGIN_MATCH" "$verify" <<'REMOTE' 2>&1 | tee "$remote_log"
 set -uo pipefail
 sha="$1"; origin_match="$2"; verify="${3:-}"
 stop() { echo ""; echo "RESULT: FAIL - $1"; exit 1; }
@@ -222,10 +230,17 @@ if [ -n "$verify" ]; then
 fi
 exec bash scripts/deploy-backend.sh --expect "$sha"
 REMOTE
-ssh_status="${PIPESTATUS[0]}"
-[ "$ssh_status" = "0" ] || fail "the backend deploy on $PROD_SSH failed or SSH did not connect (exit $ssh_status; log: $remote_log). The frontend is live at $sha; run this command again to continue"
-grep -q "^RESULT: PASS - backend deployed from $sha" "$remote_log" || fail "the production box did not report RESULT: PASS for $sha (log: $remote_log)"
+  ssh_status="${PIPESTATUS[0]}"
+  [ "$ssh_status" = "0" ] \
+    || fail "the backend deploy on $PROD_SSH failed or SSH did not connect (exit $ssh_status; log: $remote_log). The frontend is live at $sha; run this command again to continue"
+  grep -q "^RESULT: PASS - backend deployed from $sha" "$remote_log" \
+    || fail "the backend deploy on $PROD_SSH failed or SSH did not connect (exit $ssh_status; log: $remote_log). The frontend is live at $sha; run this command again to continue"
+fi
 
 receipt
 echo ""
-echo "RESULT: PASS - frontend and backend deployed at $sha"
+if [ "$backend_needed" = 1 ]; then
+  echo "RESULT: PASS - frontend and backend deployed at $sha"
+else
+  echo "RESULT: PASS - frontend deployed at $sha; backend unchanged"
+fi

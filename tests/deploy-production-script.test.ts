@@ -154,8 +154,8 @@ describe("scripts/deploy-production.sh", () => {
         `[release] ${BRANCH} (reviewed by test-model)`,
       );
       expect(checkout.calls()).toEqual([
-        `bun scripts/verify-vercel-release.ts --sha ${sha} --wait 900`,
         `bun scripts/release-backend-scope.ts --sha ${sha}`,
+        `bun scripts/verify-vercel-release.ts --sha ${sha} --wait 900`,
       ]);
       // One receipt, after the deploy, for the release commit (#382).
       expect(readFileSync(`${checkout.log}.receipt`, "utf8").trim()).toBe(
@@ -177,7 +177,8 @@ describe("scripts/deploy-production.sh", () => {
         `RESULT: PASS - frontend and backend deployed at ${sha}`,
       );
       expect(result.status).toBe(0);
-      const ssh = checkout.calls().at(-1) ?? "";
+      const ssh =
+        checkout.calls().find((call) => call.startsWith("ssh ")) ?? "";
       expect(ssh).toContain("-o BatchMode=yes");
       expect(ssh).toContain(
         `oc@pop-os bash -l -s -- ${sha} Angriff36/capsule listA,listB`,
@@ -207,7 +208,19 @@ describe("scripts/deploy-production.sh", () => {
       });
       expect(vercelRun.lastLine).toContain("RESULT: FAIL - the Vercel");
       expect(vercelRun.status).toBe(1);
-      expect(vercel.calls()).toHaveLength(1);
+      expect(
+        vercel
+          .calls()
+          .some((call) => call.includes("release-backend-scope.ts")),
+      ).toBe(true);
+      expect(
+        vercel
+          .calls()
+          .some((call) => call.includes("verify-vercel-release.ts")),
+      ).toBe(true);
+      expect(vercel.calls().some((call) => call.startsWith("ssh "))).toBe(
+        false,
+      );
 
       for (const mode of ["fail", "silent"]) {
         const checkout = await makeCheckout();

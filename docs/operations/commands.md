@@ -175,7 +175,7 @@ including why `diagram -o diagrams` fails ownership):
 bun run check
 ```
 
-Runs, in order: `toolchain` → `proof:emit` → `check:proof` → `check:manifest-registry` → domain manifest integration guards → `typecheck` → `format:check` → `secrets` → `test:coverage` → `build` → `baseline:decay`.
+Runs `scripts/check-gate.ts`. Wave 0 (toolchain, secrets, format, ownership) is sequential and stops on the first failure. Wave 0b emits proof files then checks them before Manifest integration reads those files. Wave 1 and wave 2 then run independent checks together. Storybook, design-vocab, Manifest fmt/scan/breaking, and the registry pin skip only when the change set proves they cannot fire (`CAPSULE_CHECK_FULL=1` turns skips off). Completeness, wiring-drift, and Manifest integration always run. Typecheck, tests+coverage, and the UI build always run.
 
 ### Individual gates
 
@@ -259,7 +259,7 @@ for the next release.
 
 ```bash
 bun run deploy                 # convex deploy — HUMAN-ONLY manual path; the normal path is `bash scripts/release.sh`
-bash scripts/deploy-production.sh --reviewer <model>  # THE production release: release.sh + Vercel check + backend deploy on the Linux box over SSH
+bash scripts/deploy-production.sh --reviewer <model>  # THE production release: release.sh + Vercel wait, then Linux backend deploy when needed
 bash scripts/deploy-backend.sh --expect <main sha>   # production backend, ON THE LINUX BOX only (deploy-production.sh runs it for you) — docs/operations/production-backend-deploy.md
 ```
 

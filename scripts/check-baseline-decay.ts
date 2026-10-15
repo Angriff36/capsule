@@ -82,7 +82,12 @@ class BaselineDecayCheck {
       readFileSync(resolve(ROOT, "package.json"), "utf8"),
     ) as { scripts?: Record<string, string> };
     const check = pkg.scripts?.check ?? "";
-    if (!check.includes("format:check")) {
+    const plan = resolve(ROOT, "scripts/check-gate/CheckGatePlan.ts");
+    const runnerSource = existsSync(plan) ? readFileSync(plan, "utf8") : "";
+    const formatWired =
+      check.includes("format:check") ||
+      (check.includes("check-gate") && runnerSource.includes("format:check"));
+    if (!formatWired) {
       this.failures.push("package.json check must include format:check");
     }
     if (existsSync(resolve(ROOT, "biome.json"))) {

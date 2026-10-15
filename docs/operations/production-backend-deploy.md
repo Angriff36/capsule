@@ -22,27 +22,32 @@ handoff between machines.
    when the reviewer's last message has `VERDICT: APPROVE`. A REJECT, no
    verdict, no `codex` CLI, or Codex-authored commits stop the run.
 2. Release commit. It takes the `[release]` commit on `origin/main` (the full
-   sha) and runs `scripts/verify-vercel-release.ts`: the production address
-   must serve the build OF that commit. Every build writes `<site>/version.json`
-   with its commit (`vite.config.ts`, from `VERCEL_GIT_COMMIT_SHA`); the script
-   reads it until it equals the release sha. Read-only, no Vercel credential. A
-   failed or stale deployment never matches.
-3. Backend or not. `scripts/release-backend-scope.ts` decides
+   sha). `scripts/release-backend-scope.ts` decides whether the backend changed
    (`src/lib/releaseBackendScope.ts`). It compares the release with the PREVIOUS
    `[release]` commit on `main`, so a branch that landed through a GitHub-side
    merge is included. The backend deploy is necessary when that range changed a `.manifest` file, `convex/`, `convex.json`, the dependency
    pins (`package.json`, `bun.lock`), or a `src/` module that `convex/` code
-   imports. Frontend-only: `RESULT: PASS - frontend deployed at <sha>; backend unchanged`.
-4. Backend deploy. It opens SSH to the production box (`oc@pop-os`, the user's
-   own SSH key and host configuration; no credential is in the repository). On
-   the box it finds the production checkout by its git origin plus the
-   self-hosted credential names in `.env.local` (no path is assumed, exactly
-   one must match), fast-forwards `main`, requires `HEAD` = the release sha, and
-   runs `scripts/deploy-backend.sh --expect <sha>`, with `--verify` for the
+   imports.
+3. Frontend wait, then backend when needed. `scripts/verify-vercel-release.ts`
+   waits until the production address serves the build OF that commit. Every
+   build writes `<site>/version.json` with its commit (`vite.config.ts`, from
+   `VERCEL_GIT_COMMIT_SHA`); the script reads it until it equals the release
+   sha. Read-only, no Vercel credential. A failed or stale deployment never
+   matches. If the backend changed, SSH to the production box runs after that
+   wait (`oc@pop-os`, the user's own SSH key and host configuration; no
+   credential is in the repository). A failed website wait does not deploy a
+   new backend behind an old UI. On the box it finds the production
+   checkout by its git origin plus the self-hosted credential names in
+   `.env.local` (no path is assumed, exactly one must match), fast-forwards
+   `main`, requires `HEAD` = the release sha, and runs
+   `scripts/deploy-backend.sh --expect <sha>`, with `--verify` for the
    zero-argument `list*` queries that the release added to `convex/queries.ts`.
    The deploy stamps the release sha into `convex/lib/backendRelease.ts` for
    the deploy only; afterwards `deploymentProbe:health` must name that sha.
-5. Release receipt (`scripts/release-receipt.ts`, report only, before the
+   Frontend-only: `RESULT: PASS - frontend deployed at <sha>; backend unchanged`.
+   Both must succeed when the backend changed. A FAIL after the git release is
+   retryable on `main`; neither deploy is rolled back.
+4. Release receipt (`scripts/release-receipt.ts`, report only, before the
    result line): the exact Vercel build, the sha the backend reports (or an
    earlier release with no backend change since, via
    `release-backend-scope.ts --since`), the config check, and a real signed-in
@@ -50,7 +55,7 @@ handoff between machines.
    (JSON `{"entity":"…","command":"…","body":{…}}`, run with
    `CAPSULE_API_KEY` and idempotency key `release-receipt-<sha>`). A missing
    leg keeps the receipt PARTIAL; it never undoes the deploy.
-6. Result. The last line is one of:
+5. Result. The last line is one of:
    - `RESULT: PASS - frontend and backend deployed at <sha>`
    - `RESULT: PASS - frontend deployed at <sha>; backend unchanged`
    - `RESULT: FAIL - <reason>`
