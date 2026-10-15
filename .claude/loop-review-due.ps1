@@ -5,7 +5,16 @@
 $root = 'C:\Projects\capsule'
 $open = Join-Path $root '.loop-worktrees\_review-open'
 $last = Join-Path $root '.loop-worktrees\_last-review'
-if (Test-Path $open) { exit 0 }
+if (Test-Path $open) {
+  # The batch can reach production without this review's APPROVE (a release by hand, or a
+  # release that went live after the lander gave up). Then dev == main and there is nothing
+  # left to review: close the review so the maker goes back to building.
+  git -C $root fetch origin dev main --quiet
+  if ($LASTEXITCODE -ne 0 -or (git -C $root rev-list --count 'origin/main..origin/dev') -ne '0') { exit 0 }
+  Remove-Item $open -Force
+  "[$(Get-Date -Format s)] daily review closed: dev is already in production (nothing to review)"
+  exit 0
+}
 if ((Test-Path $last) -and ((Get-Date) - (Get-Item $last).LastWriteTime).TotalHours -lt 24) { exit 0 }
 git -C $root fetch origin dev main --quiet
 if ((git -C $root rev-list --count 'origin/main..origin/dev') -eq '0') { exit 0 }
