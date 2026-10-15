@@ -221,7 +221,7 @@ export function IntegrationsPage() {
       <GoogleCalendarSection connection={connection} />
 
       <Section title="QuickBooks Online">
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.7fr)]">
+        <div className="grid gap-5 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.7fr)]">
           <div>
             <p className="max-w-2xl text-base leading-relaxed text-ink-2">
               Confirmed invoices and received payments are pushed to your
@@ -322,7 +322,7 @@ export function IntegrationsPage() {
       </Section>
 
       <Section title="SMS alerts (Twilio)">
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.7fr)]">
+        <div className="grid gap-5 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.7fr)]">
           <div>
             <p className="max-w-2xl text-base leading-relaxed text-ink-2">
               Opted-in staff receive a text message on three high-urgency

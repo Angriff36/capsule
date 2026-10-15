@@ -18,7 +18,7 @@ import { MetricDefinitionList } from "./MetricDefinitionList";
 import { CompGoalsSection } from "./CompGoalsSection";
 
 const LOADING = "Loading…";
-const NOT_ASKED = "Show all-time to see";
+const NOT_ASKED = "—";
 
 export function CompMasterDashboardPage() {
   const embedded = useEmbedded();

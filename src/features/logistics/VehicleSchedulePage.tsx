@@ -222,7 +222,13 @@ export function VehicleSchedulePage() {
                 {HOUR_MARKS.map((hour) => (
                   <span
                     key={hour}
-                    className="absolute -translate-x-1/2"
+                    className={`absolute ${
+                      hour === 0
+                        ? ""
+                        : hour === 24
+                          ? "-translate-x-full"
+                          : "-translate-x-1/2"
+                    }`}
                     style={{ left: `${(hour / 24) * 100}%` }}
                   >
                     {hour}:00

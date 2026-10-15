@@ -180,6 +180,8 @@
 
 /* Secondary board action: destructive or follow-up, never the primary bump. */
 .kds-secondary {
+  /* Fixed height: the 100px reserve on a lone Start / Claim button is two of these. */
+  height: 42px;
   background: transparent;
   color: #b04f18;
   border: 1px solid #a9b6ae;
