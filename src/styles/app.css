@@ -202,7 +202,7 @@
      and back in on hover. Dropdown triggers keep no circle (their chevron
      already says what they do). */
   .btn {
-    @apply relative inline-flex min-h-10 cursor-pointer items-center gap-1.5 rounded-full border-2 border-ink-2 py-1 pl-4 text-left text-sm leading-tight font-medium text-ink transition-colors duration-200 select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-45;
+    @apply relative inline-flex min-h-10 cursor-pointer items-center justify-self-start gap-1.5 rounded-full border-2 border-ink-2 py-1 pl-4 text-left text-sm leading-tight font-medium text-ink transition-colors duration-200 select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-45;
     background-image: linear-gradient(
       to right,
       var(--color-inset),

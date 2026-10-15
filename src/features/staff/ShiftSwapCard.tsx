@@ -172,7 +172,7 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
                 </p>
                 <div className="mt-3 flex gap-2">
                   <button
-                    className="btn btn-primary btn-sm flex-1"
+                    className="btn btn-primary btn-sm"
                     disabled={busy != null || !linked}
                     onClick={() =>
                       run(`accept:${request._id}`, () =>
