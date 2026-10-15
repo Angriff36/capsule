@@ -16,9 +16,10 @@
 #    decides if anything since the previous [release] commit changed the backend.
 # 3. Waits until the production address serves the Vercel build OF that commit
 #    (<site>/version.json). If the backend changed, SSH to the production box
-#    at the SAME TIME (find the checkout by git origin, fast-forward main,
+#    after that wait (find the checkout by git origin, fast-forward main,
 #    require HEAD == the release sha, run scripts/deploy-backend.sh --expect
-#    <sha> with --verify for the list queries that the release added).
+#    <sha> with --verify for the list queries that the release added). A failed
+#    website wait must not leave a new backend behind an old UI.
 # 4. One last line: RESULT: PASS ... or RESULT: FAIL ...
 #    Both deploys must succeed when the backend changed. A FAIL after the
 #    release is retryable on main; each deploy is idempotent.
@@ -190,22 +191,21 @@ case "$scope" in
   *) fail "scripts/release-backend-scope.ts gave no answer" ;;
 esac
 
-# 3. Vercel wait, and the Linux backend deploy when needed, at the same time.
-#    The box pulls origin/main; it does not need the website to be live first.
+# 3. Wait until Vercel serves this commit. Only then deploy the backend, so a
+#    failed website wait cannot leave a new backend behind an old UI.
 remote_log=.artifacts/deploy-production-backend.log
 if [ "$backend_needed" = 1 ]; then
-  echo "deploy-production: waiting for Vercel and backend together"
+  echo "deploy-production: waiting for Vercel, then backend on $PROD_SSH"
 else
   echo "deploy-production: waiting for Vercel (backend unchanged)"
 fi
 
-bun scripts/verify-vercel-release.ts --sha "$sha" --wait "$VERCEL_WAIT_SECONDS" &
-vercel_pid=$!
-backend_pid=""
+bun scripts/verify-vercel-release.ts --sha "$sha" --wait "$VERCEL_WAIT_SECONDS" \
+  || fail "the Vercel production deployment for $sha did not succeed (above)"
+
 if [ "$backend_needed" = 1 ]; then
-  echo "deploy-production: backend deploy on $PROD_SSH (alongside Vercel)"
-  (
-    ssh -o BatchMode=yes -o ConnectTimeout=20 "$PROD_SSH" bash -l -s -- "$sha" "$ORIGIN_MATCH" "$verify" <<'REMOTE' 2>&1 | tee "$remote_log"
+  echo "deploy-production: backend deploy on $PROD_SSH"
+  ssh -o BatchMode=yes -o ConnectTimeout=20 "$PROD_SSH" bash -l -s -- "$sha" "$ORIGIN_MATCH" "$verify" <<'REMOTE' 2>&1 | tee "$remote_log"
 set -uo pipefail
 sha="$1"; origin_match="$2"; verify="${3:-}"
 stop() { echo ""; echo "RESULT: FAIL - $1"; exit 1; }
@@ -230,31 +230,11 @@ if [ -n "$verify" ]; then
 fi
 exec bash scripts/deploy-backend.sh --expect "$sha"
 REMOTE
-    ssh_status="${PIPESTATUS[0]}"
-    [ "$ssh_status" = "0" ] || exit "$ssh_status"
-    grep -q "^RESULT: PASS - backend deployed from $sha" "$remote_log" || exit 1
-  ) &
-  backend_pid=$!
-fi
-
-vercel_status=0
-wait "$vercel_pid" || vercel_status=$?
-backend_status=0
-if [ -n "$backend_pid" ]; then
-  wait "$backend_pid" || backend_status=$?
-fi
-
-if [ "$vercel_status" != 0 ] && [ "$backend_status" != 0 ]; then
-  fail "the Vercel production deployment for $sha did not succeed, and the backend deploy on $PROD_SSH failed (log: $remote_log). Run this command again to continue"
-fi
-if [ "$vercel_status" != 0 ]; then
-  if [ "$backend_needed" = 1 ] && [ "$backend_status" = 0 ]; then
-    fail "the Vercel production deployment for $sha did not succeed (above). The backend is at $sha; run this command again to finish the frontend"
-  fi
-  fail "the Vercel production deployment for $sha did not succeed (above)"
-fi
-if [ "$backend_needed" = 1 ] && [ "$backend_status" != 0 ]; then
-  fail "the backend deploy on $PROD_SSH failed or SSH did not connect (exit $backend_status; log: $remote_log). The frontend is live at $sha; run this command again to continue"
+  ssh_status="${PIPESTATUS[0]}"
+  [ "$ssh_status" = "0" ] \
+    || fail "the backend deploy on $PROD_SSH failed or SSH did not connect (exit $ssh_status; log: $remote_log). The frontend is live at $sha; run this command again to continue"
+  grep -q "^RESULT: PASS - backend deployed from $sha" "$remote_log" \
+    || fail "the backend deploy on $PROD_SSH failed or SSH did not connect (exit $ssh_status; log: $remote_log). The frontend is live at $sha; run this command again to continue"
 fi
 
 receipt

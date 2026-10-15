@@ -28,14 +28,15 @@ handoff between machines.
    merge is included. The backend deploy is necessary when that range changed a `.manifest` file, `convex/`, `convex.json`, the dependency
    pins (`package.json`, `bun.lock`), or a `src/` module that `convex/` code
    imports.
-3. Frontend wait, and backend when needed, together. `scripts/verify-vercel-release.ts`
+3. Frontend wait, then backend when needed. `scripts/verify-vercel-release.ts`
    waits until the production address serves the build OF that commit. Every
    build writes `<site>/version.json` with its commit (`vite.config.ts`, from
    `VERCEL_GIT_COMMIT_SHA`); the script reads it until it equals the release
    sha. Read-only, no Vercel credential. A failed or stale deployment never
-   matches. If the backend changed, SSH to the production box runs at the same
-   time (`oc@pop-os`, the user's own SSH key and host configuration; no
-   credential is in the repository). On the box it finds the production
+   matches. If the backend changed, SSH to the production box runs after that
+   wait (`oc@pop-os`, the user's own SSH key and host configuration; no
+   credential is in the repository). A failed website wait does not deploy a
+   new backend behind an old UI. On the box it finds the production
    checkout by its git origin plus the self-hosted credential names in
    `.env.local` (no path is assumed, exactly one must match), fast-forwards
    `main`, requires `HEAD` = the release sha, and runs

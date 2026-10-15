@@ -259,7 +259,7 @@ for the next release.
 
 ```bash
 bun run deploy                 # convex deploy — HUMAN-ONLY manual path; the normal path is `bash scripts/release.sh`
-bash scripts/deploy-production.sh --reviewer <model>  # THE production release: release.sh + Vercel wait and Linux backend deploy together
+bash scripts/deploy-production.sh --reviewer <model>  # THE production release: release.sh + Vercel wait, then Linux backend deploy when needed
 bash scripts/deploy-backend.sh --expect <main sha>   # production backend, ON THE LINUX BOX only (deploy-production.sh runs it for you) — docs/operations/production-backend-deploy.md
 ```
 

@@ -218,7 +218,9 @@ describe("scripts/deploy-production.sh", () => {
           .calls()
           .some((call) => call.includes("verify-vercel-release.ts")),
       ).toBe(true);
-      expect(vercel.calls().some((call) => call.startsWith("ssh "))).toBe(true);
+      expect(vercel.calls().some((call) => call.startsWith("ssh "))).toBe(
+        false,
+      );
 
       for (const mode of ["fail", "silent"]) {
         const checkout = await makeCheckout();
