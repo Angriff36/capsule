@@ -11,7 +11,7 @@ export class CheckGatePlan {
     const changes = CheckChangeSet.load(root);
     const skip = new CheckSkipPolicy(changes);
     this.unproven = changes.proven ? "" : changes.whyUnproven;
-    this.waves = [wave0(), wave1(skip), wave2(skip)];
+    this.waves = [wave0(), waveProof(), wave1(skip), wave2(skip)];
   }
 }
 
@@ -31,6 +31,22 @@ function wave0(): CheckWave {
   };
 }
 
+function waveProof(): CheckWave {
+  return {
+    name: "wave 0b (proof emit then check)",
+    serial: true,
+    tasks: [
+      {
+        id: "proof:emit+check",
+        steps: [
+          ["run", "proof:emit"],
+          ["run", "check:proof"],
+        ],
+      },
+    ],
+  };
+}
+
 function wave1(skip: CheckSkipPolicy): CheckWave {
   const cluster = skip.manifestCluster();
   return {
@@ -45,13 +61,6 @@ function wave1(skip: CheckSkipPolicy): CheckWave {
       maybe("check:manifest-completeness", cluster),
       maybe("check:wiring-drift", cluster),
       maybe("check:manifest-integration", cluster),
-      {
-        id: "proof:emit+check",
-        steps: [
-          ["run", "proof:emit"],
-          ["run", "check:proof"],
-        ],
-      },
       script("baseline:decay"),
     ],
   };
