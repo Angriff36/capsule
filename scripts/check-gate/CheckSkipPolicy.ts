@@ -37,9 +37,26 @@ export class CheckSkipPolicy {
     );
   }
 
-  /** fmt, scan, breaking, completeness, wiring, integration. */
-  manifestCluster(): SkipDecision {
-    return this.decide("manifest cluster", isManifestClusterPath);
+  /** fmt and scan only need authored Manifest files. */
+  manifestFmtScan(): SkipDecision {
+    return this.decide(
+      "manifest fmt/scan",
+      (path) => path.endsWith(".manifest") || path === "manifest.config.yaml",
+    );
+  }
+
+  manifestBreaking(): SkipDecision {
+    return this.decide(
+      "manifest-breaking",
+      (path) =>
+        path.endsWith(".manifest") ||
+        path === "manifest.config.yaml" ||
+        path === "scripts/manifest-breaking-acks.json" ||
+        path === "scripts/check-manifest-breaking.ts" ||
+        path.startsWith("scripts/manifest-builder/") ||
+        path === "package.json" ||
+        path === "bun.lock",
+    );
   }
 
   manifestRegistry(): SkipDecision {
@@ -76,20 +93,4 @@ function directoryOf(path: string): string {
 function isSrcScanTarget(path: string): boolean {
   if (!path.startsWith("src/")) return false;
   return /\.(tsx?|css)$/.test(path);
-}
-
-function isManifestClusterPath(path: string): boolean {
-  return (
-    path.endsWith(".manifest") ||
-    path === "manifest.config.yaml" ||
-    path === "scripts/manifest-breaking-acks.json" ||
-    path === "scripts/manifest-completeness-tracked.json" ||
-    path.startsWith("scripts/check-manifest-") ||
-    path.startsWith("scripts/manifest-builder/") ||
-    path.startsWith("generated/proof/") ||
-    path.startsWith("wiring/") ||
-    path.startsWith("src/generated/") ||
-    path === "src/agent/CapsuleStaffActionOffer.ts" ||
-    path === "src/agent/CapsuleLiveEventPrepStateLoader.ts"
-  );
 }

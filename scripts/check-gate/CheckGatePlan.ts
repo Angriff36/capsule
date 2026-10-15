@@ -48,19 +48,19 @@ function waveProof(): CheckWave {
 }
 
 function wave1(skip: CheckSkipPolicy): CheckWave {
-  const cluster = skip.manifestCluster();
+  const fmtScan = skip.manifestFmtScan();
   return {
     name: "wave 1 (independent gates)",
     tasks: [
       script("typecheck"),
       maybe("check:design-vocab", skip.designVocab()),
       maybe("check:manifest-registry", skip.manifestRegistry()),
-      maybe("check:manifest-breaking", cluster),
-      maybe("check:manifest-fmt", cluster),
-      maybe("check:manifest-scan", cluster),
-      maybe("check:manifest-completeness", cluster),
-      maybe("check:wiring-drift", cluster),
-      maybe("check:manifest-integration", cluster),
+      maybe("check:manifest-breaking", skip.manifestBreaking()),
+      maybe("check:manifest-fmt", fmtScan),
+      maybe("check:manifest-scan", fmtScan),
+      script("check:manifest-completeness"),
+      script("check:wiring-drift"),
+      script("check:manifest-integration"),
       script("baseline:decay"),
     ],
   };

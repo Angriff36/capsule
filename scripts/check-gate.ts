@@ -5,8 +5,9 @@
  * Wave 0b emits proof files then checks them, before Manifest integration
  * reads those files. Wave 1 runs independent checks together. Wave 2 overlaps
  * at most two heavy jobs so coverage never shares the box with two Vite builds.
- * Storybook, design vocab, Manifest cluster, and the registry pin skip only
- * when the change set proves they cannot be affected. CAPSULE_CHECK_FULL=1
+ * Storybook, design vocab, Manifest fmt/scan/breaking, and the registry pin
+ * skip only when the change set proves they cannot be affected. Completeness,
+ * wiring-drift, and Manifest integration always run. CAPSULE_CHECK_FULL=1
  * turns skips off.
  */
 import { resolve } from "node:path";
