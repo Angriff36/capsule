@@ -4,8 +4,9 @@ export type SkipDecision = { skip: false } | { skip: true; reason: string };
 
 /**
  * Specialized checks skip only when the change set proves they cannot fire.
- * Always-on gates (toolchain, secrets, format, ownership, typecheck, tests,
- * UI build) are not listed here.
+ * Always-on gates (toolchain, secrets, format, ownership, typecheck, UI
+ * build) are not listed here. Runtime proofs and the coverage ratchet skip
+ * the same way — they are not a tax on every UI change.
  */
 export class CheckSkipPolicy {
   constructor(private readonly changes: CheckChangeSet) {}
@@ -69,6 +70,21 @@ export class CheckSkipPolicy {
     );
   }
 
+  /** Coverage only instruments auth and navigation. */
+  coverage(): SkipDecision {
+    return this.decide(
+      "coverage ratchet",
+      (path) =>
+        path.startsWith("src/app/auth/") ||
+        path.startsWith("src/app/navigation/") ||
+        path === "vite.config.ts",
+    );
+  }
+
+  runtimeProofs(): SkipDecision {
+    return this.decide("runtime proofs", isRuntimeProofPath);
+  }
+
   private decide(
     label: string,
     isRelevant: (path: string) => boolean,
@@ -93,4 +109,26 @@ function directoryOf(path: string): string {
 function isSrcScanTarget(path: string): boolean {
   if (!path.startsWith("src/")) return false;
   return /\.(tsx?|css)$/.test(path);
+}
+
+function isRuntimeProofPath(path: string): boolean {
+  return (
+    path.startsWith("tests/proofs/") ||
+    path === "tests/proof-registry-gate.test.ts" ||
+    path.startsWith("manifest-integration-guard") ||
+    path.endsWith(".manifest") ||
+    path === "manifest.config.yaml" ||
+    path.startsWith("convex/lib/") ||
+    path.startsWith("convex/_generated/") ||
+    path.startsWith("src/generated/") ||
+    path.startsWith("src/agent/") ||
+    path === "src/lib/manifest-convex-react.ts" ||
+    path === "convex/schema.ts" ||
+    path === "convex/queries.ts" ||
+    path === "convex/mutations.ts" ||
+    path === "convex/http.ts" ||
+    path === "convex/crons.ts" ||
+    path === "convex/sagas.ts" ||
+    path === "convex/computed.ts"
+  );
 }
