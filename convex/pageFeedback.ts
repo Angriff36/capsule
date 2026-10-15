@@ -24,7 +24,8 @@ export const fileIssue = action({
     ctx,
     { id },
   ): Promise<
-    { issueUrl: string } | { skipped: "no-token" | "not-found" | "filed" }
+    | { issueUrl: string; started: boolean }
+    | { skipped: "no-token" | "not-found" }
   > => {
     const auth = await getAuthContext(ctx);
     if (!ADMIN_ROLES.has(String(auth.role))) {
@@ -33,11 +34,16 @@ export const fileIssue = action({
     const feedback = await ctx.runQuery(api.queries.getPageFeedback, { id });
     if (!feedback || feedback.deletedAt != null)
       return { skipped: "not-found" };
-    if (feedback.issueUrl) return { skipped: "filed" };
-    const token = process.env.CAPSULE_FEEDBACK_GITHUB_TOKEN?.trim();
-    if (!token) return { skipped: "no-token" };
     const repo =
       process.env.CAPSULE_FEEDBACK_GITHUB_REPO?.trim() || "Angriff36/capsule";
+    if (feedback.issueUrl) {
+      const issueNumber =
+        feedback.issueNumber ?? issueNumberFromUrl(feedback.issueUrl);
+      const started = await kickRoutine(repo, issueNumber, feedback.issueUrl);
+      return { issueUrl: feedback.issueUrl, started };
+    }
+    const token = process.env.CAPSULE_FEEDBACK_GITHUB_TOKEN?.trim();
+    if (!token) return { skipped: "no-token" };
     const appUrl = process.env.CAPSULE_PUBLIC_APP_URL?.trim().replace(
       /\/$/,
       "",
@@ -96,32 +102,43 @@ export const fileIssue = action({
       issueNumber: issue.number,
       issueUrl: issue.html_url,
     });
-    // GitHub can start a Claude routine only on pull requests and releases,
-    // not on new issues, so Capsule starts the screen-comment routine itself.
-    // A failed start leaves the issue filed; the routine also picks up any
-    // open capsule-feedback issue it has not worked on yet.
-    const routineUrl = process.env.CAPSULE_FEEDBACK_ROUTINE_URL?.trim();
-    const routineToken = process.env.CAPSULE_FEEDBACK_ROUTINE_TOKEN?.trim();
-    if (routineUrl && routineToken) {
-      const started = await fetch(routineUrl, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${routineToken}`,
-          "anthropic-beta": "experimental-cc-routine-2026-04-01",
-          "anthropic-version": "2023-06-01",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          text: `New screen comment: issue #${issue.number} in ${repo} (${issue.html_url}). Work on this issue.`,
-        }),
-      }).catch((error: unknown) => error);
-      if (!(started instanceof Response) || !started.ok) {
-        console.error(
-          "Screen-comment routine did not start",
-          started instanceof Response ? started.status : started,
-        );
-      }
-    }
-    return { issueUrl: issue.html_url };
+    const started = await kickRoutine(repo, issue.number, issue.html_url);
+    return { issueUrl: issue.html_url, started };
   },
 });
+
+function issueNumberFromUrl(issueUrl: string): number {
+  const match = /\/issues\/(\d+)/.exec(issueUrl);
+  return match ? Number(match[1]) : 0;
+}
+
+/** GitHub will not start Claude from a new issue, so Capsule pokes the routine. */
+async function kickRoutine(
+  repo: string,
+  issueNumber: number,
+  issueUrl: string,
+): Promise<boolean> {
+  const routineUrl = process.env.CAPSULE_FEEDBACK_ROUTINE_URL?.trim();
+  const routineToken = process.env.CAPSULE_FEEDBACK_ROUTINE_TOKEN?.trim();
+  if (!routineUrl || !routineToken) return false;
+  const started = await fetch(routineUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${routineToken}`,
+      "anthropic-beta": "experimental-cc-routine-2026-04-01",
+      "anthropic-version": "2023-06-01",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      text: `Screen comment: issue #${issueNumber} in ${repo} (${issueUrl}). Work on this issue.`,
+    }),
+  }).catch((error: unknown) => error);
+  if (!(started instanceof Response) || !started.ok) {
+    console.error(
+      "Screen-comment routine did not start",
+      started instanceof Response ? started.status : started,
+    );
+    return false;
+  }
+  return true;
+}
