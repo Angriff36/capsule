@@ -103,7 +103,7 @@
 }
 
 .production-yield-scorecard > div:first-child {
-  border-top: 5px solid var(--yield-sage);
+  box-shadow: inset 0 5px 0 var(--yield-sage);
   border-left: 0;
 }
 

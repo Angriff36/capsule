@@ -105,7 +105,7 @@ export function GoogleCalendarSection({
 
   return (
     <Section title="Google Calendar">
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.7fr)]">
+      <div className="grid gap-5 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.7fr)]">
         <div>
           <p className="max-w-2xl text-base leading-relaxed text-ink-2">
             Approved events are added to the connected primary calendar with

@@ -572,10 +572,13 @@ export function MessageInboxPage() {
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-base font-medium">
+                      <span
+                        className="min-w-0 truncate text-base font-medium"
+                        title={threadTitle(t)}
+                      >
                         {threadTitle(t)}
                       </span>
-                      <span className="rounded-full bg-brand-soft px-2 py-0.5 text-2xs font-medium text-brand">
+                      <span className="shrink-0 rounded-full bg-brand-soft px-2 py-0.5 text-2xs font-medium text-brand">
                         {PROVIDER_LABEL[t.provider] ?? t.provider}
                       </span>
                     </div>

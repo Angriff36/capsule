@@ -272,6 +272,7 @@ export function PersonPayRateCell({
         }
       }}
     >
+      {hasRate ? null : <span className="text-xs text-warn">No pay rate</span>}
       <input
         key={rate ?? "unset"}
         name="hourlyRate"
@@ -287,7 +288,6 @@ export function PersonPayRateCell({
       <button type="submit" className="btn btn-ghost btn-sm" disabled={busy}>
         {busy ? "…" : "Set"}
       </button>
-      {hasRate ? null : <span className="text-xs text-warn">No pay rate</span>}
     </form>
   );
 }
