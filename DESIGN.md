@@ -89,10 +89,10 @@ typography:
     letterSpacing: 0
   button:
     fontFamily: DM Sans Variable
-    fontSize: 14px
-    fontWeight: 600
-    lineHeight: 1
-    letterSpacing: 0.06em
+    fontSize: 13px
+    fontWeight: 500
+    lineHeight: 1.25
+    letterSpacing: 0
   label:
     fontFamily: DM Sans Variable
     fontSize: 14px
@@ -140,28 +140,29 @@ spacing:
 
 components:
   button-primary:
-    backgroundColor: "{colors.brand}"
-    textColor: "{colors.on-brand}"
-    typography: "{typography.button}"
-    rounded: "{rounded.pill}"
-    height: 40px
-    padding: 0 22px
-  button-ghost:
-    backgroundColor: "{colors.panel}"
+    backgroundColor: "{colors.accent-soft}"
     textColor: "{colors.ink}"
-    borderColor: "{colors.line-2}"
+    borderColor: "{colors.brand}"
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
     height: 40px
-    padding: 0 20px
+    padding: 0 44px 0 16px
+  button-ghost:
+    backgroundColor: "{colors.inset}"
+    textColor: "{colors.ink}"
+    borderColor: "{colors.ink-2}"
+    typography: "{typography.button}"
+    rounded: "{rounded.pill}"
+    height: 40px
+    padding: 0 44px 0 16px
   button-danger:
-    backgroundColor: "{colors.panel}"
+    backgroundColor: "{colors.inset}"
     textColor: "{colors.danger}"
     borderColor: "{colors.danger}"
     typography: "{typography.button}"
     rounded: "{rounded.pill}"
     height: 40px
-    padding: 0 20px
+    padding: 0 44px 0 16px
   text-link:
     backgroundColor: transparent
     textColor: "{colors.brand}"
@@ -317,6 +318,40 @@ map onto the app tokens. Phones use the same page (Ryan, 2026-09-24: "obviously 
 updated"): one tile per row, a 2x2 count strip, and a sideways-scrolling
 group switcher. This is a scoped exception. Do not add it to `design-contract-exceptions.json`.
 
+## Owner visual decisions (2026-10-14)
+
+Ryan approved each of these in conversation on 2026-10-14; app.css and the
+components match them.
+
+- **Dark scheme is neutral graphite** (Ryan: "why does capsule always have
+  this weird ugly fukcing hue to it"). The old green-black "lamplight" dark
+  scheme is gone. Dark tokens in `src/styles/app.css` `.dark`: canvas
+  `#141416`, panel `#1c1c1f`, inset `#242428`, sage `#222226`, sage-2
+  `#34343a`, ink `#ececee`, ink-2 `#c4c4c9`, ink-3 `#9a9aa2`, line `#2f2f35`,
+  line-2 `#45454c`, rail `#111113`, brand / accent / service `#e08a52`,
+  accent-deep `#f0a271`, on-brand `#141416` (text on the light brand), brand-soft / accent-soft `#3a2618`, rail-active
+  `#a4501f`, ok `#7fbf94`, info `#93a9d8`, warn `#d6ad5c`, danger `#e07f70`.
+  Orange is the brand in both modes; no surface carries a green tint.
+- **ui-layouts components** (Ryan: "replace the clunky looking components
+  with the professional ones from the mcp"). Filter strips are
+  `SegmentedTabs` (one sliding highlight); file pickers are `FileDrop`;
+  pick-several fields are `MultiSelect`; action menus are `DropdownMenu`;
+  `Dialog` and `Accordion` are available in the catalog. All use app.css
+  tokens; see `docs/design/component-catalog.md`.
+- **Buttons are the ui-layouts "Cross Arrow" button** — see `button-primary`.
+- **Page help is a small "?" button**, top right of the page, that widens to
+  "About <page>" on hover and opens the purpose and tips in a small card
+  (Ryan: "replace the big dialog boxes with one of the smaller more subtle
+  buttons"). The full-width help strip that opened by itself is gone.
+- **Company app colors** (Ryan: "add a way for me to manually adjust color
+  palette", everyone, on the Branding page). Managers may override the light
+  and dark color tokens for their company on Admin → Branding → App colors,
+  with a Randomize button that keeps every text color at WCAG contrast
+  (Ryan: "randomizes the color palette but keep it kind of weighted so it
+  never becomes unreadable"). The values in this file stay the defaults.
+- **Balanced pages**: cards in one row end on one line, button groups in a
+  card form even columns, and side-by-side columns end together.
+
 ## Component picker decisions (owner, 2026-09-29)
 
 Ryan chose these in the component picker (Storybook stories carry the live
@@ -324,7 +359,9 @@ reference; section specs below are updated where they conflict):
 
 - **Page header** — editorial masthead (`PageHeader`): uppercase eyebrow with
   the state word in accent, large bold title, optional fact pairs on a 1.5px
-  ink rule, actions under it. `size="compact"` only in narrow shells (My Day).
+  ink rule; the page's actions sit on the right, level with the title, and
+  drop under it on a phone (owner, 2026-10-14: "make sure every page is
+  symetrical"). `size="compact"` only in narrow shells (My Day).
 - **Event stage rail** — numbered steps on a connector line with the open
   check count under the current step, and a gate list of the checks before
   the next stage. Every open check links to where it is fixed. Checks come
@@ -393,8 +430,8 @@ The visual language stays consistent across roles, but information priority chan
 
 ### Brand & Accent
 
-- **Culinary Green** (`#31574f`): Primary actions, active navigation, strong links, and structural emphasis.
-- **Main Ink** (`#24322d`): Display headings, object names, and primary body text.
+- **Brand Orange** (`#b04f18`): Primary actions, active navigation, strong links, and structural emphasis. (Replaces the old Culinary Green `#31574f`, removed from every screen 2026-10-14.)
+- **Main Ink** (`#0f0f11`): Display headings, object names, and primary body text. (Replaces the old green-black `#24322d`.)
 - **Saffron** (`#c8783f`): Hand-drawn underlines, small counts, and editorial cues.
 - **Deep Saffron** (`#9c572d`): Hover states and warning-adjacent editorial labels.
 
@@ -427,7 +464,7 @@ Semantic color reinforces labels and icons but never carries state alone.
 
 ### Gradient System
 
-Capsule does not use gradients as generic component fills. The current canvas uses a restrained pale-sage field with a soft white radial lift at the upper left. Any future rich gradient must be attached to real culinary media or an intentional full-page atmosphere, never buttons, cards, or status.
+Capsule does not use gradients as generic component fills. The one exception is the ui-layouts "Cross Arrow" button the owner chose (2026-10-14): its pill carries a soft left-to-right fade from `accent-soft` (primary) or `inset` (others) into `panel`. Any other rich gradient must be attached to real culinary media or an intentional full-page atmosphere, never cards or status.
 
 ## Typography
 
@@ -452,13 +489,13 @@ The serif creates identity; Archivo carries controls and dense information; IBM 
 | Breadcrumb      | Iowan Old Style |    19px | 400 it |        1.30 |              0 | Route context above a page title.        |
 | Body Large      | Archivo         |    16px |    400 |        1.70 |              0 | Page descriptions and important help.    |
 | Body            | Archivo         |    15px |    400 |        1.60 |              0 | Default interface and document copy.     |
-| Button          | Archivo         |    14px |    600 |        1.00 |         0.06em | Primary and secondary actions, uppercase.|
+| Button          | DM Sans         |    13px |    500 |        1.25 |              0 | Primary and secondary actions, sentence case.|
 | Label           | Archivo         |    14px |    700 |        1.40 |         0.04em | `fact-pair` labels, uppercase.           |
 | Eyebrow         | Archivo         |    14px |    700 |        1.40 |         0.09em | `section-rule` labels, uppercase.        |
 | Mono Data       | IBM Plex Mono   |    15px |    500 |        1.40 |         0.02em | Times, money, counts, and relative time. |
 | Micro           | Archivo         |    13px |    600 |        1.40 |         0.06em | ~~Chip text,~~ Micro labels, uppercase. (chip text is 13px sentence case since 2026-09-29) |
 
-**Floors.** Body never falls below 15px and supporting metadata never below 13px. Uppercase is a deliberate device for labels, chips, and buttons — it is never a way to make text small. There is no type role under 13px.
+**Floors.** Body never falls below 15px and supporting metadata never below 13px. Uppercase is a deliberate device for labels and eyebrows — it is never a way to make text small. There is no type role under 13px.
 
 ### Principles
 
@@ -532,7 +569,7 @@ Botanical forms may appear in the outer frame or an authored zero state. They sh
 
 ### **`navigation-rail`**
 
-94px light vertical rail that lives **inside** the workspace sheet, separated from the document by a single hairline rather than floating as its own surface. It carries a 42px circular Capsule mark and 46px icon targets. Active navigation uses a brand-green filled rounded rectangle, not a circle. Only shipped, canonical workspaces remain persistent. Planned modules live in the bottom overflow drawer and do not compete with available work; legacy Capsule-Pro areas without current Manifest authority do not appear as promises.
+94px light vertical rail that lives **inside** the workspace sheet, separated from the document by a single hairline rather than floating as its own surface. It carries a 42px circular Capsule mark and 46px icon targets. Active navigation uses a brand-filled rounded rectangle, not a circle. Only shipped, canonical workspaces remain persistent. Planned modules live in the bottom overflow drawer and do not compete with available work; legacy Capsule-Pro areas without current Manifest authority do not appear as promises.
 
 ### **`workspace-sheet`**
 
@@ -544,7 +581,7 @@ Italic serif breadcrumb, large serif page title, a row of `fact-pair` values, an
 
 ### **`button-primary`**
 
-Deep-green pill action with 40px height and an Archivo 14px semibold uppercase label, tracked 0.06em. Use once per immediate decision region. Secondary actions beside it are `text-link`, not a second filled button.
+The ui-layouts "Cross Arrow" button (owner, 2026-10-14: "why would we not just use one of the professional ones from the storyboard like this"): a 40px pill with a 2px border and a soft left-to-right fade (the backgroundColor above fading into `panel`), a 13px medium sentence-case label on the left, and a dark circle on the right whose arrow slides out and back in on hover. Primary uses the brand border and a brand circle; dropdown triggers keep no circle. Use once per immediate decision region. Secondary actions beside it are `text-link`, not a second filled button.
 
 ### **`fact-pair`**
 
@@ -560,11 +597,11 @@ Exceptions and open decisions sit in a pale-sage band that bleeds the full width
 
 ### **`button-ghost`**
 
-Warm-white secondary action with a strong hairline border. Hover uses the soft inset surface. It must remain visibly secondary to the filled primary action.
+Same Cross Arrow pill as `button-primary` with an ink border and an ink circle. It must remain visibly secondary to the filled primary action.
 
 ### **`button-danger`**
 
-Warm-white action with danger text and restrained danger border. Destructive actions stay separate from routine primary actions and require explicit confirmation.
+Same Cross Arrow pill with a danger border, danger text and a danger circle. Destructive actions stay separate from routine primary actions and require explicit confirmation.
 
 ### **`text-link`**
 

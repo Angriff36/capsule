@@ -283,7 +283,7 @@ export function VehicleSchedulePage() {
                       return (
                         <span
                           key={run._id}
-                          className="absolute inset-y-1 overflow-hidden rounded-xs bg-accent/80 px-1.5 text-xs leading-7 whitespace-nowrap text-white"
+                          className="absolute inset-y-1 overflow-hidden rounded-xs bg-accent/80 px-1.5 text-xs leading-7 whitespace-nowrap text-on-brand"
                           style={{ left: `${left}%`, width: `${width}%` }}
                           title={`${run.destination} · ${formatTime(run.windowStartsAt ?? startsAt)} → ${formatTime(run.windowEndsAt ?? endsAt)}`}
                         >

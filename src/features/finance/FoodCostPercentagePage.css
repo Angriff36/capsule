@@ -1,5 +1,5 @@
 .food-cost-stage {
-  --food-cost-green: #31574f;
+  --food-cost-green: var(--color-ok);
   --food-cost-rust: #ad4e32;
   --food-cost-paper: var(--color-panel);
   /* Local aliases onto the app theme so every rule below resolves (these
@@ -89,9 +89,9 @@
 }
 
 .food-cost-switch button[aria-pressed="true"] {
-  border-color: var(--food-cost-green);
-  background: var(--food-cost-green);
-  color: #fff;
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
 }
 
 .food-cost-venue-filter {

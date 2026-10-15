@@ -504,7 +504,7 @@ export function InvoicesPage() {
               Issue an invoice for a registered client to begin billing.
             </span>
             {showIssue ? null : (
-              <div className="mt-3 flex justify-center">
+              <div className="mt-3 flex">
                 <button
                   type="button"
                   className="btn btn-primary btn-sm"

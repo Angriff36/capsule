@@ -1737,7 +1737,7 @@ export function KitchenDashboardPage() {
                               aria-hidden="true"
                               className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border ${
                                 done
-                                  ? "border-ok bg-ok text-white"
+                                  ? "border-ok bg-ok text-panel"
                                   : blocked
                                     ? "border-danger text-danger"
                                     : "border-line-2 text-ink-3"
@@ -2143,7 +2143,7 @@ export function KitchenDashboardPage() {
               return (
                 <section
                   key={column.id}
-                  className="flex h-[calc(100vh-19rem)] max-h-[900px] min-h-[520px] w-[382px] shrink-0 flex-col"
+                  className="flex h-[calc(100vh-19rem)] max-h-[900px] min-h-[520px] min-w-[382px] flex-1 shrink-0 basis-[382px] flex-col"
                 >
                   {/* Column head: whose sheet this is, and what is left on it. */}
                   <header className="border-t-2 border-ink pt-3">

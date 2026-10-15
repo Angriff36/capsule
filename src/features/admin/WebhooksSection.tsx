@@ -273,7 +273,7 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
           </form>
         </div>
 
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <div className="rounded-sm border border-line bg-inset p-4">
             <p className="eyebrow">Registered endpoints</p>
             {endpoints === undefined ? (
@@ -341,7 +341,7 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
             )}
           </div>
 
-          <div className="rounded-sm border border-line bg-inset p-4">
+          <div className="flex-1 rounded-sm border border-line bg-inset p-4">
             <p className="eyebrow">Recent deliveries</p>
             {deliveries === undefined ? (
               <Skeleton className="mt-2 h-6" />

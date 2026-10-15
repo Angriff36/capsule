@@ -1,5 +1,5 @@
 .capacity-planner {
-  --capacity-spruce: #224b43;
+  --capacity-spruce: var(--color-ink);
   --capacity-celadon: #dce9dc;
   --capacity-saffron: #d69346;
   --capacity-coral: #b24a37;
@@ -73,7 +73,7 @@
   padding: 0.8rem;
   border: 1px solid rgb(34 75 67 / 0.16);
   border-radius: 0.65rem;
-  background: rgb(255 254 250 / 0.76);
+  background: var(--color-panel);
   backdrop-filter: blur(12px);
 }
 
@@ -200,12 +200,28 @@
 [data-heat="full"] {
   --capacity-heat: #e6a093;
 }
+/* Dark mode: the same heat hues, sunk into the dark page. */
+.dark [data-heat="unknown"] {
+  --capacity-heat: #2e2e33;
+}
+.dark [data-heat="quiet"] {
+  --capacity-heat: #24352a;
+}
+.dark [data-heat="steady"] {
+  --capacity-heat: #2f4a36;
+}
+.dark [data-heat="busy"] {
+  --capacity-heat: #4d3c1f;
+}
+.dark [data-heat="full"] {
+  --capacity-heat: #4f2a25;
+}
 
 .capacity-calendar-shell {
   overflow: hidden;
   border: 1px solid rgb(34 75 67 / 0.16);
   border-radius: 0.8rem;
-  background: #f7f6ef;
+  background: var(--color-inset);
   box-shadow: 0 24px 55px -48px rgb(34 75 67 / 0.75);
 }
 
@@ -223,8 +239,8 @@
   padding: 0.65rem 0.8rem;
   border-right: 1px solid var(--color-line);
   border-bottom: 1px solid var(--color-line-2);
-  background: var(--capacity-spruce);
-  color: #f7f4e8;
+  background: #1c1c1f;
+  color: #f1f1f3;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -240,11 +256,11 @@
   padding: 0.65rem;
   border-right: 1px solid var(--color-line);
   border-bottom: 1px solid var(--color-line);
-  background: rgb(255 254 250 / 0.62);
+  background: var(--color-panel);
 }
 
 .capacity-day.is-outside {
-  background: #edf0e8;
+  background: var(--color-sage);
   background-size: 12px 12px;
 }
 
@@ -295,7 +311,7 @@
   border-left: 3px solid
     color-mix(in srgb, var(--capacity-heat) 72%, var(--capacity-spruce));
   border-radius: 0.42rem;
-  background: color-mix(in srgb, var(--capacity-heat) 42%, white);
+  background: color-mix(in srgb, var(--capacity-heat) 42%, var(--color-panel));
   color: var(--color-ink);
   box-shadow: 0 10px 20px -18px rgb(34 75 67 / 0.6);
   transition:
@@ -427,7 +443,7 @@
   padding: 0.75rem;
   border: 1px solid rgb(178 74 55 / 0.18);
   border-radius: 0.45rem;
-  background: rgb(255 254 250 / 0.78);
+  background: var(--color-panel);
 }
 
 .capacity-conflict-ledger li > span {

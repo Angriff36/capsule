@@ -721,26 +721,3 @@
     transition: none !important;
   }
 }
-
-/* the page's header actions (Export BEO, More) in the dashboard button style */
-.evd-actions > .btn,
-.evd-actions > .action-menu > .btn {
-  border-radius: 99px;
-  border: 1px solid var(--evd-line-2);
-  background: transparent;
-  color: var(--evd-ink);
-  font: 500 13.5px var(--evd-sans);
-  text-transform: none;
-  letter-spacing: 0;
-  padding: 9px 18px;
-  box-shadow: none;
-}
-.evd-actions > .btn:hover,
-.evd-actions > .action-menu > .btn:hover {
-  border-color: var(--evd-ink);
-}
-.evd-actions > .btn-primary {
-  background: var(--color-accent);
-  color: var(--color-on-brand);
-  border-color: var(--color-accent);
-}

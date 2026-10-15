@@ -85,6 +85,20 @@ Their styles live in `src/ui/ui-layouts.css` and use only app.css tokens. Use
 them in place of new hand-made filter strips, scrim-and-sheet pairs, bare
 `<details>` folds, bare file inputs and `<select multiple>` boxes.
 
+## UI Layouts Library (try-out previews)
+
+Every ui-layouts part is in
+Storybook under **UI Layouts Library**, grouped as on ui-layouts.com. The
+sources live in `ui-library/` (outside `src/`): the app never imports them and
+the design-vocab gate does not scan them. `ui-library/library.css` points the
+library's shadcn color names at Capsule tokens, so previews follow light/dark.
+To use a part in the app, adapt it into `src/ui/` with Capsule tokens, as was
+done for SegmentedTabs, Dialog, Accordion, FileDrop and MultiSelect.
+
+All 72 ui-layouts parts are previewed (196 stories). Their packages (embla,
+vaul, Radix primitives, three / react-three, shiki, cmdk, pickers, particles,
+lenis and others) are dev dependencies used only by these previews.
+
 ## Adding to the catalog
 
 Search `src/**/*.stories.tsx` and the shared UI first. Extend an existing component

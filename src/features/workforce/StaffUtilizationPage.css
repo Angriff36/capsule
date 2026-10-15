@@ -1,9 +1,9 @@
 .staff-utilization-stage {
-  --utilization-green: #31574f;
-  --utilization-sage: #718b6d;
+  --utilization-green: var(--color-ok);
+  --utilization-sage: var(--color-ink-3);
   --utilization-rust: #ad4e32;
   --utilization-gold: #c28a38;
-  --utilization-paper: #f5f1e6;
+  --utilization-paper: var(--color-panel);
 }
 
 .staff-utilization-masthead {
@@ -86,9 +86,9 @@
 
 .staff-utilization-switch button:hover,
 .staff-utilization-switch button[aria-pressed="true"] {
-  border-color: var(--utilization-green);
-  background: var(--utilization-green);
-  color: white;
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
 }
 
 .staff-utilization-dates {

@@ -1,5 +1,5 @@
 .stock-count-page {
-  --count-ink: #18332d;
+  --count-ink: var(--color-ink);
   --count-safety: #e68a2e;
   --count-safety-soft: color-mix(in srgb, var(--count-safety) 12%, transparent);
   --count-grid: color-mix(in srgb, var(--color-line) 68%, transparent);

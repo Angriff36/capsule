@@ -496,7 +496,7 @@ export function VehicleFleetPage() {
               Add the first delivery vehicle to make fleet capacity visible to
               dispatch.
             </span>
-            <div className="mt-3 flex justify-center">
+            <div className="mt-3 flex">
               <button
                 type="button"
                 className="btn btn-primary btn-sm"
@@ -623,7 +623,7 @@ export function VehicleFleetPage() {
             <span>
               Add the first trailer to make towed capacity visible to dispatch.
             </span>
-            <div className="mt-3 flex justify-center">
+            <div className="mt-3 flex">
               <button
                 type="button"
                 className="btn btn-primary btn-sm"

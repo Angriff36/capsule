@@ -25,6 +25,7 @@ const preview: Preview = {
           "Primitives",
           "Charts",
           "Compositions",
+          "UI Layouts Library",
         ],
       },
     },

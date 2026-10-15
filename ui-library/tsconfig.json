@@ -1,0 +1,7 @@
+{
+  // The ui-layouts previews are Storybook-only. Their three / react-three
+  // types are heavy enough to exhaust the app typecheck's memory, so they are
+  // checked here on their own: `bunx tsc --noEmit -p ui-library`.
+  "extends": "../tsconfig.json",
+  "include": ["**/*.ts", "**/*.tsx", "../src/vite-env.d.ts"]
+}

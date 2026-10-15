@@ -553,6 +553,7 @@ import {
   OperatingLocationReviseParamsSchema,
   OrganizationCapabilitySettingRegisterParamsSchema,
   OrganizationCapabilitySettingSetEnabledParamsSchema,
+  OrganizationConfigureAppPaletteParamsSchema,
   OrganizationConfigureBrandingParamsSchema,
   OrganizationConfigureContactDetailsParamsSchema,
   OrganizationConfigureEmailSenderParamsSchema,
@@ -8618,6 +8619,16 @@ export function useGetOrganization(id: string | "skip") {
   return useQuery(api.queries.getOrganization, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for Organization.configureAppPalette. */
+export function useOrganizationConfigureAppPalette() {
+  const mutate = useMutation(api.mutations.Organization_configureAppPalette);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationConfigureAppPaletteParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Organization.configureBranding. */
 export function useOrganizationConfigureBranding() {
   const mutate = useMutation(api.mutations.Organization_configureBranding);
@@ -15662,4 +15673,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1654 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1655 as const;

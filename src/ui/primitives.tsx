@@ -95,15 +95,26 @@ export function PageHeader({
   const shownFacts = facts?.filter((fact) => fact.value != null) ?? [];
   return (
     <header className="page-header min-w-0">
-      {eyebrowLine}
-      <h1
-        className={`font-display text-4xl leading-[0.95] font-bold tracking-[-0.045em] text-balance break-words text-ink lg:text-5xl ${eyebrow ? "mt-2.5" : ""}`}
-      >
-        {title}
-      </h1>
-      {lead ? (
-        <p className="mt-3 max-w-[72ch] text-base text-ink-2">{lead}</p>
-      ) : null}
+      {/* Title on the left, the page's actions level with it on the right
+          (as on Events and Home); on a phone the actions drop below. */}
+      <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
+        <div className="min-w-0 flex-1 basis-80">
+          {eyebrowLine}
+          <h1
+            className={`font-display text-4xl leading-[0.95] font-bold tracking-[-0.045em] text-balance break-words text-ink lg:text-5xl ${eyebrow ? "mt-2.5" : ""}`}
+          >
+            {title}
+          </h1>
+          {lead ? (
+            <p className="mt-3 max-w-[72ch] text-base text-ink-2">{lead}</p>
+          ) : null}
+        </div>
+        {actions ? (
+          <div className="flex flex-wrap items-center gap-2 md:justify-end">
+            {actions}
+          </div>
+        ) : null}
+      </div>
       {shownFacts.length > 0 ? (
         <dl className="mt-5 grid grid-cols-2 gap-x-7 gap-y-3.5 border-t-[1.5px] border-ink pt-3 sm:flex sm:flex-wrap">
           {shownFacts.map((fact) => (
@@ -120,9 +131,6 @@ export function PageHeader({
       ) : (
         <div aria-hidden="true" className="mt-5 border-t-[1.5px] border-ink" />
       )}
-      {actions ? (
-        <div className="mt-4 flex flex-wrap items-center gap-2">{actions}</div>
-      ) : null}
     </header>
   );
 }

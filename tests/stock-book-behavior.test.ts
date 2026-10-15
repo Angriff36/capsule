@@ -62,11 +62,14 @@ function fixture() {
 }
 it("tells operators to reorder actual shortages rather than every below-PAR item", async () => {
   await mount(createElement(PageGuide), "/inventory/stock");
+  // Help opens on demand from the small "?" button, never by itself.
+  expect(container.textContent).not.toContain("Below reorder alerts");
+  await click(button("About Stock"));
   expect(container.textContent).toContain(
     "Watch the Below reorder alerts — that's what to reorder.",
   );
   expect(container.textContent).not.toContain("Below PAR list");
-  await click(button("Dismiss"));
+  await click(button("Close"));
   await click(button("About Stock"));
   expect(container.textContent).toContain("Below reorder alerts");
 });

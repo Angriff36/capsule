@@ -1,9 +1,9 @@
 .production-yield-stage {
-  --yield-ink: #1c3029;
-  --yield-sage: #416859;
+  --yield-ink: var(--color-ink);
+  --yield-sage: var(--color-brand);
   --yield-red: #ad4e32;
   --yield-amber: #bd7a2e;
-  --yield-paper: #f4f0e5;
+  --yield-paper: var(--color-panel);
 }
 
 .production-yield-masthead {
@@ -86,7 +86,7 @@
 .production-yield-switch button[aria-pressed="true"] {
   border-color: var(--yield-sage);
   background: var(--yield-sage);
-  color: white;
+  color: var(--color-on-brand);
 }
 
 .production-yield-scorecard {

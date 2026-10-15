@@ -535,7 +535,7 @@ export function CutoverPage() {
             <>
               <button
                 type="button"
-                className="btn btn-lg border-ok bg-ok text-white"
+                className="btn btn-lg border-ok bg-ok bg-none text-panel"
                 disabled={
                   !validation.canProceed ||
                   !localApproval ||

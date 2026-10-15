@@ -6,8 +6,8 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Capsule editorial system — warm working paper, botanical frame, deep green
-   ink, and a small saffron gesture. Dense controls stay crisp; key pages read
+/* Capsule editorial system — neutral paper and graphite, near-black ink, and
+   one orange action color. Dense controls stay crisp; key pages read
    like beautifully composed service documents. */
 @theme {
   /* Two faces, per DESIGN.md: DM Sans carries everything from page titles to
@@ -94,50 +94,53 @@
   --text-5xl: 45px;
 }
 
-/* Dark scheme — same editorial palette shifted to lamplight: deep green-black
-   paper, pale sage ink, brand lifted so it stays legible as text. Applied via
-   .dark on <html> (set pre-paint in index.html from the stored preference or
-   the OS prefers-color-scheme default). */
+/* Dark scheme — neutral graphite (owner, 2026-10-14: the green-black
+   "lamplight" dark had a "weird ugly hue"). Same hues as light mode: neutral
+   gray surfaces and text, Capsule orange lifted so it reads on dark. Applied
+   via .dark on <html> (set pre-paint in index.html from the stored preference
+   or the OS prefers-color-scheme default). */
 .dark {
   color-scheme: dark;
 
-  --color-canvas: #171d1a;
-  --color-panel: #212824;
-  --color-inset: #2a322d;
-  --color-sage: #242c27;
-  --color-sage-2: #38423b;
+  --color-canvas: #141416;
+  --color-panel: #1c1c1f;
+  --color-inset: #242428;
+  --color-sage: #222226;
+  --color-sage-2: #34343a;
 
-  --color-ink: #e3e9e2;
-  --color-chat-other: #2e3731;
-  --color-chat-on-accent: #171d1a;
+  --color-ink: #ececee;
+  --color-chat-other: #2a2a2f;
+  --color-chat-on-accent: #141416;
   --color-chat-plum: #c7a3d6;
   --color-chat-teal: #7fc4bd;
-  --color-ink-2: #bcc6be;
-  --color-ink-3: #97a39a;
-  --color-brand: #85b8a9;
-  --color-brand-soft: #26352f;
+  --color-ink-2: #c4c4c9;
+  --color-ink-3: #9a9aa2;
+  --color-brand: #e08a52;
+  /* Light brand on dark: text and icons on it are near black. */
+  --color-on-brand: #141416;
+  --color-brand-soft: #3a2618;
 
-  --color-line: #343e37;
-  --color-line-2: #4d5a51;
-  --color-rail: #141c18;
-  --color-rail-2: #212b26;
-  --color-rail-active: #2f6a57;
-  --color-rail-ink: #eef3ef;
-  --color-rail-dim: #97a39a;
-  --color-service: #85b8a9;
+  --color-line: #2f2f35;
+  --color-line-2: #45454c;
+  --color-rail: #111113;
+  --color-rail-2: #1c1c1f;
+  --color-rail-active: #a4501f;
+  --color-rail-ink: #f1f1f3;
+  --color-rail-dim: #9a9aa2;
+  --color-service: #e08a52;
 
-  --color-accent: #d79860;
-  --color-accent-deep: #e2ac79;
-  --color-accent-soft: #3a2d20;
-  --color-ok: #82b992;
-  --color-ok-soft: #22362a;
+  --color-accent: #e08a52;
+  --color-accent-deep: #f0a271;
+  --color-accent-soft: #3a2618;
+  --color-ok: #7fbf94;
+  --color-ok-soft: #1f3127;
   --color-info: #93a9d8;
-  --color-info-soft: #242c3c;
-  --color-warn: #d0a854;
-  --color-warn-soft: #383021;
-  --color-danger: #d97f6e;
-  --color-danger-soft: #3c2723;
-  --color-mute-soft: #31302a;
+  --color-info-soft: #242a3a;
+  --color-warn: #d6ad5c;
+  --color-warn-soft: #372f1f;
+  --color-danger: #e07f70;
+  --color-danger-soft: #3d2522;
+  --color-mute-soft: #2e2e33;
 }
 
 /* Brand is light in dark mode, so white-on-brand chips flip to dark ink,
@@ -145,25 +148,24 @@
 .dark .capsule-mark,
 .dark .clear-check,
 .dark .schedule-notice-count,
-.dark .revenue-switch button[aria-pressed="true"],
-.dark .btn-primary {
+.dark .revenue-switch button[aria-pressed="true"] {
   color: var(--color-canvas);
 }
 .dark .app-canvas {
   background: var(--color-canvas);
 }
 .dark .attention-ledger {
-  background: #232b26;
+  background: var(--color-inset);
 }
 .dark .component-empty-state {
   background: var(--color-inset);
 }
 .dark .schedule-publish-status span,
 .dark .schedule-notice-item {
-  background: rgb(33 40 36 / 0.85);
+  background: rgb(36 36 40 / 0.85);
 }
 .dark .revenue-prior-bar {
-  fill: rgb(33 40 36 / 0.55);
+  fill: rgb(36 36 40 / 0.55);
 }
 
 @layer base {
@@ -187,25 +189,103 @@
   }
 }
 
+/* The Cross Arrow button's arrow, drawn as a mask over its circle. */
+:root {
+  --btn-arrow-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 15 15'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' d='M3.64645 11.3536C3.45118 11.1583 3.45118 10.8417 3.64645 10.6465L10.2929 4L6 4C5.72386 4 5.5 3.77614 5.5 3.5C5.5 3.22386 5.72386 3 6 3L11.5 3C11.6326 3 11.7598 3.05268 11.8536 3.14645C11.9473 3.24022 12 3.36739 12 3.5L12 9.00001C12 9.27615 11.7761 9.50001 11.5 9.50001C11.2239 9.50001 11 9.27615 11 9.00001V4.70711L4.35355 11.3536C4.15829 11.5488 3.84171 11.5488 3.64645 11.3536Z'/%3E%3C/svg%3E");
+}
+
 @layer components {
+  /* Buttons are the ui-layouts "Cross Arrow" button (owner, 2026-10-14:
+     "why would we not just use one of the professional ones from the
+     storyboard like this"): a pill with a 2px border and a soft gradient,
+     the label on the left, a dark circle on the right whose arrow slides out
+     and back in on hover. Dropdown triggers keep no circle (their chevron
+     already says what they do). */
   .btn {
-    @apply inline-flex min-h-10 cursor-pointer items-center gap-2 rounded-full border px-5 py-1 text-center text-base leading-tight font-semibold tracking-[0.06em] uppercase transition-all duration-150 select-none disabled:cursor-not-allowed disabled:opacity-45;
+    @apply relative inline-flex min-h-10 cursor-pointer items-center gap-1.5 rounded-full border-2 border-ink-2 py-1 pl-4 text-left text-sm leading-tight font-medium text-ink transition-colors duration-200 select-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-45;
+    background-image: linear-gradient(
+      to right,
+      var(--color-inset),
+      var(--color-panel)
+    );
+  }
+  /* Room for the arrow circle wins over any screen's own padding. */
+  .btn {
+    padding-inline-end: var(--btn-end, 2.75rem) !important;
+  }
+  .btn::after,
+  .btn::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 3px;
+    width: 1.875rem;
+    height: 1.875rem;
+    border-radius: 9999px;
+    translate: 0 -50%;
+    pointer-events: none;
+  }
+  .btn::after {
+    background: var(--btn-circle, var(--color-ink));
+  }
+  .btn::before {
+    z-index: 1;
+    background: var(--btn-arrow, var(--color-panel));
+    mask-image: var(--btn-arrow-icon), var(--btn-arrow-icon);
+    mask-repeat: no-repeat;
+    mask-size: 1rem;
+    mask-position:
+      center,
+      calc(50% - 1.25rem) calc(50% + 1.25rem);
+    transition: mask-position 200ms ease;
+  }
+  .btn:hover:not(:disabled)::before {
+    mask-position:
+      calc(50% + 1.25rem) calc(50% - 1.25rem),
+      center;
+  }
+  .btn[aria-haspopup] {
+    --btn-end: 1rem;
+  }
+  .btn[aria-haspopup]::before,
+  .btn[aria-haspopup]::after {
+    content: none;
   }
   .btn-primary {
-    @apply border-brand bg-brand text-white hover:-translate-y-px hover:bg-ink;
-    box-shadow: 0 8px 18px -12px rgb(36 50 45 / 0.65);
+    @apply border-brand text-ink;
+    --btn-circle: var(--color-brand);
+    --btn-arrow: var(--color-on-brand);
+    background-image: linear-gradient(
+      to right,
+      var(--color-brand-soft),
+      var(--color-panel)
+    );
   }
   .btn-ghost {
-    @apply border-line-2 bg-panel text-ink hover:border-brand/50 hover:bg-inset;
+    @apply border-ink-2 text-ink;
   }
   .btn-secondary {
-    @apply border-brand/40 bg-panel text-brand hover:border-brand hover:bg-brand-soft;
+    @apply border-brand text-brand;
+    --btn-circle: var(--color-brand);
+    --btn-arrow: var(--color-on-brand);
   }
   .btn-danger {
-    @apply border-danger/40 bg-panel text-danger hover:bg-danger-soft;
+    @apply border-danger text-danger;
+    --btn-circle: var(--color-danger);
+    --btn-arrow: var(--color-on-brand);
   }
   .btn-sm {
-    @apply min-h-8 px-3.5 text-sm;
+    --btn-end: 2.25rem;
+    @apply min-h-8 pl-3 text-sm;
+  }
+  .btn-sm::after,
+  .btn-sm::before {
+    width: 1.5rem;
+    height: 1.5rem;
+    right: 2px;
+  }
+  .btn-sm::before {
+    mask-size: 0.8125rem;
   }
   /* Every file picker gets the small ghost button look. The browser's own
      grey "Choose File" box read as plain text on a phone, on every import. */
@@ -1007,7 +1087,7 @@
     place-items: center;
     border-radius: 50%;
     background: var(--color-brand);
-    color: white;
+    color: var(--color-on-brand);
   }
   .decision-list {
     margin-top: 2rem;
@@ -2317,7 +2397,7 @@
   place-items: center;
   border-radius: 999px;
   background: var(--color-brand);
-  color: white;
+  color: var(--color-on-brand);
   font-family: var(--font-mono);
   font-size: 11px;
 }
@@ -3873,6 +3953,14 @@ div.tpp-parameter-wide {
   margin-top: 1.5rem;
   min-height: 70vh;
 }
+/* Both panes reach the bottom of the split, so the columns end together. */
+:where(.component-import-split > div) {
+  display: flex;
+  flex-direction: column;
+}
+:where(.component-import-split > div) > .component-import-pane {
+  flex: 1;
+}
 
 .component-import-pane {
   display: flex;
@@ -4821,12 +4909,12 @@ div.tpp-parameter-wide {
    values so the sheet stays legible when the app is in dark mode; the page
    carries its own portrait @page override for printing. */
 .contract-document {
-  --color-ink: #24322d;
-  --color-ink-2: #53615b;
-  --color-ink-3: #7b867f;
-  --color-line: #dde1d9;
-  --color-line-2: #c8cec5;
-  --color-brand: #31574f;
+  --color-ink: #0f0f11;
+  --color-ink-2: #3b3e45;
+  --color-ink-3: #65686f;
+  --color-line: #d9dce1;
+  --color-line-2: #c3c7ce;
+  --color-brand: #b04f18;
   --color-brand-soft: #e0eae4;
   --color-accent: #c8783f;
   --color-accent-soft: #f3e2d4;
@@ -5065,7 +5153,7 @@ div.tpp-parameter-wide {
 
 .revenue-switch button[aria-pressed="true"] {
   background: var(--color-brand);
-  color: white;
+  color: var(--color-on-brand);
   box-shadow: 0 7px 14px -10px rgb(36 50 45 / 0.8);
 }
 

@@ -1,0 +1,10 @@
+/* ui-layouts globals.css: hide the native number spinners on the Motion Number input. */
+.spin-hide::-webkit-inner-spin-button,
+.spin-hide::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.spin-hide {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}

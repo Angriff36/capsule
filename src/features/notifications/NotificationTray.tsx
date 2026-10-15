@@ -124,7 +124,7 @@ export function NotificationTray() {
       >
         <BellIcon />
         {unreadCount > 0 && (
-          <span className="absolute top-0.5 right-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-brand px-1 text-2xs leading-none font-semibold text-white">
+          <span className="absolute top-0.5 right-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-brand px-1 text-2xs leading-none font-semibold text-on-brand">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}

@@ -2,11 +2,11 @@
    pin the light-theme tokens locally so the sheet stays legible in dark mode,
    on screen and in the printed output. */
 .briefing-document {
-  --color-ink: #24322d;
-  --color-ink-2: #53615b;
-  --color-ink-3: #7b867f;
-  --color-line: #dde1d9;
-  --color-line-2: #c8cec5;
+  --color-ink: #0f0f11;
+  --color-ink-2: #3b3e45;
+  --color-ink-3: #65686f;
+  --color-line: #d9dce1;
+  --color-line-2: #c3c7ce;
   --color-panel: #fffefa;
   --color-inset: #f1f3ed;
   --color-ok: #3d7253;

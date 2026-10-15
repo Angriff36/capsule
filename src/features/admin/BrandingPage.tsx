@@ -19,6 +19,7 @@ import {
 import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
+import { AppColorsSection } from "./AppColorsSection";
 import { ContactDetailsSection } from "./ContactDetailsSection";
 import { EmailSenderSection } from "./EmailSenderSection";
 import { EmailInboxSection } from "./EmailInboxSection";
@@ -467,6 +468,10 @@ export function BrandingPage() {
             </div>
           </form>
         </Section>
+
+        <div className="xl:col-span-2">
+          <AppColorsSection record={record} canEdit={canEdit} />
+        </div>
 
         <EmailSenderSection
           record={record}

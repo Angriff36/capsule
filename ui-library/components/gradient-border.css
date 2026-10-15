@@ -1,0 +1,16 @@
+/* Ported from ui-layouts globals.css: rotating conic border angle. */
+@property --border-angle {
+  inherits: false;
+  initial-value: 0deg;
+  syntax: "<angle>";
+}
+
+@keyframes uil-border-angle {
+  to {
+    --border-angle: 360deg;
+  }
+}
+
+.animate-border {
+  animation: uil-border-angle 4s linear infinite;
+}

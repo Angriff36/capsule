@@ -509,7 +509,7 @@ export function PaymentsPage() {
           <div className="document-empty">
             <p>{showTerminal ? "No payments yet." : "No open payments."}</p>
             {!showTerminal ? (
-              <div className="mt-3 flex justify-center gap-2">
+              <div className="mt-3 flex gap-2">
                 <button
                   type="button"
                   className="btn btn-primary btn-sm"

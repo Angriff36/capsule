@@ -6,7 +6,7 @@
   overflow: hidden;
   padding: clamp(1rem, 4vw, 3.5rem);
   background: #dce6d7;
-  color: #24322d;
+  color: #0f0f11;
 }
 
 .client-portal::before {
@@ -77,7 +77,7 @@
 .client-portal-section-heading > p,
 .client-portal-facts p,
 .client-portal-status-card > span {
-  color: #7b867f;
+  color: #65686f;
   font-size: 8px;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -94,7 +94,7 @@
 
 .client-portal-address {
   margin-top: 0.22rem;
-  color: #7b867f;
+  color: #65686f;
   font-size: 9px;
 }
 
@@ -716,7 +716,7 @@
 
 .client-portal-empty-menu p {
   margin-top: 0.5rem;
-  color: #7b867f;
+  color: #65686f;
 }
 
 .client-portal-footer {
@@ -726,7 +726,7 @@
   padding: 1.25rem clamp(1.25rem, 4vw, 3.3rem);
   border-top: 1px solid #e2e3dc;
   background: #f5f5ef;
-  color: #7b867f;
+  color: #65686f;
   font-size: 9px;
 }
 

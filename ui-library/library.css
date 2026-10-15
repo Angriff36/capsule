@@ -1,0 +1,37 @@
+/* Styles for the ui-layouts library previews in Storybook only. The app never
+   loads this file. The library's sources use shadcn color names (primary,
+   muted, card...); here each one points at a Capsule token from app.css, so
+   the previews follow Capsule's colors and its light/dark switch. */
+@import "tailwindcss" source(".");
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --color-background: var(--color-canvas);
+  --color-foreground: var(--color-ink);
+  --color-card: var(--color-panel);
+  --color-card-foreground: var(--color-ink);
+  --color-popover: var(--color-panel);
+  --color-popover-foreground: var(--color-ink);
+  --color-primary: var(--color-brand);
+  --color-primary-foreground: var(--color-on-brand);
+  --color-primary-base: var(--color-panel);
+  --color-secondary: var(--color-sage);
+  --color-secondary-foreground: var(--color-ink);
+  --color-muted: var(--color-inset);
+  --color-muted-foreground: var(--color-ink-3);
+  --color-accent: var(--color-sage);
+  --color-accent-foreground: var(--color-ink);
+  --color-destructive: var(--color-danger);
+  --color-border: var(--color-line);
+  --color-input: var(--color-line-2);
+  --color-ring: var(--color-brand);
+  --font-sans: "DM Sans Variable", "DM Sans", system-ui, sans-serif;
+}
+
+@layer base {
+  .uil-root,
+  .uil-root * {
+    border-color: var(--color-line);
+  }
+}

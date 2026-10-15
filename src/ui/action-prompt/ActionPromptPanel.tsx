@@ -200,7 +200,7 @@ export function ActionPromptPanel({
 
   const confirmClass =
     tone === "danger"
-      ? "btn justify-center border-danger bg-danger text-white hover:-translate-y-px hover:bg-danger/90 dark:text-canvas"
+      ? "btn justify-center border-danger bg-danger bg-none text-white hover:-translate-y-px hover:bg-danger/90 dark:text-canvas"
       : "btn btn-primary justify-center";
   const Icon =
     tone === "danger"
