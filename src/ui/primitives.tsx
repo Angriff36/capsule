@@ -195,7 +195,7 @@ export function ErrorState({
 export function Skeleton({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`animate-pulse rounded-xs bg-inset ${className}`}
+      className={`animate-pulse rounded-xs bg-line ${className}`}
       aria-hidden="true"
     />
   );
