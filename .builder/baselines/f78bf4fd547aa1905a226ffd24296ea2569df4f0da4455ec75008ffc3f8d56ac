@@ -523,6 +523,7 @@ import {
   MenuMarkPublishedParamsSchema,
   MenuRestoreParamsSchema,
   MenuReviseDetailsParamsSchema,
+  MenuSetCoursePicksParamsSchema,
   MenuSetPricingOptionsParamsSchema,
   MenuSetSeasonParamsSchema,
   MenuSetServiceParamsSchema,
@@ -8105,6 +8106,16 @@ export function useMenuReviseDetails() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = MenuReviseDetailsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Menu.setCoursePicks. */
+export function useMenuSetCoursePicks() {
+  const mutate = useMutation(api.mutations.Menu_setCoursePicks);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = MenuSetCoursePicksParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -15803,4 +15814,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1669 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1670 as const;

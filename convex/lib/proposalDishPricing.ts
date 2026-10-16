@@ -22,6 +22,13 @@ import { api } from "../_generated/api";
 import { v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import { effectiveSellingPrice } from "../../src/lib/catalogEligibility";
+import {
+  choiceForPicks,
+  hasAutomaticChoices,
+  perGuestLineDescription,
+  readMenuPricingOptions,
+} from "../../src/lib/menuPricing";
+import { readCoursePicks } from "../../src/lib/coursePicks";
 import { getAuthContext } from "./authContext";
 
 async function activeLines(
@@ -76,6 +83,84 @@ async function ownLine(
   return undefined;
 }
 
+// A menu sold as a package the client builds by picking (price choices or
+// per-course pick rules, src/lib/menuPricing.ts and src/lib/coursePicks.ts):
+// its per-guest line comes with the first pick, and its price follows the
+// choice the picks call for ("your highest entrée tier sets one price").
+function isPickedPackage(menu: Doc<"menus">): boolean {
+  return (
+    readMenuPricingOptions(menu).choices.length > 0 ||
+    readCoursePicks(menu).length > 0
+  );
+}
+
+async function syncPackageLine(
+  ctx: any,
+  proposalId: Id<"proposals">,
+  menu: Doc<"menus">,
+  addIfMissing: boolean,
+): Promise<void> {
+  const options = readMenuPricingOptions(menu);
+  const selections = (
+    await ctx.db
+      .query("proposalDishSelections")
+      .withIndex("by_proposalId", (q: any) => q.eq("proposalId", proposalId))
+      .collect()
+  ).filter(
+    (row: any) =>
+      row.deletedAt == null &&
+      row.selectedAt != null &&
+      String(row.menuId) === String(menu._id),
+  );
+  const picked = [];
+  for (const row of selections) {
+    const dish = await ctx.db.get(row.dishId);
+    picked.push({
+      dishId: String(row.dishId),
+      course: (row.course ?? dish?.course ?? null) as string | null,
+    });
+  }
+  const choice = choiceForPicks(options, picked);
+  const price = choice?.pricePerPerson ?? Number(menu.pricePerPerson);
+  const description = perGuestLineDescription(menu.name, choice?.label ?? "");
+  const lines = await activeLines(ctx, proposalId);
+  const line = lines.find(
+    (row) =>
+      String(row.pricingBasis) === "per_person" &&
+      String(row.menuId ?? "") === String(menu._id) &&
+      row.description.startsWith(`${menu.name} (per `),
+  );
+  if (line) {
+    // Staff picked a choice by hand and no choice follows the picks: keep it.
+    if (!hasAutomaticChoices(options) || !choice) return;
+    if (Number(line.unitPrice) === price && line.description === description)
+      return;
+    await ctx.runMutation(api.lib.proposalPricing.reviseProposalLineAndRecompute, {
+      docId: line._id,
+      version: Number(line.version),
+      description,
+      pricingBasis: "per_person",
+      unitPrice: price,
+      quantity: Number(line.quantity),
+      unit: line.unit ?? undefined,
+      sortOrder: line.sortOrder ?? undefined,
+      notes: line.notes ?? undefined,
+    });
+    return;
+  }
+  if (!addIfMissing || !(price > 0) || picked.length === 0) return;
+  await ctx.runMutation(api.lib.proposalPricing.addProposalLineAndRecompute, {
+    proposalId,
+    description,
+    pricingBasis: "per_person",
+    unitPrice: price,
+    sortOrder:
+      lines.reduce((max, row) => Math.max(max, Number(row.sortOrder) || 0), -1) +
+      1,
+    menuId: menu._id,
+  });
+}
+
 async function proposalOf(ctx: any, proposalId: Id<"proposals">) {
   const auth = await getAuthContext(ctx);
   const proposal = await ctx.db.get(proposalId);
@@ -119,6 +204,10 @@ export const pickProposalDish = mutation({
     const menu = await ctx.db.get(menuDish.menuId);
     const dish = await ctx.db.get(menuDish.dishId);
     if (!menu || !dish) return;
+    if (isPickedPackage(menu)) {
+      await syncPackageLine(ctx, args.proposalId, menu, true);
+      return;
+    }
     const lines = await activeLines(ctx, args.proposalId);
     // Covered already: its own line, the menu's per-guest line, or a custom
     // line named after the dish.
@@ -255,6 +344,11 @@ export const removeProposalDish = mutation({
     });
     const proposal = await ctx.db.get(selection.proposalId);
     if (!proposal || proposal.status !== "draft") return;
+    const menu = await ctx.db.get(selection.menuId);
+    if (menu && isPickedPackage(menu)) {
+      await syncPackageLine(ctx, selection.proposalId, menu, false);
+      return;
+    }
     const line = await ownLine(
       ctx,
       await activeLines(ctx, selection.proposalId),

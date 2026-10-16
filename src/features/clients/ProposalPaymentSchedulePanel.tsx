@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useProposalSetPaymentSchedule } from "../../lib/manifest-convex-react";
 import { formatDate, formatMoneyExact } from "../../lib/format";
+import { usePricingRules } from "../../lib/usePricingRules";
 import {
   paymentScheduleLines,
   proposalPaymentSchedule,
@@ -13,6 +14,7 @@ interface ProposalPaymentSchedulePanelProps {
     total: number;
     eventDate?: number | null;
     depositPercent?: number | null;
+    depositAmount?: number | null;
     balanceDueDaysBefore?: number | null;
   };
   editable: boolean;
@@ -32,10 +34,20 @@ export function ProposalPaymentSchedulePanel({
   onNotice,
 }: ProposalPaymentSchedulePanelProps) {
   const save = useProposalSetPaymentSchedule();
+  const rules = usePricingRules();
   const [busy, setBusy] = useState(false);
+  // A proposal with no schedule yet starts from the company retainer.
+  const noSchedule =
+    proposal.depositPercent == null &&
+    proposal.depositAmount == null &&
+    proposal.balanceDueDaysBefore == null;
+  const retainerStart =
+    proposal.depositAmount ??
+    (noSchedule && rules && rules.retainer > 0 ? rules.retainer : null);
   const schedule = proposalPaymentSchedule({
     total: Number(proposal.total) || 0,
     depositPercent: proposal.depositPercent,
+    depositAmount: proposal.depositAmount,
     balanceDueDaysBefore: proposal.balanceDueDaysBefore,
     eventDate: proposal.eventDate,
   });
@@ -80,6 +92,7 @@ export function ProposalPaymentSchedulePanel({
         docId: proposal._id,
         version: proposal.version,
         depositPercent: whole("depositPercent"),
+        depositAmount: whole("depositAmount"),
         balanceDueDaysBefore: whole("balanceDueDaysBefore"),
       });
       onNotice("Payment schedule saved.");
@@ -92,7 +105,7 @@ export function ProposalPaymentSchedulePanel({
 
   return (
     <form
-      key={proposal.version}
+      key={`${proposal.version}:${retainerStart ?? ""}`}
       className="mt-3 grid gap-3 rounded-sm border border-line bg-inset p-4"
       onSubmit={(event) => void submit(event)}
     >
@@ -112,6 +125,18 @@ export function ProposalPaymentSchedulePanel({
           />
         </label>
         <label className="field-label">
+          Or a fixed retainer ($, due when the client accepts)
+          <input
+            className="input"
+            name="depositAmount"
+            type="number"
+            inputMode="decimal"
+            min={0}
+            step="0.01"
+            defaultValue={retainerStart ?? ""}
+          />
+        </label>
+        <label className="field-label">
           Balance due (days before the event, 0 = event day)
           <input
             className="input"
@@ -125,7 +150,10 @@ export function ProposalPaymentSchedulePanel({
         </label>
       </div>
       {summary}
-      <p className="text-xs text-ink-2">Leave both empty for no schedule.</p>
+      <p className="text-xs text-ink-2">
+        A retainer takes the place of the percent. Leave all empty for no
+        schedule.
+      </p>
       <div>
         <button className="btn btn-primary" type="submit" disabled={busy}>
           {busy ? "Saving…" : "Save payment schedule"}

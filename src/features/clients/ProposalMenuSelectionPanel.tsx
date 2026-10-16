@@ -10,6 +10,7 @@ import {
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { ProposalMenuPriceOptions } from "./ProposalMenuPriceOptions";
+import { ProposalMenuPackageChecks } from "./ProposalMenuPackageChecks";
 
 interface ProposalMenuSelectionPanelProps {
   proposalId: string;
@@ -277,6 +278,25 @@ export function ProposalMenuSelectionPanel({
         </div>
       ) : null}
 
+      <ProposalMenuPackageChecks
+        proposalId={proposalId}
+        guestCount={guestCount}
+        menus={(menus ?? []).filter((menu) =>
+          pickedMenuIds.has(String(menu._id)),
+        )}
+        lines={priceLines}
+        picked={activeSelections.map((row) => ({
+          menuId: String(row.menuId),
+          dishId: String(row.dishId),
+          course:
+            row.course ??
+            (dishes ?? []).find((d) => d._id === row.dishId)?.course ??
+            null,
+        }))}
+        draft={draft}
+        busy={busy != null}
+        run={(key, work) => void run(key, work)}
+      />
       {draft ? (
         <ProposalMenuPriceOptions
           proposalId={proposalId}

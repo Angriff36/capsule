@@ -3626,12 +3626,6 @@
       "reason": "Command name shared by several entities (BookingRule.change, ScreenLayoutOverride.change); the diff pairs different entities' commands. No command moved."
     },
     {
-      "path": "change.parameters.componentId",
-      "category": "command-parameter-added",
-      "acknowledgedAt": "2026-10-16",
-      "reason": "Screen editor (ScreenLayoutOverride) reuses the command names set/change/revert; the diff pairs it with other entities' same-name commands. No command moved."
-    },
-    {
       "path": "change.parameters.gapMinutes",
       "category": "command-parameter-removed",
       "acknowledgedAt": "2026-10-16",
@@ -3662,12 +3656,6 @@
       "reason": "Screen editor (ScreenLayoutOverride) reuses the command names set/change/revert; the diff pairs it with other entities' same-name commands. No command moved."
     },
     {
-      "path": "change.parameters.sourceComponentId",
-      "category": "command-parameter-added",
-      "acknowledgedAt": "2026-10-16",
-      "reason": "Screen editor (ScreenLayoutOverride) reuses the command names set/change/revert; the diff pairs it with other entities' same-name commands. No command moved."
-    },
-    {
       "path": "change.parameters.targetLabel",
       "category": "command-parameter-added",
       "acknowledgedAt": "2026-10-16",
@@ -3688,12 +3676,6 @@
     {
       "path": "set.entity",
       "category": "command-entity-changed",
-      "acknowledgedAt": "2026-10-16",
-      "reason": "Screen editor (ScreenLayoutOverride) reuses the command names set/change/revert; the diff pairs it with other entities' same-name commands. No command moved."
-    },
-    {
-      "path": "set.parameters.componentId",
-      "category": "command-parameter-added",
       "acknowledgedAt": "2026-10-16",
       "reason": "Screen editor (ScreenLayoutOverride) reuses the command names set/change/revert; the diff pairs it with other entities' same-name commands. No command moved."
     },
@@ -3740,12 +3722,6 @@
       "reason": "Screen editor (ScreenLayoutOverride) reuses the command names set/change/revert; the diff pairs it with other entities' same-name commands. No command moved."
     },
     {
-      "path": "set.parameters.sourceComponentId",
-      "category": "command-parameter-added",
-      "acknowledgedAt": "2026-10-16",
-      "reason": "Screen editor (ScreenLayoutOverride) reuses the command names set/change/revert; the diff pairs it with other entities' same-name commands. No command moved."
-    },
-    {
       "path": "set.parameters.target",
       "category": "command-parameter-removed",
       "acknowledgedAt": "2026-10-16",
@@ -3762,6 +3738,48 @@
       "category": "command-parameter-added",
       "acknowledgedAt": "2026-10-16",
       "reason": "Screen editor (ScreenLayoutOverride) reuses the command names set/change/revert; the diff pairs it with other entities' same-name commands. No command moved."
+    },
+    {
+      "path": "change.parameters.pieceName",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-16",
+      "reason": "Screen editor (ScreenLayoutOverride) reuses the command names set/change/revert; the diff pairs it with other entities' same-name commands. No command moved."
+    },
+    {
+      "path": "change.parameters.sourcePieceName",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-16",
+      "reason": "Screen editor (ScreenLayoutOverride) reuses the command names set/change/revert; the diff pairs it with other entities' same-name commands. No command moved."
+    },
+    {
+      "path": "set.parameters.pieceName",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-16",
+      "reason": "Screen editor (ScreenLayoutOverride) reuses the command names set/change/revert; the diff pairs it with other entities' same-name commands. No command moved."
+    },
+    {
+      "path": "set.parameters.sourcePieceName",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-16",
+      "reason": "Screen editor (ScreenLayoutOverride) reuses the command names set/change/revert; the diff pairs it with other entities' same-name commands. No command moved."
+    },
+    {
+      "path": "Menu.coursePicksJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-16",
+      "reason": "Per-course client pick rules: optional; unset = no rule. Stored menus need no backfill."
+    },
+    {
+      "path": "Proposal.depositAmount",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-16",
+      "reason": "Fixed retainer: optional; unset = the deposit percent as before. Stored proposals need no backfill."
+    },
+    {
+      "path": "setPaymentSchedule.parameters.depositAmount",
+      "category": "command-parameter-added",
+      "acknowledgedAt": "2026-10-16",
+      "reason": "Optional retainer parameter; callers that leave it out keep the percent deposit."
     }
   ]
 }

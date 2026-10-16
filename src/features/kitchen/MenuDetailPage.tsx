@@ -23,6 +23,7 @@ import { KitchenBookNav } from "./KitchenBookNav";
 import { ReturnToListLink } from "../list-state/listOrigin";
 import { MenuDetailsEditor } from "./MenuDetailsEditor";
 import { MenuPriceOptionsSection } from "./MenuPriceOptionsSection";
+import { MenuCoursePicksSection } from "./MenuCoursePicksSection";
 import { readMenuPricingOptions } from "../../lib/menuPricing";
 import { MenuDishManager } from "./MenuDishManager";
 import { dishRecipeLinks, withRecipeDishIds } from "./dishVersions";
@@ -136,6 +137,22 @@ export function MenuDetailPage() {
         names.push(course);
     }
     return names;
+  }, [dishes, selectedMenuDishes]);
+  // The menu's dishes with their course, for price choices a pick calls for.
+  const menuChoiceDishes = useMemo(() => {
+    const byId = new Map(
+      (dishes ?? []).map((dish) => [String(dish._id), dish]),
+    );
+    return [...selectedMenuDishes]
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map((selection) => {
+        const dish = byId.get(String(selection.dishId));
+        return {
+          dishId: String(selection.dishId),
+          name: String(dish?.name ?? "Dish"),
+          course: String(selection.course ?? dish?.course ?? "").trim(),
+        };
+      });
   }, [dishes, selectedMenuDishes]);
   const allergensByDish = useMemo(() => {
     const rows = deriveAllergenRows({
@@ -591,6 +608,19 @@ export function MenuDetailPage() {
           pricePerPerson: Number(menu.pricePerPerson),
           pricingOptionsJson: menu.pricingOptionsJson,
         }}
+        courses={menuCourses}
+        dishes={menuChoiceDishes}
+        onFailure={setFailure}
+      />
+
+      <MenuCoursePicksSection
+        menu={{
+          _id: menu._id,
+          version: menu.version,
+          status: String(menu.status),
+          coursePicksJson: menu.coursePicksJson,
+        }}
+        courses={menuCourses}
         onFailure={setFailure}
       />
 

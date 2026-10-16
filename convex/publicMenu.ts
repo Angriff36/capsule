@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import { readCoursePicks, type CoursePick } from "../src/lib/coursePicks";
 import { query, type QueryCtx } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
 import { deriveDishAllergens } from "../src/features/kitchen/dishAllergens";
@@ -46,6 +47,8 @@ export type PublicMenu = {
   guestsPerServer: number | null;
   /** Courses where each guest picks one dish. */
   pickOneCourses: string[];
+  /** How many dishes the client picks per course (src/lib/coursePicks.ts). */
+  coursePicks: CoursePick[];
   /** Why this menu does not fit the given event; empty when it does. */
   notAvailableBecause: string[];
   dishes: PublicMenuDish[];
@@ -155,6 +158,7 @@ export const getPublicMenu = query({
           availableUntil: menu.availableUntil ?? null,
           guestsPerServer: menu.guestsPerServer ?? null,
           pickOneCourses: menu.pickOneCourses ?? [],
+          coursePicks: readCoursePicks(menu),
           notAvailableBecause: menuIneligibleReasons(menu, {
             eventDate,
             guestCount,

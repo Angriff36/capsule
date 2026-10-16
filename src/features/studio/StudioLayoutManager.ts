@@ -4,8 +4,8 @@ export type StudioLayoutRow = {
   _id: Id<"screenLayoutOverrides">;
   pagePattern: string;
   slotKey: string;
-  componentId: string;
-  sourceComponentId?: string | null;
+  pieceName: string;
+  sourcePieceName?: string | null;
   slotKind?: string | null;
   targetSelector?: string | null;
   targetLabel?: string | null;
@@ -16,8 +16,8 @@ export type StudioLayoutRow = {
 type CreateLayout = (args: {
   pagePattern: string;
   slotKey: string;
-  componentId: string;
-  sourceComponentId?: string;
+  pieceName: string;
+  sourcePieceName?: string;
   slotKind?: string;
   targetSelector?: string;
   targetLabel?: string;
@@ -29,8 +29,8 @@ type ChangeLayout = (args: {
   version?: number;
   pagePattern: string;
   slotKey: string;
-  componentId: string;
-  sourceComponentId?: string;
+  pieceName: string;
+  sourcePieceName?: string;
   slotKind?: string;
   targetSelector?: string;
   targetLabel?: string;
@@ -63,7 +63,7 @@ export class StudioLayoutManager {
         item.pagePattern === pagePattern &&
         item.slotKey === slotKey,
     );
-    return row?.componentId ?? fallback;
+    return row?.pieceName ?? fallback;
   }
 
   matching(pagePattern: string, slotKey: string): StudioLayoutRow | undefined {
@@ -85,19 +85,25 @@ export class StudioLayoutManager {
     if (
       existing &&
       existing.deletedAt == null &&
-      existing.componentId === input.componentId
+      existing.pieceName === input.componentId
     )
       return;
+    const { componentId, sourceComponentId, ...rest } = input;
+    const stored = {
+      ...rest,
+      pieceName: componentId,
+      sourcePieceName: sourceComponentId,
+    };
     if (existing) {
       await this.change({
         docId: existing._id,
         version: existing.version,
-        ...input,
+        ...stored,
       });
       return;
     }
     await this.create({
-      ...input,
+      ...stored,
       idempotencyKey: `studio-layout:${input.pagePattern}:${input.slotKey}`,
     });
   }

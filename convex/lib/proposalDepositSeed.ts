@@ -36,6 +36,7 @@ export async function applyAcceptedDeposit(
       : proposalPaymentSchedule({
           total: Number(proposal.total ?? 0),
           depositPercent: proposal.depositPercent,
+          depositAmount: proposal.depositAmount,
           balanceDueDaysBefore: proposal.balanceDueDaysBefore,
           eventDate: proposal.eventDate,
         });

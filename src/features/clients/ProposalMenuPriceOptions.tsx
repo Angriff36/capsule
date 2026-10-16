@@ -2,7 +2,6 @@ import { useMutation } from "convex/react";
 import { api, type Doc, type Id } from "../../lib/api";
 import {
   addOnText,
-  hasMenuPricingOptions,
   menuMoney,
   perGuestPriceText,
   priceStepFor,
@@ -46,7 +45,13 @@ export function ProposalMenuPriceOptions({
   const { prompt, host } = useActionPrompt();
   const priced = menus
     .map((menu) => ({ menu, options: readMenuPricingOptions(menu) }))
-    .filter(({ options }) => hasMenuPricingOptions(options));
+    .filter(
+      ({ options }) =>
+        options.priceTo != null ||
+        options.choices.length > 0 ||
+        options.addOns.length > 0 ||
+        options.steps.length > 0,
+    );
   if (priced.length === 0) return null;
 
   const nextSortOrder = () =>

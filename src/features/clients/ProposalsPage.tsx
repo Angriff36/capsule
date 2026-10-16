@@ -631,6 +631,7 @@ export function ProposalsPage({ eventId }: { eventId?: string }) {
       paymentSchedule: proposalPaymentSchedule({
         total: Number(row.total) || 0,
         depositPercent: row.depositPercent,
+        depositAmount: row.depositAmount,
         balanceDueDaysBefore: row.balanceDueDaysBefore,
         eventDate: row.eventDate,
       }),

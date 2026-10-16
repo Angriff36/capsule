@@ -13,8 +13,8 @@ entity ScreenLayoutOverride mixin TenantScoped, SoftDeletable {
 
   property indexed required pagePattern: string = ""
   property indexed required slotKey: string = ""
-  property required componentId: string = ""
-  property sourceComponentId: string?
+  property required pieceName: string = ""
+  property sourcePieceName: string?
   property slotKind: string?
   property targetSelector: string?
   property targetLabel: string?
@@ -22,7 +22,7 @@ entity ScreenLayoutOverride mixin TenantScoped, SoftDeletable {
 
   constraint screenLayoutPagePattern: length(trim(self.pagePattern)) > 0 "Pick a screen first."
   constraint screenLayoutSlotKey: length(trim(self.slotKey)) > 0 "Pick the block to change."
-  constraint screenLayoutComponent: length(trim(self.componentId)) > 0 "Pick a catalog piece."
+  constraint screenLayoutComponent: length(trim(self.pieceName)) > 0 "Pick a catalog piece."
 
   default policy screenLayoutRead read: roleAllows(user.role, "staffAccess") "Staff may see app layout"
   default policy screenLayoutWrite write: roleAllows(user.role, "adminAccess") "Admins may swap catalog pieces"
@@ -31,8 +31,8 @@ entity ScreenLayoutOverride mixin TenantScoped, SoftDeletable {
   command set(
     pagePattern: string,
     slotKey: string,
-    componentId: string,
-    optional sourceComponentId: string,
+    pieceName: string,
+    optional sourcePieceName: string,
     optional slotKind: string,
     optional targetSelector: string,
     optional targetLabel: string
@@ -42,12 +42,12 @@ entity ScreenLayoutOverride mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "adminAccess")
     constraint setLayoutPage: length(trim(pagePattern)) > 0 "Pick a screen first."
     constraint setLayoutSlot: length(trim(slotKey)) > 0 "Pick the block to change."
-    constraint setLayoutComponent: length(trim(componentId)) > 0 "Pick a catalog piece."
+    constraint setLayoutComponent: length(trim(pieceName)) > 0 "Pick a catalog piece."
     mutate setAt = now()
     mutate pagePattern = trim(pagePattern)
     mutate slotKey = trim(slotKey)
-    mutate componentId = trim(componentId)
-    mutate sourceComponentId = sourceComponentId
+    mutate pieceName = trim(pieceName)
+    mutate sourcePieceName = sourcePieceName
     mutate slotKind = slotKind
     mutate targetSelector = targetSelector
     mutate targetLabel = targetLabel
@@ -61,8 +61,8 @@ entity ScreenLayoutOverride mixin TenantScoped, SoftDeletable {
   command change(
     pagePattern: string,
     slotKey: string,
-    componentId: string,
-    optional sourceComponentId: string,
+    pieceName: string,
+    optional sourcePieceName: string,
     optional slotKind: string,
     optional targetSelector: string,
     optional targetLabel: string
@@ -71,12 +71,12 @@ entity ScreenLayoutOverride mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "adminAccess")
     constraint changeLayoutPage: length(trim(pagePattern)) > 0 "Pick a screen first."
     constraint changeLayoutSlot: length(trim(slotKey)) > 0 "Pick the block to change."
-    constraint changeLayoutComponent: length(trim(componentId)) > 0 "Pick a catalog piece."
+    constraint changeLayoutComponent: length(trim(pieceName)) > 0 "Pick a catalog piece."
     mutate deletedAt = null
     mutate pagePattern = trim(pagePattern)
     mutate slotKey = trim(slotKey)
-    mutate componentId = trim(componentId)
-    mutate sourceComponentId = sourceComponentId
+    mutate pieceName = trim(pieceName)
+    mutate sourcePieceName = sourcePieceName
     mutate slotKind = slotKind
     mutate targetSelector = targetSelector
     mutate targetLabel = targetLabel

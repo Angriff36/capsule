@@ -70,16 +70,32 @@ Roles: finance staff/managers (`financeAccess`) own invoice and payment commands
   pull-based until that lands.
 - Company price rules (`Organization.pricingRulesJson`, read by
   `src/lib/pricingRules.ts`, set under Kitchens → Price rules): catering
-  minimums by weekday in and out of the busy season, a far-away minimum, and
-  whether menus show extra price fields. A draft proposal under the minimum
-  shows the gap and adds, updates or removes one "Catering minimum" flat line
-  (`ProposalCateringMinimum.tsx`); it never blocks sending. Each company sets
-  its own; a company with no rules sees no change.
+  minimums by weekday in and out of the busy season, holiday minimums (the
+  highest that fits wins), a far-away minimum by miles or drive hours, the
+  retainer a new payment schedule starts from, the tasting fee (per tasting
+  guest, up to a limit, free from a food-and-drink amount), and whether menus
+  show extra price fields. A draft proposal under the minimum shows the gap
+  and adds, updates or removes one "Catering minimum" flat line
+  (`ProposalCateringMinimum.tsx`); the tasting fee works the same way
+  (`ProposalTastingFee.tsx`). Nothing blocks sending. Each company sets its
+  own; a company with no rules sees no change.
+- Fixed retainer: `Proposal.depositAmount` takes the place of the deposit
+  percent in `src/lib/proposalPaymentSchedule.ts` (never above the total), so
+  the panel, the client page, the PDF, the frozen revision and the invoice
+  deposit seed all show "Retainer".
 - Menu price options (`Menu.pricingOptionsJson`, read by `src/lib/menuPricing.ts`):
   a per-guest price range, named price choices, add-ons per guest or per item,
-  and a price table by count that rounds up to the next step. A draft proposal
-  with that menu picked offers them as one-tap price lines
-  (`ProposalMenuPriceOptions.tsx`); a price-table line covers the menu's dishes.
+  a price table by count that rounds up to the next step, a smallest spend on
+  the menu with a one-tap top-up line, and units per guests ("3 stations"). A
+  price choice can apply by itself when a number of dishes is picked from a
+  course or when one of its dishes is picked; the highest choice met wins, and
+  `convex/lib/proposalDishPricing.ts` moves the menu's per-guest line to it on
+  each pick or removal. A draft proposal with that menu picked offers the
+  options as one-tap price lines (`ProposalMenuPriceOptions.tsx`,
+  `ProposalMenuPackageChecks.tsx`); a price-table line covers the menu's dishes.
+- Client picks per course (`Menu.coursePicksJson`, `src/lib/coursePicks.ts`):
+  "Pick 1", "Pick 2–3", "Up to 3". The public menu and the quote form show
+  them; the proposal shows picked counts and warns when over or under.
 - Issue CreditMemos against paid invoices; apply to a same-client open balance or carry forward as client credit
 - Record / begin processing / settle / fail / refund Payments
 - Payment settlement applies to Invoice via generated reaction

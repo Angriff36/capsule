@@ -7,6 +7,7 @@ import {
 import {
   readPricingRules,
   WEEKDAYS,
+  type HolidayMinimum,
   type PricingRules,
   type SeasonRange,
 } from "../../lib/pricingRules";
@@ -41,9 +42,43 @@ function parseSeasonsText(value: string): SeasonRange[] | string {
   return ranges;
 }
 
+const holidaysText = (holidays: HolidayMinimum[]) =>
+  holidays
+    .map(
+      (row) => `${row.date}, ${row.label ? `${row.label}, ` : ""}${row.amount}`,
+    )
+    .join("\n");
+
 /**
- * Company price rules: catering minimums by weekday and season, the minimum
- * for far events, and whether menus show the extra price fields. Each company
+ * "12-24, Christmas Eve, 5000" or "2026-11-26, Thanksgiving, 5000" per line;
+ * the name is optional. A line without a date and an amount is an error.
+ */
+function parseHolidaysText(value: string): HolidayMinimum[] | string {
+  const rows: HolidayMinimum[] = [];
+  for (const raw of value.split("\n")) {
+    const line = raw.trim();
+    if (!line) continue;
+    const match =
+      /^((?:\d{4}-)?\d{1,2}-\d{1,2})\s*,\s*(?:(.*?)\s*,\s*)?\$?(\d+(?:\.\d+)?)$/.exec(
+        line,
+      );
+    if (!match || !(Number(match[3]) > 0))
+      return `"${line}" is not a holiday minimum. Write the date, a name and the amount, like 12-24, Christmas Eve, 5000.`;
+    const parts = match[1].split("-");
+    const pad = (part: string) => part.padStart(2, "0");
+    const date =
+      parts.length === 3
+        ? `${parts[0]}-${pad(parts[1])}-${pad(parts[2])}`
+        : `${pad(parts[0])}-${pad(parts[1])}`;
+    rows.push({ date, label: match[2] ?? "", amount: Number(match[3]) });
+  }
+  return rows;
+}
+
+/**
+ * Company price rules: catering minimums by weekday, season and holiday, the
+ * minimum for far events, the retainer a payment schedule starts from, the
+ * tasting fee, and whether menus show the extra price fields. Each company
  * sets its own; empty rules change nothing.
  */
 export function PricingRulesSection({
@@ -71,6 +106,11 @@ export function PricingRulesSection({
       setError(seasons);
       return;
     }
+    const holidays = parseHolidaysText(String(data.get("holidays") ?? ""));
+    if (typeof holidays === "string") {
+      setError(holidays);
+      return;
+    }
     setError(null);
     const next: PricingRules = {
       menuPriceOptions: data.get("menuPriceOptions") === "on",
@@ -79,6 +119,14 @@ export function PricingRulesSection({
       offPeakMinimums: WEEKDAYS.map((_, day) => amount(`off${day}`)),
       farAwayMinimum: amount("farAwayMinimum"),
       farAwayMiles: amount("farAwayMiles"),
+      farAwayHours: amount("farAwayHours"),
+      holidays,
+      retainer: amount("retainer"),
+      tasting: {
+        perGuest: amount("tastingPerGuest"),
+        maxGuests: Math.round(amount("tastingMaxGuests")),
+        freeAt: amount("tastingFreeAt"),
+      },
     };
     await run(async () => {
       let docId = record?._id;
@@ -181,7 +229,7 @@ export function PricingRulesSection({
                 defaultValue={rules.farAwayMinimum || ""}
               />
               <span className="mt-1 block text-xs font-normal text-ink-3">
-                Any day, in place of the weekday minimum.
+                Any day, when it is higher than the weekday minimum.
               </span>
             </label>
             <label>
@@ -197,7 +245,82 @@ export function PricingRulesSection({
                 Each proposal can also mark its event as far away.
               </span>
             </label>
+            <label>
+              Or far away from (hours of driving, one way)
+              <input
+                name="farAwayHours"
+                type="number"
+                min={0}
+                step="0.25"
+                defaultValue={rules.farAwayHours || ""}
+              />
+              <span className="mt-1 block text-xs font-normal text-ink-3">
+                Uses the event&apos;s drive time when Capsule has one.
+              </span>
+            </label>
+            <label>
+              Retainer ($)
+              <input
+                name="retainer"
+                type="number"
+                min={0}
+                step="0.01"
+                defaultValue={rules.retainer || ""}
+              />
+              <span className="mt-1 block text-xs font-normal text-ink-3">
+                A new payment schedule starts with this fixed deposit.
+              </span>
+            </label>
           </div>
+          <label>
+            Holiday minimums
+            <textarea
+              name="holidays"
+              rows={3}
+              defaultValue={holidaysText(rules.holidays)}
+              placeholder={
+                "12-24, Christmas Eve, 5000\n12-31, New Year's Eve, 5000\n2026-11-26, Thanksgiving, 5000"
+              }
+            />
+            <span className="mt-1 block text-xs font-normal text-ink-3">
+              One per line: the date (month-day every year, or year-month-day
+              once), a name, and the minimum. The highest minimum that fits an
+              event is the one it gets.
+            </span>
+          </label>
+          <fieldset className="grid gap-3 sm:grid-cols-3">
+            <legend className="eyebrow">Tasting fee</legend>
+            <label>
+              Per tasting guest ($)
+              <input
+                name="tastingPerGuest"
+                type="number"
+                min={0}
+                step="0.01"
+                defaultValue={rules.tasting.perGuest || ""}
+              />
+            </label>
+            <label>
+              Up to (guests)
+              <input
+                name="tastingMaxGuests"
+                type="number"
+                min={0}
+                step="1"
+                defaultValue={rules.tasting.maxGuests || ""}
+              />
+            </label>
+            <label>
+              Free from food and drink of ($)
+              <input
+                name="tastingFreeAt"
+                type="number"
+                min={0}
+                step="0.01"
+                defaultValue={rules.tasting.freeAt || ""}
+              />
+            </label>
+          </fieldset>
         </fieldset>
         {error ? (
           <p role="alert" className="mt-2 text-base text-danger">

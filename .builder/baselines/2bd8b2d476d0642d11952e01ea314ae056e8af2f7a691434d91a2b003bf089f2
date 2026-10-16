@@ -2655,6 +2655,7 @@ export const MenuSchema = z.object({
   guestsPerServer: z.number().int().nullable().optional(),
   pickOneCourses: z.array(z.string()).optional().default([]),
   pricingOptionsJson: z.string().nullable().optional(),
+  coursePicksJson: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -3706,6 +3707,7 @@ export const ProposalSchema = z.object({
   notes: z.string().nullable().optional(),
   terms: z.string().nullable().optional(),
   depositPercent: z.number().int().nullable().optional(),
+  depositAmount: z.number().nullable().optional(),
   balanceDueDaysBefore: z.number().int().nullable().optional(),
   visibleSections: z.array(z.string()).nullable().optional(),
   sectionOrder: z.array(z.string()).nullable().optional(),
@@ -4266,8 +4268,8 @@ export const ScreenLayoutOverrideSchema = z.object({
   deletedAt: z.coerce.date().nullable().optional(),
   pagePattern: z.string().default(""),
   slotKey: z.string().default(""),
-  componentId: z.string().default(""),
-  sourceComponentId: z.string().nullable().optional(),
+  pieceName: z.string().default(""),
+  sourcePieceName: z.string().nullable().optional(),
   slotKind: z.string().nullable().optional(),
   targetSelector: z.string().nullable().optional(),
   targetLabel: z.string().nullable().optional(),
@@ -10130,6 +10132,13 @@ export const MenuReviseDetailsParamsSchema = z.object({
 
 export type MenuReviseDetailsParams = z.infer<typeof MenuReviseDetailsParamsSchema>;
 
+// Command: setCoursePicks on Menu
+export const MenuSetCoursePicksParamsSchema = z.object({
+  picksJson: z.string().optional(),
+});
+
+export type MenuSetCoursePicksParams = z.infer<typeof MenuSetCoursePicksParamsSchema>;
+
 // Command: setPricingOptions on Menu
 export const MenuSetPricingOptionsParamsSchema = z.object({
   optionsJson: z.string().optional(),
@@ -11949,6 +11958,7 @@ export const ProposalDraftParamsSchema = z.object({
   sectionOrder: z.array(z.string()).optional(),
   depositPercent: z.number().optional(),
   balanceDueDaysBefore: z.number().optional(),
+  depositAmount: z.number().optional(),
 });
 
 export type ProposalDraftParams = z.infer<typeof ProposalDraftParamsSchema>;
@@ -12049,6 +12059,7 @@ export type ProposalSetDiscountParams = z.infer<typeof ProposalSetDiscountParams
 export const ProposalSetPaymentScheduleParamsSchema = z.object({
   depositPercent: z.number().optional(),
   balanceDueDaysBefore: z.number().optional(),
+  depositAmount: z.number().optional(),
 });
 
 export type ProposalSetPaymentScheduleParams = z.infer<typeof ProposalSetPaymentScheduleParamsSchema>;
@@ -12853,8 +12864,8 @@ export type ScreenCopyOverrideSetParams = z.infer<typeof ScreenCopyOverrideSetPa
 export const ScreenLayoutOverrideChangeParamsSchema = z.object({
   pagePattern: z.string(),
   slotKey: z.string(),
-  componentId: z.string(),
-  sourceComponentId: z.string().optional(),
+  pieceName: z.string(),
+  sourcePieceName: z.string().optional(),
   slotKind: z.string().optional(),
   targetSelector: z.string().optional(),
   targetLabel: z.string().optional(),
@@ -12871,8 +12882,8 @@ export type ScreenLayoutOverrideRevertParams = z.infer<typeof ScreenLayoutOverri
 export const ScreenLayoutOverrideSetParamsSchema = z.object({
   pagePattern: z.string(),
   slotKey: z.string(),
-  componentId: z.string(),
-  sourceComponentId: z.string().optional(),
+  pieceName: z.string(),
+  sourcePieceName: z.string().optional(),
   slotKind: z.string().optional(),
   targetSelector: z.string().optional(),
   targetLabel: z.string().optional(),

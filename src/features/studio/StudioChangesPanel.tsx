@@ -73,7 +73,7 @@ export function StudioChangesPanel(props: {
               {row.targetLabel ?? row.slotKey}
             </p>
             <p className="mt-1 text-ink">
-              {row.sourceComponentId ?? "Catalog"} → {row.componentId}
+              {row.sourcePieceName ?? "Catalog"} → {row.pieceName}
             </p>
             <button
               type="button"

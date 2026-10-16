@@ -34,15 +34,8 @@ function StudioEditorSurface() {
     setHover(null);
   }, []);
 
-  if (!studio) {
-    return (
-      <EditAppTab
-        onClick={() => {
-          window.location.reload();
-        }}
-      />
-    );
-  }
+  // The editor tab shows once the screen editor has loaded.
+  if (!studio) return null;
 
   const pick = (x: number, y: number) => {
     const next = StudioEditDraftFactory.fromPoint(

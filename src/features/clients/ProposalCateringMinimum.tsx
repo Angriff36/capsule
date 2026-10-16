@@ -8,6 +8,7 @@ import {
   cateringMinimumFor,
   countsTowardMinimum,
   hasCateringMinimums,
+  isFarAway,
   isMinimumLine,
   MINIMUM_LINE_DESCRIPTION,
 } from "../../lib/pricingRules";
@@ -46,11 +47,8 @@ export function ProposalCateringMinimum({
   const lines = (lineItems ?? []).filter((line) => line.deletedAt == null);
   const minimumLine = lines.find(isMinimumLine);
   const miles = travel?.fee.distanceMiles ?? null;
-  const farByDistance =
-    rules != null &&
-    rules.farAwayMiles > 0 &&
-    miles != null &&
-    miles >= rules.farAwayMiles;
+  const driveMinutes = travel?.driveMinutes ?? null;
+  const farByDistance = rules != null && isFarAway(rules, miles, driveMinutes);
   // Untouched: follow the saved minimum line.
   const [farTicked, setFarByHand] = useState<boolean | null>(null);
   const farByHand =
@@ -165,7 +163,16 @@ export function ProposalCateringMinimum({
           />
           Far from the kitchen ({formatMoneyExact(rules.farAwayMinimum)}{" "}
           minimum)
-          {farByDistance ? ` — ${miles} mi each way` : ""}
+          {farByDistance
+            ? ` — ${[
+                miles != null ? `${miles} mi` : null,
+                driveMinutes != null
+                  ? `${Math.floor(driveMinutes / 60)} h ${driveMinutes % 60} min`
+                  : null,
+              ]
+                .filter(Boolean)
+                .join(", ")} each way`
+            : ""}
         </label>
       ) : null}
     </div>

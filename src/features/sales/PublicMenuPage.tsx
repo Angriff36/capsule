@@ -1,5 +1,6 @@
 import { useQuery } from "convex/react";
 import { api } from "../../lib/api";
+import { coursePickFor, coursePickText } from "../../lib/coursePicks";
 import {
   allergenText,
   courseGroups,
@@ -138,6 +139,17 @@ export function PublicMenuPage() {
                           Each guest picks one
                         </p>
                       ) : null}
+                      {(() => {
+                        const rule = coursePickFor(
+                          menu.coursePicks ?? [],
+                          group.course,
+                        );
+                        return rule ? (
+                          <p className="text-xs italic text-ink-2">
+                            {coursePickText(rule)}
+                          </p>
+                        ) : null;
+                      })()}
                       <ul
                         className={pickOne ? undefined : "divide-y divide-line"}
                       >

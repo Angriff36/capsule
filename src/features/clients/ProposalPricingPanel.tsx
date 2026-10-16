@@ -17,6 +17,7 @@ import {
 import { useCatalogDishes } from "./useCatalogDishes";
 import { ProposalTravelFee } from "./ProposalTravelFee";
 import { ProposalCateringMinimum } from "./ProposalCateringMinimum";
+import { ProposalTastingFee } from "./ProposalTastingFee";
 import { ProposalDiscount } from "./ProposalDiscount";
 
 interface ProposalPricingPanelProps {
@@ -541,6 +542,11 @@ export function ProposalPricingPanel({
             proposalId={proposalId}
             guestCount={guestCount}
             eventDate={eventDate}
+            onFailure={onFailure}
+          />
+          <ProposalTastingFee
+            proposalId={proposalId}
+            guestCount={guestCount}
             onFailure={onFailure}
           />
           <ProposalDiscount
