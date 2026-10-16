@@ -3606,6 +3606,18 @@
       "category": "property-added",
       "acknowledgedAt": "2026-10-14",
       "reason": "App colors on the Branding page (owner, 2026-10-14): optional; unset reads as the DESIGN.md colors. Stored companies need no backfill."
+    },
+    {
+      "path": "Menu.pricingOptionsJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-16",
+      "reason": "Menu price options (range, choices, add-ons, price by count): optional; unset = the plain base and per-guest price. Stored menus need no backfill."
+    },
+    {
+      "path": "Organization.pricingRulesJson",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-16",
+      "reason": "Company price rules (catering minimums, menu price fields): optional; unset = no rules. Stored companies need no backfill."
     }
   ]
 }

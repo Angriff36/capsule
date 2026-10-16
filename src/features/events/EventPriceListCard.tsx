@@ -157,6 +157,7 @@ export function EventPriceListCard({
             taxAmount={list.taxAmount}
             discountAmount={list.discountAmount}
             discountPercent={list.discountPercent}
+            eventDate={startsAt}
             editable={list.status === "draft"}
             onFailure={(error) =>
               reportActionFail(

@@ -68,6 +68,18 @@ Roles: finance staff/managers (`financeAccess`) own invoice and payment commands
   Inbound Stripe webhooks remain blocked (issue #52: generated Convex webhook
   verifier cannot parse Stripe's `t=…,v1=…` signature), so confirmation is
   pull-based until that lands.
+- Company price rules (`Organization.pricingRulesJson`, read by
+  `src/lib/pricingRules.ts`, set under Kitchens → Price rules): catering
+  minimums by weekday in and out of the busy season, a far-away minimum, and
+  whether menus show extra price fields. A draft proposal under the minimum
+  shows the gap and adds, updates or removes one "Catering minimum" flat line
+  (`ProposalCateringMinimum.tsx`); it never blocks sending. Each company sets
+  its own; a company with no rules sees no change.
+- Menu price options (`Menu.pricingOptionsJson`, read by `src/lib/menuPricing.ts`):
+  a per-guest price range, named price choices, add-ons per guest or per item,
+  and a price table by count that rounds up to the next step. A draft proposal
+  with that menu picked offers them as one-tap price lines
+  (`ProposalMenuPriceOptions.tsx`); a price-table line covers the menu's dishes.
 - Issue CreditMemos against paid invoices; apply to a same-client open balance or carry forward as client credit
 - Record / begin processing / settle / fail / refund Payments
 - Payment settlement applies to Invoice via generated reaction

@@ -2654,6 +2654,7 @@ export const MenuSchema = z.object({
   availableUntil: z.coerce.date().nullable().optional(),
   guestsPerServer: z.number().int().nullable().optional(),
   pickOneCourses: z.array(z.string()).optional().default([]),
+  pricingOptionsJson: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2892,6 +2893,7 @@ export const OrganizationSchema = z.object({
   travelFeeMinimum: z.number().nullable().optional(),
   travelFeeRoundTrip: z.boolean().nullable().optional(),
   travelFeeZonesJson: z.string().nullable().optional(),
+  pricingRulesJson: z.string().nullable().optional(),
   timingFullServiceSetupMinutes: z.number().int().nullable().optional(),
   timingLimitedServiceSetupMinutes: z.number().int().nullable().optional(),
   timingBriefingMinutes: z.number().int().nullable().optional(),
@@ -10091,6 +10093,13 @@ export const MenuReviseDetailsParamsSchema = z.object({
 
 export type MenuReviseDetailsParams = z.infer<typeof MenuReviseDetailsParamsSchema>;
 
+// Command: setPricingOptions on Menu
+export const MenuSetPricingOptionsParamsSchema = z.object({
+  optionsJson: z.string().optional(),
+});
+
+export type MenuSetPricingOptionsParams = z.infer<typeof MenuSetPricingOptionsParamsSchema>;
+
 // Command: setSeason on Menu
 export const MenuSetSeasonParamsSchema = z.object({
   availableFrom: z.coerce.date().optional(),
@@ -10452,6 +10461,13 @@ export const OrganizationConfigurePlanningChecksParamsSchema = z.object({
 });
 
 export type OrganizationConfigurePlanningChecksParams = z.infer<typeof OrganizationConfigurePlanningChecksParamsSchema>;
+
+// Command: configurePricingRules on Organization
+export const OrganizationConfigurePricingRulesParamsSchema = z.object({
+  rulesJson: z.string().optional(),
+});
+
+export type OrganizationConfigurePricingRulesParams = z.infer<typeof OrganizationConfigurePricingRulesParamsSchema>;
 
 // Command: configureRoutePolicy on Organization
 export const OrganizationConfigureRoutePolicyParamsSchema = z.object({

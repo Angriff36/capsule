@@ -205,6 +205,10 @@ entity Organization mixin TenantScoped, SoftDeletable {
   property travelFeeMinimum: money(12, 2)?
   property travelFeeRoundTrip: boolean?
   property travelFeeZonesJson: string?
+  // Company price rules (src/lib/pricingRules.ts): catering minimums by
+  // weekday and season, the far-away minimum, and whether menus show the
+  // extra price fields (choices, add-ons, price by count). Unset = none.
+  property pricingRulesJson: string?
   // Event timing rules (spec §8.4, PL-TIMING): on-site setup before serve
   // for full and limited service, crew briefing before loading, the load
   // time used when no load rule matches, and the load rules themselves (JSON
@@ -404,6 +408,16 @@ entity Organization mixin TenantScoped, SoftDeletable {
       organizationId: self.id
       tenantId: self.tenantId
       mode: mode
+    }
+  }
+
+  // Company price rules. Empty goes back to no minimums and plain menu prices.
+  command configurePricingRules(optional rulesJson: string) {
+    guard self.deletedAt == null
+    mutate pricingRulesJson = rulesJson
+    emit OrganizationPricingRulesConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -609,6 +623,11 @@ event OrganizationTravelFeeConfigured: "organization.travel_fee_configured" {
   organizationId: string
   tenantId: string
   mode: string
+}
+
+event OrganizationPricingRulesConfigured: "organization.pricing_rules_configured" {
+  organizationId: string
+  tenantId: string
 }
 
 event OrganizationTimingPolicyConfigured: "organization.timing_policy_configured" {

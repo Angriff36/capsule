@@ -523,6 +523,7 @@ import {
   MenuMarkPublishedParamsSchema,
   MenuRestoreParamsSchema,
   MenuReviseDetailsParamsSchema,
+  MenuSetPricingOptionsParamsSchema,
   MenuSetSeasonParamsSchema,
   MenuSetServiceParamsSchema,
   MenuUnpublishParamsSchema,
@@ -559,6 +560,7 @@ import {
   OrganizationConfigureEmailSenderParamsSchema,
   OrganizationConfigureEquipmentFieldsParamsSchema,
   OrganizationConfigurePlanningChecksParamsSchema,
+  OrganizationConfigurePricingRulesParamsSchema,
   OrganizationConfigureRoutePolicyParamsSchema,
   OrganizationConfigureSocialAccountsParamsSchema,
   OrganizationConfigureStageMovesParamsSchema,
@@ -8101,6 +8103,16 @@ export function useMenuReviseDetails() {
   };
 }
 
+/** Mutation hook for Menu.setPricingOptions. */
+export function useMenuSetPricingOptions() {
+  const mutate = useMutation(api.mutations.Menu_setPricingOptions);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = MenuSetPricingOptionsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Menu.setSeason. */
 export function useMenuSetSeason() {
   const mutate = useMutation(api.mutations.Menu_setSeason);
@@ -8675,6 +8687,16 @@ export function useOrganizationConfigurePlanningChecks() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = OrganizationConfigurePlanningChecksParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Organization.configurePricingRules. */
+export function useOrganizationConfigurePricingRules() {
+  const mutate = useMutation(api.mutations.Organization_configurePricingRules);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationConfigurePricingRulesParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -15673,4 +15695,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1655 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1657 as const;
