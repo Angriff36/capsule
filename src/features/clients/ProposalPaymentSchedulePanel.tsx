@@ -79,6 +79,15 @@ export function ProposalPaymentSchedulePanel({
     );
   }
 
+  // The percent and the retainer are two ways to set one deposit: typing in
+  // one clears the other, so the saved schedule is the one on the screen.
+  const clearOther =
+    (other: string) => (event: FormEvent<HTMLInputElement>) => {
+      const input = event.currentTarget.form?.elements.namedItem(other);
+      if (event.currentTarget.value !== "" && input instanceof HTMLInputElement)
+        input.value = "";
+    };
+
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -122,6 +131,7 @@ export function ProposalPaymentSchedulePanel({
             max={100}
             step={1}
             defaultValue={proposal.depositPercent ?? ""}
+            onInput={clearOther("depositAmount")}
           />
         </label>
         <label className="field-label">
@@ -134,6 +144,7 @@ export function ProposalPaymentSchedulePanel({
             min={0}
             step="0.01"
             defaultValue={retainerStart ?? ""}
+            onInput={clearOther("depositPercent")}
           />
         </label>
         <label className="field-label">
