@@ -131,6 +131,59 @@ describe("screen editor saved wording", () => {
     expect(db.rows[0]!.deletedAt).not.toBeNull();
   });
 
+  it("offers no split label and no control with its own screen-reader name", () => {
+    document.body.innerHTML = `<main>
+      <a href="/orders">Orders <b>3</b></a>
+      <button aria-label="Delete the chicken dish">Delete</button>
+    </main>`;
+    expect(
+      StudioCopySpot.fromElement(document.querySelector("a")!, "/kitchen"),
+    ).toBeNull();
+    expect(
+      StudioCopySpot.fromElement(document.querySelector("button")!, "/kitchen"),
+    ).toBeNull();
+  });
+
+  it("keeps a named control's screen-reader name in step through edit, re-edit and restore", async () => {
+    document.body.innerHTML = `<main>
+      <button aria-label="Save"><svg></svg>Save</button>
+      <a href="/menus" aria-label="Menus"><span>Menus</span></a>
+    </main>`;
+    const button = document.querySelector("button")!;
+    const span = document.querySelector("span")!;
+    const link = document.querySelector("a")!;
+    const db = store();
+    const apply = () => new StudioCopyApplier(db.rows).apply("/kitchen");
+
+    await db
+      .manager()
+      .save(StudioCopySpot.fromElement(button, "/kitchen")!, "Keep");
+    await db
+      .manager()
+      .save(StudioCopySpot.fromElement(span, "/kitchen")!, "Our menus");
+    apply();
+    expect(button.textContent).toBe("Keep");
+    expect(button.getAttribute("aria-label")).toBe("Keep");
+    expect(button.querySelector("svg")).not.toBeNull();
+    expect(link.getAttribute("aria-label")).toBe("Our menus");
+
+    await db
+      .manager()
+      .save(StudioCopySpot.fromElement(button, "/kitchen")!, "Keep it");
+    apply();
+    expect(db.rows).toHaveLength(2);
+    expect(button.textContent).toBe("Keep it");
+    expect(button.getAttribute("aria-label")).toBe("Keep it");
+
+    for (const row of [...db.rows])
+      await db.manager().revertKey("/kitchen", row.copyKey);
+    apply();
+    expect(button.textContent).toBe("Save");
+    expect(button.getAttribute("aria-label")).toBe("Save");
+    expect(span.textContent).toBe("Menus");
+    expect(link.getAttribute("aria-label")).toBe("Menus");
+  });
+
   it("keeps editor actions off until saved edits have loaded", () => {
     queries.copy = undefined;
     queries.layout = undefined;

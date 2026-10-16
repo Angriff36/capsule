@@ -70,6 +70,37 @@ export class StudioCopySpot {
     return raw.replace(/\s+/g, " ").trim();
   }
 
+  /**
+   * The one text node that holds all of a spot's words, or null when the
+   * words are split over several parts ("Orders <b>3</b>"): the applier can
+   * only change one text node, so a split label is not offered for editing.
+   */
+  static wordsNode(element: Element): Text | null {
+    const all = this.leafText(element);
+    if (!all) return null;
+    for (const child of Array.from(element.childNodes)) {
+      if (child.nodeType !== Node.TEXT_NODE) continue;
+      const words = (child.textContent ?? "").replace(/\s+/g, " ").trim();
+      if (words) return words === all ? (child as Text) : null;
+    }
+    return null;
+  }
+
+  /** The element whose aria-label names this spot for screen readers. */
+  static namer(element: Element): Element | null {
+    if (element.hasAttribute("aria-label")) return element;
+    const control = element.closest(
+      "button, a, [role='button'], [role='tab'], [role='link'], [role='menuitem']",
+    );
+    return control?.hasAttribute("aria-label") ? control : null;
+  }
+
+  static ariaName(element: Element): string {
+    return (element.getAttribute("aria-label") ?? "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
   static isSkippable(element: Element): boolean {
     if (SKIP_TAGS.has(element.tagName)) return true;
     if (element.closest(LAYER_SKIP)) return true;
@@ -86,6 +117,11 @@ export class StudioCopySpot {
     if (element.querySelector("select, option, textarea, input")) return null;
     const originalText = this.leafText(element);
     if (!originalText || originalText.length > 80) return null;
+    if (!this.wordsNode(element)) return null;
+    // A screen-reader name that differs from the words cannot be kept in
+    // step with an edit, so that spot is not offered.
+    const namer = this.namer(element);
+    if (namer && this.ariaName(namer) !== originalText) return null;
     return new StudioCopySpot(
       pagePattern,
       this.cssPath(element),

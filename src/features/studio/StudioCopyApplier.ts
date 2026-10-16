@@ -1,4 +1,4 @@
-import type { StudioCopySpot } from "./StudioCopySpot";
+import { StudioCopySpot } from "./StudioCopySpot";
 
 export type StudioCopyRow = {
   pagePattern: string;
@@ -38,8 +38,10 @@ export class StudioCopyApplier {
       written.delete(element);
       if (!element.isConnected) continue;
       if (this.current(element) !== mark.text) continue;
-      const node = this.textNode(element);
-      if (node) node.textContent = mark.original;
+      const node = StudioCopySpot.wordsNode(element);
+      if (!node) continue;
+      node.textContent = mark.original;
+      this.rename(element, mark.text, mark.original);
     }
   }
 
@@ -70,27 +72,19 @@ export class StudioCopyApplier {
     const current = this.current(element);
     const mine = written.get(element)?.text === current;
     if (current !== originalText && current !== next && !mine) return;
-    if (current === next) {
-      written.set(element, { original: originalText, text: next });
-      return;
+    if (current !== next) {
+      const node = StudioCopySpot.wordsNode(element);
+      if (!node) return;
+      node.textContent = next;
     }
-    const node = this.textNode(element);
-    if (!node) return;
-    node.textContent = next;
+    this.rename(element, current, next);
     written.set(element, { original: originalText, text: next });
   }
 
-  private textNode(element: Element): Text | null {
-    for (const child of Array.from(element.childNodes)) {
-      if (child.nodeType === Node.TEXT_NODE) {
-        const text = child.textContent ?? "";
-        if (text.replace(/\s+/g, " ").trim().length > 0) return child as Text;
-      }
-    }
-    if (element.childElementCount === 0) {
-      const only = element.firstChild;
-      if (only && only.nodeType === Node.TEXT_NODE) return only as Text;
-    }
-    return null;
+  // Keeps a control's screen-reader name in step with the words it shows.
+  private rename(element: Element, from: string, to: string): void {
+    const namer = StudioCopySpot.namer(element);
+    if (namer && StudioCopySpot.ariaName(namer) === from)
+      namer.setAttribute("aria-label", to);
   }
 }
