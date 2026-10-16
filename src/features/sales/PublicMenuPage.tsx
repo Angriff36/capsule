@@ -1,5 +1,6 @@
 import { useQuery } from "convex/react";
 import { api } from "../../lib/api";
+import { coursePickFor, coursePickText } from "../../lib/coursePicks";
 import {
   allergenText,
   courseGroups,
@@ -126,6 +127,12 @@ export function PublicMenuPage() {
                   const pickOne =
                     group.dishes.length > 1 &&
                     isPickOneCourse(group.course, menu.pickOneCourses);
+                  // The client's pick rule ("Pick 2", "Up to 3") says it
+                  // better than the guest pick-one line, so it replaces it.
+                  const clientPick = coursePickFor(
+                    menu.coursePicks ?? [],
+                    group.course,
+                  );
                   return (
                     <div key={group.course ?? ""} className="mt-4">
                       {group.course ? (
@@ -133,7 +140,11 @@ export function PublicMenuPage() {
                           {group.course}
                         </h3>
                       ) : null}
-                      {pickOne ? (
+                      {clientPick ? (
+                        <p className="text-xs italic text-ink-2">
+                          {coursePickText(clientPick)}
+                        </p>
+                      ) : pickOne ? (
                         <p className="text-xs italic text-ink-2">
                           Each guest picks one
                         </p>

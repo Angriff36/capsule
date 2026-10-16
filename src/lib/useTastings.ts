@@ -16,3 +16,11 @@ export function useTastingPrepList(tastingId: string | null) {
 export function useApplyTastingSelections() {
   return useMutation(api.tastingApply.applyApprovedSelections);
 }
+
+/** The tastings booked for one proposal (for its tasting fee). */
+export function useProposalTastings(proposalId: string | null) {
+  return useQuery(
+    api.queries.listTastingByProposalId,
+    proposalId ? { proposalId: proposalId as Id<"proposals"> } : "skip",
+  );
+}

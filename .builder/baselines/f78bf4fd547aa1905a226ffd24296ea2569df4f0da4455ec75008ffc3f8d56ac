@@ -523,6 +523,8 @@ import {
   MenuMarkPublishedParamsSchema,
   MenuRestoreParamsSchema,
   MenuReviseDetailsParamsSchema,
+  MenuSetCoursePicksParamsSchema,
+  MenuSetPricingOptionsParamsSchema,
   MenuSetSeasonParamsSchema,
   MenuSetServiceParamsSchema,
   MenuUnpublishParamsSchema,
@@ -559,6 +561,7 @@ import {
   OrganizationConfigureEmailSenderParamsSchema,
   OrganizationConfigureEquipmentFieldsParamsSchema,
   OrganizationConfigurePlanningChecksParamsSchema,
+  OrganizationConfigurePricingRulesParamsSchema,
   OrganizationConfigureRoutePolicyParamsSchema,
   OrganizationConfigureSocialAccountsParamsSchema,
   OrganizationConfigureStageMovesParamsSchema,
@@ -834,6 +837,12 @@ import {
   ScorecardTargetRetireParamsSchema,
   ScorecardTargetReviseParamsSchema,
   ScorecardTargetSetParamsSchema,
+  ScreenCopyOverrideChangeParamsSchema,
+  ScreenCopyOverrideRevertParamsSchema,
+  ScreenCopyOverrideSetParamsSchema,
+  ScreenLayoutOverrideChangeParamsSchema,
+  ScreenLayoutOverrideRevertParamsSchema,
+  ScreenLayoutOverrideSetParamsSchema,
   ServiceStyleActivateParamsSchema,
   ServiceStyleDeactivateParamsSchema,
   ServiceStyleKitItemAddParamsSchema,
@@ -8101,6 +8110,26 @@ export function useMenuReviseDetails() {
   };
 }
 
+/** Mutation hook for Menu.setCoursePicks. */
+export function useMenuSetCoursePicks() {
+  const mutate = useMutation(api.mutations.Menu_setCoursePicks);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = MenuSetCoursePicksParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Menu.setPricingOptions. */
+export function useMenuSetPricingOptions() {
+  const mutate = useMutation(api.mutations.Menu_setPricingOptions);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = MenuSetPricingOptionsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Menu.setSeason. */
 export function useMenuSetSeason() {
   const mutate = useMutation(api.mutations.Menu_setSeason);
@@ -8675,6 +8704,16 @@ export function useOrganizationConfigurePlanningChecks() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = OrganizationConfigurePlanningChecksParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Organization.configurePricingRules. */
+export function useOrganizationConfigurePricingRules() {
+  const mutate = useMutation(api.mutations.Organization_configurePricingRules);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationConfigurePricingRulesParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -12413,6 +12452,108 @@ export function useCreateScorecardTarget() {
   };
 }
 
+/** Reactive list for ScreenCopyOverride. */
+export function useListScreenCopyOverride() {
+  return useQuery(api.queries.listScreenCopyOverride);
+}
+
+/** Reactive get-by-id for ScreenCopyOverride. Pass "skip" to suspend. */
+export function useGetScreenCopyOverride(id: string | "skip") {
+  return useQuery(api.queries.getScreenCopyOverride, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for ScreenCopyOverride.change. */
+export function useScreenCopyOverrideChange() {
+  const mutate = useMutation(api.mutations.ScreenCopyOverride_change);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ScreenCopyOverrideChangeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ScreenCopyOverride.revert. */
+export function useScreenCopyOverrideRevert() {
+  const mutate = useMutation(api.mutations.ScreenCopyOverride_revert);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ScreenCopyOverrideRevertParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ScreenCopyOverride.set. */
+export function useScreenCopyOverrideSet() {
+  const mutate = useMutation(api.mutations.ScreenCopyOverride_set);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ScreenCopyOverrideSetParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for ScreenCopyOverride.set. */
+export function useCreateScreenCopyOverride() {
+  const mutate = useMutation(api.mutations.ScreenCopyOverride_createViaSet);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = ScreenCopyOverrideSetParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for ScreenLayoutOverride. */
+export function useListScreenLayoutOverride() {
+  return useQuery(api.queries.listScreenLayoutOverride);
+}
+
+/** Reactive get-by-id for ScreenLayoutOverride. Pass "skip" to suspend. */
+export function useGetScreenLayoutOverride(id: string | "skip") {
+  return useQuery(api.queries.getScreenLayoutOverride, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for ScreenLayoutOverride.change. */
+export function useScreenLayoutOverrideChange() {
+  const mutate = useMutation(api.mutations.ScreenLayoutOverride_change);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ScreenLayoutOverrideChangeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ScreenLayoutOverride.revert. */
+export function useScreenLayoutOverrideRevert() {
+  const mutate = useMutation(api.mutations.ScreenLayoutOverride_revert);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ScreenLayoutOverrideRevertParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ScreenLayoutOverride.set. */
+export function useScreenLayoutOverrideSet() {
+  const mutate = useMutation(api.mutations.ScreenLayoutOverride_set);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ScreenLayoutOverrideSetParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for ScreenLayoutOverride.set. */
+export function useCreateScreenLayoutOverride() {
+  const mutate = useMutation(api.mutations.ScreenLayoutOverride_createViaSet);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = ScreenLayoutOverrideSetParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for ServiceStyle. */
 export function useListServiceStyle() {
   return useQuery(api.queries.listServiceStyle);
@@ -15673,4 +15814,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1655 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 1670 as const;

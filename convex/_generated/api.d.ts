@@ -79,6 +79,7 @@ import type * as importCommit from "../importCommit.js";
 import type * as importCoordinator from "../importCoordinator.js";
 import type * as importEventLookups from "../importEventLookups.js";
 import type * as importHistory from "../importHistory.js";
+import type * as importPaymentChoices from "../importPaymentChoices.js";
 import type * as importPaymentMatch from "../importPaymentMatch.js";
 import type * as importPipeline from "../importPipeline.js";
 import type * as importResolution from "../importResolution.js";
@@ -164,6 +165,8 @@ import type * as lib_eventStaffingOperations from "../lib/eventStaffingOperation
 import type * as lib_eventTimingOperations from "../lib/eventTimingOperations.js";
 import type * as lib_eventTimingPolicy from "../lib/eventTimingPolicy.js";
 import type * as lib_fdcNutrientMapper from "../lib/fdcNutrientMapper.js";
+import type * as lib_feedbackClaudePoke from "../lib/feedbackClaudePoke.js";
+import type * as lib_feedbackGithubSync from "../lib/feedbackGithubSync.js";
 import type * as lib_foodDatabaseClient from "../lib/foodDatabaseClient.js";
 import type * as lib_foodDatabaseImage from "../lib/foodDatabaseImage.js";
 import type * as lib_foodDensityFromLookup from "../lib/foodDensityFromLookup.js";
@@ -463,6 +466,7 @@ declare const fullApi: ApiFromModules<{
   importCoordinator: typeof importCoordinator;
   importEventLookups: typeof importEventLookups;
   importHistory: typeof importHistory;
+  importPaymentChoices: typeof importPaymentChoices;
   importPaymentMatch: typeof importPaymentMatch;
   importPipeline: typeof importPipeline;
   importResolution: typeof importResolution;
@@ -548,6 +552,8 @@ declare const fullApi: ApiFromModules<{
   "lib/eventTimingOperations": typeof lib_eventTimingOperations;
   "lib/eventTimingPolicy": typeof lib_eventTimingPolicy;
   "lib/fdcNutrientMapper": typeof lib_fdcNutrientMapper;
+  "lib/feedbackClaudePoke": typeof lib_feedbackClaudePoke;
+  "lib/feedbackGithubSync": typeof lib_feedbackGithubSync;
   "lib/foodDatabaseClient": typeof lib_foodDatabaseClient;
   "lib/foodDatabaseImage": typeof lib_foodDatabaseImage;
   "lib/foodDensityFromLookup": typeof lib_foodDensityFromLookup;

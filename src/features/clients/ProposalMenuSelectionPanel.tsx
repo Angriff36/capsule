@@ -9,6 +9,8 @@ import {
 } from "../../lib/financeScopedQueries";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { ProposalMenuPriceOptions } from "./ProposalMenuPriceOptions";
+import { ProposalMenuPackageChecks } from "./ProposalMenuPackageChecks";
 
 interface ProposalMenuSelectionPanelProps {
   proposalId: string;
@@ -123,8 +125,10 @@ export function ProposalMenuSelectionPanel({
       (m) =>
         // "Fall Harvest Dinner (per guest)" from the event build,
         // "(per person)" from a website quote.
-        String(line.pricingBasis) === "per_person" &&
-        line.description.startsWith(`${m.name} (per `),
+        (String(line.pricingBasis) === "per_person" &&
+          line.description.startsWith(`${m.name} (per `)) ||
+        // A menu charged from its price table (src/lib/menuPricing.ts).
+        (String(line.pricingBasis) === "package" && line.menuId === m._id),
     );
     if (menu)
       for (const md of menuDishes ?? [])
@@ -272,6 +276,38 @@ export function ProposalMenuSelectionPanel({
             </button>
           ))}
         </div>
+      ) : null}
+
+      <ProposalMenuPackageChecks
+        proposalId={proposalId}
+        guestCount={guestCount}
+        menus={(menus ?? []).filter((menu) =>
+          pickedMenuIds.has(String(menu._id)),
+        )}
+        lines={priceLines}
+        picked={activeSelections.map((row) => ({
+          menuId: String(row.menuId),
+          dishId: String(row.dishId),
+          course:
+            row.course ??
+            (dishes ?? []).find((d) => d._id === row.dishId)?.course ??
+            null,
+        }))}
+        draft={draft}
+        busy={busy != null}
+        run={(key, work) => void run(key, work)}
+      />
+      {draft ? (
+        <ProposalMenuPriceOptions
+          proposalId={proposalId}
+          guestCount={guestCount}
+          menus={(menus ?? []).filter((menu) =>
+            pickedMenuIds.has(String(menu._id)),
+          )}
+          lines={priceLines}
+          busy={busy != null}
+          run={(key, work) => void run(key, work)}
+        />
       ) : null}
 
       {host}

@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useLocation } from "react-router-dom";
+import { registerStudioRenderer } from "../features/studio/StudioCatalog";
+import { StudioCatalogGate } from "../features/studio/StudioCatalogGate";
+import {
+  studioSlotKey,
+  studioSlotProps,
+  studioText,
+} from "../features/studio/StudioSlot";
 import { EmbeddedContext } from "./embedded";
 import { ChevronDownIcon } from "./icons";
 
@@ -29,6 +36,7 @@ export function MergedSection({
   defaultOpen?: boolean;
   children: ReactNode;
 }) {
+  const slotKey = studioSlotKey("merged", id);
   const ref = useRef<HTMLElement>(null);
   const { hash } = useLocation();
   const [open, setOpen] = useState(() => defaultOpen || hash === `#${id}`);
@@ -60,39 +68,53 @@ export function MergedSection({
   }, [hash, id]);
 
   return (
-    <section
-      ref={ref}
-      id={id}
-      aria-labelledby={`${id}-title`}
-      className="merged-section card scroll-mt-20"
-      data-open={open || undefined}
+    <StudioCatalogGate
+      kind="merged"
+      name="MergedSection"
+      slotKey={slotKey}
+      model={{ title: studioText(title), lead: studioText(summary) }}
     >
-      <h2 id={`${id}-title`} className="merged-section-head">
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls={`${id}-body`}
-          onClick={() => setOpen((value) => !value)}
-        >
-          <span className="merged-section-title">{title}</span>
-          {summary ? (
-            <span className="merged-section-summary">{summary}</span>
-          ) : null}
-          <ChevronDownIcon
-            width={18}
-            height={18}
-            aria-hidden="true"
-            className="merged-section-chevron"
-          />
-        </button>
-      </h2>
-      {open ? (
-        <div id={`${id}-body`} className="merged-section-body">
-          <EmbeddedContext.Provider value={true}>
-            {children}
-          </EmbeddedContext.Provider>
-        </div>
-      ) : null}
-    </section>
+      <section
+        ref={ref}
+        id={id}
+        aria-labelledby={`${id}-title`}
+        className="merged-section card scroll-mt-20"
+        data-open={open || undefined}
+        {...studioSlotProps("merged", "MergedSection", slotKey)}
+      >
+        <h2 id={`${id}-title`} className="merged-section-head">
+          <button
+            type="button"
+            aria-expanded={open}
+            aria-controls={`${id}-body`}
+            onClick={() => setOpen((value) => !value)}
+          >
+            <span className="merged-section-title">{title}</span>
+            {summary ? (
+              <span className="merged-section-summary">{summary}</span>
+            ) : null}
+            <ChevronDownIcon
+              width={18}
+              height={18}
+              aria-hidden="true"
+              className="merged-section-chevron"
+            />
+          </button>
+        </h2>
+        {open ? (
+          <div id={`${id}-body`} className="merged-section-body">
+            <EmbeddedContext.Provider value={true}>
+              {children}
+            </EmbeddedContext.Provider>
+          </div>
+        ) : null}
+      </section>
+    </StudioCatalogGate>
   );
 }
+
+registerStudioRenderer("MergedSection", (model) => (
+  <MergedSection id="studio-merged" title={model.title} summary={model.lead}>
+    {null}
+  </MergedSection>
+));

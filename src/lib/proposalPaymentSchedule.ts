@@ -20,16 +20,24 @@ const DAY_MS = 24 * 60 * 60_000;
 export function proposalPaymentSchedule(input: {
   total: number;
   depositPercent?: number | null;
+  /** A fixed retainer; set, it is the deposit (never above the total). */
+  depositAmount?: number | null;
   balanceDueDaysBefore?: number | null;
   eventDate?: number | null;
 }): ProposalPaymentSchedule | null {
   const percent = input.depositPercent;
+  const fixed = input.depositAmount;
   const days = input.balanceDueDaysBefore;
-  if (percent == null && days == null) return null;
-  const depositPercent = Math.min(100, Math.max(0, Number(percent ?? 0)));
+  if (percent == null && fixed == null && days == null) return null;
   const balanceDueDaysBefore = Math.max(0, Math.round(Number(days ?? 0)));
   const totalCents = Math.round(Number(input.total || 0) * 100);
-  const depositCents = Math.round((totalCents * depositPercent) / 100);
+  const fixedCents = Math.max(0, Math.round(Number(fixed ?? 0) * 100));
+  const depositPercent =
+    fixedCents > 0 ? 0 : Math.min(100, Math.max(0, Number(percent ?? 0)));
+  const depositCents =
+    fixedCents > 0
+      ? Math.min(fixedCents, totalCents)
+      : Math.round((totalCents * depositPercent) / 100);
   return {
     depositPercent,
     depositAmount: depositCents / 100,
@@ -74,9 +82,13 @@ export function paymentScheduleLines(
   formatDate: (at: number) => string,
 ): PaymentScheduleLine[] {
   const lines: PaymentScheduleLine[] = [];
-  if (schedule.depositPercent > 0) {
+  const hasDeposit = schedule.depositPercent > 0 || schedule.depositAmount > 0;
+  if (hasDeposit) {
     lines.push({
-      label: `Deposit (${schedule.depositPercent}%)`,
+      label:
+        schedule.depositPercent > 0
+          ? `Deposit (${schedule.depositPercent}%)`
+          : "Retainer",
       amount: schedule.depositAmount,
       due: "Due when you accept",
     });
@@ -87,7 +99,7 @@ export function paymentScheduleLines(
       ? "Due on the event day"
       : `Due ${days} day${days === 1 ? "" : "s"} before the event`;
   lines.push({
-    label: schedule.depositPercent > 0 ? "Balance" : "Full amount",
+    label: hasDeposit ? "Balance" : "Full amount",
     amount: schedule.balanceAmount,
     due:
       schedule.balanceDueAt != null

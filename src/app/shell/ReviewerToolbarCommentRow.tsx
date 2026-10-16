@@ -33,7 +33,10 @@ export function commentSendChip(input: {
   working: boolean;
   fail?: string;
   sent: boolean;
+  resolved: boolean;
 }): { status: string; color: string; label: string } | null {
+  if (input.resolved)
+    return { status: "completed", color: "chip-tone-ok", label: "Done" };
   if (input.addressing)
     return { status: "executing", color: "chip-tone-info", label: "Sending…" };
   if (input.fail)
@@ -74,6 +77,7 @@ export function ReviewerToolbarCommentRow(props: {
     working: props.working,
     fail: props.fail,
     sent: Boolean(row.issueUrl),
+    resolved: row.status === "resolved",
   });
   const addressLabel = props.addressing
     ? "Sending…"

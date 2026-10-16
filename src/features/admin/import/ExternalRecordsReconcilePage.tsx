@@ -5,25 +5,16 @@ import {
   useExternalRecordLinkResolveConflict,
   useExternalRecordLinkVerifyLink,
 } from "../../../lib/manifest-convex-react";
-import { useExternalRecordLinksFor } from "../../../lib/useExternalRecordLinkLists";
-import {
-  ErrorState,
-  PageHeader,
-  StatusChip,
-  TableSkeleton,
-} from "../../../ui/primitives";
+import { useImportQueue } from "../../../lib/useExternalRecordLinkLists";
+import { ErrorState, PageHeader, TableSkeleton } from "../../../ui/primitives";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionNotice, useActionFailure } from "../../../ui/action-result";
-import { ImportedPaymentMatch } from "./ImportedPaymentMatch";
+import { ImportQueueRow } from "./ImportQueueRow";
 import { OldInvoiceRebuild } from "./OldInvoiceRebuild";
 import { SameIdPaymentMatch } from "./SameIdPaymentMatch";
-import { ServiceStyleMatch } from "./ServiceStyleMatch";
 import { SourceChangeReview } from "./SourceChangeReview";
-import { referenceOnlyMoneyRows } from "./referenceOnlyRows";
 import { isDerivedSourceId } from "../../../../convex/lib/importIdentity";
 import { sourceSummary } from "../../../../convex/lib/importResolution";
-import { ResolveImportItem } from "./ResolveImportItem";
-import { LookAlikeNote } from "./LookAlikeNote";
 import {
   BulkActionPreview,
   type BulkAction,
@@ -41,52 +32,6 @@ const SOURCE_SYSTEM_LABELS: Record<string, string> = {
   other: "Other",
 };
 
-// Record type labels
-const RECORD_TYPE_LABELS: Record<string, string> = {
-  event_record: "Event",
-  contact: "Contact",
-  lead: "Lead",
-  menu: "Menu",
-  dish: "Dish",
-  venue: "Venue",
-  payment: "Payment",
-  invoice: "Invoice",
-  contract: "Contract",
-  proposal: "Proposal",
-  client: "Client",
-  vendor: "Vendor",
-  person: "Person",
-  task: "Task",
-  batch: "Batch",
-  order: "Order",
-  delivery: "Delivery",
-  stock: "Stock",
-  location: "Location",
-  pack_list: "Pack List",
-  service_style: "Service style",
-  client_communication: "Message or task",
-};
-
-// Conflict status labels
-const CONFLICT_STATUS_LABELS: Record<string, string> = {
-  resolved: "Resolved",
-  pending_conflict: "Conflict",
-  superseded: "Superseded",
-};
-
-/** The old-system row's name and details, under its id. */
-function SourceRowSummary({ raw }: Readonly<{ raw?: string | null }>) {
-  const { name, detail } = sourceSummary(raw);
-  return (
-    <>
-      {name ? <p className="mt-1 font-sans text-xs text-ink">{name}</p> : null}
-      {detail ? (
-        <p className="font-sans text-2xs text-ink-2">{detail}</p>
-      ) : null}
-    </>
-  );
-}
-
 export function ExternalRecordsReconcilePage() {
   const [selectedSourceSystem, setSelectedSourceSystem] = useState<
     string | null
@@ -97,28 +42,16 @@ export function ExternalRecordsReconcilePage() {
   const { error, setError } = useActionFailure();
   const { notice, setNotice } = useActionNotice();
 
-  // Query for all external records + Capsule payments (for the §6.4 match flow).
-  // Only the rows this page works with: the ones waiting for a person, and
-  // payments (the match flow and the reference-only count). The full list is
-  // too long for one read.
-  const allRecords = useExternalRecordLinksFor({
-    pending: true,
-    recordTypes: ["payment"],
+  // One page of rows still waiting. Show more reads the next page.
+  const queue = useImportQueue(selectedSourceSystem);
+  const waiting = useQuery(api.externalRecordLinkLists.waitingCount, {
+    sourceSystem: selectedSourceSystem ?? undefined,
   });
-  // Capsule payments and invoices feed only the payment match picker, so they
-  // are read only while an imported payment waits for a match.
-  const needsPayments = (allRecords ?? []).some(
-    (r) =>
-      r.conflictStatus === "pending_conflict" && r.capsuleEntity === "payment",
+  const reference = useQuery(
+    api.externalRecordLinkLists.referenceOnlyCount,
+    {},
   );
-  const payments = useQuery(
-    api.queries.listPayment,
-    needsPayments ? {} : "skip",
-  );
-  const invoices = useQuery(
-    api.queries.listInvoice,
-    needsPayments ? {} : "skip",
-  );
+  const allRecords = queue.results;
 
   // Commands for resolving records.
   const verifyLink = useExternalRecordLinkVerifyLink();
@@ -129,15 +62,11 @@ export function ExternalRecordsReconcilePage() {
   // verified=true, so Skip/Match results would never leave the queue. The only
   // non-terminal ConflictStatus is pending_conflict (resolved/superseded are
   // terminal), so that is the faithful "needs action" set.
-  const filteredRecords = useMemo(() => {
-    const records = (allRecords ?? []).filter(
-      (r) => r.conflictStatus === "pending_conflict",
-    );
-    if (selectedSourceSystem) {
-      return records.filter((r) => r.sourceSystem === selectedSourceSystem);
-    }
-    return records;
-  }, [allRecords, selectedSourceSystem]);
+  const filteredRecords = useMemo(
+    () =>
+      (allRecords ?? []).filter((r) => r.conflictStatus === "pending_conflict"),
+    [allRecords],
+  );
 
   // PL-SOURCE-RESOLUTION: the Capsule record each waiting item points at, by
   // name, shown beside the old-system row.
@@ -157,39 +86,17 @@ export function ExternalRecordsReconcilePage() {
     .map((r) => ({
       id: r._id,
       sourceId: isDerivedSourceId(r.externalId) ? "" : r.externalId,
-      sourceName: sourceSummary(r.rawSourceData).name,
+      sourceName:
+        r.sourceName ||
+        sourceSummary(
+          "rawSourceData" in r && typeof r.rawSourceData === "string"
+            ? r.rawSourceData
+            : null,
+        ).name,
       recordLabel: r.capsuleId ? (recordLabels?.[r._id] ?? r.capsuleId) : null,
     }));
 
-  const referenceOnly = useMemo(
-    () => referenceOnlyMoneyRows(allRecords ?? []),
-    [allRecords],
-  );
-
-  const candidatePayments = useMemo(
-    () => (payments ?? []).filter((p) => p.deletedAt == null),
-    [payments],
-  );
-  // A Capsule payment already matched by an imported row is not offered again.
-  const takenPaymentIds = useMemo(
-    () =>
-      new Set(
-        (allRecords ?? [])
-          .filter(
-            (r) =>
-              r.deletedAt == null &&
-              r.recordType === "payment" &&
-              r.capsuleEntity === "payment" &&
-              r.conflictStatus !== "superseded" &&
-              r.capsuleId,
-          )
-          .map((r) => String(r.capsuleId)),
-      ),
-    [allRecords],
-  );
-
-  const invoiceNumber = (id: string) =>
-    invoices?.find((row) => row._id === id)?.invoiceNumber || "Unknown invoice";
+  const referenceOnly = reference?.count ?? 0;
 
   // Toggle selection
   function toggleSelection(id: string) {
@@ -289,12 +196,18 @@ export function ExternalRecordsReconcilePage() {
           </>
         }
       />
-      {referenceOnly > 0 ? (
+      {referenceOnly > 0 || reference?.more ? (
         <p className="mt-2 max-w-160 text-sm text-ink-3">
-          {referenceOnly} old money{" "}
-          {referenceOnly === 1 ? "line is" : "lines are"} kept for the record
-          only (quotes, invoices, report totals, balances, credits, $0 lines and
-          the same money seen twice). They are not counted in any total.
+          {reference?.more
+            ? referenceOnly > 0
+              ? `${referenceOnly}+`
+              : "Some"
+            : referenceOnly}{" "}
+          old money{" "}
+          {referenceOnly === 1 && !reference?.more ? "line is" : "lines are"}{" "}
+          kept for the record only (quotes, invoices, report totals, balances,
+          credits, $0 lines and the same money seen twice). They are not counted
+          in any total.
         </p>
       ) : null}
 
@@ -353,9 +266,11 @@ export function ExternalRecordsReconcilePage() {
 
           <div className="ml-auto">
             <p className="text-xs text-ink-2">
-              {allRecords === undefined
+              {waiting === undefined
                 ? "Counting what is waiting…"
-                : `${filteredRecords.length} waiting to be matched`}
+                : waiting.more
+                  ? `${waiting.count}+ waiting to be matched`
+                  : `${waiting.count} waiting to be matched`}
             </p>
           </div>
         </div>
@@ -432,8 +347,7 @@ export function ExternalRecordsReconcilePage() {
               </tr>
             </thead>
             <tbody>
-              {allRecords === undefined ||
-              (needsPayments && payments === undefined) ? (
+              {queue.status === "LoadingFirstPage" ? (
                 <tr>
                   <td colSpan={9} className="py-4">
                     <TableSkeleton rows={4} />
@@ -442,123 +356,44 @@ export function ExternalRecordsReconcilePage() {
               ) : filteredRecords.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="text-center py-8 text-ink-2">
-                    Everything has been matched up. Great job!
+                    {queue.status === "CanLoadMore"
+                      ? "Nothing else on this page."
+                      : "Everything has been matched up. Great job!"}
                   </td>
                 </tr>
               ) : (
                 filteredRecords.map((record) => (
-                  <tr
+                  <ImportQueueRow
                     key={record._id}
-                    className="border-b border-line hover:bg-inset"
-                  >
-                    <td className="py-3 px-4">
-                      <input
-                        type="checkbox"
-                        checked={selectedIds.has(record._id)}
-                        onChange={() => toggleSelection(record._id)}
-                        className="w-4 h-4"
-                        aria-label={
-                          isDerivedSourceId(record.externalId)
-                            ? "Select this old-system item"
-                            : `Select old-system item ${record.externalId}`
-                        }
-                      />
-                    </td>
-                    <td className="py-3 px-4" data-label="Old system">
-                      {SOURCE_SYSTEM_LABELS[record.sourceSystem] ||
-                        record.sourceSystem}
-                    </td>
-                    <td className="py-3 px-4" data-label="Type">
-                      {RECORD_TYPE_LABELS[record.capsuleEntity] ||
-                        record.capsuleEntity}
-                    </td>
-                    <td
-                      className="py-3 px-4 font-mono text-2xs"
-                      data-label="ID in the old system"
-                    >
-                      {isDerivedSourceId(record.externalId)
-                        ? "None — known by its name and details"
-                        : record.externalId}
-                      {/* PL-SOURCE-RESOLUTION: the old row beside the result. */}
-                      <SourceRowSummary raw={record.rawSourceData} />
-                    </td>
-                    <td className="py-3 px-4" data-label="In Capsule as">
-                      {RECORD_TYPE_LABELS[record.capsuleEntity] ||
-                        record.capsuleEntity}
-                    </td>
-                    <td className="py-3 px-4 text-xs" data-label="In Capsule">
-                      {record.capsuleId ? (
-                        (recordLabels?.[record._id] ?? (
-                          <span className="font-mono text-2xs">
-                            {record.capsuleId}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-ink-3 italic">
-                          Not linked yet
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4" data-label="Status">
-                      {record.conflictStatus !== "resolved" ? (
-                        <StatusChip
-                          status={
-                            CONFLICT_STATUS_LABELS[record.conflictStatus] ||
-                            record.conflictStatus
-                          }
-                        />
-                      ) : (
-                        <span className="text-ink-2">—</span>
-                      )}
-                      {/* PL-SOURCE-IDENTITY: why this item waits (for example
-                          the same name as a client Capsule already has). */}
-                      {record.resolutionNote ? (
-                        <p className="mt-1 max-w-80 text-2xs text-ink-2">
-                          <LookAlikeNote
-                            note={record.resolutionNote}
-                            capsuleEntity={record.capsuleEntity}
-                          />
-                        </p>
-                      ) : null}
-                    </td>
-                    <td className="py-3 px-4 text-ink-2" data-label="Created">
-                      {record.createdAt
-                        ? new Date(record.createdAt).toLocaleDateString()
-                        : "—"}
-                    </td>
-                    <td className="py-3 px-4">
-                      {record.capsuleEntity === "payment" ? (
-                        <ImportedPaymentMatch
-                          link={record}
-                          payments={candidatePayments}
-                          takenPaymentIds={takenPaymentIds}
-                          invoiceLabel={invoiceNumber}
-                          disabled={busy}
-                          onDone={setNotice}
-                          onError={setError}
-                        />
-                      ) : record.capsuleEntity === "service_style" ? (
-                        <ServiceStyleMatch
-                          linkId={record._id}
-                          disabled={busy}
-                          onDone={setNotice}
-                          onError={setError}
-                        />
-                      ) : (
-                        <ResolveImportItem
-                          link={record}
-                          disabled={busy}
-                          onDone={setNotice}
-                          onError={setError}
-                        />
-                      )}
-                    </td>
-                  </tr>
+                    record={record}
+                    sourceLabel={
+                      SOURCE_SYSTEM_LABELS[record.sourceSystem] ||
+                      record.sourceSystem
+                    }
+                    selected={selectedIds.has(record._id)}
+                    recordLabel={recordLabels?.[record._id]}
+                    disabled={busy}
+                    onToggle={() => toggleSelection(record._id)}
+                    onDone={setNotice}
+                    onError={setError}
+                  />
                 ))
               )}
             </tbody>
           </table>
         </div>
+        {queue.status === "CanLoadMore" || queue.status === "LoadingMore" ? (
+          <div className="border-t border-line p-4">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              disabled={queue.status === "LoadingMore"}
+              onClick={() => queue.loadMore(50)}
+            >
+              {queue.status === "LoadingMore" ? "Loading…" : "Show more"}
+            </button>
+          </div>
+        ) : null}
       </div>
 
       <SourceChangeReview
@@ -568,62 +403,6 @@ export function ExternalRecordsReconcilePage() {
       />
 
       <OldInvoiceRebuild onDone={setNotice} onError={setError} />
-
-      {/* Help text */}
-      <div className="card mt-4">
-        <div className="border-b border-line px-3">
-          <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
-            How matching works
-          </h2>
-        </div>
-        <div className="p-4">
-          <h3 className="font-medium text-xs mb-2">Actions</h3>
-          <ul className="text-xs text-ink-2 space-y-1">
-            <li>
-              • <strong>Match</strong>: Link an imported payment to an existing
-              Capsule payment, then mark it resolved. A payment with the same id
-              is safe to match; a payment that only has the same amount is a
-              guess, so check it first. One payment is matched only once.
-            </li>
-            <li>
-              • <strong>Verify</strong>: Confirm a match is correct; the item is
-              marked done and leaves this list.
-            </li>
-            <li>
-              • <strong>Same name or email</strong>: An imported client or venue
-              that looks like one you already have is added on its own and waits
-              here. Verify it if it is a different one. If it is the same, merge
-              the two on the Clients page; the old names and old-system links
-              stay on the client you keep.
-            </li>
-            <li>
-              • <strong>Pick existing</strong>: Point the old row at a record
-              you already have. <strong>Add as new</strong> makes a new one of
-              the right kind from the old row. Later imports of the same row use
-              your choice.
-            </li>
-            <li>
-              • <strong>Skip</strong>: Mark as resolved with a note. Later
-              imports leave a skipped row out.
-            </li>
-          </ul>
-          <h3 className="font-medium text-xs mb-2 mt-4">Status Guide</h3>
-          <ul className="text-xs text-ink-2 space-y-1">
-            <li>
-              • Items marked <strong>Conflict</strong> need to be sorted out
-              before they leave this list.
-            </li>
-            <li>
-              • Filter by old system to focus on specific imports (TPP,
-              QuickBooks, etc.).
-            </li>
-            <li>
-              • Select multiple items to Verify or Skip them together; you see
-              every item it changes before it runs.
-            </li>
-          </ul>
-        </div>
-      </div>
     </div>
   );
 }

@@ -139,7 +139,7 @@ export function Sidebar() {
                   }
                 >
                   <area.icon width={17} height={17} />
-                  <span>{area.label}</span>
+                  <span data-copy>{area.label}</span>
                 </NavLink>
               ))}
             </Fragment>

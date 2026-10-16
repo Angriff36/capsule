@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { coursePickFor, coursePickText } from "../../lib/coursePicks";
 import { useQuery } from "convex/react";
 import { api, type Id } from "../../lib/api";
 import { dishPriceText, menuPriceText } from "./publicMenuText";
@@ -63,15 +64,23 @@ export function QuoteMenuChoice({
 
   if (!menus || menus.length === 0) return null;
   const menu = menus.find((m) => m.menuId === menuId);
-  // In a course where guests pick one dish, only the first starts ticked.
+  // In a course where guests pick one dish, only the first starts ticked;
+  // in a course where the client picks some ("Pick 2"), the first that many.
   const startsOn = (
     current: (typeof menus)[number],
     dish: (typeof menus)[number]["dishes"][number],
-  ) =>
-    !dish.course ||
-    !(current.pickOneCourses ?? []).includes(dish.course) ||
-    current.dishes.find((row) => row.course === dish.course)?.menuDishId ===
-      dish.menuDishId;
+  ) => {
+    if (!dish.course) return true;
+    const sameCourse = current.dishes.filter(
+      (row) => row.course === dish.course,
+    );
+    const at = sameCourse.findIndex(
+      (row) => row.menuDishId === dish.menuDishId,
+    );
+    const rule = coursePickFor(current.coursePicks ?? [], dish.course);
+    if (rule) return at < Math.max(rule.min, 1);
+    return !(current.pickOneCourses ?? []).includes(dish.course) || at === 0;
+  };
   const others = menus.filter(
     (m) => m.menuId !== menuId && m.notAvailableBecause.length === 0,
   );
@@ -208,6 +217,14 @@ export function QuoteMenuChoice({
           <p className="text-xs text-ink-3 mb-2">
             Untick what you don't want. Leave portions blank for one per guest.
           </p>
+          {(menu.coursePicks ?? []).length > 0 ? (
+            <p className="text-xs text-ink-3 mb-2">
+              {(menu.coursePicks ?? [])
+                .map((rule) => `${rule.course}: ${coursePickText(rule)}`)
+                .join(" · ")}
+              . The first ones are ticked; tick or untick to choose.
+            </p>
+          ) : null}
           {(menu.pickOneCourses ?? []).length > 0 ? (
             <p className="text-xs text-ink-3 mb-2">
               Guests pick one{" "}

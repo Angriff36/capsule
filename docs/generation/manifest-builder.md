@@ -192,6 +192,9 @@ If adopt dry-run refuses a path, read its classification (`identical` vs `baseli
 
 After recovery, commit `.builder/ownership.json` (and any new
 `.builder/baselines/*` blobs) together with regenerated files from `--apply`.
+Those blobs are **binary** in `.gitattributes` (and ignored by Cursor indexing
+in `.cursorignore`) so Source Control does not count a full `mutations.ts`
+copy as hundreds of thousands of line deletions. Do not mark them `text`.
 
 **Verify ledger matches disk** (optional spot-check):
 

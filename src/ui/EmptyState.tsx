@@ -1,4 +1,11 @@
 import type { ReactNode } from "react";
+import { registerStudioRenderer } from "../features/studio/StudioCatalog";
+import { StudioCatalogGate } from "../features/studio/StudioCatalogGate";
+import {
+  studioSlotKey,
+  studioSlotProps,
+  studioText,
+} from "../features/studio/StudioSlot";
 import { CheckIcon } from "./icons";
 
 /** One row of the "next steps" list under an empty state. */
@@ -10,6 +17,15 @@ export interface EmptyStateStep {
   action?: ReactNode;
 }
 
+type EmptyStateProps = {
+  title: string;
+  hint?: ReactNode;
+  /** Optional CTA(s) answering "so what do I do now?" — buttons or links. */
+  action?: ReactNode;
+  /** Numbered next steps, in order; done ones show a check. */
+  steps?: EmptyStateStep[];
+};
+
 /**
  * Empty state — variant B, "Next steps list" (owner pick in the component
  * picker, 2026-09-29). Left-aligned: a bold title line, the hint, then — when
@@ -17,21 +33,49 @@ export interface EmptyStateStep {
  * space. Pass `steps` only for steps the data actually shows; never invent
  * them.
  */
-export function EmptyState({
+export function EmptyState(props: EmptyStateProps) {
+  const slotKey = studioSlotKey("empty", props.title);
+  return (
+    <StudioCatalogGate
+      kind="empty"
+      name="EmptyState"
+      slotKey={slotKey}
+      model={{ title: props.title, lead: studioText(props.hint) }}
+      live={emptyStateLive(props)}
+    >
+      <EmptyStateView {...props} slotKey={slotKey} />
+    </StudioCatalogGate>
+  );
+}
+
+// A button, steps, or a hint that is more than words: the stand-in drops them.
+function emptyStateLive(
+  props: Pick<EmptyStateProps, "hint" | "action" | "steps">,
+) {
+  return (
+    props.action != null ||
+    (props.steps?.length ?? 0) > 0 ||
+    (props.hint != null && typeof props.hint !== "string")
+  );
+}
+
+function EmptyStateView({
   title,
   hint,
   action,
   steps,
-}: {
-  title: string;
-  hint?: ReactNode;
-  /** Optional CTA(s) answering "so what do I do now?" — buttons or links. */
-  action?: ReactNode;
-  /** Numbered next steps, in order; done ones show a check. */
-  steps?: EmptyStateStep[];
-}) {
+  slotKey = studioSlotKey("empty", title),
+}: EmptyStateProps & { slotKey?: string }) {
   return (
-    <div className="grid gap-3 px-4 py-6 text-left">
+    <div
+      className="grid gap-3 px-4 py-6 text-left"
+      {...studioSlotProps(
+        "empty",
+        "EmptyState",
+        slotKey,
+        emptyStateLive({ hint, action, steps }),
+      )}
+    >
       <div>
         <p className="text-xl leading-snug font-bold tracking-tight text-balance text-ink">
           {title}
@@ -75,3 +119,7 @@ export function EmptyState({
     </div>
   );
 }
+
+registerStudioRenderer("EmptyState", (model) => (
+  <EmptyStateView title={model.title} hint={model.lead} />
+));

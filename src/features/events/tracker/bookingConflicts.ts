@@ -3,10 +3,14 @@
  * a vehicle, a person or a piece of equipment is already in use by another
  * event, with rules the office sets, "so that you can book on the same day
  * but different times"). A warning never blocks; the office can book anyway.
+ * A double booking is the same thing in two places at the same time, never
+ * just the same day (owner, 2026-10-15, issue #447: "the 2nd event is 5 hours
+ * later than the first ... double booking is for trying to take the same
+ * vehicle or equipment to 2 places at the same time").
  */
 
 export type BookingResource = "vehicle" | "person" | "equipment";
-export type BookingWarnMode = "same_day" | "overlap" | "off";
+export type BookingWarnMode = "overlap" | "off";
 
 export interface BookingRuleValue {
   mode: BookingWarnMode;
@@ -15,12 +19,17 @@ export interface BookingRuleValue {
 
 export type BookingRules = Record<BookingResource, BookingRuleValue>;
 
-/** With no saved rule: warn when the same thing is booked the same day. */
+/** With no saved rule: warn when the same thing is booked at the same time. */
 export const DEFAULT_RULES: BookingRules = {
-  vehicle: { mode: "same_day", gapMinutes: 0 },
-  person: { mode: "same_day", gapMinutes: 0 },
-  equipment: { mode: "same_day", gapMinutes: 0 },
+  vehicle: { mode: "overlap", gapMinutes: 0 },
+  person: { mode: "overlap", gapMinutes: 0 },
+  equipment: { mode: "overlap", gapMinutes: 0 },
 };
+
+/** Saved rules from before #447 may say "same_day"; read them as "overlap". */
+export function warnModeOf(saved: string): BookingWarnMode {
+  return saved === "off" ? "off" : "overlap";
+}
 
 export const RESOURCE_LABEL: Record<BookingResource, string> = {
   vehicle: "Vehicles and trailers",
@@ -29,7 +38,6 @@ export const RESOURCE_LABEL: Record<BookingResource, string> = {
 };
 
 export const MODE_LABEL: Record<BookingWarnMode, string> = {
-  same_day: "Warn when booked the same day",
   overlap: "Warn only when the times overlap",
   off: "Do not warn",
 };
@@ -56,15 +64,6 @@ export interface BookingConflict {
   text: string;
 }
 
-function dayOf(time: number): number {
-  const date = new Date(time);
-  return new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate(),
-  ).getTime();
-}
-
 /** Do two bookings of the same thing clash under this rule? */
 export function clashes(
   a: Pick<Booking, "start" | "end">,
@@ -72,14 +71,6 @@ export function clashes(
   rule: BookingRuleValue,
 ): boolean {
   if (rule.mode === "off") return false;
-  if (rule.mode === "same_day") {
-    // Any calendar day both bookings touch.
-    const aFirst = dayOf(a.start);
-    const aLast = dayOf(Math.max(a.start, a.end - 1));
-    const bFirst = dayOf(b.start);
-    const bLast = dayOf(Math.max(b.start, b.end - 1));
-    return aFirst <= bLast && bFirst <= aLast;
-  }
   const gap = Math.max(0, rule.gapMinutes) * 60_000;
   return a.start < b.end + gap && b.start < a.end + gap;
 }

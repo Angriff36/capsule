@@ -19,6 +19,7 @@ import {
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { reportActionFail, reportActionOk } from "../../ui/action-result";
 import { ReviewerToolbarCommentRow } from "./ReviewerToolbarCommentRow";
+import { useFeedbackGithubSync } from "./useFeedbackGithubSync";
 
 /** Capsule roles that leave screen comments. */
 const REVIEWER_ROLES = new Set(["owner", "admin", "system"]);
@@ -180,12 +181,13 @@ function FeedbackLayer() {
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [scope, setScope] = useState<"page" | "all">("page");
-  const [showResolved, setShowResolved] = useState(false);
+  const [showResolved, setShowResolved] = useState(true);
   const [focusId, setFocusId] = useState<string | null>(null);
   const [addressingId, setAddressingId] = useState<string | null>(null);
   const [workingIds, setWorkingIds] = useState<Record<string, true>>({});
   const [failById, setFailById] = useState<Record<string, string>>({});
   const textRef = useRef<HTMLTextAreaElement>(null);
+  useFeedbackGithubSync(open);
 
   const path = location.pathname;
   const live = useMemo(
@@ -585,7 +587,9 @@ function FeedbackLayer() {
                     number={number}
                     offScreen={offScreen}
                     addressing={addressingId === row._id}
-                    working={workingIds[row._id] === true}
+                    working={
+                      row.status === "open" && workingIds[row._id] === true
+                    }
                     fail={failById[row._id]}
                     onShow={() => show(row)}
                     onAddress={() => void sendToClaude(row._id)}

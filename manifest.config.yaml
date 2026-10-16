@@ -176,6 +176,10 @@ projections:
           # Payments settled in a month (finance overview).
           - fields: [tenantId, settledAt]
             name: by_tenantId_and_settledAt
+          # The payment picker looks up the same amount. It does not read
+          # every payment the company has.
+          - fields: [tenantId, amount]
+            name: by_tenantId_and_amount
         ExternalRecordLink:
           - fields: [tenantId, capsuleId]
             name: by_tenantId_and_capsuleId
@@ -188,6 +192,16 @@ projections:
             name: by_tenantId_and_capsuleEntity
           - fields: [tenantId, conflictStatus]
             name: by_tenantId_and_conflictStatus
+          # The matching list filtered to one old system, a full page at a time.
+          - fields: [tenantId, conflictStatus, sourceSystem]
+            name: by_conflict_and_source
+          # Old money kept only for the record: resolved, and no Capsule payment.
+          - fields: [tenantId, recordType, conflictStatus, capsuleId]
+            name: by_record_status_capsule
+          # Imported events still waiting. The count stops at 500.
+          - fields:
+              [tenantId, capsuleEntity, sourceSystem, conflictStatus, verified]
+            name: by_waiting_event
         # Ingredient totals per event: every contribution reaction sums one
         # ingredient's rows in one event. Reading the whole event 13 times per
         # contribution passed Convex's 16 MB read limit on a 15-dish BEO

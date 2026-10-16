@@ -1,0 +1,113 @@
+// Capsule admin — catalog piece swaps made in the live app (Edit app).
+//
+// Ryan 2026-10-15: pick another shipped Storybook catalog piece for a spot on
+// any screen, without AI or code. Staff see the swap; only admins may change it.
+
+use "../foundation/base.manifest"
+
+entity ScreenLayoutOverride mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, pagePattern, slotKey]
+  timestamps
+  versionProperty version: number
+
+  property indexed required pagePattern: string = ""
+  property indexed required slotKey: string = ""
+  property required pieceName: string = ""
+  property sourcePieceName: string?
+  property slotKind: string?
+  property targetSelector: string?
+  property targetLabel: string?
+  property setAt: datetime?
+
+  constraint screenLayoutPagePattern: length(trim(self.pagePattern)) > 0 "Pick a screen first."
+  constraint screenLayoutSlotKey: length(trim(self.slotKey)) > 0 "Pick the block to change."
+  constraint screenLayoutComponent: length(trim(self.pieceName)) > 0 "Pick a catalog piece."
+
+  default policy screenLayoutRead read: roleAllows(user.role, "staffAccess") "Staff may see app layout"
+  default policy screenLayoutWrite write: roleAllows(user.role, "adminAccess") "Admins may swap catalog pieces"
+  default policy screenLayoutExecute execute: roleAllows(user.role, "adminAccess") "Admins may swap catalog pieces"
+
+  command set(
+    pagePattern: string,
+    slotKey: string,
+    pieceName: string,
+    optional sourcePieceName: string,
+    optional slotKind: string,
+    optional targetSelector: string,
+    optional targetLabel: string
+  ) {
+    guard self.setAt == null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    constraint setLayoutPage: length(trim(pagePattern)) > 0 "Pick a screen first."
+    constraint setLayoutSlot: length(trim(slotKey)) > 0 "Pick the block to change."
+    constraint setLayoutComponent: length(trim(pieceName)) > 0 "Pick a catalog piece."
+    mutate setAt = now()
+    mutate pagePattern = trim(pagePattern)
+    mutate slotKey = trim(slotKey)
+    mutate pieceName = trim(pieceName)
+    mutate sourcePieceName = sourcePieceName
+    mutate slotKind = slotKind
+    mutate targetSelector = targetSelector
+    mutate targetLabel = targetLabel
+    emit ScreenLayoutOverrideSet {
+      screenLayoutOverrideId: self.id
+      tenantId: self.tenantId
+      pagePattern: pagePattern
+    }
+  }
+
+  command change(
+    pagePattern: string,
+    slotKey: string,
+    pieceName: string,
+    optional sourcePieceName: string,
+    optional slotKind: string,
+    optional targetSelector: string,
+    optional targetLabel: string
+  ) {
+    guard self.setAt != null
+    guard roleAllows(user.role, "adminAccess")
+    constraint changeLayoutPage: length(trim(pagePattern)) > 0 "Pick a screen first."
+    constraint changeLayoutSlot: length(trim(slotKey)) > 0 "Pick the block to change."
+    constraint changeLayoutComponent: length(trim(pieceName)) > 0 "Pick a catalog piece."
+    mutate deletedAt = null
+    mutate pagePattern = trim(pagePattern)
+    mutate slotKey = trim(slotKey)
+    mutate pieceName = trim(pieceName)
+    mutate sourcePieceName = sourcePieceName
+    mutate slotKind = slotKind
+    mutate targetSelector = targetSelector
+    mutate targetLabel = targetLabel
+    emit ScreenLayoutOverrideSet {
+      screenLayoutOverrideId: self.id
+      tenantId: self.tenantId
+      pagePattern: pagePattern
+    }
+  }
+
+  command revert() {
+    guard self.setAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    mutate deletedAt = now()
+    emit ScreenLayoutOverrideReverted {
+      screenLayoutOverrideId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store ScreenLayoutOverride in durable
+}
+
+event ScreenLayoutOverrideSet: "screen_layout.override.set" {
+  screenLayoutOverrideId: string
+  tenantId: string
+  pagePattern: string
+}
+
+event ScreenLayoutOverrideReverted: "screen_layout.override.reverted" {
+  screenLayoutOverrideId: string
+  tenantId: string
+}

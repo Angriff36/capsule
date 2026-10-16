@@ -15,6 +15,7 @@ import {
   type AuthStatusSnapshot,
   workspaceMembershipPolicy,
 } from "./auth/WorkspaceMembershipPolicy";
+import { StudioProvider } from "../features/studio/StudioContext";
 import { GateShell } from "./GateShell";
 import { MembershipRequired } from "./MembershipRequired";
 
@@ -79,10 +80,10 @@ export function ClaimGate({ children }: { readonly children?: ReactNode }) {
     // The backend has confirmed workspace membership and role. A staff profile
     // is needed for personal workflows, not for entering an empty organization.
     return (
-      <>
+      <StudioProvider>
         <BackgroundProfileSetup key={`${user?.id}:${status.tenantId}`} />
         {children}
-      </>
+      </StudioProvider>
     );
   }
   const stored = status as StoredAuthStatus;
@@ -95,10 +96,12 @@ export function ClaimGate({ children }: { readonly children?: ReactNode }) {
         readOnly,
       }}
     >
-      {readOnly && snapshot ? (
-        <OfflineReadOnlyBanner capturedAt={snapshot.capturedAt} />
-      ) : null}
-      {children}
+      <StudioProvider>
+        {readOnly && snapshot ? (
+          <OfflineReadOnlyBanner capturedAt={snapshot.capturedAt} />
+        ) : null}
+        {children}
+      </StudioProvider>
     </OfflineAuthProvider>
   );
 }

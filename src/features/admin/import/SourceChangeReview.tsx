@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { useAction } from "convex/react";
-import { api } from "../../../lib/api";
+import { useAction, useQuery } from "convex/react";
+import { api, type Id } from "../../../lib/api";
 import { useImportConflictSettle } from "../../../lib/manifest-convex-react";
 import { usePendingImportConflicts } from "../../../lib/workforceHistoryQueries";
 import {
@@ -9,7 +9,6 @@ import {
   describeValue,
   fieldLabel,
   fieldWritable,
-  parseValues,
   readStoredValue,
 } from "../../../../convex/lib/importSourceFields";
 
@@ -17,28 +16,8 @@ type Link = {
   _id: string;
   recordType: string;
   externalId: string;
-  rawSourceData?: string | null;
+  sourceName?: string | null;
 };
-
-function recordName(link: Link | undefined): string {
-  if (!link) return "Unknown record";
-  const kept = parseValues(link.rawSourceData) ?? {};
-  if (typeof kept.name === "string") return kept.name;
-  if (typeof kept.title === "string") return kept.title;
-  const company = kept.company;
-  if (
-    company &&
-    typeof company === "object" &&
-    !Array.isArray(company) &&
-    typeof company.name === "string"
-  ) {
-    return company.name;
-  }
-  const person = [kept.givenName, kept.familyName]
-    .filter((part) => typeof part === "string" && part)
-    .join(" ");
-  return person || link.externalId;
-}
 
 /**
  * PL-SOURCE-DELTA (AC-273): a repeat import found a field changed both in the
@@ -68,6 +47,18 @@ export function SourceChangeReview({
   const waiting = (conflicts ?? []).filter(
     (row) => row.status === "pending" && row.deletedAt == null,
   );
+  const named = useQuery(
+    api.externalRecordLinkLists.sourceNames,
+    waiting.length > 0
+      ? {
+          linkIds: waiting
+            .slice(0, 50)
+            .map(
+              (row) => row.externalRecordLinkId as Id<"externalRecordLinks">,
+            ),
+        }
+      : "skip",
+  );
   if (waiting.length === 0) return null;
 
   async function run(id: string, work: () => Promise<unknown>, done: string) {
@@ -96,8 +87,10 @@ export function SourceChangeReview({
       <ul className="divide-y divide-line">
         {waiting.map((row) => {
           const link = linkById.get(String(row.externalRecordLinkId));
-          const dataset = link
-            ? DATASET_BY_RECORD_TYPE[link.recordType]
+          const namedRow = named?.[String(row.externalRecordLinkId)];
+          const recordType = link?.recordType ?? namedRow?.recordType;
+          const dataset = recordType
+            ? DATASET_BY_RECORD_TYPE[recordType]
             : undefined;
           const map = dataset ? SOURCE_FIELD_MAPS[dataset] : undefined;
           const label = map ? fieldLabel(map, row.field) : row.field;
@@ -111,7 +104,11 @@ export function SourceChangeReview({
               className="px-4 py-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm"
             >
               <span className="font-medium">
-                {recordName(link)} · {label}
+                {namedRow?.name ||
+                  link?.sourceName ||
+                  link?.externalId ||
+                  "Unknown record"}{" "}
+                · {label}
               </span>
               <span>
                 <span className="text-ink-3">In Capsule now: </span>

@@ -16,6 +16,8 @@ import {
 } from "../../lib/pricing";
 import { useCatalogDishes } from "./useCatalogDishes";
 import { ProposalTravelFee } from "./ProposalTravelFee";
+import { ProposalCateringMinimum } from "./ProposalCateringMinimum";
+import { ProposalTastingFee } from "./ProposalTastingFee";
 import { ProposalDiscount } from "./ProposalDiscount";
 
 interface ProposalPricingPanelProps {
@@ -25,6 +27,8 @@ interface ProposalPricingPanelProps {
   discountAmount: number;
   /** A percent discount, when the discount is set as one. */
   discountPercent?: number | null;
+  /** The event day, for the company's catering minimum. */
+  eventDate?: number | null;
   /** When true (proposal is a draft), surface Edit/Remove/Add so the persisted
    * lines can be revised through the generated commands + the recompute seam
    * (reviseLine/removeLine were previously dead). */
@@ -80,6 +84,7 @@ export function ProposalPricingPanel({
   taxAmount,
   discountAmount,
   discountPercent = null,
+  eventDate = null,
   editable = false,
   onFailure,
 }: ProposalPricingPanelProps) {
@@ -533,6 +538,17 @@ export function ProposalPricingPanel({
       {editable ? (
         <>
           <ProposalTravelFee proposalId={proposalId} onFailure={onFailure} />
+          <ProposalCateringMinimum
+            proposalId={proposalId}
+            guestCount={guestCount}
+            eventDate={eventDate}
+            onFailure={onFailure}
+          />
+          <ProposalTastingFee
+            proposalId={proposalId}
+            guestCount={guestCount}
+            onFailure={onFailure}
+          />
           <ProposalDiscount
             key={`${discountAmount}:${discountPercent ?? ""}`}
             proposalId={proposalId}

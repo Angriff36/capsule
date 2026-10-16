@@ -113,10 +113,18 @@ export const getProposalTravelFee = query({
       : null;
     if (!fee) return null;
     const line = await activeTravelLine(ctx, proposal._id);
+    // One-way drive time, for the company's far-away minimum by hours.
+    const route = eventId
+      ? await readEventRouteStatus(ctx, auth.tenantId, eventId, Date.now())
+      : null;
+    const outbound = route?.legs.find((leg) => leg.leg === "outbound");
+    const seconds =
+      outbound?.fact?.status === "ok" ? outbound.fact.durationSeconds : null;
     return {
       fee,
       lineAmount: line ? Number(line.unitPrice) : null,
       editable: proposal.status === "draft",
+      driveMinutes: seconds != null ? Math.round(seconds / 60) : null,
     };
   },
 });

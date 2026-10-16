@@ -16,12 +16,22 @@
 //   - servings follow onto the dish's own line; removing a pick removes only
 //     the dish's own line. A per-guest menu line stays: it is the menu's price,
 //     and one dish less does not make the rest free.
+//   - a menu sold by picks (price choices that follow the picks) keeps its
+//     per-guest line in step with the picks on every add and remove: back to
+//     the menu's own price when no choice applies, gone with the last pick.
+//     A choice staff set by hand is left alone.
 
 import { mutation } from "../_generated/server";
 import { api } from "../_generated/api";
 import { v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import { effectiveSellingPrice } from "../../src/lib/catalogEligibility";
+import {
+  choiceForPicks,
+  perGuestLineDescription,
+  readMenuPricingOptions,
+} from "../../src/lib/menuPricing";
+import { readCoursePicks } from "../../src/lib/coursePicks";
 import { getAuthContext } from "./authContext";
 
 async function activeLines(
@@ -76,6 +86,113 @@ async function ownLine(
   return undefined;
 }
 
+// A menu sold as a package the client builds by picking (price choices or
+// per-course pick rules, src/lib/menuPricing.ts and src/lib/coursePicks.ts):
+// its per-guest line comes with the first pick, and its price follows the
+// choice the picks call for ("your highest entrée tier sets one price").
+// Course pick rules alone only say how many dishes a course takes: a menu whose
+// dishes carry their own prices stays priced dish by dish.
+async function isPickedPackage(
+  ctx: { db: any },
+  menu: Doc<"menus">,
+): Promise<boolean> {
+  if (readMenuPricingOptions(menu).choices.length > 0) return true;
+  if (readCoursePicks(menu).length === 0) return false;
+  const now = Date.now();
+  return !(await catalogLines(ctx, menu._id)).some(
+    (row) => (effectiveSellingPrice(row, now) ?? 0) > 0,
+  );
+}
+
+async function syncPackageLine(
+  ctx: any,
+  proposalId: Id<"proposals">,
+  menu: Doc<"menus">,
+  addIfMissing: boolean,
+): Promise<void> {
+  const options = readMenuPricingOptions(menu);
+  const selections = (
+    await ctx.db
+      .query("proposalDishSelections")
+      .withIndex("by_proposalId", (q: any) => q.eq("proposalId", proposalId))
+      .collect()
+  ).filter(
+    (row: any) =>
+      row.deletedAt == null &&
+      row.selectedAt != null &&
+      String(row.menuId) === String(menu._id),
+  );
+  const picked = [];
+  for (const row of selections) {
+    const dish = await ctx.db.get(row.dishId);
+    picked.push({
+      dishId: String(row.dishId),
+      course: (row.course ?? dish?.course ?? null) as string | null,
+    });
+  }
+  const choice = choiceForPicks(options, picked);
+  const price = choice?.pricePerPerson ?? Number(menu.pricePerPerson);
+  const description = perGuestLineDescription(menu.name, choice?.label ?? "");
+  const lines = await activeLines(ctx, proposalId);
+  // The menu's per-guest line: linked to it, or named after it (a line built
+  // from the event or a website quote carries no menu link).
+  const line = lines.find(
+    (row) =>
+      String(row.pricingBasis) === "per_person" &&
+      (row.menuId == null || String(row.menuId) === String(menu._id)) &&
+      row.description.startsWith(`${menu.name} (per `),
+  );
+  if (line) {
+    // A line the picks set: the menu's own price, or a choice that follows the
+    // picks, at that price. Anything else (a choice only staff pick, or a price
+    // typed by hand) is staff's and stays.
+    const auto = [
+      { label: "", pricePerPerson: Number(menu.pricePerPerson) },
+      ...options.choices.filter(
+        (row) => (row.dishIds?.length ?? 0) > 0 || row.picks != null,
+      ),
+    ].some(
+      (row) =>
+        line.description === perGuestLineDescription(menu.name, row.label) &&
+        Number(line.unitPrice) === row.pricePerPerson,
+    );
+    if (!auto) return;
+    // No pick left, or nothing sets a price: the line came with the picks.
+    if (picked.length === 0 || !(price > 0)) {
+      await ctx.runMutation(
+        api.lib.proposalPricing.removeProposalLineAndRecompute,
+        { docId: line._id, version: Number(line.version) },
+      );
+      return;
+    }
+    if (Number(line.unitPrice) === price && line.description === description)
+      return;
+    await ctx.runMutation(api.lib.proposalPricing.reviseProposalLineAndRecompute, {
+      docId: line._id,
+      version: Number(line.version),
+      description,
+      pricingBasis: "per_person",
+      unitPrice: price,
+      quantity: Number(line.quantity),
+      unit: line.unit ?? undefined,
+      sortOrder: line.sortOrder ?? undefined,
+      notes: line.notes ?? undefined,
+    });
+    return;
+  }
+  if (!addIfMissing || !(price > 0) || picked.length === 0) return;
+  await ctx.runMutation(api.lib.proposalPricing.addProposalLineAndRecompute, {
+    proposalId,
+    description,
+    pricingBasis: "per_person",
+    unitPrice: price,
+    sortOrder:
+      lines.reduce((max, row) => Math.max(max, Number(row.sortOrder) || 0), -1) +
+      1,
+    menuId: menu._id,
+  });
+}
+
 async function proposalOf(ctx: any, proposalId: Id<"proposals">) {
   const auth = await getAuthContext(ctx);
   const proposal = await ctx.db.get(proposalId);
@@ -119,6 +236,10 @@ export const pickProposalDish = mutation({
     const menu = await ctx.db.get(menuDish.menuId);
     const dish = await ctx.db.get(menuDish.dishId);
     if (!menu || !dish) return;
+    if (await isPickedPackage(ctx, menu)) {
+      await syncPackageLine(ctx, args.proposalId, menu, true);
+      return;
+    }
     const lines = await activeLines(ctx, args.proposalId);
     // Covered already: its own line, the menu's per-guest line, or a custom
     // line named after the dish.
@@ -255,6 +376,11 @@ export const removeProposalDish = mutation({
     });
     const proposal = await ctx.db.get(selection.proposalId);
     if (!proposal || proposal.status !== "draft") return;
+    const menu = await ctx.db.get(selection.menuId);
+    if (menu && (await isPickedPackage(ctx, menu))) {
+      await syncPackageLine(ctx, selection.proposalId, menu, false);
+      return;
+    }
     const line = await ownLine(
       ctx,
       await activeLines(ctx, selection.proposalId),

@@ -8,13 +8,38 @@
  * (2026-10-02). Each read here returns only the rows its screen works with.
  * Access is the same as the generated read: importAccess.
  */
+import { paginationOptsValidator } from "convex/server";
 import { v } from "convex/values";
 import type { Doc } from "./_generated/dataModel";
 import { query, type QueryCtx } from "./_generated/server";
 import { getAuthContext } from "./lib/authContext";
+import { sourceSummary } from "./lib/importResolution";
 import { canRead } from "./search";
 
+/** How many rows a list screen asks for at a time. */
+export const LIST_PAGE = 50;
+/** Stop counting once the exact number stops mattering. */
+const COUNT_CAP = 500;
+
 type Link = Doc<"externalRecordLinks">;
+
+const SOURCE_SYSTEMS = new Set<Link["sourceSystem"]>([
+  "tpp_legacy",
+  "csv_export",
+  "api_sync",
+  "quickbooks_online",
+  "google_calendar",
+  "stripe",
+  "nowsta",
+  "other",
+]);
+
+function sourceOf(value: string | undefined): Link["sourceSystem"] | null {
+  if (!value) return null;
+  return SOURCE_SYSTEMS.has(value as Link["sourceSystem"])
+    ? (value as Link["sourceSystem"])
+    : null;
+}
 
 async function tenantOf(ctx: QueryCtx): Promise<string | null> {
   const auth = await getAuthContext(ctx);
@@ -81,10 +106,240 @@ export const listFor = query({
   },
 });
 
+function parsedRaw(raw: string | null | undefined): Record<string, unknown> {
+  try {
+    const value: unknown = JSON.parse(raw ?? "{}");
+    return value && typeof value === "object"
+      ? (value as Record<string, unknown>)
+      : {};
+  } catch {
+    return {};
+  }
+}
+
+function num(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function text(value: unknown): string | null {
+  return typeof value === "string" && value.trim() ? value.trim() : null;
+}
+
+/** Columns the match list shows. The old spreadsheet text stays on the server. */
+function queueRow(row: Link) {
+  const summary = sourceSummary(row.rawSourceData);
+  return {
+    _id: row._id,
+    sourceSystem: row.sourceSystem,
+    recordType: row.recordType,
+    externalId: row.externalId,
+    capsuleEntity: row.capsuleEntity,
+    capsuleId: row.capsuleId,
+    conflictStatus: row.conflictStatus,
+    resolutionNote: row.resolutionNote ?? null,
+    createdAt: row.createdAt ?? null,
+    deletedAt: row.deletedAt ?? null,
+    verified: row.verified,
+    sourceName: summary.name,
+    sourceDetail: summary.detail,
+  };
+}
+
+function pendingIndex(
+  ctx: QueryCtx,
+  tenantId: string,
+  source: Link["sourceSystem"] | null,
+) {
+  if (source) {
+    return ctx.db
+      .query("externalRecordLinks")
+      .withIndex("by_conflict_and_source", (q) =>
+        q
+          .eq("tenantId", tenantId)
+          .eq("conflictStatus", "pending_conflict")
+          .eq("sourceSystem", source),
+      );
+  }
+  return ctx.db
+    .query("externalRecordLinks")
+    .withIndex("by_tenantId_and_conflictStatus", (q) =>
+      q.eq("tenantId", tenantId).eq("conflictStatus", "pending_conflict"),
+    );
+}
+
 /**
- * The parallel-run menu check: how many TPP menu links there are, how many
- * point at no live Capsule dish, and which dishes are linked. Counted here so
- * the screen does not need every menu link (5,513 on 2026-10-02).
+ * One page of imported rows still waiting. A source-system choice is part of
+ * the lookup, so the page is a full page of that system.
+ */
+export const queuePage = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+    sourceSystem: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const tenantId = await tenantOf(ctx);
+    if (tenantId == null) {
+      return { page: [], isDone: true, continueCursor: "" };
+    }
+    const result = await pendingIndex(
+      ctx,
+      tenantId,
+      sourceOf(args.sourceSystem),
+    ).paginate(args.paginationOpts);
+    return {
+      page: result.page.filter((row) => row.deletedAt == null).map(queueRow),
+      isDone: result.isDone,
+      continueCursor: result.continueCursor,
+    };
+  },
+});
+
+/** How many rows are still waiting, stopping at 500. */
+export const waitingCount = query({
+  args: { sourceSystem: v.optional(v.string()) },
+  handler: async (ctx, args) => {
+    const tenantId = await tenantOf(ctx);
+    if (tenantId == null) return { count: 0, more: false };
+    let count = 0;
+    for await (const row of pendingIndex(
+      ctx,
+      tenantId,
+      sourceOf(args.sourceSystem),
+    )) {
+      if (row.deletedAt != null) continue;
+      count += 1;
+      if (count > COUNT_CAP) return { count: COUNT_CAP, more: true };
+    }
+    return { count, more: false };
+  },
+});
+
+/**
+ * Payment links for the money check, one page at a time, without the
+ * spreadsheet text. The amounts the check needs are copied onto the row.
+ */
+export const paymentMoneyPage = query({
+  args: { paginationOpts: paginationOptsValidator },
+  handler: async (ctx, args) => {
+    const tenantId = await tenantOf(ctx);
+    if (tenantId == null) {
+      return { page: [], isDone: true, continueCursor: "" };
+    }
+    const result = await ctx.db
+      .query("externalRecordLinks")
+      .withIndex("by_tenantId_and_recordType", (q) =>
+        q.eq("tenantId", tenantId).eq("recordType", "payment"),
+      )
+      .paginate(args.paginationOpts);
+    return {
+      page: result.page
+        .filter((row) => row.deletedAt == null)
+        .map((row) => {
+          const facts = parsedRaw(row.rawSourceData);
+          return {
+            _id: row._id,
+            _creationTime: row._creationTime,
+            createdAt: row.createdAt ?? null,
+            recordType: row.recordType,
+            externalId: row.externalId,
+            capsuleId: row.capsuleId,
+            conflictStatus: row.conflictStatus,
+            resolutionNote: row.resolutionNote ?? null,
+            deletedAt: null,
+            recordedAt: num(facts.recordedAt),
+            amount: num(facts.amount),
+            currency: text(facts.currency) ?? text(facts.currencyCode),
+            rowClass: text(facts.rowClass),
+            movesMoney: facts.movesMoney === true,
+          };
+        }),
+      isDone: result.isDone,
+      continueCursor: result.continueCursor,
+    };
+  },
+});
+
+/** Old money kept only for the record. Stops at 500. */
+export const referenceOnlyCount = query({
+  args: {},
+  handler: async (ctx) => {
+    const tenantId = await tenantOf(ctx);
+    if (tenantId == null) return { count: 0, more: false };
+    let count = 0;
+    for await (const row of ctx.db
+      .query("externalRecordLinks")
+      .withIndex("by_record_status_capsule", (q) =>
+        q
+          .eq("tenantId", tenantId)
+          .eq("recordType", "payment")
+          .eq("conflictStatus", "resolved")
+          .eq("capsuleId", ""),
+      )) {
+      if (row.deletedAt != null) continue;
+      if (parsedRaw(row.rawSourceData).rowClass === undefined) continue;
+      count += 1;
+      if (count > COUNT_CAP) return { count: COUNT_CAP, more: true };
+    }
+    return { count, more: false };
+  },
+});
+
+/**
+ * The first 50 imported events still to match, plus a count that stops at 500.
+ * The parallel-run page shows that page. It does not load every event link.
+ */
+export const unresolvedEvents = query({
+  args: {},
+  handler: async (ctx) => {
+    const tenantId = await tenantOf(ctx);
+    if (tenantId == null) return { rows: [], count: 0, more: false };
+    const rows: ReturnType<typeof queueRow>[] = [];
+    let count = 0;
+    for await (const row of ctx.db
+      .query("externalRecordLinks")
+      .withIndex("by_waiting_event", (q) =>
+        q
+          .eq("tenantId", tenantId)
+          .eq("capsuleEntity", "event_record")
+          .eq("sourceSystem", "tpp_legacy")
+          .eq("conflictStatus", "pending_conflict")
+          .eq("verified", false),
+      )) {
+      if (row.deletedAt != null) continue;
+      count += 1;
+      if (rows.length < LIST_PAGE) rows.push(queueRow(row));
+      if (count > COUNT_CAP) return { rows, count: COUNT_CAP, more: true };
+    }
+    return { rows, count, more: false };
+  },
+});
+
+/**
+ * Names for the change-review list. One read per row on that list. The
+ * spreadsheet text stays on the server; only the name comes back.
+ */
+export const sourceNames = query({
+  args: { linkIds: v.array(v.id("externalRecordLinks")) },
+  handler: async (ctx, args) => {
+    const tenantId = await tenantOf(ctx);
+    const names: Record<string, { name: string; recordType: string }> = {};
+    if (tenantId == null) return names;
+    for (const id of args.linkIds.slice(0, LIST_PAGE)) {
+      const row = await ctx.db.get(id);
+      if (!row || row.tenantId !== tenantId || row.deletedAt != null) continue;
+      const summary = sourceSummary(row.rawSourceData);
+      names[id] = {
+        name: summary.name || row.externalId,
+        recordType: row.recordType,
+      };
+    }
+    return names;
+  },
+});
+
+/**
+ * The parallel-run menu check, counted on the server. The screen gets the
+ * numbers only, not the dish catalog and not the menu links.
  */
 export const menuLinkStats = query({
   args: {},
@@ -96,24 +351,27 @@ export const menuLinkStats = query({
       .query("dishes")
       .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId)))
       if (dish.deletedAt == null) dishIds.add(String(dish._id));
-    const menuLinks = (await ofRecordType(ctx, tenantId, "menu")).filter(
-      (link) =>
-        link.sourceSystem === "tpp_legacy" &&
-        link.conflictStatus !== "superseded",
-    );
-    const linkedDishIds = [
-      ...new Set(
-        menuLinks
-          .map((link) => String(link.capsuleId ?? ""))
-          .filter((id) => id !== ""),
-      ),
-    ];
+    let tppTotal = 0;
+    let unresolvedLinks = 0;
+    const linked = new Set<string>();
+    for await (const link of ctx.db
+      .query("externalRecordLinks")
+      .withIndex("by_tenantId_and_recordType", (q) =>
+        q.eq("tenantId", tenantId).eq("recordType", "menu"),
+      )) {
+      if (link.deletedAt != null) continue;
+      if (link.sourceSystem !== "tpp_legacy") continue;
+      if (link.conflictStatus === "superseded") continue;
+      tppTotal += 1;
+      const id = String(link.capsuleId ?? "");
+      if (!id || !dishIds.has(id)) unresolvedLinks += 1;
+      else linked.add(id);
+    }
     return {
-      tppTotal: menuLinks.length,
-      unresolvedLinks: menuLinks.filter(
-        (link) => !link.capsuleId || !dishIds.has(String(link.capsuleId)),
-      ).length,
-      linkedDishIds,
+      tppTotal,
+      unresolvedLinks,
+      capsuleTotal: dishIds.size,
+      dishesWithoutLink: dishIds.size - linked.size,
     };
   },
 });

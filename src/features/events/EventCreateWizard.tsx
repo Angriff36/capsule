@@ -1,7 +1,7 @@
 import { useClientSearch, useClientsByIds } from "../../lib/useClientDirectory";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { formatMoney } from "../../lib/format";
+import { formatMoney, formatMoneyExact } from "../../lib/format";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import { addLocalDateTimeHours } from "../../ui/naturalDate";
 import { SearchSelect } from "../../ui/SearchSelect";
@@ -44,6 +44,8 @@ import {
   WizardDishLineFields,
   WizardMenuPrice,
 } from "./EventWizardMenuEditor";
+import { WizardPackageEditor } from "./EventWizardPackageEditor";
+import { cateringPackages } from "../../data/cateringPackages";
 
 const DRAFT_KEY = "capsule.event-create-wizard.active";
 /** An explicitly saved draft survives closing the tab; the active key is per tab. */
@@ -875,6 +877,7 @@ function DishStep({
           No dishes selected. Choose Skip for now to mark this incomplete.
         </p>
       )}
+      <WizardPackageEditor draft={draft} update={update} />
       <WizardMenuPrice draft={draft} locked={locked} update={update} />
     </div>
   );
@@ -1099,8 +1102,22 @@ function ReviewStep({
                       } (${eventWizardDishServings(dish, draft)} servings)`,
                   )
                   .join(", ")
-              : "Incomplete: no dishes"}
+              : draft.cateringPackage?.packageId
+                ? "No single dishes"
+                : "Incomplete: no dishes"}
           </p>
+          {draft.cateringPackage?.packageId ? (
+            <p className="text-sm text-ink-2">
+              Package:{" "}
+              {cateringPackages.find(
+                (entry) => entry.id === draft.cateringPackage?.packageId,
+              )?.name ?? draft.cateringPackage.packageId}{" "}
+              · {draft.cateringPackage.selections.length} dishes
+              {Number(draft.cateringPackage.pricePerGuest) > 0
+                ? ` · ${formatMoneyExact(Number(draft.cateringPackage.pricePerGuest))} per guest`
+                : ""}
+            </p>
+          ) : null}
         </div>
         <div>
           <button

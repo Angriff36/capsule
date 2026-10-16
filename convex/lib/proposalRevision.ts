@@ -434,6 +434,7 @@ export async function buildProposalRevisionSnapshot(
     paymentSchedule: proposalPaymentSchedule({
       total: proposal.total,
       depositPercent: proposal.depositPercent,
+      depositAmount: proposal.depositAmount,
       balanceDueDaysBefore: proposal.balanceDueDaysBefore,
       eventDate: proposal.eventDate,
     }),

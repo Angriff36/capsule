@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "../../ui/DropdownMenu";
 import { formatStatusLabel } from "../../lib/statusLabels";
+import { StudioMastheadSlot } from "../studio/StudioMastheadSlot";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { SegmentedTabs } from "../../ui/SegmentedTabs";
 import { SavedViewsBar } from "../views/SavedViewsBar";
@@ -395,7 +396,7 @@ export function EventsListPage() {
   return (
     <div className="pb-10">
       <div className="flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
-        <div>
+        <StudioMastheadSlot title="Events">
           <h1 className="display-title text-ink">Events</h1>
           <div className="fact-row mt-3">
             <span className="fact">
@@ -415,7 +416,7 @@ export function EventsListPage() {
               {formatCount(totalCovers)}
             </span>
           </div>
-        </div>
+        </StudioMastheadSlot>
         <div className="flex flex-wrap items-center gap-3">
           <button
             type="button"

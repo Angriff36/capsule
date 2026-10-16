@@ -242,6 +242,7 @@ describe("plain words on leftover import manifests", () => {
     const files = [
       "src/features/admin/import/ParallelRunDashboardPage.tsx",
       "src/features/admin/import/ExternalRecordsReconcilePage.tsx",
+      "src/app/guide/pageGuides.ts",
     ];
     // strip // comments and JSX {/* */} comments so developer notes are not
     // treated as user copy; also join JSX text splits ({" "}) and line wraps
@@ -302,9 +303,7 @@ describe("plain words on leftover import manifests", () => {
     );
     expectPlain(matchNote);
 
-    expect(visible).toContain(
-      'formatCountNoun(unresolvedMappings.length, "item")',
-    );
+    expect(visible).toContain('formatCountNoun(leftoverCount, "item")');
     expect(visible).not.toContain(
       'formatCountNoun(unresolvedMappings.length, "record")',
     );

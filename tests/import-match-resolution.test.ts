@@ -46,11 +46,15 @@ const contactLink = {
 };
 
 function setUp() {
-  // The page reads only the rows it works with (pending and payments).
-  backend.values.set("externalRecordLinkLists:listFor", [
+  // The page reads one page of rows still waiting.
+  backend.values.set("externalRecordLinkLists:queuePage", [
     venueLink,
     contactLink,
   ]);
+  backend.values.set("externalRecordLinkLists:waitingCount", {
+    count: 2,
+    more: false,
+  });
   backend.values.set("importResolution:itemRecordLabels", {
     "link-venue": "Grand Hall at Main",
   });

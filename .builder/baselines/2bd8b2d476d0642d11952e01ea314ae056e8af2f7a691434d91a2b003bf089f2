@@ -2654,6 +2654,8 @@ export const MenuSchema = z.object({
   availableUntil: z.coerce.date().nullable().optional(),
   guestsPerServer: z.number().int().nullable().optional(),
   pickOneCourses: z.array(z.string()).optional().default([]),
+  pricingOptionsJson: z.string().nullable().optional(),
+  coursePicksJson: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2892,6 +2894,7 @@ export const OrganizationSchema = z.object({
   travelFeeMinimum: z.number().nullable().optional(),
   travelFeeRoundTrip: z.boolean().nullable().optional(),
   travelFeeZonesJson: z.string().nullable().optional(),
+  pricingRulesJson: z.string().nullable().optional(),
   timingFullServiceSetupMinutes: z.number().int().nullable().optional(),
   timingLimitedServiceSetupMinutes: z.number().int().nullable().optional(),
   timingBriefingMinutes: z.number().int().nullable().optional(),
@@ -3704,6 +3707,7 @@ export const ProposalSchema = z.object({
   notes: z.string().nullable().optional(),
   terms: z.string().nullable().optional(),
   depositPercent: z.number().int().nullable().optional(),
+  depositAmount: z.number().nullable().optional(),
   balanceDueDaysBefore: z.number().int().nullable().optional(),
   visibleSections: z.array(z.string()).nullable().optional(),
   sectionOrder: z.array(z.string()).nullable().optional(),
@@ -4238,6 +4242,43 @@ export const ScorecardTargetSchema = z.object({
 });
 
 export type ScorecardTarget = z.infer<typeof ScorecardTargetSchema>;
+
+// Entity: ScreenCopyOverride
+export const ScreenCopyOverrideSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  pagePattern: z.string().default(""),
+  copyKey: z.string().default(""),
+  originalText: z.string().default(""),
+  text: z.string().default(""),
+  targetSelector: z.string().nullable().optional(),
+  targetLabel: z.string().nullable().optional(),
+  setAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ScreenCopyOverride = z.infer<typeof ScreenCopyOverrideSchema>;
+
+// Entity: ScreenLayoutOverride
+export const ScreenLayoutOverrideSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  pagePattern: z.string().default(""),
+  slotKey: z.string().default(""),
+  pieceName: z.string().default(""),
+  sourcePieceName: z.string().nullable().optional(),
+  slotKind: z.string().nullable().optional(),
+  targetSelector: z.string().nullable().optional(),
+  targetLabel: z.string().nullable().optional(),
+  setAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ScreenLayoutOverride = z.infer<typeof ScreenLayoutOverrideSchema>;
 
 // Entity: ServiceStyle
 export const ServiceStyleSchema = z.object({
@@ -10091,6 +10132,20 @@ export const MenuReviseDetailsParamsSchema = z.object({
 
 export type MenuReviseDetailsParams = z.infer<typeof MenuReviseDetailsParamsSchema>;
 
+// Command: setCoursePicks on Menu
+export const MenuSetCoursePicksParamsSchema = z.object({
+  picksJson: z.string().optional(),
+});
+
+export type MenuSetCoursePicksParams = z.infer<typeof MenuSetCoursePicksParamsSchema>;
+
+// Command: setPricingOptions on Menu
+export const MenuSetPricingOptionsParamsSchema = z.object({
+  optionsJson: z.string().optional(),
+});
+
+export type MenuSetPricingOptionsParams = z.infer<typeof MenuSetPricingOptionsParamsSchema>;
+
 // Command: setSeason on Menu
 export const MenuSetSeasonParamsSchema = z.object({
   availableFrom: z.coerce.date().optional(),
@@ -10452,6 +10507,13 @@ export const OrganizationConfigurePlanningChecksParamsSchema = z.object({
 });
 
 export type OrganizationConfigurePlanningChecksParams = z.infer<typeof OrganizationConfigurePlanningChecksParamsSchema>;
+
+// Command: configurePricingRules on Organization
+export const OrganizationConfigurePricingRulesParamsSchema = z.object({
+  rulesJson: z.string().optional(),
+});
+
+export type OrganizationConfigurePricingRulesParams = z.infer<typeof OrganizationConfigurePricingRulesParamsSchema>;
 
 // Command: configureRoutePolicy on Organization
 export const OrganizationConfigureRoutePolicyParamsSchema = z.object({
@@ -11896,6 +11958,7 @@ export const ProposalDraftParamsSchema = z.object({
   sectionOrder: z.array(z.string()).optional(),
   depositPercent: z.number().optional(),
   balanceDueDaysBefore: z.number().optional(),
+  depositAmount: z.number().optional(),
 });
 
 export type ProposalDraftParams = z.infer<typeof ProposalDraftParamsSchema>;
@@ -11996,6 +12059,7 @@ export type ProposalSetDiscountParams = z.infer<typeof ProposalSetDiscountParams
 export const ProposalSetPaymentScheduleParamsSchema = z.object({
   depositPercent: z.number().optional(),
   balanceDueDaysBefore: z.number().optional(),
+  depositAmount: z.number().optional(),
 });
 
 export type ProposalSetPaymentScheduleParams = z.infer<typeof ProposalSetPaymentScheduleParamsSchema>;
@@ -12766,6 +12830,66 @@ export const ScorecardTargetSetParamsSchema = z.object({
 });
 
 export type ScorecardTargetSetParams = z.infer<typeof ScorecardTargetSetParamsSchema>;
+
+// Command: change on ScreenCopyOverride
+export const ScreenCopyOverrideChangeParamsSchema = z.object({
+  pagePattern: z.string(),
+  copyKey: z.string(),
+  originalText: z.string(),
+  text: z.string(),
+  targetSelector: z.string().optional(),
+  targetLabel: z.string().optional(),
+});
+
+export type ScreenCopyOverrideChangeParams = z.infer<typeof ScreenCopyOverrideChangeParamsSchema>;
+
+// Command: revert on ScreenCopyOverride
+export const ScreenCopyOverrideRevertParamsSchema = z.object({});
+
+export type ScreenCopyOverrideRevertParams = z.infer<typeof ScreenCopyOverrideRevertParamsSchema>;
+
+// Command: set on ScreenCopyOverride
+export const ScreenCopyOverrideSetParamsSchema = z.object({
+  pagePattern: z.string(),
+  copyKey: z.string(),
+  originalText: z.string(),
+  text: z.string(),
+  targetSelector: z.string().optional(),
+  targetLabel: z.string().optional(),
+});
+
+export type ScreenCopyOverrideSetParams = z.infer<typeof ScreenCopyOverrideSetParamsSchema>;
+
+// Command: change on ScreenLayoutOverride
+export const ScreenLayoutOverrideChangeParamsSchema = z.object({
+  pagePattern: z.string(),
+  slotKey: z.string(),
+  pieceName: z.string(),
+  sourcePieceName: z.string().optional(),
+  slotKind: z.string().optional(),
+  targetSelector: z.string().optional(),
+  targetLabel: z.string().optional(),
+});
+
+export type ScreenLayoutOverrideChangeParams = z.infer<typeof ScreenLayoutOverrideChangeParamsSchema>;
+
+// Command: revert on ScreenLayoutOverride
+export const ScreenLayoutOverrideRevertParamsSchema = z.object({});
+
+export type ScreenLayoutOverrideRevertParams = z.infer<typeof ScreenLayoutOverrideRevertParamsSchema>;
+
+// Command: set on ScreenLayoutOverride
+export const ScreenLayoutOverrideSetParamsSchema = z.object({
+  pagePattern: z.string(),
+  slotKey: z.string(),
+  pieceName: z.string(),
+  sourcePieceName: z.string().optional(),
+  slotKind: z.string().optional(),
+  targetSelector: z.string().optional(),
+  targetLabel: z.string().optional(),
+});
+
+export type ScreenLayoutOverrideSetParams = z.infer<typeof ScreenLayoutOverrideSetParamsSchema>;
 
 // Command: activate on ServiceStyle
 export const ServiceStyleActivateParamsSchema = z.object({});

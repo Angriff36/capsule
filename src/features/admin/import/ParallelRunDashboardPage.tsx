@@ -9,11 +9,7 @@ import { FinanceReconciliationPage } from "../../finance/FinanceReconciliationPa
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "@/lib/api";
-import { useWholeDishList } from "../../../lib/useDishesByIds";
-import {
-  useExternalRecordLinksFor,
-  useMenuLinkStats,
-} from "../../../lib/useExternalRecordLinkLists";
+import { useMenuLinkStats } from "../../../lib/useExternalRecordLinkLists";
 import { formatCountNoun, formatDateTime } from "../../../lib/format";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { PageHeader, StatusChip, TableSkeleton } from "../../../ui/primitives";
@@ -128,7 +124,6 @@ export function ParallelRunDashboardPage() {
     from: windowEnd - COMPARISON_WINDOW_MS,
     to: windowEnd + 1,
   });
-  const capsuleDishes = useWholeDishList();
   // Runs of the comparison window only. A run gets its start time when it
   // is created, so its creation time is inside the window too.
   const importRuns = useQuery(api.adminWindow.importRunsSince, {
@@ -137,9 +132,7 @@ export function ParallelRunDashboardPage() {
   // The full link list is too long for one read: the menu check is counted
   // on the server, and only links to imported events are listed.
   const menuStats = useMenuLinkStats();
-  const externalLinks = useExternalRecordLinksFor({
-    capsuleEntities: ["event_record"],
-  });
+  const unresolved = useQuery(api.externalRecordLinkLists.unresolvedEvents, {});
   const overview = useQuery(api.parallelRun.overview, {});
   const compareNow = useMutation(api.parallelRun.compareNow);
   const [comparing, setComparing] = useState(false);
@@ -198,17 +191,12 @@ export function ParallelRunDashboardPage() {
     const menuRuns = completedImportRuns.filter(
       (run) => run.datasetType === "menus",
     );
-    // Active TPP→Capsule menu links are the imported catalog, counted on the
-    // server (menuLinkStats): a link is resolved only when its dish exists.
-    // capsuleDishes === null means the read was denied, NOT an empty catalog.
-    const dishesKnown = capsuleDishes !== null;
-    const linkedDishIds = new Set(menuStats?.linkedDishIds ?? []);
+    // Counted on the server. null means the read was denied, not an empty catalog.
+    const dishesKnown = menuStats != null;
     const tppTotal = menuStats?.tppTotal ?? 0;
     const unresolvedLinks = menuStats?.unresolvedLinks ?? 0;
-    const capsuleTotal = capsuleDishes?.length ?? 0;
-    const dishesWithoutLink = capsuleDishes
-      ? capsuleDishes.filter((dish) => !linkedDishIds.has(dish._id)).length
-      : 0;
+    const capsuleTotal = menuStats?.capsuleTotal ?? 0;
+    const dishesWithoutLink = menuStats?.dishesWithoutLink ?? 0;
     const matched = tppTotal - unresolvedLinks;
     const diff = capsuleTotal - tppTotal;
     const diffPercent = tppTotal > 0 ? (diff / tppTotal) * 100 : 0;
@@ -231,7 +219,7 @@ export function ParallelRunDashboardPage() {
             : ("warning" as const),
       runCount: menuRuns.length,
     };
-  }, [completedImportRuns, capsuleDishes, menuStats]);
+  }, [completedImportRuns, menuStats]);
 
   // Both sides from the newest daily comparison (same rows as the list of
   // differences below).
@@ -323,17 +311,11 @@ export function ParallelRunDashboardPage() {
     [summary],
   );
 
-  // Unresolved mappings (ExternalRecordLinks with verified=false)
-  const unresolvedMappings = useMemo(() => {
-    if (!externalLinks) return [];
-    return externalLinks.filter(
-      (link) =>
-        !link.verified &&
-        link.capsuleEntity === "event_record" &&
-        link.sourceSystem === "tpp_legacy" &&
-        link.conflictStatus !== "resolved",
-    );
-  }, [externalLinks]);
+  const unresolvedMappings = unresolved?.rows ?? [];
+  const leftoverCount = unresolved?.count ?? unresolvedMappings.length;
+  const leftoverLabel = unresolved?.more
+    ? `${leftoverCount}+`
+    : String(leftoverCount);
 
   // Recently created/changed events
   const recentChanges = useMemo(() => {
@@ -348,9 +330,8 @@ export function ParallelRunDashboardPage() {
 
   const loading =
     capsuleEvents === undefined ||
-    capsuleDishes === undefined ||
     importRuns === undefined ||
-    externalLinks === undefined ||
+    unresolved === undefined ||
     menuStats === undefined ||
     overview === undefined;
 
@@ -451,10 +432,10 @@ export function ParallelRunDashboardPage() {
                   unresolvedMappings.length === 0 ? "text-ok" : "text-warn"
                 }`}
               >
-                {unresolvedMappings.length}
+                {leftoverLabel}
               </p>
               <p className="text-2xs text-ink-3">
-                {unresolvedMappings.length === 0
+                {leftoverCount === 0 && !unresolved?.more
                   ? "All verified"
                   : "Need resolution"}
               </p>
@@ -913,7 +894,11 @@ export function ParallelRunDashboardPage() {
                   Imported items that still need to be checked or matched up.
                 </p>
               </div>
-              <span>{formatCountNoun(unresolvedMappings.length, "item")}</span>
+              <span>
+                {unresolved?.more
+                  ? `${leftoverCount}+ items`
+                  : formatCountNoun(leftoverCount, "item")}
+              </span>
             </div>
             <div className="supply-table-wrap">
               <table className="supply-table">
@@ -935,7 +920,7 @@ export function ParallelRunDashboardPage() {
                       </td>
                     </tr>
                   ) : (
-                    unresolvedMappings.slice(0, 50).map((link) => (
+                    unresolvedMappings.map((link) => (
                       <tr key={link._id}>
                         <td>
                           {SOURCE_SYSTEM_LABELS[link.sourceSystem] ??
@@ -981,11 +966,12 @@ export function ParallelRunDashboardPage() {
                 </tbody>
               </table>
             </div>
-            {unresolvedMappings.length > 50 && (
+            {unresolved?.more || leftoverCount > unresolvedMappings.length ? (
               <p className="mt-3 text-xs text-center text-ink-3">
-                Showing 50 of {unresolvedMappings.length} leftover items
+                Showing {unresolvedMappings.length} of {leftoverLabel} leftover
+                items
               </p>
-            )}
+            ) : null}
           </section>
 
           {/* Import Runs Reference */}

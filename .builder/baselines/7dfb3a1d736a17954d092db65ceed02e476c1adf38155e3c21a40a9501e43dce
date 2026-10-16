@@ -676,9 +676,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // Proposal has multiple initialization commands (draft, followEventClient, recordPriceObjection); using the selected initialization command: draft.
   // Proposal → api.mutations.Proposal_createViaDraft
   rowsAttempted += 1;
-  await client.mutation(api.mutations.Proposal_createViaDraft, { "clientId": "clientId-proposal-1", "eventId": "eventId-proposal-1", "proposalNumber": "demo-proposalNumber-1", "title": "Proposal 1", "eventDate": 1767268800000, "eventEndDate": 1767268800000, "eventType": "demo-eventType-1", "guestCount": 1, "venueName": "Proposal 1", "venueAddress": "demo-venueAddress-1", "subtotal": 1, "taxAmount": 1, "discountAmount": 1, "total": 1, "expiresAt": 1767268800000, "notes": "demo-notes-1", "terms": "demo-terms-1", "depositPercent": 1, "balanceDueDaysBefore": 1, "visibleSections": "demo-visibleSections-1", "sectionOrder": "demo-sectionOrder-1", "replacesProposalId": "replacesProposalId-proposal-1" } as any);
+  await client.mutation(api.mutations.Proposal_createViaDraft, { "clientId": "clientId-proposal-1", "eventId": "eventId-proposal-1", "proposalNumber": "demo-proposalNumber-1", "title": "Proposal 1", "eventDate": 1767268800000, "eventEndDate": 1767268800000, "eventType": "demo-eventType-1", "guestCount": 1, "venueName": "Proposal 1", "venueAddress": "demo-venueAddress-1", "subtotal": 1, "taxAmount": 1, "discountAmount": 1, "total": 1, "expiresAt": 1767268800000, "notes": "demo-notes-1", "terms": "demo-terms-1", "depositPercent": 1, "depositAmount": 1, "balanceDueDaysBefore": 1, "visibleSections": "demo-visibleSections-1", "sectionOrder": "demo-sectionOrder-1", "replacesProposalId": "replacesProposalId-proposal-1" } as any);
   rowsAttempted += 1;
-  await client.mutation(api.mutations.Proposal_createViaDraft, { "clientId": "clientId-proposal-2", "eventId": "eventId-proposal-2", "proposalNumber": "demo-proposalNumber-2", "title": "Proposal 2", "eventDate": 1767355200000, "eventEndDate": 1767355200000, "eventType": "demo-eventType-2", "guestCount": 2, "venueName": "Proposal 2", "venueAddress": "demo-venueAddress-2", "subtotal": 2, "taxAmount": 2, "discountAmount": 2, "total": 2, "expiresAt": 1767355200000, "notes": "demo-notes-2", "terms": "demo-terms-2", "depositPercent": 2, "balanceDueDaysBefore": 2, "visibleSections": "demo-visibleSections-2", "sectionOrder": "demo-sectionOrder-2", "replacesProposalId": "replacesProposalId-proposal-2" } as any);
+  await client.mutation(api.mutations.Proposal_createViaDraft, { "clientId": "clientId-proposal-2", "eventId": "eventId-proposal-2", "proposalNumber": "demo-proposalNumber-2", "title": "Proposal 2", "eventDate": 1767355200000, "eventEndDate": 1767355200000, "eventType": "demo-eventType-2", "guestCount": 2, "venueName": "Proposal 2", "venueAddress": "demo-venueAddress-2", "subtotal": 2, "taxAmount": 2, "discountAmount": 2, "total": 2, "expiresAt": 1767355200000, "notes": "demo-notes-2", "terms": "demo-terms-2", "depositPercent": 2, "depositAmount": 2, "balanceDueDaysBefore": 2, "visibleSections": "demo-visibleSections-2", "sectionOrder": "demo-sectionOrder-2", "replacesProposalId": "replacesProposalId-proposal-2" } as any);
   // ProposalDishSelection has multiple initialization commands (remove, select); using the selected initialization command: select.
   // ProposalDishSelection → api.mutations.ProposalDishSelection_createViaSelect
   rowsAttempted += 1;
@@ -784,6 +784,18 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.ScorecardTarget_createViaSet, { "metricKey": "demo-metricKey-1", "target": 1, "direction": "demo-direction-1", "ownerPersonId": "ownerPersonId-scorecard-target-1", "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.ScorecardTarget_createViaSet, { "metricKey": "demo-metricKey-2", "target": 2, "direction": "demo-direction-2", "ownerPersonId": "ownerPersonId-scorecard-target-2", "notes": "demo-notes-2" } as any);
+  // ScreenCopyOverride has multiple initialization commands (revert, set); using the selected initialization command: set.
+  // ScreenCopyOverride → api.mutations.ScreenCopyOverride_createViaSet
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ScreenCopyOverride_createViaSet, { "pagePattern": "demo-pagePattern-1", "copyKey": "demo-copyKey-1", "originalText": "demo-originalText-1", "text": "demo-text-1", "targetSelector": "demo-targetSelector-1", "targetLabel": "demo-targetLabel-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ScreenCopyOverride_createViaSet, { "pagePattern": "demo-pagePattern-2", "copyKey": "demo-copyKey-2", "originalText": "demo-originalText-2", "text": "demo-text-2", "targetSelector": "demo-targetSelector-2", "targetLabel": "demo-targetLabel-2" } as any);
+  // ScreenLayoutOverride has multiple initialization commands (revert, set); using the selected initialization command: set.
+  // ScreenLayoutOverride → api.mutations.ScreenLayoutOverride_createViaSet
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ScreenLayoutOverride_createViaSet, { "pagePattern": "demo-pagePattern-1", "slotKey": "demo-slotKey-1", "pieceName": "ScreenLayoutOverride 1", "sourcePieceName": "ScreenLayoutOverride 1", "slotKind": "demo-slotKind-1", "targetSelector": "demo-targetSelector-1", "targetLabel": "demo-targetLabel-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ScreenLayoutOverride_createViaSet, { "pagePattern": "demo-pagePattern-2", "slotKey": "demo-slotKey-2", "pieceName": "ScreenLayoutOverride 2", "sourcePieceName": "ScreenLayoutOverride 2", "slotKind": "demo-slotKind-2", "targetSelector": "demo-targetSelector-2", "targetLabel": "demo-targetLabel-2" } as any);
   // ServiceStyle → api.mutations.ServiceStyle_createViaRegister
   rowsAttempted += 1;
   await client.mutation(api.mutations.ServiceStyle_createViaRegister, { "name": "ServiceStyle 1", "code": "demo-code-1", "sortOrder": 1, "description": "demo-description-1" } as any);
@@ -1850,6 +1862,16 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "ScorecardTarget",
       "createMutation": "ScorecardTarget_createViaSet",
+      "rowCount": 2
+    },
+    {
+      "entity": "ScreenCopyOverride",
+      "createMutation": "ScreenCopyOverride_createViaSet",
+      "rowCount": 2
+    },
+    {
+      "entity": "ScreenLayoutOverride",
+      "createMutation": "ScreenLayoutOverride_createViaSet",
       "rowCount": 2
     },
     {

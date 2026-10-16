@@ -12,10 +12,11 @@ import {
   type BookingRules,
   type BookingRuleValue,
   type BookingWarnMode,
+  warnModeOf,
 } from "./bookingConflicts";
 
 const RESOURCES: BookingResource[] = ["vehicle", "person", "equipment"];
-const MODES: BookingWarnMode[] = ["same_day", "overlap", "off"];
+const MODES: BookingWarnMode[] = ["overlap", "off"];
 
 /** The company's booking rules, with the defaults where none is saved. */
 export function useBookingRules() {
@@ -31,7 +32,7 @@ export function useBookingRules() {
     const next = { ...DEFAULT_RULES };
     for (const row of live)
       next[row.resource as BookingResource] = {
-        mode: row.mode as BookingWarnMode,
+        mode: warnModeOf(row.mode),
         gapMinutes: row.gapMinutes,
       };
     return next;

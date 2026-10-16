@@ -77,6 +77,9 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   // freezes them into the revision, and the accepted deposit seeds the
   // event's draft invoice (Invoice.setDeposit). No money moves here.
   property depositPercent: int?
+  // A fixed retainer in place of a percent ("a $1,000 retainer locks your
+  // date"); set = the deposit is this amount (never above the total).
+  property depositAmount: money(12, 2)?
   property balanceDueDaysBefore: int?
   property visibleSections: list<string>?
   // PL-PROPOSAL-DRAFT (AC-259/AC-096): section order copied from the template.
@@ -159,7 +162,8 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     optional replacesProposalId: uuid,
     optional sectionOrder: list<string>,
     optional depositPercent: number,
-    optional balanceDueDaysBefore: number
+    optional balanceDueDaysBefore: number,
+    optional depositAmount: money(12, 2)
   ) {
     guard self.draftedAt == null
     guard self.status == "draft"
@@ -172,6 +176,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     constraint draftTotalMatch: total == subtotal + taxAmount - discountAmount "Proposal total must equal subtotal plus tax minus discount"
     constraint draftDepositPercent: depositPercent == null or (depositPercent >= 0 and depositPercent <= 100) "The deposit is a share of the total, from 0 to 100 percent."
     constraint draftBalanceDays: balanceDueDaysBefore == null or balanceDueDaysBefore >= 0 "The balance can't be due after the event. Use zero or more days before it."
+    constraint draftDepositAmount: depositAmount == null or depositAmount >= 0 "The retainer can't be negative. Use zero or more."
     mutate clientId = clientId
     mutate title = title
     mutate proposalNumber = proposalNumber
@@ -191,6 +196,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     mutate visibleSections = visibleSections
     mutate sectionOrder = sectionOrder
     mutate depositPercent = depositPercent
+    mutate depositAmount = depositAmount
     mutate balanceDueDaysBefore = balanceDueDaysBefore
     mutate eventId = eventId
     mutate replacesProposalId = replacesProposalId
@@ -336,14 +342,17 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   // Leaving both out removes the schedule.
   command setPaymentSchedule(
     optional depositPercent: number,
-    optional balanceDueDaysBefore: number
+    optional balanceDueDaysBefore: number,
+    optional depositAmount: money(12, 2)
   ) {
     guard self.status == "draft"
     guard self.draftedAt != null
     guard self.deletedAt == null
     constraint scheduleDepositPercent: depositPercent == null or (depositPercent >= 0 and depositPercent <= 100) "The deposit is a share of the total, from 0 to 100 percent."
     constraint scheduleBalanceDays: balanceDueDaysBefore == null or balanceDueDaysBefore >= 0 "The balance can't be due after the event. Use zero or more days before it."
+    constraint scheduleDepositAmount: depositAmount == null or depositAmount >= 0 "The retainer can't be negative. Use zero or more."
     mutate depositPercent = depositPercent
+    mutate depositAmount = depositAmount
     mutate balanceDueDaysBefore = balanceDueDaysBefore
     emit ProposalPaymentScheduleSet {
       proposalId: self.id

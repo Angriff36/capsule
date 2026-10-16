@@ -41,5 +41,9 @@ manifest-context-summary.json text eol=lf
 PRESET.md text eol=lf
 tsconfig.builder.json text eol=lf
 .builder/** text eol=lf
+# Full copies of generated files (mutations.ts etc.). Treated as text they
+# show up as hundreds of thousands of fake line deletions on every regen.
+# Binary keeps hashes byte-identical and stops Source Control from counting them.
+.builder/baselines/** binary
 package.json text eol=lf
 tsconfig.json text eol=lf

@@ -1,5 +1,8 @@
 import { MotionConfig, motion } from "motion/react";
 import { useId, useRef, type KeyboardEvent, type ReactNode } from "react";
+import { registerStudioRenderer } from "../features/studio/StudioCatalog";
+import { StudioCatalogGate } from "../features/studio/StudioCatalogGate";
+import { studioSlotKey, studioSlotProps } from "../features/studio/StudioSlot";
 import "./ui-layouts.css";
 
 export type SegmentedTabOption<T extends string> = {
@@ -31,6 +34,7 @@ export function SegmentedTabs<T extends string>({
   size?: "sm" | "md";
   className?: string;
 }) {
+  const slotKey = studioSlotKey("tabs", label);
   const pillId = useId();
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -54,44 +58,58 @@ export function SegmentedTabs<T extends string>({
   };
 
   return (
-    <MotionConfig reducedMotion="user">
-      <div
-        ref={listRef}
-        role="tablist"
-        aria-label={label}
-        onKeyDown={onKeyDown}
-        className={`segmented-tabs segmented-tabs-${size}${className ? ` ${className}` : ""}`}
-      >
-        {options.map((option) => {
-          const active = option.value === value;
-          return (
-            <button
-              key={option.value}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              tabIndex={active ? 0 : -1}
-              data-active={active || undefined}
-              onClick={() => onChange(option.value)}
-            >
-              {active ? (
-                <motion.span
-                  layoutId={pillId}
-                  className="segmented-tabs-pill"
-                  transition={{ type: "spring", bounce: 0.15, duration: 0.4 }}
-                  aria-hidden="true"
-                />
-              ) : null}
-              <span className="segmented-tabs-label">
-                {option.label}
-                {option.count !== undefined ? (
-                  <span className="segmented-tabs-count">{option.count}</span>
+    <StudioCatalogGate
+      kind="tabs"
+      name="SegmentedTabs"
+      slotKey={slotKey}
+      model={{ title: label }}
+    >
+      <MotionConfig reducedMotion="user">
+        <div
+          ref={listRef}
+          role="tablist"
+          aria-label={label}
+          onKeyDown={onKeyDown}
+          className={`segmented-tabs segmented-tabs-${size}${className ? ` ${className}` : ""}`}
+          {...studioSlotProps("tabs", "SegmentedTabs", slotKey)}
+        >
+          {options.map((option) => {
+            const active = option.value === value;
+            return (
+              <button
+                key={option.value}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                tabIndex={active ? 0 : -1}
+                data-active={active || undefined}
+                onClick={() => onChange(option.value)}
+              >
+                {active ? (
+                  <motion.span
+                    layoutId={pillId}
+                    className="segmented-tabs-pill"
+                    transition={{ type: "spring", bounce: 0.15, duration: 0.4 }}
+                    aria-hidden="true"
+                  />
                 ) : null}
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </MotionConfig>
+                <span className="segmented-tabs-label">
+                  {option.label}
+                  {option.count !== undefined ? (
+                    <span className="segmented-tabs-count">{option.count}</span>
+                  ) : null}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </MotionConfig>
+    </StudioCatalogGate>
   );
 }
+
+registerStudioRenderer("SegmentedTabs", (model) => (
+  <p className="segmented-tabs segmented-tabs-md px-3 py-2 text-sm">
+    {model.title}
+  </p>
+));

@@ -1,0 +1,110 @@
+// Capsule admin — wording changes made in the live app (Edit app).
+//
+// Ryan 2026-10-15: in-app editor for labels without AI or code. Staff see the
+// new words; only admins may change them. One row per screen-pattern + spot.
+
+use "../foundation/base.manifest"
+
+entity ScreenCopyOverride mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, pagePattern, copyKey]
+  timestamps
+  versionProperty version: number
+
+  // Screen shape with record ids stripped, e.g. "/events/:id".
+  property indexed required pagePattern: string = ""
+  // Stable spot: CSS path plus the original words.
+  property indexed required copyKey: string = ""
+  property required originalText: string = ""
+  property required text: string = ""
+  property targetSelector: string?
+  property targetLabel: string?
+  property setAt: datetime?
+
+  constraint screenCopyPagePattern: length(trim(self.pagePattern)) > 0 "Pick a screen first."
+  constraint screenCopyKeyPresent: length(trim(self.copyKey)) > 0 "Pick the words to change."
+  constraint screenCopyTextPresent: length(trim(self.text)) > 0 "Type the new words."
+
+  default policy screenCopyRead read: roleAllows(user.role, "staffAccess") "Staff may see app wording"
+  default policy screenCopyWrite write: roleAllows(user.role, "adminAccess") "Admins may change app wording"
+  default policy screenCopyExecute execute: roleAllows(user.role, "adminAccess") "Admins may change app wording"
+
+  command set(
+    pagePattern: string,
+    copyKey: string,
+    originalText: string,
+    text: string,
+    optional targetSelector: string,
+    optional targetLabel: string
+  ) {
+    guard self.setAt == null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    constraint setCopyPage: length(trim(pagePattern)) > 0 "Pick a screen first."
+    constraint setCopyKey: length(trim(copyKey)) > 0 "Pick the words to change."
+    constraint setCopyText: length(trim(text)) > 0 "Type the new words."
+    mutate setAt = now()
+    mutate pagePattern = trim(pagePattern)
+    mutate copyKey = trim(copyKey)
+    mutate originalText = originalText
+    mutate text = trim(text)
+    mutate targetSelector = targetSelector
+    mutate targetLabel = targetLabel
+    emit ScreenCopyOverrideSet {
+      screenCopyOverrideId: self.id
+      tenantId: self.tenantId
+      pagePattern: pagePattern
+    }
+  }
+
+  command change(
+    pagePattern: string,
+    copyKey: string,
+    originalText: string,
+    text: string,
+    optional targetSelector: string,
+    optional targetLabel: string
+  ) {
+    guard self.setAt != null
+    guard roleAllows(user.role, "adminAccess")
+    constraint changeCopyPage: length(trim(pagePattern)) > 0 "Pick a screen first."
+    constraint changeCopyKey: length(trim(copyKey)) > 0 "Pick the words to change."
+    constraint changeCopyText: length(trim(text)) > 0 "Type the new words."
+    mutate deletedAt = null
+    mutate pagePattern = trim(pagePattern)
+    mutate copyKey = trim(copyKey)
+    mutate originalText = originalText
+    mutate text = trim(text)
+    mutate targetSelector = targetSelector
+    mutate targetLabel = targetLabel
+    emit ScreenCopyOverrideSet {
+      screenCopyOverrideId: self.id
+      tenantId: self.tenantId
+      pagePattern: pagePattern
+    }
+  }
+
+  command revert() {
+    guard self.setAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    mutate deletedAt = now()
+    emit ScreenCopyOverrideReverted {
+      screenCopyOverrideId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store ScreenCopyOverride in durable
+}
+
+event ScreenCopyOverrideSet: "screen_copy.override.set" {
+  screenCopyOverrideId: string
+  tenantId: string
+  pagePattern: string
+}
+
+event ScreenCopyOverrideReverted: "screen_copy.override.reverted" {
+  screenCopyOverrideId: string
+  tenantId: string
+}

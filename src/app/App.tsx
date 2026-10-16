@@ -28,6 +28,8 @@ import { EventProposalPreviewPage } from "../features/events/EventProposalPrevie
 import { eventMenuRedirectPath } from "../features/events/eventRoutes";
 import { WorkingEventRouteSync } from "../features/events/workingEvent";
 import { ReviewerToolbar } from "./shell/ReviewerToolbar";
+import { StudioCopyApplierHost } from "../features/studio/StudioCopyApplierHost";
+import { StudioEditorLayer } from "../features/studio/StudioEditorLayer";
 import { MovedRoute } from "./MovedRoute";
 import { HomeCalendarPage } from "../features/home/HomeCalendarPage";
 import { AllergenMatrixPage } from "../features/kitchen/AllergenMatrixPage";
@@ -530,6 +532,8 @@ export function App() {
       <AuthGate>
         <AppPaletteSync />
         <WorkingEventRouteSync />
+        <StudioCopyApplierHost />
+        <StudioEditorLayer />
         <ReviewerToolbar />
         <Routes>
           {/* Staff-facing mobile view lives outside AppShell so admin nav never renders. */}

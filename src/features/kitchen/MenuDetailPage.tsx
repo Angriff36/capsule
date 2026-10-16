@@ -22,6 +22,9 @@ import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { KitchenBookNav } from "./KitchenBookNav";
 import { ReturnToListLink } from "../list-state/listOrigin";
 import { MenuDetailsEditor } from "./MenuDetailsEditor";
+import { MenuPriceOptionsSection } from "./MenuPriceOptionsSection";
+import { MenuCoursePicksSection } from "./MenuCoursePicksSection";
+import { readMenuPricingOptions } from "../../lib/menuPricing";
 import { MenuDishManager } from "./MenuDishManager";
 import { dishRecipeLinks, withRecipeDishIds } from "./dishVersions";
 import { buildMenuProfitability } from "./MenuProfitabilityAnalysis";
@@ -134,6 +137,22 @@ export function MenuDetailPage() {
         names.push(course);
     }
     return names;
+  }, [dishes, selectedMenuDishes]);
+  // The menu's dishes with their course, for price choices a pick calls for.
+  const menuChoiceDishes = useMemo(() => {
+    const byId = new Map(
+      (dishes ?? []).map((dish) => [String(dish._id), dish]),
+    );
+    return [...selectedMenuDishes]
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map((selection) => {
+        const dish = byId.get(String(selection.dishId));
+        return {
+          dishId: String(selection.dishId),
+          name: String(dish?.name ?? "Dish"),
+          course: String(selection.course ?? dish?.course ?? "").trim(),
+        };
+      });
   }, [dishes, selectedMenuDishes]);
   const allergensByDish = useMemo(() => {
     const rows = deriveAllergenRows({
@@ -531,7 +550,15 @@ export function MenuDetailPage() {
           </div>
           <div>
             <dt>Per person</dt>
-            <dd>{formatMoneyExact(Number(menu.pricePerPerson))}</dd>
+            <dd>
+              {formatMoneyExact(Number(menu.pricePerPerson))}
+              {(() => {
+                const priceTo = readMenuPricingOptions(menu).priceTo;
+                return priceTo != null && priceTo > Number(menu.pricePerPerson)
+                  ? `–${formatMoneyExact(priceTo)}`
+                  : null;
+              })()}
+            </dd>
           </div>
           <div>
             <dt>Guests</dt>
@@ -568,6 +595,30 @@ export function MenuDetailPage() {
           availableUntil: menu.availableUntil,
           guestsPerServer: menu.guestsPerServer,
           pickOneCourses: menu.pickOneCourses,
+        }}
+        courses={menuCourses}
+        onFailure={setFailure}
+      />
+
+      <MenuPriceOptionsSection
+        menu={{
+          _id: menu._id,
+          version: menu.version,
+          status: String(menu.status),
+          pricePerPerson: Number(menu.pricePerPerson),
+          pricingOptionsJson: menu.pricingOptionsJson,
+        }}
+        courses={menuCourses}
+        dishes={menuChoiceDishes}
+        onFailure={setFailure}
+      />
+
+      <MenuCoursePicksSection
+        menu={{
+          _id: menu._id,
+          version: menu.version,
+          status: String(menu.status),
+          coursePicksJson: menu.coursePicksJson,
         }}
         courses={menuCourses}
         onFailure={setFailure}

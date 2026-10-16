@@ -3,6 +3,9 @@ import {
   useCreateEventAssignment,
   useCreateEventDish,
 } from "../../lib/manifest-convex-react";
+import { useApplyCateringPackage } from "../../lib/operational-transactions";
+import { cateringPackages } from "../../data/cateringPackages";
+import type { Id } from "../../../convex/_generated/dataModel";
 import { eventPlanEngagementFormMapper } from "../events/EventPlanEngagementFormMapper";
 import {
   eventWizardCreateErrors,
@@ -58,6 +61,10 @@ export type EventWizardCommitPorts = {
   createAssignment: (
     args: Record<string, unknown>,
   ) => Promise<{ docId?: string } | void>;
+  /** Adds the picked catering package; the operation key makes a retry safe. */
+  applyPackage: (
+    args: Record<string, unknown> & { operationKey: string },
+  ) => Promise<unknown>;
   setWorkingEvent: (eventId: string) => void;
 };
 const entryKey = (
@@ -82,6 +89,24 @@ const dishArgs = (
   headcountOverride: 0,
   ...(line.notes?.trim() ? { specialInstructions: line.notes.trim() } : {}),
 });
+/** The package request without its retry key; service activities start with the event. */
+const packageArgs = (eventId: string, draft: EventWizardDraft) => {
+  const pack = draft.cateringPackage!;
+  const price = pack.pricePerGuest.trim();
+  const starts = Date.parse(draft.startsAt);
+  const serviceTasks = cateringPackages.find(
+    (entry) => entry.id === pack.packageId,
+  )?.serviceTasks;
+  return {
+    eventId,
+    packageId: pack.packageId,
+    selections: pack.selections,
+    ...(price ? { pricePerGuest: Number(price) } : {}),
+    ...(serviceTasks?.length && Number.isFinite(starts)
+      ? { serviceStartsAt: starts }
+      : {}),
+  };
+};
 const commandArgs = (args: Record<string, unknown>, key: string) => ({
   ...args,
   idempotencyKey: key,
@@ -101,13 +126,14 @@ function existingEntry(
 }
 function rejected(
   progress: EventWizardCommitProgress,
-  kind: "event" | "dishes" | "staff",
+  kind: "event" | "dishes" | "staff" | "package",
   lineId?: string,
 ): EventWizardCommitProgress {
   const slot = lineId ? `${kind === "dishes" ? "dish" : kind}:${lineId}` : kind;
   return {
     ...progress,
     event: kind === "event" ? undefined : progress.event,
+    cateringPackage: kind === "package" ? undefined : progress.cateringPackage,
     dishes:
       kind === "dishes" && lineId
         ? Object.fromEntries(
@@ -150,16 +176,32 @@ function preflightEventWizard(draft: EventWizardDraft) {
   for (const lineId of Object.keys(progress.staff))
     if (!staffIds.has(lineId))
       problems.push(`Saved staff assignment '${lineId}' was removed.`);
+  if (progress.cateringPackage && !draft.cateringPackage?.packageId)
+    problems.push("The saved catering package was removed.");
   const savedEvent =
     event?.status === "saved" && event.docId ? event.docId : undefined;
   if (
     !savedEvent &&
-    (Object.keys(progress.dishes).length || Object.keys(progress.staff).length)
+    (Object.keys(progress.dishes).length ||
+      Object.keys(progress.staff).length ||
+      progress.cateringPackage)
   )
     problems.push(
       "Saved work is out of sync. Open the event page to change saved work.",
     );
   const dishes: PreparedLine<EventWizardDraft["dishes"][number]>[] = [];
+  if (
+    savedEvent &&
+    progress.cateringPackage &&
+    draft.cateringPackage?.packageId
+  )
+    if (
+      progress.cateringPackage.fingerprint !==
+      eventWizardFingerprint(packageArgs(savedEvent, draft))
+    )
+      problems.push(
+        "The catering package may already be saved with different details.",
+      );
   const staff: PreparedLine<EventWizardDraft["staff"][number]>[] = [];
   if (savedEvent) {
     for (const line of draft.dishes) {
@@ -316,6 +358,38 @@ export async function commitEventWizard(
       );
     }
   }
+  if (draft.cateringPackage?.packageId) {
+    const args = packageArgs(event.docId, draft);
+    const fingerprint = eventWizardFingerprint(args);
+    let entry = existingEntry(
+      progress.cateringPackage,
+      fingerprint,
+      "The catering package",
+    );
+    if (entry?.status !== "saved") {
+      entry ??= {
+        key: entryKey(draft, "package", progress),
+        fingerprint,
+        status: "attempted",
+      };
+      progress = { ...progress, cateringPackage: entry };
+      onProgress(progress);
+      try {
+        await ports.applyPackage({ ...args, operationKey: entry.key });
+        progress = {
+          ...progress,
+          cateringPackage: { ...entry, status: "saved" },
+        };
+        onProgress(progress);
+      } catch (error) {
+        progress = rejected(progress, "package");
+        onProgress(progress);
+        throw new Error(
+          `Could not add the catering package: ${error instanceof Error ? error.message : "Unknown error"}`,
+        );
+      }
+    }
+  }
   const preparedStaff = prepared.staff.length
     ? prepared.staff
     : draft.staff.map((line) => ({
@@ -376,13 +450,28 @@ export async function commitEventWizard(
 export function useEventWizardCommit() {
   const createEvent = useCreateEvent(),
     createDish = useCreateEventDish(),
-    createAssignment = useCreateEventAssignment();
+    createAssignment = useCreateEventAssignment(),
+    applyCateringPackage = useApplyCateringPackage();
+  const applyPackage = (
+    args: Record<string, unknown> & { operationKey: string },
+  ) =>
+    applyCateringPackage(
+      args as Parameters<typeof applyCateringPackage>[0] & {
+        eventId: Id<"events">;
+      },
+    );
   return (
     draft: EventWizardDraft,
     onProgress: (next: EventWizardCommitProgress) => void,
   ) =>
     commitEventWizard(
-      { createEvent, createDish, createAssignment, setWorkingEvent },
+      {
+        createEvent,
+        createDish,
+        createAssignment,
+        applyPackage,
+        setWorkingEvent,
+      },
       draft,
       onProgress,
     );

@@ -37,6 +37,17 @@ entity Menu mixin TenantScoped, SoftDeletable {
   // each guest picks one dish ("Guests select one entrée", "or").
   property guestsPerServer: int?
   property pickOneCourses: list<string> = []
+  // Extra price rules a printed menu book can carry (src/lib/menuPricing.ts):
+  // the top of a per-guest price range ("$4.50-6"), named price choices
+  // ("$67 · full portions of both"), add-ons ("+$10 per guest", "+$5 per
+  // pizza") and a price table by count ("feeds up to 30: $930"). Unset = the
+  // plain base and per-guest price only.
+  property pricingOptionsJson: string?
+  // How many dishes the client picks from each course when booking ("Pick 1
+  // salad", "Sides, pick 2-3", "Up to 3 pizza flavors"), a JSON list of
+  // {"course": "Salads", "min": 1, "max": 1} read by src/lib/coursePicks.ts.
+  // Unset = no pick rule; every dish of the course is offered as it is now.
+  property coursePicksJson: string?
 
   computed isPublished: boolean = self.status == "published"
   computed isEditable: boolean = self.status == "draft"
@@ -165,6 +176,30 @@ entity Menu mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Set or clear the extra price rules. Empty goes back to the plain price.
+  command setPricingOptions(optional optionsJson: string) {
+    guard self.status == "draft" or self.status == "published"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    mutate pricingOptionsJson = optionsJson
+    emit MenuPricingOptionsSet {
+      menuId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Set or clear the per-course pick rules. Empty = no pick rules.
+  command setCoursePicks(optional picksJson: string) {
+    guard self.status == "draft" or self.status == "published"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    mutate coursePicksJson = picksJson
+    emit MenuCoursePicksSet {
+      menuId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   command markPublished() {
     guard self.status == "draft"
     guard self.draftedAt != null
@@ -259,6 +294,16 @@ event MenuServiceSet: "menu.service_set" {
   tenantId: string
   guestsPerServer: number?
   pickOneCourses: list<string>
+}
+
+event MenuPricingOptionsSet: "menu.pricing_options_set" {
+  menuId: string
+  tenantId: string
+}
+
+event MenuCoursePicksSet: "menu.course_picks_set" {
+  menuId: string
+  tenantId: string
 }
 
 event MenuPublished:"menu.published" {
