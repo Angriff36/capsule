@@ -11,17 +11,22 @@ export type FeedbackGithubIssue = {
   state: string;
   html_url: string;
   labels: string[];
+  /** Why GitHub closed it: "completed", "not_planned", "duplicate", or null. */
+  state_reason: string | null;
 };
 
-/** GitHub issue closed or labelled claude-done means the screen comment is done. */
+/**
+ * Done means labelled claude-done, or closed as completed. A duplicate, a
+ * not-planned close, or a close with no reason leaves the comment open.
+ */
 export class FeedbackGithubSync {
   static marker(): string {
     return RESOLVED_MARKER;
   }
 
   static finished(issue: FeedbackGithubIssue): boolean {
-    if (issue.state === "closed") return true;
-    return issue.labels.includes("claude-done");
+    if (issue.labels.includes("claude-done")) return true;
+    return issue.state === "closed" && issue.state_reason === "completed";
   }
 
   static async readIssue(
@@ -120,6 +125,7 @@ function parseIssue(value: unknown): FeedbackGithubIssue | null {
     state?: unknown;
     html_url?: unknown;
     labels?: unknown;
+    state_reason?: unknown;
   };
   if (typeof row.number !== "number" || typeof row.state !== "string") {
     return null;
@@ -143,5 +149,7 @@ function parseIssue(value: unknown): FeedbackGithubIssue | null {
     state: row.state,
     html_url: typeof row.html_url === "string" ? row.html_url : "",
     labels,
+    state_reason:
+      typeof row.state_reason === "string" ? row.state_reason : null,
   };
 }
