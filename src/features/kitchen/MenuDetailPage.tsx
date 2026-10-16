@@ -22,6 +22,8 @@ import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { KitchenBookNav } from "./KitchenBookNav";
 import { ReturnToListLink } from "../list-state/listOrigin";
 import { MenuDetailsEditor } from "./MenuDetailsEditor";
+import { MenuPriceOptionsSection } from "./MenuPriceOptionsSection";
+import { readMenuPricingOptions } from "../../lib/menuPricing";
 import { MenuDishManager } from "./MenuDishManager";
 import { dishRecipeLinks, withRecipeDishIds } from "./dishVersions";
 import { buildMenuProfitability } from "./MenuProfitabilityAnalysis";
@@ -531,7 +533,15 @@ export function MenuDetailPage() {
           </div>
           <div>
             <dt>Per person</dt>
-            <dd>{formatMoneyExact(Number(menu.pricePerPerson))}</dd>
+            <dd>
+              {formatMoneyExact(Number(menu.pricePerPerson))}
+              {(() => {
+                const priceTo = readMenuPricingOptions(menu).priceTo;
+                return priceTo != null && priceTo > Number(menu.pricePerPerson)
+                  ? `–${formatMoneyExact(priceTo)}`
+                  : null;
+              })()}
+            </dd>
           </div>
           <div>
             <dt>Guests</dt>
@@ -570,6 +580,17 @@ export function MenuDetailPage() {
           pickOneCourses: menu.pickOneCourses,
         }}
         courses={menuCourses}
+        onFailure={setFailure}
+      />
+
+      <MenuPriceOptionsSection
+        menu={{
+          _id: menu._id,
+          version: menu.version,
+          status: String(menu.status),
+          pricePerPerson: Number(menu.pricePerPerson),
+          pricingOptionsJson: menu.pricingOptionsJson,
+        }}
         onFailure={setFailure}
       />
 

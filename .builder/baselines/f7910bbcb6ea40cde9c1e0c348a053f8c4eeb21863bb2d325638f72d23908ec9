@@ -2654,6 +2654,7 @@ export const MenuSchema = z.object({
   availableUntil: z.coerce.date().nullable().optional(),
   guestsPerServer: z.number().int().nullable().optional(),
   pickOneCourses: z.array(z.string()).optional().default([]),
+  pricingOptionsJson: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -2892,6 +2893,7 @@ export const OrganizationSchema = z.object({
   travelFeeMinimum: z.number().nullable().optional(),
   travelFeeRoundTrip: z.boolean().nullable().optional(),
   travelFeeZonesJson: z.string().nullable().optional(),
+  pricingRulesJson: z.string().nullable().optional(),
   timingFullServiceSetupMinutes: z.number().int().nullable().optional(),
   timingLimitedServiceSetupMinutes: z.number().int().nullable().optional(),
   timingBriefingMinutes: z.number().int().nullable().optional(),
@@ -5668,7 +5670,7 @@ export const AccountabilitySeatPlaceParamsSchema = z.object({
   title: z.string(),
   roles: z.string().optional(),
   personId: z.string().min(1).optional(),
-  parentSeatId: z.string().uuid().optional(),
+  parentSeatId: z.string().min(1).optional(),
   sortOrder: z.number().int(),
 });
 
@@ -5684,7 +5686,7 @@ export const AccountabilitySeatReviseParamsSchema = z.object({
   title: z.string(),
   roles: z.string().optional(),
   personId: z.string().min(1).optional(),
-  parentSeatId: z.string().uuid().optional(),
+  parentSeatId: z.string().min(1).optional(),
   sortOrder: z.number().int(),
 });
 
@@ -5922,7 +5924,7 @@ export type ClientSetEmailPreferenceParams = z.infer<typeof ClientSetEmailPrefer
 
 // Command: stageClientMerge on Client
 export const ClientStageClientMergeParamsSchema = z.object({
-  clientMergeId: z.string().uuid(),
+  clientMergeId: z.string().min(1),
   primaryClientId: z.string().min(1),
 });
 
@@ -5946,7 +5948,7 @@ export type ClientCommunicationRecordParams = z.infer<typeof ClientCommunication
 
 // Command: stageClientMerge on ClientCommunication
 export const ClientCommunicationStageClientMergeParamsSchema = z.object({
-  clientMergeId: z.string().uuid(),
+  clientMergeId: z.string().min(1),
   clientId: z.string().min(1),
 });
 
@@ -5985,7 +5987,7 @@ export type ClientContactSetPrimaryParams = z.infer<typeof ClientContactSetPrima
 
 // Command: stageClientMerge on ClientContact
 export const ClientContactStageClientMergeParamsSchema = z.object({
-  clientMergeId: z.string().uuid(),
+  clientMergeId: z.string().min(1),
   clientId: z.string().min(1),
 });
 
@@ -6042,7 +6044,7 @@ export type ClientOutreachTaskReassignClientParams = z.infer<typeof ClientOutrea
 
 // Command: stageClientMerge on ClientOutreachTask
 export const ClientOutreachTaskStageClientMergeParamsSchema = z.object({
-  clientMergeId: z.string().uuid(),
+  clientMergeId: z.string().min(1),
   clientId: z.string().min(1),
 });
 
@@ -6613,7 +6615,7 @@ export type ContractSignParams = z.infer<typeof ContractSignParamsSchema>;
 
 // Command: stageClientMerge on Contract
 export const ContractStageClientMergeParamsSchema = z.object({
-  clientMergeId: z.string().uuid(),
+  clientMergeId: z.string().min(1),
   clientId: z.string().min(1),
 });
 
@@ -6687,7 +6689,7 @@ export type CreditMemoReassignClientParams = z.infer<typeof CreditMemoReassignCl
 
 // Command: stageClientMerge on CreditMemo
 export const CreditMemoStageClientMergeParamsSchema = z.object({
-  clientMergeId: z.string().uuid(),
+  clientMergeId: z.string().min(1),
   clientId: z.string().min(1),
 });
 
@@ -6937,7 +6939,7 @@ export type DishLabelVersionParams = z.infer<typeof DishLabelVersionParamsSchema
 
 // Command: linkAsEdition on Dish
 export const DishLinkAsEditionParamsSchema = z.object({
-  sourceDishId: z.string().uuid(),
+  sourceDishId: z.string().min(1),
   editionNumber: z.number().int().optional(),
 });
 
@@ -6945,7 +6947,7 @@ export type DishLinkAsEditionParams = z.infer<typeof DishLinkAsEditionParamsSche
 
 // Command: makeVersionOf on Dish
 export const DishMakeVersionOfParamsSchema = z.object({
-  mainDishId: z.string().uuid(),
+  mainDishId: z.string().min(1),
   label: z.string(),
 });
 
@@ -6960,7 +6962,7 @@ export type DishMarkSignatureParams = z.infer<typeof DishMarkSignatureParamsSche
 
 // Command: mergeInto on Dish
 export const DishMergeIntoParamsSchema = z.object({
-  targetDishId: z.string().uuid(),
+  targetDishId: z.string().min(1),
   reason: z.string(),
 });
 
@@ -7206,8 +7208,8 @@ export const DishTaskSpecifyWorkParamsSchema = z.object({
   choiceOptions: z.array(z.string()).optional(),
   leadTimeMinDays: z.number().int().optional(),
   leadTimeMaxDays: z.number().int().optional(),
-  sequenceAfterDishTaskId: z.string().uuid().optional(),
-  stationId: z.string().uuid().optional(),
+  sequenceAfterDishTaskId: z.string().min(1).optional(),
+  stationId: z.string().min(1).optional(),
 });
 
 export type DishTaskSpecifyWorkParams = z.infer<typeof DishTaskSpecifyWorkParamsSchema>;
@@ -7367,8 +7369,8 @@ export const EquipmentIssueRaiseParamsSchema = z.object({
   description: z.string(),
   equipmentId: z.string().min(1).optional(),
   eventId: z.string().min(1).optional(),
-  equipmentReservationId: z.string().uuid().optional(),
-  rentalOrderLineId: z.string().uuid().optional(),
+  equipmentReservationId: z.string().min(1).optional(),
+  rentalOrderLineId: z.string().min(1).optional(),
   quantity: z.number().int().optional(),
   severity: z.enum(["low", "medium", "high"]).optional(),
   holdsUnits: z.boolean().optional(),
@@ -7833,7 +7835,7 @@ export type EventSetUpsellPotentialParams = z.infer<typeof EventSetUpsellPotenti
 
 // Command: stageClientMerge on Event
 export const EventStageClientMergeParamsSchema = z.object({
-  clientMergeId: z.string().uuid(),
+  clientMergeId: z.string().min(1),
   clientId: z.string().min(1),
 });
 
@@ -7959,7 +7961,7 @@ export type EventAllergenCheckRecordParams = z.infer<typeof EventAllergenCheckRe
 // Command: applyApprovedShiftSwap on EventAssignment
 export const EventAssignmentApplyApprovedShiftSwapParamsSchema = z.object({
   personId: z.string().min(1),
-  shiftSwapRequestId: z.string().uuid(),
+  shiftSwapRequestId: z.string().min(1),
   acceptedAt: z.coerce.date(),
 });
 
@@ -8258,10 +8260,10 @@ export const EventDishLineOverrideApplyParamsSchema = z.object({
   kind: z.enum(["add", "remove", "replace", "adjust"]),
   portionsAffected: z.number(),
   reason: z.string(),
-  targetDishIngredientId: z.string().uuid().optional(),
-  targetDishComponentId: z.string().uuid().optional(),
-  targetDishContainerId: z.string().uuid().optional(),
-  targetDishTaskId: z.string().uuid().optional(),
+  targetDishIngredientId: z.string().min(1).optional(),
+  targetDishComponentId: z.string().min(1).optional(),
+  targetDishContainerId: z.string().min(1).optional(),
+  targetDishTaskId: z.string().min(1).optional(),
   ingredientId: z.string().min(1).optional(),
   componentId: z.string().min(1).optional(),
   quantity: z.number().optional(),
@@ -8354,11 +8356,11 @@ export const EventIngredientContributionRecordParamsSchema = z.object({
   quantityBasis: z.enum(["as_purchased", "as_produced", "raw", "cooked", "unknown"]).optional(),
   unitStatus: z.string().optional(),
   ownership: z.string().optional(),
-  sourceDishIngredientId: z.string().uuid().optional(),
-  sourceDishComponentId: z.string().uuid().optional(),
+  sourceDishIngredientId: z.string().min(1).optional(),
+  sourceDishComponentId: z.string().min(1).optional(),
   componentPath: z.array(z.string()).optional(),
   productionBatchId: z.string().min(1).optional(),
-  productionBatchAllocationId: z.string().uuid().optional(),
+  productionBatchAllocationId: z.string().min(1).optional(),
   calculationSnapshot: z.unknown().optional(),
 });
 
@@ -8405,7 +8407,7 @@ export const EventLayoutSectionAddParamsSchema = z.object({
   type: z.string(),
   instructions: z.string().optional(),
   sortOrder: z.number().optional(),
-  sourceTemplateId: z.string().uuid().optional(),
+  sourceTemplateId: z.string().min(1).optional(),
   sourceTemplateVersion: z.number().optional(),
 });
 
@@ -8460,7 +8462,7 @@ export type EventPlanNeedsReviseParams = z.infer<typeof EventPlanNeedsRevisePara
 // Command: applyApprovedShiftSwap on EventStaffNeed
 export const EventStaffNeedApplyApprovedShiftSwapParamsSchema = z.object({
   personId: z.string().min(1),
-  shiftSwapRequestId: z.string().uuid(),
+  shiftSwapRequestId: z.string().min(1),
   acceptedAt: z.coerce.date(),
 });
 
@@ -8545,7 +8547,7 @@ export const EventStaffNeedPostOpenParamsSchema = z.object({
   workLocation: z.string().optional(),
   payBasis: z.enum(["hourly", "flat_rate"]).optional(),
   budgetHourlyRate: z.number().optional(),
-  staffingTemplateId: z.string().uuid().optional(),
+  staffingTemplateId: z.string().min(1).optional(),
   templateLineKey: z.string().optional(),
   templateSlot: z.number().int().optional(),
 });
@@ -8648,7 +8650,7 @@ export const EventTemplateDefineParamsSchema = z.object({
   defaultStaffRoles: z.array(z.string()).optional(),
   typicalEquipment: z.array(z.string()).optional(),
   notes: z.string().optional(),
-  sourceEventId: z.string().uuid().optional(),
+  sourceEventId: z.string().min(1).optional(),
 });
 
 export type EventTemplateDefineParams = z.infer<typeof EventTemplateDefineParamsSchema>;
@@ -9245,7 +9247,7 @@ export type IngredientIntroduceParams = z.infer<typeof IngredientIntroduceParams
 
 // Command: linkAsEdition on Ingredient
 export const IngredientLinkAsEditionParamsSchema = z.object({
-  sourceIngredientId: z.string().uuid(),
+  sourceIngredientId: z.string().min(1),
   editionNumber: z.number().int().optional(),
 });
 
@@ -9253,7 +9255,7 @@ export type IngredientLinkAsEditionParams = z.infer<typeof IngredientLinkAsEditi
 
 // Command: mergeInto on Ingredient
 export const IngredientMergeIntoParamsSchema = z.object({
-  targetIngredientId: z.string().uuid(),
+  targetIngredientId: z.string().min(1),
   reason: z.string(),
 });
 
@@ -9806,7 +9808,7 @@ export type InvoiceSetDepositParams = z.infer<typeof InvoiceSetDepositParamsSche
 
 // Command: stageClientMerge on Invoice
 export const InvoiceStageClientMergeParamsSchema = z.object({
-  clientMergeId: z.string().uuid(),
+  clientMergeId: z.string().min(1),
   clientId: z.string().min(1),
 });
 
@@ -9924,7 +9926,7 @@ export type LeadReviseDetailsParams = z.infer<typeof LeadReviseDetailsParamsSche
 
 // Command: stageClientMerge on Lead
 export const LeadStageClientMergeParamsSchema = z.object({
-  clientMergeId: z.string().uuid(),
+  clientMergeId: z.string().min(1),
   clientId: z.string().min(1),
 });
 
@@ -10128,6 +10130,13 @@ export const MenuReviseDetailsParamsSchema = z.object({
 
 export type MenuReviseDetailsParams = z.infer<typeof MenuReviseDetailsParamsSchema>;
 
+// Command: setPricingOptions on Menu
+export const MenuSetPricingOptionsParamsSchema = z.object({
+  optionsJson: z.string().optional(),
+});
+
+export type MenuSetPricingOptionsParams = z.infer<typeof MenuSetPricingOptionsParamsSchema>;
+
 // Command: setSeason on Menu
 export const MenuSetSeasonParamsSchema = z.object({
   availableFrom: z.coerce.date().optional(),
@@ -10240,14 +10249,14 @@ export const MessageThreadCreateParamsSchema = z.object({
   providerThreadId: z.string().optional(),
   subject: z.string().optional(),
   senderIdentity: z.string().optional(),
-  contactId: z.string().uuid().optional(),
+  contactId: z.string().min(1).optional(),
 });
 
 export type MessageThreadCreateParams = z.infer<typeof MessageThreadCreateParamsSchema>;
 
 // Command: linkContact on MessageThread
 export const MessageThreadLinkContactParamsSchema = z.object({
-  contactId: z.string().uuid(),
+  contactId: z.string().min(1),
 });
 
 export type MessageThreadLinkContactParams = z.infer<typeof MessageThreadLinkContactParamsSchema>;
@@ -10268,7 +10277,7 @@ export type MessageThreadLinkLeadParams = z.infer<typeof MessageThreadLinkLeadPa
 
 // Command: mergeInto on MessageThread
 export const MessageThreadMergeIntoParamsSchema = z.object({
-  targetThreadId: z.string().uuid(),
+  targetThreadId: z.string().min(1),
 });
 
 export type MessageThreadMergeIntoParams = z.infer<typeof MessageThreadMergeIntoParamsSchema>;
@@ -10489,6 +10498,13 @@ export const OrganizationConfigurePlanningChecksParamsSchema = z.object({
 });
 
 export type OrganizationConfigurePlanningChecksParams = z.infer<typeof OrganizationConfigurePlanningChecksParamsSchema>;
+
+// Command: configurePricingRules on Organization
+export const OrganizationConfigurePricingRulesParamsSchema = z.object({
+  rulesJson: z.string().optional(),
+});
+
+export type OrganizationConfigurePricingRulesParams = z.infer<typeof OrganizationConfigurePricingRulesParamsSchema>;
 
 // Command: configureRoutePolicy on Organization
 export const OrganizationConfigureRoutePolicyParamsSchema = z.object({
@@ -10785,7 +10801,7 @@ export type PackListItemEnsureContainerParams = z.infer<typeof PackListItemEnsur
 // Command: ensureKitItem on PackListItem
 export const PackListItemEnsureKitItemParamsSchema = z.object({
   packListId: z.string().min(1),
-  serviceStyleKitItemId: z.string().uuid(),
+  serviceStyleKitItemId: z.string().min(1),
   description: z.string(),
   requiredQuantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
@@ -10797,7 +10813,7 @@ export type PackListItemEnsureKitItemParams = z.infer<typeof PackListItemEnsureK
 // Command: ensureTemplateLine on PackListItem
 export const PackListItemEnsureTemplateLineParamsSchema = z.object({
   packListId: z.string().min(1),
-  packListTemplateId: z.string().uuid(),
+  packListTemplateId: z.string().min(1),
   templateLineKey: z.string(),
   templateVersion: z.number().int(),
   requiredQuantity: z.number(),
@@ -11202,7 +11218,7 @@ export type PaymentSettleParams = z.infer<typeof PaymentSettleParamsSchema>;
 
 // Command: stageClientMerge on Payment
 export const PaymentStageClientMergeParamsSchema = z.object({
-  clientMergeId: z.string().uuid(),
+  clientMergeId: z.string().min(1),
   clientId: z.string().min(1),
 });
 
@@ -11273,7 +11289,7 @@ export type PaymentMethodRemoveParams = z.infer<typeof PaymentMethodRemoveParams
 
 // Command: stageClientMerge on PaymentMethod
 export const PaymentMethodStageClientMergeParamsSchema = z.object({
-  clientMergeId: z.string().uuid(),
+  clientMergeId: z.string().min(1),
   clientId: z.string().min(1),
 });
 
@@ -11613,7 +11629,7 @@ export type PrepTaskMarkBlockedParams = z.infer<typeof PrepTaskMarkBlockedParams
 
 // Command: markOverride on PrepTask
 export const PrepTaskMarkOverrideParamsSchema = z.object({
-  overrideOfDishTaskId: z.string().uuid(),
+  overrideOfDishTaskId: z.string().min(1),
   reason: z.string(),
   name: z.string().optional(),
   specialInstructions: z.string().optional(),
@@ -11676,7 +11692,7 @@ export type PrepTaskReleaseParams = z.infer<typeof PrepTaskReleaseParamsSchema>;
 
 // Command: replaceRecipeComponent on PrepTask
 export const PrepTaskReplaceRecipeComponentParamsSchema = z.object({
-  previousComponentId: z.string().uuid(),
+  previousComponentId: z.string().min(1),
   componentId: z.string().min(1),
 });
 
@@ -11783,8 +11799,8 @@ export type PrepTaskDependencySatisfyParams = z.infer<typeof PrepTaskDependencyS
 // Command: link on PrepTaskMaterial
 export const PrepTaskMaterialLinkParamsSchema = z.object({
   prepTaskId: z.string().min(1),
-  eventIngredientContributionId: z.string().uuid().optional(),
-  productionBatchAllocationId: z.string().uuid().optional(),
+  eventIngredientContributionId: z.string().min(1).optional(),
+  productionBatchAllocationId: z.string().min(1).optional(),
   dishIngredientId: z.string().min(1).optional(),
   dishComponentId: z.string().min(1).optional(),
   workQuantity: z.number().optional(),
@@ -11831,7 +11847,7 @@ export const ProductionBatchPlanParamsSchema = z.object({
   yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
   eventId: z.string().min(1).optional(),
   notes: z.string().optional(),
-  makeUpForBatchId: z.string().uuid().optional(),
+  makeUpForBatchId: z.string().min(1).optional(),
 });
 
 export type ProductionBatchPlanParams = z.infer<typeof ProductionBatchPlanParamsSchema>;
@@ -12039,7 +12055,7 @@ export type ProposalSetPaymentScheduleParams = z.infer<typeof ProposalSetPayment
 
 // Command: stageClientMerge on Proposal
 export const ProposalStageClientMergeParamsSchema = z.object({
-  clientMergeId: z.string().uuid(),
+  clientMergeId: z.string().min(1),
   clientId: z.string().min(1),
 });
 
@@ -12054,7 +12070,7 @@ export type ProposalStageEventLinkParams = z.infer<typeof ProposalStageEventLink
 
 // Command: supersede on Proposal
 export const ProposalSupersedeParamsSchema = z.object({
-  revisedById: z.string().uuid(),
+  revisedById: z.string().min(1),
   reason: z.string(),
 });
 
@@ -12122,7 +12138,7 @@ export const ProposalLineItemAddLineParamsSchema = z.object({
   unit: z.string().optional(),
   sortOrder: z.number().int().optional(),
   notes: z.string().optional(),
-  menuDishId: z.string().uuid().optional(),
+  menuDishId: z.string().min(1).optional(),
   overrideReason: z.string().optional(),
   equipmentId: z.string().min(1).optional(),
   travelFee: z.boolean().optional(),
@@ -12148,7 +12164,7 @@ export const ProposalLineItemReviseLineParamsSchema = z.object({
   unit: z.string().optional(),
   sortOrder: z.number().int().optional(),
   notes: z.string().optional(),
-  menuDishId: z.string().uuid().optional(),
+  menuDishId: z.string().min(1).optional(),
   overrideReason: z.string().optional(),
   equipmentId: z.string().min(1).optional(),
   feePercent: z.number().optional(),
@@ -12440,7 +12456,7 @@ export type QuoteSubmissionRetryParams = z.infer<typeof QuoteSubmissionRetryPara
 
 // Command: stageClientMerge on QuoteSubmission
 export const QuoteSubmissionStageClientMergeParamsSchema = z.object({
-  clientMergeId: z.string().uuid(),
+  clientMergeId: z.string().min(1),
   clientId: z.string().min(1),
 });
 
@@ -13020,7 +13036,7 @@ export type ShiftScheduleParams = z.infer<typeof ShiftScheduleParamsSchema>;
 
 // Command: stageApprovedSwap on Shift
 export const ShiftStageApprovedSwapParamsSchema = z.object({
-  shiftSwapRequestId: z.string().uuid(),
+  shiftSwapRequestId: z.string().min(1),
   requesterPersonId: z.string().min(1),
   recipientPersonId: z.string().min(1),
   targetQualificationId: z.string().min(1).optional(),
@@ -13119,7 +13135,7 @@ export const SignatureRequestRequestSignatureParamsSchema = z.object({
   recipientEmail: z.string(),
   recipientName: z.string(),
   recipientPersonId: z.string().min(1).optional(),
-  recipientContactId: z.string().uuid().optional(),
+  recipientContactId: z.string().min(1).optional(),
   provider: z.enum(["internal", "docusign", "hellosign", "pandadoc", "other"]).optional(),
   expiresAt: z.coerce.date().optional(),
   proposalId: z.string().min(1).optional(),
@@ -14103,7 +14119,7 @@ export const VendorOrderEnsureWeeklyDraftParamsSchema = z.object({
   vendorId: z.string().min(1),
   sourceRangeStart: z.coerce.date(),
   sourceRangeEnd: z.coerce.date(),
-  purchaseNeedId: z.string().uuid(),
+  purchaseNeedId: z.string().min(1),
   ingredientDemandId: z.string().min(1),
   ingredientId: z.string().min(1),
   requiredQuantity: z.number(),
@@ -14233,7 +14249,7 @@ export const VendorOrderLineEnsureWeeklyLineParamsSchema = z.object({
   onHand: z.number(),
   contributionQuantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle", "fluid_ounce", "piece", "slice", "pizza", "package", "case", "can", "tub"]),
-  purchaseNeedId: z.string().uuid(),
+  purchaseNeedId: z.string().min(1),
   ingredientDemandId: z.string().min(1),
   pendingSupply: z.number().optional(),
   orderedNeed: z.number().optional(),
@@ -14747,7 +14763,7 @@ export type WeeklyPurchasingConfigConfigureParams = z.infer<typeof WeeklyPurchas
 
 // Command: routeNeed on WeeklyPurchasingConfig
 export const WeeklyPurchasingConfigRouteNeedParamsSchema = z.object({
-  purchaseNeedId: z.string().uuid(),
+  purchaseNeedId: z.string().min(1),
   eventId: z.string().min(1),
   ingredientDemandId: z.string().min(1),
   ingredientId: z.string().min(1),

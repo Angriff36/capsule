@@ -21,6 +21,7 @@ import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useActionFailure, useActionNotice } from "../../ui/action-result";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
 import { EventTimingRulesSection } from "./EventTimingRulesSection";
+import { PricingRulesSection } from "./PricingRulesSection";
 import { TravelFeeRulesSection } from "./TravelFeeRulesSection";
 import { useTenantBranding } from "./tenantBranding";
 
@@ -445,6 +446,13 @@ export function KitchensPage() {
       />
 
       <TravelFeeRulesSection
+        record={record ?? null}
+        canEdit={canEdit}
+        busy={busy}
+        run={run}
+      />
+
+      <PricingRulesSection
         record={record ?? null}
         canEdit={canEdit}
         busy={busy}

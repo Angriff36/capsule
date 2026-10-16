@@ -1214,6 +1214,11 @@ export function ProposalsPage({ eventId }: { eventId?: string }) {
                                 ? null
                                 : Number(row.discountPercent)
                             }
+                            eventDate={
+                              row.eventDate == null
+                                ? null
+                                : Number(row.eventDate)
+                            }
                             editable={String(row.status) === "draft"}
                             onFailure={setFailure}
                           />
