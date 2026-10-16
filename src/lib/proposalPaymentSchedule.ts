@@ -82,7 +82,8 @@ export function paymentScheduleLines(
   formatDate: (at: number) => string,
 ): PaymentScheduleLine[] {
   const lines: PaymentScheduleLine[] = [];
-  if (schedule.depositAmount > 0) {
+  const hasDeposit = schedule.depositPercent > 0 || schedule.depositAmount > 0;
+  if (hasDeposit) {
     lines.push({
       label:
         schedule.depositPercent > 0
@@ -98,7 +99,7 @@ export function paymentScheduleLines(
       ? "Due on the event day"
       : `Due ${days} day${days === 1 ? "" : "s"} before the event`;
   lines.push({
-    label: schedule.depositAmount > 0 ? "Balance" : "Full amount",
+    label: hasDeposit ? "Balance" : "Full amount",
     amount: schedule.balanceAmount,
     due:
       schedule.balanceDueAt != null
