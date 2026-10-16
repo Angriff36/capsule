@@ -178,10 +178,10 @@ export class ClerkStaffAccountDirectory {
    * enters the app's existing SignIn ticket flow rather than a second signup.
    * Capsule's Person role remains authoritative, not the provider member role.
    */
-  async sendOrganizationInvitation(input: { organizationId: string; email: string; appUrl: string }): Promise<boolean> {
+  async sendOrganizationInvitation(input: { organizationId: string; email: string; appUrl: string; notify?: boolean }): Promise<boolean> {
     const url = `https://api.clerk.com/v1/organizations/${encodeURIComponent(input.organizationId)}/invitations`;
     const send = () => this.request<{ id?: string; status?: string }>(url,
-      { method: "POST", body: JSON.stringify({ email_address: input.email, role: "org:member", redirect_url: input.appUrl }) });
+      { method: "POST", body: JSON.stringify({ email_address: input.email, role: "org:member", redirect_url: input.appUrl, notify: input.notify ?? true }) });
     let invitation;
     try {
       invitation = await send();
