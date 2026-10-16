@@ -1,4 +1,10 @@
 import { clsx } from "@/lib/utils";
+import { registerStudioRenderer } from "../../features/studio/StudioCatalog";
+import { StudioCatalogGate } from "../../features/studio/StudioCatalogGate";
+import {
+  studioSlotKey,
+  studioSlotProps,
+} from "../../features/studio/StudioSlot";
 import { Sparkline, type StatCardTrend } from "./Sparkline";
 
 export type { StatCardTrend } from "./Sparkline";
@@ -101,6 +107,7 @@ export function StatCard({
         ? "text-warn"
         : "text-ink-3";
   const value = formatStatValue(main.value, main.format);
+  const slotKey = studioSlotKey("stat", title);
   const trendLabel =
     trend && trend.points.length >= 2
       ? `${title} trend${
@@ -114,69 +121,84 @@ export function StatCard({
       : "";
 
   return (
-    <div
-      className={clsx(
-        "grid min-w-0 gap-0.5 rounded-md border border-line bg-panel text-ink",
-        SIZE_STYLES[size],
-        className,
-      )}
+    <StudioCatalogGate
+      kind="stat"
+      name="StatCard"
+      slotKey={slotKey}
+      model={{ title, value: String(main.value), lead: String(main.value) }}
     >
-      <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
-        <h3 className="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-ink-2">
-          {icon ? (
-            <span className={clsx("shrink-0 self-center", TONE_ICON[tone])}>
-              {icon}
-            </span>
-          ) : null}
-          <span className="min-w-0">{title}</span>
-          {isLive ? (
-            <span
-              className="h-1.5 w-1.5 shrink-0 animate-pulse self-center rounded-full bg-ok"
-              aria-label="Live"
-              role="img"
-            />
-          ) : null}
-        </h3>
-        <span
-          className={clsx(
-            "font-mono leading-tight font-semibold tracking-tight tabular-nums",
-            VALUE_SIZE[size],
-          )}
-        >
-          {value}
-        </span>
+      <div
+        className={clsx(
+          "grid min-w-0 gap-0.5 rounded-md border border-line bg-panel text-ink",
+          SIZE_STYLES[size],
+          className,
+        )}
+        {...studioSlotProps("stat", "StatCard", slotKey)}
+      >
+        <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
+          <h3 className="flex min-w-0 items-center gap-1.5 text-sm font-semibold text-ink-2">
+            {icon ? (
+              <span className={clsx("shrink-0 self-center", TONE_ICON[tone])}>
+                {icon}
+              </span>
+            ) : null}
+            <span className="min-w-0">{title}</span>
+            {isLive ? (
+              <span
+                className="h-1.5 w-1.5 shrink-0 animate-pulse self-center rounded-full bg-ok"
+                aria-label="Live"
+                role="img"
+              />
+            ) : null}
+          </h3>
+          <span
+            className={clsx(
+              "font-mono leading-tight font-semibold tracking-tight tabular-nums",
+              VALUE_SIZE[size],
+            )}
+          >
+            {value}
+          </span>
+        </div>
+
+        {delta ? (
+          <p
+            className={clsx(
+              "text-right font-mono text-2xs font-medium tabular-nums",
+              deltaColor,
+            )}
+          >
+            {deltaIcon} {Math.abs(delta.value)}%
+          </p>
+        ) : null}
+
+        {trend ? (
+          <Sparkline trend={trend} tone={tone} label={trendLabel} />
+        ) : null}
+
+        {rows.length > 0 ? (
+          <dl className="mt-2 space-y-1 border-t border-line pt-2">
+            {rows.map((row, index) => (
+              <div
+                key={index}
+                className="flex items-baseline justify-between gap-2 text-sm"
+              >
+                <dt className="text-ink-2">{row.label}</dt>
+                <dd className="font-mono font-medium text-ink tabular-nums">
+                  {formatStatValue(row.value, row.format)}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
       </div>
-
-      {delta ? (
-        <p
-          className={clsx(
-            "text-right font-mono text-2xs font-medium tabular-nums",
-            deltaColor,
-          )}
-        >
-          {deltaIcon} {Math.abs(delta.value)}%
-        </p>
-      ) : null}
-
-      {trend ? (
-        <Sparkline trend={trend} tone={tone} label={trendLabel} />
-      ) : null}
-
-      {rows.length > 0 ? (
-        <dl className="mt-2 space-y-1 border-t border-line pt-2">
-          {rows.map((row, index) => (
-            <div
-              key={index}
-              className="flex items-baseline justify-between gap-2 text-sm"
-            >
-              <dt className="text-ink-2">{row.label}</dt>
-              <dd className="font-mono font-medium text-ink tabular-nums">
-                {formatStatValue(row.value, row.format)}
-              </dd>
-            </div>
-          ))}
-        </dl>
-      ) : null}
-    </div>
+    </StudioCatalogGate>
   );
 }
+
+registerStudioRenderer("StatCard", (model) => (
+  <StatCard
+    title={model.title}
+    main={{ value: model.value ?? model.lead ?? "—" }}
+  />
+));

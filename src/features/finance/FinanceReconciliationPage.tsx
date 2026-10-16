@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useEmbedded } from "../../ui/embedded";
 import { useCreateSavedReportDefinition } from "../../lib/manifest-convex-react";
 import { useAllRowsOnRequest } from "../../lib/financeScopedQueries";
-import { useExternalRecordLinksFor } from "../../lib/useExternalRecordLinkLists";
+import { usePaymentMoneyWhen } from "../../lib/useExternalRecordLinkLists";
 import {
   buildFinanceReconciliation,
   sourceMoneySpan,
@@ -36,11 +36,12 @@ function endOfDay(value: string): number | null {
  */
 export function FinanceReconciliationPage() {
   const embedded = useEmbedded();
-  // Only payment rows: the full link list is too long for one read.
-  const links = useExternalRecordLinksFor({ recordTypes: ["payment"] });
   // The check covers every Capsule payment ever recorded, so the ledger is
   // read only when the user asks for the check.
   const [requested, setRequested] = useState(false);
+  // Payment facts, a page at a time, only after Run. No spreadsheet text.
+  const loadedPayments = usePaymentMoneyWhen(requested);
+  const links = requested ? loadedPayments : [];
   const payments = useAllRowsOnRequest("payments", requested);
   const invoices = useAllRowsOnRequest("invoices", requested);
   const saveReport = useCreateSavedReportDefinition();

@@ -784,6 +784,18 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   await client.mutation(api.mutations.ScorecardTarget_createViaSet, { "metricKey": "demo-metricKey-1", "target": 1, "direction": "demo-direction-1", "ownerPersonId": "ownerPersonId-scorecard-target-1", "notes": "demo-notes-1" } as any);
   rowsAttempted += 1;
   await client.mutation(api.mutations.ScorecardTarget_createViaSet, { "metricKey": "demo-metricKey-2", "target": 2, "direction": "demo-direction-2", "ownerPersonId": "ownerPersonId-scorecard-target-2", "notes": "demo-notes-2" } as any);
+  // ScreenCopyOverride has multiple initialization commands (revert, set); using the selected initialization command: set.
+  // ScreenCopyOverride → api.mutations.ScreenCopyOverride_createViaSet
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ScreenCopyOverride_createViaSet, { "pagePattern": "demo-pagePattern-1", "copyKey": "demo-copyKey-1", "originalText": "demo-originalText-1", "text": "demo-text-1", "targetSelector": "demo-targetSelector-1", "targetLabel": "demo-targetLabel-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ScreenCopyOverride_createViaSet, { "pagePattern": "demo-pagePattern-2", "copyKey": "demo-copyKey-2", "originalText": "demo-originalText-2", "text": "demo-text-2", "targetSelector": "demo-targetSelector-2", "targetLabel": "demo-targetLabel-2" } as any);
+  // ScreenLayoutOverride has multiple initialization commands (revert, set); using the selected initialization command: set.
+  // ScreenLayoutOverride → api.mutations.ScreenLayoutOverride_createViaSet
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ScreenLayoutOverride_createViaSet, { "pagePattern": "demo-pagePattern-1", "slotKey": "demo-slotKey-1", "componentId": "componentId-screen-layout-override-1", "sourceComponentId": "sourceComponentId-screen-layout-override-1", "slotKind": "demo-slotKind-1", "targetSelector": "demo-targetSelector-1", "targetLabel": "demo-targetLabel-1" } as any);
+  rowsAttempted += 1;
+  await client.mutation(api.mutations.ScreenLayoutOverride_createViaSet, { "pagePattern": "demo-pagePattern-2", "slotKey": "demo-slotKey-2", "componentId": "componentId-screen-layout-override-2", "sourceComponentId": "sourceComponentId-screen-layout-override-2", "slotKind": "demo-slotKind-2", "targetSelector": "demo-targetSelector-2", "targetLabel": "demo-targetLabel-2" } as any);
   // ServiceStyle → api.mutations.ServiceStyle_createViaRegister
   rowsAttempted += 1;
   await client.mutation(api.mutations.ServiceStyle_createViaRegister, { "name": "ServiceStyle 1", "code": "demo-code-1", "sortOrder": 1, "description": "demo-description-1" } as any);
@@ -1850,6 +1862,16 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     {
       "entity": "ScorecardTarget",
       "createMutation": "ScorecardTarget_createViaSet",
+      "rowCount": 2
+    },
+    {
+      "entity": "ScreenCopyOverride",
+      "createMutation": "ScreenCopyOverride_createViaSet",
+      "rowCount": 2
+    },
+    {
+      "entity": "ScreenLayoutOverride",
+      "createMutation": "ScreenLayoutOverride_createViaSet",
       "rowCount": 2
     },
     {

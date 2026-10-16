@@ -1,19 +1,36 @@
-import { useQuery } from "convex/react";
+import { useEffect, useMemo } from "react";
+import { usePaginatedQuery, useQuery } from "convex/react";
 import { api } from "./api";
-
-/**
- * Only the imported-record links a screen works with. The full list grew past
- * what the server can return in one list (9,385 links on 2026-10-02).
- */
-export function useExternalRecordLinksFor(filter: {
-  recordTypes?: string[];
-  pending?: boolean;
-  capsuleEntities?: string[];
-}) {
-  return useQuery(api.externalRecordLinkLists.listFor, filter);
-}
 
 /** The parallel-run menu check, counted on the server. */
 export function useMenuLinkStats() {
   return useQuery(api.externalRecordLinkLists.menuLinkStats, {});
+}
+
+/** One page of imported rows still waiting. Show more asks for the next page. */
+export function useImportQueue(sourceSystem: string | null) {
+  return usePaginatedQuery(
+    api.externalRecordLinkLists.queuePage,
+    { sourceSystem: sourceSystem ?? undefined },
+    { initialNumItems: 50 },
+  );
+}
+
+/**
+ * Every old payment, page by page, only after the person runs the money
+ * check. The spreadsheet text is not included.
+ */
+export function usePaymentMoneyWhen(enabled: boolean) {
+  const { results, status, loadMore } = usePaginatedQuery(
+    api.externalRecordLinkLists.paymentMoneyPage,
+    enabled ? {} : "skip",
+    { initialNumItems: 200 },
+  );
+  useEffect(() => {
+    if (enabled && status === "CanLoadMore") loadMore(200);
+  }, [enabled, status, loadMore]);
+  return useMemo(
+    () => (enabled && status === "Exhausted" ? results : undefined),
+    [enabled, status, results],
+  );
 }

@@ -1,0 +1,13 @@
+# Builder stores full copies of generated files here. Indexing them makes
+# Cursor report hundreds of thousands of fake edits on every regen.
+.builder/baselines/
+
+# Scratch / local output — already gitignored; keep the AI off them too.
+.artifacts/
+.loop-worktrees/
+.worktrees/
+graphify-out/
+storybook-static/
+.convex/
+coverage/
+dist/

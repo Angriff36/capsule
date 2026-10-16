@@ -1,4 +1,7 @@
 import QRCode from "qrcode";
+import { registerStudioRenderer } from "../features/studio/StudioCatalog";
+import { StudioCatalogGate } from "../features/studio/StudioCatalogGate";
+import { studioSlotKey, studioSlotProps } from "../features/studio/StudioSlot";
 import { code39Bars, code39Text } from "../lib/code39";
 
 const BAR_HEIGHT = 56;
@@ -69,6 +72,7 @@ export function BarcodeLabel({
   title: string;
   subtitle?: string;
 }) {
+  const slotKey = studioSlotKey("label", title);
   const text = code?.trim() ?? "";
   const carried = text ? code39Text(text) : null;
   const bars = carried != null ? code39Bars(carried) : null;
@@ -76,7 +80,10 @@ export function BarcodeLabel({
 
   if (!bars && !square)
     return (
-      <p className="text-base text-ink-2">
+      <p
+        className="text-base text-ink-2"
+        {...studioSlotProps("label", "BarcodeLabel", slotKey)}
+      >
         A bar label can't carry "{text}". Use letters, numbers and keyboard
         signs in the tag.
       </p>
@@ -94,60 +101,74 @@ export function BarcodeLabel({
   };
 
   return (
-    <div className="barcode-label">
-      {square ? (
-        <svg
-          className="barcode-label-qr"
-          viewBox={`0 0 ${square.size} ${square.size}`}
-          shapeRendering="crispEdges"
-          role="img"
-          aria-label={`QR code for ${title}`}
-        >
-          <rect width={square.size} height={square.size} fill="#fff" />
-          {square.squares.map(([x, y]) => (
-            <rect
-              key={`${x}:${y}`}
-              x={x}
-              y={y}
-              width={1}
-              height={1}
-              fill="#000"
-            />
-          ))}
-        </svg>
-      ) : null}
-      {bars && carried != null ? (
-        <>
+    <StudioCatalogGate
+      kind="label"
+      name="BarcodeLabel"
+      slotKey={slotKey}
+      model={{ title, lead: subtitle }}
+    >
+      <div
+        className="barcode-label"
+        {...studioSlotProps("label", "BarcodeLabel", slotKey)}
+      >
+        {square ? (
           <svg
-            viewBox={`0 0 ${bars.width + QUIET * 2} ${BAR_HEIGHT}`}
-            preserveAspectRatio="none"
+            className="barcode-label-qr"
+            viewBox={`0 0 ${square.size} ${square.size}`}
+            shapeRendering="crispEdges"
             role="img"
-            aria-label={`Bar label ${text}`}
+            aria-label={`QR code for ${title}`}
           >
-            <rect
-              width={bars.width + QUIET * 2}
-              height={BAR_HEIGHT}
-              fill="#fff"
-            />
-            {bars.bars.map((bar) => (
+            <rect width={square.size} height={square.size} fill="#fff" />
+            {square.squares.map(([x, y]) => (
               <rect
-                key={bar.x}
-                x={bar.x + QUIET}
-                y={0}
-                width={bar.width}
-                height={BAR_HEIGHT}
+                key={`${x}:${y}`}
+                x={x}
+                y={y}
+                width={1}
+                height={1}
                 fill="#000"
               />
             ))}
           </svg>
-          <p className="barcode-label-code">{text}</p>
-        </>
-      ) : null}
-      <p className="barcode-label-title">{title}</p>
-      {subtitle ? <p className="barcode-label-subtitle">{subtitle}</p> : null}
-      <button type="button" className="btn btn-ghost btn-sm" onClick={print}>
-        Print label
-      </button>
-    </div>
+        ) : null}
+        {bars && carried != null ? (
+          <>
+            <svg
+              viewBox={`0 0 ${bars.width + QUIET * 2} ${BAR_HEIGHT}`}
+              preserveAspectRatio="none"
+              role="img"
+              aria-label={`Bar label ${text}`}
+            >
+              <rect
+                width={bars.width + QUIET * 2}
+                height={BAR_HEIGHT}
+                fill="#fff"
+              />
+              {bars.bars.map((bar) => (
+                <rect
+                  key={bar.x}
+                  x={bar.x + QUIET}
+                  y={0}
+                  width={bar.width}
+                  height={BAR_HEIGHT}
+                  fill="#000"
+                />
+              ))}
+            </svg>
+            <p className="barcode-label-code">{text}</p>
+          </>
+        ) : null}
+        <p className="barcode-label-title">{title}</p>
+        {subtitle ? <p className="barcode-label-subtitle">{subtitle}</p> : null}
+        <button type="button" className="btn btn-ghost btn-sm" onClick={print}>
+          Print label
+        </button>
+      </div>
+    </StudioCatalogGate>
   );
 }
+
+registerStudioRenderer("BarcodeLabel", (model) => (
+  <BarcodeLabel title={model.title} subtitle={model.lead} />
+));

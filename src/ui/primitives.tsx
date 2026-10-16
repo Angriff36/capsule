@@ -1,4 +1,11 @@
 import type { ReactNode } from "react";
+import { registerStudioRenderer } from "../features/studio/StudioCatalog";
+import { StudioCatalogGate } from "../features/studio/StudioCatalogGate";
+import {
+  studioSlotKey,
+  studioSlotProps,
+  studioText,
+} from "../features/studio/StudioSlot";
 import { type EventStage, STAGE_LABEL } from "../features/events/eventStatus";
 import { formatStatusLabel, statusChipClass } from "../lib/statusLabels";
 
@@ -36,10 +43,23 @@ export function StatusChip({
     (STAGE_CHIP as Record<string, string>)[status] ??
     statusChipClass(status) ??
     "chip-tone-mute";
+  const title =
+    studioText(children) || label || known || formatStatusLabel(status);
+  const slotKey = studioSlotKey("chip", title);
   return (
-    <span className={`chip ${cls}`}>
-      {children ?? label ?? known ?? formatStatusLabel(status)}
-    </span>
+    <StudioCatalogGate
+      kind="chip"
+      name="StatusChip"
+      slotKey={slotKey}
+      model={{ title }}
+    >
+      <span
+        className={`chip ${cls}`}
+        {...studioSlotProps("chip", "StatusChip", slotKey)}
+      >
+        {children ?? label ?? known ?? formatStatusLabel(status)}
+      </span>
+    </StudioCatalogGate>
   );
 }
 
@@ -69,6 +89,19 @@ export function PageHeader({
   facts?: PageHeaderFact[];
   size?: "default" | "compact";
 }) {
+  const titleText = studioText(title);
+  const slotKey = studioSlotKey("masthead", titleText);
+  const gate = (node: ReactNode) => (
+    <StudioCatalogGate
+      kind="masthead"
+      name="PageHeader"
+      slotKey={slotKey}
+      model={{ title: titleText, lead: studioText(lead) }}
+    >
+      {node}
+    </StudioCatalogGate>
+  );
+  const slot = studioSlotProps("masthead", "PageHeader", slotKey);
   const eyebrowLine = eyebrow ? (
     <p className="text-sm font-bold tracking-[0.09em] text-ink-3 uppercase [&_b]:font-bold [&_b]:text-accent">
       {eyebrow}
@@ -76,8 +109,11 @@ export function PageHeader({
   ) : null;
 
   if (size === "compact") {
-    return (
-      <header className="page-header flex flex-wrap items-end justify-between gap-x-4 gap-y-2 border-b border-line pb-3">
+    return gate(
+      <header
+        className="page-header flex flex-wrap items-end justify-between gap-x-4 gap-y-2 border-b border-line pb-3"
+        {...slot}
+      >
         <div className="min-w-0">
           {eyebrowLine}
           <h1 className="font-display text-2xl leading-tight font-bold tracking-tight text-balance text-ink">
@@ -88,13 +124,13 @@ export function PageHeader({
         {actions ? (
           <div className="flex flex-wrap items-center gap-2">{actions}</div>
         ) : null}
-      </header>
+      </header>,
     );
   }
 
   const shownFacts = facts?.filter((fact) => fact.value != null) ?? [];
-  return (
-    <header className="page-header min-w-0">
+  return gate(
+    <header className="page-header min-w-0" {...slot}>
       {/* Title on the left, the page's actions level with it on the right
           (as on Events and Home); on a phone the actions drop below. */}
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
@@ -131,7 +167,7 @@ export function PageHeader({
       ) : (
         <div aria-hidden="true" className="mt-5 border-t-[1.5px] border-ink" />
       )}
-    </header>
+    </header>,
   );
 }
 
@@ -146,21 +182,32 @@ export function Section({
   actions?: ReactNode;
   children: ReactNode;
 }) {
+  const slotKey = studioSlotKey("section", title);
   return (
-    <section className="card">
-      <div className="flex min-h-9 flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-line bg-inset px-3 py-0.5">
-        <h2 className="text-sm font-semibold text-ink">
-          {title}
-          {count != null && (
-            <span className="ml-1.5 font-mono text-xs font-medium text-ink-2">
-              {count}
-            </span>
-          )}
-        </h2>
-        {actions}
-      </div>
-      {children}
-    </section>
+    <StudioCatalogGate
+      kind="section"
+      name="Section"
+      slotKey={slotKey}
+      model={{ title }}
+    >
+      <section
+        className="card"
+        {...studioSlotProps("section", "Section", slotKey)}
+      >
+        <div className="flex min-h-9 flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-line bg-inset px-3 py-0.5">
+          <h2 className="text-sm font-semibold text-ink">
+            {title}
+            {count != null && (
+              <span className="ml-1.5 font-mono text-xs font-medium text-ink-2">
+                {count}
+              </span>
+            )}
+          </h2>
+          {actions}
+        </div>
+        {children}
+      </section>
+    </StudioCatalogGate>
   );
 }
 
@@ -175,22 +222,47 @@ export function ErrorState({
   detail?: string;
   onRetry?: () => void;
 }) {
+  const slotKey = studioSlotKey("error", title);
   return (
-    <div className="card border-danger/40 px-4 py-6 text-center" role="alert">
-      <p className="font-semibold text-danger">{title}</p>
-      {detail ? <p className="mt-1 text-sm text-ink-2">{detail}</p> : null}
-      {onRetry ? (
-        <button
-          type="button"
-          className="btn btn-ghost btn-sm mt-3"
-          onClick={onRetry}
-        >
-          Try again
-        </button>
-      ) : null}
-    </div>
+    <StudioCatalogGate
+      kind="error"
+      name="ErrorState"
+      slotKey={slotKey}
+      model={{ title, lead: detail }}
+    >
+      <div
+        className="card border-danger/40 px-4 py-6 text-center"
+        role="alert"
+        {...studioSlotProps("error", "ErrorState", slotKey)}
+      >
+        <p className="font-semibold text-danger">{title}</p>
+        {detail ? <p className="mt-1 text-sm text-ink-2">{detail}</p> : null}
+        {onRetry ? (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm mt-3"
+            onClick={onRetry}
+          >
+            Try again
+          </button>
+        ) : null}
+      </div>
+    </StudioCatalogGate>
   );
 }
+
+registerStudioRenderer("PageHeader", (model) => (
+  <PageHeader title={model.title} lead={model.lead} />
+));
+registerStudioRenderer("StatusChip", (model) => (
+  <StatusChip status="planning" label={model.title} />
+));
+registerStudioRenderer("Section", (model) => (
+  <Section title={model.title}>{model.lead ?? null}</Section>
+));
+registerStudioRenderer("ErrorState", (model) => (
+  <ErrorState title={model.title} detail={model.lead} />
+));
 
 export function Skeleton({ className = "" }: { className?: string }) {
   return (

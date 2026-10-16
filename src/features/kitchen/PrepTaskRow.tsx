@@ -1,4 +1,7 @@
 import { useId, type ReactNode } from "react";
+import { registerStudioRenderer } from "../studio/StudioCatalog";
+import { StudioCatalogGate } from "../studio/StudioCatalogGate";
+import { studioSlotKey, studioSlotProps } from "../studio/StudioSlot";
 import { readableRecipeAmount } from "../../lib/recipeDisplay";
 import { prepQuantityLabel } from "./prepQuantityLabel";
 import { prepTaskCheck } from "./prepTaskCheck";
@@ -85,69 +88,87 @@ export function PrepTaskRow({
       ? "Saved on this phone. It sends when you're back online."
       : check.note;
   const title = name.trim() || "Prep task";
+  const slotKey = studioSlotKey("row", title);
   const amount = prepTaskAmount(quantity, unit);
   const detail = [context, station].filter(Boolean).join(" · ");
 
   return (
-    <li className="border-b border-line last:border-b-0">
-      <div className="flex min-h-[60px] items-center gap-3.5 px-4 py-2.5">
-        {/* Only the box ticks: completing has no undo, so a stray tap on the
+    <StudioCatalogGate
+      kind="row"
+      name="PrepTaskRow"
+      slotKey={slotKey}
+      model={{ title, lead: amount }}
+    >
+      <li
+        className="border-b border-line last:border-b-0"
+        {...studioSlotProps("row", "PrepTaskRow", slotKey)}
+      >
+        <div className="flex min-h-[60px] items-center gap-3.5 px-4 py-2.5">
+          {/* Only the box ticks: completing has no undo, so a stray tap on the
             task name must not finish it. The 44px wrapper is the hit area. */}
-        <span className="-m-2 flex size-11 shrink-0 items-center justify-center">
-          <input
-            id={id}
-            type="checkbox"
-            className="size-7 shrink-0 cursor-pointer accent-ok disabled:cursor-not-allowed aria-disabled:cursor-default"
-            checked={checked}
-            disabled={inert}
-            aria-disabled={disabled || undefined}
-            aria-label={`Done: ${title}, ${amount}`}
-            aria-describedby={note ? `${id}-note` : undefined}
-            onChange={(event) => {
-              if (event.target.checked && !disabled) onComplete?.();
-              // There is no reopen command; a ticked box stays ticked.
-            }}
-          />
-        </span>
-        <div className="flex min-w-0 flex-1 items-center gap-3">
-          <span className="min-w-0 flex-1">
-            <span
-              className={`block text-base font-semibold break-words ${checked ? "text-ink-3 line-through" : "text-ink"}`}
-            >
-              {title} · {amount}
-            </span>
-            <span className="block text-sm break-words text-ink-3">
-              {detail || "No station set"}
-            </span>
-            {note ? (
-              <span
-                id={`${id}-note`}
-                className={`block text-sm break-words ${check.tone === "danger" && !working && !queued ? "text-danger" : "text-ink-2"}`}
-              >
-                {note}
-              </span>
-            ) : null}
+          <span className="-m-2 flex size-11 shrink-0 items-center justify-center">
+            <input
+              id={id}
+              type="checkbox"
+              className="size-7 shrink-0 cursor-pointer accent-ok disabled:cursor-not-allowed aria-disabled:cursor-default"
+              checked={checked}
+              disabled={inert}
+              aria-disabled={disabled || undefined}
+              aria-label={`Done: ${title}, ${amount}`}
+              aria-describedby={note ? `${id}-note` : undefined}
+              onChange={(event) => {
+                if (event.target.checked && !disabled) onComplete?.();
+                // There is no reopen command; a ticked box stays ticked.
+              }}
+            />
           </span>
-          {dueAt != null ? (
-            <time
-              dateTime={new Date(dueAt).toISOString()}
-              className={`shrink-0 text-right font-mono text-sm whitespace-nowrap ${late ? "font-semibold text-danger" : "text-ink-2"}`}
-            >
-              {dueLabel(dueAt, now)}
-              {late ? <span className="sr-only"> (late)</span> : null}
-            </time>
-          ) : (
-            <span className="shrink-0 font-mono text-sm whitespace-nowrap text-ink-3">
-              No time
+          <div className="flex min-w-0 flex-1 items-center gap-3">
+            <span className="min-w-0 flex-1">
+              <span
+                className={`block text-base font-semibold break-words ${checked ? "text-ink-3 line-through" : "text-ink"}`}
+              >
+                {title} · {amount}
+              </span>
+              <span className="block text-sm break-words text-ink-3">
+                {detail || "No station set"}
+              </span>
+              {note ? (
+                <span
+                  id={`${id}-note`}
+                  className={`block text-sm break-words ${check.tone === "danger" && !working && !queued ? "text-danger" : "text-ink-2"}`}
+                >
+                  {note}
+                </span>
+              ) : null}
             </span>
-          )}
+            {dueAt != null ? (
+              <time
+                dateTime={new Date(dueAt).toISOString()}
+                className={`shrink-0 text-right font-mono text-sm whitespace-nowrap ${late ? "font-semibold text-danger" : "text-ink-2"}`}
+              >
+                {dueLabel(dueAt, now)}
+                {late ? <span className="sr-only"> (late)</span> : null}
+              </time>
+            ) : (
+              <span className="shrink-0 font-mono text-sm whitespace-nowrap text-ink-3">
+                No time
+              </span>
+            )}
+          </div>
         </div>
-      </div>
-      {children ? (
-        <div className="flex min-w-0 flex-wrap items-center gap-2 pr-4 pb-3 pl-[58px]">
-          {children}
-        </div>
-      ) : null}
-    </li>
+        {children ? (
+          <div className="flex min-w-0 flex-wrap items-center gap-2 pr-4 pb-3 pl-[58px]">
+            {children}
+          </div>
+        ) : null}
+      </li>
+    </StudioCatalogGate>
   );
 }
+
+registerStudioRenderer("PrepTaskRow", (model) => (
+  <li className="border-b border-line px-4 py-2 text-sm">
+    {model.title}
+    {model.lead ? ` · ${model.lead}` : ""}
+  </li>
+));

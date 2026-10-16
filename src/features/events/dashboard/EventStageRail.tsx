@@ -1,4 +1,7 @@
 import { useLayoutEffect, useRef, useState } from "react";
+import { registerStudioRenderer } from "../../studio/StudioCatalog";
+import { StudioCatalogGate } from "../../studio/StudioCatalogGate";
+import { studioSlotKey, studioSlotProps } from "../../studio/StudioSlot";
 import "./EventStageRail.css";
 
 export type StageRailCheck = {
@@ -78,59 +81,74 @@ export function EventStageRail({ steps, current, gate }: Props) {
     return () => window.removeEventListener("resize", measure);
   }, [current, steps.length]);
 
+  const slotKey = studioSlotKey("rail", steps[0] ?? "stages");
   return (
-    <div className="evd-rail">
+    <StudioCatalogGate
+      kind="rail"
+      name="EventStageRail"
+      slotKey={slotKey}
+      model={{ title: steps[current] ?? steps[0] ?? "Stages" }}
+    >
       <div
-        ref={scroller}
-        className="evd-rail-scroll"
-        role={scrollable ? "region" : undefined}
-        aria-label={scrollable ? "Event stages, scroll sideways" : undefined}
-        tabIndex={scrollable ? 0 : undefined}
+        className="evd-rail"
+        {...studioSlotProps("rail", "EventStageRail", slotKey)}
       >
-        <ol
-          className="evd-rail-steps"
-          style={{
-            gridTemplateColumns: `repeat(${steps.length}, minmax(76px, 1fr))`,
-          }}
+        <div
+          ref={scroller}
+          className="evd-rail-scroll"
+          role={scrollable ? "region" : undefined}
+          aria-label={scrollable ? "Event stages, scroll sideways" : undefined}
+          tabIndex={scrollable ? 0 : undefined}
         >
-          {steps.map((label, index) => {
-            // The last stage ends the track: reaching it means done.
-            const reached = current >= 0 && index <= current;
-            const finished = current === steps.length - 1;
-            const state = !reached
-              ? ""
-              : index < current || finished
-                ? "done"
-                : "now";
-            return (
-              <li
-                key={label}
-                className={`evd-rail-step ${state}`}
-                aria-current={index === current ? "step" : undefined}
-              >
-                <span className="evd-rail-dot" aria-hidden="true">
-                  {state === "done" ? CHECK : index + 1}
-                </span>
-                <span className="evd-rail-name">
-                  {label}
-                  {state === "done" ? (
-                    <span className="sr-only">, done</span>
+          <ol
+            className="evd-rail-steps"
+            style={{
+              gridTemplateColumns: `repeat(${steps.length}, minmax(76px, 1fr))`,
+            }}
+          >
+            {steps.map((label, index) => {
+              // The last stage ends the track: reaching it means done.
+              const reached = current >= 0 && index <= current;
+              const finished = current === steps.length - 1;
+              const state = !reached
+                ? ""
+                : index < current || finished
+                  ? "done"
+                  : "now";
+              return (
+                <li
+                  key={label}
+                  className={`evd-rail-step ${state}`}
+                  aria-current={index === current ? "step" : undefined}
+                >
+                  <span className="evd-rail-dot" aria-hidden="true">
+                    {state === "done" ? CHECK : index + 1}
+                  </span>
+                  <span className="evd-rail-name">
+                    {label}
+                    {state === "done" ? (
+                      <span className="sr-only">, done</span>
+                    ) : null}
+                  </span>
+                  {state === "now" && open > 0 ? (
+                    <small className="evd-rail-open">
+                      {plural(open, "check")} open
+                    </small>
                   ) : null}
-                </span>
-                {state === "now" && open > 0 ? (
-                  <small className="evd-rail-open">
-                    {plural(open, "check")} open
-                  </small>
-                ) : null}
-              </li>
-            );
-          })}
-        </ol>
+                </li>
+              );
+            })}
+          </ol>
+        </div>
+        {gate ? <StageGateList gate={gate} open={open} /> : null}
       </div>
-      {gate ? <StageGateList gate={gate} open={open} /> : null}
-    </div>
+    </StudioCatalogGate>
   );
 }
+
+registerStudioRenderer("EventStageRail", (model) => (
+  <p className="evd-rail px-3 py-2 text-sm">{model.title}</p>
+));
 
 function StageGateList({
   gate,

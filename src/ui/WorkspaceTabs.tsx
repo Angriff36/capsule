@@ -1,4 +1,7 @@
 import { Link, NavLink, useLocation } from "react-router-dom";
+import { registerStudioRenderer } from "../features/studio/StudioCatalog";
+import { StudioCatalogGate } from "../features/studio/StudioCatalogGate";
+import { studioSlotKey, studioSlotProps } from "../features/studio/StudioSlot";
 import { useActiveNavLinkInView } from "../lib/useActiveNavLinkInView";
 import {
   DropdownMenu,
@@ -29,38 +32,57 @@ export function WorkspaceTabs({
   const activeMore = more.find((tab) =>
     tab.end ? pathname === tab.path : pathname.startsWith(tab.path),
   );
+  const slotKey = studioSlotKey("tabs", label);
   return (
-    <nav className="kitchen-book-nav" ref={navRef} aria-label={label}>
-      {tabs.map((tab) => (
-        <NavLink
-          key={tab.path}
-          to={tab.path}
-          end={tab.end}
-          className={({ isActive }) => (isActive ? "active" : undefined)}
-        >
-          {tab.label}
-        </NavLink>
-      ))}
-      {more.length > 0 ? (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              type="button"
-              className={`workspace-tabs-more${activeMore ? " active" : ""}`}
-            >
-              {activeMore ? activeMore.label : "More"}
-              <ChevronDownIcon width={12} height={12} aria-hidden="true" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            {more.map((tab) => (
-              <DropdownMenuItem key={tab.path} asChild>
-                <Link to={tab.path}>{tab.label}</Link>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ) : null}
-    </nav>
+    <StudioCatalogGate
+      kind="tabs"
+      name="WorkspaceTabs"
+      slotKey={slotKey}
+      model={{ title: label }}
+    >
+      <nav
+        className="kitchen-book-nav"
+        ref={navRef}
+        aria-label={label}
+        {...studioSlotProps("tabs", "WorkspaceTabs", slotKey)}
+      >
+        {tabs.map((tab) => (
+          <NavLink
+            key={tab.path}
+            to={tab.path}
+            end={tab.end}
+            className={({ isActive }) => (isActive ? "active" : undefined)}
+          >
+            {tab.label}
+          </NavLink>
+        ))}
+        {more.length > 0 ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className={`workspace-tabs-more${activeMore ? " active" : ""}`}
+              >
+                {activeMore ? activeMore.label : "More"}
+                <ChevronDownIcon width={12} height={12} aria-hidden="true" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {more.map((tab) => (
+                <DropdownMenuItem key={tab.path} asChild>
+                  <Link to={tab.path}>{tab.label}</Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : null}
+      </nav>
+    </StudioCatalogGate>
   );
 }
+
+registerStudioRenderer(
+  "WorkspaceTabs",
+  (model, original) =>
+    original ?? <p className="text-sm text-ink-2">{model.title}</p>,
+);

@@ -38,6 +38,12 @@ export interface ReconciliationSourceRow {
   rawSourceData?: string | null;
   resolutionNote?: string | null;
   deletedAt?: number | null;
+  /** Copied off the old row so the check does not need the spreadsheet text. */
+  recordedAt?: number | null;
+  amount?: number | null;
+  currency?: string | null;
+  rowClass?: string | null;
+  movesMoney?: boolean | null;
 }
 
 export interface ReconciliationPayment {
@@ -119,6 +125,15 @@ function text(value: unknown): string | null {
 }
 
 function raw(row: ReconciliationSourceRow): Record<string, unknown> {
+  if (row.rawSourceData == null) {
+    return {
+      recordedAt: row.recordedAt,
+      amount: row.amount,
+      currency: row.currency,
+      rowClass: row.rowClass,
+      movesMoney: row.movesMoney,
+    };
+  }
   try {
     const parsed: unknown = JSON.parse(row.rawSourceData ?? "{}");
     return parsed && typeof parsed === "object"
