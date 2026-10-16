@@ -3,6 +3,7 @@ import type { StudioLayoutManager } from "./StudioLayoutManager";
 
 export function StudioChangesPanel(props: {
   pagePattern: string;
+  ready: boolean;
   copy: StudioCopyManager;
   layout: StudioLayoutManager;
   onClose: () => void;
@@ -28,6 +29,7 @@ export function StudioChangesPanel(props: {
         <button
           type="button"
           className="btn btn-primary"
+          disabled={!props.ready}
           onClick={props.onPick}
         >
           Edit a spot
@@ -39,7 +41,10 @@ export function StudioChangesPanel(props: {
         </p>
       </div>
       <ol className="flex-1 overflow-y-auto">
-        {copies.length === 0 && layouts.length === 0 ? (
+        {!props.ready ? (
+          <li className="px-4 py-3 text-ink-3">Loading saved edits…</li>
+        ) : null}
+        {props.ready && copies.length === 0 && layouts.length === 0 ? (
           <li className="px-4 py-3 text-ink-3">No edits on this screen yet.</li>
         ) : null}
         {copies.map((row) => (

@@ -78,7 +78,8 @@ function StudioProviderLive({ children }: { children: ReactNode }) {
     () => ({
       pagePattern,
       canEdit,
-      ready: true,
+      // Saved edits must be known before anyone saves or restores one.
+      ready: copyRows !== undefined && layoutRows !== undefined,
       copy: new StudioCopyManager(
         copyRows ?? [],
         createCopy,

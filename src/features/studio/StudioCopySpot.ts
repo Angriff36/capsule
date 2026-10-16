@@ -22,8 +22,10 @@ export class StudioCopySpot {
     readonly targetLabel: string,
   ) {}
 
+  // The spot's place on the screen, never its words: once saved wording
+  // shows, picking the same spot again must find the same row.
   get copyKey(): string {
-    return `${this.selector}::${this.originalText}`.slice(0, 500);
+    return this.selector.slice(0, 500);
   }
 
   static cssPath(element: Element): string {

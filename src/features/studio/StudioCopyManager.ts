@@ -47,11 +47,20 @@ export class StudioCopyManager {
     );
   }
 
+  /** The spot's row, found by its place on the screen; a live row wins. */
   matching(spot: StudioCopySpot): CopyDoc | undefined {
-    return this.rows.find(
+    const same = this.rows.filter(
       (row) =>
-        row.pagePattern === spot.pagePattern && row.copyKey === spot.copyKey,
+        row.pagePattern === spot.pagePattern &&
+        (row.copyKey === spot.copyKey || row.targetSelector === spot.selector),
     );
+    return same.find((row) => row.deletedAt == null) ?? same[0];
+  }
+
+  /** The words the spot had before anyone changed them. */
+  originalText(spot: StudioCopySpot): string {
+    const existing = this.matching(spot);
+    return existing?.originalText || spot.originalText;
   }
 
   async save(spot: StudioCopySpot, text: string): Promise<void> {
@@ -59,12 +68,21 @@ export class StudioCopyManager {
     const next = text.trim();
     if (existing && existing.deletedAt == null && existing.text === next)
       return;
+    if (existing && existing.originalText === next) {
+      // Typing the first words back is the same as restoring them.
+      if (existing.deletedAt == null)
+        await this.revertCmd({
+          docId: existing._id,
+          version: existing.version,
+        });
+      return;
+    }
     if (existing) {
       await this.change({
         docId: existing._id,
         version: existing.version,
         pagePattern: spot.pagePattern,
-        copyKey: spot.copyKey,
+        copyKey: existing.copyKey,
         originalText: existing.originalText || spot.originalText,
         text: next,
         targetSelector: spot.selector,

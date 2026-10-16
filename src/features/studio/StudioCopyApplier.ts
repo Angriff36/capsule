@@ -11,21 +11,35 @@ export type StudioCopyRow = {
   version?: number;
 };
 
+// What the applier last wrote into each spot, and the words it replaced, so
+// a later edit can replace those words and a restore can put them back.
+const written = new Map<Element, { original: string; text: string }>();
+
 /**
  * Puts saved wording onto the live DOM after React paints. Only replaces
- * when the node still shows the original words or the saved words, so a
- * record name on another page is left alone.
+ * when the node still shows the original words, the saved words or words
+ * the applier wrote itself, so a record name on another page is left alone.
  */
 export class StudioCopyApplier {
   constructor(private readonly rows: readonly StudioCopyRow[]) {}
 
   apply(pagePattern: string): void {
+    const live = new Set<Element>();
     for (const row of this.rows) {
       if (row.deletedAt != null) continue;
       if (row.pagePattern !== pagePattern) continue;
       const element = this.findElement(row);
       if (!element) continue;
+      live.add(element);
       this.write(element, row.originalText, row.text);
+    }
+    for (const [element, mark] of Array.from(written)) {
+      if (live.has(element)) continue;
+      written.delete(element);
+      if (!element.isConnected) continue;
+      if (this.current(element) !== mark.text) continue;
+      const node = this.textNode(element);
+      if (node) node.textContent = mark.original;
     }
   }
 
@@ -48,13 +62,22 @@ export class StudioCopyApplier {
     }
   }
 
+  private current(element: Element): string {
+    return (element.textContent ?? "").replace(/\s+/g, " ").trim();
+  }
+
   private write(element: Element, originalText: string, next: string): void {
-    const current = (element.textContent ?? "").replace(/\s+/g, " ").trim();
-    if (current !== originalText && current !== next) return;
-    if (current === next) return;
+    const current = this.current(element);
+    const mine = written.get(element)?.text === current;
+    if (current !== originalText && current !== next && !mine) return;
+    if (current === next) {
+      written.set(element, { original: originalText, text: next });
+      return;
+    }
     const node = this.textNode(element);
     if (!node) return;
     node.textContent = next;
+    written.set(element, { original: originalText, text: next });
   }
 
   private textNode(element: Element): Text | null {

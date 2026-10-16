@@ -57,7 +57,8 @@ function StudioEditorSurface() {
     );
     stopPicking();
     if (!next) return;
-    const saved = studio.copy.matching(next.copy);
+    const found = studio.copy.matching(next.copy);
+    const saved = found?.deletedAt == null ? found : undefined;
     setDraft(next);
     setText(
       saved?.text ??
@@ -96,10 +97,15 @@ function StudioEditorSurface() {
     }
     setSaving(true);
     try {
+      const shown = studio.copy.matching(draft.copy);
+      const before =
+        shown?.deletedAt == null && shown
+          ? shown.text
+          : draft.copy.originalText;
       if (
         draft.copyEditable &&
         draft.copy.originalText &&
-        text.trim() !== draft.copy.originalText
+        text.trim() !== before
       ) {
         await studio.copy.save(draft.copy, text);
       }
@@ -160,6 +166,7 @@ function StudioEditorSurface() {
       {open && !picking && !draft ? (
         <StudioChangesPanel
           pagePattern={studio.pagePattern}
+          ready={studio.ready}
           copy={studio.copy}
           layout={studio.layout}
           onClose={() => setOpen(false)}
