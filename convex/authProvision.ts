@@ -18,7 +18,14 @@ export type StaffSignInProvisionResult = {
   email: string;
   appUrl: string;
   passwordIssued: boolean;
+  /** A local test copy: the invitation exists, but no email went out. */
+  testCopy: boolean;
 };
+
+// The sign-in service is shared with production, so a test copy on this
+// computer must never email the real address on a test record.
+const isTestCopy = (appUrl: string) =>
+  /^https?:\/\/(localhost|127\.0\.0\.1)(:|\/|$)/i.test(appUrl);
 
 export const loadPersonForProvision = internalQuery({
   args: { personId: v.id("people") },
@@ -183,6 +190,7 @@ export const provisionStaffSignIn = action({
         organizationId: person.tenantId,
         email: person.email,
         appUrl,
+        notify: !isTestCopy(appUrl),
       });
       await record("succeeded");
     } catch (error) {
@@ -199,6 +207,7 @@ export const provisionStaffSignIn = action({
       email: person.email,
       appUrl,
       passwordIssued: false,
+      testCopy: isTestCopy(appUrl),
     };
   },
 });
