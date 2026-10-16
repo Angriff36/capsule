@@ -2994,6 +2994,7 @@ export default defineSchema({
     issueNumber: v.optional(v.union(v.number(), v.null())),
     issueUrl: v.optional(v.union(v.string(), v.null())),
     resolvedAt: v.optional(v.union(v.number(), v.null())),
+    issueDoneAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),

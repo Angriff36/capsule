@@ -48359,6 +48359,7 @@ async function __runPageFeedbackReopen(ctx: MutationCtx, { docId, version }: any
     const updates = {
       status: "open",
       resolvedAt: null,
+      issueDoneAt: null,
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);

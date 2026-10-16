@@ -200,6 +200,7 @@ export const applyResolved = internalMutation({
     await ctx.db.patch(docId, {
       status: "resolved",
       resolvedAt: Date.now(),
+      issueDoneAt: Date.now(),
       version: (doc.version ?? 0) + 1,
       updatedAt: Date.now(),
     });
