@@ -239,12 +239,9 @@ export function MenuPriceOptionsSection({
             defaultValue={options.addOns
               .map((row) => `${row.label} = ${row.price} per ${row.per}`)
               .join("\n")}
-            placeholder={
-              "Jidori chicken upgrade = 10 per guest\nGluten-free dough = 5 per pizza"
-            }
           />
           {hint(
-            "One per line: the name, = the price, then per guest or per item.",
+            "One per line: the name, = the price, then per guest or per item. Example: Gluten-free dough = 5 per pizza",
           )}
         </label>
         <label className="field-label sm:col-span-2">
@@ -257,10 +254,9 @@ export function MenuPriceOptionsSection({
             defaultValue={options.steps
               .map((row) => `${row.upTo}, ${row.price}`)
               .join("\n")}
-            placeholder={"30, 930\n50, 1450\n100, 2750\n150, 4050"}
           />
           {hint(
-            "One per line: up to this many, then the price for all of them. A count between two lines takes the next one up.",
+            "One per line: up to this many, then the price for all of them, like 30, 930. A count between two lines takes the next one up.",
           )}
         </label>
         {error ? (

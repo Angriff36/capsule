@@ -160,8 +160,8 @@ export function PricingRulesSection({
               type="checkbox"
               defaultChecked={rules.menuPriceOptions}
             />
-            Menus show extra price fields: price range, price choices, add-ons
-            and price by count
+            Menus show extra fields: client picks per course, price range, price
+            choices, add-ons, smallest spend and price by count
           </label>
           <label>
             Busy season
@@ -169,11 +169,10 @@ export function PricingRulesSection({
               name="peakSeasons"
               rows={2}
               defaultValue={seasonsText(rules.peakSeasons)}
-              placeholder={"05-01 to 10-31\n12-01 to 12-31"}
             />
             <span className="mt-1 block text-xs font-normal text-ink-3">
-              One range per line, month-day to month-day. Every other day is off
-              season.
+              One range per line, month-day to month-day, like 05-01 to 10-31.
+              Every other day is off season.
             </span>
           </label>
           <div className="overflow-x-auto">
@@ -207,7 +206,7 @@ export function PricingRulesSection({
                           type="number"
                           min={0}
                           step="0.01"
-                          className="w-24"
+                          className="input w-24"
                           aria-label={`${label} season ${day} minimum`}
                           defaultValue={values[index] || ""}
                         />
@@ -278,14 +277,11 @@ export function PricingRulesSection({
               name="holidays"
               rows={3}
               defaultValue={holidaysText(rules.holidays)}
-              placeholder={
-                "12-24, Christmas Eve, 5000\n12-31, New Year's Eve, 5000\n2026-11-26, Thanksgiving, 5000"
-              }
             />
             <span className="mt-1 block text-xs font-normal text-ink-3">
               One per line: the date (month-day every year, or year-month-day
-              once), a name, and the minimum. The highest minimum that fits an
-              event is the one it gets.
+              once), a name, and the minimum, like 12-24, Christmas Eve, 5000.
+              The highest minimum that fits an event is the one it gets.
             </span>
           </label>
           <fieldset className="grid gap-3 sm:grid-cols-3">

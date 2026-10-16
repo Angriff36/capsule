@@ -100,7 +100,13 @@ export function ProposalMenuPriceOptions({
 
   const menuSection = (menu: Doc<"menus">, options: MenuPricingOptions) => {
     const menuId = String(menu._id);
-    const own = lines.filter((line) => String(line.menuId ?? "") === menuId);
+    // Lines of this menu: linked to it, or named after it (a line built from
+    // the event or a website quote carries no menu link).
+    const own = lines.filter(
+      (line) =>
+        String(line.menuId ?? "") === menuId ||
+        (line.menuId == null && line.description.startsWith(`${menu.name} (`)),
+    );
     const perGuestLine = own.find(
       (line) =>
         String(line.pricingBasis) === "per_person" &&

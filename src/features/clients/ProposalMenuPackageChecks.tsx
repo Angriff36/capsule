@@ -72,7 +72,14 @@ export function ProposalMenuPackageChecks({
       if (rules.length === 0 && !choice && !units && !minimum) return null;
 
       const minimumName = minimum ? `${menu.name}: ${minimum.label}` : "";
-      const own = lines.filter((line) => String(line.menuId ?? "") === menuId);
+      // Lines of this menu: linked to it, or named after it (a line built
+      // from the event or a website quote carries no menu link).
+      const own = lines.filter(
+        (line) =>
+          String(line.menuId ?? "") === menuId ||
+          (line.menuId == null &&
+            line.description.startsWith(`${menu.name} (`)),
+      );
       const topUp = own.find((line) => line.description === minimumName);
       const spentCents = own
         .filter((line) => line !== topUp)

@@ -124,10 +124,12 @@ async function syncPackageLine(
   const price = choice?.pricePerPerson ?? Number(menu.pricePerPerson);
   const description = perGuestLineDescription(menu.name, choice?.label ?? "");
   const lines = await activeLines(ctx, proposalId);
+  // The menu's per-guest line: linked to it, or named after it (a line built
+  // from the event or a website quote carries no menu link).
   const line = lines.find(
     (row) =>
       String(row.pricingBasis) === "per_person" &&
-      String(row.menuId ?? "") === String(menu._id) &&
+      (row.menuId == null || String(row.menuId) === String(menu._id)) &&
       row.description.startsWith(`${menu.name} (per `),
   );
   if (line) {
