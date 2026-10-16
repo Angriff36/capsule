@@ -216,13 +216,22 @@ describe("screen editor finds the shared headings and labels", () => {
         null,
         createElement(PageHeader, { title: "Prep list", lead: "Today's work" }),
         createElement(Section, { title: "Stations", children: "x" }),
+        createElement(Section, { title: "Posted", count: 12, children: "x" }),
         createElement(EmptyState, { title: "No tasks yet", hint: "Add one." }),
         createElement(StatCard, { title: "Open tasks", main: { value: 4 } }),
       ),
     );
     expect(spot("h1", "/kitchen")?.originalText).toBe("Prep list");
     expect(spot("header p", "/kitchen")?.originalText).toBe("Today's work");
-    expect(spot("h2", "/kitchen")?.originalText).toBe("Stations");
+    const titles = document.querySelectorAll("h2 > span:first-child");
+    expect(
+      StudioCopySpot.fromElement(titles[0]!, "/kitchen")?.originalText,
+    ).toBe("Stations");
+    // A counted section's title is editable; its count is live data.
+    expect(
+      StudioCopySpot.fromElement(titles[1]!, "/kitchen")?.originalText,
+    ).toBe("Posted");
+    expect(spot("h2 > span + span", "/kitchen")).toBeNull();
     expect(spot("p.text-xl", "/kitchen")?.originalText).toBe("No tasks yet");
     expect(spot("h3 span", "/kitchen")?.originalText).toBe("Open tasks");
   });
@@ -241,8 +250,8 @@ describe("screen editor finds the shared headings and labels", () => {
       ),
     );
     expect(spot("h1", "/events/:id")).toBeNull();
-    expect(spot("h2", "/events/:id")).toBeNull();
-    expect(spot("h2", "/kitchen")).toBeNull();
+    expect(spot("h2 > span", "/events/:id")).toBeNull();
+    expect(spot("h2 > span", "/kitchen")).toBeNull();
   });
 
   it("the edit window says when words cannot be changed and offers no Save", () => {

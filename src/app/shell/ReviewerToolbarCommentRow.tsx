@@ -38,13 +38,15 @@ export function commentSendChip(input: {
   issueDone: boolean;
 }): { status: string; color: string; label: string } | null {
   // Done only when the GitHub issue was finished; closing by hand is not Done.
+  // A sent comment closed before Capsule kept the finish time may have been
+  // finished on GitHub, so it only says Closed.
   if (input.issueDone)
     return { status: "completed", color: "chip-tone-ok", label: "Done" };
   if (input.resolved)
     return {
       status: "cancelled",
       color: "chip-tone-mute",
-      label: "Closed by hand",
+      label: input.sent ? "Closed" : "Closed by hand",
     };
   if (input.addressing)
     return { status: "executing", color: "chip-tone-info", label: "Sending…" };

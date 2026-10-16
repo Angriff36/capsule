@@ -16,6 +16,16 @@ describe("screen comment chip", () => {
     ).toBe("Done");
     expect(
       commentSendChip({ ...base, resolved: true, issueDone: false })?.label,
+    ).toBe("Closed");
+    // An old sent comment may have been finished on GitHub before Capsule
+    // kept the finish time, so only a comment never sent says "by hand".
+    expect(
+      commentSendChip({
+        ...base,
+        sent: false,
+        resolved: true,
+        issueDone: false,
+      })?.label,
     ).toBe("Closed by hand");
     expect(
       commentSendChip({ ...base, resolved: false, issueDone: false })?.label,

@@ -219,13 +219,14 @@ export function Section({
         {...studioSlotProps("section", "Section", slotKey)}
       >
         <div className="flex min-h-9 flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-line bg-inset px-3 py-0.5">
-          <h2
-            data-copy={liveTitle ? "live" : ""}
-            className="text-sm font-semibold text-ink"
-          >
-            {title}
+          {/* Only the title words are editable; the count is live data. */}
+          <h2 className="text-sm font-semibold text-ink">
+            <span data-copy={liveTitle ? "live" : ""}>{title}</span>
             {count != null && (
-              <span className="ml-1.5 font-mono text-xs font-medium text-ink-2">
+              <span
+                data-copy="live"
+                className="ml-1.5 font-mono text-xs font-medium text-ink-2"
+              >
                 {count}
               </span>
             )}
