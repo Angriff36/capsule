@@ -210,6 +210,134 @@ describe("runtime proof: proposal dish picks carry their price", () => {
     expect(await proposal()).toMatchObject({ subtotal: 500, total: 500 });
   });
 
+  it("keeps a picked menu's price in step when picks are removed", async () => {
+    const proof = createManifestTestContext({
+      convexTest: convexTest as never,
+      schema,
+      modules,
+    });
+    const sales = proof.asRole({
+      subject: "pick-sales-3",
+      role: "sales_manager",
+      tenantId: TENANT,
+    }) as unknown as Actor;
+    await linkStaffProfile(proof, TENANT, "pick-sales-3", "sales_manager");
+    const [chicken, steak] = await menu(sales, "Plated", 40, 0, [
+      { name: "Roast chicken" },
+      { name: "Filet steak" },
+    ]);
+    await sales.run(async (ctx) => {
+      const steakRow = await ctx.db.get(steak);
+      await ctx.db.patch(steakRow.menuId, {
+        pricingOptionsJson: JSON.stringify({
+          choices: [
+            {
+              label: "Steak tier",
+              pricePerPerson: 60,
+              dishIds: [String(steakRow.dishId)],
+            },
+            { label: "Family style", pricePerPerson: 55 },
+          ],
+        }),
+      });
+    });
+    const client = (await proof.executeCommand(
+      sales as never,
+      api.mutations.Client_createViaRegister,
+      { clientType: "company", companyName: "Plated client" },
+    )) as { docId: string };
+    await sales.mutation(
+      (api.lib as any).proposalDraft.draftProposalWithLines,
+      {
+        clientId: client.docId,
+        title: "Gala",
+        guestCount: 10,
+        subtotal: 0,
+        taxAmount: 0,
+        discountAmount: 0,
+        total: 0,
+        lines: [],
+      },
+    );
+    const proposalId = (
+      (await sales.query(api.queries.listProposal, {})) as any[]
+    )[0]._id;
+    const rows = async () =>
+      (
+        (await sales.query(api.queries.listProposalLineItem, {})) as any[]
+      ).filter((row) => row.proposalId === proposalId && row.deletedAt == null);
+    const lines = async () =>
+      (await rows()).map((row) => ({
+        description: row.description,
+        unitPrice: row.unitPrice,
+      }));
+    const pickOf = async (menuDishId: string) => {
+      const dishId = ((await sales.run((ctx) => ctx.db.get(menuDishId))) as any)
+        .dishId;
+      return (
+        (await sales.query(api.queries.listProposalDishSelection, {})) as any[]
+      ).find(
+        (row) =>
+          row.deletedAt == null &&
+          row.selectedAt != null &&
+          String(row.dishId) === String(dishId),
+      );
+    };
+    const pick = (menuDishId: string) =>
+      sales.mutation((api.lib as any).proposalDishPricing.pickProposalDish, {
+        proposalId,
+        menuDishId,
+        quantityServings: 10,
+      });
+    const unpick = async (menuDishId: string) => {
+      const row = await pickOf(menuDishId);
+      await sales.mutation(
+        (api.lib as any).proposalDishPricing.removeProposalDish,
+        { docId: row._id, version: row.version },
+      );
+    };
+
+    await pick(chicken);
+    expect(await lines()).toEqual([
+      { description: "Plated (per guest)", unitPrice: 40 },
+    ]);
+    await pick(steak);
+    expect(await lines()).toEqual([
+      { description: "Plated (per guest) — Steak tier", unitPrice: 60 },
+    ]);
+
+    // The steak pick goes: back to the menu's own price.
+    await unpick(steak);
+    expect(await lines()).toEqual([
+      { description: "Plated (per guest)", unitPrice: 40 },
+    ]);
+
+    // The last pick goes: the line that came with the picks goes too.
+    await unpick(chicken);
+    expect(await lines()).toEqual([]);
+
+    // A choice staff set by hand stays when the picks change.
+    await pick(chicken);
+    await pick(steak);
+    const line = (await rows())[0];
+    await sales.mutation(
+      (api.lib as any).proposalPricing.reviseProposalLineAndRecompute,
+      {
+        docId: line._id,
+        version: line.version,
+        description: "Plated (per guest) — Family style",
+        pricingBasis: "per_person",
+        unitPrice: 55,
+        quantity: line.quantity,
+      },
+    );
+    await unpick(steak);
+    await unpick(chicken);
+    expect(await lines()).toEqual([
+      { description: "Plated (per guest) — Family style", unitPrice: 55 },
+    ]);
+  });
+
   it("adds no second line for a dish a line already covers", async () => {
     const proof = createManifestTestContext({
       convexTest: convexTest as never,

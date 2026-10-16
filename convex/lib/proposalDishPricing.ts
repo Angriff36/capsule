@@ -16,6 +16,10 @@
 //   - servings follow onto the dish's own line; removing a pick removes only
 //     the dish's own line. A per-guest menu line stays: it is the menu's price,
 //     and one dish less does not make the rest free.
+//   - a menu sold by picks (price choices that follow the picks) keeps its
+//     per-guest line in step with the picks on every add and remove: back to
+//     the menu's own price when no choice applies, gone with the last pick.
+//     A choice staff set by hand is left alone.
 
 import { mutation } from "../_generated/server";
 import { api } from "../_generated/api";
@@ -133,8 +137,29 @@ async function syncPackageLine(
       row.description.startsWith(`${menu.name} (per `),
   );
   if (line) {
-    // Staff picked a choice by hand and no choice follows the picks: keep it.
-    if (!hasAutomaticChoices(options) || !choice) return;
+    if (!hasAutomaticChoices(options)) return;
+    // A line the picks set: the menu's own price, or a choice that follows the
+    // picks, at that price. Anything else (a choice only staff pick, or a price
+    // typed by hand) is staff's and stays.
+    const auto = [
+      { label: "", pricePerPerson: Number(menu.pricePerPerson) },
+      ...options.choices.filter(
+        (row) => (row.dishIds?.length ?? 0) > 0 || row.picks != null,
+      ),
+    ].some(
+      (row) =>
+        line.description === perGuestLineDescription(menu.name, row.label) &&
+        Number(line.unitPrice) === row.pricePerPerson,
+    );
+    if (!auto) return;
+    // No pick left, or nothing sets a price: the line came with the picks.
+    if (picked.length === 0 || !(price > 0)) {
+      await ctx.runMutation(
+        api.lib.proposalPricing.removeProposalLineAndRecompute,
+        { docId: line._id, version: Number(line.version) },
+      );
+      return;
+    }
     if (Number(line.unitPrice) === price && line.description === description)
       return;
     await ctx.runMutation(api.lib.proposalPricing.reviseProposalLineAndRecompute, {
