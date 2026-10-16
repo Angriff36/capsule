@@ -185,6 +185,11 @@
       "code": "DOMAIN_UNWIRED_FK",
       "key": "VendorContractPriceTier.contractId",
       "issue": "https://github.com/Angriff36/Manifest/issues/90"
+    },
+    {
+      "code": "DOMAIN_UNWIRED_FK",
+      "key": "ScreenLayoutOverride.componentId",
+      "issue": "https://github.com/Angriff36/capsule/issues/448"
     }
   ]
 }
