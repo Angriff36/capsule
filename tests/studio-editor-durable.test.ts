@@ -61,6 +61,7 @@ function SaveButton() {
     {
       type: "button",
       "data-test-save": "",
+      "data-copy": "",
       onClick: () => setSaving((value) => !value),
     },
     saving ? "Saving" : "Save",

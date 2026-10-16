@@ -52,6 +52,7 @@ export function WorkspaceTabs({
             to={tab.path}
             end={tab.end}
             className={({ isActive }) => (isActive ? "active" : undefined)}
+            data-copy
           >
             {tab.label}
           </NavLink>

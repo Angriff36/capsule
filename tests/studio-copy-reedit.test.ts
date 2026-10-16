@@ -78,7 +78,7 @@ afterEach(() => {
 
 describe("screen editor saved wording", () => {
   it("updates the same row on a second edit and restores the true original", async () => {
-    document.body.innerHTML = `<main><h1>Prep list</h1></main>`;
+    document.body.innerHTML = `<main data-copy><h1>Prep list</h1></main>`;
     const heading = document.querySelector("h1")!;
     const db = store();
     const apply = () => new StudioCopyApplier(db.rows).apply("/kitchen");
@@ -117,7 +117,7 @@ describe("screen editor saved wording", () => {
   });
 
   it("typing the first words back restores them", async () => {
-    document.body.innerHTML = `<main><h1>Prep list</h1></main>`;
+    document.body.innerHTML = `<main data-copy><h1>Prep list</h1></main>`;
     const heading = document.querySelector("h1")!;
     const db = store();
     await db
@@ -131,8 +131,48 @@ describe("screen editor saved wording", () => {
     expect(db.rows[0]!.deletedAt).not.toBeNull();
   });
 
-  it("offers no split label and no control with its own screen-reader name", () => {
+  it("never turns record names, money, dates or counts into saved wording", () => {
     document.body.innerHTML = `<main>
+      <h1 id="dish">Chicken Marsala</h1>
+      <nav data-copy>
+        <a href="/menus">Menus</a>
+        <span data-copy="live">Ashley's Wedding</span>
+        <span id="price">$42.50</span>
+        <span id="date">Oct 18</span>
+        <span id="count">120 guests</span>
+      </nav>
+    </main>`;
+    const pick = (selector: string) =>
+      StudioCopySpot.fromElement(
+        document.querySelector(selector)!,
+        "/kitchen/dishes/:id",
+      );
+    // An unmarked record name, a live part inside a marked area, money, a
+    // date and a count are all refused; marked interface words are offered.
+    expect(pick("#dish")).toBeNull();
+    expect(pick("[data-copy='live']")).toBeNull();
+    expect(pick("#price")).toBeNull();
+    expect(pick("#date")).toBeNull();
+    expect(pick("#count")).toBeNull();
+    expect(pick("a")?.originalText).toBe("Menus");
+
+    // A saved row that points at a record name never changes it.
+    new StudioCopyApplier([
+      {
+        pagePattern: "/kitchen/dishes/:id",
+        copyKey: "body > main > h1",
+        originalText: "Chicken Marsala",
+        text: "Beef Stew",
+        targetSelector: "#dish",
+      },
+    ]).apply("/kitchen/dishes/:id");
+    expect(document.querySelector("#dish")!.textContent).toBe(
+      "Chicken Marsala",
+    );
+  });
+
+  it("offers no split label and no control with its own screen-reader name", () => {
+    document.body.innerHTML = `<main data-copy>
       <a href="/orders">Orders <b>3</b></a>
       <button aria-label="Delete the chicken dish">Delete</button>
     </main>`;
@@ -145,7 +185,7 @@ describe("screen editor saved wording", () => {
   });
 
   it("keeps a named control's screen-reader name in step through edit, re-edit and restore", async () => {
-    document.body.innerHTML = `<main>
+    document.body.innerHTML = `<main data-copy>
       <button aria-label="Save"><svg></svg>Save</button>
       <a href="/menus" aria-label="Menus"><span>Menus</span></a>
     </main>`;
