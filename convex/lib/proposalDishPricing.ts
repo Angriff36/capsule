@@ -28,7 +28,6 @@ import type { Doc, Id } from "../_generated/dataModel";
 import { effectiveSellingPrice } from "../../src/lib/catalogEligibility";
 import {
   choiceForPicks,
-  hasAutomaticChoices,
   perGuestLineDescription,
   readMenuPricingOptions,
 } from "../../src/lib/menuPricing";
@@ -91,10 +90,17 @@ async function ownLine(
 // per-course pick rules, src/lib/menuPricing.ts and src/lib/coursePicks.ts):
 // its per-guest line comes with the first pick, and its price follows the
 // choice the picks call for ("your highest entrée tier sets one price").
-function isPickedPackage(menu: Doc<"menus">): boolean {
-  return (
-    readMenuPricingOptions(menu).choices.length > 0 ||
-    readCoursePicks(menu).length > 0
+// Course pick rules alone only say how many dishes a course takes: a menu whose
+// dishes carry their own prices stays priced dish by dish.
+async function isPickedPackage(
+  ctx: { db: any },
+  menu: Doc<"menus">,
+): Promise<boolean> {
+  if (readMenuPricingOptions(menu).choices.length > 0) return true;
+  if (readCoursePicks(menu).length === 0) return false;
+  const now = Date.now();
+  return !(await catalogLines(ctx, menu._id)).some(
+    (row) => (effectiveSellingPrice(row, now) ?? 0) > 0,
   );
 }
 
@@ -137,7 +143,6 @@ async function syncPackageLine(
       row.description.startsWith(`${menu.name} (per `),
   );
   if (line) {
-    if (!hasAutomaticChoices(options)) return;
     // A line the picks set: the menu's own price, or a choice that follows the
     // picks, at that price. Anything else (a choice only staff pick, or a price
     // typed by hand) is staff's and stays.
@@ -231,7 +236,7 @@ export const pickProposalDish = mutation({
     const menu = await ctx.db.get(menuDish.menuId);
     const dish = await ctx.db.get(menuDish.dishId);
     if (!menu || !dish) return;
-    if (isPickedPackage(menu)) {
+    if (await isPickedPackage(ctx, menu)) {
       await syncPackageLine(ctx, args.proposalId, menu, true);
       return;
     }
@@ -372,7 +377,7 @@ export const removeProposalDish = mutation({
     const proposal = await ctx.db.get(selection.proposalId);
     if (!proposal || proposal.status !== "draft") return;
     const menu = await ctx.db.get(selection.menuId);
-    if (menu && isPickedPackage(menu)) {
+    if (menu && (await isPickedPackage(ctx, menu))) {
       await syncPackageLine(ctx, selection.proposalId, menu, false);
       return;
     }

@@ -338,6 +338,105 @@ describe("runtime proof: proposal dish picks carry their price", () => {
     ]);
   });
 
+  it("prices course-pick menus as a package only when no dish has its own price", async () => {
+    const proof = createManifestTestContext({
+      convexTest: convexTest as never,
+      schema,
+      modules,
+    });
+    const sales = proof.asRole({
+      subject: "pick-sales-4",
+      role: "sales_manager",
+      tenantId: TENANT,
+    }) as unknown as Actor;
+    await linkStaffProfile(proof, TENANT, "pick-sales-4", "sales_manager");
+    const rules = JSON.stringify([{ course: "Salad", min: 1, max: 1 }]);
+    const [caesar, garden] = await menu(sales, "Buffet", 30, 0, [
+      { name: "Caesar salad" },
+      { name: "Garden salad" },
+    ]);
+    const [wings] = await menu(sales, "Bar snacks", 0, 0, [
+      { name: "Wings", sellingPrice: 4 },
+    ]);
+    await sales.run(async (ctx) => {
+      for (const row of [caesar, wings]) {
+        const menuDish = await ctx.db.get(row);
+        await ctx.db.patch(menuDish.menuId, { coursePicksJson: rules });
+      }
+    });
+    const client = (await proof.executeCommand(
+      sales as never,
+      api.mutations.Client_createViaRegister,
+      { clientType: "company", companyName: "Course client" },
+    )) as { docId: string };
+    await sales.mutation(
+      (api.lib as any).proposalDraft.draftProposalWithLines,
+      {
+        clientId: client.docId,
+        title: "Picnic",
+        guestCount: 10,
+        subtotal: 0,
+        taxAmount: 0,
+        discountAmount: 0,
+        total: 0,
+        lines: [],
+      },
+    );
+    const proposalId = (
+      (await sales.query(api.queries.listProposal, {})) as any[]
+    )[0]._id;
+    const lines = async () =>
+      ((await sales.query(api.queries.listProposalLineItem, {})) as any[])
+        .filter((row) => row.proposalId === proposalId && row.deletedAt == null)
+        .map((row) => ({
+          description: row.description,
+          unitPrice: row.unitPrice,
+        }));
+    const pick = (menuDishId: string) =>
+      sales.mutation((api.lib as any).proposalDishPricing.pickProposalDish, {
+        proposalId,
+        menuDishId,
+        quantityServings: 10,
+      });
+    const unpick = async (menuDishId: string) => {
+      const dishId = ((await sales.run((ctx) => ctx.db.get(menuDishId))) as any)
+        .dishId;
+      const row = (
+        (await sales.query(api.queries.listProposalDishSelection, {})) as any[]
+      ).find(
+        (item) =>
+          item.deletedAt == null &&
+          item.selectedAt != null &&
+          String(item.dishId) === String(dishId),
+      );
+      await sales.mutation(
+        (api.lib as any).proposalDishPricing.removeProposalDish,
+        { docId: row._id, version: row.version },
+      );
+    };
+
+    // A course-pick menu with no dish prices: the per-guest line comes with
+    // the first pick and goes with the last.
+    await pick(caesar);
+    await pick(garden);
+    expect(await lines()).toEqual([
+      { description: "Buffet (per guest)", unitPrice: 30 },
+    ]);
+    await unpick(caesar);
+    expect(await lines()).toEqual([
+      { description: "Buffet (per guest)", unitPrice: 30 },
+    ]);
+    await unpick(garden);
+    expect(await lines()).toEqual([]);
+
+    // Course rules on a menu whose dishes carry their own prices: priced
+    // dish by dish, and the dish line goes with its pick.
+    await pick(wings);
+    expect(await lines()).toEqual([{ description: "Wings", unitPrice: 4 }]);
+    await unpick(wings);
+    expect(await lines()).toEqual([]);
+  });
+
   it("adds no second line for a dish a line already covers", async () => {
     const proof = createManifestTestContext({
       convexTest: convexTest as never,
