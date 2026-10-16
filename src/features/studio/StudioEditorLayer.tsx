@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { reportActionFail, reportActionOk } from "../../ui/action-result";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useStudio } from "./StudioContext";
@@ -34,6 +34,16 @@ function StudioEditorSurface() {
     setPicking(false);
     setHover(null);
   }, []);
+
+  // Escape stops picking wherever focus is; the overlay itself never has it.
+  useEffect(() => {
+    if (!picking) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") stopPicking();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [picking, stopPicking]);
 
   // The editor tab shows once the screen editor has loaded.
   if (!studio) return null;
@@ -170,9 +180,6 @@ function StudioEditorSurface() {
               setHover(element ? element.getBoundingClientRect() : null);
             }}
             onClick={(event) => pick(event.clientX, event.clientY)}
-            onKeyDown={(event) => {
-              if (event.key === "Escape") stopPicking();
-            }}
           />
           {hover ? (
             <div
@@ -189,7 +196,7 @@ function StudioEditorSurface() {
             Click the words or block you want to change.
             <button
               type="button"
-              className="rounded-sm border border-panel/40 px-2 py-0.5 text-xs"
+              className="btn btn-ghost shrink-0"
               onClick={stopPicking}
             >
               Stop (Esc)

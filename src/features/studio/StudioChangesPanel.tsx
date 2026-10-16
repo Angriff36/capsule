@@ -20,11 +20,7 @@ export function StudioChangesPanel(props: {
     >
       <header className="flex items-center justify-between border-b border-line px-4 py-3">
         <h2 className="text-base font-semibold">App edits</h2>
-        <button
-          type="button"
-          className="rounded-sm px-2 py-1 text-sm hover:bg-inset"
-          onClick={props.onClose}
-        >
+        <button type="button" className="btn btn-ghost" onClick={props.onClose}>
           Close
         </button>
       </header>
@@ -60,7 +56,7 @@ export function StudioChangesPanel(props: {
             </p>
             <button
               type="button"
-              className="mt-2 text-xs font-semibold text-accent"
+              className="text-link mt-1 inline-flex min-h-10"
               onClick={() => props.onRevertCopy(row.copyKey)}
             >
               Use original words
@@ -77,7 +73,7 @@ export function StudioChangesPanel(props: {
             </p>
             <button
               type="button"
-              className="mt-2 text-xs font-semibold text-accent"
+              className="text-link mt-1 inline-flex min-h-10"
               onClick={() => props.onRevertLayout(row.slotKey)}
             >
               Use original piece
