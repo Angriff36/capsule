@@ -152,23 +152,10 @@ export function renderStudioCatalog(
 export function studioCatalogForKind(
   kind: StudioCatalogKind,
 ): StudioCatalogEntry[] {
-  const matching = STUDIO_CATALOG.filter((entry) => entry.kind === kind);
-  const related =
-    kind === "masthead"
-      ? STUDIO_CATALOG.filter(
-          (entry) =>
-            entry.kind === "empty" ||
-            entry.kind === "error" ||
-            entry.kind === "section",
-        )
-      : [];
-  const combined = [
-    ...matching,
-    ...related.filter(
-      (entry) => !matching.some((item) => item.id === entry.id),
-    ),
-  ];
-  return combined.length > 0 ? combined : [...STUDIO_CATALOG];
+  // Only pieces of the same kind: a page heading must stay the editorial
+  // masthead with its <h1> (DESIGN.md "Page header"), so an empty or error
+  // state is never offered in its place.
+  return STUDIO_CATALOG.filter((entry) => entry.kind === kind);
 }
 
 /**

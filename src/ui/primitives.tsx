@@ -124,10 +124,17 @@ export function PageHeader({
       >
         <div className="min-w-0">
           {eyebrowLine}
-          <h1 className="font-display text-2xl leading-tight font-bold tracking-tight text-balance text-ink">
+          <h1
+            data-copy="page"
+            className="font-display text-2xl leading-tight font-bold tracking-tight text-balance text-ink"
+          >
             {title}
           </h1>
-          {lead ? <p className="mt-0.5 text-sm text-ink-2">{lead}</p> : null}
+          {lead ? (
+            <p data-copy="page" className="mt-0.5 text-sm text-ink-2">
+              {lead}
+            </p>
+          ) : null}
         </div>
         {actions ? (
           <div className="flex flex-wrap items-center gap-2">{actions}</div>
@@ -145,12 +152,18 @@ export function PageHeader({
         <div className="min-w-0 flex-1 basis-80">
           {eyebrowLine}
           <h1
+            data-copy="page"
             className={`font-display text-4xl leading-[0.95] font-bold tracking-[-0.045em] text-balance break-words text-ink lg:text-5xl ${eyebrow ? "mt-2.5" : ""}`}
           >
             {title}
           </h1>
           {lead ? (
-            <p className="mt-3 max-w-[72ch] text-base text-ink-2">{lead}</p>
+            <p
+              data-copy="page"
+              className="mt-3 max-w-[72ch] text-base text-ink-2"
+            >
+              {lead}
+            </p>
           ) : null}
         </div>
         {actions ? (
@@ -184,9 +197,12 @@ export function Section({
   count,
   actions,
   children,
+  liveTitle = false,
 }: {
   title: string;
   count?: number;
+  /** The title shows a record's name, so the screen editor leaves it alone. */
+  liveTitle?: boolean;
   actions?: ReactNode;
   children: ReactNode;
 }) {
@@ -203,7 +219,10 @@ export function Section({
         {...studioSlotProps("section", "Section", slotKey)}
       >
         <div className="flex min-h-9 flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-line bg-inset px-3 py-0.5">
-          <h2 className="text-sm font-semibold text-ink">
+          <h2
+            data-copy={liveTitle ? "live" : ""}
+            className="text-sm font-semibold text-ink"
+          >
             {title}
             {count != null && (
               <span className="ml-1.5 font-mono text-xs font-medium text-ink-2">

@@ -25,6 +25,8 @@ import type { StudioEditDraft } from "../src/features/studio/StudioEditDraft";
 import { PrepTaskRow } from "../src/features/kitchen/PrepTaskRow";
 import { SegmentedTabs } from "../src/ui/SegmentedTabs";
 import { EmptyState } from "../src/ui/EmptyState";
+import { PageHeader, Section } from "../src/ui/primitives";
+import { StatCard } from "../src/ui/charts/StatCard";
 
 beforeAll(() => {
   (
@@ -65,12 +67,11 @@ describe("screen editor swaps keep live behavior", () => {
     expect(studioSwapChoices("section", "Section", false)).toEqual([]);
   });
 
-  it("offers only fitting words-only pieces, and none for a block with buttons", () => {
-    const ids = studioSwapChoices("masthead", "PageHeader", false).map(
-      (entry) => entry.id,
-    );
-    expect(ids).toEqual(["EmptyState", "ErrorState"]);
+  it("never swaps a page heading for an empty or error state (keeps the <h1> masthead)", () => {
+    expect(studioSwapChoices("masthead", "PageHeader", false)).toEqual([]);
     expect(studioSwapChoices("masthead", "PageHeader", true)).toEqual([]);
+    expect(studioSwapChoices("empty", "EmptyState", false)).toEqual([]);
+    expect(studioSwapChoices("error", "ErrorState", false)).toEqual([]);
   });
 
   it("a saved swap on filter tabs still shows tabs that switch", () => {
@@ -169,12 +170,10 @@ describe("screen editor edit window", () => {
     expect(dialog?.getAttribute("aria-modal")).toBe("true");
     expect(dialog?.className).toContain("ui-dialog");
     expect(dialog?.getAttribute("style") ?? "").not.toContain("28rem");
-    const radio = dialog!.querySelector<HTMLInputElement>(
-      "input[type='radio']",
-    );
-    expect(radio).not.toBeNull();
+    const words = dialog!.querySelector<HTMLTextAreaElement>("textarea");
+    expect(words).not.toBeNull();
     act(() => {
-      radio!.dispatchEvent(
+      words!.dispatchEvent(
         new KeyboardEvent("keydown", { key: "Escape", bubbles: true }),
       );
     });
@@ -203,5 +202,83 @@ describe("screen editor edit window", () => {
     const dialog = document.querySelector<HTMLElement>("[role='dialog']");
     expect(dialog!.querySelector("input[type='radio']")).toBeNull();
     expect(dialog!.textContent).toContain("keeps its own look");
+  });
+});
+
+describe("screen editor finds the shared headings and labels", () => {
+  const spot = (selector: string, pattern: string) =>
+    StudioCopySpot.fromElement(document.querySelector(selector)!, pattern);
+
+  it("page headings, section titles, empty messages and tile names are editable words", () => {
+    mount(
+      createElement(
+        "div",
+        null,
+        createElement(PageHeader, { title: "Prep list", lead: "Today's work" }),
+        createElement(Section, { title: "Stations", children: "x" }),
+        createElement(EmptyState, { title: "No tasks yet", hint: "Add one." }),
+        createElement(StatCard, { title: "Open tasks", main: { value: 4 } }),
+      ),
+    );
+    expect(spot("h1", "/kitchen")?.originalText).toBe("Prep list");
+    expect(spot("header p", "/kitchen")?.originalText).toBe("Today's work");
+    expect(spot("h2", "/kitchen")?.originalText).toBe("Stations");
+    expect(spot("p.text-xl", "/kitchen")?.originalText).toBe("No tasks yet");
+    expect(spot("h3 span", "/kitchen")?.originalText).toBe("Open tasks");
+  });
+
+  it("a record's page heading and a section named after a record stay as they are", () => {
+    mount(
+      createElement(
+        "div",
+        null,
+        createElement(PageHeader, { title: "Ashley's Wedding" }),
+        createElement(Section, {
+          title: "Venue follow-up · Grand Hall",
+          liveTitle: true,
+          children: "x",
+        }),
+      ),
+    );
+    expect(spot("h1", "/events/:id")).toBeNull();
+    expect(spot("h2", "/events/:id")).toBeNull();
+    expect(spot("h2", "/kitchen")).toBeNull();
+  });
+
+  it("the edit window says when words cannot be changed and offers no Save", () => {
+    mount(
+      createElement(StudioEditPopover, {
+        draft: {
+          x: 0,
+          y: 0,
+          copy: new StudioCopySpot("/kitchen", "div", "", "block"),
+          copyEditable: false,
+          slot: {
+            kind: "section",
+            name: "Section",
+            slotKey: "section:Stations",
+            selector: "section",
+            label: "Stations",
+            previewTitle: "Stations",
+            live: false,
+          },
+        },
+        text: "Stations",
+        saving: false,
+        componentId: "Section",
+        onText: () => {},
+        onComponent: () => {},
+        onCancel: () => {},
+        onSave: () => {},
+      }),
+    );
+    const dialog = document.querySelector<HTMLElement>("[role='dialog']")!;
+    expect(dialog.querySelector("textarea")).toBeNull();
+    expect(dialog.textContent).toContain("stay as they are");
+    expect(dialog.textContent).not.toContain("change its words");
+    const save = [...dialog.querySelectorAll("button")].find(
+      (button) => button.textContent === "Save",
+    );
+    expect(save?.disabled).toBe(true);
   });
 });

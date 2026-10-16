@@ -105,12 +105,17 @@ export class StudioCopySpot {
    * Only words a screen marks as its own interface text (`data-copy` on the
    * element or a part around it) can be edited. Record names, money, dates
    * and counts come from live data, so they are never marked, and a part
-   * inside a marked area can opt back out with `data-copy="live"`. Words
-   * with a number or money sign are refused even when marked.
+   * inside a marked area can opt back out with `data-copy="live"`. A page
+   * heading (`data-copy="page"`) can show a record's name on a record's own
+   * page (`/events/:id`), so it is editable only on a page with no record in
+   * its address. Words with a number or money sign are refused even when
+   * marked.
    */
-  static isAuthoredCopy(element: Element): boolean {
+  static isAuthoredCopy(element: Element, pagePattern: string): boolean {
     const marked = element.closest("[data-copy]");
-    if (!marked || marked.getAttribute("data-copy") === "live") return false;
+    const mark = marked?.getAttribute("data-copy");
+    if (!marked || mark === "live") return false;
+    if (mark === "page" && pagePattern.includes(":")) return false;
     return !/[\d$€£%]/.test(this.leafText(element));
   }
 
@@ -127,7 +132,7 @@ export class StudioCopySpot {
     pagePattern: string,
   ): StudioCopySpot | null {
     if (this.isSkippable(element)) return null;
-    if (!this.isAuthoredCopy(element)) return null;
+    if (!this.isAuthoredCopy(element, pagePattern)) return null;
     if (element.querySelector("select, option, textarea, input")) return null;
     const originalText = this.leafText(element);
     if (!originalText || originalText.length > 80) return null;

@@ -223,7 +223,7 @@ export function EventVenueFollowUpCard(props: {
   );
 
   return (
-    <Section title={`Venue follow-up · ${venue.name}`}>
+    <Section title={`Venue follow-up · ${venue.name}`} liveTitle>
       <div className="space-y-5 p-4" data-testid="event-venue-follow-up">
         <p className="text-sm text-ink-3">
           {venue.name} is a partner venue. After every event there: thank the
