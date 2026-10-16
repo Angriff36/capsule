@@ -17,8 +17,9 @@ export function StudioMastheadSlot({
       name="PageHeader"
       slotKey={slotKey}
       model={{ title }}
+      live
     >
-      <div {...studioSlotProps("masthead", "PageHeader", slotKey)}>
+      <div {...studioSlotProps("masthead", "PageHeader", slotKey, true)}>
         {children}
       </div>
     </StudioCatalogGate>

@@ -1,6 +1,6 @@
 import {
-  STUDIO_CATALOG,
-  studioCatalogForKind,
+  studioCatalogEntry,
+  studioSwapChoices,
   type StudioCatalogEntry,
   type StudioCatalogKind,
 } from "./StudioCatalog";
@@ -8,78 +8,65 @@ import {
 export function StudioCatalogSwapPicker(props: {
   kind: StudioCatalogKind;
   currentId: string;
+  live: boolean;
   selectedId: string;
   onSelect: (id: string) => void;
 }) {
-  const fitting = studioCatalogForKind(props.kind);
-  const extras = STUDIO_CATALOG.filter(
-    (entry) => !fitting.some((choice) => choice.id === entry.id),
-  );
+  const choices = studioSwapChoices(props.kind, props.currentId, props.live);
+  const current = studioCatalogEntry(props.currentId);
+  if (choices.length === 0 || !current)
+    return (
+      <p className="mb-2 text-sm text-ink-2">
+        This block has tabs, buttons, links or live details, so it keeps its own
+        look. You can still change its words.
+      </p>
+    );
   return (
     <fieldset className="m-0 min-w-0 border-0 p-0">
       <legend className="mb-1 text-xs font-semibold text-ink">
         Switch this block to
       </legend>
-      <PieceGroup
-        label="Fits this spot"
-        entries={fitting}
-        currentId={props.currentId}
-        selectedId={props.selectedId}
-        onSelect={props.onSelect}
-      />
-      {extras.length > 0 ? (
-        <PieceGroup
-          label="Other catalog pieces"
-          entries={extras}
-          currentId={props.currentId}
-          selectedId={props.selectedId}
-          onSelect={props.onSelect}
-        />
-      ) : null}
+      <div className="grid max-h-48 gap-1 overflow-y-auto">
+        {[current, ...choices].map((entry) => (
+          <PieceChoice
+            key={entry.id}
+            entry={entry}
+            now={entry.id === props.currentId}
+            selected={entry.id === props.selectedId}
+            onSelect={props.onSelect}
+          />
+        ))}
+      </div>
     </fieldset>
   );
 }
 
-function PieceGroup(props: {
-  label: string;
-  entries: StudioCatalogEntry[];
-  currentId: string;
-  selectedId: string;
+function PieceChoice(props: {
+  entry: StudioCatalogEntry;
+  now: boolean;
+  selected: boolean;
   onSelect: (id: string) => void;
 }) {
   return (
-    <div className="mb-2">
-      <p className="mb-1 text-xs tracking-[0.04em] text-ink-3 uppercase">
-        {props.label}
-      </p>
-      <div className="grid max-h-40 gap-1 overflow-y-auto">
-        {props.entries.map((entry) => {
-          const selected = entry.id === props.selectedId;
-          return (
-            <label
-              key={entry.id}
-              className={`flex cursor-pointer items-center gap-2 rounded-sm border px-2 py-1.5 text-sm ${
-                selected
-                  ? "border-accent bg-accent-soft text-ink"
-                  : "border-line bg-panel text-ink hover:bg-inset"
-              }`}
-            >
-              <input
-                type="radio"
-                name="studio-catalog-piece"
-                value={entry.id}
-                checked={selected}
-                onChange={() => props.onSelect(entry.id)}
-                className="accent-accent"
-              />
-              <span className="min-w-0 flex-1 truncate">{entry.label}</span>
-              {entry.id === props.currentId ? (
-                <span className="shrink-0 text-xs text-ink-3">Now</span>
-              ) : null}
-            </label>
-          );
-        })}
-      </div>
-    </div>
+    <label
+      className={`flex min-h-11 cursor-pointer items-center gap-2 rounded-sm border px-3 text-sm ${
+        props.selected
+          ? "border-accent bg-accent-soft text-ink"
+          : "border-line bg-panel text-ink hover:bg-inset"
+      }`}
+    >
+      <input
+        type="radio"
+        name="studio-catalog-piece"
+        value={props.entry.id}
+        checked={props.selected}
+        onChange={() => props.onSelect(props.entry.id)}
+        className="accent-accent"
+      />
+      <span className="min-w-0 flex-1 truncate">{props.entry.label}</span>
+      {props.now ? (
+        <span className="shrink-0 text-xs text-ink-3">Now</span>
+      ) : null}
+    </label>
   );
 }

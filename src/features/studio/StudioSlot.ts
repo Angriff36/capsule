@@ -2,11 +2,14 @@ export function studioSlotProps(
   kind: string,
   name: string,
   slotKey: string,
+  /** The block shows buttons, links or content a catalog stand-in drops. */
+  live = false,
 ): Record<string, string> {
   return {
     "data-studio-kind": kind,
     "data-studio-slot": name,
     "data-studio-key": slotKey,
+    ...(live ? { "data-studio-live": "true" } : {}),
   };
 }
 

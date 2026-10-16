@@ -91,17 +91,25 @@ export function PageHeader({
 }) {
   const titleText = studioText(title);
   const slotKey = studioSlotKey("masthead", titleText);
+  // Buttons, facts, an eyebrow or rich title/lead: the stand-in drops them.
+  const live =
+    actions != null ||
+    eyebrow != null ||
+    (facts?.length ?? 0) > 0 ||
+    typeof title !== "string" ||
+    (lead != null && typeof lead !== "string");
   const gate = (node: ReactNode) => (
     <StudioCatalogGate
       kind="masthead"
       name="PageHeader"
       slotKey={slotKey}
       model={{ title: titleText, lead: studioText(lead) }}
+      live={live}
     >
       {node}
     </StudioCatalogGate>
   );
-  const slot = studioSlotProps("masthead", "PageHeader", slotKey);
+  const slot = studioSlotProps("masthead", "PageHeader", slotKey, live);
   const eyebrowLine = eyebrow ? (
     <p className="text-sm font-bold tracking-[0.09em] text-ink-3 uppercase [&_b]:font-bold [&_b]:text-accent">
       {eyebrow}
@@ -229,11 +237,12 @@ export function ErrorState({
       name="ErrorState"
       slotKey={slotKey}
       model={{ title, lead: detail }}
+      live={onRetry != null}
     >
       <div
         className="card border-danger/40 px-4 py-6 text-center"
         role="alert"
-        {...studioSlotProps("error", "ErrorState", slotKey)}
+        {...studioSlotProps("error", "ErrorState", slotKey, onRetry != null)}
       >
         <p className="font-semibold text-danger">{title}</p>
         {detail ? <p className="mt-1 text-sm text-ink-2">{detail}</p> : null}

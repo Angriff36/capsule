@@ -41,9 +41,21 @@ export function EmptyState(props: EmptyStateProps) {
       name="EmptyState"
       slotKey={slotKey}
       model={{ title: props.title, lead: studioText(props.hint) }}
+      live={emptyStateLive(props)}
     >
       <EmptyStateView {...props} slotKey={slotKey} />
     </StudioCatalogGate>
+  );
+}
+
+// A button, steps, or a hint that is more than words: the stand-in drops them.
+function emptyStateLive(
+  props: Pick<EmptyStateProps, "hint" | "action" | "steps">,
+) {
+  return (
+    props.action != null ||
+    (props.steps?.length ?? 0) > 0 ||
+    (props.hint != null && typeof props.hint !== "string")
   );
 }
 
@@ -57,7 +69,12 @@ function EmptyStateView({
   return (
     <div
       className="grid gap-3 px-4 py-6 text-left"
-      {...studioSlotProps("empty", "EmptyState", slotKey)}
+      {...studioSlotProps(
+        "empty",
+        "EmptyState",
+        slotKey,
+        emptyStateLive({ hint, action, steps }),
+      )}
     >
       <div>
         <p className="text-xl leading-snug font-bold tracking-tight text-balance text-ink">

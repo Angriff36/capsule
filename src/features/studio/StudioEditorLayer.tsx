@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { reportActionFail, reportActionOk } from "../../ui/action-result";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useStudio } from "./StudioContext";
+import { studioSwapAllowed } from "./StudioCatalog";
 import { StudioRoles } from "./StudioRoles";
 import { StudioChangesPanel } from "./StudioChangesPanel";
 import {
@@ -54,14 +55,26 @@ function StudioEditorSurface() {
           ? next.copy.originalText
           : (next.slot?.previewTitle ?? "")),
     );
+    const savedId = next.slot
+      ? studio.layout.componentId(
+          studio.pagePattern,
+          next.slot.slotKey,
+          next.slot.name,
+        )
+      : "PageHeader";
+    // A saved swap this block cannot take falls back to the block as built,
+    // so the next save clears it.
     setComponentId(
-      next.slot
-        ? studio.layout.componentId(
-            studio.pagePattern,
-            next.slot.slotKey,
-            next.slot.name,
-          )
-        : "PageHeader",
+      next.slot &&
+        savedId !== next.slot.name &&
+        !studioSwapAllowed(
+          next.slot.kind,
+          next.slot.name,
+          next.slot.live,
+          savedId,
+        )
+        ? next.slot.name
+        : savedId,
     );
   };
 

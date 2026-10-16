@@ -25,6 +25,12 @@ export type StudioCatalogEntry = {
   label: string;
   kind: StudioCatalogKind;
   story: string;
+  /**
+   * Its live block has tabs, buttons, links or content the stand-in drops
+   * (DESIGN.md: a swap keeps live data, routes and actions), so it is never
+   * swapped in or out.
+   */
+  live?: true;
 };
 
 type StudioRenderer = (
@@ -59,6 +65,7 @@ export const STUDIO_CATALOG: readonly StudioCatalogEntry[] = [
     label: "Section card",
     kind: "section",
     story: "Primitives/PageHeader",
+    live: true,
   },
   {
     id: "StatCard",
@@ -77,12 +84,14 @@ export const STUDIO_CATALOG: readonly StudioCatalogEntry[] = [
     label: "Area tabs",
     kind: "tabs",
     story: "Navigation/WorkspaceTabs",
+    live: true,
   },
   {
     id: "SegmentedTabs",
     label: "Filter tabs",
     kind: "tabs",
     story: "UI Layouts/UiLayouts",
+    live: true,
   },
   {
     id: "FieldHelp",
@@ -101,18 +110,21 @@ export const STUDIO_CATALOG: readonly StudioCatalogEntry[] = [
     label: "Folded section",
     kind: "merged",
     story: "Layout/MergedSection",
+    live: true,
   },
   {
     id: "EventStageRail",
     label: "Event stage rail",
     kind: "rail",
     story: "Events/EventStageRail",
+    live: true,
   },
   {
     id: "PrepTaskRow",
     label: "Prep task row",
     kind: "row",
     story: "Kitchen/PrepTaskRow",
+    live: true,
   },
 ];
 
@@ -157,4 +169,31 @@ export function studioCatalogForKind(
     ),
   ];
   return combined.length > 0 ? combined : [...STUDIO_CATALOG];
+}
+
+/**
+ * Pieces a slot may switch to: ones that fit the spot, when neither side has
+ * anything live the stand-in would drop. `live` = this block shows buttons,
+ * links or extra content right now.
+ */
+export function studioSwapChoices(
+  kind: StudioCatalogKind,
+  name: string,
+  live: boolean,
+): StudioCatalogEntry[] {
+  if (live || studioCatalogEntry(name)?.live) return [];
+  return studioCatalogForKind(kind).filter(
+    (entry) => !entry.live && entry.id !== name,
+  );
+}
+
+export function studioSwapAllowed(
+  kind: StudioCatalogKind,
+  name: string,
+  live: boolean,
+  target: string,
+): boolean {
+  return studioSwapChoices(kind, name, live).some(
+    (entry) => entry.id === target,
+  );
 }

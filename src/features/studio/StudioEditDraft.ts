@@ -9,6 +9,8 @@ export type StudioSlotDraft = {
   selector: string;
   label: string;
   previewTitle: string;
+  /** Shows tabs, buttons, links or content a catalog stand-in drops. */
+  live: boolean;
 };
 
 export type StudioEditDraft = {
@@ -65,6 +67,11 @@ export class StudioEditDraftFactory {
       selector: StudioCopySpot.cssPath(root),
       label: StudioCopySpot.readableLabel(root),
       previewTitle: this.headingFrom(root, name),
+      live:
+        root.dataset.studioLive === "true" ||
+        root.querySelector(
+          "a[href], button, input, select, textarea, [role='tab'], [tabindex]",
+        ) != null,
     };
   }
 
