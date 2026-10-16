@@ -92,7 +92,7 @@ export function MenuPriceChoicesEditor({
       {rows.map((row, index) => (
         <div
           key={index}
-          className="grid gap-2 rounded-sm border border-line p-3 sm:grid-cols-[1fr_8rem_12rem_auto]"
+          className="grid gap-2 border-b border-line pb-3 sm:grid-cols-[1fr_8rem_12rem_auto]"
         >
           <label className="field-label">
             <span>Name</span>

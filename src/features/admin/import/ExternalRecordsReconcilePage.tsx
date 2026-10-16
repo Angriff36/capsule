@@ -9,7 +9,6 @@ import { useImportQueue } from "../../../lib/useExternalRecordLinkLists";
 import { ErrorState, PageHeader, TableSkeleton } from "../../../ui/primitives";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 import { useActionNotice, useActionFailure } from "../../../ui/action-result";
-import { ImportMatchHelp } from "./ImportMatchHelp";
 import { ImportQueueRow } from "./ImportQueueRow";
 import { OldInvoiceRebuild } from "./OldInvoiceRebuild";
 import { SameIdPaymentMatch } from "./SameIdPaymentMatch";
@@ -404,8 +403,6 @@ export function ExternalRecordsReconcilePage() {
       />
 
       <OldInvoiceRebuild onDone={setNotice} onError={setError} />
-
-      <ImportMatchHelp />
     </div>
   );
 }

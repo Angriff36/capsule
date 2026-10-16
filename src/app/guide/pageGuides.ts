@@ -553,6 +553,21 @@ export const PAGE_GUIDES: PageGuide[] = [
     ],
   },
   {
+    prefix: "/admin/reconcile",
+    title: "Match leftover items",
+    purpose:
+      "Imported items that still need a check, a match or a skip before they leave this list.",
+    steps: [
+      "Match links an imported payment to a Capsule payment. The same id is safe; only the same amount is a guess, so check it first.",
+      "Verify confirms a match is correct; the item is done and leaves this list.",
+      "A client or venue with the same name or email waits here. Verify it if it is a different one; if it is the same, merge the two on the Clients page.",
+      "Pick existing points the old row at a record you have; Add as new makes a new one. Later imports of the same row use your choice.",
+      "Skip marks it done with a note; later imports leave it out.",
+      "Items marked Conflict need to be sorted out before they leave this list.",
+      "Select multiple items to Verify or Skip them together; you see every item it changes before it runs.",
+    ],
+  },
+  {
     prefix: "/settings/email",
     title: "Email settings",
     purpose: "Which email notifications you get, and when.",

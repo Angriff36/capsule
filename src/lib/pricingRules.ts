@@ -62,8 +62,38 @@ export const EMPTY_PRICING_RULES: PricingRules = {
   tasting: { perGuest: 0, maxGuests: 0, freeAt: 0 },
 };
 
-const MONTH_DAY = /^(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
-const HOLIDAY_DATE = /^(\d{4}-)?(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+/** Days in a month; a year-less date allows Feb 29 (it happens in leap years). */
+const daysInMonth = (month: number, year = 2000) =>
+  new Date(year, month, 0).getDate();
+
+const pad = (value: number) => String(value).padStart(2, "0");
+
+/** "5-1" or "05-01" → "05-01"; a day the month does not have ("04-31") → null. */
+export function parseMonthDay(value: string): string | null {
+  const match = /^(\d{1,2})-(\d{1,2})$/.exec(value.trim());
+  if (!match) return null;
+  const month = Number(match[1]);
+  const day = Number(match[2]);
+  if (month < 1 || month > 12 || day < 1 || day > daysInMonth(month))
+    return null;
+  return `${pad(month)}-${pad(day)}`;
+}
+
+/**
+ * A holiday date: "12-24" every year or "2026-11-26" one year, padded. A date
+ * the calendar does not have ("02-31", "2027-02-29") → null.
+ */
+export function parseHolidayDate(value: string): string | null {
+  const match = /^(?:(\d{4})-)?(\d{1,2})-(\d{1,2})$/.exec(value.trim());
+  if (!match) return null;
+  if (!match[1]) return parseMonthDay(`${match[2]}-${match[3]}`);
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  if (month < 1 || month > 12 || day < 1 || day > daysInMonth(month, year))
+    return null;
+  return `${year}-${pad(month)}-${pad(day)}`;
+}
 
 const amount = (value: unknown) => {
   const parsed = Number(value);
@@ -93,7 +123,11 @@ export function readPricingRules(
         from: String((row as SeasonRange | null)?.from ?? ""),
         to: String((row as SeasonRange | null)?.to ?? ""),
       }))
-      .filter((row) => MONTH_DAY.test(row.from) && MONTH_DAY.test(row.to)),
+      .map((row) => ({
+        from: parseMonthDay(row.from) ?? "",
+        to: parseMonthDay(row.to) ?? "",
+      }))
+      .filter((row) => row.from && row.to),
     peakMinimums: week(raw.peakMinimums),
     offPeakMinimums: week(raw.offPeakMinimums),
     farAwayMinimum: amount(raw.farAwayMinimum),
@@ -103,12 +137,12 @@ export function readPricingRules(
       .map((row) => {
         const item = (row ?? {}) as Record<string, unknown>;
         return {
-          date: String(item.date ?? ""),
+          date: parseHolidayDate(String(item.date ?? "")) ?? "",
           label: typeof item.label === "string" ? item.label.trim() : "",
           amount: amount(item.amount),
         };
       })
-      .filter((row) => HOLIDAY_DATE.test(row.date) && row.amount > 0),
+      .filter((row) => row.date && row.amount > 0),
     retainer: amount(raw.retainer),
     tasting: (() => {
       const item = (raw.tasting ?? {}) as Record<string, unknown>;

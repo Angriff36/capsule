@@ -242,7 +242,7 @@ describe("plain words on leftover import manifests", () => {
     const files = [
       "src/features/admin/import/ParallelRunDashboardPage.tsx",
       "src/features/admin/import/ExternalRecordsReconcilePage.tsx",
-      "src/features/admin/import/ImportMatchHelp.tsx",
+      "src/app/guide/pageGuides.ts",
     ];
     // strip // comments and JSX {/* */} comments so developer notes are not
     // treated as user copy; also join JSX text splits ({" "}) and line wraps

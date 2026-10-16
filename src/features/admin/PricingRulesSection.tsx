@@ -5,6 +5,8 @@ import {
   useOrganizationConfigurePricingRules,
 } from "../../lib/manifest-convex-react";
 import {
+  parseHolidayDate,
+  parseMonthDay,
   readPricingRules,
   WEEKDAYS,
   type HolidayMinimum,
@@ -22,22 +24,15 @@ function parseSeasonsText(value: string): SeasonRange[] | string {
   for (const raw of value.split("\n")) {
     const line = raw.trim();
     if (!line) continue;
-    const match =
-      /^(\d{1,2})-(\d{1,2})\s*(?:to|-|–)\s*(\d{1,2})-(\d{1,2})$/.exec(line);
-    const pad = (part: string) => part.padStart(2, "0");
-    const valid = (month: number, day: number) =>
-      month >= 1 && month <= 12 && day >= 1 && day <= 31;
-    if (
-      !match ||
-      !valid(Number(match[1]), Number(match[2])) ||
-      !valid(Number(match[3]), Number(match[4]))
-    ) {
+    const match = /^(\d{1,2}-\d{1,2})\s*(?:to|-|–)\s*(\d{1,2}-\d{1,2})$/.exec(
+      line,
+    );
+    const from = match ? parseMonthDay(match[1]) : null;
+    const to = match ? parseMonthDay(match[2]) : null;
+    if (!from || !to) {
       return `"${line}" is not a season. Write month-day to month-day, like 05-01 to 10-31.`;
     }
-    ranges.push({
-      from: `${pad(match[1])}-${pad(match[2])}`,
-      to: `${pad(match[3])}-${pad(match[4])}`,
-    });
+    ranges.push({ from, to });
   }
   return ranges;
 }
@@ -64,12 +59,9 @@ function parseHolidaysText(value: string): HolidayMinimum[] | string {
       );
     if (!match || !(Number(match[3]) > 0))
       return `"${line}" is not a holiday minimum. Write the date, a name and the amount, like 12-24, Christmas Eve, 5000.`;
-    const parts = match[1].split("-");
-    const pad = (part: string) => part.padStart(2, "0");
-    const date =
-      parts.length === 3
-        ? `${parts[0]}-${pad(parts[1])}-${pad(parts[2])}`
-        : `${pad(parts[0])}-${pad(parts[1])}`;
+    const date = parseHolidayDate(match[1]);
+    if (!date)
+      return `"${match[1]}" is not a real date. Check the month and the day.`;
     rows.push({ date, label: match[2] ?? "", amount: Number(match[3]) });
   }
   return rows;
