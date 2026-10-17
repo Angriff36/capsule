@@ -32,6 +32,9 @@ const TIMEOUT = 180_000;
 const STUBS: Record<string, string> = {
   bun: `#!/usr/bin/env bash
 case "$*" in
+  # The live-backend probe (deploymentProbe:health). Default: the backend runs
+  # the previous release (first parent of the new [release] commit).
+  *deploymentProbe:health*) case "\${STUB_LIVE_SHA:-previous}" in previous) git rev-parse origin/main^1 ;; none) ;; *) echo "$STUB_LIVE_SHA" ;; esac; exit 0 ;;
   *verify-vercel-release.ts*) echo "bun $*" >> "$STUB_LOG"; exit "\${STUB_VERCEL_EXIT:-0}" ;;
   *release-backend-scope.ts*) echo "bun $*" >> "$STUB_LOG"; printf '%b' "\${STUB_SCOPE:-backend=unchanged\\nverify=\\n}"; exit 0 ;;
   *release-receipt.ts*) echo "bun $*" >> "$STUB_LOG.receipt"; exit 0 ;;
@@ -153,8 +156,9 @@ describe("scripts/deploy-production.sh", () => {
       expect(await git(checkout.work, "log", "-1", "--format=%s", sha)).toBe(
         `[release] ${BRANCH} (reviewed by test-model)`,
       );
+      const previous = await git(checkout.work, "rev-parse", `${sha}^1`);
       expect(checkout.calls()).toEqual([
-        `bun scripts/release-backend-scope.ts --sha ${sha}`,
+        `bun scripts/release-backend-scope.ts --sha ${sha} --since ${previous}`,
         `bun scripts/verify-vercel-release.ts --sha ${sha} --wait 900`,
       ]);
       // One receipt, after the deploy, for the release commit (#382).
@@ -194,6 +198,48 @@ describe("scripts/deploy-production.sh", () => {
       expect(readFileSync(`${checkout.log}.receipt`, "utf8").trim()).toBe(
         `bun scripts/release-receipt.ts --sha ${sha} --wait 0`,
       );
+    },
+    TIMEOUT,
+  );
+
+  it(
+    "compares with the sha the live backend runs; deploys the backend when that sha is unknown (#450)",
+    async () => {
+      // The live backend still runs an older commit (a failed backend deploy).
+      const stale = await makeCheckout();
+      const base = await git(stale.work, "rev-parse", "main");
+      const staleRun = await stale.run(["--reviewer", "test-model"], {
+        STUB_LIVE_SHA: base,
+      });
+      const sha = await stale.mainSha();
+      expect(staleRun.output).toContain(
+        `deploy-production: the live backend runs ${base}`,
+      );
+      expect(stale.calls()).toContain(
+        `bun scripts/release-backend-scope.ts --sha ${sha} --since ${base}`,
+      );
+
+      // No answer, "unreleased", or a commit the repo does not know: deploy it.
+      for (const live of ["none", "unreleased", "f".repeat(40)]) {
+        const checkout = await makeCheckout();
+        const result = await checkout.run(["--reviewer", "test-model"], {
+          STUB_LIVE_SHA: live,
+        });
+        const released = await checkout.mainSha();
+        expect(result.output).toContain("did not report a known release sha");
+        expect(result.output).toContain(
+          "deploy-production: scope backend=required",
+        );
+        expect(result.lastLine).toBe(
+          `RESULT: PASS - frontend and backend deployed at ${released}`,
+        );
+        expect(checkout.calls()).toContain(
+          `bun scripts/release-backend-scope.ts --sha ${released}`,
+        );
+        expect(checkout.calls().some((call) => call.startsWith("ssh "))).toBe(
+          true,
+        );
+      }
     },
     TIMEOUT,
   );
