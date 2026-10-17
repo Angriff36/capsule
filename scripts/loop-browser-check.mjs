@@ -147,12 +147,15 @@ if (await answers(`${convexUrl}/version`)) {
   const logDir = join(main, ".artifacts", "loop-browser");
   mkdirSync(logDir, { recursive: true });
   const devLog = join(logDir, "convex-dev.log");
+  // --local-force-upgrade: an old local backend otherwise asks "Upgrade now?"
+  // and waits forever for a key press nobody gives (issue #449). The upgrade
+  // carries the local data over.
   if (process.platform === "win32") {
     // Started by Windows itself (Win32_Process.Create), not as a child of this
     // run: a child inherits every open handle of the builder round, including
     // .claude/loop-tick.log, and kept it locked so every later round failed on
     // its first log line (2026-10-02 19:02 to 21:43).
-    const command = `cmd.exe /c ""${process.execPath}" "${join(main, "node_modules", "convex", "bin", "main.js")}" dev > "${devLog}" 2>&1"`;
+    const command = `cmd.exe /c ""${process.execPath}" "${join(main, "node_modules", "convex", "bin", "main.js")}" dev --local-force-upgrade > "${devLog}" 2>&1"`;
     const created = spawnSync(
       "powershell.exe",
       [
@@ -170,7 +173,11 @@ if (await answers(`${convexUrl}/version`)) {
     const fd = openSync(devLog, "w");
     const child = spawn(
       process.execPath,
-      [join(main, "node_modules", "convex", "bin", "main.js"), "dev"],
+      [
+        join(main, "node_modules", "convex", "bin", "main.js"),
+        "dev",
+        "--local-force-upgrade",
+      ],
       { cwd: main, detached: true, stdio: ["ignore", fd, fd] },
     );
     child.unref();
