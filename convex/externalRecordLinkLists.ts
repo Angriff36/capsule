@@ -150,15 +150,14 @@ function pendingIndex(
   tenantId: string,
   source: Link["sourceSystem"] | null,
 ) {
+  // Waiting links are few, so the source system is a filter, not an index.
   if (source) {
     return ctx.db
       .query("externalRecordLinks")
-      .withIndex("by_conflict_and_source", (q) =>
-        q
-          .eq("tenantId", tenantId)
-          .eq("conflictStatus", "pending_conflict")
-          .eq("sourceSystem", source),
-      );
+      .withIndex("by_tenantId_and_conflictStatus", (q) =>
+        q.eq("tenantId", tenantId).eq("conflictStatus", "pending_conflict"),
+      )
+      .filter((q) => q.eq(q.field("sourceSystem"), source));
   }
   return ctx.db
     .query("externalRecordLinks")
@@ -268,14 +267,11 @@ export const referenceOnlyCount = query({
     let count = 0;
     for await (const row of ctx.db
       .query("externalRecordLinks")
-      .withIndex("by_record_status_capsule", (q) =>
-        q
-          .eq("tenantId", tenantId)
-          .eq("recordType", "payment")
-          .eq("conflictStatus", "resolved")
-          .eq("capsuleId", ""),
+      .withIndex("by_tenantId_and_recordType", (q) =>
+        q.eq("tenantId", tenantId).eq("recordType", "payment"),
       )) {
       if (row.deletedAt != null) continue;
+      if (row.conflictStatus !== "resolved" || row.capsuleId !== "") continue;
       if (parsedRaw(row.rawSourceData).rowClass === undefined) continue;
       count += 1;
       if (count > COUNT_CAP) return { count: COUNT_CAP, more: true };
@@ -297,15 +293,16 @@ export const unresolvedEvents = query({
     let count = 0;
     for await (const row of ctx.db
       .query("externalRecordLinks")
-      .withIndex("by_waiting_event", (q) =>
-        q
-          .eq("tenantId", tenantId)
-          .eq("capsuleEntity", "event_record")
-          .eq("sourceSystem", "tpp_legacy")
-          .eq("conflictStatus", "pending_conflict")
-          .eq("verified", false),
+      .withIndex("by_tenantId_and_conflictStatus", (q) =>
+        q.eq("tenantId", tenantId).eq("conflictStatus", "pending_conflict"),
       )) {
       if (row.deletedAt != null) continue;
+      if (
+        row.capsuleEntity !== "event_record" ||
+        row.sourceSystem !== "tpp_legacy" ||
+        row.verified !== false
+      )
+        continue;
       count += 1;
       if (rows.length < LIST_PAGE) rows.push(queueRow(row));
       if (count > COUNT_CAP) return { rows, count: COUNT_CAP, more: true };

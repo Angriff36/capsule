@@ -347,7 +347,10 @@ export function BattleBoardSheet({
         </Section>
       ) : null}
 
-      <Section title={`${companyName.split(" ")[0]}'s Responsibilities`}>
+      <Section
+        title={`${companyName.split(" ")[0]}'s Responsibilities`}
+        liveTitle
+      >
         <div className="bbs-resp">
           <Column title="Scope" rows={SCOPE} event={event} />
           <Column title="Service" rows={SERVICE} event={event} />
