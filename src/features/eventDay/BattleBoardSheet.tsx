@@ -347,7 +347,10 @@ export function BattleBoardSheet({
         </Section>
       ) : null}
 
-      <Section title={`${companyName.split(" ")[0]}'s Responsibilities`}>
+      <Section
+        title={`${companyName.split(" ")[0]}'s Responsibilities`}
+        liveTitle
+      >
         <div className="bbs-resp">
           <Column title="Scope" rows={SCOPE} event={event} />
           <Column title="Service" rows={SERVICE} event={event} />
@@ -664,10 +667,21 @@ function Fact({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+function Section({
+  title,
+  liveTitle,
+  children,
+}: {
+  title: string;
+  /** The title holds live data (the company name), so it is not editable copy. */
+  liveTitle?: boolean;
+  children: ReactNode;
+}) {
   return (
     <section className="bbs-section">
-      <h2 className="bbs-kicker">{title}</h2>
+      <h2 className="bbs-kicker" data-copy={liveTitle ? "live" : undefined}>
+        {title}
+      </h2>
       {children}
     </section>
   );
