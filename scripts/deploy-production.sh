@@ -13,7 +13,8 @@
 #    passed on. With no --reviewer this script runs the documented primary
 #    review (Codex gpt-5.6-terra by default) and continues only on `VERDICT: APPROVE`.
 # 2. Takes the [release] commit on origin/main. scripts/release-backend-scope.ts
-#    decides if anything since the previous [release] commit changed the backend.
+#    decides if anything since the sha the LIVE backend reports changed the
+#    backend (no known sha: deploy it).
 # 3. Waits until the production address serves the Vercel build OF that commit
 #    (<site>/version.json). If the backend changed, SSH to the production box
 #    after that wait (find the checkout by git origin, fast-forward main,
@@ -176,7 +177,38 @@ receipt() {
 }
 
 # 2. Does this release change the backend? Cheap, local, before any wait.
-scope="$(bun scripts/release-backend-scope.ts --sha "$sha")" || fail "cannot decide if $sha changes the backend (above)"
+#    Compare with the sha the LIVE backend reports (deploymentProbe:health,
+#    stamped by scripts/deploy-backend.sh), not only with the previous
+#    [release] commit: a release whose backend deploy failed must not hide its
+#    backend changes from the next release (issue #450). The backend address
+#    comes from the site's own version.json. No answer, "unreleased", or an
+#    unknown commit: deploy the backend.
+live_backend_sha() {
+  CAPSULE_SITE_URL="${CAPSULE_RELEASE_URL:-https://capsule-tau-eight.vercel.app}" bun -e '
+    try {
+      const site = process.env.CAPSULE_SITE_URL.replace(/\/+$/, "");
+      const version = await (await fetch(`${site}/version.json`, { cache: "no-store", signal: AbortSignal.timeout(20000) })).json();
+      if (typeof version.convexUrl === "string" && version.convexUrl) {
+        const answer = await (await fetch(`${version.convexUrl.replace(/\/+$/, "")}/api/query`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ path: "deploymentProbe:health", args: {}, format: "json" }),
+          signal: AbortSignal.timeout(20000),
+        })).json();
+        if (answer.status === "success" && typeof answer.value?.releaseSha === "string") console.log(answer.value.releaseSha);
+      }
+    } catch {}
+  ' 2>/dev/null | tr -d '\r'
+}
+live_sha="$(live_backend_sha)"
+if printf '%s' "$live_sha" | grep -Eq '^[0-9a-f]{40}$' && git cat-file -e "$live_sha^{commit}" 2>/dev/null; then
+  echo "deploy-production: the live backend runs $live_sha"
+  scope="$(bun scripts/release-backend-scope.ts --sha "$sha" --since "$live_sha")" || fail "cannot decide if $sha changes the backend (above)"
+else
+  echo "deploy-production: the live backend did not report a known release sha (${live_sha:-no answer}); the backend will be deployed"
+  scope="$(bun scripts/release-backend-scope.ts --sha "$sha")" || fail "cannot decide if $sha changes the backend (above)"
+  scope="$(printf '%s\n' "$scope" | sed 's/^backend=unchanged$/backend=required/')"
+fi
 echo "$scope" | sed 's/^/deploy-production: scope /'
 backend_needed=0
 verify=""
