@@ -258,6 +258,8 @@ export const paymentMoneyPage = query({
   },
 });
 
+const READ_CAP = 4000;
+
 /** Old money kept only for the record. Stops at 500. */
 export const referenceOnlyCount = query({
   args: {},
@@ -265,11 +267,16 @@ export const referenceOnlyCount = query({
     const tenantId = await tenantOf(ctx);
     if (tenantId == null) return { count: 0, more: false };
     let count = 0;
+    // Payment links are few (509 in production, 2026-10-16); the read still
+    // stops at a fixed number of rows so the page always loads.
+    let read = 0;
     for await (const row of ctx.db
       .query("externalRecordLinks")
       .withIndex("by_tenantId_and_recordType", (q) =>
         q.eq("tenantId", tenantId).eq("recordType", "payment"),
       )) {
+      read += 1;
+      if (read > READ_CAP) return { count, more: true };
       if (row.deletedAt != null) continue;
       if (row.conflictStatus !== "resolved" || row.capsuleId !== "") continue;
       if (parsedRaw(row.rawSourceData).rowClass === undefined) continue;
@@ -291,11 +298,15 @@ export const unresolvedEvents = query({
     if (tenantId == null) return { rows: [], count: 0, more: false };
     const rows: ReturnType<typeof queueRow>[] = [];
     let count = 0;
+    // Waiting links are few; the read still stops at a fixed number of rows.
+    let read = 0;
     for await (const row of ctx.db
       .query("externalRecordLinks")
       .withIndex("by_tenantId_and_conflictStatus", (q) =>
         q.eq("tenantId", tenantId).eq("conflictStatus", "pending_conflict"),
       )) {
+      read += 1;
+      if (read > READ_CAP) return { rows, count, more: true };
       if (row.deletedAt != null) continue;
       if (
         row.capsuleEntity !== "event_record" ||
