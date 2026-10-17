@@ -200,7 +200,7 @@ function StudioEditorSurface() {
             />
           ) : null}
           <div className="fixed left-1/2 top-3 z-[9996] flex -translate-x-1/2 items-center gap-3 rounded-md bg-ink px-4 py-2 text-sm text-panel shadow-lg">
-            Click the words or block you want to change.
+            Click a heading, label or block to change it.
             <button
               type="button"
               className="btn btn-ghost shrink-0"

@@ -9,6 +9,8 @@ export function StudioCatalogSwapPicker(props: {
   kind: StudioCatalogKind;
   currentId: string;
   live: boolean;
+  /** The clicked words can be changed in the Words box above. */
+  copyEditable: boolean;
   selectedId: string;
   onSelect: (id: string) => void;
 }) {
@@ -17,8 +19,10 @@ export function StudioCatalogSwapPicker(props: {
   if (choices.length === 0 || !current)
     return (
       <p className="mb-2 text-sm text-ink-2">
-        This block has tabs, buttons, links or live details, so it keeps its own
-        look. You can still change its words.
+        {props.live || current?.live
+          ? "This block has tabs, buttons, links or live details, so it keeps its own look."
+          : "No other catalog piece fits this spot, so it keeps its own look."}
+        {props.copyEditable ? " You can change its words above." : null}
       </p>
     );
   return (

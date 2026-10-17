@@ -3189,6 +3189,7 @@ export const PageFeedbackSchema = z.object({
   issueNumber: z.number().int().nullable().optional(),
   issueUrl: z.string().nullable().optional(),
   resolvedAt: z.coerce.date().nullable().optional(),
+  issueDoneAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });

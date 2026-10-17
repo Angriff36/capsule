@@ -80,7 +80,12 @@ export function StudioEditPopover(props: {
             className="mt-1 w-full rounded-sm border border-line bg-panel p-2 text-sm text-ink"
           />
         </label>
-      ) : null}
+      ) : (
+        <p className="mb-2 text-sm text-ink-2">
+          These words come from your records or are not set up for changing
+          here, so they stay as they are.
+        </p>
+      )}
       {slot ? (
         <>
           {swappable ? (
@@ -108,16 +113,12 @@ export function StudioEditPopover(props: {
             kind={slot.kind}
             currentId={nowId}
             live={slot.live}
+            copyEditable={props.draft.copyEditable}
             selectedId={props.componentId}
             onSelect={props.onComponent}
           />
         </>
-      ) : (
-        <p className="mb-2 text-sm text-ink-2">
-          This click was words only. Click a heading, empty state, chip, or
-          other catalog block to switch the piece.
-        </p>
-      )}
+      ) : null}
     </Dialog>
   );
 }

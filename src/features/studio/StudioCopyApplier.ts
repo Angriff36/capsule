@@ -31,7 +31,8 @@ export class StudioCopyApplier {
       const element = this.findElement(row);
       // A saved row on words that are not marked interface text (a dish
       // name, a price) never changes what the screen shows.
-      if (!element || !StudioCopySpot.isAuthoredCopy(element)) continue;
+      if (!element || !StudioCopySpot.isAuthoredCopy(element, pagePattern))
+        continue;
       live.add(element);
       this.write(element, row.originalText, row.text);
     }

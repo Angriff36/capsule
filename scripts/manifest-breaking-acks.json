@@ -3780,6 +3780,12 @@
       "category": "command-parameter-added",
       "acknowledgedAt": "2026-10-16",
       "reason": "Optional retainer parameter; callers that leave it out keep the percent deposit."
+    },
+    {
+      "path": "PageFeedback.issueDoneAt",
+      "category": "property-added",
+      "acknowledgedAt": "2026-10-16",
+      "reason": "Optional: set only when the GitHub issue is finished. Stored comments need no backfill; old resolved ones show Closed instead of Done."
     }
   ]
 }

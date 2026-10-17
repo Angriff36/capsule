@@ -77,10 +77,17 @@ function EmptyStateView({
       )}
     >
       <div>
-        <p className="text-xl leading-snug font-bold tracking-tight text-balance text-ink">
+        <p
+          data-copy=""
+          className="text-xl leading-snug font-bold tracking-tight text-balance text-ink"
+        >
           {title}
         </p>
-        {hint ? <p className="mt-1 text-sm text-ink-2">{hint}</p> : null}
+        {hint ? (
+          <p data-copy="" className="mt-1 text-sm text-ink-2">
+            {hint}
+          </p>
+        ) : null}
       </div>
       {steps && steps.length > 0 ? (
         <ol className="grid">

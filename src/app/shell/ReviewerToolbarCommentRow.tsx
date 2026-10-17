@@ -12,6 +12,7 @@ export type ReviewerToolbarComment = {
   leftByName?: string | null;
   issueUrl?: string | null;
   issueNumber?: number | null;
+  issueDoneAt?: number | null;
   version?: number;
 };
 
@@ -34,9 +35,19 @@ export function commentSendChip(input: {
   fail?: string;
   sent: boolean;
   resolved: boolean;
+  issueDone: boolean;
 }): { status: string; color: string; label: string } | null {
-  if (input.resolved)
+  // Done only when the GitHub issue was finished; closing by hand is not Done.
+  // A sent comment closed before Capsule kept the finish time may have been
+  // finished on GitHub, so it only says Closed.
+  if (input.issueDone)
     return { status: "completed", color: "chip-tone-ok", label: "Done" };
+  if (input.resolved)
+    return {
+      status: "cancelled",
+      color: "chip-tone-mute",
+      label: input.sent ? "Closed" : "Closed by hand",
+    };
   if (input.addressing)
     return { status: "executing", color: "chip-tone-info", label: "Sending…" };
   if (input.fail)
@@ -78,6 +89,7 @@ export function ReviewerToolbarCommentRow(props: {
     fail: props.fail,
     sent: Boolean(row.issueUrl),
     resolved: row.status === "resolved",
+    issueDone: row.status === "resolved" && row.issueDoneAt != null,
   });
   const addressLabel = props.addressing
     ? "Sending…"
@@ -102,7 +114,7 @@ export function ReviewerToolbarCommentRow(props: {
           {row.leftByName ?? "An admin"}
           {row.leftAt ? ` · ${timeFormat.format(row.leftAt)}` : ""}
         </span>
-        {row.status === "resolved" ? <span>· Resolved</span> : null}
+        {row.status === "resolved" ? <span>· Closed</span> : null}
       </div>
       <p className="whitespace-pre-wrap">{row.body}</p>
       {chip ? (

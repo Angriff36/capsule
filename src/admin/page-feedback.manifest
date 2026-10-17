@@ -46,6 +46,9 @@ entity PageFeedback mixin TenantScoped, SoftDeletable {
   property issueNumber: int?
   property issueUrl: string?
   property resolvedAt: datetime?
+  // Set only when the GitHub issue was finished (claude-done label or closed
+  // as completed). A comment closed by hand stays without it.
+  property issueDoneAt: datetime?
 
   constraint pageFeedbackBodyPresent: self.leftAt == null or length(trim(self.body)) > 0 "Write what should change."
 
@@ -120,6 +123,7 @@ entity PageFeedback mixin TenantScoped, SoftDeletable {
     guard self.status == "resolved"
     mutate status = "open"
     mutate resolvedAt = null
+    mutate issueDoneAt = null
     emit PageFeedbackReopened {
       pageFeedbackId: self.id
       tenantId: self.tenantId

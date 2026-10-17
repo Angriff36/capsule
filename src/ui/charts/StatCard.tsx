@@ -142,7 +142,9 @@ export function StatCard({
                 {icon}
               </span>
             ) : null}
-            <span className="min-w-0">{title}</span>
+            <span data-copy="" className="min-w-0">
+              {title}
+            </span>
             {isLive ? (
               <span
                 className="h-1.5 w-1.5 shrink-0 animate-pulse self-center rounded-full bg-ok"

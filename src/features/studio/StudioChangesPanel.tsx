@@ -35,9 +35,10 @@ export function StudioChangesPanel(props: {
           Edit a spot
         </button>
         <p className="text-sm text-ink-2">
-          Click a heading, button, empty state, or other label on any screen.
-          Change the words, or pick another catalog piece. You will see the
-          current block next to the one you are switching to before you save.
+          Click a page heading, section title, empty-page message, tile name,
+          tab or menu label to change its words. Names, amounts and dates from
+          your records stay as they are, and so does the heading on a page for
+          one event or one client.
         </p>
       </div>
       <ol className="flex-1 overflow-y-auto">

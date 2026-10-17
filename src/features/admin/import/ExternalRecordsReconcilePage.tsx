@@ -81,20 +81,21 @@ export function ExternalRecordsReconcilePage() {
       : "skip",
   );
 
-  const bulkItems: BulkPreviewItem[] = filteredRecords
-    .filter((r) => selectedIds.has(r._id))
-    .map((r) => ({
-      id: r._id,
-      sourceId: isDerivedSourceId(r.externalId) ? "" : r.externalId,
-      sourceName:
-        r.sourceName ||
-        sourceSummary(
-          "rawSourceData" in r && typeof r.rawSourceData === "string"
-            ? r.rawSourceData
-            : null,
-        ).name,
-      recordLabel: r.capsuleId ? (recordLabels?.[r._id] ?? r.capsuleId) : null,
-    }));
+  // Only rows on screen count as selected: a row hidden by the filter or gone
+  // from the queue is never part of a bulk action.
+  const visibleSelected = filteredRecords.filter((r) => selectedIds.has(r._id));
+  const bulkItems: BulkPreviewItem[] = visibleSelected.map((r) => ({
+    id: r._id,
+    sourceId: isDerivedSourceId(r.externalId) ? "" : r.externalId,
+    sourceName:
+      r.sourceName ||
+      sourceSummary(
+        "rawSourceData" in r && typeof r.rawSourceData === "string"
+          ? r.rawSourceData
+          : null,
+      ).name,
+    recordLabel: r.capsuleId ? (recordLabels?.[r._id] ?? r.capsuleId) : null,
+  }));
 
   const referenceOnly = reference?.count ?? 0;
 
@@ -112,7 +113,7 @@ export function ExternalRecordsReconcilePage() {
 
   // Toggle all
   function toggleAll() {
-    if (selectedIds.size === filteredRecords.length) {
+    if (visibleSelected.length === filteredRecords.length) {
       setSelectedIds(new Set());
     } else {
       setSelectedIds(new Set(filteredRecords.map((r) => r._id)));
@@ -124,18 +125,18 @@ export function ExternalRecordsReconcilePage() {
     setNotice(null);
   }
 
-  // Run one write per selected item. Every item is tried; the ones that fail
-  // stay selected and the notice says how many went through.
+  // Run one write per item in the preview list. Every item is tried; the ones
+  // that fail stay selected and the notice says how many went through.
   async function runEachSelected(
+    selectedList: string[],
     write: (id: string) => Promise<unknown>,
     doneLabel: string,
     failedLabel: string,
   ) {
-    if (selectedIds.size === 0) return;
+    if (selectedList.length === 0) return;
     setBusy(true);
     setError(null);
     setNotice(null);
-    const selectedList = [...selectedIds];
     const failed = new Set<string>();
     let firstFailure: string | null = null;
     for (const id of selectedList) {
@@ -162,8 +163,9 @@ export function ExternalRecordsReconcilePage() {
 
   // Verify selected records. The generated hook reads `docId` (not `id`); the
   // server records the signed-in person as the one who checked each record.
-  function verifySelected() {
+  function verifySelected(ids: string[]) {
     return runEachSelected(
+      ids,
       (id) => verifyLink({ docId: id, verified: true }),
       "Checked ",
       "Couldn't check those items.",
@@ -171,8 +173,9 @@ export function ExternalRecordsReconcilePage() {
   }
 
   // Skip selected records (mark as resolved with note).
-  function skipSelected() {
+  function skipSelected(ids: string[]) {
     return runEachSelected(
+      ids,
       (id) =>
         resolveConflict({
           docId: id,
@@ -246,7 +249,11 @@ export function ExternalRecordsReconcilePage() {
             <select
               id="source-system-filter"
               value={selectedSourceSystem ?? ""}
-              onChange={(e) => setSelectedSourceSystem(e.target.value || null)}
+              onChange={(e) => {
+                setSelectedSourceSystem(e.target.value || null);
+                setSelectedIds(new Set());
+                setBulkAction(null);
+              }}
               className="min-w-48 px-3 py-2 border border-line-2 rounded-sm text-xs"
             >
               <option value="">All Systems</option>
@@ -276,18 +283,22 @@ export function ExternalRecordsReconcilePage() {
         </div>
 
         {/* Bulk actions: a preview of every affected item comes first. */}
-        {selectedIds.size > 0 && bulkAction ? (
+        {bulkItems.length > 0 && bulkAction ? (
           <BulkActionPreview
             action={bulkAction}
             items={bulkItems}
             busy={busy}
-            onApply={bulkAction === "verify" ? verifySelected : skipSelected}
+            onApply={(ids) =>
+              void (bulkAction === "verify"
+                ? verifySelected(ids)
+                : skipSelected(ids))
+            }
             onCancel={() => setBulkAction(null)}
           />
-        ) : selectedIds.size > 0 ? (
+        ) : visibleSelected.length > 0 ? (
           <div className="flex items-center gap-3 p-4 bg-inset border-b border-line">
             <span className="text-xs font-medium">
-              {selectedIds.size} item(s) selected
+              {visibleSelected.length} item(s) selected
             </span>
             <button
               type="button"
@@ -324,7 +335,7 @@ export function ExternalRecordsReconcilePage() {
                   <input
                     type="checkbox"
                     checked={
-                      selectedIds.size === filteredRecords.length &&
+                      visibleSelected.length === filteredRecords.length &&
                       filteredRecords.length > 0
                     }
                     onChange={toggleAll}

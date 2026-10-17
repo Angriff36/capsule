@@ -29,7 +29,8 @@ export function BulkActionPreview({
   action: BulkAction;
   items: BulkPreviewItem[];
   busy: boolean;
-  onApply: () => void;
+  // Gets exactly the ids this preview lists.
+  onApply: (ids: string[]) => void;
   onCancel: () => void;
 }>) {
   const verb = action === "verify" ? "Verify" : "Skip";
@@ -56,7 +57,7 @@ export function BulkActionPreview({
           type="button"
           className="btn btn-primary"
           disabled={busy}
-          onClick={onApply}
+          onClick={() => onApply(items.map((item) => item.id))}
         >
           {verb} {items.length}
         </button>

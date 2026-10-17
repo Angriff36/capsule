@@ -106,7 +106,7 @@ export function ApiKeysPage() {
       {error ? <ErrorState title="API keys" detail={error} /> : null}
 
       {fresh ? (
-        <Section title={`New key: ${fresh.name}`}>
+        <Section title={`New key: ${fresh.name}`} liveTitle>
           <p className="text-ink-2">
             Copy it now. This is the only time the key is shown.
           </p>
