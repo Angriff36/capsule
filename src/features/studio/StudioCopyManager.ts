@@ -90,6 +90,9 @@ export class StudioCopyManager {
       });
       return;
     }
+    // No fixed retry key: saved edits list hides restored rows, so a spot
+    // edited again after a restore needs a new row, and a fixed key would
+    // replay the first save and keep nothing.
     await this.create({
       pagePattern: spot.pagePattern,
       copyKey: spot.copyKey,
@@ -97,7 +100,6 @@ export class StudioCopyManager {
       text: next,
       targetSelector: spot.selector,
       targetLabel: spot.targetLabel,
-      idempotencyKey: `studio-copy:${spot.pagePattern}:${spot.copyKey}`,
     });
   }
 

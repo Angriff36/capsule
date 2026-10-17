@@ -148,6 +148,42 @@ describe("screen editor saved wording", () => {
     expect(db.manager().originalText(again!)).toBe("Dishes");
   });
 
+  it("keeps a second edit made after a restore, as the live list hides restored rows", async () => {
+    document.body.innerHTML = `<main data-copy><h1>Dishes</h1></main>`;
+    const heading = document.querySelector("h1")!;
+    const rows: Row[] = [];
+    const seenKeys = new Set<string>();
+    // Like the real backend: the list shows live rows only, and a create
+    // with a key it has seen before replays and writes nothing.
+    const manager = () =>
+      new StudioCopyManager(
+        rows.filter((row) => row.deletedAt == null),
+        async ({ idempotencyKey, ...args }) => {
+          if (idempotencyKey && seenKeys.has(idempotencyKey)) return;
+          if (idempotencyKey) seenKeys.add(idempotencyKey);
+          rows.push({
+            ...args,
+            _id: `row-${rows.length}` as Row["_id"],
+            version: 1,
+            deletedAt: null,
+          });
+        },
+        async () => {},
+        async ({ docId }) => {
+          rows.find((item) => item._id === docId)!.deletedAt = Date.now();
+        },
+      );
+    const spot = () => StudioCopySpot.fromElement(heading, "/kitchen")!;
+    await manager().save(spot(), "Our dishes");
+    await manager().revertKey("/kitchen", spot().copyKey);
+    await manager().save(spot(), "All dishes");
+    expect(
+      manager()
+        .liveOn("/kitchen")
+        .map((row) => row.text),
+    ).toEqual(["All dishes"]);
+  });
+
   it("typing the first words back restores them", async () => {
     document.body.innerHTML = `<main data-copy><h1>Prep list</h1></main>`;
     const heading = document.querySelector("h1")!;
