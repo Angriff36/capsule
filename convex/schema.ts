@@ -1889,10 +1889,7 @@ export default defineSchema({
     .index("by_tenantId_and_capsuleId", ["tenantId", "capsuleId"])
     .index("by_tenantId_and_recordType", ["tenantId", "recordType"])
     .index("by_tenantId_and_capsuleEntity", ["tenantId", "capsuleEntity"])
-    .index("by_tenantId_and_conflictStatus", ["tenantId", "conflictStatus"])
-    .index("by_conflict_and_source", ["tenantId", "conflictStatus", "sourceSystem"])
-    .index("by_record_status_capsule", ["tenantId", "recordType", "conflictStatus", "capsuleId"])
-    .index("by_waiting_event", ["tenantId", "capsuleEntity", "sourceSystem", "conflictStatus", "verified"]),
+    .index("by_tenantId_and_conflictStatus", ["tenantId", "conflictStatus"]),
   fieldConfirmations: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
