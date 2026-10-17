@@ -102,10 +102,10 @@ export class StudioLayoutManager {
       });
       return;
     }
-    await this.create({
-      ...stored,
-      idempotencyKey: `studio-layout:${input.pagePattern}:${input.slotKey}`,
-    });
+    // No fixed retry key: a block swapped again after a restore needs a new
+    // row (restored rows are not listed), and a fixed key would replay the
+    // first save and keep nothing.
+    await this.create(stored);
   }
 
   async revert(pagePattern: string, slotKey: string): Promise<void> {

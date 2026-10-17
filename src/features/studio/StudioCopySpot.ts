@@ -15,6 +15,13 @@ const SKIP_TAGS = new Set([
 
 /** One clickable bit of wording on a screen. */
 export class StudioCopySpot {
+  // What the applier last wrote into each spot, and the words it replaced, so
+  // a later edit can replace those words and a restore can put them back.
+  static readonly written = new Map<
+    Element,
+    { original: string; text: string }
+  >();
+
   constructor(
     readonly pagePattern: string,
     readonly selector: string,
@@ -109,14 +116,18 @@ export class StudioCopySpot {
    * heading (`data-copy="page"`) can show a record's name on a record's own
    * page (`/events/:id`), so it is editable only on a page with no record in
    * its address. Words with a number or money sign are refused even when
-   * marked.
+   * marked. The check reads the screen's own first words: saved words the
+   * applier put in may hold a number ("Top 10 dishes") and stay editable.
    */
   static isAuthoredCopy(element: Element, pagePattern: string): boolean {
     const marked = element.closest("[data-copy]");
     const mark = marked?.getAttribute("data-copy");
     if (!marked || mark === "live") return false;
     if (mark === "page" && pagePattern.includes(":")) return false;
-    return !/[\d$€£%]/.test(this.leafText(element));
+    const shown = this.leafText(element);
+    const mine = this.written.get(element);
+    const words = mine?.text === shown ? mine.original : shown;
+    return !/[\d$€£%]/.test(words);
   }
 
   static isSkippable(element: Element): boolean {
