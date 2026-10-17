@@ -116,6 +116,38 @@ describe("screen editor saved wording", () => {
     expect(heading.textContent).toBe("Prep for today");
   });
 
+  it("keeps saved words that hold a number and settles after one pass", async () => {
+    document.body.innerHTML = `<main data-copy><h1>Dishes</h1></main>`;
+    const heading = document.querySelector("h1")!;
+    const db = store();
+    const apply = () => new StudioCopyApplier(db.rows).apply("/kitchen");
+    await db
+      .manager()
+      .save(StudioCopySpot.fromElement(heading, "/kitchen")!, "Top 10 dishes");
+    const writes = vi.fn();
+    const observer = new MutationObserver(writes);
+    observer.observe(document.body, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    });
+    apply();
+    await Promise.resolve();
+    writes.mockClear();
+    // The page watcher runs the applier again after its own write: it must
+    // leave the saved words alone, not flip back to the first words.
+    apply();
+    await Promise.resolve();
+    observer.disconnect();
+    expect(heading.textContent).toBe("Top 10 dishes");
+    expect(writes).not.toHaveBeenCalled();
+
+    // The spot can still be picked and changed while it shows them.
+    const again = StudioCopySpot.fromElement(heading, "/kitchen");
+    expect(again?.copyKey).toBeDefined();
+    expect(db.manager().originalText(again!)).toBe("Dishes");
+  });
+
   it("typing the first words back restores them", async () => {
     document.body.innerHTML = `<main data-copy><h1>Prep list</h1></main>`;
     const heading = document.querySelector("h1")!;

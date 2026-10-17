@@ -11,9 +11,7 @@ export type StudioCopyRow = {
   version?: number;
 };
 
-// What the applier last wrote into each spot, and the words it replaced, so
-// a later edit can replace those words and a restore can put them back.
-const written = new Map<Element, { original: string; text: string }>();
+const written = StudioCopySpot.written;
 
 /**
  * Puts saved wording onto the live DOM after React paints. Only replaces
