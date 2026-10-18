@@ -238,7 +238,9 @@ describe("scripts/deploy-backend.sh", () => {
       expect(result.output).not.toContain(ADMIN_KEY_VALUE);
       const calls = readFileSync(checkout.log, "utf8").trim().split("\n");
       expect(calls[0]).toBe("bun install --frozen-lockfile");
-      expect(calls[1]).toBe("npx convex deploy -y");
+      expect(calls[1]).toBe(
+        "npx convex deploy -y --allow-deleting-large-indexes",
+      );
       // The probes go to the backend the deploy used, not to a second address.
       expect(calls[2]).toContain("http://backend.invalid/api/query");
       expect(calls[2]).toContain("queries:listEvent");
