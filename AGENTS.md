@@ -437,7 +437,8 @@ build script still deploys both outside self-hosted mode; do not remove it.)
 When the human asks for a MANUAL deploy (no `main` push involved):
 
 1. Backend first, if `convex/` or manifests changed:
-   `bun run manifest:regen` (manifest changes only) → `npx convex deploy -y`
+   `bun run manifest:regen` (manifest changes only) →
+   `npx convex deploy -y --allow-deleting-large-indexes`
    → the production Convex backend (since the 2026-09-14 cutover that is the
    self-hosted instance, not Convex Cloud `impartial-mule-193`). For that
    instance the ONLY path is `scripts/deploy-backend.sh --expect <main sha>` on
