@@ -14,7 +14,7 @@
 # 2. Verifies the machine: Linux, the Bun pinned in .bun-version, the
 #    self-hosted credential NAMES present (values are never printed).
 # 3. Runs the documented deploy (AGENTS.md): bun install --frozen-lockfile,
-#    then npx convex deploy -y.
+#    then npx convex deploy -y --allow-deleting-large-indexes.
 # 4. Verifies runtime: POST <CONVEX_SELF_HOSTED_URL>/api/query (the SAME
 #    backend the deploy used; this script holds no second backend address) for
 #    a baseline query and every --verify query, then deploymentProbe:health
@@ -185,7 +185,7 @@ if [ "$dry_run" = 1 ]; then
   echo "dry run: checkout, sha, bun $pinned and credential names are good."
   echo "dry run: a real run would now do:"
   echo "  bun install --frozen-lockfile"
-  echo "  npx convex deploy -y"
+  echo "  npx convex deploy -y --allow-deleting-large-indexes"
   for i in "${!verify_queries[@]}"; do echo "  POST <CONVEX_SELF_HOSTED_URL>/api/query  ${verify_queries[$i]}  args ${verify_args[$i]}"; done
   echo "  GET  $FRONTEND_URL"
   echo ""
@@ -200,7 +200,10 @@ bun install --frozen-lockfile || fail "bun install failed"
 grep -q '"unreleased"' "$RELEASE_STAMP" 2>/dev/null || fail "$RELEASE_STAMP is missing or has no \"unreleased\" marker to stamp"
 trap 'git checkout -- "$RELEASE_STAMP" 2>/dev/null || true' EXIT
 sed -i "s/\"unreleased\"/\"$head_sha\"/" "$RELEASE_STAMP" || fail "cannot stamp $RELEASE_STAMP"
-npx convex deploy -y || fail "convex deploy failed"
+# The schema is the source of truth, so an index it drops goes without an
+# interactive confirm (a dropped index deletes no documents). 2026-10-17: the
+# crash-fix drop of three large externalRecordLinks indexes blocked the release.
+npx convex deploy -y --allow-deleting-large-indexes || fail "convex deploy failed"
 git checkout -- "$RELEASE_STAMP" 2>/dev/null || true
 # The Convex CLI rewrites its own generated files on every deploy. They are
 # tracked, so the next release would refuse this "dirty" checkout: put the

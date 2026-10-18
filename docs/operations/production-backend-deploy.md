@@ -151,7 +151,7 @@ If the checkout is older than this script (first use), bring it to `main` first:
    `CONVEX_SELF_HOSTED_URL` and `CONVEX_SELF_HOSTED_ADMIN_KEY` are set in the
    shell or in `.env.local` on the box. It never prints their values.
 3. Deploy (the documented commands, `AGENTS.md`): `bun install --frozen-lockfile`,
-   then `npx convex deploy -y`.
+   then `npx convex deploy -y --allow-deleting-large-indexes`.
 4. Runtime verification: `POST <CONVEX_SELF_HOSTED_URL>/api/query` with
    `{"path":"<query>","args":<payload>,"format":"json"}` for each query. The
    address is the effective `CONVEX_SELF_HOSTED_URL` (the shell value, else
