@@ -1685,6 +1685,15 @@ export async function openMenu(trigger: HTMLElement) {
     );
   });
 }
+/**
+ * Choose a menu item, then let Radix finish closing: it hands focus back to
+ * the menu trigger on a timer, which would otherwise steal focus from a field
+ * the next step focuses.
+ */
+export async function chooseMenuItem(text: string) {
+  await click(menuItem(text));
+  await act(() => new Promise<void>((resolve) => setTimeout(resolve, 0)));
+}
 /** The open Radix menu item with this label (menus render in a portal). */
 export function menuItem(text: string) {
   const matches = [
