@@ -23,9 +23,13 @@ handoff between machines.
    verdict, no `codex` CLI, or Codex-authored commits stop the run.
 2. Release commit. It takes the `[release]` commit on `origin/main` (the full
    sha). `scripts/release-backend-scope.ts` decides whether the backend changed
-   (`src/lib/releaseBackendScope.ts`). It compares the release with the PREVIOUS
-   `[release]` commit on `main`, so a branch that landed through a GitHub-side
-   merge is included. The backend deploy is necessary when that range changed a `.manifest` file, `convex/`, `convex.json`, the dependency
+   (`src/lib/releaseBackendScope.ts`). It compares the release with the sha the
+   LIVE backend reports (`deploymentProbe:health` `releaseSha`, read at the
+   backend address in `<site>/version.json`), passed as `--since`. So a release
+   after a failed backend deploy still deploys that backend (issue #450), and a
+   branch that landed through a GitHub-side merge is included. When the backend
+   gives no answer, reports `unreleased`, or names a commit that is not in the
+   repository, the backend is deployed (`backend=required`). The backend deploy is necessary when that range changed a `.manifest` file, `convex/`, `convex.json`, the dependency
    pins (`package.json`, `bun.lock`), or a `src/` module that `convex/` code
    imports.
 3. Frontend wait, then backend when needed. `scripts/verify-vercel-release.ts`

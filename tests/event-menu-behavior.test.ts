@@ -12,7 +12,7 @@ import {
   click,
   change,
   openMenu,
-  menuItem,
+  chooseMenuItem,
   submit,
 } from "./support/mounted-app";
 import { EventMenuTab } from "../src/features/events/EventMenuTab";
@@ -109,7 +109,7 @@ it("calculates displayed menu cost and pans from the recipe, and saves course pl
     serviceStyle: "plated",
   });
   await openMenu(menuTrigger());
-  await click(menuItem("Edit recipe on this menu"));
+  await chooseMenuItem("Edit recipe on this menu");
   const editor = container.querySelector(
     '[data-testid="event-menu-recipe-editor"]',
   )!;
@@ -150,7 +150,7 @@ it("warns about incompatible recipe units and excludes that line from the priced
       ?.textContent,
   ).toContain("$0.00");
   await openMenu(menuTrigger());
-  await click(menuItem("Edit recipe on this menu"));
+  await chooseMenuItem("Edit recipe on this menu");
   expect(
     container.querySelector(
       '[data-testid="event-menu-recipe-editor"] [data-testid="event-menu-unit-mismatch"]',
@@ -164,7 +164,7 @@ it("searches the live ingredient catalog, adds the selected amount, and creates 
   const pan = command("useCreateDishContainer");
   await mount(page());
   await openMenu(menuTrigger());
-  await click(menuItem("Edit recipe on this menu"));
+  await chooseMenuItem("Edit recipe on this menu");
   const search = field("eventMenuRecipeCatalogSearch");
   await act(async () => search.focus());
   input("eventMenuRecipeCatalogSearch", "But");
@@ -205,7 +205,7 @@ it("creates and links an ingredient from the always-available inline form withou
   const add = command("useCreateDishIngredient");
   await mount(page());
   await openMenu(menuTrigger());
-  await click(menuItem("Edit recipe on this menu"));
+  await chooseMenuItem("Edit recipe on this menu");
   expect(field("eventMenuRecipeCatalogSearch").value).toBe("");
   await click(button("Create ingredient"));
   input("newIngredientName", "Saffron");

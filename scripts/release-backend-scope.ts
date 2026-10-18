@@ -7,7 +7,11 @@
 //   reason=<changed path>          (up to 10)
 //   verify=<listA,listB>           (new zero-argument list queries; may be empty)
 //
-// The change set is everything since the PREVIOUS [release] commit on main, not
+// The change set is everything since the --since commit. deploy-production.sh
+// passes the sha the LIVE backend reports, so a release after a failed backend
+// deploy still sees that backend's changes (issue #450); it forces "required"
+// itself when the backend reports no known sha. With no --since (default), the
+// change set is everything since the PREVIOUS [release] commit on main, not
 // only the release commit itself: a release of a branch that already landed on
 // main (a GitHub-side merge) is an empty [release] commit, and merges that
 // landed between two releases were never deployed either. No previous release
@@ -122,8 +126,8 @@ ${dirty}`,
   process.exit(2);
 }
 
-// --since <sha>: compare with that commit (the release receipt passes the
-// commit the running backend was deployed from). Default: the last commit
+// --since <sha>: compare with that commit (deploy-production.sh and the
+// release receipt pass the commit the running backend was deployed from). Default: the last commit
 // that was released before this one (first-parent history).
 const sinceIndex = process.argv.indexOf("--since");
 const since = sinceIndex >= 0 ? (process.argv[sinceIndex + 1] ?? "") : null;
