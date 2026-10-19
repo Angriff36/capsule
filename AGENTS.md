@@ -256,9 +256,21 @@ and partners share the same generated command contract — no separate AI API.
 
 ## Merge gate: independent cross-model review required (owner rule, 2026-07-19; cross-model fallback 2026-07-22 — ALL agents: Claude Code, Cursor, Codex, any other)
 
-No PR merges until an AI model that did NOT author the diff reviews and
-APPROVES it. The reviewer must be a different model than the author; a model
-never approves its own diff.
+Decide once, before release, whether the diff needs a review. A review is
+required only when the diff touches: auth, permissions, tenant isolation,
+secrets, or another security boundary; money (pricing, billing, payments,
+taxes, invoice numbers); schema changes, migrations, backfills, destructive or
+irreversible data writes; release, deploy, infrastructure, or production
+config/data; a new or changed public API, event contract, idempotency scheme,
+concurrency-sensitive transaction, or cross-entity lifecycle rule; a broad
+change across subsystems that focused checks cannot prove; or when the owner
+asks for one. No review for: narrow bug fixes with a proven cause, small
+UI/CSS/copy/layout/accessibility fixes, parser/matcher/formatting fixes,
+test-only or docs-only changes, behavior-preserving local refactors, or
+routine CRUD that follows an existing pattern.
+
+When a review is required, no merge until an AI model that did NOT author the
+diff reviews and APPROVES it. A model never approves its own diff.
 
 Primary reviewer — Codex gpt-5.6-sol:
 
@@ -279,10 +291,15 @@ eligible**; the named routes are the preferred defaults:
 - Diff authored by GLM/MiniMax (loop implementers) → Codex primary; either
   Fable 5 or grok as the fallback.
 
-If no eligible reviewer can produce a verdict, treat it as REJECT and
-escalate to the human; never merge unreviewed.
+If a reviewer cannot produce a verdict, try the next eligible reviewer until
+one does; never merge unreviewed.
 
-Whichever model reviews, the prompt MUST include: "Review the changes AND
+Whichever model reviews, the prompt MUST include: "Review only for concrete
+release blockers caused by this diff: regressions, data loss or corruption,
+security or tenant-isolation failures, financial integrity failures, unsafe
+migration/deployment behavior, and direct task violations. Do not block
+release for feature design gaps, adjacent improvements, speculative
+hardening, or hypothetical edge cases." It MUST ALSO include: "Review the changes AND
 ensure they do NOT add tedium for app users via guardrails and policies that
 barely matter — this is a catering app, not a bank. Changes should REDUCE
 user tedium and let users actually use the app instead of being policy-denied
@@ -316,9 +333,12 @@ must be given `DESIGN.md` itself, not just the diff:
 A reviewer that was not given `DESIGN.md` has not reviewed the presentation.
 Treat that verdict as incomplete and re-run the review with the file attached.
 
-Reviewer APPROVE = authorization to merge. Reviewer REJECT = fix or escalate
-to the human; never merge over a rejection. The PR body must name the
-reviewing model and its verdict.
+Reviewer APPROVE = authorization to merge. Reviewer REJECT = fix every
+concrete blocker it names, rerun the focused checks, and review again, round
+after round, until it APPROVES. There is no retry cap and no escalate step
+(Ryan, 2026-09-21). A rejection must name a concrete problem in the changed
+code and a plausible user or production failure. Never merge over a
+rejection. The PR body must name the reviewing model and its verdict.
 
 RYAN_APPROVED 2026-08-01: **Green CI + independent cross-model APPROVE is
 FULL push/merge authorization.** No additional owner sign-off is required to
@@ -437,7 +457,8 @@ build script still deploys both outside self-hosted mode; do not remove it.)
 When the human asks for a MANUAL deploy (no `main` push involved):
 
 1. Backend first, if `convex/` or manifests changed:
-   `bun run manifest:regen` (manifest changes only) → `npx convex deploy -y`
+   `bun run manifest:regen` (manifest changes only) →
+   `npx convex deploy -y --allow-deleting-large-indexes`
    → the production Convex backend (since the 2026-09-14 cutover that is the
    self-hosted instance, not Convex Cloud `impartial-mule-193`). For that
    instance the ONLY path is `scripts/deploy-backend.sh --expect <main sha>` on
